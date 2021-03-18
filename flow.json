@@ -1,0 +1,60 @@
+{
+	"contracts": {
+		"NonFungibleToken": {
+			"source": "./contracts/standard/NonFungibleToken.cdc",
+			"aliases": {
+				"testnet": "0x631e88ae7f1d7c20"
+			}
+		},
+		"FungibleToken": {
+			"source": "./contracts/standard/FungibleToken.cdc",
+			"aliases": {
+				"testnet": "9a0766d93b6608b7",
+				"emulator": "ee82856bf20e2aa6"
+			}
+		},
+		"FlowToken": {
+			"source": "./contracts/standard/FlowToken.cdc",
+			"aliases": {
+				"testnet": "0x7e60df042a9c0868",
+				"emulator": "0x0ae53cb6e3f42a79"
+			}
+		},
+		"FIN": "./contracts/FIN.cdc",
+		"Content" : "./contracts/Content.cdc"
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"NonFungibleToken",
+				"Content",
+				"FIN"
+			]
+		}
+	},
+	"emulators": {
+		"default": {
+			"port": 3569,
+			"serviceAccount": "emulator-account"
+		}
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"keys": "bf9db4706c2fdb9011ee7e170ccac492f05427b96ab41d8bf2d8c58443704b76",
+			"chain": "flow-emulator"
+		}
+	},
+	"networks": {
+		"emulator": {
+			"host": "127.0.0.1:3569",
+			"serviceAccount": "emulator-account",
+			"chain" : "flow-emulator"
+		}
+	},
+	"emulatorAccounts" : {
+		"fin" : "01cf0e2f2f715450",
+		"user1" : "179b6b1cb6755e31",
+		"user2" : "f3fcd2c1a78f5eee"
+	}
+}
