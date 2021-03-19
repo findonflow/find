@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bjartek/go-with-the-flow/gwtf"
 )
 
 func tickAndStatus(flow *gwtf.GoWithTheFlow) {
-	flow.TransactionFromFile("status").SignProposeAndPayAsService().StringArgument("D").Run()
 	time.Sleep(10 * time.Second)
+	flow.TransactionFromFile("status").SignProposeAndPayAsService().StringArgument("D").Run()
 }
 
 func main() {
@@ -20,7 +21,16 @@ func main() {
 		RunPrintEventsFull()
 
 	for {
+		fmt.Println("Tick and status")
 		tickAndStatus(flow)
+		fmt.Println("Press 'y' to try to reregister, any other key to wait longer")
+		var char string
+		fmt.Scanln(&char)
+		if char == "y" {
+			break
+		}
 	}
+
+	flow.TransactionFromFile("reregister").SignProposeAndPayAs("user1").StringArgument("D").Run()
 
 }

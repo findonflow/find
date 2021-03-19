@@ -192,8 +192,6 @@ pub contract FIN {
 
         pub fun register(tag: String, vault: @FungibleToken.Vault, profile: Capability<&{PublicIdentity}>) {
   
-            //TODO: If register is called with the same profile that is LOCKED it should be reopened
-            //SO if the owner of the capability is the same as the one that is locked
             let status=self.status(tag)
             if status == LeaseStatus.TAKEN {
                 panic("Tag already registered")
@@ -202,12 +200,12 @@ pub contract FIN {
             let registrant= profile.borrow()!.owner!.address
             //if we have a locked profile that is not owned by the same identity then panic
             if status == LeaseStatus.LOCKED && self.profiles[tag]!.address != registrant {
-                    panic("Tag is locked")
+                panic("Tag is locked")
             }
             
             let cost= self.calculateCost(tag)
             if vault.balance != cost {
-                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of flow"))
+                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of flow"))
             }
             self.wallet.borrow()!.deposit(from: <- vault)
 
