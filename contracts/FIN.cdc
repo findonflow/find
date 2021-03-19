@@ -226,26 +226,39 @@ pub contract FIN {
 
         pub fun status(_ tag: String): LeaseStatus {
             let currentTime=getCurrentBlock().timestamp
+            log("Check status at time=".concat(currentTime.toString()))
             if let  lease= self.profiles[tag] {
+                let owner=lease.profile.borrow()!.owner!.address
+                log("lease time is=".concat(lease.time.toString()))
+                let diff= Int64(lease.time) - Int64(currentTime)
+                log("time diff is=".concat(diff.toString()))
+                log("lease status was=".concat(lease.status.rawValue.toString()))
                 if currentTime <= lease.time {
+                    log("Still valid")
                     return lease.status
                 }
 
                 if lease.status == LeaseStatus.LOCKED {
                     self.profiles.remove(key: tag)
-                    self.addresses.remove(key: lease.profile.borrow()!.owner!.address)
+                    self.addresses.remove(key: owner)
+                    log("was locked that is expired")
                     return LeaseStatus.FREE
                 }
 
                 if lease.status == LeaseStatus.TAKEN {
                     lease.status= LeaseStatus.LOCKED
-                    //consider this beeing lease.time instead of currentTime
+                    log("lock period is")
+                    log(self.lockPeriod)
                     lease.time = currentTime + self.lockPeriod
-                    //TODO: Do i need to do this?
-                    //self.profiles[tag] = lease
+                    self.profiles[tag] = lease
+                    self.addresses[owner] = lease
+                    log("was taken is now locked")
+                    log(lease.time)
+                    log(lease.status)
                 }
                 return lease.status
             }
+            log("FREE")
             return LeaseStatus.FREE
         }
 
