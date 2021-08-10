@@ -18,6 +18,7 @@ Right now an Identity in FIN is a single user.  It uses the Versus profile to re
  - specify royalty to FIN when creating network
  - specify prices for differnt letters when creting network
  - allow admin to create tokens that are shorter then 3 <3
+ - auctions of tokens?
 
 
 # Flow Identity and the Flow Identity Network
