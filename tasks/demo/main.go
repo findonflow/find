@@ -52,18 +52,27 @@ func main() {
 
 	g.TransactionFromFile("register").
 		SignProposeAndPayAs("user1").
-		StringArgument("D").
+		StringArgument("user1").
 		RunPrintEventsFull()
 
 	g.TransactionFromFile("mint_fusd").
 		SignProposeAndPayAsService().
 		AccountArgument("user2").
-		UFix64Argument("20.0").
+		UFix64Argument("30.0").
 		RunPrintEventsFull()
 
 	g.TransactionFromFile("send").
 		SignProposeAndPayAs("user2").
-		StringArgument("D").
+		StringArgument("user1").
 		UFix64Argument("13.37").
 		RunPrintEventsFull()
+
+	g.TransactionFromFile("renew").
+		SignProposeAndPayAs("user1").
+		StringArgument("user1").
+		RunPrintEventsFull()
+
+	g.TransactionFromFile("sell").SignProposeAndPayAs("user1").StringArgument("user1").UFix64Argument("10.0").RunPrintEventsFull()
+	g.TransactionFromFile("buy").SignProposeAndPayAs("user2").AccountArgument("user1").StringArgument("user1").UFix64Argument("10.0").RunPrintEventsFull()
+
 }
