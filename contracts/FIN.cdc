@@ -50,6 +50,7 @@ pub contract FIN {
 	pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>) : @LeaseToken{
 		pre {
 			self.networkCap != nil : "Network is not set up"
+			tag.length >= 3 : "A public minted FIN tag has to be minimum 3 letters long"
 		}
 		return <- self.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile)
 	}
@@ -59,11 +60,17 @@ pub contract FIN {
 		pub fun createNetwork(
 			leasePeriod: UFix64, 
 			lockPeriod: UFix64, 
+			secondaryCut: UFix64, 
+			defaultPrice: UFix64, 
+			lengthPrices: {Int:UFix64},
 			wallet:Capability<&{FungibleToken.Receiver}>
 		): @Network {
 			return  <-  create Network(
 				leasePeriod: leasePeriod,
 				lockPeriod: lockPeriod,
+				secondaryCut: secondaryCut, 
+				defaultPrice: defaultPrice, 
+				lengthPrices: lengthPrices,
 				wallet: wallet
 			)
 		}
@@ -95,7 +102,7 @@ pub contract FIN {
 			self.capability = cap
 		}
 
-		pub fun createNetwork( admin: AuthAccount, leasePeriod: UFix64, lockPeriod: UFix64, wallet:Capability<&{FungibleToken.Receiver}>) {
+		pub fun createNetwork( admin: AuthAccount, leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
 
 			pre {
 				self.capability != nil: "Cannot create FIN, capability is not set"
@@ -104,6 +111,9 @@ pub contract FIN {
 			let network <- self.capability!.borrow()!.createNetwork(
 				leasePeriod: leasePeriod,
 				lockPeriod: lockPeriod,
+				secondaryCut:secondaryCut, 
+				defaultPrice:defaultPrice, 
+				lengthPrices:lengthPrices, 
 				wallet: wallet
 			)
 			admin.save(<-network, to: FIN.NetworkStoragePath)
@@ -148,7 +158,7 @@ pub contract FIN {
 	}
 
 	pub struct LeaseForSale{
-	  pub let tag: String
+		pub let tag: String
 		pub let amount: UFix64
 		pub let expireAt: UFix64
 
@@ -164,17 +174,21 @@ pub contract FIN {
 		// NFT is a resource type with an `UInt64` ID field
 		pub var tokens: @{String: FIN.LeaseToken}
 		pub var forSale: {String: UFix64}
+		pub let networkCut: UFix64
+		pub let networkWallet: Capability<&{FungibleToken.Receiver}>
 
-		init () {
+		init (networkCut: UFix64, networkWallet: Capability<&{FungibleToken.Receiver}>) {
 			self.tokens <- {}
 			self.forSale = {}
+			self.networkCut=networkCut
+			self.networkWallet=networkWallet
 		}
 
 		pub fun getForSale() : [LeaseForSale]  {
 
 			var forSales: [LeaseForSale]=[]
 			for tag in self.forSale.keys {
-				let time=self.borrow(tag)!.getLeaseExpireTime()
+				let time=self.borrow(tag).getLeaseExpireTime()
 				let item=LeaseForSale(tag:  tag, amount: self.forSale[tag]!, expireAt: time)
 				forSales.append(item)
 			}
@@ -187,21 +201,26 @@ pub contract FIN {
 				self.forSale.containsKey(tag) : "Invalid tag=".concat(tag)
 				self.forSale[tag]! == vault.balance : "Invalid amount of fusd sent in want=".concat(self.forSale[tag]!.toString()).concat(" got ").concat(vault.balance.toString())
 			}
+
+			let newProfile= getAccount(leases.address).getCapability<&{Profile.Public}>(Profile.publicPath)
+
+			//move the token to the new profile
+			let tokenRef = self.borrow(tag)
+			tokenRef.move(profile: newProfile)
+
+			if self.networkCut != 0.0 {
+				let cutAmount= self.forSale[tag]! * self.networkCut
+				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+			}
+
 			//why not use FIN to send money :P
 			FIN.lookup(tag)!.deposit(from: <- vault)
+			//remove the resource
+			let token <- self.tokens.remove(key: tag)! 
+			self.forSale.remove(key: tag)
 
-     let newProfile= getAccount(leases.address).getCapability<&{Profile.Public}>(Profile.publicPath)
-
-		 //move the token to the new profile
-		 let tokenRef = self.borrow(tag)
-		 tokenRef.move(profile: newProfile)
-
-		 //remove the resource
-		 let token <- self.tokens.remove(key: tag)! 
-		 self.forSale.remove(key: tag)
-
-		 //put it in the collection
-		 leases.borrow()!.deposit(token: <- token)
+			//put it in the collection
+			leases.borrow()!.deposit(token: <- token)
 
 		}
 
@@ -253,7 +272,12 @@ pub contract FIN {
 
 	// public function that anyone can call to create a new empty collection
 	pub fun createEmptyCollection(): @FIN.LeaseCollection {
-		return <- create LeaseCollection()
+		pre {
+			self.networkCap != nil : "Network is not set up"
+		}
+		let network=self.networkCap!.borrow()!
+
+		return <- create LeaseCollection(networkCut:network.secondaryCut, networkWallet: network.wallet)
 	}
 
 	pub struct NetworkLease {
@@ -291,12 +315,18 @@ pub contract FIN {
 		access(contract) let wallet: Capability<&{FungibleToken.Receiver}>
 		access(contract) var leasePeriod: UFix64
 		access(contract) var lockPeriod: UFix64
+		access(contract) var defaultPrice: UFix64
+		access(contract) var secondaryCut: UFix64
+		access(contract) var lengthPrices: {Int: UFix64}
 
 		access(contract) let profiles: { String: NetworkLease}
 
-		init(leasePeriod: UFix64, lockPeriod: UFix64, wallet:Capability<&{FungibleToken.Receiver}>) {
+		init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
 			self.leasePeriod=leasePeriod
 			self.lockPeriod=lockPeriod
+			self.secondaryCut=secondaryCut
+			self.defaultPrice=defaultPrice
+			self.lengthPrices=lengthPrices
 			self.profiles={}
 			self.wallet=wallet
 		}
@@ -437,13 +467,12 @@ pub contract FIN {
 		pub fun calculateCost(_ tag: String) : UFix64 {
 			let length= tag.length
 
-			if length == 3 {
-				return 500.0
-			} else if length == 4 {
-				return 100.0
-			} else   {
-				return 5.0
+			for i in self.lengthPrices.keys {
+				if length==i {
+					return self.lengthPrices[i]!
+				}
 			}
+			return self.defaultPrice
 		}
 
 		pub fun setLeasePeriod(_ period: UFix64)  {
