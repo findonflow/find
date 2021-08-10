@@ -15,9 +15,9 @@ Right now an Identity in FIN is a single user.  It uses the Versus profile to re
 
 ## Plans
 
- - allow admin to create tokens that are shorter then 3 <3
  - auctions of tokens?
  - events
+ - heavily test with gwtf
 
 
 # Flow Identity and the Flow Identity Network
