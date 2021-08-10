@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/bjartek/go-with-the-flow/gwtf"
+	"github.com/bjartek/go-with-the-flow/v2/gwtf"
 	"github.com/onflow/cadence"
 )
 
@@ -29,7 +29,7 @@ func main() {
 		SignProposeAndPayAs("fin").
 		UFix64Argument("60.0"). //duration of a lease, this is for testing
 		UFix64Argument("0.1").  //base cost
-		Argument(cadence.UInt64(6)). //minPrizeLetterStart
+		UInt64Argument(6).
 		RunPrintEventsFull()
 
 	flow.TransactionFromFile("mint_tokens").SignProposeAndPayAsService().AccountArgument("user1").UFix64Argument("100.0").RunPrintEventsFull()

@@ -1,6 +1,6 @@
 
-//emulator
-import FIN from 0xf8d6e0586b0a20c7
+import FIN from "../contracts/FIN.cdc."
+
 transaction(tag: String) {
 
     prepare(account: AuthAccount) {

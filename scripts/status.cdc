@@ -1,7 +1,7 @@
-import FIN from 0xf8d6e0586b0a20c7
+import FIN from "../contracts/FIN.cdc"
 
+//Check the status of a fin user
 pub fun main(tag: String) : UInt8 {
     let status=FIN.status(tag)
-    log(status)
     return status.rawValue
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bjartek/go-with-the-flow/gwtf"
+	"github.com/bjartek/go-with-the-flow/v2/gwtf"
 )
 
 func tickAndStatus(flow *gwtf.GoWithTheFlow) {
