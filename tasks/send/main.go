@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
-	"github.com/onflow/cadence"
 )
 
 //NB! start from root dir with makefile

@@ -15,7 +15,7 @@ transaction(leasePeriod: UFix64) {
 			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
 		}
 
-		let adminClient=account.borrow<&FIN.Admin>(from: FIN.AdminClientStoragePath)!
+		let adminClient=account.borrow<&FIN.AdminProxy>(from: FIN.AdminProxyStoragePath)!
 
 		adminClient.createNetwork(
 			admin: account, 

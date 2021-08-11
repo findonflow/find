@@ -18,11 +18,13 @@ pub contract FIN {
 	pub let NetworkPrivatePath: PrivatePath
 	pub let AdministratorPrivatePath: PrivatePath
 	pub let AdministratorStoragePath: StoragePath
-	pub let AdminClientPublicPath: PublicPath
-	pub let AdminClientStoragePath: StoragePath
+	pub let AdminProxyPublicPath: PublicPath
+	pub let AdminProxyStoragePath: StoragePath
 	pub let LeaseStoragePath: StoragePath
 	pub let LeasePublicPath: PublicPath
 
+
+	//For convenience the contract has a link to the given network so that you can call methods without having to borrow things.
 	access(contract) var networkCap: Capability<&Network>?
 
 
@@ -64,6 +66,8 @@ pub contract FIN {
 		return <- self.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile)
 	}
 
+
+	//An Minter resource that can create a Network
 	pub resource Administrator {
 
 		pub fun createNetwork(
@@ -87,15 +91,18 @@ pub contract FIN {
 	}
 
 
-	pub fun createAdminClient() : @Admin {
-		return <- create Admin()
+	//Admin client to use for capability receiver pattern
+	pub fun createAdminProxyClient() : @AdminProxy {
+		return <- create AdminProxy()
 	}
 
-	pub resource interface AdminClient {
+	//interface to use for capability receiver pattern
+	pub resource interface AdminProxyClient {
 		pub fun addCapability(_ cap: Capability<&Administrator>)
 	}
 
-	pub resource Admin: AdminClient {
+
+	pub resource AdminProxy: AdminProxyClient {
 
 		access(self) var capability: Capability<&Administrator>?
 
@@ -147,7 +154,7 @@ pub contract FIN {
 			network.renew(tag: self.tag, vault:<-  vault) 
 		}
 
-		pub fun move(profile: Capability<&{Profile.Public}>) {
+		access(contract) fun move(profile: Capability<&{Profile.Public}>) {
 			let network= self.networkCap.borrow()!
 			network.move(tag: self.tag, profile: profile)
 		}
@@ -159,6 +166,22 @@ pub contract FIN {
 		}
 	}
 
+	/*
+
+	  Buyer see a tag he wants, 
+		Buyer creates a bid an  sends it to the LeaseCollectionPublic
+		fetch LeaseToken and add bid to it. 
+		calback to the pointer and say bid registred and that it lasts until X time.
+		creates a Pointer to that and sendsd it to bid. 
+		leaseCollectionPublic has a dict of array of bidPointers
+		a Bid is valid if its pointers resolve and it still has enough balance.
+		when updating a bid you send in the new reference again to emit a new event.
+
+
+			
+		}
+
+	*/
 
 	pub resource interface LeaseCollectionPublic {
 		pub fun getTokens(): [String] 
@@ -167,6 +190,7 @@ pub contract FIN {
 		pub fun buy(tag: String, vault: @FUSD.Vault, leases: Capability<&{LeaseCollectionPublic}>) 
 	}
 
+	//might also want to have status here, you should be able to sell a locked token
 	pub struct LeaseForSale{
 		pub let tag: String
 		pub let amount: UFix64
@@ -251,11 +275,16 @@ pub contract FIN {
 			self.forSale.remove(key: tag)
 		}
 
-		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(_ tag: String): @FIN.LeaseToken {
+		pub fun move(tag: String, profile: Capability<&{Profile.Public}>, to: Capability<&{LeaseCollectionPublic}>) {
 			let token <- self.tokens.remove(key:  tag) ?? panic("missing NFT")
-			return <-token
+			if self.forSale.containsKey(tag) {
+				self.forSale.remove(key: tag)
+			}
+			token.move(profile: profile)
+			to.borrow()!.deposit(token: <- token)
+
 		}
+
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
@@ -278,6 +307,7 @@ pub contract FIN {
 		}
 
 		destroy() {
+			//should really deregister tokens in the Network?
 			destroy self.tokens
 		}
 	}
@@ -506,8 +536,8 @@ pub contract FIN {
 		self.NetworkStoragePath= /storage/FIN
 		self.AdministratorStoragePath=/storage/finAdmin
 		self.AdministratorPrivatePath=/private/finAdmin
-		self.AdminClientPublicPath= /public/finAdminClient
-		self.AdminClientStoragePath=/storage/finAdminClient
+		self.AdminProxyPublicPath= /public/finAdminProxy
+		self.AdminProxyStoragePath=/storage/finAdminProxy
 		self.LeasePublicPath=/public/finLeases
 		self.LeaseStoragePath=/storage/finLeases
 		self.account.save(<- create Administrator(), to: self.AdministratorStoragePath)
