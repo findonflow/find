@@ -16,7 +16,6 @@ Right now an Identity in FIN is a single user.  It uses the Versus profile to re
 ## Plans
 
  - auctions of tokens?
- - events
  - heavily test with gwtf
 
 

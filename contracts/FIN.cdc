@@ -5,6 +5,15 @@ import Profile from "./Profile.cdc"
 
 pub contract FIN {
 
+	//event that is emited when a tag is registered or renewed
+	pub event Register(tag: String, owner: Address, expireAt: UFix64)
+
+	//event that is emitted when a tag is moved
+	pub event Moved(tag: String, previousOwner: Address, newOwner: Address, expireAt: UFix64)
+
+	//event that is emitted when a tag is sold
+	pub event Sold(tag: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
+
 	pub let NetworkStoragePath: StoragePath
 	pub let NetworkPrivatePath: PrivatePath
 	pub let AdministratorPrivatePath: PrivatePath
@@ -143,9 +152,10 @@ pub contract FIN {
 			network.move(tag: self.tag, profile: profile)
 		}
 
+
+
 		pub fun getLeaseExpireTime() : UFix64 {
 			return self.networkCap.borrow()!.getLeaseExpireTime(self.tag)
-
 		}
 	}
 
@@ -204,8 +214,10 @@ pub contract FIN {
 
 			let newProfile= getAccount(leases.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 
+
 			//move the token to the new profile
 			let tokenRef = self.borrow(tag)
+			emit Sold(tag: tag, previousOwner:tokenRef.owner!.address, newOwner: newProfile.address, expireAt: tokenRef.getLeaseExpireTime(), amount: vault.balance)
 			tokenRef.move(profile: newProfile)
 
 			if self.networkCut != 0.0 {
@@ -358,6 +370,7 @@ pub contract FIN {
 					tag: tag
 				)
 
+				emit Register(tag: tag, owner:lease.profile.address, expireAt: lease.time)
 				self.profiles[tag] =  lease
 				return
 			}
@@ -374,6 +387,7 @@ pub contract FIN {
 
 		access(contract) fun move(tag: String, profile: Capability<&{Profile.Public}>) {
 			if let lease= self.profiles[tag] {
+				emit Moved(tag: tag, previousOwner: lease.profile.address, newOwner: profile.address, expireAt: lease.time)
 				lease.profile=profile
 				self.profiles[tag] =  lease
 				return
@@ -385,7 +399,7 @@ pub contract FIN {
 
 			let status=self.status(tag)
 			if status == LeaseStatus.TAKEN {
-				panic("Tag already registered")
+				panic("Tag already registered, if you want to renew lease use you LeaseToken")
 			}
 
 			let registrant= profile.address
@@ -409,9 +423,11 @@ pub contract FIN {
 				tag: tag
 			)
 
+			emit Register(tag: tag, owner:profile.address, expireAt: lease.time)
 			self.profiles[tag] =  lease
 			return <- create LeaseToken(tag: tag, networkCap: FIN.networkCap!)
 		}
+
 
 		pub fun status(_ tag: String): LeaseStatus {
 			let currentTime=getCurrentBlock().timestamp
