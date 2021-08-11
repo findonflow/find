@@ -1,5 +1,5 @@
 
-import FIN from "../contracts/FIN.cdc."
+import FIN from "../contracts/FIN.cdc"
 
 transaction(tag: String) {
 

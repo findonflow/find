@@ -18,3 +18,8 @@ deploy:
 .PHONY: emulator
 emulator:
 	flow project start-emulator -v
+
+
+.phony: test
+test:
+	go test fin_test.go
