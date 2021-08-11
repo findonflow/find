@@ -24,6 +24,8 @@ pub contract FIN {
 	//event that is emitted when a tag is sold
 	pub event Sold(tag: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
 
+	pub event ForSale(tag: String, owner: Address, expireAt: UFix64, amount: UFix64, active: Bool)
+
 	pub let NetworkStoragePath: StoragePath
 	pub let NetworkPrivatePath: PrivatePath
 	pub let AdministratorPrivatePath: PrivatePath
@@ -79,8 +81,8 @@ pub contract FIN {
 
 	/*
 
-		LeaseToken is a resource you get back when you register a lease. 
-		You can use methods on it to renew the lease or to move to another profile
+	LeaseToken is a resource you get back when you register a lease. 
+	You can use methods on it to renew the lease or to move to another profile
 	*/
 	pub resource LeaseToken {
 		pub let tag: String
@@ -104,29 +106,32 @@ pub contract FIN {
 		pub fun getLeaseExpireTime() : UFix64 {
 			return self.networkCap.borrow()!.getLeaseExpireTime(self.tag)
 		}
+
+		pub fun getLeaseStatus() : LeaseStatus {
+			return self.networkCap.borrow()!.getLeaseStatus(self.tag)
+		}
 	}
 
 	/*
 
-	  Buyer see a tag he wants, 
-		Buyer creates a bid an  sends it to the LeaseCollectionPublic
-		fetch LeaseToken and add bid to it. 
-		calback to the pointer and say bid registred and that it lasts until X time.
-		creates a Pointer to that and sendsd it to bid. 
-		leaseCollectionPublic has a dict of array of bidPointers
-		a Bid is valid if its pointers resolve and it still has enough balance.
-		when updating a bid you send in the new reference again to emit a new event.
+	Buyer see a tag he wants, 
+	Buyer creates a bid an  sends it to the LeaseCollectionPublic
+	fetch LeaseToken and add bid to it. 
+	calback to the pointer and say bid registred and that it lasts until X time.
+	creates a Pointer to that and sendsd it to bid. 
+	leaseCollectionPublic has a dict of array of bidPointers
+	a Bid is valid if its pointers resolve and it still has enough balance.
+	when updating a bid you send in the new reference again to emit a new event.
 
 
-			
-		}
+
 
 	*/
 
 	/*
 
-	 Since a single account can own more then one tag there is a collecition of them
-	 This collection has build in support for direct sale of a FIN leaseToken. The network owner till take 2.5% cut
+	Since a single account can own more then one tag there is a collecition of them
+	This collection has build in support for direct sale of a FIN leaseToken. The network owner till take 2.5% cut
 	*/
 	pub resource interface LeaseCollectionPublic {
 		//fetch all the tokens in the collection
@@ -140,16 +145,17 @@ pub contract FIN {
 		pub fun buy(tag: String, vault: @FUSD.Vault, leases: Capability<&{LeaseCollectionPublic}>) 
 	}
 
-	//might also want to have status here, you should be able to sell a locked token
 	pub struct LeaseForSale{
 		pub let tag: String
 		pub let amount: UFix64
 		pub let expireAt: UFix64
+		pub let status: LeaseStatus
 
-		init(tag: String, amount:UFix64, expireAt:UFix64) {
+		init(tag: String, amount:UFix64, expireAt:UFix64, status: LeaseStatus) {
 			self.tag=tag
 			self.amount=amount
 			self.expireAt=expireAt
+			self.status=status
 		}
 	}
 
@@ -179,8 +185,8 @@ pub contract FIN {
 		pub fun getForSale() : [LeaseForSale]  {
 			var forSales: [LeaseForSale]=[]
 			for tag in self.forSale.keys {
-				let time=self.borrow(tag).getLeaseExpireTime()
-				let item=LeaseForSale(tag:  tag, amount: self.forSale[tag]!, expireAt: time)
+				let token=self.borrow(tag)
+				let item=LeaseForSale(tag:  tag, amount: self.forSale[tag]!, expireAt: token.getLeaseExpireTime(), status: token.getLeaseStatus())
 				forSales.append(item)
 			}
 			return forSales
@@ -221,6 +227,9 @@ pub contract FIN {
 			pre {
 				self.tokens.containsKey(tag) : "Cannot list tag for sale that is not registered to you tag=".concat(tag)
 			}
+
+			let tokenRef = self.borrow(tag)
+			emit ForSale(tag: tag, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: amount, active: true)
 			self.forSale[tag] = amount
 
 		}
@@ -229,6 +238,9 @@ pub contract FIN {
 			pre {
 				self.tokens.containsKey(tag) : "Cannot list tag for sale that is not registered to you tag=".concat(tag)
 			}
+
+			let tokenRef = self.borrow(tag)
+			emit ForSale(tag: tag, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: self.forSale[tag]!, active: false)
 			self.forSale.remove(key: tag)
 		}
 
@@ -370,6 +382,13 @@ pub contract FIN {
 			panic("Could not find profile with tag=".concat(tag))
 		}
 
+		access(contract) fun getLeaseStatus(_ tag: String) : LeaseStatus{
+			if let lease= self.profiles[tag] {
+				return lease.status
+			}
+			panic("Could not find profile with tag=".concat(tag))
+		}
+
 
 		access(contract) fun move(tag: String, profile: Capability<&{Profile.Public}>) {
 			if let lease= self.profiles[tag] {
@@ -463,9 +482,6 @@ pub contract FIN {
 			return nil
 		}
 
-		/*
-		Do we want to be able to set the parameters?
-		*/
 		pub fun calculateCost(_ tag: String) : UFix64 {
 			let length= tag.length
 
@@ -475,6 +491,14 @@ pub contract FIN {
 				}
 			}
 			return self.defaultPrice
+		}
+
+		pub fun setLengthPrices(_ lengthPrices: {Int: UFix64}) {
+			self.lengthPrices=lengthPrices
+		}
+
+		pub fun setDefaultPrice(_ price: UFix64) {
+			self.defaultPrice=price
 		}
 
 		pub fun setLeasePeriod(_ period: UFix64)  {
@@ -559,8 +583,6 @@ pub contract FIN {
 			FIN.networkCap= admin.getCapability<&Network>(FIN.NetworkPrivatePath)
 		}
 	}
-
-
 
 	init() {
 		self.NetworkPrivatePath= /private/FIN
