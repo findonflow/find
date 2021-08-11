@@ -13,7 +13,7 @@ transaction(from: Address, tag: String, amount: UFix64) {
 		let payVault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
 		
 
-		let finLeases <- FIN.createEmptyCollection()
+		let finLeases <- FIN.createEmptyLeaseCollection()
 		acct.save(<- finLeases, to: FIN.LeaseStoragePath)
 		acct.link<&{FIN.LeaseCollectionPublic}>( FIN.LeasePublicPath, target: FIN.LeaseStoragePath)
 

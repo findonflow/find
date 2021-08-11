@@ -3,6 +3,16 @@ import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 
+/*
+
+Flow Identity Network. 
+
+A naming service flow flow, 
+
+3 token tag cost 500 FUSD a year
+4 token tag cost 100 FUSD a year
+5 or more token tag cost 5 FUSD a year
+*/
 pub contract FIN {
 
 	//event that is emited when a tag is registered or renewed
@@ -58,88 +68,20 @@ pub contract FIN {
 		return self.networkCap!.borrow()!.status(tag)
 	}
 
-	pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>) : @LeaseToken{
+	pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
 		pre {
 			self.networkCap != nil : "Network is not set up"
 			tag.length >= 3 : "A public minted FIN tag has to be minimum 3 letters long"
 		}
-		return <- self.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile)
+		self.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile, leases: leases)
 	}
 
 
-	//An Minter resource that can create a Network
-	pub resource Administrator {
+	/*
 
-		pub fun createNetwork(
-			leasePeriod: UFix64, 
-			lockPeriod: UFix64, 
-			secondaryCut: UFix64, 
-			defaultPrice: UFix64, 
-			lengthPrices: {Int:UFix64},
-			wallet:Capability<&{FungibleToken.Receiver}>
-		): @Network {
-			return  <-  create Network(
-				leasePeriod: leasePeriod,
-				lockPeriod: lockPeriod,
-				secondaryCut: secondaryCut, 
-				defaultPrice: defaultPrice, 
-				lengthPrices: lengthPrices,
-				wallet: wallet
-			)
-		}
-
-	}
-
-
-	//Admin client to use for capability receiver pattern
-	pub fun createAdminProxyClient() : @AdminProxy {
-		return <- create AdminProxy()
-	}
-
-	//interface to use for capability receiver pattern
-	pub resource interface AdminProxyClient {
-		pub fun addCapability(_ cap: Capability<&Administrator>)
-	}
-
-
-	pub resource AdminProxy: AdminProxyClient {
-
-		access(self) var capability: Capability<&Administrator>?
-
-		init() {
-			self.capability = nil
-		}
-
-		pub fun addCapability(_ cap: Capability<&Administrator>) {
-			pre {
-				cap.check() : "Invalid server capablity"
-				self.capability == nil : "Server already set"
-			}
-			self.capability = cap
-		}
-
-		pub fun createNetwork( admin: AuthAccount, leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
-
-			pre {
-				self.capability != nil: "Cannot create FIN, capability is not set"
-			}
-
-			let network <- self.capability!.borrow()!.createNetwork(
-				leasePeriod: leasePeriod,
-				lockPeriod: lockPeriod,
-				secondaryCut:secondaryCut, 
-				defaultPrice:defaultPrice, 
-				lengthPrices:lengthPrices, 
-				wallet: wallet
-			)
-			admin.save(<-network, to: FIN.NetworkStoragePath)
-			admin.link<&Network>( FIN.NetworkPrivatePath, target: FIN.NetworkStoragePath)
-			FIN.networkCap= admin.getCapability<&Network>(FIN.NetworkPrivatePath)
-		}
-	}
-
-
-
+		LeaseToken is a resource you get back when you register a lease. 
+		You can use methods on it to renew the lease or to move to another profile
+	*/
 	pub resource LeaseToken {
 		pub let tag: String
 		pub let networkCap: Capability<&Network> //Does this have to be an interface?
@@ -158,8 +100,6 @@ pub contract FIN {
 			let network= self.networkCap.borrow()!
 			network.move(tag: self.tag, profile: profile)
 		}
-
-
 
 		pub fun getLeaseExpireTime() : UFix64 {
 			return self.networkCap.borrow()!.getLeaseExpireTime(self.tag)
@@ -183,10 +123,20 @@ pub contract FIN {
 
 	*/
 
+	/*
+
+	 Since a single account can own more then one tag there is a collecition of them
+	 This collection has build in support for direct sale of a FIN leaseToken. The network owner till take 2.5% cut
+	*/
 	pub resource interface LeaseCollectionPublic {
+		//fetch all the tokens in the collection
 		pub fun getTokens(): [String] 
+		//fetch all tags that are for sale
 		pub fun getForSale() : [LeaseForSale]
-		pub fun deposit(token: @FIN.LeaseToken)
+
+		//add a new lease token to the collection, can only be called in this contract
+		access(contract) fun deposit(token: @FIN.LeaseToken)
+		//Buy a token and send it to the sent in leases collection, network will take 2.5% cut
 		pub fun buy(tag: String, vault: @FUSD.Vault, leases: Capability<&{LeaseCollectionPublic}>) 
 	}
 
@@ -207,8 +157,15 @@ pub contract FIN {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var tokens: @{String: FIN.LeaseToken}
+
+		//should maybe consider just putting this inside of LeaseToken 
 		pub var forSale: {String: UFix64}
+
+
+		//the cut the network will take, default 2.5%
 		pub let networkCut: UFix64
+
+		//the wallet of the network to transfer royalty to
 		pub let networkWallet: Capability<&{FungibleToken.Receiver}>
 
 		init (networkCut: UFix64, networkWallet: Capability<&{FungibleToken.Receiver}>) {
@@ -218,8 +175,8 @@ pub contract FIN {
 			self.networkWallet=networkWallet
 		}
 
-		pub fun getForSale() : [LeaseForSale]  {
 
+		pub fun getForSale() : [LeaseForSale]  {
 			var forSales: [LeaseForSale]=[]
 			for tag in self.forSale.keys {
 				let time=self.borrow(tag).getLeaseExpireTime()
@@ -275,20 +232,19 @@ pub contract FIN {
 			self.forSale.remove(key: tag)
 		}
 
+		//note that when moving a tag
 		pub fun move(tag: String, profile: Capability<&{Profile.Public}>, to: Capability<&{LeaseCollectionPublic}>) {
 			let token <- self.tokens.remove(key:  tag) ?? panic("missing NFT")
 			if self.forSale.containsKey(tag) {
 				self.forSale.remove(key: tag)
 			}
+			emit Moved(tag: tag, previousOwner:self.owner!.address, newOwner: profile.address, expireAt: token.getLeaseExpireTime())
 			token.move(profile: profile)
 			to.borrow()!.deposit(token: <- token)
-
 		}
 
-
-		// deposit takes a NFT and adds it to the collections dictionary
-		// and adds the ID to the id array
-		pub fun deposit(token: @FIN.LeaseToken) {
+		//depoit a lease token into the lease collection, not available from the outside
+		access(contract) fun deposit(token: @FIN.LeaseToken) {
 			// add the new token to the dictionary which removes the old one
 			let oldToken <- self.tokens[token.tag] <- token
 
@@ -313,7 +269,7 @@ pub contract FIN {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @FIN.LeaseCollection {
+	pub fun createEmptyLeaseCollection(): @FIN.LeaseCollection {
 		pre {
 			self.networkCap != nil : "Network is not set up"
 		}
@@ -417,7 +373,6 @@ pub contract FIN {
 
 		access(contract) fun move(tag: String, profile: Capability<&{Profile.Public}>) {
 			if let lease= self.profiles[tag] {
-				emit Moved(tag: tag, previousOwner: lease.profile.address, newOwner: profile.address, expireAt: lease.time)
 				lease.profile=profile
 				self.profiles[tag] =  lease
 				return
@@ -425,7 +380,7 @@ pub contract FIN {
 			panic("Could not find profile with tag=".concat(tag))
 		}
 
-		pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>) : @LeaseToken{
+		pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
 			let status=self.status(tag)
 			if status == LeaseStatus.TAKEN {
@@ -455,7 +410,8 @@ pub contract FIN {
 
 			emit Register(tag: tag, owner:profile.address, expireAt: lease.time)
 			self.profiles[tag] =  lease
-			return <- create LeaseToken(tag: tag, networkCap: FIN.networkCap!)
+
+			leases.borrow()!.deposit(token: <- create LeaseToken(tag: tag, networkCap: FIN.networkCap!))
 		}
 
 
@@ -530,6 +486,81 @@ pub contract FIN {
 		}
 
 	}
+
+	// Everything from here downwards is the admin capability receiver pattern
+	//An Minter resource that can create a Network
+	pub resource Administrator {
+
+		pub fun createNetwork(
+			leasePeriod: UFix64, 
+			lockPeriod: UFix64, 
+			secondaryCut: UFix64, 
+			defaultPrice: UFix64, 
+			lengthPrices: {Int:UFix64},
+			wallet:Capability<&{FungibleToken.Receiver}>
+		): @Network {
+			return  <-  create Network(
+				leasePeriod: leasePeriod,
+				lockPeriod: lockPeriod,
+				secondaryCut: secondaryCut, 
+				defaultPrice: defaultPrice, 
+				lengthPrices: lengthPrices,
+				wallet: wallet
+			)
+		}
+
+	}
+
+
+	//Admin client to use for capability receiver pattern
+	pub fun createAdminProxyClient() : @AdminProxy {
+		return <- create AdminProxy()
+	}
+
+	//interface to use for capability receiver pattern
+	pub resource interface AdminProxyClient {
+		pub fun addCapability(_ cap: Capability<&Administrator>)
+	}
+
+
+	pub resource AdminProxy: AdminProxyClient {
+
+		access(self) var capability: Capability<&Administrator>?
+
+		init() {
+			self.capability = nil
+		}
+
+		pub fun addCapability(_ cap: Capability<&Administrator>) {
+			pre {
+				cap.check() : "Invalid server capablity"
+				self.capability == nil : "Server already set"
+			}
+			self.capability = cap
+		}
+
+		pub fun createNetwork( admin: AuthAccount, leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
+
+			pre {
+				self.capability != nil: "Cannot create FIN, capability is not set"
+			}
+
+			let network <- self.capability!.borrow()!.createNetwork(
+				leasePeriod: leasePeriod,
+				lockPeriod: lockPeriod,
+				secondaryCut:secondaryCut, 
+				defaultPrice:defaultPrice, 
+				lengthPrices:lengthPrices, 
+				wallet: wallet
+			)
+			admin.save(<-network, to: FIN.NetworkStoragePath)
+			admin.link<&Network>( FIN.NetworkPrivatePath, target: FIN.NetworkStoragePath)
+			//For convenience in FIN we set the network in the contract itself. So there should really only be a single FIN. Not sure if this is really needed or apropriate.
+			FIN.networkCap= admin.getCapability<&Network>(FIN.NetworkPrivatePath)
+		}
+	}
+
+
 
 	init() {
 		self.NetworkPrivatePath= /private/FIN
