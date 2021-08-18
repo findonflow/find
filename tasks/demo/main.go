@@ -26,6 +26,9 @@ func main() {
 		UFix64Argument("60.0"). //duration of a lease, this is for testing
 		RunPrintEventsFull()
 
+		//we advance the clock
+	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").RunPrintEventsFull()
+
 	tags := cadence.NewArray([]cadence.Value{cadence.String("tag1"), cadence.String("tag2")})
 
 	g.TransactionFromFile("create_profile").
@@ -73,6 +76,24 @@ func main() {
 		RunPrintEventsFull()
 
 	g.TransactionFromFile("sell").SignProposeAndPayAs("user1").StringArgument("user1").UFix64Argument("10.0").RunPrintEventsFull()
-	g.TransactionFromFile("buy").SignProposeAndPayAs("user2").AccountArgument("user1").StringArgument("user1").UFix64Argument("10.0").RunPrintEventsFull()
+
+	g.TransactionFromFile("bid").
+		SignProposeAndPayAs("user2").
+		StringArgument("user1").
+		UFix64Argument("10.0").
+		RunPrintEventsFull()
+
+	g.ScriptFromFile("lease_status").StringArgument("user1").AccountArgument("user1").Run()
+	g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
+
+	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86500.0").RunPrintEventsFull()
+
+	g.TransactionFromFile("fullfill").
+		SignProposeAndPayAs("user1").
+		StringArgument("user1").
+		RunPrintEventsFull()
+
+	g.ScriptFromFile("lease_status").StringArgument("user1").AccountArgument("user1").Run()
+	g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
 
 }

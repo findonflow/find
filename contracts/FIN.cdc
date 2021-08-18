@@ -5,15 +5,17 @@ import Profile from "./Profile.cdc"
 
 /*
 
-Flow Identity Network. 
+FNS
 
-A naming service flow flow, 
+A naming service flow flow,
 
 3 token tag cost 500 FUSD a year
 4 token tag cost 100 FUSD a year
 5 or more token tag cost 5 FUSD a year
 */
 pub contract FIN {
+
+
 
 	//event that is emited when a tag is registered or renewed
 	pub event Register(tag: String, owner: Address, expireAt: UFix64)
@@ -26,6 +28,12 @@ pub contract FIN {
 
 	pub event ForSale(tag: String, owner: Address, expireAt: UFix64, amount: UFix64, active: Bool)
 
+	pub event BlindBid(tag: String, bidder: Address, amount: UFix64)
+	pub event AuctionBid(tag: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
+
+	pub let BidPublicPath: PublicPath
+	pub let BidPrivatePath: PrivatePath
+	pub let BidStoragePath: StoragePath
 	pub let NetworkStoragePath: StoragePath
 	pub let NetworkPrivatePath: PrivatePath
 	pub let AdministratorPrivatePath: PrivatePath
@@ -35,6 +43,9 @@ pub contract FIN {
 	pub let LeaseStoragePath: StoragePath
 	pub let LeasePublicPath: PublicPath
 
+	access(account) var fakeClock:UFix64?
+
+	access(contract) var bidTotalSupply: UInt64
 
 	//For convenience the contract has a link to the given network so that you can call methods without having to borrow things.
 	access(contract) var networkCap: Capability<&Network>?
@@ -81,21 +92,33 @@ pub contract FIN {
 
 	/*
 
-	LeaseToken is a resource you get back when you register a lease. 
+	LeaseToken is a resource you get back when you register a lease.
 	You can use methods on it to renew the lease or to move to another profile
 	*/
 	pub resource LeaseToken {
-		pub let tag: String
-		pub let networkCap: Capability<&Network> //Does this have to be an interface?
+		access(contract) let tag: String
+		access(contract) let networkCap: Capability<&Network> //Does this have to be an interface?
+		access(contract) var salePrice: UFix64?
+		access(contract) var  bid: LeaseBid?
 
 		init(tag:String, networkCap: Capability<&Network>) {
 			self.tag=tag
 			self.networkCap= networkCap
+			self.salePrice=0.0
+			self.bid=nil
+		}
+
+		pub fun setSalePrice(_ price: UFix64?) {
+			self.salePrice=price
+		}
+
+		pub fun setBid(_ bid: LeaseBid) {
+			self.bid=bid
 		}
 
 		pub fun extendLease(_ vault: @FUSD.Vault) {
 			let network= self.networkCap.borrow()!
-			network.renew(tag: self.tag, vault:<-  vault) 
+			network.renew(tag: self.tag, vault:<-  vault)
 		}
 
 		access(contract) fun move(profile: Capability<&{Profile.Public}>) {
@@ -112,114 +135,194 @@ pub contract FIN {
 		}
 	}
 
+	/* An Auction for a lease */
+	pub resource Auction {
+		access(contract) var endsAt: UFix64
+		access(contract) var startedAt: UFix64
+		access(contract) let extendOnLateBid: UFix64
+		access(contract) var bid: LeaseBid
+
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, bid: LeaseBid) {
+			self.endsAt=endsAt
+			self.startedAt=startedAt
+			self.extendOnLateBid=extendOnLateBid
+			self.bid= bid
+		}
+
+		pub fun addBid(bid: LeaseBid, timestamp: UFix64) {
+			if bid.balance() <= self.bid.balance() {
+				panic("bid must be larger then previous bid")
+			}
+			//TODO: cancel current bid
+			self.bid=bid
+			let suggestedEndTime=timestamp+self.extendOnLateBid
+			if suggestedEndTime > self.endsAt {
+				//EMIT EVENT
+				self.endsAt=suggestedEndTime
+			}
+		}
+	}
+
+	pub struct LeaseInformation {
+		pub let tag: String
+		pub let status: LeaseStatus
+		pub let expireTime: UFix64
+		pub let latestBid: UFix64?
+		pub let auctionEnds: UFix64?
+		pub let salePrice: UFix64?
+		pub let latestBidBy: Address?
+
+		init(tag: String, status:LeaseStatus, expireTime: UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?) {
+
+			self.tag=tag
+			self.status=status
+			self.expireTime=expireTime
+			self.latestBid=latestBid
+			self.latestBidBy=latestBidBy
+			self.auctionEnds=auctionEnds
+			self.salePrice=salePrice
+		}
+
+	}
 	/*
-
-	Buyer see a tag he wants, 
-	Buyer creates a bid an  sends it to the LeaseCollectionPublic
-	fetch LeaseToken and add bid to it. 
-	calback to the pointer and say bid registred and that it lasts until X time.
-	creates a Pointer to that and sendsd it to bid. 
-	leaseCollectionPublic has a dict of array of bidPointers
-	a Bid is valid if its pointers resolve and it still has enough balance.
-	when updating a bid you send in the new reference again to emit a new event.
-
-
-
-
-	*/
-
-	/*
-
 	Since a single account can own more then one tag there is a collecition of them
 	This collection has build in support for direct sale of a FIN leaseToken. The network owner till take 2.5% cut
 	*/
 	pub resource interface LeaseCollectionPublic {
 		//fetch all the tokens in the collection
-		pub fun getTokens(): [String] 
+		pub fun getTokens(): [String]
 		//fetch all tags that are for sale
-		pub fun getForSale() : [LeaseForSale]
+		pub fun getLeaseInformation() : [LeaseInformation]
+		pub fun getLease(_ tag: String) :LeaseInformation?
 
 		//add a new lease token to the collection, can only be called in this contract
 		access(contract) fun deposit(token: @FIN.LeaseToken)
-		//Buy a token and send it to the sent in leases collection, network will take 2.5% cut
-		pub fun buy(tag: String, vault: @FUSD.Vault, leases: Capability<&{LeaseCollectionPublic}>) 
+
+		//place a bid on a token
+		access(contract) fun bid(tag: String, bid: LeaseBid)
 	}
 
-	pub struct LeaseForSale{
-		pub let tag: String
-		pub let amount: UFix64
-		pub let expireAt: UFix64
-		pub let status: LeaseStatus
-
-		init(tag: String, amount:UFix64, expireAt:UFix64, status: LeaseStatus) {
-			self.tag=tag
-			self.amount=amount
-			self.expireAt=expireAt
-			self.status=status
-		}
-	}
 
 	pub resource LeaseCollection: LeaseCollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var tokens: @{String: FIN.LeaseToken}
+		access(contract) var tokens: @{String: FIN.LeaseToken}
 
-		//should maybe consider just putting this inside of LeaseToken 
-		pub var forSale: {String: UFix64}
-
+		access(contract) var auctions: @{String: Auction}
 
 		//the cut the network will take, default 2.5%
-		pub let networkCut: UFix64
+		access(contract) let networkCut: UFix64
 
 		//the wallet of the network to transfer royalty to
-		pub let networkWallet: Capability<&{FungibleToken.Receiver}>
+		access(contract) let networkWallet: Capability<&{FungibleToken.Receiver}>
 
 		init (networkCut: UFix64, networkWallet: Capability<&{FungibleToken.Receiver}>) {
 			self.tokens <- {}
-			self.forSale = {}
+			self.auctions <- {}
 			self.networkCut=networkCut
 			self.networkWallet=networkWallet
 		}
 
-
-		pub fun getForSale() : [LeaseForSale]  {
-			var forSales: [LeaseForSale]=[]
-			for tag in self.forSale.keys {
-				let token=self.borrow(tag)
-				let item=LeaseForSale(tag:  tag, amount: self.forSale[tag]!, expireAt: token.getLeaseExpireTime(), status: token.getLeaseStatus())
-				forSales.append(item)
+		pub fun getLease(_ tag: String) : LeaseInformation? {
+			if !self.tokens.containsKey(tag) {
+				return nil 
 			}
-			return forSales
+			let token=self.borrow(tag)
+
+			var latestBid: UFix64? = nil
+			var auctionEnds: UFix64?= nil
+
+			if self.auctions.containsKey(tag) {
+				let auction = self.borrowAuction(tag)
+				auctionEnds= auction.endsAt
+				latestBid= auction.bid.balance()
+			} else {
+				latestBid= token.bid?.balance()
+			}
+
+			return LeaseInformation(tag:  tag, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: token.bid?.balance(), auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: token.bid?.capability?.address)
+
 		}
 
-		pub fun buy(tag: String, vault: @FUSD.Vault, leases: Capability<&{LeaseCollectionPublic}>)  {
+		pub fun getLeaseInformation() : [LeaseInformation]  {
+			var info: [LeaseInformation]=[]
+			for tag in self.tokens.keys {
+				info.append(self.getLease(tag)!)
+			}
+			return info
+		}
+
+		//call this to start an auction for this lease
+		pub fun startAuction(_ tag: String) {
+			let timestamp=FIN.time()
+			let duration=86400.0
+			let lease = self.borrow(tag)
+			if lease.bid == nil {
+				panic("cannot start an auction on a tag without a bid, set salePrice")
+			}
+			let oldAuction <- self.auctions[tag] <- create Auction(endsAt: timestamp + duration, startedAt: timestamp, extendOnLateBid: 300.0, bid: lease.bid!)
+			//TODO: Emit event
+			destroy oldAuction
+		}
+
+
+		pub fun bid(tag: String, bid: LeaseBid) {
 			pre {
 				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
-				self.forSale.containsKey(tag) : "Invalid tag=".concat(tag)
-				self.forSale[tag]! == vault.balance : "Invalid amount of fusd sent in want=".concat(self.forSale[tag]!.toString()).concat(" got ").concat(vault.balance.toString())
 			}
 
-			let newProfile= getAccount(leases.address).getCapability<&{Profile.Public}>(Profile.publicPath)
+			let timestamp=FIN.time()
+			let lease = self.borrow(tag)
+			if self.auctions.containsKey(tag) {
+				let auction = self.borrowAuction(tag)
+				if auction.endsAt < timestamp {
+					panic("Auction has ended")
+				}
+				auction.addBid(bid:bid, timestamp:timestamp)
+				return
+			} 
 
+			//cancel the previous bid if there is a new one?
+			lease.setBid(bid)
 
+			if lease.salePrice == nil {
+				return
+			}
+
+			if lease.salePrice!  <= bid.balance() {
+				self.startAuction(tag)
+			}
+
+		}
+
+		pub fun fullfill(tag: String) {
+			pre {
+				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
+				self.auctions.containsKey(tag) : "Tag is not for auction tag=".concat(tag)
+//				self.borrowAuction(tag).endsAt > FIN.time() : "Auction has not ended yet"
+			}
+
+			let oldProfile=FIN.lookup(tag)!
+
+			let auction = self.borrowAuction(tag)
+
+			let newProfile= getAccount(auction.bid.capability.address).getCapability<&{Profile.Public}>(Profile.publicPath)
+
+			let soldFor=auction.bid.balance()
 			//move the token to the new profile
 			let tokenRef = self.borrow(tag)
-			emit Sold(tag: tag, previousOwner:tokenRef.owner!.address, newOwner: newProfile.address, expireAt: tokenRef.getLeaseExpireTime(), amount: vault.balance)
+			emit Sold(tag: tag, previousOwner:tokenRef.owner!.address, newOwner: newProfile.address, expireAt: tokenRef.getLeaseExpireTime(), amount: soldFor)
 			tokenRef.move(profile: newProfile)
 
+			let token <- self.tokens.remove(key: tag)!
+			let vault <- auction.bid.fullfill(<- token)
 			if self.networkCut != 0.0 {
-				let cutAmount= self.forSale[tag]! * self.networkCut
+				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 
 			//why not use FIN to send money :P
-			FIN.lookup(tag)!.deposit(from: <- vault)
-			//remove the resource
-			let token <- self.tokens.remove(key: tag)! 
-			self.forSale.remove(key: tag)
-
-			//put it in the collection
-			leases.borrow()!.deposit(token: <- token)
+			oldProfile.deposit(from: <- vault)
 
 		}
 
@@ -230,7 +333,7 @@ pub contract FIN {
 
 			let tokenRef = self.borrow(tag)
 			emit ForSale(tag: tag, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: amount, active: true)
-			self.forSale[tag] = amount
+			tokenRef.setSalePrice(amount)
 
 		}
 
@@ -240,16 +343,13 @@ pub contract FIN {
 			}
 
 			let tokenRef = self.borrow(tag)
-			emit ForSale(tag: tag, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: self.forSale[tag]!, active: false)
-			self.forSale.remove(key: tag)
+			emit ForSale(tag: tag, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: tokenRef.salePrice!, active: false)
+			tokenRef.setSalePrice(nil)
 		}
 
 		//note that when moving a tag
 		pub fun move(tag: String, profile: Capability<&{Profile.Public}>, to: Capability<&{LeaseCollectionPublic}>) {
 			let token <- self.tokens.remove(key:  tag) ?? panic("missing NFT")
-			if self.forSale.containsKey(tag) {
-				self.forSale.remove(key: tag)
-			}
 			emit Moved(tag: tag, previousOwner:self.owner!.address, newOwner: profile.address, expireAt: token.getLeaseExpireTime())
 			token.move(profile: profile)
 			to.borrow()!.deposit(token: <- token)
@@ -274,9 +374,14 @@ pub contract FIN {
 			return &self.tokens[tag] as &FIN.LeaseToken
 		}
 
+		pub fun borrowAuction(_ tag: String): &FIN.Auction {
+			return &self.auctions[tag] as &FIN.Auction
+		}
+
 		destroy() {
 			//should really deregister tokens in the Network?
 			destroy self.tokens
+			destroy self.auctions
 		}
 	}
 
@@ -310,7 +415,7 @@ pub contract FIN {
 	/*
 	FREE, does not exist in profiles dictionary
 	TAKEN, registered with a time that is currentTime + leasePeriod
-	LOCKED, after TAKEN.time you will get a new  status and the new time will be 
+	LOCKED, after TAKEN.time you will get a new  status and the new time will be
 
 	*/
 
@@ -350,8 +455,8 @@ pub contract FIN {
 				if status == LeaseStatus.TAKEN {
 					newTime= lease.time + self.leasePeriod
 				} else {
-					let block=getCurrentBlock()
-					newTime = block.timestamp + self.leasePeriod
+					let time=FIN.time()
+					newTime = time + self.leasePeriod
 				}
 
 				let cost= self.calculateCost(tag)
@@ -393,7 +498,7 @@ pub contract FIN {
 		access(contract) fun move(tag: String, profile: Capability<&{Profile.Public}>) {
 			if let lease= self.profiles[tag] {
 				lease.profile=profile
-				self.profiles[tag] =  lease
+				self.profiles[tag] = lease
 				return
 			}
 			panic("Could not find profile with tag=".concat(tag))
@@ -418,11 +523,9 @@ pub contract FIN {
 			}
 			self.wallet.borrow()!.deposit(from: <- vault)
 
-			let block=getCurrentBlock()
-
 			let lease= NetworkLease(
 				status: LeaseStatus.TAKEN,
-				time:block.timestamp + self.leasePeriod,
+				time:FIN.time() + self.leasePeriod,
 				profile: profile,
 				tag: tag
 			)
@@ -435,7 +538,7 @@ pub contract FIN {
 
 
 		pub fun status(_ tag: String): LeaseStatus {
-			let currentTime=getCurrentBlock().timestamp
+			let currentTime=FIN.time()
 			log("Check status at time=".concat(currentTime.toString()))
 			if let  lease= self.profiles[tag] {
 				let owner=lease.profile.borrow()!.owner!.address
@@ -516,18 +619,18 @@ pub contract FIN {
 	pub resource Administrator {
 
 		pub fun createNetwork(
-			leasePeriod: UFix64, 
-			lockPeriod: UFix64, 
-			secondaryCut: UFix64, 
-			defaultPrice: UFix64, 
+			leasePeriod: UFix64,
+			lockPeriod: UFix64,
+			secondaryCut: UFix64,
+			defaultPrice: UFix64,
 			lengthPrices: {Int:UFix64},
 			wallet:Capability<&{FungibleToken.Receiver}>
 		): @Network {
 			return  <-  create Network(
 				leasePeriod: leasePeriod,
 				lockPeriod: lockPeriod,
-				secondaryCut: secondaryCut, 
-				defaultPrice: defaultPrice, 
+				secondaryCut: secondaryCut,
+				defaultPrice: defaultPrice,
 				lengthPrices: lengthPrices,
 				wallet: wallet
 			)
@@ -563,6 +666,15 @@ pub contract FIN {
 			self.capability = cap
 		}
 
+		pub fun advanceClock(_ time: UFix64) {
+			pre {
+				self.capability != nil: "Cannot create FIN, capability is not set"
+			}
+
+			FIN.fakeClock=(FIN.fakeClock ?? 0.0) + time
+			log("clock is now at=".concat(FIN.fakeClock?.toString() ?? "" ))
+		}
+
 		pub fun createNetwork( admin: AuthAccount, leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
 
 			pre {
@@ -572,9 +684,9 @@ pub contract FIN {
 			let network <- self.capability!.borrow()!.createNetwork(
 				leasePeriod: leasePeriod,
 				lockPeriod: lockPeriod,
-				secondaryCut:secondaryCut, 
-				defaultPrice:defaultPrice, 
-				lengthPrices:lengthPrices, 
+				secondaryCut:secondaryCut,
+				defaultPrice:defaultPrice,
+				lengthPrices:lengthPrices,
 				wallet: wallet
 			)
 			admin.save(<-network, to: FIN.NetworkStoragePath)
@@ -584,17 +696,189 @@ pub contract FIN {
 		}
 	}
 
+
+
+	pub struct BidInfo{
+		pub let id: UInt64
+		pub let tag: String
+		pub let amount: UFix64
+		pub let timestamp: UFix64
+
+		init(id: UInt64, tag: String, amount: UFix64, timestamp: UFix64) {
+			self.id=id
+			self.tag=tag
+			self.amount=amount
+			self.timestamp=timestamp
+		}
+	}
+
+	pub resource Bid {
+		access(contract) let id: UInt64
+		access(contract) let from: Capability<&{FIN.LeaseCollectionPublic}>
+		access(contract) let tag: String
+		access(contract) let vault: @FUSD.Vault
+		access(contract) var bidAt: UFix64
+
+		init(from: Capability<&{FIN.LeaseCollectionPublic}>, tag: String, vault: @FUSD.Vault){
+			self.vault <- vault
+			self.tag=tag
+			self.from=from
+			self.id= FIN.bidTotalSupply
+			self.bidAt=FIN.time()
+			FIN.bidTotalSupply=FIN.bidTotalSupply+1
+		}
+
+		access(contract) fun setBidAt(_ time: UFix64) {
+			self.bidAt=time
+		}
+
+		destroy() {
+			//This is kinda bad. find FUSD vault of owner and deploy to that?
+			destroy self.vault
+		}
+	}
+
+	pub resource interface BidCollectionPublic {
+		pub fun getBids() : [BidInfo]
+	}
+
+	//A collection stored for bidders/buyers
+	pub resource BidCollection: BidCollectionPublic {
+
+		//TODO: why is this not indexed for a tag
+		access(contract) var bids : @{UInt64: Bid}
+		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
+		access(contract) let leases: Capability<&{FIN.LeaseCollectionPublic}>
+
+		init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&{FIN.LeaseCollectionPublic}>) {
+			self.bids <- {}
+			self.receiver=receiver
+			self.leases=leases
+		}
+
+		//if purchase if fullfilled then we deposit money back into vault we get passed along and token into your own leases collection
+		access(contract) fun fullfill(id: UInt64, token: @FIN.LeaseToken) : @FungibleToken.Vault{
+			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
+
+			let vaultRef = &bid.vault as &FungibleToken.Vault
+
+			self.leases.borrow()!.deposit(token: <- token)
+			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
+			destroy bid
+			return <- vault
+		}
+
+		//if the bid is canceled from seller then we move the vault tokens back into your vault
+		access(contract) fun cancel(id: UInt64) {
+			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
+			let vaultRef = &bid.vault as &FungibleToken.Vault
+			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
+			destroy bid
+		}
+
+		access(contract) fun bid(_ bid: @Bid) {
+			let oldToken <- self.bids[bid.id] <- bid
+			//send info to leaseCollection
+			destroy oldToken
+		}
+
+
+		pub fun getBids() : [BidInfo] {
+			var bidInfo: [BidInfo] = []
+			for id in self.bids.keys {
+				let bid =&self.bids[id] as &Bid
+				bidInfo.append(BidInfo(id: id, tag: bid.tag, amount: bid.vault.balance, timestamp: bid.bidAt))
+			}
+			return bidInfo
+		}
+
+		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
+			//TODO: Emit event here?
+			let bid =self.borrowBid(id)
+			bid.setBidAt(FIN.time())
+			bid.vault.deposit(from: <- vault)
+			//we will not extend duration, it is a feature
+		}
+
+
+		pub fun borrowBid(_ id: UInt64): &Bid {
+			return &self.bids[id] as &Bid
+		}
+
+		pub fun getBalance(id: UInt64) : UFix64 {
+			let bid= self.borrowBid(id)
+			return bid.vault.balance
+		}
+
+		destroy() {
+			destroy self.bids
+		}
+	}
+
+	pub fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&{FIN.LeaseCollectionPublic}>) : @BidCollection {
+		return <- create BidCollection(receiver: receiver,  leases: leases)
+	}
+
+	pub fun bid(tag: String, vault: @FUSD.Vault, bids: Capability<&BidCollection>) {
+
+		let seller= FIN.lookup(tag)!.owner!
+		let from=seller.getCapability<&{FIN.LeaseCollectionPublic}>(FIN.LeasePublicPath)
+		let bid <- create Bid(from: from, tag:tag, vault: <- vault)
+		let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of tag=".concat(tag))
+		let leaseBid =LeaseBid(capability: bids, id: bid.id)
+		bids.borrow()!.bid(<- bid)
+		leaseCollection.bid(tag: tag, bid: leaseBid) 
+	}
+
+	pub struct LeaseBid {
+		pub let capability: Capability<&BidCollection>
+		pub let id: UInt64
+
+		init(capability: Capability<&BidCollection>, id: UInt64) {
+			self.capability=capability
+			self.id=id
+		}
+
+		pub fun balance() : UFix64 {
+			log("finding balance")
+			let collection=self.capability.borrow()!
+			log(collection)
+			return collection.getBalance(id: self.id)
+		}
+
+		pub fun fullfill(_ token: @LeaseToken) : @FungibleToken.Vault {
+			return <- self.capability.borrow()!.fullfill(id: self.id, token: <- token)
+		}
+	}
+
+
+	access(contract) fun time() : UFix64 {
+		return self.fakeClock ?? getCurrentBlock().timestamp
+	}
+
 	init() {
 		self.NetworkPrivatePath= /private/FIN
 		self.NetworkStoragePath= /storage/FIN
+
 		self.AdministratorStoragePath=/storage/finAdmin
 		self.AdministratorPrivatePath=/private/finAdmin
+
 		self.AdminProxyPublicPath= /public/finAdminProxy
 		self.AdminProxyStoragePath=/storage/finAdminProxy
+
 		self.LeasePublicPath=/public/finLeases
 		self.LeaseStoragePath=/storage/finLeases
+
+		self.BidPublicPath=/public/finbids
+		self.BidPrivatePath=/private/finbids
+		self.BidStoragePath=/storage/finBids
+
+
 		self.account.save(<- create Administrator(), to: self.AdministratorStoragePath)
-		self.account.link<&Administrator>(self.AdministratorPrivatePath, target: self.AdministratorStoragePath) 
+		self.account.link<&Administrator>(self.AdministratorPrivatePath, target: self.AdministratorStoragePath)
 		self.networkCap = nil
+
+		self.fakeClock=nil
+		self.bidTotalSupply = 0
 	}
 }

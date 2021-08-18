@@ -18,7 +18,7 @@ func TestFin(t *testing.T) {
 		g := gwtf.NewTestingEmulator()
 		setupFIN(g, t, "5.0")
 
-		createUser(g, t, "100.0")
+		createUser(g, t, "100.0", "user1")
 
 		g.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -34,7 +34,7 @@ func TestFin(t *testing.T) {
 		g := gwtf.NewTestingEmulator()
 		setupFIN(g, t, "5.0")
 
-		createUser(g, t, "5.0")
+		createUser(g, t, "5.0", "user1")
 
 		g.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -49,7 +49,7 @@ func TestFin(t *testing.T) {
 		g := gwtf.NewTestingEmulator()
 		setupFIN(g, t, "5.0")
 
-		createUser(g, t, "5.0")
+		createUser(g, t, "5.0", "user1")
 
 		g.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -63,7 +63,7 @@ func TestFin(t *testing.T) {
 		g := gwtf.NewTestingEmulator()
 		setupFIN(g, t, "5.0")
 
-		createUser(g, t, "10.0")
+		createUser(g, t, "10.0", "user1")
 
 		g.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -84,7 +84,7 @@ func TestFin(t *testing.T) {
 		g := gwtf.NewTestingEmulator()
 		setupFIN(g, t, "1.0")
 
-		createUser(g, t, "10.0")
+		createUser(g, t, "10.0", "user1")
 
 		g.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -105,27 +105,24 @@ func TestFin(t *testing.T) {
 			AssertSuccess()
 
 	})
+
 }
 
-func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string) {
+func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
 	tags := cadence.NewArray([]cadence.Value{cadence.String("tag1"), cadence.String("tag2")})
 
 	g.TransactionFromFile("create_profile").
-		SignProposeAndPayAs("user1").
-		StringArgument("User1").
-		StringArgument("This is user1").
+		SignProposeAndPayAs(name).
+		StringArgument(name).
+		StringArgument("This is a user").
 		Argument(tags).
 		BooleanArgument(true).
 		Test(t).
-		AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Verification", map[string]interface{}{
-			"account": "0x179b6b1cb6755e31",
-			"message": "test",
-		}))
+		AssertSuccess()
 
 	g.TransactionFromFile("mint_fusd").
 		SignProposeAndPayAsService().
-		AccountArgument("user1").
+		AccountArgument(name).
 		UFix64Argument(fusd).
 		Test(t).
 		AssertSuccess().

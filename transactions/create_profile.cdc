@@ -31,6 +31,8 @@ transaction(name: String, description: String, tags:[String], allowStoringFollow
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 
 
+		 //TODO; Add fin bids and leases here
+
 		let p =acct.borrow<&Profile.User>(from:Profile.storagePath)!
 		p.verify("test")
 	}
