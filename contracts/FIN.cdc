@@ -112,7 +112,7 @@ pub contract FIN {
 			self.salePrice=price
 		}
 
-		pub fun setBid(_ bid: LeaseBid) {
+		pub fun setBid(_ bid: LeaseBid?) {
 			self.bid=bid
 		}
 
@@ -247,7 +247,10 @@ pub contract FIN {
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
 			for tag in self.tokens.keys {
-				info.append(self.getLease(tag)!)
+				let lease=self.getLease(tag)
+				if lease != nil {
+					info.append(lease!)
+				}
 			}
 			return info
 		}
@@ -261,6 +264,7 @@ pub contract FIN {
 				panic("cannot start an auction on a tag without a bid, set salePrice")
 			}
 			let oldAuction <- self.auctions[tag] <- create Auction(endsAt: timestamp + duration, startedAt: timestamp, extendOnLateBid: 300.0, bid: lease.bid!)
+			lease.setBid(nil)
 			//TODO: Emit event
 			destroy oldAuction
 		}
@@ -304,7 +308,7 @@ pub contract FIN {
 
 			let oldProfile=FIN.lookup(tag)!
 
-			let auction = self.borrowAuction(tag)
+			let auction <- self.auctions.remove(key: tag)!
 
 			let newProfile= getAccount(auction.bid.capability.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 
@@ -315,6 +319,7 @@ pub contract FIN {
 			tokenRef.move(profile: newProfile)
 
 			let token <- self.tokens.remove(key: tag)!
+
 			let vault <- auction.bid.fullfill(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
@@ -324,6 +329,8 @@ pub contract FIN {
 			//why not use FIN to send money :P
 			oldProfile.deposit(from: <- vault)
 
+			destroy auction
+			
 		}
 
 		pub fun listForSale(tag :String, amount: UFix64) {
@@ -762,6 +769,8 @@ pub contract FIN {
 
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 
+			token.setSalePrice(nil)
+			token.setBid(nil)
 			self.leases.borrow()!.deposit(token: <- token)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
@@ -786,7 +795,7 @@ pub contract FIN {
 		pub fun getBids() : [BidInfo] {
 			var bidInfo: [BidInfo] = []
 			for id in self.bids.keys {
-				let bid =&self.bids[id] as &Bid
+				let bid = self.borrowBid(id)
 				bidInfo.append(BidInfo(id: id, tag: bid.tag, amount: bid.vault.balance, timestamp: bid.bidAt))
 			}
 			return bidInfo

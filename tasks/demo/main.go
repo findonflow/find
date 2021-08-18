@@ -14,19 +14,19 @@ func main() {
 		SignProposeAndPayAs("fin").
 		RunPrintEventsFull()
 
-		//link in the server in the versus client
+	//link in the server in the versus client
 	g.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAsService().
 		AccountArgument("fin").
 		RunPrintEventsFull()
 
-		//set up fin network as the fin user
+	//set up fin network as the fin user
 	g.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("fin").
-		UFix64Argument("60.0"). //duration of a lease, this is for testing
+		UFix64Argument("864000.0"). //duration of a lease, this is for testing
 		RunPrintEventsFull()
 
-		//we advance the clock
+	//we advance the clock
 	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").RunPrintEventsFull()
 
 	tags := cadence.NewArray([]cadence.Value{cadence.String("tag1"), cadence.String("tag2")})
@@ -83,7 +83,8 @@ func main() {
 		UFix64Argument("10.0").
 		RunPrintEventsFull()
 
-	g.ScriptFromFile("lease_status").StringArgument("user1").AccountArgument("user1").Run()
+	g.ScriptFromFile("lease_status").AccountArgument("user1").Run()
+	g.ScriptFromFile("lease_status").AccountArgument("user2").Run()
 	g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
 
 	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86500.0").RunPrintEventsFull()
@@ -93,7 +94,8 @@ func main() {
 		StringArgument("user1").
 		RunPrintEventsFull()
 
-	g.ScriptFromFile("lease_status").StringArgument("user1").AccountArgument("user1").Run()
+	g.ScriptFromFile("lease_status").AccountArgument("user2").Run()
+	g.ScriptFromFile("lease_status").AccountArgument("user1").Run()
 	g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
 
 }
