@@ -849,9 +849,7 @@ pub contract FIN {
 		}
 
 		pub fun balance() : UFix64 {
-			log("finding balance")
 			let collection=self.capability.borrow()!
-			log(collection)
 			return collection.getBalance(id: self.id)
 		}
 
