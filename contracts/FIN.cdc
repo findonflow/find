@@ -102,21 +102,21 @@ pub contract FIN {
 		access(contract) let tag: String
 		access(contract) let networkCap: Capability<&Network> //Does this have to be an interface?
 		access(contract) var salePrice: UFix64?
-		access(contract) var  bid: LeaseBid?
+		access(contract) var  callback: Capability<&{BidCollectionPublic}>?
 
 		init(tag:String, networkCap: Capability<&Network>) {
 			self.tag=tag
 			self.networkCap= networkCap
 			self.salePrice=0.0
-			self.bid=nil
+			self.callback=nil
 		}
 
 		pub fun setSalePrice(_ price: UFix64?) {
 			self.salePrice=price
 		}
 
-		pub fun setBid(_ bid: LeaseBid?) {
-			self.bid=bid
+		pub fun setCallback(_ callback: Capability<&{BidCollectionPublic}>?) {
+			self.callback=callback
 		}
 
 		pub fun extendLease(_ vault: @FUSD.Vault) {
@@ -143,21 +143,28 @@ pub contract FIN {
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
-		access(contract) var bid: LeaseBid
+		access(contract) var  callback: Capability<&{BidCollectionPublic}>
+		access(contract) let tag: String
 
-		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, bid: LeaseBid) {
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, callback: Capability<&{BidCollectionPublic}>, tag: String) {
 			self.endsAt=endsAt
 			self.startedAt=startedAt
 			self.extendOnLateBid=extendOnLateBid
-			self.bid= bid
+			self.callback=callback
+			self.tag=tag
 		}
 
-		pub fun addBid(bid: LeaseBid, timestamp: UFix64) {
-			if bid.balance() <= self.bid.balance() {
+		pub fun getBalance() : UFix64 {
+			return self.callback.borrow()!.getBalance(self.tag)
+		}
+
+		pub fun addBid(callback: Capability<&{BidCollectionPublic}>, timestamp: UFix64) {
+			if callback.borrow()!.getBalance(self.tag) <= self.getBalance() {
 				panic("bid must be larger then previous bid")
 			}
 			//TODO: cancel current bid
-			self.bid=bid
+//			self.callback.borrow()!.cancel()
+			self.callback=callback
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
 				//EMIT EVENT
@@ -202,7 +209,7 @@ pub contract FIN {
 		access(contract) fun deposit(token: @FIN.LeaseToken)
 
 		//place a bid on a token
-		access(contract) fun bid(tag: String, bid: LeaseBid)
+		access(contract) fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>)
 	}
 
 
@@ -234,17 +241,21 @@ pub contract FIN {
 
 			var latestBid: UFix64? = nil
 			var auctionEnds: UFix64?= nil
+			var latestBidBy: Address?=nil
 
 			if self.auctions.containsKey(tag) {
 				let auction = self.borrowAuction(tag)
 				auctionEnds= auction.endsAt
-				latestBid= auction.bid.balance()
+				latestBid= auction.getBalance()
+				latestBidBy= auction.callback.address
 			} else {
-				latestBid= token.bid?.balance()
+				if let callback = token.callback {
+					latestBid= callback.borrow()!.getBalance(tag)
+					latestBidBy=callback.address
+				}
 			}
 
-			return LeaseInformation(tag:  tag, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: token.bid?.balance(), auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: token.bid?.capability?.address)
-
+			return LeaseInformation(tag:  tag, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy)
 		}
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -263,17 +274,17 @@ pub contract FIN {
 			let timestamp=FIN.time()
 			let duration=86400.0
 			let lease = self.borrow(tag)
-			if lease.bid == nil {
+			if lease.callback == nil {
 				panic("cannot start an auction on a tag without a bid, set salePrice")
 			}
-			let oldAuction <- self.auctions[tag] <- create Auction(endsAt: timestamp + duration, startedAt: timestamp, extendOnLateBid: 300.0, bid: lease.bid!)
-			lease.setBid(nil)
+			let oldAuction <- self.auctions[tag] <- create Auction(endsAt: timestamp + duration, startedAt: timestamp, extendOnLateBid: 300.0, callback: lease.callback!, tag: tag)
+			lease.setCallback(nil)
 			//TODO: Emit event
 			destroy oldAuction
 		}
 
 
-		pub fun bid(tag: String, bid: LeaseBid) {
+		pub fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>) {
 			pre {
 				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
 			}
@@ -285,18 +296,19 @@ pub contract FIN {
 				if auction.endsAt < timestamp {
 					panic("Auction has ended")
 				}
-				auction.addBid(bid:bid, timestamp:timestamp)
+				auction.addBid(callback:callback, timestamp:timestamp)
 				return
 			} 
 
-			//cancel the previous bid if there is a new one?
-			lease.setBid(bid)
+			//TODO: cancel the previous bid if there is a new one?
+
+			lease.setCallback(callback)
 
 			if lease.salePrice == nil {
 				return
 			}
 
-			if lease.salePrice!  <= bid.balance() {
+			if lease.salePrice!  <= callback.borrow()!.getBalance(tag) {
 				self.startAuction(tag)
 			}
 
@@ -313,9 +325,9 @@ pub contract FIN {
 
 			let auction <- self.auctions.remove(key: tag)!
 
-			let newProfile= getAccount(auction.bid.capability.address).getCapability<&{Profile.Public}>(Profile.publicPath)
+			let newProfile= getAccount(auction.callback.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 
-			let soldFor=auction.bid.balance()
+			let soldFor=auction.getBalance()
 			//move the token to the new profile
 			let tokenRef = self.borrow(tag)
 			emit Sold(tag: tag, previousOwner:tokenRef.owner!.address, newOwner: newProfile.address, expireAt: tokenRef.getLeaseExpireTime(), amount: soldFor)
@@ -323,7 +335,7 @@ pub contract FIN {
 
 			let token <- self.tokens.remove(key: tag)!
 
-			let vault <- auction.bid.fullfill(<- token)
+			let vault <- auction.callback.borrow()!.fullfill(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -770,7 +782,7 @@ pub contract FIN {
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 
 			token.setSalePrice(nil)
-			token.setBid(nil)
+			token.setCallback(nil)
 			self.leases.borrow()!.deposit(token: <- token)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
@@ -800,12 +812,11 @@ pub contract FIN {
 
 			let bid <- create Bid(from: from, tag:tag, vault: <- vault)
 		  let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of tag=".concat(tag))
-		  let leaseBid =LeaseBid(capability: self.owner!.getCapability<&{BidCollectionPublic}>(FIN.BidPublicPath), tag: tag)
+		  let callbackCapability =self.owner!.getCapability<&{BidCollectionPublic}>(FIN.BidPublicPath)
 			let oldToken <- self.bids[bid.tag] <- bid
 			//send info to leaseCollection
 			destroy oldToken
-
-		  leaseCollection.bid(tag: tag, bid: leaseBid) 
+			leaseCollection.bid(tag: tag, callback: callbackCapability) 
 	  }
 
 
@@ -836,24 +847,6 @@ pub contract FIN {
 		return <- create BidCollection(receiver: receiver,  leases: leases)
 	}
 
-	pub struct LeaseBid {
-		pub let capability: Capability<&{BidCollectionPublic}>
-		pub let tag: String
-
-		init(capability: Capability<&{BidCollectionPublic}>, tag: String) {
-			self.capability=capability
-			self.tag=tag
-		}
-
-		pub fun balance() : UFix64 {
-			let collection=self.capability.borrow()!
-			return collection.getBalance(self.tag)
-		}
-
-		pub fun fullfill(_ token: @LeaseToken) : @FungibleToken.Vault {
-			return <- self.capability.borrow()!.fullfill( <- token)
-		}
-	}
 
 	access(contract) fun time() : UFix64 {
 		return self.fakeClock ?? getCurrentBlock().timestamp
