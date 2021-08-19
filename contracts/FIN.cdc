@@ -12,6 +12,10 @@ A naming service flow flow,
 3 token tag cost 500 FUSD a year
 4 token tag cost 100 FUSD a year
 5 or more token tag cost 5 FUSD a year
+
+
+This contract is pretty long, I have tried splitting it up into several files, but then there are issues
+
 */
 pub contract FIN {
 
@@ -43,7 +47,7 @@ pub contract FIN {
 	pub let LeaseStoragePath: StoragePath
 	pub let LeasePublicPath: PublicPath
 
-	access(account) var fakeClock:UFix64?
+	access(contract) var fakeClock:UFix64?
 
 	access(contract) var bidTotalSupply: UInt64
 
