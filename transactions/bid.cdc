@@ -25,6 +25,7 @@ transaction(tag: String, amount: UFix64) {
 		}
 
 		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
-		FIN.bid(tag: tag, vault: <- vault, bids: bidCollection)
+		bidCollection.borrow()!.bid(tag: tag, vault: <- vault)
+
 	}
 }
