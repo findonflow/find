@@ -162,8 +162,9 @@ pub contract FIN {
 			if callback.borrow()!.getBalance(self.tag) <= self.getBalance() {
 				panic("bid must be larger then previous bid")
 			}
-			//TODO: cancel current bid
-//			self.callback.borrow()!.cancel()
+
+			//we send the money back
+			self.callback.borrow()!.cancel(self.tag)
 			self.callback=callback
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
@@ -207,6 +208,9 @@ pub contract FIN {
 
 		//add a new lease token to the collection, can only be called in this contract
 		access(contract) fun deposit(token: @FIN.LeaseToken)
+
+	  access(contract)fun cancelBid(_ tag: String) 
+		access(contract) fun increaseBid(_ tag: String) 
 
 		//place a bid on a token
 		access(contract) fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>)
@@ -284,7 +288,37 @@ pub contract FIN {
 		}
 
 
-		pub fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>) {
+		access(contract) fun cancelBid(_ tag: String) {
+			pre {
+				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
+				!self.auctions.containsKey(tag) : "Cannot cancel a bid that is in an auction=".concat(tag)
+			}
+
+			let bid= self.borrow(tag)
+			bid.setCallback(nil)
+			//TODO: emit event
+		}
+
+		access(contract) fun increaseBid(_ tag: String) {
+			pre {
+				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
+				!self.auctions.containsKey(tag) : "Can only increase bid before auction=".concat(tag)
+			}
+
+			let lease = self.borrow(tag)
+
+			if lease.salePrice == nil {
+				return
+			}
+
+			if lease.salePrice!  <= lease.callback!.borrow()!.getBalance(tag) {
+				self.startAuction(tag)
+			}
+		//TODO: emit event
+
+		}
+
+		access(contract) fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>) {
 			pre {
 				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
 			}
@@ -300,7 +334,9 @@ pub contract FIN {
 				return
 			} 
 
-			//TODO: cancel the previous bid if there is a new one?
+			if let cb= lease.callback {
+				cb.borrow()!.cancel(tag)
+			}
 
 			lease.setCallback(callback)
 
@@ -759,6 +795,7 @@ pub contract FIN {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ tag: String) : UFix64
 		access(contract) fun fullfill(_ token: @FIN.LeaseToken) : @FungibleToken.Vault
+		access(contract) fun cancel(_ tag: String)
 	}
 
 	//A collection stored for bidders/buyers
@@ -819,13 +856,24 @@ pub contract FIN {
 			leaseCollection.bid(tag: tag, callback: callbackCapability) 
 	  }
 
+		//TODO; You have to be able to cancel a bid that is not in an auction
 
 		pub fun increaseBid(tag: String, vault: @FungibleToken.Vault) {
 			//TODO: Emit event here?
 			let bid =self.borrowBid(tag)
 			bid.setBidAt(FIN.time())
 			bid.vault.deposit(from: <- vault)
-			//we will not extend duration, it is a feature
+
+			let seller= FIN.lookup(tag)!.owner!
+			let from=seller.getCapability<&{FIN.LeaseCollectionPublic}>(FIN.LeasePublicPath)
+			from.borrow()!.increaseBid(tag)
+		}
+
+		pub fun cancelBid(tag: String) {
+			let seller= FIN.lookup(tag)!.owner!
+			let from=seller.getCapability<&{FIN.LeaseCollectionPublic}>(FIN.LeasePublicPath)
+			from.borrow()!.cancelBid(tag)
+			self.cancelBid(tag: tag)
 		}
 
 
