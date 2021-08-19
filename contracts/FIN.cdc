@@ -49,7 +49,6 @@ pub contract FIN {
 
 	access(contract) var fakeClock:UFix64?
 
-	access(contract) var bidTotalSupply: UInt64
 
 	//For convenience the contract has a link to the given network so that you can call methods without having to borrow things.
 	access(contract) var networkCap: Capability<&Network>?
@@ -710,13 +709,11 @@ pub contract FIN {
 
 
 	pub struct BidInfo{
-		pub let id: UInt64
 		pub let tag: String
 		pub let amount: UFix64
 		pub let timestamp: UFix64
 
-		init(id: UInt64, tag: String, amount: UFix64, timestamp: UFix64) {
-			self.id=id
+		init(tag: String, amount: UFix64, timestamp: UFix64) {
 			self.tag=tag
 			self.amount=amount
 			self.timestamp=timestamp
@@ -724,7 +721,6 @@ pub contract FIN {
 	}
 
 	pub resource Bid {
-		access(contract) let id: UInt64
 		access(contract) let from: Capability<&{FIN.LeaseCollectionPublic}>
 		access(contract) let tag: String
 		access(contract) let vault: @FUSD.Vault
@@ -734,9 +730,7 @@ pub contract FIN {
 			self.vault <- vault
 			self.tag=tag
 			self.from=from
-			self.id= FIN.bidTotalSupply
 			self.bidAt=FIN.time()
-			FIN.bidTotalSupply=FIN.bidTotalSupply+1
 		}
 
 		access(contract) fun setBidAt(_ time: UFix64) {
@@ -757,7 +751,7 @@ pub contract FIN {
 	pub resource BidCollection: BidCollectionPublic {
 
 		//TODO: why is this not indexed for a tag
-		access(contract) var bids : @{UInt64: Bid}
+		access(contract) var bids : @{String: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
 		access(contract) let leases: Capability<&{FIN.LeaseCollectionPublic}>
 
@@ -768,8 +762,9 @@ pub contract FIN {
 		}
 
 		//if purchase if fullfilled then we deposit money back into vault we get passed along and token into your own leases collection
-		access(contract) fun fullfill(id: UInt64, token: @FIN.LeaseToken) : @FungibleToken.Vault{
-			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
+		access(contract) fun fullfill(_ token: @FIN.LeaseToken) : @FungibleToken.Vault{
+
+			let bid <- self.bids.remove(key: token.tag) ?? panic("missing bid")
 
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 
@@ -782,15 +777,15 @@ pub contract FIN {
 		}
 
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
-		access(contract) fun cancel(id: UInt64) {
-			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
+		access(contract) fun cancel(_ tag: String) {
+			let bid <- self.bids.remove(key: tag) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
 			destroy bid
 		}
 
 		access(contract) fun bid(_ bid: @Bid) {
-			let oldToken <- self.bids[bid.id] <- bid
+			let oldToken <- self.bids[bid.tag] <- bid
 			//send info to leaseCollection
 			destroy oldToken
 		}
@@ -800,26 +795,26 @@ pub contract FIN {
 			var bidInfo: [BidInfo] = []
 			for id in self.bids.keys {
 				let bid = self.borrowBid(id)
-				bidInfo.append(BidInfo(id: id, tag: bid.tag, amount: bid.vault.balance, timestamp: bid.bidAt))
+				bidInfo.append(BidInfo(tag: bid.tag, amount: bid.vault.balance, timestamp: bid.bidAt))
 			}
 			return bidInfo
 		}
 
-		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
+		pub fun increaseBid(tag: String, vault: @FungibleToken.Vault) {
 			//TODO: Emit event here?
-			let bid =self.borrowBid(id)
+			let bid =self.borrowBid(tag)
 			bid.setBidAt(FIN.time())
 			bid.vault.deposit(from: <- vault)
 			//we will not extend duration, it is a feature
 		}
 
 
-		pub fun borrowBid(_ id: UInt64): &Bid {
-			return &self.bids[id] as &Bid
+		pub fun borrowBid(_ tag: String): &Bid {
+			return &self.bids[tag] as &Bid
 		}
 
-		pub fun getBalance(id: UInt64) : UFix64 {
-			let bid= self.borrowBid(id)
+		pub fun getBalance(_ tag: String) : UFix64 {
+			let bid= self.borrowBid(tag)
 			return bid.vault.balance
 		}
 
@@ -838,27 +833,27 @@ pub contract FIN {
 		let from=seller.getCapability<&{FIN.LeaseCollectionPublic}>(FIN.LeasePublicPath)
 		let bid <- create Bid(from: from, tag:tag, vault: <- vault)
 		let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of tag=".concat(tag))
-		let leaseBid =LeaseBid(capability: bids, id: bid.id)
+		let leaseBid =LeaseBid(capability: bids, tag: tag)
 		bids.borrow()!.bid(<- bid)
 		leaseCollection.bid(tag: tag, bid: leaseBid) 
 	}
 
 	pub struct LeaseBid {
 		pub let capability: Capability<&BidCollection>
-		pub let id: UInt64
+		pub let tag: String
 
-		init(capability: Capability<&BidCollection>, id: UInt64) {
+		init(capability: Capability<&BidCollection>, tag: String) {
 			self.capability=capability
-			self.id=id
+			self.tag=tag
 		}
 
 		pub fun balance() : UFix64 {
 			let collection=self.capability.borrow()!
-			return collection.getBalance(id: self.id)
+			return collection.getBalance(self.tag)
 		}
 
 		pub fun fullfill(_ token: @LeaseToken) : @FungibleToken.Vault {
-			return <- self.capability.borrow()!.fullfill(id: self.id, token: <- token)
+			return <- self.capability.borrow()!.fullfill( <- token)
 		}
 	}
 
@@ -890,6 +885,5 @@ pub contract FIN {
 		self.networkCap = nil
 
 		self.fakeClock=nil
-		self.bidTotalSupply = 0
 	}
 }
