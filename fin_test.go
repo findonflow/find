@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"time"
 
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
 	"github.com/onflow/cadence"
@@ -92,7 +91,7 @@ func TestFin(t *testing.T) {
 			Test(t).
 			AssertSuccess()
 
-		time.Sleep(2 * time.Second)
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("2.0").Test(t).AssertSuccess()
 		g.TransactionFromFile("status").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
@@ -106,6 +105,16 @@ func TestFin(t *testing.T) {
 
 	})
 
+}
+
+func registerUser(g *gwtf.GoWithTheFlow, t *testing.T, name string) {
+
+	g.TransactionFromFile("register").
+		SignProposeAndPayAs(name).
+		StringArgument(name).
+		Test(t).
+		AssertSuccess().
+		AssertEventCount(3)
 }
 
 func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
@@ -146,4 +155,6 @@ func setupFIN(g *gwtf.GoWithTheFlow, t *testing.T, leaseDuration string) {
 		SignProposeAndPayAs("fin").
 		UFix64Argument(leaseDuration). //duration of a lease, this is for testing
 		Test(t).AssertSuccess().AssertNoEvents()
+
+	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").Test(t).AssertSuccess()
 }
