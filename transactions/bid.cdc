@@ -17,15 +17,16 @@ transaction(tag: String, amount: UFix64) {
 			account.link<&{FIN.LeaseCollectionPublic}>( FIN.LeasePublicPath, target: FIN.LeaseStoragePath)
 		}
 
-		let bidCollection = account.getCapability<&FIN.BidCollection>(FIN.BidPrivatePath)
+		let bidCollection = account.getCapability<&{FIN.BidCollectionPublic}>(FIN.BidPublicPath)
 		if !bidCollection.check() {
 			account.save(<- FIN.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIN.BidStoragePath)
 			account.link<&{FIN.BidCollectionPublic}>( FIN.BidPublicPath, target: FIN.BidStoragePath)
-			account.link<&FIN.BidCollection>( FIN.BidPrivatePath, target: FIN.BidStoragePath)
 		}
 
+
 		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
-		bidCollection.borrow()!.bid(tag: tag, vault: <- vault)
+		let bids = account.borrow<&FIN.BidCollection>(from: FIN.BidStoragePath)!
+		bids.bid(tag: tag, vault: <- vault)
 
 	}
 }
