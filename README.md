@@ -17,6 +17,9 @@ Right now an Identity in FiNS is a single user.  It uses the Versus profile to r
 
  - heavily test with gwtf
 
+## Testing
+ `gotestsum -f testname --watch`
+ 
 
 # Flow Identity and the Flow Identity Network
 

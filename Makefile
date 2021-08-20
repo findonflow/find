@@ -1,9 +1,4 @@
-all: demo
-
-#run the demo script on devnet
-.PHONY: send
-send: deploy
-	go run ./tasks/send/main.go
+all: dev
 
 .PHONY: setup
 setup: deploy
@@ -22,4 +17,8 @@ emulator:
 
 .phony: test
 test:
-	go test fin_test.go
+	gotessum -f testname
+
+.phony: dev
+dev:
+	gotestsum -f testname --watch

@@ -270,7 +270,7 @@ func TestAuction(t *testing.T) {
 				"tag":    "user1",
 			}))
 
-		res := g.TransactionFromFile("cancelBid").
+		g.TransactionFromFile("cancelBid").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			Test(t).
@@ -279,10 +279,6 @@ func TestAuction(t *testing.T) {
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"tag":    "user1",
 			}))
-
-		for _, ev := range res.Events {
-			t.Log(ev.String())
-		}
 
 	})
 
@@ -440,6 +436,7 @@ func TestAuction(t *testing.T) {
 				"tag":          "user1",
 			}))
 
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86380.0").Test(t).AssertSuccess()
 		g.TransactionFromFile("bid").
 			SignProposeAndPayAs("user3").
 			StringArgument("user1").
@@ -452,11 +449,13 @@ func TestAuction(t *testing.T) {
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.AuctionBid", map[string]interface{}{
 				"amount":       "15.00000000",
-				"auctionEndAt": "86401.00000000",
+				"auctionEndAt": "86681.00000000", //auction is extended
 				"bidder":       "0xe03daebed8ca0615",
 				"tag":          "user1",
 			}))
 
 	})
 
+	//TODO: cannot cancel auction after it is done.
+	//TODO: cancel auction before it ends
 }

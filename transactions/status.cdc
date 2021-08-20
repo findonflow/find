@@ -5,7 +5,9 @@ transaction(tag: String) {
 
     prepare(account: AuthAccount) {
         let status=FiNS.status(tag)
-        log(status)
+				if status == FiNS.LeaseStatus.LOCKED {
+					panic("locked")
+				}
     }
 
 }

@@ -767,6 +767,16 @@ pub contract FiNS {
 			self.capability = cap
 		}
 
+
+		//Admins can register tags without tag length restrictions
+		pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
+			pre {
+				self.capability != nil: "Cannot create FiNS, capability is not set"
+			}
+
+			FiNS.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile, leases: leases)
+		}
+
 		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
 		pub fun advanceClock(_ time: UFix64) {
 			pre {
