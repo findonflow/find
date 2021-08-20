@@ -20,7 +20,6 @@ This contract is pretty long, I have tried splitting it up into several files, b
 pub contract FIN {
 
 
-
 	//event that is emited when a tag is registered or renewed
 	pub event Register(tag: String, owner: Address, expireAt: UFix64)
 
@@ -33,6 +32,9 @@ pub contract FIN {
 	pub event ForSale(tag: String, owner: Address, expireAt: UFix64, amount: UFix64, active: Bool)
 
 	pub event BlindBid(tag: String, bidder: Address, amount: UFix64)
+	pub event BlindBidCanceled(tag: String, bidder: Address)
+
+	pub event AuctionStarted(tag: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 	pub event AuctionBid(tag: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 
 	pub let BidPublicPath: PublicPath
@@ -168,9 +170,9 @@ pub contract FIN {
 			self.callback=callback
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
-				//EMIT EVENT
 				self.endsAt=suggestedEndTime
 			}
+			emit AuctionBid(tag: self.tag, bidder: self.callback.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
 		}
 	}
 
@@ -281,9 +283,13 @@ pub contract FIN {
 			if lease.callback == nil {
 				panic("cannot start an auction on a tag without a bid, set salePrice")
 			}
-			let oldAuction <- self.auctions[tag] <- create Auction(endsAt: timestamp + duration, startedAt: timestamp, extendOnLateBid: 300.0, callback: lease.callback!, tag: tag)
+
+			let endsAt=timestamp + duration
+			emit AuctionStarted(tag: tag, bidder: lease.callback!.address, amount: lease.callback!.borrow()!.getBalance(tag), auctionEndAt: endsAt)
+      
+			let oldAuction <- self.auctions[tag] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: 300.0, callback: lease.callback!, tag: tag)
 			lease.setCallback(nil)
-			//TODO: Emit event
+
 			destroy oldAuction
 		}
 
@@ -295,8 +301,11 @@ pub contract FIN {
 			}
 
 			let bid= self.borrow(tag)
+			if let callback = bid.callback {
+				emit BlindBidCanceled(tag: tag, bidder: callback.address)
+			}
+
 			bid.setCallback(nil)
-			//TODO: emit event
 		}
 
 		access(contract) fun increaseBid(_ tag: String) {
@@ -313,8 +322,9 @@ pub contract FIN {
 
 			if lease.salePrice!  <= lease.callback!.borrow()!.getBalance(tag) {
 				self.startAuction(tag)
+			} else {
+				emit BlindBid(tag: tag, bidder: lease.callback!.address, amount: lease.callback!.borrow()!.getBalance(tag))
 			}
-		//TODO: emit event
 
 		}
 
@@ -338,6 +348,7 @@ pub contract FIN {
 				cb.borrow()!.cancel(tag)
 			}
 
+
 			lease.setCallback(callback)
 
 			if lease.salePrice == nil {
@@ -346,6 +357,8 @@ pub contract FIN {
 
 			if lease.salePrice!  <= callback.borrow()!.getBalance(tag) {
 				self.startAuction(tag)
+			} else {
+				emit BlindBid(tag: tag, bidder: callback.address, amount: callback.borrow()!.getBalance(tag))
 			}
 
 		}
@@ -354,7 +367,7 @@ pub contract FIN {
 			pre {
 				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
 				self.auctions.containsKey(tag) : "Tag is not for auction tag=".concat(tag)
-//				self.borrowAuction(tag).endsAt > FIN.time() : "Auction has not ended yet"
+				self.borrowAuction(tag).endsAt < FIN.time() : "Auction has not ended yet"
 			}
 
 			let oldProfile=FIN.lookup(tag)!
@@ -856,10 +869,8 @@ pub contract FIN {
 			leaseCollection.bid(tag: tag, callback: callbackCapability) 
 	  }
 
-		//TODO; You have to be able to cancel a bid that is not in an auction
 
 		pub fun increaseBid(tag: String, vault: @FungibleToken.Vault) {
-			//TODO: Emit event here?
 			let bid =self.borrowBid(tag)
 			bid.setBidAt(FIN.time())
 			bid.vault.deposit(from: <- vault)
