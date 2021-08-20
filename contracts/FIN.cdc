@@ -929,11 +929,11 @@ pub contract FIN {
 		}
 
 		//cancel a bid, will panic if called after auction has started
-		pub fun cancelBid(tag: String) {
+		pub fun cancelBid(_ tag: String) {
 			let seller= FIN.lookup(tag)!.owner!
 			let from=seller.getCapability<&{FIN.LeaseCollectionPublic}>(FIN.LeasePublicPath)
 			from.borrow()!.cancelBid(tag)
-			self.cancelBid(tag: tag)
+			self.cancel(tag)
 		}
 
 

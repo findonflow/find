@@ -15,7 +15,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should be able to register a tag", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t, "5.0")
+		setupFIN(g, t)
 
 		createUser(g, t, "100.0", "user1")
 
@@ -31,7 +31,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should get error if you try to register a tag and dont have enough money", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t, "5.0")
+		setupFIN(g, t)
 
 		createUser(g, t, "5.0", "user1")
 
@@ -46,7 +46,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should get error if you try to register a tag that is too short", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t, "5.0")
+		setupFIN(g, t)
 
 		createUser(g, t, "5.0", "user1")
 
@@ -60,7 +60,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should get error if you try to register a tag that is already claimed", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t, "5.0")
+		setupFIN(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -81,7 +81,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should allow registering a lease after it is freed", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t, "1.0")
+		setupFIN(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -91,6 +91,7 @@ func TestFin(t *testing.T) {
 			Test(t).
 			AssertSuccess()
 
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("2.0").Test(t).AssertSuccess()
 		g.TransactionFromFile("status").
 			SignProposeAndPayAs("user1").
@@ -138,7 +139,11 @@ func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
 		AssertEventCount(3)
 }
 
-func setupFIN(g *gwtf.GoWithTheFlow, t *testing.T, leaseDuration string) {
+//a year
+const leaseDuration = "31536000.0"
+
+//TODO: sending in lease here is just a pain, just advance clock
+func setupFIN(g *gwtf.GoWithTheFlow, t *testing.T) {
 	//first step create the adminClient as the fin user
 	g.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("fin").
@@ -153,7 +158,7 @@ func setupFIN(g *gwtf.GoWithTheFlow, t *testing.T, leaseDuration string) {
 	//set up fin network as the fin user
 	g.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("fin").
-		UFix64Argument(leaseDuration). //duration of a lease, this is for testing
+		UFix64Argument(leaseDuration).
 		Test(t).AssertSuccess().AssertNoEvents()
 
 	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").Test(t).AssertSuccess()
