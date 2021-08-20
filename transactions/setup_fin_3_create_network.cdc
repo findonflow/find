@@ -1,7 +1,7 @@
 
 
 import FUSD from "../contracts/standard/FUSD.cdc"
-import FIN from "../contracts/FIN.cdc"
+import FiNS from "../contracts/FiNS.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(leasePeriod: UFix64) {
@@ -15,7 +15,7 @@ transaction(leasePeriod: UFix64) {
 			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
 		}
 
-		let adminClient=account.borrow<&FIN.AdminProxy>(from: FIN.AdminProxyStoragePath)!
+		let adminClient=account.borrow<&FiNS.AdminProxy>(from: FiNS.AdminProxyStoragePath)!
 
 		adminClient.createNetwork(
 			admin: account, 

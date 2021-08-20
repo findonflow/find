@@ -1,10 +1,10 @@
 
-import FIN from "../contracts/FIN.cdc"
+import FiNS from "../contracts/FiNS.cdc"
 
 transaction(tag: String) {
 
     prepare(account: AuthAccount) {
-        let status=FIN.status(tag)
+        let status=FiNS.status(tag)
         log(status)
     }
 

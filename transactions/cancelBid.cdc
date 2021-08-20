@@ -1,8 +1,8 @@
-import FIN from "../contracts/FIN.cdc"
+import FiNS from "../contracts/FiNS.cdc"
 
 transaction(tag: String) {
 	prepare(account: AuthAccount) {
-		let bids = account.borrow<&FIN.BidCollection>(from: FIN.BidStoragePath)!
+		let bids = account.borrow<&FiNS.BidCollection>(from: FiNS.BidStoragePath)!
 		bids.cancelBid(tag)
 	}
 }

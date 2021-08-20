@@ -1,4 +1,4 @@
-import "../contracts/FIN.cdc"
+import "../contracts/FiNS.cdc"
 
 
 //link together the administrator to the client, signed by the owner of the contract
@@ -8,10 +8,10 @@ transaction(ownerAddress: Address) {
     prepare(account: AuthAccount) {
 
         let owner= getAccount(ownerAddress)
-        let client= owner.getCapability<&{FIN.AdminProxyClient}>(FIN.AdminProxyPublicPath)
+        let client= owner.getCapability<&{FiNS.AdminProxyClient}>(FiNS.AdminProxyPublicPath)
                 .borrow() ?? panic("Could not borrow admin client")
 
-        let admin=account.getCapability<&FIN.Administrator>(FIN.AdministratorPrivatePath)
+        let admin=account.getCapability<&FiNS.Administrator>(FiNS.AdministratorPrivatePath)
         client.addCapability(admin)
 
     }

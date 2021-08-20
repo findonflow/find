@@ -15,7 +15,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should be able to register a tag", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t)
+		setupFiNS(g, t)
 
 		createUser(g, t, "100.0", "user1")
 
@@ -31,7 +31,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should get error if you try to register a tag and dont have enough money", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t)
+		setupFiNS(g, t)
 
 		createUser(g, t, "5.0", "user1")
 
@@ -46,7 +46,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should get error if you try to register a tag that is too short", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t)
+		setupFiNS(g, t)
 
 		createUser(g, t, "5.0", "user1")
 
@@ -54,13 +54,13 @@ func TestFin(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("ur").
 			Test(t).
-			AssertFailure("A public minted FIN tag has to be minimum 3 letters long")
+			AssertFailure("A public minted FiNS tag has to be minimum 3 letters long")
 
 	})
 	t.Run("Should get error if you try to register a tag that is already claimed", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t)
+		setupFiNS(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -81,7 +81,7 @@ func TestFin(t *testing.T) {
 	t.Run("Should allow registering a lease after it is freed", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFIN(g, t)
+		setupFiNS(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -143,7 +143,7 @@ func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
 const leaseDuration = "31536000.0"
 
 //TODO: sending in lease here is just a pain, just advance clock
-func setupFIN(g *gwtf.GoWithTheFlow, t *testing.T) {
+func setupFiNS(g *gwtf.GoWithTheFlow, t *testing.T) {
 	//first step create the adminClient as the fin user
 	g.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("fin").

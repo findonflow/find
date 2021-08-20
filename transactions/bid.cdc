@@ -1,4 +1,4 @@
-import FIN from "../contracts/FIN.cdc"
+import FiNS from "../contracts/FiNS.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
@@ -7,25 +7,25 @@ transaction(tag: String, amount: UFix64) {
 
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
-		let seller=FIN.lookup(tag)!.owner
+		let seller=FiNS.lookup(tag)!.owner
 		
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
-		let leaseCollection = account.getCapability<&{FIN.LeaseCollectionPublic}>(FIN.LeasePublicPath)
+		let leaseCollection = account.getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
 		if !leaseCollection.check() {
-			account.save(<- FIN.createEmptyLeaseCollection(), to: FIN.LeaseStoragePath)
-			account.link<&{FIN.LeaseCollectionPublic}>( FIN.LeasePublicPath, target: FIN.LeaseStoragePath)
+			account.save(<- FiNS.createEmptyLeaseCollection(), to: FiNS.LeaseStoragePath)
+			account.link<&{FiNS.LeaseCollectionPublic}>( FiNS.LeasePublicPath, target: FiNS.LeaseStoragePath)
 		}
 
-		let bidCollection = account.getCapability<&{FIN.BidCollectionPublic}>(FIN.BidPublicPath)
+		let bidCollection = account.getCapability<&{FiNS.BidCollectionPublic}>(FiNS.BidPublicPath)
 		if !bidCollection.check() {
-			account.save(<- FIN.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIN.BidStoragePath)
-			account.link<&{FIN.BidCollectionPublic}>( FIN.BidPublicPath, target: FIN.BidStoragePath)
+			account.save(<- FiNS.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FiNS.BidStoragePath)
+			account.link<&{FiNS.BidCollectionPublic}>( FiNS.BidPublicPath, target: FiNS.BidStoragePath)
 		}
 
 
 		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
-		let bids = account.borrow<&FIN.BidCollection>(from: FIN.BidStoragePath)!
+		let bids = account.borrow<&FiNS.BidCollection>(from: FiNS.BidStoragePath)!
 		bids.bid(tag: tag, vault: <- vault)
 
 	}

@@ -1,22 +1,21 @@
-# FIN - Flow Identity Network
+# FiNS - Flow identity Name Service
 
 Flow does not have any equivalent to ENS or any way to lookup a user by a tag/alias/nick. 
 
-Fin is here to solve that issue. 
+FiNS is here to solve that issue. 
 
-In order to use FIN you create your Flow Identity and store that in your account. Then you can optionally register that with FIN for a small yearly fee. 
+In order to use FiNS you create your Flow Identity/Profile [and](and) store that in your account. Then you can optionally register that with FiNS for a small yearly fee. 
 
-FIN is priced on a sliding scale from 0.1 for tags with 6+ characters to 0.6 for single character tags.
+FiNS is priced with inspiration from ENS. 500 for 3 chars, 100 for 4 chars and 5 for 5 or more chars. 2 and 1 chars can only be minted by admin.
 
 ## Flow Identity
 
-Right now an Identity in FIN is a single user.  It uses the Versus profile to represent a user.
+Right now an Identity in FiNS is a single user.  It uses the Versus profile to represent a user.
 
 
 ## Plans
 
  - heavily test with gwtf
- - better comments
 
 
 # Flow Identity and the Flow Identity Network

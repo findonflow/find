@@ -1,9 +1,9 @@
-import FIN from "../contracts/FIN.cdc"
+import FiNS from "../contracts/FiNS.cdc"
 
 transaction(tag: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
 
-		let finLeases= acct.borrow<&FIN.LeaseCollection>(from:FIN.LeaseStoragePath)!
+		let finLeases= acct.borrow<&FiNS.LeaseCollection>(from:FiNS.LeaseStoragePath)!
 		finLeases.listForSale(tag: tag, amount: amount)
 
 	}
