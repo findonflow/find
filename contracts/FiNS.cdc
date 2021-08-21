@@ -103,6 +103,8 @@ pub contract FiNS {
 		return self.networkCap!.borrow()!.status(tag)
 	}
 
+
+	//TODO:  move this to leases, since you should never be able to register a profile for somebody else. you can spam them with names they do not want
 	pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
 		pre {
 			self.networkCap != nil : "Network is not set up"
