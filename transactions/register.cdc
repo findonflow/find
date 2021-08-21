@@ -22,7 +22,8 @@ transaction(tag: String) {
 			acct.link<&{FiNS.LeaseCollectionPublic}>( FiNS.LeasePublicPath, target: FiNS.LeaseStoragePath)
 		}
 
-		FiNS.register(tag: tag, vault: <- payVault, profile: profileCap, leases: leaseCollectionCap)
+		let leases=acct.borrow<&FiNS.LeaseCollection>(from: FiNS.LeaseStoragePath)!
+		leases.register(tag: tag, vault: <- payVault)
 
 		log("STATUS POST")
 		log(FiNS.status(tag))

@@ -45,7 +45,6 @@ pub contract FiNS {
 	//event that is emitted when there is a bid on a given auction
 	pub event AuctionBid(tag: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 
-
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
 	pub let BidStoragePath: StoragePath
@@ -102,17 +101,6 @@ pub contract FiNS {
 		}
 		return self.networkCap!.borrow()!.status(tag)
 	}
-
-
-	//TODO:  move this to leases, since you should never be able to register a profile for somebody else. you can spam them with names they do not want
-	pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
-		pre {
-			self.networkCap != nil : "Network is not set up"
-			tag.length >= 3 : "A public minted FiNS tag has to be minimum 3 letters long"
-		}
-		self.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile, leases: leases)
-	}
-
 
 	/*
 	=============================================================
@@ -476,6 +464,19 @@ pub contract FiNS {
 		pub fun borrowAuction(_ tag: String): &FiNS.Auction {
 			return &self.auctions[tag] as &FiNS.Auction
 		}
+
+
+		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
+		pub fun register(tag: String, vault: @FUSD.Vault){
+	  	pre {
+	  		tag.length >= 3 : "A public minted FiNS tag has to be minimum 3 letters long"
+	  	}
+			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
+			let leases= self.owner!.getCapability<&{LeaseCollectionPublic}>(FiNS.LeasePublicPath)
+			FiNS.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profileCap, leases: leases)
+	}
+
+
 
 		destroy() {
 			destroy self.tokens
