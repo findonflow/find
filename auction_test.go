@@ -456,6 +456,162 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	//TODO: cannot cancel auction after it is done.
-	//TODO: cancel auction before it ends
+	t.Run("Should not be able to cancel finished auction", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFiNS(g, t)
+
+		createUser(g, t, "100.0", "user1")
+		registerUser(g, t, "user1")
+		createUser(g, t, "100.0", "user2")
+		registerUser(g, t, "user2")
+
+		g.TransactionFromFile("sell").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.ForSale", map[string]interface{}{
+				"active":   "true",
+				"amount":   "10.00000000",
+				"expireAt": "31536001.00000000",
+				"owner":    "0x179b6b1cb6755e31",
+				"tag":      "user1",
+			}))
+
+		g.TransactionFromFile("bid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.AuctionStarted", map[string]interface{}{
+				"amount":       "10.00000000",
+				"auctionEndAt": "86401.00000000",
+				"bidder":       "0xf3fcd2c1a78f5eee",
+				"tag":          "user1",
+			}))
+
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86402.0").Test(t).AssertSuccess()
+
+		g.TransactionFromFile("cancelAuction").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).
+			AssertFailure("Cannot cancel finished auction")
+
+	})
+
+	t.Run("Should be able to cancel unfinished auction", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFiNS(g, t)
+
+		createUser(g, t, "100.0", "user1")
+		registerUser(g, t, "user1")
+		createUser(g, t, "100.0", "user2")
+		registerUser(g, t, "user2")
+
+		g.TransactionFromFile("sell").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.ForSale", map[string]interface{}{
+				"active":   "true",
+				"amount":   "10.00000000",
+				"expireAt": "31536001.00000000",
+				"owner":    "0x179b6b1cb6755e31",
+				"tag":      "user1",
+			}))
+
+		g.TransactionFromFile("bid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.AuctionStarted", map[string]interface{}{
+				"amount":       "10.00000000",
+				"auctionEndAt": "86401.00000000",
+				"bidder":       "0xf3fcd2c1a78f5eee",
+				"tag":          "user1",
+			}))
+
+		g.TransactionFromFile("cancelAuction").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "10.00000000",
+				"to":     "0xf3fcd2c1a78f5eee",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+				"amount": "10.00000000",
+				"from":   "0xf3fcd2c1a78f5eee",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.AuctionCancelled", map[string]interface{}{
+				"amount": "10.00000000",
+				"bidder": "0xf3fcd2c1a78f5eee",
+				"tag":    "user1",
+			}))
+	})
+
+	t.Run("Should be able to reject blind bid", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFiNS(g, t)
+
+		createUser(g, t, "100.0", "user1")
+		registerUser(g, t, "user1")
+		createUser(g, t, "100.0", "user2")
+		registerUser(g, t, "user2")
+
+		g.TransactionFromFile("sell").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.ForSale", map[string]interface{}{
+				"active":   "true",
+				"amount":   "10.00000000",
+				"expireAt": "31536001.00000000",
+				"owner":    "0x179b6b1cb6755e31",
+				"tag":      "user1",
+			}))
+
+		g.TransactionFromFile("bid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("5.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.BlindBid", map[string]interface{}{
+				"amount": "5.00000000",
+				"bidder": "0xf3fcd2c1a78f5eee",
+				"tag":    "user1",
+			}))
+
+		g.TransactionFromFile("cancelAuction").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "5.00000000",
+				"to":     "0xf3fcd2c1a78f5eee",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+				"amount": "5.00000000",
+				"from":   "0xf3fcd2c1a78f5eee",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.BlindBidRejected", map[string]interface{}{
+				"amount": "5.00000000",
+				"bidder": "0xf3fcd2c1a78f5eee",
+				"tag":    "user1",
+			}))
+	})
+
 }

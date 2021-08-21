@@ -38,6 +38,13 @@ pub contract FiNS {
 	//event that is emitted if a blind bid is canceled	
 	pub event BlindBidCanceled(tag: String, bidder: Address)
 
+	//event reject the blind bid
+	pub event BlindBidRejected(tag: String, bidder: Address, amount: UFix64)
+
+
+	//event that is emitted if a auction is canceled
+	pub event AuctionCancelled(tag: String, bidder: Address, amount: UFix64)
+
 	//event that is emitted when an auction is startet, that is a bid that is greater then the minimum price has been added, 
 	//or the start auction is called manually by the seller on a lower bid
 	pub event AuctionStarted(tag: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
@@ -199,6 +206,7 @@ pub contract FiNS {
 		pub let auctionEnds: UFix64?
 		pub let salePrice: UFix64?
 		pub let latestBidBy: Address?
+		pub let currentTime: UFix64
 
 		init(tag: String, status:LeaseStatus, expireTime: UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?) {
 
@@ -209,6 +217,7 @@ pub contract FiNS {
 			self.latestBidBy=latestBidBy
 			self.auctionEnds=auctionEnds
 			self.salePrice=salePrice
+			self.currentTime=FiNS.time()
 		}
 
 	}
@@ -231,6 +240,9 @@ pub contract FiNS {
 
 		//place a bid on a token
 		access(contract) fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>)
+
+		//anybody should be able to fullfill an auction as long as it is done
+		pub fun fullfill(_ tag: String) 
 	}
 
 
@@ -378,7 +390,39 @@ pub contract FiNS {
 
 		}
 
-		pub fun fullfill(tag: String) {
+		//cancel will cancel and auction or reject a bid if no auction has started
+		pub fun cancel(_ tag: String) {
+			pre {
+				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
+			}
+
+
+			let lease = self.borrow(tag)
+			//if we have a callback there is no auction and it is a blind bid
+			if let cb= lease.callback {
+
+  				emit BlindBidRejected(tag: tag, bidder: cb.address, amount: cb.borrow()!.getBalance(tag))
+					cb.borrow()!.cancel(tag)
+					lease.setCallback(nil)
+			}
+
+
+			if self.auctions.containsKey(tag) {
+
+				let auction=self.borrowAuction(tag)
+
+				//the auction has ended
+				if auction.endsAt <= FiNS.time() {
+					panic("Cannot cancel finished auction, fullfill it instead")
+				}
+
+				emit AuctionCancelled(tag: tag, bidder: auction.callback.address, amount: auction.getBalance())
+				auction.callback.borrow()!.cancel(tag)
+				destroy <- self.auctions.remove(key: tag)!
+			}
+		}
+
+		pub fun fullfill(_ tag: String) {
 			pre {
 				self.tokens.containsKey(tag) : "Invalid tag=".concat(tag)
 				self.auctions.containsKey(tag) : "Tag is not for auction tag=".concat(tag)
