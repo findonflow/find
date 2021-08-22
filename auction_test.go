@@ -640,16 +640,32 @@ func TestAuction(t *testing.T) {
 			}))
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
 
-		value := g.ScriptFromFile("lease_status").StringArgument("user1").RunReturnsInterface()
-		t.Log(value)
+		g.TransactionFromFile("update_status").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.JanitorLock", map[string]interface{}{
+				"lockedUntil": "158840003.00000000",
+				"tag":         "user1",
+			}))
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
+
+		g.TransactionFromFile("update_status").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.JanitorFree", map[string]interface{}{
+				"tag": "user1",
+			}))
 
 		g.TransactionFromFile("bid").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			UFix64Argument("10.0").
 			Test(t).
-			AssertFailure("Cannot bid on tag that is free")
+			AssertFailure("cannot bid on tag that is free")
 
 	})
 }

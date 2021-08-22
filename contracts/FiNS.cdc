@@ -19,7 +19,10 @@ This contract is pretty long, I have tried splitting it up into several files, b
 */
 pub contract FiNS {
 
+	pub event JanitorLock(tag: String, lockedUntil:UFix64)
+	pub event JanitorFree(tag: String)
 
+//	pub event Janitor(tag: String, 
 	//event that is emited when a tag is registered or renewed
 	pub event Register(tag: String, owner: Address, expireAt: UFix64)
 
@@ -169,7 +172,7 @@ pub contract FiNS {
 		}
 
 		pub fun getLeaseStatus() : LeaseStatus {
-			return self.networkCap.borrow()!.getLeaseStatus(self.tag)
+			return FiNS.status(self.tag).status
 		}
 	}
 
@@ -178,7 +181,7 @@ pub contract FiNS {
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
-		access(contract) var  callback: Capability<&{BidCollectionPublic}>
+		access(contract) var callback: Capability<&{BidCollectionPublic}>
 		access(contract) let tag: String
 
 		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, callback: Capability<&{BidCollectionPublic}>, tag: String) {
@@ -651,14 +654,7 @@ pub contract FiNS {
 			panic("Could not find profile with tag=".concat(tag))
 		}
 
-		access(contract) fun getLeaseStatus(_ tag: String) : LeaseStatus{
-			if let lease= self.profiles[tag] {
-				return lease.status
-			}
-			panic("Could not find profile with tag=".concat(tag))
-		}
-
-		//moveing leases are done from the lease collection
+		//moving leases are done from the lease collection
 		access(contract) fun move(tag: String, profile: Capability<&{Profile.Public}>) {
 			if let lease= self.profiles[tag] {
 				lease.profile=profile
@@ -673,12 +669,11 @@ pub contract FiNS {
 
 			let tagStatus=self.status(tag)
 			if tagStatus.status == LeaseStatus.TAKEN {
-				panic("Tag already registered, if you want to renew lease use you LeaseToken")
+				panic("Tag already registered")
 			}
 
-			let registrant= profile.address
 			//if we have a locked profile that is not owned by the same identity then panic
-			if tagStatus.status == LeaseStatus.LOCKED && tagStatus.owner != registrant {
+			if tagStatus.status == LeaseStatus.LOCKED {
 				panic("Tag is locked")
 			}
 
@@ -712,12 +707,14 @@ pub contract FiNS {
 
 				if lease.status == LeaseStatus.LOCKED {
 					self.profiles.remove(key: tag)
+					emit JanitorFree(tag: tag)
 					return TagStatus(status: LeaseStatus.FREE, owner: nil)
 				}
 
 				if lease.status == LeaseStatus.TAKEN {
 					lease.status= LeaseStatus.LOCKED
 					lease.time = currentTime + self.lockPeriod
+					emit JanitorLock(tag: tag, lockedUntil:lease.time)
 					self.profiles[tag] = lease
 				}
 				return TagStatus(status:lease.status, owner:  owner)

@@ -86,7 +86,7 @@ func TestFiNS(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
-			AssertFailure("Tag already registered, if you want to renew lease use you LeaseToke")
+			AssertFailure("Tag already registered")
 
 	})
 
@@ -110,13 +110,27 @@ func TestFiNS(t *testing.T) {
 			StringArgument("user1").
 			Test(t).AssertFailure("locked")
 
+		g.TransactionFromFile("update_status").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.JanitorLock", map[string]interface{}{
+				"lockedUntil": "47304003.00000000",
+				"tag":         "user1",
+			}))
+
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
+
 		g.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.JanitorFree", map[string]interface{}{
+				"tag": "user1",
+			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.Register", map[string]interface{}{
-				"expireAt": "63072003.00000000",
+				"expireAt": "94608003.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 				"tag":      "user1",
 			})).

@@ -8,6 +8,9 @@ transaction(tag: String) {
 				if status.status == FiNS.LeaseStatus.LOCKED {
 					panic("locked")
 				}
+				if status.status == FiNS.LeaseStatus.FREE {
+					panic("free")
+				}
     }
 
 }
