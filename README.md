@@ -15,10 +15,13 @@ Right now an Identity in FiNS is a single user.  It uses the Versus profile to r
 
 ## Plans
 
- - heavily test with gwtf
+ - refactor tests
+ - create job to listed to events for JanitorTasks and run janitor on tags affected
+ - make lease for 1-2 chars cost 500 a year
 
 ## Testing
  `gotestsum -f testname --watch`
+ 
  
 
 # Flow Identity and the Flow Identity Network

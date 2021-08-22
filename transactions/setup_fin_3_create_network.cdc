@@ -23,7 +23,7 @@ transaction(leasePeriod: UFix64) {
 			lockPeriod: leasePeriod / 2.0,
 			secondaryCut: 0.025,
 			defaultPrice: 5.0,
-			lengthPrices: { 3: 500.0, 4:100.0},
+			lengthPrices: {1: 500.0, 2:500.0, 3: 500.0, 4:100.0},
 			wallet: wallet)
 		}
 	}
