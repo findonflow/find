@@ -7,8 +7,7 @@ transaction(tag: String, amount: UFix64) {
 
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
-		let seller=FiNS.lookup(tag)!.owner
-		
+		 
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
 		let leaseCollection = account.getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)

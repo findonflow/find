@@ -95,6 +95,7 @@ func TestAuction(t *testing.T) {
 			}))
 
 	})
+
 	t.Run("Should not start auction if bid lower then sale price", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
@@ -614,4 +615,41 @@ func TestAuction(t *testing.T) {
 			}))
 	})
 
+	t.Run("Should not be able to bid on lease that is free, and not cleaned up", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFiNS(g, t)
+
+		createUser(g, t, "100.0", "user1")
+		registerUser(g, t, "user1")
+		createUser(g, t, "100.0", "user2")
+		registerUser(g, t, "user2")
+
+		g.TransactionFromFile("sell").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.ForSale", map[string]interface{}{
+				"active":   "true",
+				"amount":   "10.00000000",
+				"expireAt": "31536001.00000000",
+				"owner":    "0x179b6b1cb6755e31",
+				"tag":      "user1",
+			}))
+
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
+
+		value := g.ScriptFromFile("lease_status").StringArgument("user1").RunReturnsInterface()
+		t.Log(value)
+
+		g.TransactionFromFile("bid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertFailure("Cannot bid on tag that is free")
+
+	})
 }

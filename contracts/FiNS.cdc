@@ -87,6 +87,7 @@ pub contract FiNS {
 		return self.networkCap!.borrow()!.calculateCost(tag)
 	}
 
+
 	pub fun lookup(_ tag:String): &{Profile.Public}? {
 		pre {
 			self.networkCap != nil : "Network is not set up"
@@ -102,12 +103,23 @@ pub contract FiNS {
 		profile.deposit(from: <- from)
 	}
 
-	pub fun status(_ tag: String): LeaseStatus {
+	pub fun status(_ tag: String): TagStatus {
 		pre {
 			self.networkCap != nil : "Network is not set up"
 		}
 		return self.networkCap!.borrow()!.status(tag)
 	}
+
+
+	pub struct  TagStatus{
+		pub let status: LeaseStatus
+		pub let owner: Address?
+
+		init(status:LeaseStatus, owner:Address?) {
+			self.status=status
+			self.owner=owner
+	}
+}
 
 	/*
 	=============================================================
@@ -247,6 +259,8 @@ pub contract FiNS {
 
 
 	pub resource LeaseCollection: LeaseCollectionPublic {
+		// TODO: janitor process, check if there are tokens that are expired or tokens that will soon be locked. Emit events should be public, script to check it and transaction to send events
+
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(contract) var tokens: @{String: FiNS.LeaseToken}
@@ -597,10 +611,10 @@ pub contract FiNS {
 		//this method is only called from a lease, and only the owner has that capability
 		access(contract) fun renew(tag: String, vault: @FUSD.Vault) {
 			if let lease= self.profiles[tag] {
-				let status=self.status(tag)
+				let tagStatus=self.status(tag)
 
 				var newTime=0.0
-				if status == LeaseStatus.TAKEN {
+				if tagStatus.status == LeaseStatus.TAKEN {
 					//the tag is taken but not expired so we extend the total period of the lease
 					newTime= lease.time + self.leasePeriod
 				} else {
@@ -623,7 +637,7 @@ pub contract FiNS {
 					tag: tag
 				)
 
-				emit Register(tag: tag, owner:lease.profile.address, expireAt: lease.time)
+				emit Register(tag: tag, owner:tagStatus.owner!, expireAt: lease.time)
 				self.profiles[tag] =  lease
 				return
 			}
@@ -657,14 +671,14 @@ pub contract FiNS {
 		//everybody can call register, normally done through the convenience method in the contract
 		pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
-			let status=self.status(tag)
-			if status == LeaseStatus.TAKEN {
+			let tagStatus=self.status(tag)
+			if tagStatus.status == LeaseStatus.TAKEN {
 				panic("Tag already registered, if you want to renew lease use you LeaseToken")
 			}
 
 			let registrant= profile.address
 			//if we have a locked profile that is not owned by the same identity then panic
-			if status == LeaseStatus.LOCKED && self.profiles[tag]!.address != registrant {
+			if tagStatus.status == LeaseStatus.LOCKED && tagStatus.owner != registrant {
 				panic("Tag is locked")
 			}
 
@@ -688,46 +702,33 @@ pub contract FiNS {
 		}
 
 
-		pub fun status(_ tag: String): LeaseStatus {
+		pub fun status(_ tag: String): TagStatus {
 			let currentTime=FiNS.time()
-			log("Check status at time=".concat(currentTime.toString()))
-			if let  lease= self.profiles[tag] {
+			if let lease= self.profiles[tag] {
 				let owner=lease.profile.borrow()!.owner!.address
-				log("lease time is=".concat(lease.time.toString()))
-				let diff= Int64(lease.time) - Int64(currentTime)
-				log("time diff is=".concat(diff.toString()))
-				log("lease status was=".concat(lease.status.rawValue.toString()))
 				if currentTime <= lease.time {
-					log("Still valid")
-					return lease.status
+					return TagStatus(status: lease.status, owner: owner)
 				}
 
 				if lease.status == LeaseStatus.LOCKED {
 					self.profiles.remove(key: tag)
-					log("was locked that is expired")
-					return LeaseStatus.FREE
+					return TagStatus(status: LeaseStatus.FREE, owner: nil)
 				}
 
 				if lease.status == LeaseStatus.TAKEN {
 					lease.status= LeaseStatus.LOCKED
-					log("lock period is")
-					log(self.lockPeriod)
 					lease.time = currentTime + self.lockPeriod
 					self.profiles[tag] = lease
-					log("was taken is now locked")
-					log(lease.time)
-					log(lease.status)
 				}
-				return lease.status
+				return TagStatus(status:lease.status, owner:  owner)
 			}
-			log("FREE")
-			return LeaseStatus.FREE
+			return TagStatus(status:LeaseStatus.FREE, owner: nil)
 		}
 
 		//lookup a tag that is not locked
 		pub fun lookup(_ tag: String) : &{Profile.Public}? {
-			let status=self.status(tag)
-			if status != LeaseStatus.TAKEN {
+			let tagStatus=self.status(tag)
+			if tagStatus.status != LeaseStatus.TAKEN {
 				return nil
 			}
 
@@ -961,8 +962,11 @@ pub contract FiNS {
 
 		//make a bid on a tag
 		pub fun bid(tag: String, vault: @FUSD.Vault) {
-			let seller= FiNS.lookup(tag)!.owner!
-			let from=seller.getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
+			let tagStatus=FiNS.status(tag)
+			if tagStatus.status ==  LeaseStatus.FREE {
+				panic("cannot bid on tag that is free")
+			}
+			let from=getAccount(tagStatus.owner!).getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
 
 			let bid <- create Bid(from: from, tag:tag, vault: <- vault)
 			let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of tag=".concat(tag))
@@ -976,19 +980,29 @@ pub contract FiNS {
 
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(tag: String, vault: @FungibleToken.Vault) {
+			let tagStatus=FiNS.status(tag)
+			if tagStatus.status ==  LeaseStatus.FREE {
+				panic("cannot increaseBid on tag that is free")
+			}
+			let seller=getAccount(tagStatus.owner!).getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
+
 			let bid =self.borrowBid(tag)
 			bid.setBidAt(FiNS.time())
 			bid.vault.deposit(from: <- vault)
 
-			let seller= FiNS.lookup(tag)!.owner!
-			let from=seller.getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
+			let from=getAccount(tagStatus.owner!).getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
 			from.borrow()!.increaseBid(tag)
 		}
 
 		//cancel a bid, will panic if called after auction has started
 		pub fun cancelBid(_ tag: String) {
-			let seller= FiNS.lookup(tag)!.owner!
-			let from=seller.getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
+
+			let tagStatus=FiNS.status(tag)
+			if tagStatus.status == LeaseStatus.FREE {
+				self.cancel(tag)
+				return
+			}
+			let from=getAccount(tagStatus.owner!).getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
 			from.borrow()!.cancelBid(tag)
 			self.cancel(tag)
 		}

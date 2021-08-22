@@ -25,8 +25,5 @@ transaction(tag: String) {
 		let leases=acct.borrow<&FiNS.LeaseCollection>(from: FiNS.LeaseStoragePath)!
 		leases.register(tag: tag, vault: <- payVault)
 
-		log("STATUS POST")
-		log(FiNS.status(tag))
-
 	}
 }
