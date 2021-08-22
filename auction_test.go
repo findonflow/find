@@ -668,4 +668,6 @@ func TestAuction(t *testing.T) {
 			AssertFailure("cannot bid on tag that is free")
 
 	})
+	//TODO; if bid on item and it gets cleaned up bid should be paid back
+	//TODO: make test methods
 }

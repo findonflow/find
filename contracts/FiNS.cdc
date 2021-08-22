@@ -20,14 +20,17 @@ This contract is pretty long, I have tried splitting it up into several files, b
 pub contract FiNS {
 
 	pub event JanitorLock(tag: String, lockedUntil:UFix64)
+
 	pub event JanitorFree(tag: String)
 
-//	pub event Janitor(tag: String, 
+	//	pub event Janitor(tag: String, 
 	//event that is emited when a tag is registered or renewed
 	pub event Register(tag: String, owner: Address, expireAt: UFix64)
 
 	//event that is emitted when a tag is moved
 	pub event Moved(tag: String, previousOwner: Address, newOwner: Address, expireAt: UFix64)
+
+	pub event Freed(tag: String, previousOwner: Address)
 
 	//event that is emitted when a tag is sold
 	pub event Sold(tag: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
@@ -106,23 +109,39 @@ pub contract FiNS {
 		profile.deposit(from: <- from)
 	}
 
-	pub fun status(_ tag: String): TagStatus {
+	pub fun outdated(): [String] {
+		pre {
+			self.networkCap != nil : "Network is not set up"
+		}
+		return self.networkCap!.borrow()!.outdated()
+	}
+
+	pub fun janitor(_ tag: String): TagStatus {
 		pre {
 			self.networkCap != nil : "Network is not set up"
 		}
 		return self.networkCap!.borrow()!.status(tag)
 	}
 
+	pub fun status(_ tag: String): TagStatus {
+		pre {
+			self.networkCap != nil : "Network is not set up"
+		}
+		return self.networkCap!.borrow()!.readStatus(tag)
+	}
+
 
 	pub struct  TagStatus{
 		pub let status: LeaseStatus
 		pub let owner: Address?
+		pub let persisted: Bool
 
-		init(status:LeaseStatus, owner:Address?) {
+		init(status:LeaseStatus, owner:Address?,persisted:Bool) {
 			self.status=status
 			self.owner=owner
+			self.persisted=persisted
+		}
 	}
-}
 
 	/*
 	=============================================================
@@ -255,6 +274,9 @@ pub contract FiNS {
 
 		//place a bid on a token
 		access(contract) fun bid(tag: String, callback: Capability<&{BidCollectionPublic}>)
+
+		//the janitor process has to remove leases
+		access(contract) fun remove(_ tag: String) 
 
 		//anybody should be able to fullfill an auction as long as it is done
 		pub fun fullfill(_ tag: String) 
@@ -418,11 +440,10 @@ pub contract FiNS {
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= lease.callback {
 
-  				emit BlindBidRejected(tag: tag, bidder: cb.address, amount: cb.borrow()!.getBalance(tag))
-					cb.borrow()!.cancel(tag)
-					lease.setCallback(nil)
+				emit BlindBidRejected(tag: tag, bidder: cb.address, amount: cb.borrow()!.getBalance(tag))
+				cb.borrow()!.cancel(tag)
+				lease.setCallback(nil)
 			}
-
 
 			if self.auctions.containsKey(tag) {
 
@@ -502,6 +523,14 @@ pub contract FiNS {
 			to.borrow()!.deposit(token: <- token)
 		}
 
+		//note that when moving a tag
+		access(contract) fun remove(_ tag: String) {
+			self.cancel(tag)
+			let token <- self.tokens.remove(key:  tag) ?? panic("missing NFT")
+			emit Freed(tag:tag, previousOwner:self.owner!.address)
+			destroy token
+		}
+
 		//depoit a lease token into the lease collection, not available from the outside
 		access(contract) fun deposit(token: @FiNS.LeaseToken) {
 			// add the new token to the dictionary which removes the old one
@@ -529,13 +558,13 @@ pub contract FiNS {
 
 		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
 		pub fun register(tag: String, vault: @FUSD.Vault){
-	  	pre {
-	  		tag.length >= 3 : "A public minted FiNS tag has to be minimum 3 letters long"
-	  	}
+			pre {
+				tag.length >= 3 : "A public minted FiNS tag has to be minimum 3 letters long"
+			}
 			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
 			let leases= self.owner!.getCapability<&{LeaseCollectionPublic}>(FiNS.LeasePublicPath)
 			FiNS.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profileCap, leases: leases)
-	}
+		}
 
 
 
@@ -696,19 +725,53 @@ pub contract FiNS {
 			leases.borrow()!.deposit(token: <- create LeaseToken(tag: tag, networkCap: FiNS.networkCap!))
 		}
 
+		pub fun readStatus(_ tag: String): TagStatus {
+			let currentTime=FiNS.time()
+			if let lease= self.profiles[tag] {
+				let owner=lease.profile.borrow()!.owner!.address
+				if currentTime <= lease.time {
+					return TagStatus(status: lease.status, owner: owner, persisted: true)
+				}
+
+				if lease.status == LeaseStatus.LOCKED {
+					return TagStatus(status: LeaseStatus.FREE, owner: nil, persisted: false)
+				}
+
+				if lease.status == LeaseStatus.TAKEN {
+					return TagStatus(status:LeaseStatus.LOCKED, owner:  owner, persisted:false)
+				}
+			}
+			return TagStatus(status:LeaseStatus.FREE, owner: nil, persisted:true)
+		}
+
+		pub fun outdated() : [String] {
+			var outdated :[String] = []
+
+			for tag in self.profiles.keys {
+				if !self.readStatus(tag).persisted {
+					outdated.append(tag)
+				}
+			}
+
+			return outdated
+		}
 
 		pub fun status(_ tag: String): TagStatus {
 			let currentTime=FiNS.time()
 			if let lease= self.profiles[tag] {
 				let owner=lease.profile.borrow()!.owner!.address
 				if currentTime <= lease.time {
-					return TagStatus(status: lease.status, owner: owner)
+					return TagStatus(status: lease.status, owner: owner, persisted:true)
 				}
 
 				if lease.status == LeaseStatus.LOCKED {
+
+					let leaseCollection=getAccount(owner).getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath).borrow()!
+					leaseCollection.remove(tag)
+
 					self.profiles.remove(key: tag)
 					emit JanitorFree(tag: tag)
-					return TagStatus(status: LeaseStatus.FREE, owner: nil)
+					return TagStatus(status: LeaseStatus.FREE, owner: nil, persisted:true)
 				}
 
 				if lease.status == LeaseStatus.TAKEN {
@@ -717,9 +780,9 @@ pub contract FiNS {
 					emit JanitorLock(tag: tag, lockedUntil:lease.time)
 					self.profiles[tag] = lease
 				}
-				return TagStatus(status:lease.status, owner:  owner)
+				return TagStatus(status:lease.status, owner:  owner, persisted: true)
 			}
-			return TagStatus(status:LeaseStatus.FREE, owner: nil)
+			return TagStatus(status:LeaseStatus.FREE, owner: nil, persisted: true)
 		}
 
 		//lookup a tag that is not locked
