@@ -17,7 +17,7 @@ Right now an Identity in FiNS is a single user.  It uses the Versus profile to r
 
  - refactor tests
  - create job to listed to events for JanitorTasks and run janitor on tags affected
- - make lease for 1-2 chars cost 500 a year
+ - should registering 1-2 chars really be allowed by admin?
 
 ## Testing
  `gotestsum -f testname --watch`
