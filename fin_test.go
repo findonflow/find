@@ -146,27 +146,6 @@ func TestFiNS(t *testing.T) {
 
 	})
 
-	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
-
-		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
-
-		createUser(g, t, "10.0", "user1")
-
-		g.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).
-			AssertSuccess()
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("2.0").Test(t).AssertSuccess()
-
-		value := g.ScriptFromFile("status").StringArgument("user1").RunReturnsInterface()
-		assert.Equal(t, "", value)
-
-	})
-
 	t.Run("Admin should be able to register short tag", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
@@ -189,6 +168,24 @@ func TestFiNS(t *testing.T) {
 			}))
 
 	})
+
+	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFiNS(g, t)
+
+		createUser(g, t, "10.0", "user1")
+
+		registerUser(g, t, "user1")
+
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
+		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("2.0").Test(t).AssertSuccess()
+
+		value := g.ScriptFromFile("status").StringArgument("user1").RunReturnsInterface()
+		assert.Equal(t, "", value)
+
+	})
+
 }
 
 func registerUser(g *gwtf.GoWithTheFlow, t *testing.T, name string) {

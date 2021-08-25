@@ -20,6 +20,7 @@ Right now an Identity in FiNS is a single user.  It uses the Versus profile to r
  - should registering 1-2 chars really be allowed by admin?
 
 ## Testing
+
  `gotestsum -f testname --watch`
  
  

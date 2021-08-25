@@ -787,7 +787,7 @@ pub contract FiNS {
 
 		//lookup a tag that is not locked
 		pub fun lookup(_ tag: String) : &{Profile.Public}? {
-			let tagStatus=self.status(tag)
+			let tagStatus=self.readStatus(tag)
 			if tagStatus.status != LeaseStatus.TAKEN {
 				return nil
 			}
