@@ -1,16 +1,16 @@
-# FiNS - Flow identity Name Service
+# FIND - Flow identity Name Directory
 
 Flow does not have any equivalent to ENS or any way to lookup a user by a tag/alias/nick. 
 
-FiNS is here to solve that issue. 
+FIND is here to solve that issue. 
 
 In order to use FiNS you create your Flow Identity/Profile [and](and) store that in your account. Then you can optionally register that with FiNS for a small yearly fee. 
 
-FiNS is priced with inspiration from ENS. 500 for 3 chars, 100 for 4 chars and 5 for 5 or more chars. 2 and 1 chars can only be minted by admin.
+FIND is priced with inspiration from ENS. 500 for 3 chars, 100 for 4 chars and 5 for 5 or more chars. 2 and 1 chars can only be minted by admin.
 
 ## Flow Identity
 
-Right now an Identity in FiNS is a single user.  It uses the Versus profile to represent a user.
+Right now an Identity in FIND is a single user.  It uses the Versus profile to represent a user.
 
 
 ## Plans
