@@ -14,16 +14,14 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 
 ## Plans
-
  - refactor tests
- - create job to listed to events for JanitorTasks and run janitor on names affected
- - should registering 1-2 chars really be allowed by admin?
+ - document
+ - use debug log in test
+ - rewrite debug log to be default turned off
 
 ## Testing
 
  `gotestsum -f testname --watch`
- 
- 
 
 # Flow Identity and the Flow Identity Network
 

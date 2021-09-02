@@ -57,10 +57,10 @@ resource interface BidCollectionPublic {
 ---
 ## Structs & Resources
 
-### struct `TagStatus`
+### struct `NameStatus`
 
 ```cadence
-struct TagStatus {
+struct NameStatus {
 
     status:  LeaseStatus
 
@@ -70,7 +70,7 @@ struct TagStatus {
 }
 ```
 
-[More...](FIND_TagStatus.md)
+[More...](FIND_NameStatus.md)
 
 ---
 
@@ -329,7 +329,7 @@ func outdated(): [String]
 ### fun `janitor()`
 
 ```cadence
-func janitor(_ String): TagStatus
+func janitor(_ String): NameStatus
 ```
 this needs to be called from a transaction
 
@@ -338,7 +338,7 @@ this needs to be called from a transaction
 ### fun `status()`
 
 ```cadence
-func status(_ String): TagStatus
+func status(_ String): NameStatus
 ```
 
 ---

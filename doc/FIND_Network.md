@@ -64,7 +64,7 @@ func register(name String, vault FUSD.Vault, profile Capability<&{Profile.Public
 ### fun `readStatus()`
 
 ```cadence
-func readStatus(_ String): TagStatus
+func readStatus(_ String): NameStatus
 ```
 
 ---
@@ -80,7 +80,7 @@ func outdated(): [String]
 ### fun `status()`
 
 ```cadence
-func status(_ String): TagStatus
+func status(_ String): NameStatus
 ```
 
 ---

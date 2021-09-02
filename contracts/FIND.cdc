@@ -1,5 +1,4 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-
 import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
@@ -49,7 +48,6 @@ pub contract FIND {
 
 	//event reject the blind bid
 	pub event BlindBidRejected(name: String, bidder: Address, amount: UFix64)
-
 
 	//event that is emitted if a auction is canceled
 	pub event AuctionCancelled(name: String, bidder: Address, amount: UFix64)
@@ -117,14 +115,14 @@ pub contract FIND {
 	}
 
 	/// this needs to be called from a transaction
-	pub fun janitor(_ name: String): TagStatus {
+	pub fun janitor(_ name: String): NameStatus {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.status(name)
 		}
 		panic("Network is not set up")
 	}
 
-	pub fun status(_ name: String): TagStatus {
+	pub fun status(_ name: String): NameStatus {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.readStatus(name)
 		}
@@ -132,7 +130,7 @@ pub contract FIND {
 	}
 
 
-	pub struct  TagStatus{
+	pub struct  NameStatus{
 		pub let status: LeaseStatus
 		pub let owner: Address?
 		pub let persisted: Bool
@@ -723,23 +721,23 @@ pub contract FIND {
 			leases.borrow()!.deposit(token: <- create LeaseToken(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
 		}
 
-		pub fun readStatus(_ name: String): TagStatus {
+		pub fun readStatus(_ name: String): NameStatus {
 			let currentTime=Clock.time()
 			if let lease= self.profiles[name] {
 				let owner=lease.profile.borrow()!.owner!.address
 				if currentTime <= lease.time {
-					return TagStatus(status: lease.status, owner: owner, persisted: true)
+					return NameStatus(status: lease.status, owner: owner, persisted: true)
 				}
 
 				if lease.status == LeaseStatus.LOCKED {
-					return TagStatus(status: LeaseStatus.FREE, owner: nil, persisted: false)
+					return NameStatus(status: LeaseStatus.FREE, owner: nil, persisted: false)
 				}
 
 				if lease.status == LeaseStatus.TAKEN {
-					return TagStatus(status:LeaseStatus.LOCKED, owner:  owner, persisted:false)
+					return NameStatus(status:LeaseStatus.LOCKED, owner:  owner, persisted:false)
 				}
 			}
-			return TagStatus(status:LeaseStatus.FREE, owner: nil, persisted:true)
+			return NameStatus(status:LeaseStatus.FREE, owner: nil, persisted:true)
 		}
 
 		pub fun outdated() : [String] {
@@ -754,12 +752,13 @@ pub contract FIND {
 			return outdated
 		}
 
-		pub fun status(_ name: String): TagStatus {
+		/// This method is almost like readStatus except that it will mutate state and fix the name it looks up if it is invalid.  Events are emitted when this is done.
+		pub fun status(_ name: String): NameStatus {
 			let currentTime=Clock.time()
 			if let lease= self.profiles[name] {
 				let owner=lease.profile.borrow()!.owner!.address
 				if currentTime <= lease.time {
-					return TagStatus(status: lease.status, owner: owner, persisted:true)
+					return NameStatus(status: lease.status, owner: owner, persisted:true)
 				}
 
 				if lease.status == LeaseStatus.LOCKED {
@@ -769,7 +768,7 @@ pub contract FIND {
 
 					self.profiles.remove(key: name)
 					emit JanitorFree(name: name)
-					return TagStatus(status: LeaseStatus.FREE, owner: nil, persisted:true)
+					return NameStatus(status: LeaseStatus.FREE, owner: nil, persisted:true)
 				}
 
 				if lease.status == LeaseStatus.TAKEN {
@@ -778,9 +777,9 @@ pub contract FIND {
 					emit JanitorLock(name: name, lockedUntil:lease.time)
 					self.profiles[name] = lease
 				}
-				return TagStatus(status:lease.status, owner:  owner, persisted: true)
+				return NameStatus(status:lease.status, owner:  owner, persisted: true)
 			}
-			return TagStatus(status:LeaseStatus.FREE, owner: nil, persisted: true)
+			return NameStatus(status:LeaseStatus.FREE, owner: nil, persisted: true)
 		}
 
 		//lookup a name that is not locked
@@ -812,66 +811,6 @@ pub contract FIND {
 		}
 	}
 
-
-	//Admin client to use for capability receiver pattern
-	pub fun createAdminProxyClient() : @AdminProxy {
-		return <- create AdminProxy()
-	}
-
-	//interface to use for capability receiver pattern
-	pub resource interface AdminProxyClient {
-		pub fun addCapability(_ cap: Capability<&Network>)
-	}
-
-
-	//admin proxy with capability receiver 
-	pub resource AdminProxy: AdminProxyClient {
-
-		access(self) var capability: Capability<&Network>?
-
-		pub fun addCapability(_ cap: Capability<&Network>) {
-			pre {
-				cap.check() : "Invalid server capablity"
-				self.capability == nil : "Server already set"
-			}
-			self.capability = cap
-		}
-
-
-		/// Set the wallet used for the network
-		/// @param _ The FT receiver to send the money to
-		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
-				pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			self.capability!.borrow()!.setWallet(wallet)
-		}
-
-		//Admins can register names without name length restrictions
-		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
-		}
-
-		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
-		pub fun advanceClock(_ time: UFix64) {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			Clock.enable()
-			Clock.tick(time)
-		}
-
-
-		init() {
-			self.capability = nil
-		}
-
-	}
 
 
 	/*
@@ -1037,6 +976,71 @@ pub contract FIND {
 		return <- create BidCollection(receiver: receiver,  leases: leases)
 	}
 
+
+
+	/// ===================================================================================
+	// Admin things
+	/// ===================================================================================
+
+	//Admin client to use for capability receiver pattern
+	pub fun createAdminProxyClient() : @AdminProxy {
+		return <- create AdminProxy()
+	}
+
+	//interface to use for capability receiver pattern
+	pub resource interface AdminProxyClient {
+		pub fun addCapability(_ cap: Capability<&Network>)
+	}
+
+
+	//admin proxy with capability receiver 
+	pub resource AdminProxy: AdminProxyClient {
+
+		access(self) var capability: Capability<&Network>?
+
+		pub fun addCapability(_ cap: Capability<&Network>) {
+			pre {
+				cap.check() : "Invalid server capablity"
+				self.capability == nil : "Server already set"
+			}
+			self.capability = cap
+		}
+
+
+		/// Set the wallet used for the network
+		/// @param _ The FT receiver to send the money to
+		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
+				pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.setWallet(wallet)
+		}
+
+		//Admins can register names without name length restrictions
+		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
+		}
+
+		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
+		pub fun advanceClock(_ time: UFix64) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			Clock.enable()
+			Clock.tick(time)
+		}
+
+
+		init() {
+			self.capability = nil
+		}
+
+	}
 	init() {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
