@@ -2,7 +2,7 @@ import FIND from "../contracts/FIND.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
-transaction(tag: String, amount: UFix64) {
+transaction(name: String, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 
@@ -25,7 +25,7 @@ transaction(tag: String, amount: UFix64) {
 
 		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
 		let bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)!
-		bids.bid(tag: tag, vault: <- vault)
+		bids.bid(name: name, vault: <- vault)
 
 	}
 }

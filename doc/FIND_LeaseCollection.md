@@ -70,7 +70,15 @@ func increaseBid(_ String)
 ### fun `bid()`
 
 ```cadence
-func bid(tag String, callback Capability<&{BidCollectionPublic}>)
+func bid(name String, callback Capability<&{BidCollectionPublic}>)
+```
+
+---
+
+### fun `cancel()`
+
+```cadence
+func cancel(_ String)
 ```
 
 ---
@@ -78,7 +86,7 @@ func bid(tag String, callback Capability<&{BidCollectionPublic}>)
 ### fun `fullfill()`
 
 ```cadence
-func fullfill(tag String)
+func fullfill(_ String)
 ```
 
 ---
@@ -86,7 +94,7 @@ func fullfill(tag String)
 ### fun `listForSale()`
 
 ```cadence
-func listForSale(tag String, amount UFix64)
+func listForSale(name String, amount UFix64)
 ```
 
 ---
@@ -102,7 +110,15 @@ func delistSale(_ String)
 ### fun `move()`
 
 ```cadence
-func move(tag String, profile Capability<&{Profile.Public}>, to Capability<&{LeaseCollectionPublic}>)
+func move(name String, profile Capability<&{Profile.Public}>, to Capability<&{LeaseCollectionPublic}>)
+```
+
+---
+
+### fun `remove()`
+
+```cadence
+func remove(_ String)
 ```
 
 ---
@@ -135,6 +151,14 @@ func borrow(_ String): &FIND.LeaseToken
 
 ```cadence
 func borrowAuction(_ String): &FIND.Auction
+```
+
+---
+
+### fun `register()`
+
+```cadence
+func register(name String, vault FUSD.Vault)
 ```
 
 ---

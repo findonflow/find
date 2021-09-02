@@ -2,11 +2,11 @@ import FIND from "../contracts/FIND.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
-transaction(tag: String, amount: UFix64) {
+transaction(name: String, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
-		let seller=FIND.lookup(tag)!.owner
+		let seller=FIND.lookup(name)!.owner
 		
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
@@ -25,7 +25,7 @@ transaction(tag: String, amount: UFix64) {
 
 		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
 		let bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)!
-		bids.increaseBid(tag: tag, vault: <- vault)
+		bids.increaseBid(name: name, vault: <- vault)
 
 	}
 }

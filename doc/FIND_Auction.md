@@ -11,7 +11,7 @@ resource Auction {
 
     callback:  Capability<&{BidCollectionPublic}>
 
-    tag:  String
+    name:  String
 }
 ```
 
@@ -19,7 +19,7 @@ resource Auction {
 ### Initializer
 
 ```cadence
-func init(endsAt UFix64, startedAt UFix64, extendOnLateBid UFix64, callback Capability<&{BidCollectionPublic}>, tag String)
+func init(endsAt UFix64, startedAt UFix64, extendOnLateBid UFix64, callback Capability<&{BidCollectionPublic}>, name String)
 ```
 
 

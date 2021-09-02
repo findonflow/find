@@ -58,7 +58,23 @@ func increaseBid(_ String)
 ### fun `bid()`
 
 ```cadence
-func bid(tag String, callback Capability<&{BidCollectionPublic}>)
+func bid(name String, callback Capability<&{BidCollectionPublic}>)
+```
+
+---
+
+### fun `remove()`
+
+```cadence
+func remove(_ String)
+```
+
+---
+
+### fun `fullfill()`
+
+```cadence
+func fullfill(_ String)
 ```
 
 ---

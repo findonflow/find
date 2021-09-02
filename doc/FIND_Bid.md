@@ -5,7 +5,7 @@ resource Bid {
 
     from:  Capability<&{FIND.LeaseCollectionPublic}>
 
-    tag:  String
+    name:  String
 
     vault:  FUSD.Vault
 
@@ -17,7 +17,7 @@ resource Bid {
 ### Initializer
 
 ```cadence
-func init(from Capability<&{FIND.LeaseCollectionPublic}>, tag String, vault FUSD.Vault)
+func init(from Capability<&{FIND.LeaseCollectionPublic}>, name String, vault FUSD.Vault)
 ```
 
 

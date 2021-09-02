@@ -11,7 +11,7 @@ struct NetworkLease {
 
     address:  Address
 
-    tag:  String
+    name:  String
 }
 ```
 
@@ -19,7 +19,7 @@ struct NetworkLease {
 ### Initializer
 
 ```cadence
-func init(status LeaseStatus, time UFix64, profile Capability<&{Profile.Public}>, tag String)
+func init(status LeaseStatus, time UFix64, profile Capability<&{Profile.Public}>, name String)
 ```
 
 

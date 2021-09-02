@@ -3,7 +3,7 @@
 ```cadence
 resource LeaseToken {
 
-    tag:  String
+    name:  String
 
     networkCap:  Capability<&Network>
 
@@ -17,7 +17,7 @@ resource LeaseToken {
 ### Initializer
 
 ```cadence
-func init(tag String, networkCap Capability<&Network>)
+func init(name String, networkCap Capability<&Network>)
 ```
 
 

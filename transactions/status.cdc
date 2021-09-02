@@ -1,10 +1,10 @@
 
 import FIND from "../contracts/FIND.cdc"
 
-transaction(tag: String) {
+transaction(name: String) {
 
     prepare(account: AuthAccount) {
-        let status=FIND.status(tag)
+        let status=FIND.status(name)
 				if status.status == FIND.LeaseStatus.LOCKED {
 					panic("locked")
 				}

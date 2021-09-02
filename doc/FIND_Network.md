@@ -32,7 +32,7 @@ func init(leasePeriod UFix64, lockPeriod UFix64, secondaryCut UFix64, defaultPri
 ### fun `renew()`
 
 ```cadence
-func renew(tag String, vault FUSD.Vault)
+func renew(name String, vault FUSD.Vault)
 ```
 
 ---
@@ -45,18 +45,10 @@ func getLeaseExpireTime(_ String): UFix64
 
 ---
 
-### fun `getLeaseStatus()`
-
-```cadence
-func getLeaseStatus(_ String): LeaseStatus
-```
-
----
-
 ### fun `move()`
 
 ```cadence
-func move(tag String, profile Capability<&{Profile.Public}>)
+func move(name String, profile Capability<&{Profile.Public}>)
 ```
 
 ---
@@ -64,7 +56,23 @@ func move(tag String, profile Capability<&{Profile.Public}>)
 ### fun `register()`
 
 ```cadence
-func register(tag String, vault FUSD.Vault, profile Capability<&{Profile.Public}>, leases Capability<&{LeaseCollectionPublic}>)
+func register(name String, vault FUSD.Vault, profile Capability<&{Profile.Public}>, leases Capability<&{LeaseCollectionPublic}>)
+```
+
+---
+
+### fun `readStatus()`
+
+```cadence
+func readStatus(_ String): TagStatus
+```
+
+---
+
+### fun `outdated()`
+
+```cadence
+func outdated(): [String]
 ```
 
 ---
@@ -72,7 +80,7 @@ func register(tag String, vault FUSD.Vault, profile Capability<&{Profile.Public}
 ### fun `status()`
 
 ```cadence
-func status(_ String): LeaseStatus
+func status(_ String): TagStatus
 ```
 
 ---
@@ -93,34 +101,10 @@ func calculateCost(_ String): UFix64
 
 ---
 
-### fun `setLengthPrices()`
+### fun `setWallet()`
 
 ```cadence
-func setLengthPrices(_ {Int: UFix64})
-```
-
----
-
-### fun `setDefaultPrice()`
-
-```cadence
-func setDefaultPrice(_ UFix64)
-```
-
----
-
-### fun `setLeasePeriod()`
-
-```cadence
-func setLeasePeriod(_ UFix64)
-```
-
----
-
-### fun `setLockPeriod()`
-
-```cadence
-func setLockPeriod(_ UFix64)
+func setWallet(_ Capability<&{FungibleToken.Receiver}>)
 ```
 
 ---

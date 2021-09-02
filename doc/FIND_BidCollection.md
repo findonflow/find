@@ -52,7 +52,7 @@ func getBids(): [BidInfo]
 ### fun `bid()`
 
 ```cadence
-func bid(tag String, vault FUSD.Vault)
+func bid(name String, vault FUSD.Vault)
 ```
 
 ---
@@ -60,7 +60,7 @@ func bid(tag String, vault FUSD.Vault)
 ### fun `increaseBid()`
 
 ```cadence
-func increaseBid(tag String, vault FungibleToken.Vault)
+func increaseBid(name String, vault FungibleToken.Vault)
 ```
 
 ---

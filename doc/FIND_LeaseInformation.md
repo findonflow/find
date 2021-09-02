@@ -3,7 +3,7 @@
 ```cadence
 struct LeaseInformation {
 
-    tag:  String
+    name:  String
 
     status:  LeaseStatus
 
@@ -16,6 +16,8 @@ struct LeaseInformation {
     salePrice:  UFix64?
 
     latestBidBy:  Address?
+
+    currentTime:  UFix64
 }
 ```
 
@@ -23,7 +25,7 @@ struct LeaseInformation {
 ### Initializer
 
 ```cadence
-func init(tag String, status LeaseStatus, expireTime UFix64, latestBid UFix64?, auctionEnds UFix64?, salePrice UFix64?, latestBidBy Address?)
+func init(name String, status LeaseStatus, expireTime UFix64, latestBid UFix64?, auctionEnds UFix64?, salePrice UFix64?, latestBidBy Address?)
 ```
 
 

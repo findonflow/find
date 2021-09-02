@@ -10,7 +10,7 @@ resource interface AdminProxyClient {
 ### fun `addCapability()`
 
 ```cadence
-func addCapability(_ Capability<&Administrator>)
+func addCapability(_ Capability<&Network>)
 ```
 
 ---

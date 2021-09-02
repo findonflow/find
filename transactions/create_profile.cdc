@@ -3,10 +3,10 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
 
 
-transaction(name: String, description: String, tags:[String], allowStoringFollowers: Bool) {
+transaction(name: String, description: String, names:[String], allowStoringFollowers: Bool) {
 	prepare(acct: AuthAccount) {
 
-		let profile <-Profile.createUser(name:name, description: description, allowStoringFollowers:allowStoringFollowers, tags:tags)
+		let profile <-Profile.createUser(name:name, description: description, allowStoringFollowers:allowStoringFollowers, names:names)
 
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
@@ -21,7 +21,7 @@ transaction(name: String, description: String, tags:[String], allowStoringFollow
 				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
 				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
 				accept: Type<@FUSD.Vault>(),
-				tags: ["fusd", "stablecoin"]
+				names: ["fusd", "stablecoin"]
 			)
 
 			profile.addWallet(fusdWallet)

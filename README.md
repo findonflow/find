@@ -1,6 +1,6 @@
-# FIND - Flow identity Name Directory
+# FIND - Flow Integrated Name Directory
 
-Flow does not have any equivalent to ENS or any way to lookup a user by a tag/alias/nick. 
+Flow does not have any equivalent to ENS or any way to lookup a user by a name/alias/nick. 
 
 FIND is here to solve that issue. 
 
@@ -16,7 +16,7 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 ## Plans
 
  - refactor tests
- - create job to listed to events for JanitorTasks and run janitor on tags affected
+ - create job to listed to events for JanitorTasks and run janitor on names affected
  - should registering 1-2 chars really be allowed by admin?
 
 ## Testing

@@ -1,7 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
-transaction(from: Address, tag: String, amount: UFix64) {
+transaction(from: Address, name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
 
 
@@ -19,7 +19,7 @@ transaction(from: Address, tag: String, amount: UFix64) {
 
 		let buyer=acct.getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-		leases.buy(tag: tag, vault: <- payVault, leases: buyer)
+		leases.buy(name: name, vault: <- payVault, leases: buyer)
 
 	}
 }

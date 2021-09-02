@@ -5,7 +5,7 @@ import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-transaction(tag: String, user: Address) {
+transaction(name: String, user: Address) {
 
 	prepare(account: AuthAccount) {
 
@@ -19,7 +19,7 @@ transaction(tag: String, user: Address) {
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
 		let payVault <- vaultRef.withdraw(amount: 5.0) as! @FUSD.Vault
 
-		adminClient.register(tag: tag, vault: <- payVault, profile: profileCap, leases: leaseCollectionCap)
+		adminClient.register(name: name, vault: <- payVault, profile: profileCap, leases: leaseCollectionCap)
 	}
 }
 

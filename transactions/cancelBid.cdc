@@ -1,8 +1,8 @@
 import FIND from "../contracts/FIND.cdc"
 
-transaction(tag: String) {
+transaction(name: String) {
 	prepare(account: AuthAccount) {
 		let bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)!
-		bids.cancelBid(tag)
+		bids.cancelBid(name)
 	}
 }

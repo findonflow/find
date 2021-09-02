@@ -11,10 +11,6 @@ contract FIND {
 
     NetworkPrivatePath:  PrivatePath
 
-    AdministratorPrivatePath:  PrivatePath
-
-    AdministratorStoragePath:  StoragePath
-
     AdminProxyPublicPath:  PublicPath
 
     AdminProxyStoragePath:  StoragePath
@@ -22,10 +18,6 @@ contract FIND {
     LeaseStoragePath:  StoragePath
 
     LeasePublicPath:  PublicPath
-
-    fakeClock:  UFix64?
-
-    networkCap:  Capability<&Network>?
 }
 ```
 
@@ -65,12 +57,29 @@ resource interface BidCollectionPublic {
 ---
 ## Structs & Resources
 
+### struct `TagStatus`
+
+```cadence
+struct TagStatus {
+
+    status:  LeaseStatus
+
+    owner:  Address?
+
+    persisted:  Bool
+}
+```
+
+[More...](FIND_TagStatus.md)
+
+---
+
 ### resource `LeaseToken`
 
 ```cadence
 resource LeaseToken {
 
-    tag:  String
+    name:  String
 
     networkCap:  Capability<&Network>
 
@@ -97,7 +106,7 @@ resource Auction {
 
     callback:  Capability<&{BidCollectionPublic}>
 
-    tag:  String
+    name:  String
 }
 ```
 
@@ -110,7 +119,7 @@ resource Auction {
 ```cadence
 struct LeaseInformation {
 
-    tag:  String
+    name:  String
 
     status:  LeaseStatus
 
@@ -123,6 +132,8 @@ struct LeaseInformation {
     salePrice:  UFix64?
 
     latestBidBy:  Address?
+
+    currentTime:  UFix64
 }
 ```
 
@@ -162,7 +173,7 @@ struct NetworkLease {
 
     address:  Address
 
-    tag:  String
+    name:  String
 }
 ```
 
@@ -195,23 +206,12 @@ resource Network {
 
 ---
 
-### resource `Administrator`
-
-```cadence
-resource Administrator {
-}
-```
-
-[More...](FIND_Administrator.md)
-
----
-
 ### resource `AdminProxy`
 
 ```cadence
 resource AdminProxy {
 
-    capability:  Capability<&Administrator>?
+    capability:  Capability<&Network>?
 }
 ```
 
@@ -224,7 +224,7 @@ resource AdminProxy {
 ```cadence
 struct BidInfo {
 
-    tag:  String
+    name:  String
 
     amount:  UFix64
 
@@ -243,7 +243,7 @@ resource Bid {
 
     from:  Capability<&{FIND.LeaseCollectionPublic}>
 
-    tag:  String
+    name:  String
 
     vault:  FUSD.Vault
 
@@ -294,6 +294,14 @@ func calculateCost(_ String): UFix64
 
 ---
 
+### fun `lookupAddress()`
+
+```cadence
+func lookupAddress(_ String): Address?
+```
+
+---
+
 ### fun `lookup()`
 
 ```cadence
@@ -310,18 +318,27 @@ func deposit(to String, from FungibleToken.Vault)
 
 ---
 
-### fun `status()`
+### fun `outdated()`
 
 ```cadence
-func status(_ String): LeaseStatus
+func outdated(): [String]
 ```
 
 ---
 
-### fun `register()`
+### fun `janitor()`
 
 ```cadence
-func register(tag String, vault FUSD.Vault, profile Capability<&{Profile.Public}>, leases Capability<&{LeaseCollectionPublic}>)
+func janitor(_ String): TagStatus
+```
+this needs to be called from a transaction
+
+---
+
+### fun `status()`
+
+```cadence
+func status(_ String): TagStatus
 ```
 
 ---
@@ -349,20 +366,28 @@ func createEmptyBidCollection(receiver Capability<&{FungibleToken.Receiver}>, le
 ```
 
 ---
+## Events
 
-### fun `time()`
+### event `JanitorLock`
 
 ```cadence
-func time(): UFix64
+event JanitorLock(name String, lockedUntil UFix64)
 ```
 
 ---
-## Events
+
+### event `JanitorFree`
+
+```cadence
+event JanitorFree(name String)
+```
+
+---
 
 ### event `Register`
 
 ```cadence
-event Register(tag String, owner Address, expireAt UFix64)
+event Register(name String, owner Address, expireAt UFix64)
 ```
 
 ---
@@ -370,7 +395,15 @@ event Register(tag String, owner Address, expireAt UFix64)
 ### event `Moved`
 
 ```cadence
-event Moved(tag String, previousOwner Address, newOwner Address, expireAt UFix64)
+event Moved(name String, previousOwner Address, newOwner Address, expireAt UFix64)
+```
+
+---
+
+### event `Freed`
+
+```cadence
+event Freed(name String, previousOwner Address)
 ```
 
 ---
@@ -378,7 +411,7 @@ event Moved(tag String, previousOwner Address, newOwner Address, expireAt UFix64
 ### event `Sold`
 
 ```cadence
-event Sold(tag String, previousOwner Address, newOwner Address, expireAt UFix64, amount UFix64)
+event Sold(name String, previousOwner Address, newOwner Address, expireAt UFix64, amount UFix64)
 ```
 
 ---
@@ -386,7 +419,7 @@ event Sold(tag String, previousOwner Address, newOwner Address, expireAt UFix64,
 ### event `ForSale`
 
 ```cadence
-event ForSale(tag String, owner Address, expireAt UFix64, amount UFix64, active Bool)
+event ForSale(name String, owner Address, expireAt UFix64, amount UFix64, active Bool)
 ```
 
 ---
@@ -394,7 +427,7 @@ event ForSale(tag String, owner Address, expireAt UFix64, amount UFix64, active 
 ### event `BlindBid`
 
 ```cadence
-event BlindBid(tag String, bidder Address, amount UFix64)
+event BlindBid(name String, bidder Address, amount UFix64)
 ```
 
 ---
@@ -402,7 +435,23 @@ event BlindBid(tag String, bidder Address, amount UFix64)
 ### event `BlindBidCanceled`
 
 ```cadence
-event BlindBidCanceled(tag String, bidder Address)
+event BlindBidCanceled(name String, bidder Address)
+```
+
+---
+
+### event `BlindBidRejected`
+
+```cadence
+event BlindBidRejected(name String, bidder Address, amount UFix64)
+```
+
+---
+
+### event `AuctionCancelled`
+
+```cadence
+event AuctionCancelled(name String, bidder Address, amount UFix64)
 ```
 
 ---
@@ -410,7 +459,7 @@ event BlindBidCanceled(tag String, bidder Address)
 ### event `AuctionStarted`
 
 ```cadence
-event AuctionStarted(tag String, bidder Address, amount UFix64, auctionEndAt UFix64)
+event AuctionStarted(name String, bidder Address, amount UFix64, auctionEndAt UFix64)
 ```
 
 ---
@@ -418,7 +467,7 @@ event AuctionStarted(tag String, bidder Address, amount UFix64, auctionEndAt UFi
 ### event `AuctionBid`
 
 ```cadence
-event AuctionBid(tag String, bidder Address, amount UFix64, auctionEndAt UFix64)
+event AuctionBid(name String, bidder Address, amount UFix64, auctionEndAt UFix64)
 ```
 
 ---
