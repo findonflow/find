@@ -647,7 +647,7 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).AssertSuccess().
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorLock", map[string]interface{}{
-				"lockedUntil": "158840003.00000000",
+				"lockedUntil": "150848003.00000000",
 				"tag":         "user1",
 			}))
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()

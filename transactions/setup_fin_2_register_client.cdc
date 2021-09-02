@@ -11,8 +11,8 @@ transaction(ownerAddress: Address) {
         let client= owner.getCapability<&{FIND.AdminProxyClient}>(FIND.AdminProxyPublicPath)
                 .borrow() ?? panic("Could not borrow admin client")
 
-        let admin=account.getCapability<&FIND.Administrator>(FIND.AdministratorPrivatePath)
-        client.addCapability(admin)
+        let network=account.getCapability<&FIND.Network>(FIND.NetworkPrivatePath)
+        client.addCapability(network)
 
     }
 }

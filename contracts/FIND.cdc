@@ -1,4 +1,5 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
+
 import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
@@ -6,13 +7,14 @@ import Clock from "./Clock.cdc"
 
 /*
 
-FNS
+FIND
 
+Flow Integrated Name Directory
 A naming service flow flow,
 
-3 token tag cost 500 FUSD a year
-4 token tag cost 100 FUSD a year
-5 or more token tag cost 5 FUSD a year
+3 token name cost 500 FUSD a year
+4 token name cost 100 FUSD a year
+5 or more token name cost 5 FUSD a year
 
 
 This contract is pretty long, I have tried splitting it up into several files, but then there are issues
@@ -67,10 +69,6 @@ pub contract FIND {
 	pub let NetworkStoragePath: StoragePath
 	pub let NetworkPrivatePath: PrivatePath
 
-	//store the administrator
-	pub let AdministratorPrivatePath: PrivatePath
-	pub let AdministratorStoragePath: StoragePath
-
 	//store the proxy for the admin
 	pub let AdminProxyPublicPath: PublicPath
 	pub let AdminProxyStoragePath: StoragePath
@@ -78,53 +76,59 @@ pub contract FIND {
 	//store the leases you own
 	pub let LeaseStoragePath: StoragePath
 	pub let LeasePublicPath: PublicPath
-	//For convenience the contract has a link to the given network so that you can call methods without having to borrow things.
-	access(contract) var networkCap: Capability<&Network>?
 
 
 	//These methods are basically just here for convenience
 	pub fun calculateCost(_ tag:String) : UFix64 {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.calculateCost(tag)
 		}
-		return self.networkCap!.borrow()!.calculateCost(tag)
+		panic("Network is not set up")
 	}
 
+	pub fun lookupAddress(_ tag:String): Address? {
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.lookup(tag)?.owner?.address
+		}
+		panic("Network is not set up")
+	}
 
 	pub fun lookup(_ tag:String): &{Profile.Public}? {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.lookup(tag)
 		}
-		return self.networkCap!.borrow()!.lookup(tag)
+		panic("Network is not set up")
 	}
 
 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			let profile=network.lookup(to) ?? panic("could not find tag")
+			profile.deposit(from: <- from)
 		}
-		let profile=self.lookup(to) ?? panic("could not find tag")
-		profile.deposit(from: <- from)
+		panic("Network is not set up")
 	}
 
 	pub fun outdated(): [String] {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.outdated()
 		}
-		return self.networkCap!.borrow()!.outdated()
+		panic("Network is not set up")
+
 	}
 
+	/// this needs to be called from a transaction
 	pub fun janitor(_ tag: String): TagStatus {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.status(tag)
 		}
-		return self.networkCap!.borrow()!.status(tag)
+		panic("Network is not set up")
 	}
 
 	pub fun status(_ tag: String): TagStatus {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.readStatus(tag)
 		}
-		return self.networkCap!.borrow()!.readStatus(tag)
+		panic("Network is not set up")
 	}
 
 
@@ -281,8 +285,6 @@ pub contract FIND {
 
 
 	pub resource LeaseCollection: LeaseCollectionPublic {
-		// TODO: janitor process, check if there are tokens that are expired or tokens that will soon be locked. Emit events should be public, script to check it and transaction to send events
-
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(contract) var tokens: @{String: FIND.LeaseToken}
@@ -555,12 +557,10 @@ pub contract FIND {
 
 		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
 		pub fun register(tag: String, vault: @FUSD.Vault){
-			pre {
-				tag.length >= 3 : "A public minted FIND tag has to be minimum 3 letters long"
-			}
-			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
+						let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
 			let leases= self.owner!.getCapability<&{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-			FIND.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profileCap, leases: leases)
+
+			FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!.register(tag:tag, vault: <- vault, profile: profileCap, leases: leases)
 		}
 
 
@@ -573,12 +573,10 @@ pub contract FIND {
 
 	//Create an empty lease collection that store your leases to a tag
 	pub fun createEmptyLeaseCollection(): @FIND.LeaseCollection {
-		pre {
-			self.networkCap != nil : "Network is not set up"
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return <- create LeaseCollection(networkCut:network.secondaryCut, networkWallet: network.wallet)
 		}
-		let network=self.networkCap!.borrow()!
-
-		return <- create LeaseCollection(networkCut:network.secondaryCut, networkWallet: network.wallet)
+		panic("Network is not set up")
 	}
 
 	//a struct that represents a lease of a tag in the network. 
@@ -616,12 +614,12 @@ pub contract FIND {
 	The main network resource that holds the state of the tags in the network
 	*/
 	pub resource Network  {
-		access(contract) let wallet: Capability<&{FungibleToken.Receiver}>
-		access(contract) var leasePeriod: UFix64
-		access(contract) var lockPeriod: UFix64
-		access(contract) var defaultPrice: UFix64
-		access(contract) var secondaryCut: UFix64
-		access(contract) var lengthPrices: {Int: UFix64}
+		access(contract) var wallet: Capability<&{FungibleToken.Receiver}>
+		access(contract) let leasePeriod: UFix64
+		access(contract) let lockPeriod: UFix64
+		access(contract) let defaultPrice: UFix64
+		access(contract) let secondaryCut: UFix64
+		access(contract) let lengthPrices: {Int: UFix64}
 
 		//map from tag to lease for that tag
 		access(contract) let profiles: { String: NetworkLease}
@@ -692,6 +690,9 @@ pub contract FIND {
 
 		//everybody can call register, normally done through the convenience method in the contract
 		pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+			pre {
+				tag.length >= 3 : "A FIND name has to be minimum 3 letters long"
+			}
 
 			let tagStatus=self.status(tag)
 			if tagStatus.status == LeaseStatus.TAKEN {
@@ -719,7 +720,7 @@ pub contract FIND {
 			emit Register(tag: tag, owner:profile.address, expireAt: lease.time)
 			self.profiles[tag] =  lease
 
-			leases.borrow()!.deposit(token: <- create LeaseToken(tag: tag, networkCap: FIND.networkCap!))
+			leases.borrow()!.deposit(token: <- create LeaseToken(tag: tag, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
 		}
 
 		pub fun readStatus(_ tag: String): TagStatus {
@@ -806,45 +807,9 @@ pub contract FIND {
 			return self.defaultPrice
 		}
 
-		pub fun setLengthPrices(_ lengthPrices: {Int: UFix64}) {
-			self.lengthPrices=lengthPrices
+		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
+			self.wallet=wallet
 		}
-
-		pub fun setDefaultPrice(_ price: UFix64) {
-			self.defaultPrice=price
-		}
-
-		pub fun setLeasePeriod(_ period: UFix64)  {
-			self.leasePeriod=period
-		}
-
-		pub fun setLockPeriod(_ period: UFix64) {
-			self.lockPeriod=period
-		}
-
-	}
-
-	//An Minter resource that can create a Network
-	pub resource Administrator {
-
-		pub fun createNetwork(
-			leasePeriod: UFix64,
-			lockPeriod: UFix64,
-			secondaryCut: UFix64,
-			defaultPrice: UFix64,
-			lengthPrices: {Int:UFix64},
-			wallet:Capability<&{FungibleToken.Receiver}>
-		): @Network {
-			return  <-  create Network(
-				leasePeriod: leasePeriod,
-				lockPeriod: lockPeriod,
-				secondaryCut: secondaryCut,
-				defaultPrice: defaultPrice,
-				lengthPrices: lengthPrices,
-				wallet: wallet
-			)
-		}
-
 	}
 
 
@@ -855,16 +820,16 @@ pub contract FIND {
 
 	//interface to use for capability receiver pattern
 	pub resource interface AdminProxyClient {
-		pub fun addCapability(_ cap: Capability<&Administrator>)
+		pub fun addCapability(_ cap: Capability<&Network>)
 	}
 
 
 	//admin proxy with capability receiver 
 	pub resource AdminProxy: AdminProxyClient {
 
-		access(self) var capability: Capability<&Administrator>?
+		access(self) var capability: Capability<&Network>?
 
-		pub fun addCapability(_ cap: Capability<&Administrator>) {
+		pub fun addCapability(_ cap: Capability<&Network>) {
 			pre {
 				cap.check() : "Invalid server capablity"
 				self.capability == nil : "Server already set"
@@ -873,13 +838,23 @@ pub contract FIND {
 		}
 
 
+		/// Set the wallet used for the network
+		/// @param _ The FT receiver to send the money to
+		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
+				pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.setWallet(wallet)
+		}
+
 		//Admins can register tags without tag length restrictions
 		pub fun register(tag: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FIND.networkCap!.borrow()!.register(tag:tag, vault: <- vault, profile: profile, leases: leases)
+			self.capability!.borrow()!.register(tag:tag, vault: <- vault, profile: profile, leases: leases)
 		}
 
 		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
@@ -891,26 +866,6 @@ pub contract FIND {
 			Clock.tick(time)
 		}
 
-		//sending in the admin account here is maybe not recommended but since it is called once i do not think it really matters.
-		pub fun createNetwork( admin: AuthAccount, leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
-
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			let network <- self.capability!.borrow()!.createNetwork(
-				leasePeriod: leasePeriod,
-				lockPeriod: lockPeriod,
-				secondaryCut:secondaryCut,
-				defaultPrice:defaultPrice,
-				lengthPrices:lengthPrices,
-				wallet: wallet
-			)
-			admin.save(<-network, to: FIND.NetworkStoragePath)
-			admin.link<&Network>( FIND.NetworkPrivatePath, target: FIND.NetworkStoragePath)
-			//For convenience in FIND we set the network in the contract itself. So there should really only be a single FIND. Not sure if this is really needed or apropriate.
-			FIND.networkCap= admin.getCapability<&Network>(FIND.NetworkPrivatePath)
-		}
 
 		init() {
 			self.capability = nil
@@ -1086,9 +1041,6 @@ pub contract FIND {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
 
-		self.AdministratorStoragePath=/storage/finAdmin
-		self.AdministratorPrivatePath=/private/finAdmin
-
 		self.AdminProxyPublicPath= /public/finAdminProxy
 		self.AdminProxyStoragePath=/storage/finAdminProxy
 
@@ -1098,9 +1050,19 @@ pub contract FIND {
 		self.BidPublicPath=/public/finBids
 		self.BidStoragePath=/storage/finBids
 
+		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
-		self.account.save(<- create Administrator(), to: self.AdministratorStoragePath)
-		self.account.link<&Administrator>(self.AdministratorPrivatePath, target: self.AdministratorStoragePath)
-		self.networkCap = nil
+		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
+		let network <-  create Network(
+				leasePeriod: 31536000.0, //365 days
+				lockPeriod: 7776000.0, //90 days
+				secondaryCut: 0.025,
+				defaultPrice: 5.0,
+				lengthPrices: {3: 500.0, 4:100.0},
+				wallet: wallet
+			)
+		self.account.save(<-network, to: FIND.NetworkStoragePath)
+		self.account.link<&Network>( FIND.NetworkPrivatePath, target: FIND.NetworkStoragePath)
+
 	}
 }
