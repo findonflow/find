@@ -1,9 +1,9 @@
-import FiNS from "../contracts/FiNS.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 transaction(clock: UFix64) {
 	prepare(account: AuthAccount) {
 
-		let adminClient=account.borrow<&FiNS.AdminProxy>(from: FiNS.AdminProxyStoragePath)!
+		let adminClient=account.borrow<&FIND.AdminProxy>(from: FIND.AdminProxyStoragePath)!
 		adminClient.advanceClock(clock)
 
 	}

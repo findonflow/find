@@ -1,4 +1,4 @@
-import FiNS from "../contracts/FiNS.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 
 /*
@@ -6,6 +6,6 @@ import FiNS from "../contracts/FiNS.cdc"
  */
 pub fun main() :UFix64 {
 
-    log(FiNS.status("0xb"))
-    return FiNS.calculateCost("0xb")
+    log(FIND.status("0xb"))
+    return FIND.calculateCost("0xb")
 }

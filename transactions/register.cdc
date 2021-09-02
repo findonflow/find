@@ -1,7 +1,7 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FiNS from "../contracts/FiNS.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 
 transaction(tag: String) {
@@ -9,20 +9,20 @@ transaction(tag: String) {
 
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
 
-		let price=FiNS.calculateCost(tag)
+		let price=FIND.calculateCost(tag)
 		log("The cost for registering this tag is ".concat(price.toString()))
 
 		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
 		let payVault <- vaultRef.withdraw(amount: price) as! @FUSD.Vault
 
-		let leaseCollectionCap=acct.getCapability<&{FiNS.LeaseCollectionPublic}>(FiNS.LeasePublicPath)
+		let leaseCollectionCap=acct.getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollectionCap.check() {
-			let finLeases <- FiNS.createEmptyLeaseCollection()
-			acct.save(<- finLeases, to: FiNS.LeaseStoragePath)
-			acct.link<&{FiNS.LeaseCollectionPublic}>( FiNS.LeasePublicPath, target: FiNS.LeaseStoragePath)
+			let finLeases <- FIND.createEmptyLeaseCollection()
+			acct.save(<- finLeases, to: FIND.LeaseStoragePath)
+			acct.link<&{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
 
-		let leases=acct.borrow<&FiNS.LeaseCollection>(from: FiNS.LeaseStoragePath)!
+		let leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 		leases.register(tag: tag, vault: <- payVault)
 
 	}

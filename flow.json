@@ -26,7 +26,8 @@
 				"emulator": "ee82856bf20e2aa6"
 			}
 		},
-		"FiNS": "./contracts/FiNS.cdc",
+		"FIND": "./contracts/FIND.cdc",
+		"Clock": "./contracts/Clock.cdc",
 		"Profile": "./contracts/Profile.cdc",
 		"Content" : "./contracts/Content.cdc"
 	},
@@ -62,7 +63,8 @@
 			"emulator-account": [
 				"NonFungibleToken",
 				"Content",
-				"FiNS",
+				"FIND",
+        "Clock",
 				"Profile",
 				"FUSD"
 			], 

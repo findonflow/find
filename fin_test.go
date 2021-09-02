@@ -12,12 +12,12 @@ import (
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
-func TestFiNS(t *testing.T) {
+func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to register a tag", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "100.0", "user1")
 
@@ -26,7 +26,7 @@ func TestFiNS(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.Register", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 				"tag":      "user1",
@@ -44,7 +44,7 @@ func TestFiNS(t *testing.T) {
 	t.Run("Should get error if you try to register a tag and dont have enough money", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "5.0", "user1")
 
@@ -59,7 +59,7 @@ func TestFiNS(t *testing.T) {
 	t.Run("Should get error if you try to register a tag that is too short", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "5.0", "user1")
 
@@ -67,13 +67,13 @@ func TestFiNS(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("ur").
 			Test(t).
-			AssertFailure("A public minted FiNS tag has to be minimum 3 letters long")
+			AssertFailure("A public minted FIND tag has to be minimum 3 letters long")
 
 	})
 	t.Run("Should get error if you try to register a tag that is already claimed", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -94,7 +94,7 @@ func TestFiNS(t *testing.T) {
 	t.Run("Should allow registering a lease after it is freed", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -111,11 +111,12 @@ func TestFiNS(t *testing.T) {
 			StringArgument("user1").
 			Test(t).AssertFailure("locked")
 
+		//do i need this now?
 		g.TransactionFromFile("update_status").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.JanitorLock", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorLock", map[string]interface{}{
 				"lockedUntil": "47304003.00000000",
 				"tag":         "user1",
 			}))
@@ -127,10 +128,10 @@ func TestFiNS(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.JanitorFree", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorFree", map[string]interface{}{
 				"tag": "user1",
 			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.Register", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"expireAt": "94608003.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 				"tag":      "user1",
@@ -149,7 +150,7 @@ func TestFiNS(t *testing.T) {
 	t.Run("Admin should be able to register short tag", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "10.0", "user1")
 		registerUser(g, t, "user1")
@@ -161,7 +162,7 @@ func TestFiNS(t *testing.T) {
 			AccountArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FiNS.Register", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 				"tag":      "u",
@@ -172,7 +173,7 @@ func TestFiNS(t *testing.T) {
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
-		setupFiNS(g, t)
+		setupFIND(g, t)
 
 		createUser(g, t, "10.0", "user1")
 
@@ -223,7 +224,7 @@ func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
 const leaseDuration = "31536000.0"
 
 //TODO: sending in lease here is just a pain, just advance clock
-func setupFiNS(g *gwtf.GoWithTheFlow, t *testing.T) {
+func setupFIND(g *gwtf.GoWithTheFlow, t *testing.T) {
 	//first step create the adminClient as the fin user
 
 	g.TransactionFromFile("setup_fin_1_create_client").

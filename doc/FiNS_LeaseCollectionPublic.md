@@ -34,7 +34,7 @@ func getLease(_ String): LeaseInformation?
 ### fun `deposit()`
 
 ```cadence
-func deposit(token FiNS.LeaseToken)
+func deposit(token FIND.LeaseToken)
 ```
 
 ---

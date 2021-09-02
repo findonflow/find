@@ -1,10 +1,10 @@
 
-import FiNS from "../contracts/FiNS.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 transaction(tag: String) {
 
     prepare(account: AuthAccount) {
-       FiNS.janitor(tag)
+       FIND.janitor(tag)
     }
 }
  

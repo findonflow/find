@@ -1,7 +1,7 @@
-# Contract `FiNS`
+# Contract `FIND`
 
 ```cadence
-contract FiNS {
+contract FIND {
 
     BidPublicPath:  PublicPath
 
@@ -38,7 +38,7 @@ resource interface LeaseCollectionPublic {
 }
 ```
 
-[More...](FiNS_LeaseCollectionPublic.md)
+[More...](FIND_LeaseCollectionPublic.md)
 
 ---
     
@@ -49,7 +49,7 @@ resource interface AdminProxyClient {
 }
 ```
 
-[More...](FiNS_AdminProxyClient.md)
+[More...](FIND_AdminProxyClient.md)
 
 ---
     
@@ -60,7 +60,7 @@ resource interface BidCollectionPublic {
 }
 ```
 
-[More...](FiNS_BidCollectionPublic.md)
+[More...](FIND_BidCollectionPublic.md)
 
 ---
 ## Structs & Resources
@@ -80,7 +80,7 @@ resource LeaseToken {
 }
 ```
 
-[More...](FiNS_LeaseToken.md)
+[More...](FIND_LeaseToken.md)
 
 ---
 
@@ -101,7 +101,7 @@ resource Auction {
 }
 ```
 
-[More...](FiNS_Auction.md)
+[More...](FIND_Auction.md)
 
 ---
 
@@ -126,7 +126,7 @@ struct LeaseInformation {
 }
 ```
 
-[More...](FiNS_LeaseInformation.md)
+[More...](FIND_LeaseInformation.md)
 
 ---
 
@@ -135,7 +135,7 @@ struct LeaseInformation {
 ```cadence
 resource LeaseCollection {
 
-    tokens:  {String: FiNS.LeaseToken}
+    tokens:  {String: FIND.LeaseToken}
 
     auctions:  {String: Auction}
 
@@ -145,7 +145,7 @@ resource LeaseCollection {
 }
 ```
 
-[More...](FiNS_LeaseCollection.md)
+[More...](FIND_LeaseCollection.md)
 
 ---
 
@@ -166,7 +166,7 @@ struct NetworkLease {
 }
 ```
 
-[More...](FiNS_NetworkLease.md)
+[More...](FIND_NetworkLease.md)
 
 ---
 
@@ -191,7 +191,7 @@ resource Network {
 }
 ```
 
-[More...](FiNS_Network.md)
+[More...](FIND_Network.md)
 
 ---
 
@@ -202,7 +202,7 @@ resource Administrator {
 }
 ```
 
-[More...](FiNS_Administrator.md)
+[More...](FIND_Administrator.md)
 
 ---
 
@@ -215,7 +215,7 @@ resource AdminProxy {
 }
 ```
 
-[More...](FiNS_AdminProxy.md)
+[More...](FIND_AdminProxy.md)
 
 ---
 
@@ -232,7 +232,7 @@ struct BidInfo {
 }
 ```
 
-[More...](FiNS_BidInfo.md)
+[More...](FIND_BidInfo.md)
 
 ---
 
@@ -241,7 +241,7 @@ struct BidInfo {
 ```cadence
 resource Bid {
 
-    from:  Capability<&{FiNS.LeaseCollectionPublic}>
+    from:  Capability<&{FIND.LeaseCollectionPublic}>
 
     tag:  String
 
@@ -251,7 +251,7 @@ resource Bid {
 }
 ```
 
-[More...](FiNS_Bid.md)
+[More...](FIND_Bid.md)
 
 ---
 
@@ -264,11 +264,11 @@ resource BidCollection {
 
     receiver:  Capability<&{FungibleToken.Receiver}>
 
-    leases:  Capability<&{FiNS.LeaseCollectionPublic}>
+    leases:  Capability<&{FIND.LeaseCollectionPublic}>
 }
 ```
 
-[More...](FiNS_BidCollection.md)
+[More...](FIND_BidCollection.md)
 
 ---
 ## Enums
@@ -329,7 +329,7 @@ func register(tag String, vault FUSD.Vault, profile Capability<&{Profile.Public}
 ### fun `createEmptyLeaseCollection()`
 
 ```cadence
-func createEmptyLeaseCollection(): FiNS.LeaseCollection
+func createEmptyLeaseCollection(): FIND.LeaseCollection
 ```
 
 ---
@@ -345,7 +345,7 @@ func createAdminProxyClient(): AdminProxy
 ### fun `createEmptyBidCollection()`
 
 ```cadence
-func createEmptyBidCollection(receiver Capability<&{FungibleToken.Receiver}>, leases Capability<&{FiNS.LeaseCollectionPublic}>): BidCollection
+func createEmptyBidCollection(receiver Capability<&{FungibleToken.Receiver}>, leases Capability<&{FIND.LeaseCollectionPublic}>): BidCollection
 ```
 
 ---

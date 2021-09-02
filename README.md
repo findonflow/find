@@ -4,7 +4,7 @@ Flow does not have any equivalent to ENS or any way to lookup a user by a tag/al
 
 FIND is here to solve that issue. 
 
-In order to use FiNS you create your Flow Identity/Profile [and](and) store that in your account. Then you can optionally register that with FiNS for a small yearly fee. 
+In order to use FIND you create your Flow Identity/Profile [and](and) store that in your account. Then you can optionally register that with FIND for a small yearly fee. 
 
 FIND is priced with inspiration from ENS. 500 for 3 chars, 100 for 4 chars and 5 for 5 or more chars. 2 and 1 chars can only be minted by admin.
 

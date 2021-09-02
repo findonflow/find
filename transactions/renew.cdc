@@ -1,7 +1,7 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FiNS from "../contracts/FiNS.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 
 transaction(tag: String) {
@@ -9,13 +9,13 @@ transaction(tag: String) {
 
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
 
-		let price=FiNS.calculateCost(tag)
+		let price=FIND.calculateCost(tag)
 		log("The cost for registering this tag is ".concat(price.toString()))
 
 		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
 		let payVault <- vaultRef.withdraw(amount: price) as! @FUSD.Vault
 
-		let finLeases= acct.borrow<&FiNS.LeaseCollection>(from:FiNS.LeaseStoragePath)!
+		let finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		log("STATUS PRE")
 		let finToken= finLeases.borrow(tag)
 		log(finToken.getLeaseExpireTime().toString())

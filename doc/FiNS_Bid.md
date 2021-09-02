@@ -3,7 +3,7 @@
 ```cadence
 resource Bid {
 
-    from:  Capability<&{FiNS.LeaseCollectionPublic}>
+    from:  Capability<&{FIND.LeaseCollectionPublic}>
 
     tag:  String
 
@@ -17,7 +17,7 @@ resource Bid {
 ### Initializer
 
 ```cadence
-func init(from Capability<&{FiNS.LeaseCollectionPublic}>, tag String, vault FUSD.Vault)
+func init(from Capability<&{FIND.LeaseCollectionPublic}>, tag String, vault FUSD.Vault)
 ```
 
 

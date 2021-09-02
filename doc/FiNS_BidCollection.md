@@ -7,7 +7,7 @@ resource BidCollection {
 
     receiver:  Capability<&{FungibleToken.Receiver}>
 
-    leases:  Capability<&{FiNS.LeaseCollectionPublic}>
+    leases:  Capability<&{FIND.LeaseCollectionPublic}>
 }
 ```
 
@@ -19,7 +19,7 @@ Implemented Interfaces:
 ### Initializer
 
 ```cadence
-func init(receiver Capability<&{FungibleToken.Receiver}>, leases Capability<&{FiNS.LeaseCollectionPublic}>)
+func init(receiver Capability<&{FungibleToken.Receiver}>, leases Capability<&{FIND.LeaseCollectionPublic}>)
 ```
 
 
@@ -28,7 +28,7 @@ func init(receiver Capability<&{FungibleToken.Receiver}>, leases Capability<&{Fi
 ### fun `fullfill()`
 
 ```cadence
-func fullfill(_ FiNS.LeaseToken): FungibleToken.Vault
+func fullfill(_ FIND.LeaseToken): FungibleToken.Vault
 ```
 
 ---

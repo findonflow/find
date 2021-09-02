@@ -26,7 +26,7 @@ func getBalance(_ String): UFix64
 ### fun `fullfill()`
 
 ```cadence
-func fullfill(_ FiNS.LeaseToken): FungibleToken.Vault
+func fullfill(_ FIND.LeaseToken): FungibleToken.Vault
 ```
 
 ---
