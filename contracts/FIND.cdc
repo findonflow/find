@@ -18,6 +18,15 @@ A naming service flow flow,
 
 This contract is pretty long, I have tried splitting it up into several files, but then there are issues
 
+
+Taxonomy:
+
+ - name: a textual description minimum 3 chars long that can be leased in FIND 
+ - profile: A Versus profile that represents a person, a name registed in FIND points to a profile
+ - lease: a resource representing registering a name for a period of 1 year
+ - leaseCollection: Collection of the leases an account holds
+ - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
+
 */
 pub contract FIND {
 
@@ -130,7 +139,7 @@ pub contract FIND {
 	}
 
 
-	pub struct  NameStatus{
+	pub struct NameStatus{
 		pub let status: LeaseStatus
 		pub let owner: Address?
 		pub let persisted: Bool
@@ -154,11 +163,14 @@ pub contract FIND {
 	LeaseToken is a resource you get back when you register a lease.
 	You can use methods on it to renew the lease or to move to another profile
 	*/
+	//TODO: rename to just Lease
 	pub resource LeaseToken {
 		access(contract) let name: String
-		access(contract) let networkCap: Capability<&Network> //Does this have to be an interface?
+		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
-		access(contract) var  callback: Capability<&{BidCollectionPublic}>?
+		//TODO: add mode on what to do if you get an offer
+		//TODO: Rename this, it is confusing that this is an offer callback
+		access(contract) var callback: Capability<&{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
@@ -285,6 +297,7 @@ pub contract FIND {
 	pub resource LeaseCollection: LeaseCollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
+		//TODO: rename to leases
 		access(contract) var tokens: @{String: FIND.LeaseToken}
 
 		access(contract) var auctions: @{String: Auction}
@@ -418,6 +431,7 @@ pub contract FIND {
 				return
 			}
 
+			//TODO; check what mode we have
 			if lease.salePrice!  <= callback.borrow()!.getBalance(name) {
 				self.startAuction(name)
 			} else {
@@ -457,6 +471,7 @@ pub contract FIND {
 			}
 		}
 
+		//TODO: check what mode we have, might fullfill from initial bid
 		pub fun fullfill(_ name: String) {
 			pre {
 				self.tokens.containsKey(name) : "Invalid name=".concat(name)
@@ -561,8 +576,6 @@ pub contract FIND {
 			FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
 		}
 
-
-
 		destroy() {
 			destroy self.tokens
 			destroy self.auctions
@@ -577,6 +590,12 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+
+
+	/*
+	 Core network things
+  //===================================================================================================================
+	*/
 	//a struct that represents a lease of a name in the network. 
 	pub struct NetworkLease {
 		pub(set) var status: LeaseStatus
