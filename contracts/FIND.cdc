@@ -116,6 +116,7 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	//TODO: test
 	/// Used in script to return a list of names that are outdated
 	pub fun outdated(): [String] {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -125,6 +126,7 @@ pub contract FIND {
 
 	}
 
+	//TODO: test
 	/// Task to janitor a name and lock/free it if appropriate
 	pub fun janitor(_ name: String): NameStatus {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
