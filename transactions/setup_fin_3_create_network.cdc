@@ -16,6 +16,7 @@ transaction(leasePeriod: UFix64) {
 
 		let adminClient=account.borrow<&FIND.AdminProxy>(from: FIND.AdminProxyStoragePath)!
 		adminClient.setWallet(wallet)
+		adminClient.setPublicEnabled(true)
 	}
 }
 

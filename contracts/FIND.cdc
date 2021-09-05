@@ -601,7 +601,13 @@ pub contract FIND {
 			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
 			let leases= self.owner!.getCapability<&{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-			FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
+			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+			if !network.publicEnabled {
+				panic("Public registration is not enabled yet")
+			}
+
+			network.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
 		}
 
 		destroy() {
@@ -665,11 +671,12 @@ pub contract FIND {
 		access(contract) let defaultPrice: UFix64
 		access(contract) let secondaryCut: UFix64
 		access(contract) let lengthPrices: {Int: UFix64}
+		access(contract) var publicEnabled: Bool
 
 		//map from name to lease for that name
 		access(contract) let profiles: { String: NetworkLease}
 
-		init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>) {
+		init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>, publicEnabled:Bool) {
 			self.leasePeriod=leasePeriod
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut
@@ -677,6 +684,7 @@ pub contract FIND {
 			self.lengthPrices=lengthPrices
 			self.profiles={}
 			self.wallet=wallet
+			self.publicEnabled=publicEnabled
 		}
 
 
@@ -854,6 +862,10 @@ pub contract FIND {
 
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
 			self.wallet=wallet
+		}
+
+		pub fun setPublicEnabled(_ enabled: Bool) {
+			self.publicEnabled=enabled
 		}
 	}
 
@@ -1063,7 +1075,18 @@ pub contract FIND {
 			self.capability!.borrow()!.setWallet(wallet)
 		}
 
-		//Admins can register names without name length restrictions
+
+		/// Enable or disable public registration 
+		pub fun setPublicEnabled(_ enabled: Bool) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.setPublicEnabled(enabled)
+		}
+
+
+
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -1110,7 +1133,8 @@ pub contract FIND {
 			secondaryCut: 0.025,
 			defaultPrice: 5.0,
 			lengthPrices: {3: 500.0, 4:100.0},
-			wallet: wallet
+			wallet: wallet,
+			publicEnabled: false
 		)
 		self.account.save(<-network, to: FIND.NetworkStoragePath)
 		self.account.link<&Network>( FIND.NetworkPrivatePath, target: FIND.NetworkStoragePath)
