@@ -17,21 +17,9 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
  - refactor tests
  - document
  - use debug log in test
+ - do we need a ban list here?
 
 ## Testing
 
  `gotestsum -f testname --watch`
 
-# Flow Identity and the Flow Identity Network
-
-Right now there is no sentral place of finding some more information about users on Flow. People have to remeber a 16 digit address in order to identify themselves and there is not way to share KYC information, or link profiles together.
-
-Flow Identity Network aim to fix all that.
-
-Flow Identity
- - is a versus profile
-
-Flow Identity Network
- - a Flow Identity can lease an alias in the Network against a small fee in FUSD
-  - when a lease run out the alias cannot be claimed until a given freeze period so that the user can release and not risk missing their alias
-	
