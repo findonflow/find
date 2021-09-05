@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//TODO: test outdated stuff
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
@@ -148,6 +147,24 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to lookup address", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFIND(g, t)
+
+		createUser(g, t, "10.0", "user1")
+
+		registerUser(g, t, "user1")
+
+		value := g.Script(`import FIND from "../contracts/FIND.cdc"
+pub fun main(name: String) :  Address? {
+    return FIND.lookupAddress(name)
+}
+		`).StringArgument("user1").RunReturnsInterface()
+		assert.Equal(t, "0x179b6b1cb6755e31", value)
+
+	})
+
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
@@ -165,6 +182,31 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to send ft to another name", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFIND(g, t)
+
+		createUser(g, t, "10.0", "user1")
+		createUser(g, t, "10.0", "user2")
+
+		registerUser(g, t, "user1")
+
+		g.TransactionFromFile("send").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("5.0").
+			Test(t).AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "5.00000000",
+				"to":     "0x179b6b1cb6755e31",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+				"amount": "5.00000000",
+				"from":   "0xf3fcd2c1a78f5eee",
+			}))
+
+	})
 }
 
 func registerUser(g *gwtf.GoWithTheFlow, t *testing.T, name string) {
@@ -201,7 +243,6 @@ func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
 //a year
 const leaseDuration = "31536000.0"
 
-//TODO: sending in lease here is just a pain, just advance clock
 func setupFIND(g *gwtf.GoWithTheFlow, t *testing.T) {
 	//first step create the adminClient as the fin user
 

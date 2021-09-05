@@ -10,6 +10,10 @@ pub contract Debug {
 		}
 	}
 
+	access(account) fun enable() {
+		self.enabled=true
+	}
+
 	init() {
 		self.enabled=false
 	}

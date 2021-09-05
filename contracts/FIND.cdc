@@ -2,6 +2,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
+import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 
 /*
@@ -110,6 +111,7 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
 			profile.deposit(from: <- from)
+			return 
 		}
 		panic("Network is not set up")
 	}
@@ -1073,6 +1075,7 @@ pub contract FIND {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
+			Debug.enable()
 			Clock.enable()
 			Clock.tick(time)
 		}
