@@ -29,7 +29,7 @@ func TestFIND(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
@@ -116,9 +116,9 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorLock", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Locked", map[string]interface{}{
 				"lockedUntil": "39312003.00000000",
-				"name":         "user1",
+				"name":        "user1",
 			}))
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
@@ -128,13 +128,14 @@ func TestFIND(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorFree", map[string]interface{}{
-				"name": "user1",
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Freed", map[string]interface{}{
+				"name":          "user1",
+				"previousOwner": "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"expireAt": "94608003.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",

@@ -82,6 +82,7 @@ func outdated(): [String]
 ```cadence
 func status(_ String): NameStatus
 ```
+This method is almost like readStatus except that it will mutate state and fix the name it looks up if it is invalid.  Events are emitted when this is done.
 
 ---
 

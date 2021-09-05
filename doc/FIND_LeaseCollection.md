@@ -3,7 +3,7 @@
 ```cadence
 resource LeaseCollection {
 
-    tokens:  {String: FIND.LeaseToken}
+    leases:  {String: FIND.Lease}
 
     auctions:  {String: Auction}
 
@@ -126,15 +126,15 @@ func remove(_ String)
 ### fun `deposit()`
 
 ```cadence
-func deposit(token FIND.LeaseToken)
+func deposit(token FIND.Lease)
 ```
 
 ---
 
-### fun `getTokens()`
+### fun `getLeases()`
 
 ```cadence
-func getTokens(): [String]
+func getLeases(): [String]
 ```
 
 ---
@@ -142,7 +142,7 @@ func getTokens(): [String]
 ### fun `borrow()`
 
 ```cadence
-func borrow(_ String): &FIND.LeaseToken
+func borrow(_ String): &FIND.Lease
 ```
 
 ---

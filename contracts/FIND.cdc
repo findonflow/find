@@ -6,18 +6,11 @@ import Clock from "./Clock.cdc"
 
 /*
 
-FIND
+///FIND
 
-Flow Integrated Name Directory
-A naming service flow flow,
+///Flow Integrated Name Directory - A naming service on flow,
 
-3 token name cost 500 FUSD a year
-4 token name cost 100 FUSD a year
-5 or more token name cost 5 FUSD a year
-
-
-This contract is pretty long, I have tried splitting it up into several files, but then there are issues
-
+/// Lease a name in the network for as little as 5 FUSD a year, (4 characters cost 100, 3 cost 500)
 
 Taxonomy:
 
@@ -30,42 +23,40 @@ Taxonomy:
 */
 pub contract FIND {
 
-	pub event JanitorLock(name: String, lockedUntil:UFix64)
+	/// Emitted when a transaction involving a lease calculates that this lease is now locked
+	pub event Locked(name: String, lockedUntil:UFix64)
 
-	pub event JanitorFree(name: String)
-
-	//	pub event Janitor(name: String, 
-	//event that is emited when a name is registered or renewed
+	///  Emitted when a name is registred in FIND
 	pub event Register(name: String, owner: Address, expireAt: UFix64)
 
-	//event that is emitted when a name is moved
+	/// Emitted when a name is moved to a new owner
 	pub event Moved(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64)
 
+	/// Emitted when a name is freed
 	pub event Freed(name: String, previousOwner: Address)
 
-	//event that is emitted when a name is sold
+	/// Emitted when a name is sold to a new owner
 	pub event Sold(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
 
-	//event that is emitted when an name is listed for sale, if the active flag is false it is no longer for sale
+	/// Emitted when a name is explicistly put up for sale
 	pub event ForSale(name: String, owner: Address, expireAt: UFix64, amount: UFix64, active: Bool)
 
-	//event that is emitted if a bid occurs at a name that is too low or not for sale
+	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event BlindBid(name: String, bidder: Address, amount: UFix64)
 
-	//event that is emitted if a blind bid is canceled	
+	/// Emitted if a blind bid is canceled
 	pub event BlindBidCanceled(name: String, bidder: Address)
 
-	//event reject the blind bid
+	/// Emitted if a blind bid is rejected
 	pub event BlindBidRejected(name: String, bidder: Address, amount: UFix64)
 
-	//event that is emitted if a auction is canceled
+	/// Emitted if an auction is canceled
 	pub event AuctionCancelled(name: String, bidder: Address, amount: UFix64)
 
-	//event that is emitted when an auction is startet, that is a bid that is greater then the minimum price has been added, 
-	//or the start auction is called manually by the seller on a lower bid
+	/// Emitted when an auction starts. 
 	pub event AuctionStarted(name: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 
-	//event that is emitted when there is a bid on a given auction
+	/// Emitted when there is a new bid in an auction
 	pub event AuctionBid(name: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 
 	//store bids made by a bidder to somebody elses leases
@@ -86,6 +77,9 @@ pub contract FIND {
 
 
 	//These methods are basically just here for convenience
+
+	/// Calculate the cost of an name
+	/// @param _ the name to calculate the cost for
 	pub fun calculateCost(_ name:String) : UFix64 {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.calculateCost(name)
@@ -807,14 +801,13 @@ pub contract FIND {
 					leaseCollection.remove(name)
 
 					self.profiles.remove(key: name)
-					emit JanitorFree(name: name)
 					return NameStatus(status: LeaseStatus.FREE, owner: nil, persisted:true)
 				}
 
 				if lease.status == LeaseStatus.TAKEN {
 					lease.status= LeaseStatus.LOCKED
 					lease.time = currentTime + self.lockPeriod
-					emit JanitorLock(name: name, lockedUntil:lease.time)
+					emit Locked(name: name, lockedUntil:lease.time)
 					self.profiles[name] = lease
 				}
 				return NameStatus(status:lease.status, owner:  owner, persisted: true)

@@ -690,7 +690,7 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorLock", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Locked", map[string]interface{}{
 				"lockedUntil": "150848003.00000000",
 				"name":        "user1",
 			}))
@@ -700,8 +700,9 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorFree", map[string]interface{}{
-				"name": "user1",
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Freed", map[string]interface{}{
+				"name":          "user1",
+				"previousOwner": "0x179b6b1cb6755e31",
 			}))
 
 		g.TransactionFromFile("bid").

@@ -34,17 +34,6 @@ resource interface LeaseCollectionPublic {
 
 ---
     
-### resource interface `AdminProxyClient`
-
-```cadence
-resource interface AdminProxyClient {
-}
-```
-
-[More...](FIND_AdminProxyClient.md)
-
----
-    
 ### resource interface `BidCollectionPublic`
 
 ```cadence
@@ -53,6 +42,17 @@ resource interface BidCollectionPublic {
 ```
 
 [More...](FIND_BidCollectionPublic.md)
+
+---
+    
+### resource interface `AdminProxyClient`
+
+```cadence
+resource interface AdminProxyClient {
+}
+```
+
+[More...](FIND_AdminProxyClient.md)
 
 ---
 ## Structs & Resources
@@ -74,10 +74,10 @@ struct NameStatus {
 
 ---
 
-### resource `LeaseToken`
+### resource `Lease`
 
 ```cadence
-resource LeaseToken {
+resource Lease {
 
     name:  String
 
@@ -85,11 +85,11 @@ resource LeaseToken {
 
     salePrice:  UFix64?
 
-    callback:  Capability<&{BidCollectionPublic}>?
+    offerCallback:  Capability<&{BidCollectionPublic}>?
 }
 ```
 
-[More...](FIND_LeaseToken.md)
+[More...](FIND_Lease.md)
 
 ---
 
@@ -104,7 +104,7 @@ resource Auction {
 
     extendOnLateBid:  UFix64
 
-    callback:  Capability<&{BidCollectionPublic}>
+    latestBidCallback:  Capability<&{BidCollectionPublic}>
 
     name:  String
 }
@@ -146,7 +146,7 @@ struct LeaseInformation {
 ```cadence
 resource LeaseCollection {
 
-    tokens:  {String: FIND.LeaseToken}
+    leases:  {String: FIND.Lease}
 
     auctions:  {String: Auction}
 
@@ -206,19 +206,6 @@ resource Network {
 
 ---
 
-### resource `AdminProxy`
-
-```cadence
-resource AdminProxy {
-
-    capability:  Capability<&Network>?
-}
-```
-
-[More...](FIND_AdminProxy.md)
-
----
-
 ### struct `BidInfo`
 
 ```cadence
@@ -271,6 +258,19 @@ resource BidCollection {
 [More...](FIND_BidCollection.md)
 
 ---
+
+### resource `AdminProxy`
+
+```cadence
+resource AdminProxy {
+
+    capability:  Capability<&Network>?
+}
+```
+
+[More...](FIND_AdminProxy.md)
+
+---
 ## Enums
 
 ### enum `LeaseStatus`
@@ -291,6 +291,8 @@ enum LeaseStatus: UInt8 {
 ```cadence
 func calculateCost(_ String): UFix64
 ```
+Calculate the cost of an name
+@param _ the name to calculate the cost for
 
 ---
 
@@ -351,14 +353,6 @@ func createEmptyLeaseCollection(): FIND.LeaseCollection
 
 ---
 
-### fun `createAdminProxyClient()`
-
-```cadence
-func createAdminProxyClient(): AdminProxy
-```
-
----
-
 ### fun `createEmptyBidCollection()`
 
 ```cadence
@@ -366,21 +360,22 @@ func createEmptyBidCollection(receiver Capability<&{FungibleToken.Receiver}>, le
 ```
 
 ---
-## Events
 
-### event `JanitorLock`
+### fun `createAdminProxyClient()`
 
 ```cadence
-event JanitorLock(name String, lockedUntil UFix64)
+func createAdminProxyClient(): AdminProxy
 ```
 
 ---
+## Events
 
-### event `JanitorFree`
+### event `Locked`
 
 ```cadence
-event JanitorFree(name String)
+event Locked(name String, lockedUntil UFix64)
 ```
+Emitted when a transaction involving a lease calculates that this lease is now locked
 
 ---
 
@@ -389,6 +384,7 @@ event JanitorFree(name String)
 ```cadence
 event Register(name String, owner Address, expireAt UFix64)
 ```
+Emitted when a name is registred in FIND
 
 ---
 
@@ -397,6 +393,7 @@ event Register(name String, owner Address, expireAt UFix64)
 ```cadence
 event Moved(name String, previousOwner Address, newOwner Address, expireAt UFix64)
 ```
+Emitted when a name is moved to a new owner
 
 ---
 
@@ -405,6 +402,7 @@ event Moved(name String, previousOwner Address, newOwner Address, expireAt UFix6
 ```cadence
 event Freed(name String, previousOwner Address)
 ```
+Emitted when a name is freed
 
 ---
 
@@ -413,6 +411,7 @@ event Freed(name String, previousOwner Address)
 ```cadence
 event Sold(name String, previousOwner Address, newOwner Address, expireAt UFix64, amount UFix64)
 ```
+Emitted when a name is sold to a new owner
 
 ---
 
@@ -421,6 +420,7 @@ event Sold(name String, previousOwner Address, newOwner Address, expireAt UFix64
 ```cadence
 event ForSale(name String, owner Address, expireAt UFix64, amount UFix64, active Bool)
 ```
+Emitted when a name is explicistly put up for sale
 
 ---
 
@@ -429,6 +429,7 @@ event ForSale(name String, owner Address, expireAt UFix64, amount UFix64, active
 ```cadence
 event BlindBid(name String, bidder Address, amount UFix64)
 ```
+Emitted if a bid occurs at a name that is too low or not for sale
 
 ---
 
@@ -437,6 +438,7 @@ event BlindBid(name String, bidder Address, amount UFix64)
 ```cadence
 event BlindBidCanceled(name String, bidder Address)
 ```
+Emitted if a blind bid is canceled
 
 ---
 
@@ -445,6 +447,7 @@ event BlindBidCanceled(name String, bidder Address)
 ```cadence
 event BlindBidRejected(name String, bidder Address, amount UFix64)
 ```
+Emitted if a blind bid is rejected
 
 ---
 
@@ -453,6 +456,7 @@ event BlindBidRejected(name String, bidder Address, amount UFix64)
 ```cadence
 event AuctionCancelled(name String, bidder Address, amount UFix64)
 ```
+Emitted if an auction is canceled
 
 ---
 
@@ -461,6 +465,7 @@ event AuctionCancelled(name String, bidder Address, amount UFix64)
 ```cadence
 event AuctionStarted(name String, bidder Address, amount UFix64, auctionEndAt UFix64)
 ```
+Emitted when an auction starts.
 
 ---
 
@@ -469,5 +474,6 @@ event AuctionStarted(name String, bidder Address, amount UFix64, auctionEndAt UF
 ```cadence
 event AuctionBid(name String, bidder Address, amount UFix64, auctionEndAt UFix64)
 ```
+Emitted when there is a new bid in an auction
 
 ---

@@ -7,10 +7,10 @@ resource interface LeaseCollectionPublic {
 
 ## Functions
 
-### fun `getTokens()`
+### fun `getLeases()`
 
 ```cadence
-func getTokens(): [String]
+func getLeases(): [String]
 ```
 
 ---
@@ -34,7 +34,7 @@ func getLease(_ String): LeaseInformation?
 ### fun `deposit()`
 
 ```cadence
-func deposit(token FIND.LeaseToken)
+func deposit(token FIND.Lease)
 ```
 
 ---
