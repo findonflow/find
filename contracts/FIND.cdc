@@ -160,16 +160,15 @@ pub contract FIND {
 
 	/*
 
-	LeaseToken is a resource you get back when you register a lease.
+	Lease is a resource you get back when you register a lease.
 	You can use methods on it to renew the lease or to move to another profile
 	*/
 	//TODO: rename to just Lease
-	pub resource LeaseToken {
+	pub resource Lease {
 		access(contract) let name: String
 		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
 		//TODO: add mode on what to do if you get an offer
-		//TODO: Rename this, it is confusing that this is an offer callback
 		access(contract) var offerCallback: Capability<&{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
@@ -278,7 +277,7 @@ pub contract FIND {
 		pub fun getLease(_ name: String) :LeaseInformation?
 
 		//add a new lease token to the collection, can only be called in this contract
-		access(contract) fun deposit(token: @FIND.LeaseToken)
+		access(contract) fun deposit(token: @FIND.Lease)
 
 		access(contract)fun cancelBid(_ name: String) 
 		access(contract) fun increaseBid(_ name: String) 
@@ -298,7 +297,7 @@ pub contract FIND {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		//TODO: rename to leases
-		access(contract) var tokens: @{String: FIND.LeaseToken}
+		access(contract) var tokens: @{String: FIND.Lease}
 
 		access(contract) var auctions: @{String: Auction}
 
@@ -544,7 +543,7 @@ pub contract FIND {
 		}
 
 		//depoit a lease token into the lease collection, not available from the outside
-		access(contract) fun deposit(token: @FIND.LeaseToken) {
+		access(contract) fun deposit(token: @FIND.Lease) {
 			// add the new token to the dictionary which removes the old one
 			let oldToken <- self.tokens[token.name] <- token
 
@@ -558,8 +557,8 @@ pub contract FIND {
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		pub fun borrow(_ name: String): &FIND.LeaseToken {
-			return &self.tokens[name] as &FIND.LeaseToken
+		pub fun borrow(_ name: String): &FIND.Lease {
+			return &self.tokens[name] as &FIND.Lease
 		}
 
 		//borrow the auction
@@ -737,7 +736,7 @@ pub contract FIND {
 			emit Register(name: name, owner:profile.address, expireAt: lease.time)
 			self.profiles[name] =  lease
 
-			leases.borrow()!.deposit(token: <- create LeaseToken(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
+			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
 		}
 
 		pub fun readStatus(_ name: String): NameStatus {
@@ -878,7 +877,7 @@ pub contract FIND {
 	pub resource interface BidCollectionPublic {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ name: String) : UFix64
-		access(contract) fun fullfill(_ token: @FIND.LeaseToken) : @FungibleToken.Vault
+		access(contract) fun fullfill(_ token: @FIND.Lease) : @FungibleToken.Vault
 		access(contract) fun cancel(_ name: String)
 	}
 
@@ -897,7 +896,7 @@ pub contract FIND {
 
 		//called from lease when auction is ended
 		//if purchase if fullfilled then we deposit money back into vault we get passed along and token into your own leases collection
-		access(contract) fun fullfill(_ token: @FIND.LeaseToken) : @FungibleToken.Vault{
+		access(contract) fun fullfill(_ token: @FIND.Lease) : @FungibleToken.Vault{
 
 			let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
