@@ -21,11 +21,11 @@ This contract is pretty long, I have tried splitting it up into several files, b
 
 Taxonomy:
 
- - name: a textual description minimum 3 chars long that can be leased in FIND 
- - profile: A Versus profile that represents a person, a name registed in FIND points to a profile
- - lease: a resource representing registering a name for a period of 1 year
- - leaseCollection: Collection of the leases an account holds
- - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
+- name: a textual description minimum 3 chars long that can be leased in FIND 
+- profile: A Versus profile that represents a person, a name registed in FIND points to a profile
+- lease: a resource representing registering a name for a period of 1 year
+- leaseCollection: Collection of the leases an account holds
+- leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
 
 */
 pub contract FIND {
@@ -172,7 +172,7 @@ pub contract FIND {
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
 			self.networkCap= networkCap
-			self.salePrice=0.0
+			self.salePrice=nil
 			self.offerCallback=nil
 		}
 
@@ -389,6 +389,7 @@ pub contract FIND {
 			let lease = self.borrow(name)
 
 			if lease.salePrice == nil {
+				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: lease.offerCallback!.borrow()!.getBalance(name))
 				return
 			}
 
@@ -424,10 +425,10 @@ pub contract FIND {
 			lease.setCallback(callback)
 
 			if lease.salePrice == nil {
+				emit BlindBid(name: name, bidder: callback.address, amount: callback.borrow()!.getBalance(name))
 				return
 			}
 
-			//TODO; check what mode we have
 			if lease.salePrice!  <= callback.borrow()!.getBalance(name) {
 				self.startAuction(name)
 			} else {
@@ -467,15 +468,40 @@ pub contract FIND {
 			}
 		}
 
-		//TODO: check what mode we have, might fullfill from initial bid
 		pub fun fullfill(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
-				self.auctions.containsKey(name) : "Tag is not for auction name=".concat(name)
-				self.borrowAuction(name).endsAt < Clock.time() : "Auction has not ended yet"
 			}
 
+			let lease = self.borrow(name)
 			let oldProfile=FIND.lookup(name)!
+			if let cb= lease.offerCallback {
+				let offer= cb.borrow()!
+				let newProfile= getAccount(cb.address).getCapability<&{Profile.Public}>(Profile.publicPath)
+				let soldFor=offer.getBalance(name)
+				//move the token to the new profile
+				emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, expireAt: lease.getLeaseExpireTime(), amount: soldFor)
+				lease.move(profile: newProfile)
+
+				let token <- self.leases.remove(key: name)!
+				let vault <- offer.fullfill(<- token)
+				if self.networkCut != 0.0 {
+					let cutAmount= soldFor * self.networkCut
+					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				}
+
+				//why not use Profile to send money :P
+				oldProfile.deposit(from: <- vault)
+				return
+			}
+
+			if !self.auctions.containsKey(name) {
+				panic("Tag is not for auction name=".concat(name))
+			}
+
+			if self.borrowAuction(name).endsAt > Clock.time() {
+				panic("Auction has not ended yet")
+			}
 
 			let auction <- self.auctions.remove(key: name)!
 
@@ -483,9 +509,8 @@ pub contract FIND {
 
 			let soldFor=auction.getBalance()
 			//move the token to the new profile
-			let tokenRef = self.borrow(name)
-			emit Sold(name: name, previousOwner:tokenRef.owner!.address, newOwner: newProfile.address, expireAt: tokenRef.getLeaseExpireTime(), amount: soldFor)
-			tokenRef.move(profile: newProfile)
+			emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, expireAt: lease.getLeaseExpireTime(), amount: soldFor)
+			lease.move(profile: newProfile)
 
 			let token <- self.leases.remove(key: name)!
 
@@ -566,7 +591,7 @@ pub contract FIND {
 
 		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
 		pub fun register(name: String, vault: @FUSD.Vault){
-						let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
+			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
 			let leases= self.owner!.getCapability<&{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
@@ -589,8 +614,8 @@ pub contract FIND {
 
 
 	/*
-	 Core network things
-  //===================================================================================================================
+	Core network things
+	//===================================================================================================================
 	*/
 	//a struct that represents a lease of a name in the network. 
 	pub struct NetworkLease {
@@ -1025,7 +1050,7 @@ pub contract FIND {
 		/// Set the wallet used for the network
 		/// @param _ The FT receiver to send the money to
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
-				pre {
+			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
@@ -1073,13 +1098,13 @@ pub contract FIND {
 
 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
 		let network <-  create Network(
-				leasePeriod: 31536000.0, //365 days
-				lockPeriod: 7776000.0, //90 days
-				secondaryCut: 0.025,
-				defaultPrice: 5.0,
-				lengthPrices: {3: 500.0, 4:100.0},
-				wallet: wallet
-			)
+			leasePeriod: 31536000.0, //365 days
+			lockPeriod: 7776000.0, //90 days
+			secondaryCut: 0.025,
+			defaultPrice: 5.0,
+			lengthPrices: {3: 500.0, 4:100.0},
+			wallet: wallet
+		)
 		self.account.save(<-network, to: FIND.NetworkStoragePath)
 		self.account.link<&Network>( FIND.NetworkPrivatePath, target: FIND.NetworkStoragePath)
 

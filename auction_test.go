@@ -27,7 +27,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -55,7 +55,7 @@ func TestAuction(t *testing.T) {
 				"amount":   "10.00000000",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			}))
 
 		g.TransactionFromFile("bid").
@@ -68,7 +68,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "10.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86401.0").Test(t).AssertSuccess()
@@ -83,7 +83,51 @@ func TestAuction(t *testing.T) {
 				"expireAt":      "31536001.00000000",
 				"newOwner":      "0xf3fcd2c1a78f5eee",
 				"previousOwner": "0x179b6b1cb6755e31",
-				"name":           "user1",
+				"name":          "user1",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "9.75000000",
+				"to":     "0x179b6b1cb6755e31",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "0.25000000",
+				"to":     "0x1cf0e2f2f715450",
+			}))
+
+	})
+	t.Run("Should be able to sell lease from offer", func(t *testing.T) {
+
+		g := gwtf.NewTestingEmulator()
+		setupFIND(g, t)
+
+		createUser(g, t, "100.0", "user1")
+		registerUser(g, t, "user1")
+		createUser(g, t, "100.0", "user2")
+		registerUser(g, t, "user2")
+
+		g.TransactionFromFile("bid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
+				"amount": "10.00000000",
+				"bidder": "0xf3fcd2c1a78f5eee",
+				"name":   "user1",
+			}))
+
+		g.TransactionFromFile("fullfill").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
+				"amount":        "10.00000000",
+				"expireAt":      "31536001.00000000",
+				"newOwner":      "0xf3fcd2c1a78f5eee",
+				"previousOwner": "0x179b6b1cb6755e31",
+				"name":          "user1",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "9.75000000",
@@ -115,7 +159,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -129,7 +173,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 	})
@@ -153,7 +197,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -167,7 +211,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 		g.TransactionFromFile("increaseBid").
@@ -180,7 +224,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "10.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 	})
@@ -204,7 +248,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -218,7 +262,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 		g.TransactionFromFile("startAuction").
@@ -230,7 +274,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "5.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 	})
@@ -254,7 +298,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -268,7 +312,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 		g.TransactionFromFile("cancelBid").
@@ -278,7 +322,7 @@ func TestAuction(t *testing.T) {
 			AssertSuccess().
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBidCanceled", map[string]interface{}{
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 	})
@@ -302,7 +346,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -316,7 +360,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 		g.TransactionFromFile("startAuction").
@@ -328,7 +372,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "5.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 		g.TransactionFromFile("cancelBid").
@@ -360,7 +404,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -375,7 +419,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "10.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 		g.TransactionFromFile("bid").
@@ -392,7 +436,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "15.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xe03daebed8ca0615",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 	})
@@ -419,7 +463,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 				"active":   "true",
 				"amount":   "10.00000000",
-				"name":      "user1",
+				"name":     "user1",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
 			}))
@@ -434,7 +478,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "10.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86380.0").Test(t).AssertSuccess()
@@ -452,7 +496,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "15.00000000",
 				"auctionEndAt": "86681.00000000", //auction is extended
 				"bidder":       "0xe03daebed8ca0615",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 	})
@@ -478,7 +522,7 @@ func TestAuction(t *testing.T) {
 				"amount":   "10.00000000",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			}))
 
 		g.TransactionFromFile("bid").
@@ -491,7 +535,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "10.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86402.0").Test(t).AssertSuccess()
@@ -525,7 +569,7 @@ func TestAuction(t *testing.T) {
 				"amount":   "10.00000000",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			}))
 
 		g.TransactionFromFile("bid").
@@ -538,7 +582,7 @@ func TestAuction(t *testing.T) {
 				"amount":       "10.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":          "user1",
+				"name":         "user1",
 			}))
 
 		g.TransactionFromFile("cancelAuction").
@@ -556,7 +600,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionCancelled", map[string]interface{}{
 				"amount": "10.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 	})
 
@@ -581,7 +625,7 @@ func TestAuction(t *testing.T) {
 				"amount":   "10.00000000",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			}))
 
 		g.TransactionFromFile("bid").
@@ -593,7 +637,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 
 		g.TransactionFromFile("cancelAuction").
@@ -611,7 +655,7 @@ func TestAuction(t *testing.T) {
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBidRejected", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":    "user1",
+				"name":   "user1",
 			}))
 	})
 
@@ -636,7 +680,7 @@ func TestAuction(t *testing.T) {
 				"amount":   "10.00000000",
 				"expireAt": "31536001.00000000",
 				"owner":    "0x179b6b1cb6755e31",
-				"name":      "user1",
+				"name":     "user1",
 			}))
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
@@ -648,7 +692,7 @@ func TestAuction(t *testing.T) {
 			Test(t).AssertSuccess().
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.JanitorLock", map[string]interface{}{
 				"lockedUntil": "150848003.00000000",
-				"name":         "user1",
+				"name":        "user1",
 			}))
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
 
