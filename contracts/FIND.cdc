@@ -163,12 +163,10 @@ pub contract FIND {
 	Lease is a resource you get back when you register a lease.
 	You can use methods on it to renew the lease or to move to another profile
 	*/
-	//TODO: rename to just Lease
 	pub resource Lease {
 		access(contract) let name: String
 		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
-		//TODO: add mode on what to do if you get an offer
 		access(contract) var offerCallback: Capability<&{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
@@ -271,7 +269,7 @@ pub contract FIND {
 	*/
 	pub resource interface LeaseCollectionPublic {
 		//fetch all the tokens in the collection
-		pub fun getTokens(): [String]
+		pub fun getLeases(): [String]
 		//fetch all names that are for sale
 		pub fun getLeaseInformation() : [LeaseInformation]
 		pub fun getLease(_ name: String) :LeaseInformation?
@@ -296,8 +294,7 @@ pub contract FIND {
 	pub resource LeaseCollection: LeaseCollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		//TODO: rename to leases
-		access(contract) var tokens: @{String: FIND.Lease}
+		access(contract) var leases: @{String: FIND.Lease}
 
 		access(contract) var auctions: @{String: Auction}
 
@@ -308,14 +305,14 @@ pub contract FIND {
 		access(contract) let networkWallet: Capability<&{FungibleToken.Receiver}>
 
 		init (networkCut: UFix64, networkWallet: Capability<&{FungibleToken.Receiver}>) {
-			self.tokens <- {}
+			self.leases <- {}
 			self.auctions <- {}
 			self.networkCut=networkCut
 			self.networkWallet=networkWallet
 		}
 
 		pub fun getLease(_ name: String) : LeaseInformation? {
-			if !self.tokens.containsKey(name) {
+			if !self.leases.containsKey(name) {
 				return nil 
 			}
 			let token=self.borrow(name)
@@ -341,7 +338,7 @@ pub contract FIND {
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
-			for name in self.tokens.keys {
+			for name in self.leases.keys {
 				let lease=self.getLease(name)
 				if lease != nil {
 					info.append(lease!)
@@ -371,7 +368,7 @@ pub contract FIND {
 
 		access(contract) fun cancelBid(_ name: String) {
 			pre {
-				self.tokens.containsKey(name) : "Invalid name=".concat(name)
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				!self.auctions.containsKey(name) : "Cannot cancel a bid that is in an auction=".concat(name)
 			}
 
@@ -385,7 +382,7 @@ pub contract FIND {
 
 		access(contract) fun increaseBid(_ name: String) {
 			pre {
-				self.tokens.containsKey(name) : "Invalid name=".concat(name)
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				!self.auctions.containsKey(name) : "Can only increase bid before auction=".concat(name)
 			}
 
@@ -405,7 +402,7 @@ pub contract FIND {
 
 		access(contract) fun bid(name: String, callback: Capability<&{BidCollectionPublic}>) {
 			pre {
-				self.tokens.containsKey(name) : "Invalid name=".concat(name)
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
 			let timestamp=Clock.time()
@@ -442,7 +439,7 @@ pub contract FIND {
 		//cancel will cancel and auction or reject a bid if no auction has started
 		pub fun cancel(_ name: String) {
 			pre {
-				self.tokens.containsKey(name) : "Invalid name=".concat(name)
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
 
@@ -473,7 +470,7 @@ pub contract FIND {
 		//TODO: check what mode we have, might fullfill from initial bid
 		pub fun fullfill(_ name: String) {
 			pre {
-				self.tokens.containsKey(name) : "Invalid name=".concat(name)
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				self.auctions.containsKey(name) : "Tag is not for auction name=".concat(name)
 				self.borrowAuction(name).endsAt < Clock.time() : "Auction has not ended yet"
 			}
@@ -490,7 +487,7 @@ pub contract FIND {
 			emit Sold(name: name, previousOwner:tokenRef.owner!.address, newOwner: newProfile.address, expireAt: tokenRef.getLeaseExpireTime(), amount: soldFor)
 			tokenRef.move(profile: newProfile)
 
-			let token <- self.tokens.remove(key: name)!
+			let token <- self.leases.remove(key: name)!
 
 			let vault <- auction.latestBidCallback.borrow()!.fullfill(<- token)
 			if self.networkCut != 0.0 {
@@ -507,7 +504,7 @@ pub contract FIND {
 
 		pub fun listForSale(name :String, amount: UFix64) {
 			pre {
-				self.tokens.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
 
 			let tokenRef = self.borrow(name)
@@ -518,7 +515,7 @@ pub contract FIND {
 
 		pub fun delistSale(_ name: String) {
 			pre {
-				self.tokens.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
 
 			let tokenRef = self.borrow(name)
@@ -528,7 +525,7 @@ pub contract FIND {
 
 		//note that when moving a name
 		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&{LeaseCollectionPublic}>) {
-			let token <- self.tokens.remove(key:  name) ?? panic("missing NFT")
+			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, expireAt: token.getLeaseExpireTime())
 			token.move(profile: profile)
 			to.borrow()!.deposit(token: <- token)
@@ -537,7 +534,7 @@ pub contract FIND {
 		//note that when moving a name
 		access(contract) fun remove(_ name: String) {
 			self.cancel(name)
-			let token <- self.tokens.remove(key:  name) ?? panic("missing NFT")
+			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Freed(name:name, previousOwner:self.owner!.address)
 			destroy token
 		}
@@ -545,20 +542,20 @@ pub contract FIND {
 		//depoit a lease token into the lease collection, not available from the outside
 		access(contract) fun deposit(token: @FIND.Lease) {
 			// add the new token to the dictionary which removes the old one
-			let oldToken <- self.tokens[token.name] <- token
+			let oldToken <- self.leases[token.name] <- token
 
 			destroy oldToken
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		pub fun getTokens(): [String] {
-			return self.tokens.keys
+		pub fun getLeases(): [String] {
+			return self.leases.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrow(_ name: String): &FIND.Lease {
-			return &self.tokens[name] as &FIND.Lease
+			return &self.leases[name] as &FIND.Lease
 		}
 
 		//borrow the auction
@@ -576,7 +573,7 @@ pub contract FIND {
 		}
 
 		destroy() {
-			destroy self.tokens
+			destroy self.leases
 			destroy self.auctions
 		}
 	}
