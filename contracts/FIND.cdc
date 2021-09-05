@@ -170,13 +170,13 @@ pub contract FIND {
 		access(contract) var salePrice: UFix64?
 		//TODO: add mode on what to do if you get an offer
 		//TODO: Rename this, it is confusing that this is an offer callback
-		access(contract) var callback: Capability<&{BidCollectionPublic}>?
+		access(contract) var offerCallback: Capability<&{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
 			self.networkCap= networkCap
 			self.salePrice=0.0
-			self.callback=nil
+			self.offerCallback=nil
 		}
 
 		pub fun setSalePrice(_ price: UFix64?) {
@@ -184,7 +184,7 @@ pub contract FIND {
 		}
 
 		pub fun setCallback(_ callback: Capability<&{BidCollectionPublic}>?) {
-			self.callback=callback
+			self.offerCallback=callback
 		}
 
 		pub fun extendLease(_ vault: @FUSD.Vault) {
@@ -211,19 +211,19 @@ pub contract FIND {
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
-		access(contract) var callback: Capability<&{BidCollectionPublic}>
+		access(contract) var latestBidCallback: Capability<&{BidCollectionPublic}>
 		access(contract) let name: String
 
-		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, callback: Capability<&{BidCollectionPublic}>, name: String) {
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&{BidCollectionPublic}>, name: String) {
 			self.endsAt=endsAt
 			self.startedAt=startedAt
 			self.extendOnLateBid=extendOnLateBid
-			self.callback=callback
+			self.latestBidCallback=latestBidCallback
 			self.name=name
 		}
 
 		pub fun getBalance() : UFix64 {
-			return self.callback.borrow()!.getBalance(self.name)
+			return self.latestBidCallback.borrow()!.getBalance(self.name)
 		}
 
 		pub fun addBid(callback: Capability<&{BidCollectionPublic}>, timestamp: UFix64) {
@@ -232,13 +232,13 @@ pub contract FIND {
 			}
 
 			//we send the money back
-			self.callback.borrow()!.cancel(self.name)
-			self.callback=callback
+			self.latestBidCallback.borrow()!.cancel(self.name)
+			self.latestBidCallback=callback
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
 				self.endsAt=suggestedEndTime
 			}
-			emit AuctionBid(name: self.name, bidder: self.callback.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
+			emit AuctionBid(name: self.name, bidder: self.latestBidCallback.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
 		}
 	}
 
@@ -329,9 +329,9 @@ pub contract FIND {
 				let auction = self.borrowAuction(name)
 				auctionEnds= auction.endsAt
 				latestBid= auction.getBalance()
-				latestBidBy= auction.callback.address
+				latestBidBy= auction.latestBidCallback.address
 			} else {
-				if let callback = token.callback {
+				if let callback = token.offerCallback {
 					latestBid= callback.borrow()!.getBalance(name)
 					latestBidBy=callback.address
 				}
@@ -356,14 +356,14 @@ pub contract FIND {
 			let timestamp=Clock.time()
 			let duration=86400.0
 			let lease = self.borrow(name)
-			if lease.callback == nil {
+			if lease.offerCallback == nil {
 				panic("cannot start an auction on a name without a bid, set salePrice")
 			}
 
 			let endsAt=timestamp + duration
-			emit AuctionStarted(name: name, bidder: lease.callback!.address, amount: lease.callback!.borrow()!.getBalance(name), auctionEndAt: endsAt)
+			emit AuctionStarted(name: name, bidder: lease.offerCallback!.address, amount: lease.offerCallback!.borrow()!.getBalance(name), auctionEndAt: endsAt)
 
-			let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: 300.0, callback: lease.callback!, name: name)
+			let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: 300.0,latestBidCallback: lease.offerCallback!, name: name)
 			lease.setCallback(nil)
 
 			destroy oldAuction
@@ -377,7 +377,7 @@ pub contract FIND {
 			}
 
 			let bid= self.borrow(name)
-			if let callback = bid.callback {
+			if let callback = bid.offerCallback {
 				emit BlindBidCanceled(name: name, bidder: callback.address)
 			}
 
@@ -396,10 +396,10 @@ pub contract FIND {
 				return
 			}
 
-			if lease.salePrice!  <= lease.callback!.borrow()!.getBalance(name) {
+			if lease.salePrice!  <= lease.offerCallback!.borrow()!.getBalance(name) {
 				self.startAuction(name)
 			} else {
-				emit BlindBid(name: name, bidder: lease.callback!.address, amount: lease.callback!.borrow()!.getBalance(name))
+				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: lease.offerCallback!.borrow()!.getBalance(name))
 			}
 
 		}
@@ -420,7 +420,7 @@ pub contract FIND {
 				return
 			} 
 
-			if let cb= lease.callback {
+			if let cb= lease.offerCallback {
 				cb.borrow()!.cancel(name)
 			}
 
@@ -449,7 +449,7 @@ pub contract FIND {
 
 			let lease = self.borrow(name)
 			//if we have a callback there is no auction and it is a blind bid
-			if let cb= lease.callback {
+			if let cb= lease.offerCallback {
 
 				emit BlindBidRejected(name: name, bidder: cb.address, amount: cb.borrow()!.getBalance(name))
 				cb.borrow()!.cancel(name)
@@ -465,8 +465,8 @@ pub contract FIND {
 					panic("Cannot cancel finished auction, fullfill it instead")
 				}
 
-				emit AuctionCancelled(name: name, bidder: auction.callback.address, amount: auction.getBalance())
-				auction.callback.borrow()!.cancel(name)
+				emit AuctionCancelled(name: name, bidder: auction.latestBidCallback.address, amount: auction.getBalance())
+				auction.latestBidCallback.borrow()!.cancel(name)
 				destroy <- self.auctions.remove(key: name)!
 			}
 		}
@@ -483,7 +483,7 @@ pub contract FIND {
 
 			let auction <- self.auctions.remove(key: name)!
 
-			let newProfile= getAccount(auction.callback.address).getCapability<&{Profile.Public}>(Profile.publicPath)
+			let newProfile= getAccount(auction.latestBidCallback.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 
 			let soldFor=auction.getBalance()
 			//move the token to the new profile
@@ -493,7 +493,7 @@ pub contract FIND {
 
 			let token <- self.tokens.remove(key: name)!
 
-			let vault <- auction.callback.borrow()!.fullfill(<- token)
+			let vault <- auction.latestBidCallback.borrow()!.fullfill(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))

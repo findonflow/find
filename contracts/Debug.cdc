@@ -4,22 +4,15 @@ pub contract Debug {
 	
 	access(account) var enabled :Bool
 
-	pub fun log(_ msg: String) : String {
+	pub fun log(_ msg: String) {
 		if self.enabled {
 			emit Log(msg: msg)
 		}
-		return msg
 	}
 
 	init() {
 		self.enabled=false
 	}
 
-	//two accounts
-	// - contracts: remove key
-	// - admin that owns data, or has access to main account data
-	//in admin
-	//pub fun enableDebug() {
-  //		Debug.enabled=true
-  //}
+
 }

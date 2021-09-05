@@ -29,7 +29,8 @@
 		"FIND": "./contracts/FIND.cdc",
 		"Clock": "./contracts/Clock.cdc",
 		"Profile": "./contracts/Profile.cdc",
-		"Content" : "./contracts/Content.cdc"
+		"Content" : "./contracts/Content.cdc",
+		"Debug" : "./contracts/Debug.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -66,6 +67,7 @@
 				"FIND",
         "Clock",
 				"Profile",
+				"Debug",
 				"FUSD"
 			], 
 			"emulator-fin" : [],
