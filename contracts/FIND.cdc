@@ -87,6 +87,7 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(name)?.owner?.address
@@ -94,6 +95,7 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	/// Lookup the profile registered for a name
 	pub fun lookup(_ name:String): &{Profile.Public}? {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(name)
@@ -101,6 +103,9 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	/// Deposit FT to name
+	/// @param to: The name to send money too
+	/// @param from: The vault to send too
 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
@@ -109,6 +114,7 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	/// Used in script to return a list of names that are outdated
 	pub fun outdated(): [String] {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.outdated()
@@ -117,7 +123,7 @@ pub contract FIND {
 
 	}
 
-	/// this needs to be called from a transaction
+	/// Task to janitor a name and lock/free it if appropriate
 	pub fun janitor(_ name: String): NameStatus {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.status(name)
@@ -125,6 +131,8 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	/// Return the status for a given name
+	/// @return The Name status of a name
 	pub fun status(_ name: String): NameStatus {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.readStatus(name)
@@ -133,6 +141,7 @@ pub contract FIND {
 	}
 
 
+	/// Struct holding information about a lease. Contains both the internal status the owner of the lease and if the state is persisted or not. 
 	pub struct NameStatus{
 		pub let status: LeaseStatus
 		pub let owner: Address?

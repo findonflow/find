@@ -11,6 +11,7 @@ struct NameStatus {
 }
 ```
 
+Struct holding information about a lease. Contains both the internal status the owner of the lease and if the state is persisted or not.
 
 ### Initializer
 

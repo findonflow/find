@@ -69,6 +69,7 @@ struct NameStatus {
     persisted:  Bool
 }
 ```
+Struct holding information about a lease. Contains both the internal status the owner of the lease and if the state is persisted or not.
 
 [More...](FIND_NameStatus.md)
 
@@ -301,6 +302,7 @@ Calculate the cost of an name
 ```cadence
 func lookupAddress(_ String): Address?
 ```
+Lookup the address registered for a name
 
 ---
 
@@ -309,6 +311,7 @@ func lookupAddress(_ String): Address?
 ```cadence
 func lookup(_ String): &{Profile.Public}?
 ```
+Lookup the profile registered for a name
 
 ---
 
@@ -317,6 +320,11 @@ func lookup(_ String): &{Profile.Public}?
 ```cadence
 func deposit(to String, from FungibleToken.Vault)
 ```
+Deposit FT to name
+
+Parameters:
+  - to : _The name to send money too_
+  - from : _The vault to send too_
 
 ---
 
@@ -325,6 +333,7 @@ func deposit(to String, from FungibleToken.Vault)
 ```cadence
 func outdated(): [String]
 ```
+Used in script to return a list of names that are outdated
 
 ---
 
@@ -333,7 +342,7 @@ func outdated(): [String]
 ```cadence
 func janitor(_ String): NameStatus
 ```
-this needs to be called from a transaction
+Task to janitor a name and lock/free it if appropriate
 
 ---
 
@@ -342,6 +351,9 @@ this needs to be called from a transaction
 ```cadence
 func status(_ String): NameStatus
 ```
+Return the status for a given name
+
+Returns: The Name status of a name
 
 ---
 
