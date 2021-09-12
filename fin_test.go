@@ -1,11 +1,9 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
-	"github.com/onflow/cadence"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -144,57 +142,4 @@ func TestFIND(t *testing.T) {
 			}))
 
 	})
-}
-
-func registerUser(g *gwtf.GoWithTheFlow, t *testing.T, name string) {
-
-	g.TransactionFromFile("register").
-		SignProposeAndPayAs(name).
-		StringArgument(name).
-		Test(t).
-		AssertSuccess().
-		AssertEventCount(3)
-}
-
-func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
-	names := cadence.NewArray([]cadence.Value{cadence.String("name1"), cadence.String("name2")})
-
-	g.TransactionFromFile("create_profile").
-		SignProposeAndPayAs(name).
-		StringArgument(name).
-		StringArgument("This is a user").
-		Argument(names).
-		BooleanArgument(true).
-		Test(t).
-		AssertSuccess()
-
-	g.TransactionFromFile("mint_fusd").
-		SignProposeAndPayAsService().
-		AccountArgument(name).
-		UFix64Argument(fusd).
-		Test(t).
-		AssertSuccess().
-		AssertEventCount(3)
-}
-
-func setupFIND(g *gwtf.GoWithTheFlow, t *testing.T) {
-	//first step create the adminClient as the fin user
-
-	g.TransactionFromFile("setup_fin_1_create_client").
-		SignProposeAndPayAs("fin").
-		Test(t).AssertSuccess().AssertNoEvents()
-
-	//link in the server in the versus client
-	g.TransactionFromFile("setup_fin_2_register_client").
-		SignProposeAndPayAsService().
-		AccountArgument("fin").
-		Test(t).AssertSuccess().AssertNoEvents()
-
-	//set up fin network as the fin user
-	g.TransactionFromFile("setup_fin_3_create_network").
-		SignProposeAndPayAs("fin").
-		UFix64Argument(fmt.Sprintf("%f", leaseDurationFloat)).
-		Test(t).AssertSuccess().AssertNoEvents()
-
-	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").Test(t).AssertSuccess()
 }

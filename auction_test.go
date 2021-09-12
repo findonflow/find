@@ -30,7 +30,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user1").
 			registerUser("user2").
 			listForSale("user1").
-			bid("user2", "user1").
+			bid("user2", "user1", "10.0").
 			expireAuction()
 
 		gt.GWTF.TransactionFromFile("fullfill").
@@ -58,27 +58,15 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to sell lease from offer", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			blindBid("user2", "user1", "10.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "10.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
-
-		g.TransactionFromFile("fullfill").
+		gt.GWTF.TransactionFromFile("fullfill").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
@@ -103,79 +91,29 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not start auction if bid lower then sale price", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
-
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("5.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
+		NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "5.0")
 
 	})
 
 	t.Run("Should start auction if we start out with smaller bid and then increase it", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "5.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("5.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
-
-		g.TransactionFromFile("increaseBid").
+		gt.GWTF.TransactionFromFile("increaseBid").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			UFix64Argument("5.0").
@@ -192,41 +130,16 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to manually start auction with lower bid", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "5.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("5.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
-
-		g.TransactionFromFile("startAuction").
+		gt.GWTF.TransactionFromFile("startAuction").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
@@ -242,41 +155,16 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to cancel blind bid", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "5.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("5.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
-
-		g.TransactionFromFile("cancelBid").
+		gt.GWTF.TransactionFromFile("cancelBid").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			Test(t).
@@ -290,53 +178,16 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to cancel bid when auction has started", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			bid("user2", "user1", "10.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("5.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
-
-		g.TransactionFromFile("startAuction").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "5.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
-			}))
-
-		g.TransactionFromFile("cancelBid").
+		gt.GWTF.TransactionFromFile("cancelBid").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			Test(t).
@@ -345,45 +196,18 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should return money if outbid", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			createUser("100.0", "user3").
+			registerUser("user1").
+			registerUser("user2").
+			registerUser("user3").
+			listForSale("user1").
+			bid("user2", "user1", "10.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		createUser(g, t, "100.0", "user3")
-		registerUser(g, t, "user3")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "10.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
-			}))
-
-		g.TransactionFromFile("bid").
+		gt.GWTF.TransactionFromFile("bid").
 			SignProposeAndPayAs("user3").
 			StringArgument("user1").
 			UFix64Argument("15.0").
@@ -404,46 +228,20 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should extend auction on late bid", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			createUser("100.0", "user3").
+			registerUser("user1").
+			registerUser("user2").
+			registerUser("user3").
+			listForSale("user1").
+			bid("user2", "user1", "10.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
+		gt.tickClock("86380.0")
 
-		createUser(g, t, "100.0", "user3")
-		registerUser(g, t, "user3")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "10.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
-			}))
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86380.0").Test(t).AssertSuccess()
-		g.TransactionFromFile("bid").
+		gt.GWTF.TransactionFromFile("bid").
 			SignProposeAndPayAs("user3").
 			StringArgument("user1").
 			UFix64Argument("15.0").
@@ -464,44 +262,17 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to cancel finished auction", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			bid("user2", "user1", "10.0").
+			expireAuction().tickClock("2.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "10.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
-			}))
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86402.0").Test(t).AssertSuccess()
-
-		g.TransactionFromFile("cancelAuction").
+		gt.GWTF.TransactionFromFile("cancelAuction").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
@@ -511,42 +282,16 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to cancel unfinished auction", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			bid("user2", "user1", "10.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "10.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
-			}))
-
-		g.TransactionFromFile("cancelAuction").
+		gt.GWTF.TransactionFromFile("cancelAuction").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
@@ -567,41 +312,16 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to reject blind bid", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "5.0")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("5.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
-			}))
-
-		g.TransactionFromFile("cancelAuction").
+		gt.GWTF.TransactionFromFile("cancelAuction").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
@@ -622,51 +342,28 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to bid on lease that is free, and not cleaned up", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1")
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
+		gt.expireLease().tickClock("2.0")
 
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			}))
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
-
-		g.TransactionFromFile("janitor").
+		gt.GWTF.TransactionFromFile("janitor").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Locked", map[string]interface{}{
-				"lockedUntil": "150848003.00000000",
+				"lockedUntil": "39312003.00000000",
 				"name":        "user1",
 			}))
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
 
-		g.TransactionFromFile("janitor").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Freed", map[string]interface{}{
-				"name":          "user1",
-				"previousOwner": "0x179b6b1cb6755e31",
-			}))
+		gt.expireLock().tickClock("2.0")
 
-		g.TransactionFromFile("bid").
+		gt.GWTF.TransactionFromFile("bid").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			UFix64Argument("10.0").
@@ -674,6 +371,5 @@ func TestAuction(t *testing.T) {
 			AssertFailure("cannot bid on name that is free")
 
 	})
-	//TODO; if bid on item and it gets cleaned up bid should be paid back
-	//TODO: make test methods
+
 }

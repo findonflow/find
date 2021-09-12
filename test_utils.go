@@ -156,18 +156,34 @@ func (gt *GWTFTestUtils) listForSale(name string) *GWTFTestUtils {
 	return gt
 }
 
-func (gt *GWTFTestUtils) bid(buyer, name string) *GWTFTestUtils {
+func (gt *GWTFTestUtils) blindBid(buyer, name, amount string) *GWTFTestUtils {
+	bidderAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(buyer).Address().String())
+	gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+		StringArgument(name).
+		UFix64Argument(amount).
+		Test(gt.T).
+		AssertSuccess().
+		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
+			"amount": fmt.Sprintf("%s0000000", amount),
+			"bidder": bidderAddress,
+			"name":   name,
+		}))
+
+	return gt
+}
+
+func (gt *GWTFTestUtils) bid(buyer, name, amount string) *GWTFTestUtils {
 
 	endTime := gt.currentTime() + auctionDurationFloat
 	endTimeSting := fmt.Sprintf("%f00", endTime)
 	bidderAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(buyer).Address().String())
 	gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
 		StringArgument(name).
-		UFix64Argument("10.0").
+		UFix64Argument(amount).
 		Test(gt.T).
 		AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-			"amount":       "10.00000000",
+			"amount":       fmt.Sprintf("%s0000000", amount),
 			"auctionEndAt": endTimeSting,
 			"bidder":       bidderAddress,
 			"name":         name,
