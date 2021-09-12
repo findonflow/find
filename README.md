@@ -14,9 +14,6 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 
 ## Plans
- - refactor tests
- - document
- - use debug log in test
  - do we need a ban list here?
 
 ## Testing
