@@ -294,7 +294,7 @@ pub contract FIND {
 		access(contract) fun remove(_ name: String) 
 
 		//anybody should be able to fullfill an auction as long as it is done
-		pub fun fullfill(_ name: String) 
+		pub fun fullfillAuction(_ name: String) 
 	}
 
 
@@ -473,6 +473,16 @@ pub contract FIND {
 				auction.latestBidCallback.borrow()!.cancel(name)
 				destroy <- self.auctions.remove(key: name)!
 			}
+		}
+
+		/// fullfillAuction wraps the fullfill method and ensure that only a finished auction can be fullfilled by anybody
+		pub fun fullfillAuction(_ name: String) {
+			pre {
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
+				self.auctions.containsKey(name) : "Cannot fullfill sale that is not an auction=".concat(name)
+			}
+	
+			return self.fullfill(name)
 		}
 
 		pub fun fullfill(_ name: String) {
@@ -1084,7 +1094,6 @@ pub contract FIND {
 
 			self.capability!.borrow()!.setPublicEnabled(enabled)
 		}
-
 
 
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
