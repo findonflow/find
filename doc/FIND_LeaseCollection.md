@@ -83,6 +83,15 @@ func cancel(_ String)
 
 ---
 
+### fun `fullfillAuction()`
+
+```cadence
+func fullfillAuction(_ String)
+```
+fullfillAuction wraps the fullfill method and ensure that only a finished auction can be fullfilled by anybody
+
+---
+
 ### fun `fullfill()`
 
 ```cadence

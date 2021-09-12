@@ -199,6 +199,8 @@ resource Network {
 
     lengthPrices:  {Int: UFix64}
 
+    publicEnabled:  Bool
+
     profiles:  {String: NetworkLease}
 }
 ```

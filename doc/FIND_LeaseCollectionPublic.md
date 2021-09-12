@@ -71,10 +71,10 @@ func remove(_ String)
 
 ---
 
-### fun `fullfill()`
+### fun `fullfillAuction()`
 
 ```cadence
-func fullfill(_ String)
+func fullfillAuction(_ String)
 ```
 
 ---

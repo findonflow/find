@@ -15,6 +15,8 @@ resource Network {
 
     lengthPrices:  {Int: UFix64}
 
+    publicEnabled:  Bool
+
     profiles:  {String: NetworkLease}
 }
 ```
@@ -23,7 +25,7 @@ resource Network {
 ### Initializer
 
 ```cadence
-func init(leasePeriod UFix64, lockPeriod UFix64, secondaryCut UFix64, defaultPrice UFix64, lengthPrices {Int: UFix64}, wallet Capability<&{FungibleToken.Receiver}>)
+func init(leasePeriod UFix64, lockPeriod UFix64, secondaryCut UFix64, defaultPrice UFix64, lengthPrices {Int: UFix64}, wallet Capability<&{FungibleToken.Receiver}>, publicEnabled Bool)
 ```
 
 
@@ -106,6 +108,14 @@ func calculateCost(_ String): UFix64
 
 ```cadence
 func setWallet(_ Capability<&{FungibleToken.Receiver}>)
+```
+
+---
+
+### fun `setPublicEnabled()`
+
+```cadence
+func setPublicEnabled(_ Bool)
 ```
 
 ---

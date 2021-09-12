@@ -39,6 +39,15 @@ Set the wallet used for the network
 
 ---
 
+### fun `setPublicEnabled()`
+
+```cadence
+func setPublicEnabled(_ Bool)
+```
+Enable or disable public registration
+
+---
+
 ### fun `register()`
 
 ```cadence
