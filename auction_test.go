@@ -21,7 +21,7 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to sell lease", func(t *testing.T) {
+	t.Run("Should be able to sell lease from auction, buyer can fullfill auction", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
@@ -33,8 +33,9 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", "10.0").
 			expireAuction()
 
-		gt.GWTF.TransactionFromFile("fullfill").
-			SignProposeAndPayAs("user1").
+		gt.GWTF.TransactionFromFile("fullfill_auction").
+			SignProposeAndPayAs("user2"). //the buy
+			AccountArgument("user1").
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().

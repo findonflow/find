@@ -15,6 +15,13 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 ## Plans
  - do we need a ban list here?
+ - structure all transactions and scripts with propper blocks and good docs
+ - more inline docs
+ - github actions
+  - run test
+	- verify that doc is up to date
+ - create webpage
+ - create job that will listed to event and fullfill auctions with bids that are not fullfilled. prob needs an db if I cannot use graffle.io
 
 ## Testing
 
