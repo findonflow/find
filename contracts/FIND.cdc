@@ -513,7 +513,7 @@ pub contract FIND {
 			}
 
 			if !self.auctions.containsKey(name) {
-				panic("Tag is not for auction name=".concat(name))
+				panic("Name is not for auction name=".concat(name))
 			}
 
 			if self.borrowAuction(name).endsAt > Clock.time() {
@@ -759,12 +759,12 @@ pub contract FIND {
 
 			let nameStatus=self.status(name)
 			if nameStatus.status == LeaseStatus.TAKEN {
-				panic("Tag already registered")
+				panic("Name already registered")
 			}
 
 			//if we have a locked profile that is not owned by the same identity then panic
 			if nameStatus.status == LeaseStatus.LOCKED {
-				panic("Tag is locked")
+				panic("Name is locked")
 			}
 
 			let cost= self.calculateCost(name)

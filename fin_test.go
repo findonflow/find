@@ -1,6 +1,7 @@
-package main
+package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
@@ -14,55 +15,34 @@ Tests must be in the same folder as flow.json with contracts and transactions/sc
 func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to register a name", func(t *testing.T) {
-
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
-
-		createUser(g, t, "100.0", "user1")
-
-		g.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
-				"to":     "0x1cf0e2f2f715450",
-			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
-				"from":   "0x179b6b1cb6755e31",
-			}))
+		NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1")
 	})
 
 	t.Run("Should get error if you try to register a name and dont have enough money", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("5.0", "user1")
 
-		createUser(g, t, "5.0", "user1")
-
-		g.TransactionFromFile("register").
+		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("usr").
 			Test(t).
 			AssertFailure("Amount withdrawn must be less than or equal than the balance of the Vault")
+		//TODO: Give a better error message here?
 
 	})
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("5.0", "user1")
 
-		createUser(g, t, "5.0", "user1")
-
-		g.TransactionFromFile("register").
+		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("ur").
 			Test(t).
@@ -71,47 +51,36 @@ func TestFIND(t *testing.T) {
 	})
 	t.Run("Should get error if you try to register a name that is already claimed", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("10.0", "user1").
+			registerUser("user1")
 
-		createUser(g, t, "10.0", "user1")
-
-		g.TransactionFromFile("register").
+		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
-			AssertSuccess()
-
-		g.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).
-			AssertFailure("Tag already registered")
+			AssertFailure("Name already registered")
 
 	})
 
 	t.Run("Should allow registering a lease after it is freed", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1")
 
-		createUser(g, t, "10.0", "user1")
+		gt.expireLease().tickClock("2.0")
 
-		g.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).
-			AssertSuccess()
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("2.0").Test(t).AssertSuccess()
-		g.TransactionFromFile("status").
+		gt.GWTF.TransactionFromFile("status").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertFailure("locked")
 
+		//TODO: test with more premutations here
 		//do i need this now?
-		g.TransactionFromFile("update_status").
+		gt.GWTF.TransactionFromFile("janitor").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
@@ -120,79 +89,47 @@ func TestFIND(t *testing.T) {
 				"name":        "user1",
 			}))
 
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
+		gt.expireLease()
 
-		g.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).
-			AssertSuccess().
+		gt.registerUserTransaction("user1").
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Freed", map[string]interface{}{
 				"name":          "user1",
 				"previousOwner": "0x179b6b1cb6755e31",
-			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
-				"expireAt": "94608003.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
-				"to":     "0x1cf0e2f2f715450",
-			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
-				"from":   "0x179b6b1cb6755e31",
 			}))
-
 	})
 
 	t.Run("Should be able to lookup address", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
-
-		createUser(g, t, "10.0", "user1")
-
-		registerUser(g, t, "user1")
-
-		value := g.Script(`import FIND from "../contracts/FIND.cdc"
-pub fun main(name: String) :  Address? {
-    return FIND.lookupAddress(name)
-}
-		`).StringArgument("user1").RunReturnsInterface()
-		assert.Equal(t, "0x179b6b1cb6755e31", value)
-
+		NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1").
+			assertLookupAddress("0x179b6b1cb6755e31")
 	})
 
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1").
+			expireLease().
+			tickClock("2.0")
 
-		createUser(g, t, "10.0", "user1")
-
-		registerUser(g, t, "user1")
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(leaseDuration).Test(t).AssertSuccess()
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("2.0").Test(t).AssertSuccess()
-
-		value := g.ScriptFromFile("status").StringArgument("user1").RunReturnsInterface()
+		value := gt.GWTF.ScriptFromFile("status").StringArgument("user1").RunReturnsInterface()
 		assert.Equal(t, "", value)
 
 	})
 
 	t.Run("Should be able to send ft to another name", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1")
 
-		createUser(g, t, "10.0", "user1")
-		createUser(g, t, "10.0", "user2")
-
-		registerUser(g, t, "user1")
-
-		g.TransactionFromFile("send").
+		gt.GWTF.TransactionFromFile("send").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			UFix64Argument("5.0").
@@ -240,9 +177,6 @@ func createUser(g *gwtf.GoWithTheFlow, t *testing.T, fusd string, name string) {
 		AssertEventCount(3)
 }
 
-//a year
-const leaseDuration = "31536000.0"
-
 func setupFIND(g *gwtf.GoWithTheFlow, t *testing.T) {
 	//first step create the adminClient as the fin user
 
@@ -259,7 +193,7 @@ func setupFIND(g *gwtf.GoWithTheFlow, t *testing.T) {
 	//set up fin network as the fin user
 	g.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("fin").
-		UFix64Argument(leaseDuration).
+		UFix64Argument(fmt.Sprintf("%f", leaseDurationFloat)).
 		Test(t).AssertSuccess().AssertNoEvents()
 
 	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").Test(t).AssertSuccess()

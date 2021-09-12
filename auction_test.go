@@ -1,4 +1,4 @@
-package main
+package test_main
 
 import (
 	"testing"
@@ -13,67 +13,27 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should list a name for sale", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
-
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"name":     "user1",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-			}))
+		NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1").
+			listForSale("user1")
 
 	})
 
 	t.Run("Should be able to sell lease", func(t *testing.T) {
 
-		g := gwtf.NewTestingEmulator()
-		setupFIND(g, t)
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			bid("user2", "user1").
+			expireAuction()
 
-		createUser(g, t, "100.0", "user1")
-		registerUser(g, t, "user1")
-		createUser(g, t, "100.0", "user2")
-		registerUser(g, t, "user2")
-
-		g.TransactionFromFile("sell").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":   "true",
-				"amount":   "10.00000000",
-				"expireAt": "31536001.00000000",
-				"owner":    "0x179b6b1cb6755e31",
-				"name":     "user1",
-			}))
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			Test(t).
-			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "10.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
-			}))
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86401.0").Test(t).AssertSuccess()
-
-		g.TransactionFromFile("fullfill").
+		gt.GWTF.TransactionFromFile("fullfill").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).
@@ -95,6 +55,7 @@ func TestAuction(t *testing.T) {
 			}))
 
 	})
+
 	t.Run("Should be able to sell lease from offer", func(t *testing.T) {
 
 		g := gwtf.NewTestingEmulator()
@@ -686,7 +647,7 @@ func TestAuction(t *testing.T) {
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
 
-		g.TransactionFromFile("update_status").
+		g.TransactionFromFile("janitor").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().
@@ -696,7 +657,7 @@ func TestAuction(t *testing.T) {
 			}))
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("71536001.00000000").Test(t).AssertSuccess()
 
-		g.TransactionFromFile("update_status").
+		g.TransactionFromFile("janitor").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertSuccess().

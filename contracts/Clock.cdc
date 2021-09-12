@@ -58,7 +58,7 @@ pub contract Clock{
 	}
 
 	//mocking the time! Should probably remove self.fakeClock in mainnet?
-	access(account) fun time() : UFix64 {
+	pub fun time() : UFix64 {
 		if self.enabled {
 			return self.fakeClock 
 		}
