@@ -1,0 +1,9 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "prepare": "mkdir -p lib & node build.js"
+  },
+  "dependencies": {
+    "cadence-to-json": "^1.0.3"
+  }
+}
