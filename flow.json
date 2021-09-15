@@ -26,10 +26,23 @@
 				"emulator": "ee82856bf20e2aa6"
 			}
 		},
+    "FlowToken": {
+      "source": "./contracts/standard/FlowToken.cdc",
+      "aliases": {
+        "testnet": "0x7e60df042a9c0868",
+        "emulator": "0x0ae53cb6e3f42a79",
+        "mainnet" : "0x1654653399040a61"
+      }
+    },
 		"FIND": "./contracts/FIND.cdc",
-		"Clock": "./contracts/Clock.cdc",
-		"Profile": "./contracts/Profile.cdc",
-		"Content" : "./contracts/Content.cdc",
+		"Clock": "./contracts/Clock.cdc", 
+		"Profile": {
+			"source" : "./contracts/Profile.cdc", 
+			"aliases" : {
+				"testnet" : "99ca04281098b33d",
+				"mainnet" : "d796ff17107bbff6"
+			}
+		},
 		"Debug" : "./contracts/Debug.cdc"
 	},
 	"networks": {
@@ -42,7 +55,7 @@
 			"address": "f8d6e0586b0a20c7",
 			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
 		},
-		"emulator-fin": {
+		"emulator-find": {
 			"address": "01cf0e2f2f715450",
 			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
 		},
@@ -57,20 +70,47 @@
 		"emulator-user3": {
 			"address": "e03daebed8ca0615",
 			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+		},
+		"testnet-find": {
+			"address": "8bde8952731c1f8c",
+			"key": "${TESTNET_FIND}"
+		},
+		"testnet-find-admin": {
+			"address": "64930216ae63617a",
+			"key": "${TESTNET_FIND_ADMIN}"
+		},
+		"testnet-user1": {
+			"address": "96a0def8269d6bc4",
+			"key": "${TESTNET_FIND_USER1}"
+		},
+		"testnet-user2": {
+			"address": "72c7672537676b1b",
+			"key": "${TESTNET_FIND_USER2}"
+		},
+		"testnet-user3": {
+			"address": "60635d0971b40946",
+			"key": "${TESTNET_FIND_USER3}"
 		}
+
 	},
 	"deployments": {
+		"testnet": {
+			"testnet-find": [
+				"FIND",
+				"Clock",
+				"Debug"
+			]
+		},
 		"emulator": {
 			"emulator-account": [
 				"NonFungibleToken",
-				"Content",
 				"FIND",
-        "Clock",
+				"Clock",
 				"Profile",
 				"Debug",
 				"FUSD"
 			], 
-			"emulator-fin" : [],
+			"emulator-find" : [],
 			"emulator-user1" : [],
 			"emulator-user2" : [],
 			"emulator-user3" : []
