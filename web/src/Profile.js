@@ -13,14 +13,15 @@ export function Profile({ user }) {
             fcl.args([fcl.arg(addr, t.Address)]),
         ]);
         const profile= await fcl.decode(response);
+			  console.log(profile)
         setProfile(profile)
     }
     getProfile(user.addr)
   }, [user]);
 
-  console.log(profile)
   if(!profile)  {
-      return <div> No Profile</div>
+      return <div>create profile like on versus</div>
   }
-  return <div> {profile}</div>
+
+	return <div> Show the profile { JSON.stringify(profile, null, 2) }</div>
 }

@@ -21,6 +21,7 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
   - run test
 	- verify that doc is up to date
  - create webpage
+ - do not expose enum status out of scripts
  - create job that will listed to event and fullfill auctions with bids that are not fullfilled. prob needs an db if I cannot use graffle.io
 
 ## Testing
