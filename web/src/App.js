@@ -5,6 +5,7 @@ import {AuthCluster} from "./auth-cluster"
 import {Profile} from "./Profile"
 import { Register } from "./Register"
 import { Leases } from "./Leases"
+import { Bids } from "./Bids"
 import * as fcl from "@onflow/fcl"
 
 export default function App() {
@@ -24,7 +25,7 @@ export default function App() {
           <Profile user={user} />
 				  <Register />
 				  <Leases user={user}/>
-				  
+				  <Bids user={user}/>
 				</div>
       )}
     </div>

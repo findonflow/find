@@ -23,5 +23,6 @@ export function Bids({ user }) {
 
 		/*
 		* Transactions:  increaseBid: to increase the bid
+		* TODO: fix bid scripts so that it can return empty
 		*/
 }
