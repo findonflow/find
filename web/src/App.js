@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 import {AuthCluster} from "./auth-cluster"
 import {Profile} from "./Profile"
 import { Register } from "./Register"
-import { Leases } from "./Leases"
-import { Bids } from "./Bids"
 import * as fcl from "@onflow/fcl"
 
 export default function App() {
@@ -21,11 +19,9 @@ export default function App() {
 		  <div>box right</div>
       { user.loggedIn && (
         <div>
+					<Register />
 				  <hr></hr>
           <Profile user={user} />
-				  <Register />
-				  <Leases user={user}/>
-				  <Bids user={user}/>
 				</div>
       )}
     </div>
