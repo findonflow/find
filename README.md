@@ -24,6 +24,17 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
  - do not expose enum status out of scripts
  - create job that will listed to event and fullfill auctions with bids that are not fullfilled. prob needs an db if I cannot use graffle.io
 
+
+### Web
+ - add edit profile with EasyEdit. Do not submit each change to profile directly. Add them up and provide a status that the profile has been changed and that you should persist the changes. 
+ - add search form that will show a hit if it exists or a list of names staring with string if not hit. -> PublicLease page
+ - add bid boxes to publicLease page, needs profile to be able to bid.
+ - public lease should have a add friend button that will mutate profile and mark as dirty but not commit directly
+ - for all transactions I want a toast on top that tells the status and a ref that blocks any other transaction while the current transaction is running. but do not block the user thread. 
+ -  the plan is to deploy to vercel so adding next.js here is probably wise. 
+ - eventually: an event stream page where all events comming in are listed
+ - for a logged in user the event where you are outbid are particulary of iterent as it shold come up if you want to up your bid for this lease. 
+ - but I guess that the blocto popup will give you that notification way before this system does.  
 ## Testing
 
  `gotestsum -f testname --watch`
