@@ -29,7 +29,6 @@ export function Profile({ user }) {
 
 		<div> Show the profile { JSON.stringify(findUser.profile, null, 2) }</div>
 		<h2>Leases</h2>
-		Probably want a table here or something. 
 		{ findUser.leases.map ((lease) => <PrivateLease lease={lease} />)}
 		<h2>Bids</h2>
 		{ findUser.bids.map ((bid) => <PrivateBid bid={bid} />)}

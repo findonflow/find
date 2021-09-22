@@ -311,12 +311,17 @@ const handleFullfillSale = async (e) => {
 
 	let sale=null
 	if(bids === null) {
-		sale= <EasyEdit value={lease.salePrice} type="number" placeholder="Sell!" instructions="List for sale" onSave={handleSell} saveButtonLabel="Sell" />
+		let listFor= <span>selling for:</span>
+		if(lease.salePrice===null) {
+			listFor= <span>list for sale:</span>
+		}
+
+		sale= <div> {listFor} <EasyEdit value={lease.salePrice} type="number" placeholder="Sell!" instructions="List for sale" onSave={handleSell} saveButtonLabel="Sell" /> </div>
 			//need to show better text when it is for sale and not for sale here
 	} 	
 
 	return <div>
 		name: { lease.name} {durationLegend}  { bids} { sale } <br /> 
-		{JSON.stringify(lease, null, 2)}
 		</div>
+		//{JSON.stringify(lease, null, 2)}
 }
