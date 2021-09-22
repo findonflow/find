@@ -218,12 +218,10 @@ pub contract FIND {
 		access(contract) let name: String
 
 		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, name: String) {
-			/*
 			pre {
 				startedAt < endsAt : "Cannot start before it will end"
-				extendOnLateBid==0.0 : "Extends on late bid must be a non zero value"
+				extendOnLateBid != 0.0 : "Extends on late bid must be a non zero value"
 			}
-			*/
 			self.endsAt=endsAt
 			self.startedAt=startedAt
 			self.extendOnLateBid=extendOnLateBid
