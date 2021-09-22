@@ -35,6 +35,10 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
  - eventually: an event stream page where all events comming in are listed
  - for a logged in user the event where you are outbid are particulary of iterent as it shold come up if you want to up your bid for this lease. 
  - but I guess that the blocto popup will give you that notification way before this system does.  
+ - listing all ongoing auctions in a subpage
+ - listing all things that are on offer in another?
+ - have a featured sale box on frontpage?
+ - integrate with graffle.io ( i have permission)
 ## Testing
 
  `gotestsum -f testname --watch`
