@@ -863,15 +863,12 @@ pub contract FIND {
 		}
 
 		pub fun calculateCost(_ name: String) : UFix64 {
-			let length= name.length
-
-			for i in self.lengthPrices.keys {
-				if length==i {
-					return self.lengthPrices[i]!
-				}
+			if self.lengthPrices[name.length] != nil {
+				return self.lengthPrices[name.length]!
+			} else {
+				return self.defaultPrice
 			}
-			return self.defaultPrice
-		}
+	  }
 
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
 			self.wallet=wallet
@@ -1127,14 +1124,14 @@ pub contract FIND {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
 
-		self.AdminProxyPublicPath= /public/finAdminProxy
-		self.AdminProxyStoragePath=/storage/finAdminProxy
+		self.AdminProxyPublicPath= /public/findAdminProxy
+		self.AdminProxyStoragePath=/storage/findAdminProxy
 
-		self.LeasePublicPath=/public/finLeases
-		self.LeaseStoragePath=/storage/finLeases
+		self.LeasePublicPath=/public/findLeases
+		self.LeaseStoragePath=/storage/findLeases
 
-		self.BidPublicPath=/public/finBids
-		self.BidStoragePath=/storage/finBids
+		self.BidPublicPath=/public/findBids
+		self.BidStoragePath=/storage/findBids
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
