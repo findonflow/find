@@ -15,11 +15,11 @@ transaction(name: String) {
 		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
 		let payVault <- vaultRef.withdraw(amount: price) as! @FUSD.Vault
 
-		let leaseCollectionCap=acct.getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+		let leaseCollectionCap=acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollectionCap.check() {
 			let finLeases <- FIND.createEmptyLeaseCollection()
 			acct.save(<- finLeases, to: FIND.LeaseStoragePath)
-			acct.link<&{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
+			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
 
 		let leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!

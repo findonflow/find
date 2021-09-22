@@ -17,9 +17,9 @@ pub struct FINDReport{
 pub fun main(user: Address) : FINDReport{
 
 	let account=getAccount(user)
-	let bidCap = account.getCapability<&{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
+	let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 
-	 let leaseCap = account.getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+	 let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 	 return FINDReport(
 		 profile: account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.asProfile(),

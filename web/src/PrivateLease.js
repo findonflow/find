@@ -3,6 +3,7 @@ import TimeAgo from 'react-timeago'
 
 export function PrivateLease({ lease }) {
 
+	 
 	let durationLegend= <div>GREEN:valid until {<TimeAgo date={new Date(lease.expireTime * 1000)} />} <button text="extend">Extend</button></div>
 	if(lease.status.rawValue.value === 2) {
 		durationLegend= <div>RED:locked until {<TimeAgo date={new Date(lease.expireTime * 1000)} />} <button text="renew">Renew</button></div>

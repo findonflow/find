@@ -11,7 +11,7 @@ transaction(name: String, user: Address) {
 
 		let userAccount=getAccount(user)
 		let profileCap = userAccount.getCapability<&{Profile.Public}>(Profile.publicPath)
-		let leaseCollectionCap=userAccount.getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+		let leaseCollectionCap=userAccount.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 		let wallet=account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		let adminClient=account.borrow<&FIND.AdminProxy>(from: FIND.AdminProxyStoragePath)!

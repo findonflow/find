@@ -173,7 +173,7 @@ pub contract FIND {
 		access(contract) let name: String
 		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
-		access(contract) var offerCallback: Capability<&{BidCollectionPublic}>?
+		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
@@ -186,7 +186,7 @@ pub contract FIND {
 			self.salePrice=price
 		}
 
-		pub fun setCallback(_ callback: Capability<&{BidCollectionPublic}>?) {
+		pub fun setCallback(_ callback: Capability<&BidCollection{BidCollectionPublic}>?) {
 			self.offerCallback=callback
 		}
 
@@ -214,10 +214,16 @@ pub contract FIND {
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
-		access(contract) var latestBidCallback: Capability<&{BidCollectionPublic}>
+		access(contract) var latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>
 		access(contract) let name: String
 
-		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&{BidCollectionPublic}>, name: String) {
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, name: String) {
+			/*
+			pre {
+				startedAt < endsAt : "Cannot start before it will end"
+				extendOnLateBid==0.0 : "Extends on late bid must be a non zero value"
+			}
+			*/
 			self.endsAt=endsAt
 			self.startedAt=startedAt
 			self.extendOnLateBid=extendOnLateBid
@@ -229,7 +235,7 @@ pub contract FIND {
 			return self.latestBidCallback.borrow()!.getBalance(self.name)
 		}
 
-		pub fun addBid(callback: Capability<&{BidCollectionPublic}>, timestamp: UFix64) {
+		pub fun addBid(callback: Capability<&BidCollection{BidCollectionPublic}>, timestamp: UFix64) {
 			if callback.borrow()!.getBalance(self.name) <= self.getBalance() {
 				panic("bid must be larger then previous bid")
 			}
@@ -287,7 +293,7 @@ pub contract FIND {
 		access(contract) fun increaseBid(_ name: String) 
 
 		//place a bid on a token
-		access(contract) fun bid(name: String, callback: Capability<&{BidCollectionPublic}>)
+		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
 
 		//the janitor process has to remove leases
 		access(contract) fun remove(_ name: String) 
@@ -407,7 +413,7 @@ pub contract FIND {
 
 		}
 
-		access(contract) fun bid(name: String, callback: Capability<&{BidCollectionPublic}>) {
+		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
@@ -565,7 +571,7 @@ pub contract FIND {
 		}
 
 		//note that when moving a name
-		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&{LeaseCollectionPublic}>) {
+		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
 			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, expireAt: token.getLeaseExpireTime())
 			token.move(profile: profile)
@@ -608,7 +614,7 @@ pub contract FIND {
 		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
 		pub fun register(name: String, vault: @FUSD.Vault){
 			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
-			let leases= self.owner!.getCapability<&{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let leases= self.owner!.getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
@@ -751,7 +757,7 @@ pub contract FIND {
 		}
 
 		//everybody can call register, normally done through the convenience method in the contract
-		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
 			pre {
 				name.length >= 3 : "A FIND name has to be minimum 3 letters long"
 			}
@@ -827,7 +833,7 @@ pub contract FIND {
 
 				if lease.status == LeaseStatus.LOCKED {
 
-					let leaseCollection=getAccount(owner).getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()!
+					let leaseCollection=getAccount(owner).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()!
 					leaseCollection.remove(name)
 
 					self.profiles.remove(key: name)
@@ -901,12 +907,12 @@ pub contract FIND {
 
 
 	pub resource Bid {
-		access(contract) let from: Capability<&{FIND.LeaseCollectionPublic}>
+		access(contract) let from: Capability<&LeaseCollection{LeaseCollectionPublic}>
 		access(contract) let name: String
 		access(contract) let vault: @FUSD.Vault
 		access(contract) var bidAt: UFix64
 
-		init(from: Capability<&{FIND.LeaseCollectionPublic}>, name: String, vault: @FUSD.Vault){
+		init(from: Capability<&LeaseCollection{LeaseCollectionPublic}>, name: String, vault: @FUSD.Vault){
 			self.vault <- vault
 			self.name=name
 			self.from=from
@@ -935,9 +941,9 @@ pub contract FIND {
 
 		access(contract) var bids : @{String: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-		access(contract) let leases: Capability<&{FIND.LeaseCollectionPublic}>
+		access(contract) let leases: Capability<&LeaseCollection{LeaseCollectionPublic}>
 
-		init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&{FIND.LeaseCollectionPublic}>) {
+		init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
 			self.bids <- {}
 			self.receiver=receiver
 			self.leases=leases
@@ -983,11 +989,11 @@ pub contract FIND {
 			if nameStatus.status ==  LeaseStatus.FREE {
 				panic("cannot bid on name that is free")
 			}
-			let from=getAccount(nameStatus.owner!).getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let bid <- create Bid(from: from, name:name, vault: <- vault)
 			let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
-			let callbackCapability =self.owner!.getCapability<&{BidCollectionPublic}>(FIND.BidPublicPath)
+			let callbackCapability =self.owner!.getCapability<&BidCollection{BidCollectionPublic}>(FIND.BidPublicPath)
 			let oldToken <- self.bids[bid.name] <- bid
 			//send info to leaseCollection
 			destroy oldToken
@@ -1001,13 +1007,13 @@ pub contract FIND {
 			if nameStatus.status ==  LeaseStatus.FREE {
 				panic("cannot increaseBid on name that is free")
 			}
-			let seller=getAccount(nameStatus.owner!).getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let seller=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
-			let from=getAccount(nameStatus.owner!).getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			from.borrow()!.increaseBid(name)
 		}
 
@@ -1019,7 +1025,7 @@ pub contract FIND {
 				self.cancel(name)
 				return
 			}
-			let from=getAccount(nameStatus.owner!).getCapability<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			from.borrow()!.cancelBid(name)
 			self.cancel(name)
 		}
@@ -1039,7 +1045,7 @@ pub contract FIND {
 		}
 	}
 
-	pub fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&{FIND.LeaseCollectionPublic}>) : @BidCollection {
+	pub fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) : @BidCollection {
 		return <- create BidCollection(receiver: receiver,  leases: leases)
 	}
 
@@ -1095,7 +1101,7 @@ pub contract FIND {
 		}
 
 
-		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>){
+		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}

@@ -27,18 +27,18 @@ func (gt *GWTFTestUtils) setupFIND() *GWTFTestUtils {
 	//first step create the adminClient as the fin user
 
 	gt.GWTF.TransactionFromFile("setup_fin_1_create_client").
-		SignProposeAndPayAs("fin").
+		SignProposeAndPayAs("find").
 		Test(gt.T).AssertSuccess().AssertNoEvents()
 
 	//link in the server in the versus client
 	gt.GWTF.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAsService().
-		AccountArgument("fin").
+		AccountArgument("find").
 		Test(gt.T).AssertSuccess().AssertNoEvents()
 
 	//set up fin network as the fin user
 	gt.GWTF.TransactionFromFile("setup_fin_3_create_network").
-		SignProposeAndPayAs("fin").
+		SignProposeAndPayAs("find").
 		UFix64Argument(fmt.Sprintf("%f", leaseDurationFloat)).
 		Test(gt.T).AssertSuccess().AssertNoEvents()
 
@@ -57,7 +57,7 @@ func (gt *GWTFTestUtils) expireLock() *GWTFTestUtils {
 	return gt.tickClock(fmt.Sprintf("%f", lockDurationFloat))
 }
 func (gt *GWTFTestUtils) tickClock(time string) *GWTFTestUtils {
-	gt.GWTF.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument(time).Test(gt.T).AssertSuccess()
+	gt.GWTF.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument(time).Test(gt.T).AssertSuccess()
 	return gt
 }
 
