@@ -17,6 +17,9 @@ transaction(name: String) {
 
 		let leaseCollectionCap=acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollectionCap.check() {
+			acct.unlink(FIND.LeasePublicPath)
+			destroy <- acct.load<@AnyResource>(from:FIND.LeaseStoragePath)
+
 			let finLeases <- FIND.createEmptyLeaseCollection()
 			acct.save(<- finLeases, to: FIND.LeaseStoragePath)
 			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)

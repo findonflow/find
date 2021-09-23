@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import {AuthCluster} from "./auth-cluster"
 import {Profile} from "./Profile"
 import { Register } from "./Register"
+import { Search } from "./Search"
 import * as fcl from "@onflow/fcl"
 
 export default function App() {
@@ -13,10 +14,10 @@ export default function App() {
   return (
     <div>
       <AuthCluster user={user}/>
-		  <div>FIND a name for your profile on flow. <br/> <input></input> search box like duckduckgo/google</div>
 			<div>box left</div>
 		  <div>box middle</div>
 		  <div>box right</div>
+			<Search />
       { user.loggedIn && (
         <div>
 					<Register />

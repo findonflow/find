@@ -174,7 +174,7 @@ const handleFullfillSale = async (e) => {
     try {
       await tx(
         [
-          fcl.transaction(transactions.cancel_auction),
+          fcl.transaction(transactions.cancelAuction),
           fcl.args([
             fcl.arg(lease.name, t.String)
           ]),
@@ -250,6 +250,7 @@ const handleFullfillSale = async (e) => {
       console.log(e);
     }
   }
+
   const handleExtend = async (e) => {
     e.preventDefault();
     try {
@@ -259,6 +260,42 @@ const handleFullfillSale = async (e) => {
           fcl.args([
             fcl.arg(lease.name, t.String)
           ]),
+          fcl.proposer(fcl.currentUser().authorization),
+          fcl.payer(fcl.currentUser().authorization),
+          fcl.authorizations([fcl.currentUser().authorization]),
+          fcl.limit(9999),
+        ],
+        {
+          onStart() {
+						console.log("start")
+          },
+          onSubmission() {
+						console.log("submitted")
+          },
+          async onSuccess(status) {
+						console.log("success")
+            const event = document.createEvent("Event");
+            event.initEvent("bid", true, true);
+            document.dispatchEvent(event);
+          },
+          async onError(error) {
+            if (error) {
+              const { message } = error;
+							console.log(message)
+            }
+          },
+        }
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  const handleProfile = async (e) => {
+    e.preventDefault();
+    try {
+      await tx(
+        [
+          fcl.transaction(transactions.edit_profile),
           fcl.proposer(fcl.currentUser().authorization),
           fcl.payer(fcl.currentUser().authorization),
           fcl.authorizations([fcl.currentUser().authorization]),
@@ -322,6 +359,7 @@ const handleFullfillSale = async (e) => {
 
 	return <div>
 		name: { lease.name} {durationLegend}  { bids} { sale } <br /> 
+		<button onClick={handleProfile}>Add fusd to profile</button>
 		</div>
 		//{JSON.stringify(lease, null, 2)}
 }

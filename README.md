@@ -27,7 +27,7 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 ### Web
  - add edit profile with EasyEdit. Do not submit each change to profile directly. Add them up and provide a status that the profile has been changed and that you should persist the changes. 
- - add search form that will show a hit if it exists or a list of names staring with string if not hit. -> PublicLease page
+ - if not hit in search field expand resource to add all leases that have a name starting with input
  - add bid boxes to publicLease page, needs profile to be able to bid.
  - public lease should have a add friend button that will mutate profile and mark as dirty but not commit directly
  - for all transactions I want a toast on top that tells the status and a ref that blocks any other transaction while the current transaction is running. but do not block the user thread. 

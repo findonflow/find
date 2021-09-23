@@ -72,7 +72,7 @@
 			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
 		},
 		"testnet-find": {
-			"address": "8bde8952731c1f8c",
+			"address": "400fc379f3eeb555",
 			"key": "${TESTNET_FIND}"
 		},
 		"testnet-find-admin": {
