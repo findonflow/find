@@ -40,7 +40,7 @@ pub contract FIND {
 	pub event Sold(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
 
 	/// Emitted when a name is explicistly put up for sale
-	pub event ForSale(name: String, owner: Address, expireAt: UFix64, amount: UFix64, active: Bool)
+	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, auctionStartPrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event BlindBid(name: String, bidder: Address, amount: UFix64)
@@ -173,25 +173,27 @@ pub contract FIND {
 		access(contract) let name: String
 		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
-		access(contract) var reservePrice: UFix64?
+		access(contract) var auctionStartPrice: UFix64?
+		access(contract) var auctionReservePrice: UFix64?
 		access(contract) var auctionDuration: UFix64
-		access(contract) var extensionOnLateBid: UFix64
-		access(contract) var minBidPrice: UFix64?
+		access(contract) var auctionMinBidIncrement: UFix64
+		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
 			self.networkCap= networkCap
 			self.salePrice=nil
-			self.reservePrice=nil
+			self.auctionStartPrice=nil
+			self.auctionReservePrice=nil
 			self.auctionDuration=86400.0
-			self.extensionOnLateBid=300.0
-			self.minBidPrice=nil
+			self.auctionExtensionOnLateBid=300.0
+			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
 		}
 
 		pub fun setExtentionOnLateBid(_ time: UFix64) {
-			self.extensionOnLateBid=time
+			self.auctionExtensionOnLateBid=time
 		}
 
 		pub fun setAuctionDuration(_ duration: UFix64) {
@@ -203,11 +205,15 @@ pub contract FIND {
 		}
 
 		pub fun setReservePrice(_ price: UFix64?) {
-			self.reservePrice=price
+			self.auctionReservePrice=price
 		}
 
-		pub fun setMinBidPrice(_ price: UFix64?) {
-			self.minBidPrice=price
+		pub fun setMinBidIncrement(_ price: UFix64) {
+			self.auctionMinBidIncrement=price
+		}
+
+		pub fun setStartAuctionPrice(_ price: UFix64?) {
+			self.auctionStartPrice=price
 		}
 
 		pub fun setCallback(_ callback: Capability<&BidCollection{BidCollectionPublic}>?) {
@@ -389,7 +395,7 @@ pub contract FIND {
 			let timestamp=Clock.time()
 			let lease = self.borrow(name)
 			let duration=lease.auctionDuration
-			let extensionOnLateBid=lease.extensionOnLateBid
+			let extensionOnLateBid=lease.auctionExtensionOnLateBid
 			if lease.offerCallback == nil {
 				panic("cannot start an auction on a name without a bid, set salePrice")
 			}
@@ -583,16 +589,26 @@ pub contract FIND {
 
 		}
 
-		//TODO: add other prices here
-		pub fun listForSale(name :String, amount: UFix64) {
+		//TODO; Add pre fields
+		pub fun listForSale(name :String, 
+		directSellPrice:UFix64, 
+		auctionStartPrice: UFix64, 
+		auctionReservePrice: UFix64, 
+		auctionDuration: UFix64, 
+		auctionMinBidIncrement: UFix64, 
+		auctionExtensionOnLateBid: UFix64) {
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
 
 			let tokenRef = self.borrow(name)
-			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: amount, active: true)
-			tokenRef.setSalePrice(amount)
-
+			tokenRef.setSalePrice(directSellPrice)
+			tokenRef.setStartAuctionPrice(auctionStartPrice)
+			tokenRef.setReservePrice(auctionReservePrice)
+			tokenRef.setAuctionDuration(auctionDuration)
+			tokenRef.setMinBidIncrement(auctionMinBidIncrement)
+			tokenRef.setExtentionOnLateBid(auctionExtensionOnLateBid)
+			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, auctionStartPrice: tokenRef.auctionStartPrice!, active: true)
 		}
 
 		//TODO: add other prices here
@@ -602,7 +618,7 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
-			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), amount: tokenRef.salePrice!, active: false)
+			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, auctionStartPrice: tokenRef.auctionStartPrice!, active: false)
 			tokenRef.setSalePrice(nil)
 		}
 
