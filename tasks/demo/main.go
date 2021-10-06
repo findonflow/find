@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
-	"github.com/onflow/cadence"
 )
 
 func main() {
@@ -11,40 +10,32 @@ func main() {
 
 	//first step create the adminClient as the fin user
 	g.TransactionFromFile("setup_fin_1_create_client").
-		SignProposeAndPayAs("fin").
+		SignProposeAndPayAs("find").
 		RunPrintEventsFull()
 
 	//link in the server in the versus client
 	g.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAsService().
-		AccountArgument("fin").
+		AccountArgument("find").
 		RunPrintEventsFull()
 
 	//set up fin network as the fin user
 	g.TransactionFromFile("setup_fin_3_create_network").
-		SignProposeAndPayAs("fin").
+		SignProposeAndPayAs("find").
 		UFix64Argument("864000.0"). //duration of a lease, this is for testing
 		RunPrintEventsFull()
 
 	//we advance the clock
-	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("1.0").RunPrintEventsFull()
-
-	tags := cadence.NewArray([]cadence.Value{cadence.String("tag1"), cadence.String("tag2")})
+	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
 
 	g.TransactionFromFile("create_profile").
 		SignProposeAndPayAs("user1").
 		StringArgument("User1").
-		StringArgument("This is user1").
-		Argument(tags).
-		BooleanArgument(true).
 		RunPrintEventsFull()
 
 	g.TransactionFromFile("create_profile").
 		SignProposeAndPayAs("user2").
 		StringArgument("User2").
-		StringArgument("This is user2").
-		Argument(tags).
-		BooleanArgument(true).
 		RunPrintEventsFull()
 
 	g.TransactionFromFile("mint_fusd").
@@ -87,7 +78,7 @@ func main() {
 	g.ScriptFromFile("lease_status").AccountArgument("user2").Run()
 	g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
 
-	g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86500.0").RunPrintEventsFull()
+	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("86500.0").RunPrintEventsFull()
 
 	g.TransactionFromFile("fullfill").
 		SignProposeAndPayAs("user1").

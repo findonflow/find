@@ -4,11 +4,17 @@ import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 
 
-//really not sure on how to input links here.
-transaction(name: String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitle: [String], linkType: [String], linkUrl: [String]) {
+//really not sure on how to input links here.)
+transaction(name: String) {
 	prepare(acct: AuthAccount) {
+		//if we do not have a profile it might be stored under a different address so we will just remove it
+		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
+		if !profileCap.check() {
+			acct.unlink(Profile.publicPath)
+			destroy <- acct.load<@AnyResource>(from:Profile.storagePath)
+		}
 
-		let profile <-Profile.createUser(name:name, description: description, allowStoringFollowers:allowStoringFollowers, tags:tags)
+		let profile <-Profile.createUser(name:name, description: "", allowStoringFollowers:true, tags:["find"])
 
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
@@ -27,11 +33,12 @@ transaction(name: String, description: String, avatar: String, tags:[String], al
 			)
 
 			profile.addWallet(fusdWallet)
-
 		}
 
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
+			acct.unlink(FIND.LeasePublicPath)
+			destroy <- acct.load<@AnyResource>(from:FIND.LeaseStoragePath)
 			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
@@ -39,22 +46,12 @@ transaction(name: String, description: String, avatar: String, tags:[String], al
 
 		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
+			acct.unlink(FIND.BidPublicPath)
+			destroy <- acct.load<@AnyResource>(from:FIND.BidStoragePath)
 			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
-
-		profile.setAvatar(avatar)
-
-		if linkTitle.length != linkType.length && linkType.length != linkUrl.length {
-			panic("need same length of link names, targets, types")
-		}
-
-		var i=0
-		while i < linkTitle.length {
-			profile.addLink(Profile.Link(title: linkTitle[i], type: linkType[i], url: linkUrl[i]))
-			i=i+1
-		}
 
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
-	"github.com/onflow/cadence"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,14 +61,10 @@ func (gt *GWTFTestUtils) tickClock(time string) *GWTFTestUtils {
 }
 
 func (gt *GWTFTestUtils) createUser(fusd string, name string) *GWTFTestUtils {
-	names := cadence.NewArray([]cadence.Value{cadence.String("name1"), cadence.String("name2")})
 
 	gt.GWTF.TransactionFromFile("create_profile").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
-		StringArgument("This is a user").
-		Argument(names).
-		BooleanArgument(true).
 		Test(gt.T).
 		AssertSuccess()
 
