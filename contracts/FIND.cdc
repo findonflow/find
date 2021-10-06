@@ -173,17 +173,41 @@ pub contract FIND {
 		access(contract) let name: String
 		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
+		access(contract) var reservePrice: UFix64?
+		access(contract) var auctionDuration: UFix64
+		access(contract) var extensionOnLateBid: UFix64
+		access(contract) var minBidPrice: UFix64?
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
 			self.networkCap= networkCap
 			self.salePrice=nil
+			self.reservePrice=nil
+			self.auctionDuration=86400.0
+			self.extensionOnLateBid=300.0
+			self.minBidPrice=nil
 			self.offerCallback=nil
+		}
+
+		pub fun setExtentionOnLateBid(_ time: UFix64) {
+			self.extensionOnLateBid=time
+		}
+
+		pub fun setAuctionDuration(_ duration: UFix64) {
+			self.auctionDuration=duration
 		}
 
 		pub fun setSalePrice(_ price: UFix64?) {
 			self.salePrice=price
+		}
+
+		pub fun setReservePrice(_ price: UFix64?) {
+			self.reservePrice=price
+		}
+
+		pub fun setMinBidPrice(_ price: UFix64?) {
+			self.minBidPrice=price
 		}
 
 		pub fun setCallback(_ callback: Capability<&BidCollection{BidCollectionPublic}>?) {
@@ -234,7 +258,10 @@ pub contract FIND {
 		}
 
 		pub fun addBid(callback: Capability<&BidCollection{BidCollectionPublic}>, timestamp: UFix64) {
-			if callback.borrow()!.getBalance(self.name) <= self.getBalance() {
+			let offer=callback.borrow()!
+			offer.setBidType(name: self.name, type: "auction")
+
+			if offer.getBalance(self.name) <= self.getBalance() {
 				panic("bid must be larger then previous bid")
 			}
 
@@ -360,16 +387,21 @@ pub contract FIND {
 		//call this to start an auction for this lease
 		pub fun startAuction(_ name: String) {
 			let timestamp=Clock.time()
-			let duration=86400.0
 			let lease = self.borrow(name)
+			let duration=lease.auctionDuration
+			let extensionOnLateBid=lease.extensionOnLateBid
 			if lease.offerCallback == nil {
 				panic("cannot start an auction on a name without a bid, set salePrice")
 			}
 
-			let endsAt=timestamp + duration
-			emit AuctionStarted(name: name, bidder: lease.offerCallback!.address, amount: lease.offerCallback!.borrow()!.getBalance(name), auctionEndAt: endsAt)
+			let callback=lease.offerCallback!
+			let offer=callback.borrow()!
+			offer.setBidType(name: name, type: "auction")
 
-			let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: 300.0,latestBidCallback: lease.offerCallback!, name: name)
+			let endsAt=timestamp + duration
+			emit AuctionStarted(name: name, bidder: callback.address, amount: offer.getBalance(name), auctionEndAt: endsAt)
+
+			let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, name: name)
 			lease.setCallback(nil)
 
 			destroy oldAuction
@@ -403,6 +435,8 @@ pub contract FIND {
 				return
 			}
 
+			//TODO: check if we can direct buy?
+
 			if lease.salePrice!  <= lease.offerCallback!.borrow()!.getBalance(name) {
 				self.startAuction(name)
 			} else {
@@ -434,6 +468,7 @@ pub contract FIND {
 
 			lease.setCallback(callback)
 
+			//TODO: check if we can direct buy?
 			if lease.salePrice == nil {
 				emit BlindBid(name: name, bidder: callback.address, amount: callback.borrow()!.getBalance(name))
 				return
@@ -484,7 +519,8 @@ pub contract FIND {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				self.auctions.containsKey(name) : "Cannot fullfill sale that is not an auction=".concat(name)
 			}
-	
+
+			//TODO: add a check to see if we have reaced min bid price
 			return self.fullfill(name)
 		}
 
@@ -547,6 +583,7 @@ pub contract FIND {
 
 		}
 
+		//TODO: add other prices here
 		pub fun listForSale(name :String, amount: UFix64) {
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
@@ -558,6 +595,7 @@ pub contract FIND {
 
 		}
 
+		//TODO: add other prices here
 		pub fun delistSale(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
@@ -868,7 +906,7 @@ pub contract FIND {
 			} else {
 				return self.defaultPrice
 			}
-	  }
+		}
 
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
 			self.wallet=wallet
@@ -890,13 +928,15 @@ pub contract FIND {
 	//Struct that is used to return information about bids
 	pub struct BidInfo{
 		pub let name: String
+		pub let type: String
 		pub let amount: UFix64
 		pub let timestamp: UFix64
 
-		init(name: String, amount: UFix64, timestamp: UFix64) {
+		init(name: String, amount: UFix64, timestamp: UFix64, type: String) {
 			self.name=name
 			self.amount=amount
 			self.timestamp=timestamp
+			self.type=type
 		}
 	}
 
@@ -904,6 +944,7 @@ pub contract FIND {
 	pub resource Bid {
 		access(contract) let from: Capability<&LeaseCollection{LeaseCollectionPublic}>
 		access(contract) let name: String
+		access(contract) var type: String
 		access(contract) let vault: @FUSD.Vault
 		access(contract) var bidAt: UFix64
 
@@ -911,9 +952,13 @@ pub contract FIND {
 			self.vault <- vault
 			self.name=name
 			self.from=from
+			self.type="blind"
 			self.bidAt=Clock.time()
 		}
 
+		access(contract) fun setType(_ type: String) {
+			self.type=type
+		}
 		access(contract) fun setBidAt(_ time: UFix64) {
 			self.bidAt=time
 		}
@@ -929,6 +974,7 @@ pub contract FIND {
 		pub fun getBalance(_ name: String) : UFix64
 		access(contract) fun fullfill(_ token: @FIND.Lease) : @FungibleToken.Vault
 		access(contract) fun cancel(_ name: String)
+		access(contract) fun setBidType(name: String, type: String) 
 	}
 
 	//A collection stored for bidders/buyers
@@ -973,7 +1019,7 @@ pub contract FIND {
 			var bidInfo: [BidInfo] = []
 			for id in self.bids.keys {
 				let bid = self.borrowBid(id)
-				bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.balance, timestamp: bid.bidAt))
+				bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type))
 			}
 			return bidInfo
 		}
@@ -1025,9 +1071,13 @@ pub contract FIND {
 			self.cancel(name)
 		}
 
-
 		pub fun borrowBid(_ name: String): &Bid {
 			return &self.bids[name] as &Bid
+		}
+
+		access(contract) fun setBidType(name: String, type: String) {
+			let bid= self.borrowBid(name)
+			bid.setType(type)
 		}
 
 		pub fun getBalance(_ name: String) : UFix64 {
