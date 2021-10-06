@@ -43,3 +43,11 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
  `gotestsum -f testname --watch`
 
+
+### TODO
+ - direct sale price
+ - minimum auction price
+ - auction duration
+  - min 1 hrs max 1 week
+ - type of bid in bidding on page 
+ - create profile 

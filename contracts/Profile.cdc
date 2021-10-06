@@ -2,7 +2,7 @@
 * Inspiration: https://flow-view-source.com/testnet/account/0xba1132bc08f82fe2/contract/Ghost
 */
 
-import FungibleToken from "./standard/FungibleToken.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 pub contract Profile {
   pub let publicPath: PublicPath
@@ -10,7 +10,7 @@ pub contract Profile {
   
   
   //and event emitted when somebody follows another user
-  pub event Follow(follower:Address, following: Address, names: [String])
+  pub event Follow(follower:Address, following: Address, tags: [String])
 
   //an event emitted when somebody unfollows somebody
   pub event Unfollow(follower:Address, unfollowing: Address)
@@ -26,20 +26,20 @@ pub contract Profile {
     pub let receiver: Capability<&{FungibleToken.Receiver}>
     pub let balance: Capability<&{FungibleToken.Balance}>
     pub let accept: Type
-    pub let names: [String]
+    pub let tags: [String]
 
     init(
       name: String,
       receiver: Capability<&{FungibleToken.Receiver}>,
       balance: Capability<&{FungibleToken.Balance}>,
       accept: Type,
-      names: [String]
+      tags: [String]
     ) {
       self.name=name
       self.receiver=receiver
       self.balance=balance
       self.accept=accept
-      self.names=names
+      self.tags=tags
     }
   }
 
@@ -50,28 +50,28 @@ pub contract Profile {
    */
   pub struct ResourceCollection {
     pub let collection: Capability
-    pub let names: [String]
+    pub let tags: [String]
     pub let type: Type
     pub let name: String
 
-    init(name: String, collection:Capability, type: Type, names: [String]) {
+    init(name: String, collection:Capability, type: Type, tags: [String]) {
       self.name=name
       self.collection=collection
-      self.names=names
+      self.tags=tags
       self.type=type
     }
   }
 
 
   pub struct CollectionProfile{
-    pub let names: [String]
+    pub let tags: [String]
     pub let type: String
     pub let name: String
 
     init(_ collection: ResourceCollection){
       self.name=collection.name
       self.type=collection.type.identifier
-      self.names=collection.names
+      self.tags=collection.tags
     }
   }
 
@@ -95,12 +95,12 @@ pub contract Profile {
   pub struct FriendStatus {
     pub let follower: Address
     pub let following:Address
-    pub let names: [String]
+    pub let tags: [String]
 
-    init(follower: Address, following:Address, names: [String]) {
+    init(follower: Address, following:Address, tags: [String]) {
       self.follower=follower
       self.following=following 
-      self.names= names
+      self.tags= tags
     }
   }
 
@@ -108,13 +108,13 @@ pub contract Profile {
     pub let name: String
     pub let balance: UFix64
     pub let accept:  String
-    pub let names: [String] 
+    pub let tags: [String] 
 
     init(_ wallet: Wallet) {
       self.name=wallet.name
       self.balance=wallet.balance.borrow()?.balance ?? 0.0 
       self.accept=wallet.accept.identifier
-      self.names=wallet.names
+      self.tags=wallet.tags
     }
   }
 
@@ -122,7 +122,7 @@ pub contract Profile {
     pub let address: Address
     pub let name: String
     pub let description: String
-    pub let names: [String]
+    pub let tags: [String]
     pub let avatar: String
     pub let links: [Link]
     pub let wallets: [WalletProfile]
@@ -135,7 +135,7 @@ pub contract Profile {
       address: Address,
       name: String,
       description: String, 
-      names: [String],
+      tags: [String],
       avatar: String, 
       links: [Link],
       wallets: [WalletProfile],
@@ -146,7 +146,7 @@ pub contract Profile {
         self.address=address
         self.name=name
         self.description=description
-        self.names=names
+        self.tags=tags
         self.avatar=avatar
         self.links=links
         self.collections=collections
@@ -192,7 +192,7 @@ pub contract Profile {
 
     pub fun setTags(_ val: [String])  {
        pre {
-        Profile.verifyTags(names: val, nameLength:10, nameSize:3) : "cannot have more then 3 names of length 10"
+        Profile.verifyTags(tags: val, tagLength:10, tagSize:3) : "cannot have more then 3 tags of length 10"
       }
     }   
 
@@ -203,9 +203,9 @@ pub contract Profile {
       }
     }
 
-    pub fun follow(_ address: Address, names:[String]) {
+    pub fun follow(_ address: Address, tags:[String]) {
        pre {
-        Profile.verifyTags(names: names, nameLength:10, nameSize:3) : "cannot have more then 3 names of length 10"
+        Profile.verifyTags(tags: tags, tagLength:10, tagSize:3) : "cannot have more then 3 tags of length 10"
       }
     }
     pub fun unfollow(_ address: Address)
@@ -240,7 +240,7 @@ pub contract Profile {
     access(self) var name: String
     access(self) var description: String
     access(self) var avatar: String
-    access(self) var names: [String]
+    access(self) var tags: [String]
     access(self) var followers: {Address: FriendStatus}
     access(self) var bans: {Address: Bool}
     access(self) var following: {Address: FriendStatus}
@@ -249,10 +249,10 @@ pub contract Profile {
     access(self) var links: {String: Link}
     access(self) var allowStoringFollowers: Bool
     
-    init(name:String, description: String, allowStoringFollowers: Bool, names: [String]) {
+    init(name:String, description: String, allowStoringFollowers: Bool, tags: [String]) {
       self.name = name
       self.description=description
-      self.names=names
+      self.tags=tags
       self.avatar = "https://avatars.onflow.org/avatar/ghostnote"
       self.followers = {}
       self.following = {}
@@ -292,7 +292,7 @@ pub contract Profile {
          address: self.owner!.address,
          name: self.getName(),
          description: self.getDescription(),
-         names: self.getTags(),
+         tags: self.getTags(),
          avatar: self.getAvatar(),
          links: self.getLinks(),
          wallets: wallets, 
@@ -365,7 +365,7 @@ pub contract Profile {
 
     pub fun getName(): String { return self.name }
     pub fun getDescription(): String{ return self.description}
-    pub fun getTags(): [String] { return self.names}
+    pub fun getTags(): [String] { return self.tags}
     pub fun getAvatar(): String { return self.avatar }
     pub fun getFollowers(): [FriendStatus] { return self.followers.values }
     pub fun getFollowing(): [FriendStatus] { return self.following.values }
@@ -373,21 +373,21 @@ pub contract Profile {
     pub fun setName(_ val: String) { self.name = val }
     pub fun setAvatar(_ val: String) { self.avatar = val }
     pub fun setDescription(_ val: String) { self.description=val}
-    pub fun setTags(_ val: [String]) { self.names=val}
+    pub fun setTags(_ val: [String]) { self.tags=val}
 
     pub fun removeCollection(_ val: String) { self.collections.remove(key: val)}
     pub fun addCollection(_ val: ResourceCollection) { self.collections[val.name]=val}
     pub fun getCollections(): [ResourceCollection] { return self.collections.values}
 
 
-    pub fun follow(_ address: Address, names:[String]) {
+    pub fun follow(_ address: Address, tags:[String]) {
       let friendProfile=Profile.find(address)
       let owner=self.owner!.address
-      let status=FriendStatus(follower:owner, following:address, names:names)
+      let status=FriendStatus(follower:owner, following:address, tags:tags)
 
       self.following[address] = status
       friendProfile.internal_addFollower(status)
-      emit Follow(follower:owner, following: address, names:names)
+      emit Follow(follower:owner, following: address, tags:tags)
     }
     
     pub fun unfollow(_ address: Address) {
@@ -412,26 +412,26 @@ pub contract Profile {
 
    pub fun find(_ address: Address) : &{Profile.Public} {
         return getAccount(address)
-        .getCapability<&{Profile.Public}>(Profile.publicPath)
+        .getCapability<&{Profile.Public}>(Profile.publicPath)!
         .borrow()!
     }
   
-  pub fun createUser(name: String, description:String, allowStoringFollowers: Bool, names:[String]) : @Profile.User {
+  pub fun createUser(name: String, description:String, allowStoringFollowers: Bool, tags:[String]) : @Profile.User {
     pre {
-      Profile.verifyTags(names: names, nameLength:10, nameSize:3) : "cannot have more then 3 names of length 10"
+      Profile.verifyTags(tags: tags, tagLength:10, tagSize:3) : "cannot have more then 3 tags of length 10"
       name.length <= 16: "Name must be 16 or less characters"
       description.length <= 255: "Descriptions must be 255 or less characters"
     }
-    return <- create Profile.User(name: name, description: description, allowStoringFollowers: allowStoringFollowers, names: names)
+    return <- create Profile.User(name: name, description: description, allowStoringFollowers: allowStoringFollowers, tags: tags)
   }
 
-  pub fun verifyTags(names : [String], nameLength: Int, nameSize: Int): Bool {
-    if names.length > nameSize {
+  pub fun verifyTags(tags : [String], tagLength: Int, tagSize: Int): Bool {
+    if tags.length > tagSize {
       return false
     }
 
-    for t in names {
-      if t.length > nameLength {
+    for t in tags {
+      if t.length > tagLength {
         return false
       }
     }
@@ -442,7 +442,4 @@ pub contract Profile {
     self.publicPath = /public/VersusUserProfile
     self.storagePath = /storage/VersusUserProfile
   }
-
-
-  
 }

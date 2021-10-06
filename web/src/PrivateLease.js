@@ -341,7 +341,8 @@ const handleFullfillSale = async (e) => {
 			button= <button text="cancel" onClick={ handleCancel} >Cancel</button>
 		}
 
-		bids= <div>Ongoing auction until { <TimeAgo date={new Date(lease.auctionEnds * 1000)} />  } latest bid { lease.latestBid } FUSD  { button}</div>
+		bids= <div>Ongoing auction until { <TimeAgo date={new Date(lease.auctionEnds * 1000)} />  } latest bid { lease.latestBid } FUSD by { lease.latestBidBy }   { button}</div>
+			//TODO link the address
 	} else if (lease.latestBid != null) {
 		bids= <div>Blind bid from { lease.latestBidBy} at {lease.latestBid } FUSD <button text="reject" onClick={handleCancel} >Reject</button> <button text="sell" onClick={handleFullfillSale}>Sell</button> <button text="auction" onClick={handleStartAuction}>Start auction</button> </div>
 	}
@@ -359,7 +360,6 @@ const handleFullfillSale = async (e) => {
 
 	return <div>
 		name: { lease.name} {durationLegend}  { bids} { sale } <br /> 
-		<button onClick={handleProfile}>Add fusd to profile</button>
 		</div>
 		//{JSON.stringify(lease, null, 2)}
 }

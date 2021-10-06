@@ -4,10 +4,11 @@ import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 
 
-transaction(name: String, description: String, names:[String], allowStoringFollowers: Bool) {
+//really not sure on how to input links here.
+transaction(name: String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitle: [String], linkType: [String], linkUrl: [String]) {
 	prepare(acct: AuthAccount) {
 
-		let profile <-Profile.createUser(name:name, description: description, allowStoringFollowers:allowStoringFollowers, names:names)
+		let profile <-Profile.createUser(name:name, description: description, allowStoringFollowers:allowStoringFollowers, tags:tags)
 
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
@@ -42,6 +43,18 @@ transaction(name: String, description: String, names:[String], allowStoringFollo
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
+
+		profile.setAvatar(avatar)
+
+		if linkTitle.length != linkType.length && linkType.length != linkUrl.length {
+			panic("need same length of link names, targets, types")
+		}
+
+		var i=0
+		while i < linkTitle.length {
+			profile.addLink(Profile.Link(title: linkTitle[i], type: linkType[i], url: linkUrl[i]))
+			i=i+1
+		}
 
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
