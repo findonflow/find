@@ -39,6 +39,7 @@ pub contract FIND {
 	/// Emitted when a name is sold to a new owner
 	pub event Sold(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
 
+
 	/// Emitted when a name is explicistly put up for sale
 	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, auctionStartPrice: UFix64, active: Bool)
 
@@ -410,6 +411,12 @@ pub contract FIND {
 			let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, name: name)
 			lease.setCallback(nil)
 
+			if lease.offerCallback == nil {
+				Debug.log("offer callback is empty")
+			}else {
+				Debug.log("offer callback is NOT empty")
+			}
+
 			destroy oldAuction
 		}
 
@@ -436,17 +443,18 @@ pub contract FIND {
 
 			let lease = self.borrow(name)
 
+			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
 			if lease.salePrice == nil {
-				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: lease.offerCallback!.borrow()!.getBalance(name))
+				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: balance)
 				return
 			}
 
-			//TODO: check if we can direct buy?
-
-			if lease.salePrice!  <= lease.offerCallback!.borrow()!.getBalance(name) {
+			if lease.salePrice != nil && balance >= lease.salePrice! {
+				self.fullfill(name)
+			} else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
-				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: lease.offerCallback!.borrow()!.getBalance(name))
+				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: balance)
 			}
 
 		}
@@ -474,16 +482,21 @@ pub contract FIND {
 
 			lease.setCallback(callback)
 
-			//TODO: check if we can direct buy?
+			let balance=callback.borrow()!.getBalance(name)
+			Debug.log("Balance of lease is at ".concat(balance.toString()))
 			if lease.salePrice == nil {
-				emit BlindBid(name: name, bidder: callback.address, amount: callback.borrow()!.getBalance(name))
+				Debug.log("Sale price not set")
+				emit BlindBid(name: name, bidder: callback.address, amount: balance)
 				return
 			}
 
-			if lease.salePrice!  <= callback.borrow()!.getBalance(name) {
-				self.startAuction(name)
+			if balance >= lease.salePrice! {
+  				Debug.log("Direct sale!")
+					self.fullfill(name)
+			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
+					self.startAuction(name)
 			} else {
-				emit BlindBid(name: name, bidder: callback.address, amount: callback.borrow()!.getBalance(name))
+				emit BlindBid(name: name, bidder: callback.address, amount: balance)
 			}
 
 		}
@@ -494,11 +507,10 @@ pub contract FIND {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
-
 			let lease = self.borrow(name)
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= lease.offerCallback {
-
+				Debug.log("we have a blind bid so we cancel that")
 				emit BlindBidRejected(name: name, bidder: cb.address, amount: cb.borrow()!.getBalance(name))
 				cb.borrow()!.cancel(name)
 				lease.setCallback(nil)
@@ -507,13 +519,20 @@ pub contract FIND {
 			if self.auctions.containsKey(name) {
 
 				let auction=self.borrowAuction(name)
+				let balance=auction.getBalance()
 
+				let auctionEnded= auction.endsAt <= Clock.time()
+				var hasMetReservePrice= false
+				if lease.auctionReservePrice != nil && lease.auctionReservePrice! > balance {
+					hasMetReservePrice=true
+				}
 				//the auction has ended
-				if auction.endsAt <= Clock.time() {
+				if auctionEnded && hasMetReservePrice {
+					//&& lease.auctionReservePrice != nil && lease.auctionReservePrice! < balance {
 					panic("Cannot cancel finished auction, fullfill it instead")
 				}
 
-				emit AuctionCancelled(name: name, bidder: auction.latestBidCallback.address, amount: auction.getBalance())
+				emit AuctionCancelled(name: name, bidder: auction.latestBidCallback.address, amount: balance)
 				auction.latestBidCallback.borrow()!.cancel(name)
 				destroy <- self.auctions.remove(key: name)!
 			}
@@ -537,6 +556,7 @@ pub contract FIND {
 
 			let lease = self.borrow(name)
 			let oldProfile=FIND.lookup(name)!
+
 			if let cb= lease.offerCallback {
 				let offer= cb.borrow()!
 				let newProfile= getAccount(cb.address).getCapability<&{Profile.Public}>(Profile.publicPath)
@@ -565,11 +585,19 @@ pub contract FIND {
 				panic("Auction has not ended yet")
 			}
 
-			let auction <- self.auctions.remove(key: name)!
 
+			let auctionRef=self.borrowAuction(name)
+			let soldFor=auctionRef.getBalance()
+			let reservePrice=lease.auctionReservePrice ?? 0.0
+
+			if reservePrice > soldFor {
+				self.cancel(name)
+				return
+			}
+
+			let auction <- self.auctions.remove(key: name)!
 			let newProfile= getAccount(auction.latestBidCallback.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 
-			let soldFor=auction.getBalance()
 			//move the token to the new profile
 			emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, expireAt: lease.getLeaseExpireTime(), amount: soldFor)
 			lease.move(profile: newProfile)
@@ -589,7 +617,6 @@ pub contract FIND {
 
 		}
 
-		//TODO; Add pre fields
 		pub fun listForSale(name :String, 
 		directSellPrice:UFix64, 
 		auctionStartPrice: UFix64, 
@@ -597,6 +624,9 @@ pub contract FIND {
 		auctionDuration: UFix64, 
 		auctionMinBidIncrement: UFix64, 
 		auctionExtensionOnLateBid: UFix64) {
+			//TODO; Add pre fields
+			//TODO: verify that startPrice must be larger then reservePrice
+			//TODO: verify that directSellprice must be larger then auctionStartPrice
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
@@ -611,7 +641,6 @@ pub contract FIND {
 			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, auctionStartPrice: tokenRef.auctionStartPrice!, active: true)
 		}
 
-		//TODO: add other prices here
 		pub fun delistSale(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)

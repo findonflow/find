@@ -136,13 +136,12 @@ func (gt *GWTFTestUtils) listForSale(name string) *GWTFTestUtils {
 	expireTimeString := fmt.Sprintf("%f00", expireTime)
 	nameAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(name).Address().String())
 
-	//transaction(name: String, directSellPrice:UFix64, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionMinBidIncrement: UFix64, auctionExtensionOnLateBid: UFix64) {
 	gt.GWTF.TransactionFromFile("sell").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
 		UFix64Argument("10.0").    //direct sale price
 		UFix64Argument("5.0").     //start auction price
-		UFix64Argument("90.0").    //auction reserve price
+		UFix64Argument("20.0").    //auction reserve price
 		UFix64Argument("86400.0"). //auction duration
 		UFix64Argument("2.0").     //min bid increment
 		UFix64Argument("300.0").   //extension on late bid
@@ -185,6 +184,25 @@ func (gt *GWTFTestUtils) bid(buyer, name, amount string) *GWTFTestUtils {
 		Test(gt.T).
 		AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+			"amount":       fmt.Sprintf("%s0000000", amount),
+			"auctionEndAt": endTimeSting,
+			"bidder":       bidderAddress,
+			"name":         name,
+		}))
+	return gt
+}
+
+func (gt *GWTFTestUtils) auctionBid(buyer, name, amount string) *GWTFTestUtils {
+
+	endTime := gt.currentTime() + auctionDurationFloat
+	endTimeSting := fmt.Sprintf("%f00", endTime)
+	bidderAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(buyer).Address().String())
+	gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+		StringArgument(name).
+		UFix64Argument(amount).
+		Test(gt.T).
+		AssertSuccess().
+		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
 			"amount":       fmt.Sprintf("%s0000000", amount),
 			"auctionEndAt": endTimeSting,
 			"bidder":       bidderAddress,
