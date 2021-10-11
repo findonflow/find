@@ -20,10 +20,4 @@ What types of links do i envision
  - if type is collection and title is same as a collection this is a weblink to that collection.
  - if type is generic then just show a simple a href. 
 
- 
- 
-   
-   
-
-
 
