@@ -782,9 +782,10 @@ pub contract FIND {
 		access(contract) var wallet: Capability<&{FungibleToken.Receiver}>
 		access(contract) let leasePeriod: UFix64
 		access(contract) let lockPeriod: UFix64
-		access(contract) let defaultPrice: UFix64
+		access(contract) var defaultPrice: UFix64
 		access(contract) let secondaryCut: UFix64
-		access(contract) let lengthPrices: {Int: UFix64}
+//		access(contract) var pricesChangedAt: UFix64 //TODO add before mainnet
+		access(contract) var lengthPrices: {Int: UFix64}
 		access(contract) var publicEnabled: Bool
 
 		//map from name to lease for that name
@@ -795,10 +796,18 @@ pub contract FIND {
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut
 			self.defaultPrice=defaultPrice
+//			self.pricesChangedAt=Clock.time()
 			self.lengthPrices=lengthPrices
 			self.profiles={}
 			self.wallet=wallet
 			self.publicEnabled=publicEnabled
+		}
+
+
+		pub fun setPrice(default: UFix64, additionalPrices: {Int: UFix64}) {
+			//TODO: pre this that the pricesChangedAt cannot be 
+			self.defaultPrice=default
+			self.lengthPrices=additionalPrices
 		}
 
 
@@ -1208,6 +1217,13 @@ pub contract FIND {
 			self.capability!.borrow()!.setPublicEnabled(enabled)
 		}
 
+		pub fun setPrice(default: UFix64, additional : {Int: UFix64}) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.setPrice(default: default, additionalPrices: additional)
+		}
 
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>){
 			pre {
