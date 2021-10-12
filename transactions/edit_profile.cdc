@@ -27,8 +27,8 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		}
 
 		profile.setName(name)
-		profile.setDescription(name)
-		profile.setAvatar(name)
+		profile.setDescription(description)
+		profile.setAvatar(avatar)
 
 		let existingTags=profile.setTags(tags)
 
@@ -37,6 +37,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		for link in links {
 			if link["remove"] == "true" {
 			  profile.removeLink(link["title"]!)	
+				continue
 			}
 			profile.addLink(Profile.Link(title: link["title"]!, type: link["type"]!, url: link["url"]!))
 		}

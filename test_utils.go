@@ -131,28 +131,45 @@ pub fun main(name: String) :  Address? {
 	assert.Equal(gt.T, expected, value)
 }
 
+func (gt *GWTFTestUtils) listForAuction(name string) *GWTFTestUtils {
+	expireTime := gt.currentTime() + leaseDurationFloat
+	expireTimeString := fmt.Sprintf("%f00", expireTime)
+	nameAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(name).Address().String())
+
+	gt.GWTF.TransactionFromFile("listForAuction").
+		SignProposeAndPayAs(name).
+		StringArgument(name).
+		UFix64Argument("5.0").     //start auction price
+		UFix64Argument("20.0").    //auction reserve price
+		UFix64Argument("86400.0"). //auction duration
+		UFix64Argument("300.0").   //extension on late bid
+		Test(gt.T).AssertSuccess().
+		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			"auctionStartPrice": "5.00000000",
+			"active":            "true",
+			"name":              name,
+			"expireAt":          expireTimeString,
+			"owner":             nameAddress,
+		}))
+	return gt
+}
+
 func (gt *GWTFTestUtils) listForSale(name string) *GWTFTestUtils {
 	expireTime := gt.currentTime() + leaseDurationFloat
 	expireTimeString := fmt.Sprintf("%f00", expireTime)
 	nameAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(name).Address().String())
 
-	gt.GWTF.TransactionFromFile("sell").
+	gt.GWTF.TransactionFromFile("listForSale").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
-		UFix64Argument("10.0").    //direct sale price
-		UFix64Argument("5.0").     //start auction price
-		UFix64Argument("20.0").    //auction reserve price
-		UFix64Argument("86400.0"). //auction duration
-		UFix64Argument("2.0").     //min bid increment
-		UFix64Argument("300.0").   //extension on late bid
+		UFix64Argument("10.0"). //direct sale price
 		Test(gt.T).AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-			"auctionStartPrice": "5.00000000",
-			"directSellPrice":   "10.00000000",
-			"active":            "true",
-			"name":              name,
-			"expireAt":          expireTimeString,
-			"owner":             nameAddress,
+			"directSellPrice": "10.00000000",
+			"active":          "true",
+			"name":            name,
+			"expireAt":        expireTimeString,
+			"owner":           nameAddress,
 		}))
 	return gt
 }

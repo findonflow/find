@@ -31,7 +31,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user1").
 			registerUser("user2").
 			registerUser("user3").
-			listForSale("user1").
+			listForAuction("user1").
 			bid("user2", "user1", "8.0").
 			auctionBid("user3", "user1", "20.0").
 			expireAuction()
@@ -104,7 +104,7 @@ func TestAuction(t *testing.T) {
 			createUser("100.0", "user2").
 			registerUser("user1").
 			registerUser("user2").
-			listForSale("user1").
+			listForAuction("user1").
 			blindBid("user2", "user1", "4.0")
 
 	})
@@ -117,7 +117,7 @@ func TestAuction(t *testing.T) {
 			createUser("100.0", "user2").
 			registerUser("user1").
 			registerUser("user2").
-			listForSale("user1").
+			listForAuction("user1").
 			blindBid("user2", "user1", "4.0")
 
 		gt.GWTF.TransactionFromFile("increaseBid").
@@ -143,7 +143,7 @@ func TestAuction(t *testing.T) {
 			createUser("100.0", "user2").
 			registerUser("user1").
 			registerUser("user2").
-			listForSale("user1").
+			listForAuction("user1").
 			blindBid("user2", "user1", "4.0")
 
 		gt.GWTF.TransactionFromFile("startAuction").
@@ -191,7 +191,7 @@ func TestAuction(t *testing.T) {
 			createUser("100.0", "user2").
 			registerUser("user1").
 			registerUser("user2").
-			listForSale("user1").
+			listForAuction("user1").
 			bid("user2", "user1", "5.0")
 
 		gt.GWTF.TransactionFromFile("cancelBid").
@@ -211,7 +211,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user1").
 			registerUser("user2").
 			registerUser("user3").
-			listForSale("user1").
+			listForAuction("user1").
 			bid("user2", "user1", "5.0")
 
 		gt.GWTF.TransactionFromFile("bid").
@@ -243,7 +243,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user1").
 			registerUser("user2").
 			registerUser("user3").
-			listForSale("user1").
+			listForAuction("user1").
 			bid("user2", "user1", "5.0")
 
 		gt.tickClock("86380.0")
@@ -275,7 +275,7 @@ func TestAuction(t *testing.T) {
 			createUser("100.0", "user2").
 			registerUser("user1").
 			registerUser("user2").
-			listForSale("user1").
+			listForAuction("user1").
 			bid("user2", "user1", "5.0")
 
 		gt.GWTF.TransactionFromFile("cancelAuction").
@@ -338,7 +338,7 @@ func TestAuction(t *testing.T) {
 			createUser("100.0", "user2").
 			registerUser("user1").
 			registerUser("user2").
-			listForSale("user1").
+			listForAuction("user1").
 			bid("user2", "user1", "5.0").
 			expireAuction().tickClock("2.0")
 

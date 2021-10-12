@@ -41,7 +41,8 @@ pub contract FIND {
 
 
 	/// Emitted when a name is explicistly put up for sale
-	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, auctionStartPrice: UFix64, active: Bool)
+	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, active: Bool)
+	pub event ForAuction(name: String, owner: Address, expireAt: UFix64,  auctionStartPrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event BlindBid(name: String, bidder: Address, amount: UFix64)
@@ -444,12 +445,14 @@ pub contract FIND {
 			let lease = self.borrow(name)
 
 			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
-			if lease.salePrice == nil {
+			Debug.log("Offer is at ".concat(balance.toString()))
+			if lease.salePrice == nil  && lease.auctionStartPrice == nil{
 				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: balance)
 				return
 			}
 
-			if lease.salePrice != nil && balance >= lease.salePrice! {
+
+			if lease.salePrice != nil && lease.salePrice != nil && balance >= lease.salePrice! {
 				self.fullfill(name)
 			} else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
@@ -484,13 +487,13 @@ pub contract FIND {
 
 			let balance=callback.borrow()!.getBalance(name)
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
-			if lease.salePrice == nil {
+			if lease.salePrice == nil && lease.auctionStartPrice == nil {
 				Debug.log("Sale price not set")
 				emit BlindBid(name: name, bidder: callback.address, amount: balance)
 				return
 			}
 
-			if balance >= lease.salePrice! {
+			if lease.salePrice != nil && balance >= lease.salePrice! {
   				Debug.log("Direct sale!")
 					self.fullfill(name)
 			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
@@ -617,29 +620,44 @@ pub contract FIND {
 
 		}
 
-		pub fun listForSale(name :String, 
-		directSellPrice:UFix64, 
-		auctionStartPrice: UFix64, 
-		auctionReservePrice: UFix64, 
-		auctionDuration: UFix64, 
-		auctionMinBidIncrement: UFix64, 
-		auctionExtensionOnLateBid: UFix64) {
+		pub fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
 			//TODO; Add pre fields
-			//TODO: verify that startPrice must be larger then reservePrice
-			//TODO: verify that directSellprice must be larger then auctionStartPrice
+			pre {
+				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+			}
+
+			let tokenRef = self.borrow(name)
+			tokenRef.setStartAuctionPrice(auctionStartPrice)
+			tokenRef.setReservePrice(auctionReservePrice)
+			tokenRef.setAuctionDuration(auctionDuration)
+			tokenRef.setExtentionOnLateBid(auctionExtensionOnLateBid)
+			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!,  active: true)
+		}
+
+		pub fun listForSale(name :String, directSellPrice:UFix64) {
+			//TODO; Add pre fields
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
 
 			let tokenRef = self.borrow(name)
 			tokenRef.setSalePrice(directSellPrice)
-			tokenRef.setStartAuctionPrice(auctionStartPrice)
-			tokenRef.setReservePrice(auctionReservePrice)
-			tokenRef.setAuctionDuration(auctionDuration)
-			tokenRef.setMinBidIncrement(auctionMinBidIncrement)
-			tokenRef.setExtentionOnLateBid(auctionExtensionOnLateBid)
-			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, auctionStartPrice: tokenRef.auctionStartPrice!, active: true)
+			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, active: true)
 		}
+
+
+		pub fun delistAuction(_ name: String) {
+			pre {
+				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+			}
+
+			let tokenRef = self.borrow(name)
+
+			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!,  active: false)
+			tokenRef.setStartAuctionPrice(nil)
+			tokenRef.setReservePrice(nil)
+		}
+
 
 		pub fun delistSale(_ name: String) {
 			pre {
@@ -647,7 +665,7 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
-			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, auctionStartPrice: tokenRef.auctionStartPrice!, active: false)
+			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, active: false)
 			tokenRef.setSalePrice(nil)
 		}
 
