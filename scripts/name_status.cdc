@@ -25,10 +25,17 @@ pub fun main(name: String) : FINDNameReport{
 	if let address=profile?.owner?.address {
 		let account=getAccount(address)
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+
+		var lease:FIND.LeaseInformation?=nil
+
+		if leaseCap.check() {
+			lease=leaseCap.borrow()!.getLease(name)
+
+		}
 	  return FINDNameReport(
 			status: "taken",
 		 profile: profile?.asProfile(),
-		 lease: leaseCap.borrow()!.getLease(name),
+		 lease: lease,
 		 address:address,
 		 cost:  cost
 	 )

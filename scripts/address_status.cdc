@@ -19,12 +19,12 @@ pub fun main(user: Address) : FINDReport{
 	let account=getAccount(user)
 	let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 
-	 let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-	 return FINDReport(
-		 profile: account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.asProfile(),
-		 bids: bidCap.borrow()?.getBids() ?? [],
-		 leases: leaseCap.borrow()?.getLeaseInformation() ?? []
-	 )
+	return FINDReport(
+		profile: account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.asProfile(),
+		bids: bidCap.borrow()?.getBids() ?? [],
+		leases: leaseCap.borrow()?.getLeaseInformation() ?? []
+	)
 
 }
