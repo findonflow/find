@@ -4,7 +4,6 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
-
 /*
 
 ///FIND
