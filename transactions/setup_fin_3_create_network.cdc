@@ -3,7 +3,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-transaction(leasePeriod: UFix64) {
+transaction() {
 
 	prepare(account: AuthAccount) {
 		let wallet=account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)

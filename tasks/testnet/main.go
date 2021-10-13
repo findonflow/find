@@ -23,7 +23,6 @@ func main() {
 	//set up fin network as the fin user
 	g.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("find-admin").
-		UFix64Argument("864000.0"). //duration of a lease, this is for testing
 		RunPrintEventsFull()
 
 	/*

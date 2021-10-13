@@ -18,7 +18,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	eventPrefix := "A.22e1ee1ca3a5c009.FIND"
+	eventPrefix := "A.dc5299b787551b63.FIND"
 	_, err := g.EventFetcher().
 		Workers(1).
 		BatchSize(25).

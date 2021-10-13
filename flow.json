@@ -71,12 +71,16 @@
 			"address": "e03daebed8ca0615",
 			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
 		},
+		"testnet-account": {
+			"address": "1ff7e32d71183db0",
+			"key": "${TESTNET_ACCOUNT}"
+		},
 		"testnet-find": {
-			"address": "22e1ee1ca3a5c009",
+			"address": "dc5299b787551b63",
 			"key": "${TESTNET_FIND}"
 		},
 		"testnet-find-admin": {
-			"address": "34b58b2f3aa1ca68",
+			"address": "ca06fc841e511102",
 			"key": "${TESTNET_FIND_ADMIN}"
 		},
 		"testnet-user1": {
