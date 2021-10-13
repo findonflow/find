@@ -39,7 +39,6 @@ pub contract FIND {
 	/// Emitted when a name is sold to a new owner
 	pub event Sold(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
 
-
 	/// Emitted when a name is explicistly put up for sale
 	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, active: Bool)
 	pub event ForAuction(name: String, owner: Address, expireAt: UFix64,  auctionStartPrice: UFix64, active: Bool)
@@ -53,6 +52,7 @@ pub contract FIND {
 	/// Emitted if a blind bid is rejected
 	pub event BlindBidRejected(name: String, bidder: Address, amount: UFix64)
 
+	//TODO: spelling error
 	/// Emitted if an auction is canceled
 	pub event AuctionCancelled(name: String, bidder: Address, amount: UFix64)
 
@@ -287,24 +287,38 @@ pub contract FIND {
 	//struct to expose information about leases
 	pub struct LeaseInformation {
 		pub let name: String
-		pub let status: LeaseStatus
+		pub let status: String
 		pub let expireTime: UFix64
 		pub let latestBid: UFix64?
 		pub let auctionEnds: UFix64?
 		pub let salePrice: UFix64?
 		pub let latestBidBy: Address?
 		pub let currentTime: UFix64
+		pub let auctionStartPrice: UFix64?
+		pub let auctionReservePrice: UFix64?
+		pub let extensionOnLateBid: UFix64?
 
-		init(name: String, status:LeaseStatus, expireTime: UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?) {
+		//return LeaseInformation(name:  name, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.extensionOnLateBid, latestBidBy: latestBidBy)
+
+		init(name: String, status:LeaseStatus, expireTime: UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?) {
 
 			self.name=name
-			self.status=status
+		  var s="TAKEN"	
+			if status == LeaseStatus.FREE {
+				s="FREE"
+			} else if status == LeaseStatus.LOCKED {
+				s="LOCKED"
+			}
+			self.status=s
 			self.expireTime=expireTime
 			self.latestBid=latestBid
 			self.latestBidBy=latestBidBy
 			self.auctionEnds=auctionEnds
 			self.salePrice=salePrice
 			self.currentTime=Clock.time()
+			self.auctionStartPrice=auctionStartPrice
+			self.auctionReservePrice=auctionReservePrice
+			self.extensionOnLateBid=extensionOnLateBid
 		}
 
 	}
@@ -378,7 +392,7 @@ pub contract FIND {
 				}
 			}
 
-			return LeaseInformation(name:  name, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy)
+			return LeaseInformation(name:  name, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid)
 		}
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -1238,11 +1252,19 @@ pub contract FIND {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			Debug.enable()
+			Debug.enable(true)
 			Clock.enable()
 			Clock.tick(time)
 		}
 
+
+		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
+		pub fun debug(_ value: Bool) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			Debug.enable(value)
+		}
 
 		init() {
 			self.capability = nil
