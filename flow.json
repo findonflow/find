@@ -26,14 +26,14 @@
 				"emulator": "ee82856bf20e2aa6"
 			}
 		},
-    "FlowToken": {
-      "source": "./contracts/standard/FlowToken.cdc",
-      "aliases": {
-        "testnet": "0x7e60df042a9c0868",
-        "emulator": "0x0ae53cb6e3f42a79",
-        "mainnet" : "0x1654653399040a61"
-      }
-    },
+		"FlowToken": {
+			"source": "./contracts/standard/FlowToken.cdc",
+			"aliases": {
+				"testnet": "0x7e60df042a9c0868",
+				"emulator": "0x0ae53cb6e3f42a79",
+				"mainnet" : "0x1654653399040a61"
+			}
+		},
 		"FIND": "./contracts/FIND.cdc",
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": {
@@ -80,7 +80,7 @@
 			"key": "${TESTNET_FIND}"
 		},
 		"testnet-find-admin": {
-        "address": "4e5b561f40b23104",
+			"address": "4e5b561f40b23104",
 			"key": "${TESTNET_FIND_ADMIN}"
 		},
 		"testnet-user1": {
