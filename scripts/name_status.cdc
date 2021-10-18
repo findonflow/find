@@ -19,6 +19,8 @@ pub struct FINDNameReport{
 
 //Check the status of a fin user
 pub fun main(name: String) : FINDNameReport{
+
+	let status=FIND.status(name)
 	let cost=FIND.calculateCost(name)
 	let profile= FIND.lookup(name)
 
@@ -42,8 +44,16 @@ pub fun main(name: String) : FINDNameReport{
 
 	}
 
+	var statusText="taken"
+	if status.status == FIND.LeaseStatus.FREE {
+		statusText="free"
+	} else if status.status == FIND.LeaseStatus.LOCKED {
+		statusText="locked"
+	}
+
+
 	return FINDNameReport(
-		status: "free",
+		status: statusText,
 		profile: nil, 
 		lease: nil,
 		address:nil,
