@@ -32,13 +32,13 @@ pub fun main(name: String) : FINDNameReport{
 			lease=leaseCap.borrow()!.getLease(name)
 
 		}
-	  return FINDNameReport(
-			status: "taken",
-		 profile: profile?.asProfile(),
-		 lease: lease,
-		 address:address,
-		 cost:  cost
-	 )
+		return FINDNameReport(
+			status: lease?.status ?? "taken",
+			profile: profile?.asProfile(),
+			lease: lease,
+			address:address,
+			cost:  cost
+		)
 
 	}
 
