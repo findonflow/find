@@ -22,17 +22,14 @@ pub fun main(name: String) : FINDNameReport{
 
 	let status=FIND.status(name)
 	let cost=FIND.calculateCost(name)
-	let profile= FIND.lookup(name)
-
 	if let address=status.owner {
 		let account=getAccount(address)
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
+		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
-
 		if leaseCap.check() {
 			lease=leaseCap.borrow()!.getLease(name)
-
 		}
 		return FINDNameReport(
 			status: lease?.status ?? "taken",
@@ -45,7 +42,7 @@ pub fun main(name: String) : FINDNameReport{
 	}
 
 	return FINDNameReport(
-		status: "FREE",
+		status: "free",
 		profile: nil, 
 		lease: nil,
 		address:nil,
