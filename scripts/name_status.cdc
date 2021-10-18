@@ -24,7 +24,7 @@ pub fun main(name: String) : FINDNameReport{
 	let cost=FIND.calculateCost(name)
 	let profile= FIND.lookup(name)
 
-	if let address=profile?.owner?.address {
+	if let address=status.owner {
 		let account=getAccount(address)
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
@@ -44,16 +44,8 @@ pub fun main(name: String) : FINDNameReport{
 
 	}
 
-	var statusText="taken"
-	if status.status == FIND.LeaseStatus.FREE {
-		statusText="free"
-	} else if status.status == FIND.LeaseStatus.LOCKED {
-		statusText="locked"
-	}
-
-
 	return FINDNameReport(
-		status: statusText,
+		status: "FREE",
 		profile: nil, 
 		lease: nil,
 		address:nil,
