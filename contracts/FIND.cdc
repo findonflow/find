@@ -19,21 +19,13 @@ Taxonomy:
 - lease: a resource representing registering a name for a period of 1 year
 - leaseCollection: Collection of the leases an account holds
 - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
-
 */
 pub contract FIND {
-
-	/// Emitted when a transaction involving a lease calculates that this lease is now locked
-	pub event Locked(name: String, lockedUntil:UFix64)
-
 	///  Emitted when a name is registred in FIND
-	pub event Register(name: String, owner: Address, expireAt: UFix64)
+	pub event Register(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64)
 
 	/// Emitted when a name is moved to a new owner
 	pub event Moved(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64)
-
-	/// Emitted when a name is freed
-	pub event Freed(name: String, previousOwner: Address)
 
 	/// Emitted when a name is sold to a new owner
 	pub event Sold(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
@@ -117,24 +109,6 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
-	//TODO: test
-	/// Used in script to return a list of names that are outdated
-	pub fun outdated(): [String] {
-		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-			return network.outdated()
-		}
-		panic("Network is not set up")
-
-	}
-
-	/// Task to janitor a name and lock/free it if appropriate
-	pub fun janitor(_ name: String): NameStatus {
-		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-			return network.status(name)
-		}
-		panic("Network is not set up")
-	}
-
 	/// Return the status for a given name
 	/// @return The Name status of a name
 	pub fun status(_ name: String): NameStatus {
@@ -149,12 +123,10 @@ pub contract FIND {
 	pub struct NameStatus{
 		pub let status: LeaseStatus
 		pub let owner: Address?
-		pub let persisted: Bool
 
-		init(status:LeaseStatus, owner:Address?,persisted:Bool) {
+		init(status:LeaseStatus, owner:Address?) {
 			self.status=status
 			self.owner=owner
-			self.persisted=persisted
 		}
 	}
 
@@ -235,6 +207,10 @@ pub contract FIND {
 			return self.networkCap.borrow()!.getLeaseExpireTime(self.name)
 		}
 
+		pub fun getLeaseLocedUntil() : UFix64 {
+			return self.networkCap.borrow()!.getLeaseLocedUntil(self.name)
+		}
+
 		pub fun getLeaseStatus() : LeaseStatus {
 			return FIND.status(self.name).status
 		}
@@ -287,7 +263,8 @@ pub contract FIND {
 	pub struct LeaseInformation {
 		pub let name: String
 		pub let status: String
-		pub let expireTime: UFix64
+		pub let validUntil: UFix64
+		pub let lockedUntil: UFix64
 		pub let latestBid: UFix64?
 		pub let auctionEnds: UFix64?
 		pub let salePrice: UFix64?
@@ -297,9 +274,7 @@ pub contract FIND {
 		pub let auctionReservePrice: UFix64?
 		pub let extensionOnLateBid: UFix64?
 
-		//return LeaseInformation(name:  name, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.extensionOnLateBid, latestBidBy: latestBidBy)
-
-		init(name: String, status:LeaseStatus, expireTime: UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?) {
+		init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?) {
 
 			self.name=name
 		  var s="TAKEN"	
@@ -309,7 +284,8 @@ pub contract FIND {
 				s="LOCKED"
 			}
 			self.status=s
-			self.expireTime=expireTime
+			self.validUntil=validUntil
+			self.lockedUntil=lockedUntil
 			self.latestBid=latestBid
 			self.latestBidBy=latestBidBy
 			self.auctionEnds=auctionEnds
@@ -340,9 +316,6 @@ pub contract FIND {
 
 		//place a bid on a token
 		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
-
-		//the janitor process has to remove leases
-		access(contract) fun remove(_ name: String) 
 
 		//anybody should be able to fullfill an auction as long as it is done
 		pub fun fullfillAuction(_ name: String) 
@@ -391,7 +364,7 @@ pub contract FIND {
 				}
 			}
 
-			return LeaseInformation(name:  name, status: token.getLeaseStatus(), expireTime: token.getLeaseExpireTime(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid)
+			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid)
 		}
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -690,14 +663,6 @@ pub contract FIND {
 			to.borrow()!.deposit(token: <- token)
 		}
 
-		//note that when moving a name
-		access(contract) fun remove(_ name: String) {
-			self.cancel(name)
-			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
-			emit Freed(name:name, previousOwner:self.owner!.address)
-			destroy token
-		}
-
 		//depoit a lease token into the lease collection, not available from the outside
 		access(contract) fun deposit(token: @FIND.Lease) {
 			// add the new token to the dictionary which removes the old one
@@ -759,18 +724,41 @@ pub contract FIND {
 	*/
 	//a struct that represents a lease of a name in the network. 
 	pub struct NetworkLease {
-		pub(set) var status: LeaseStatus
-		pub(set) var time: UFix64
+		pub let registeredTime: UFix64
+		pub var validUntil: UFix64
+		pub var lockedUntil: UFix64
 		pub(set) var profile: Capability<&{Profile.Public}>
 		pub var address: Address
 		pub var name: String
 
-		init(status:LeaseStatus, time:UFix64, profile: Capability<&{Profile.Public}>, name: String) {
-			self.status=status
-			self.time=time
+		init( validUntil:UFix64, lockedUntil:UFix64, profile: Capability<&{Profile.Public}>, name: String) {
+			self.validUntil=validUntil
+			self.lockedUntil=lockedUntil
+			self.registeredTime=Clock.time()
 			self.profile=profile
 			self.address= profile.address
 			self.name=name
+		}
+
+		pub fun setValidUntil(_ unit: UFix64) {
+			self.validUntil=unit
+		}
+
+		pub fun setLockedUntil(_ unit: UFix64) {
+			self.lockedUntil=unit
+		}
+
+		pub fun status() : LeaseStatus {
+			let time=Clock.time()
+
+			if time >= self.lockedUntil {
+				return LeaseStatus.FREE
+			}
+
+			if time >= self.validUntil {
+				return LeaseStatus.LOCKED
+			}
+			return 	LeaseStatus.TAKEN
 		}
 	}
 
@@ -827,17 +815,15 @@ pub contract FIND {
 		//this method is only called from a lease, and only the owner has that capability
 		access(contract) fun renew(name: String, vault: @FUSD.Vault) {
 			if let lease= self.profiles[name] {
-				let nameStatus=self.status(name)
 
 				var newTime=0.0
-				if nameStatus.status == LeaseStatus.TAKEN {
+				if lease.status() == LeaseStatus.TAKEN {
 					//the name is taken but not expired so we extend the total period of the lease
-					newTime= lease.time + self.leasePeriod
+					lease.setValidUntil(lease.validUntil + self.leasePeriod)
 				} else {
-					//the name was locked so we extend from now and for a new period
-					let time=Clock.time()
-					newTime = time + self.leasePeriod
+					lease.setValidUntil(Clock.time() + self.leasePeriod)
 				}
+				lease.setLockedUntil(lease.validUntil+ self.lockPeriod)
 
 				let cost= self.calculateCost(name)
 				if vault.balance != cost {
@@ -845,24 +831,24 @@ pub contract FIND {
 				}
 				self.wallet.borrow()!.deposit(from: <- vault)
 
-
-				let lease= NetworkLease(
-					status: LeaseStatus.TAKEN,
-					time:newTime,
-					profile: lease.profile,
-					name: name
-				)
-
-				emit Register(name: name, owner:nameStatus.owner!, expireAt: lease.time)
+				emit Register(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 				self.profiles[name] =  lease
 				return
 			}
 			panic("Could not find profile with name=".concat(name))
 		}
 
+
 		access(contract) fun getLeaseExpireTime(_ name: String) : UFix64{
 			if let lease= self.profiles[name] {
-				return lease.time
+				return lease.validUntil
+			}
+			panic("Could not find profile with name=".concat(name))
+		}
+
+		access(contract) fun getLeaseLocedUntil(_ name: String) : UFix64{
+			if let lease= self.profiles[name] {
+				return lease.lockedUntil
 			}
 			panic("Could not find profile with name=".concat(name))
 		}
@@ -883,7 +869,7 @@ pub contract FIND {
 				name.length >= 3 : "A FIND name has to be minimum 3 letters long"
 			}
 
-			let nameStatus=self.status(name)
+			let nameStatus=self.readStatus(name)
 			if nameStatus.status == LeaseStatus.TAKEN {
 				panic("Name already registered")
 			}
@@ -900,13 +886,13 @@ pub contract FIND {
 			self.wallet.borrow()!.deposit(from: <- vault)
 
 			let lease= NetworkLease(
-				status: LeaseStatus.TAKEN,
-				time:Clock.time() + self.leasePeriod,
+				validUntil:Clock.time() + self.leasePeriod,
+			  lockedUntil: Clock.time() + self.leasePeriod+ self.lockPeriod,
 				profile: profile,
 				name: name
 			)
 
-			emit Register(name: name, owner:profile.address, expireAt: lease.time)
+			emit Register(name: name, owner:profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 			self.profiles[name] =  lease
 
 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
@@ -916,33 +902,13 @@ pub contract FIND {
 			let currentTime=Clock.time()
 			if let lease= self.profiles[name] {
 				let owner=lease.profile.borrow()!.owner!.address
-				if currentTime <= lease.time {
-					return NameStatus(status: lease.status, owner: owner, persisted: true)
-				}
-
-				if lease.status == LeaseStatus.LOCKED {
-					return NameStatus(status: LeaseStatus.FREE, owner: nil, persisted: false)
-				}
-
-				if lease.status == LeaseStatus.TAKEN {
-					return NameStatus(status:LeaseStatus.LOCKED, owner:  owner, persisted:false)
-				}
+				return NameStatus(status: lease.status(), owner: owner)
 			}
-			return NameStatus(status:LeaseStatus.FREE, owner: nil, persisted:true)
+			return NameStatus(status:LeaseStatus.FREE, owner: nil)
 		}
 
-		pub fun outdated() : [String] {
-			var outdated :[String] = []
 
-			for name in self.profiles.keys {
-				if !self.readStatus(name).persisted {
-					outdated.append(name)
-				}
-			}
-
-			return outdated
-		}
-
+		/*
 		/// This method is almost like readStatus except that it will mutate state and fix the name it looks up if it is invalid.  Events are emitted when this is done.
 		pub fun status(_ name: String): NameStatus {
 			let currentTime=Clock.time()
@@ -953,7 +919,6 @@ pub contract FIND {
 				}
 
 				if lease.status == LeaseStatus.LOCKED {
-
 					let leaseCollection=getAccount(owner).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()!
 					leaseCollection.remove(name)
 
@@ -971,6 +936,7 @@ pub contract FIND {
 			}
 			return NameStatus(status:LeaseStatus.FREE, owner: nil, persisted: true)
 		}
+		*/
 
 		//lookup a name that is not locked
 		pub fun lookup(_ name: String) : &{Profile.Public}? {
@@ -1277,11 +1243,11 @@ pub contract FIND {
 		self.AdminProxyPublicPath= /public/findAdminProxy
 		self.AdminProxyStoragePath=/storage/findAdminProxy
 
-		self.LeasePublicPath=/public/findLeases
-		self.LeaseStoragePath=/storage/findLeases
+		self.LeasePublicPath=/public/findLeases2
+		self.LeaseStoragePath=/storage/findLeases2
 
-		self.BidPublicPath=/public/findBids
-		self.BidStoragePath=/storage/findBids
+		self.BidPublicPath=/public/findBids2
+		self.BidStoragePath=/storage/findBids2
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 

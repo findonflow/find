@@ -30,7 +30,6 @@ func TestFIND(t *testing.T) {
 			StringArgument("usr").
 			Test(t).
 			AssertFailure("Amount withdrawn must be less than or equal than the balance of the Vault")
-		//TODO: Give a better error message here?
 
 	})
 
@@ -47,6 +46,7 @@ func TestFIND(t *testing.T) {
 			AssertFailure("A FIND name has to be minimum 3 letters long")
 
 	})
+
 	t.Run("Should get error if you try to register a name that is already claimed", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
@@ -76,24 +76,8 @@ func TestFIND(t *testing.T) {
 			StringArgument("user1").
 			Test(t).AssertFailure("locked")
 
-		//TODO: test with more premutations here
-		//do i need this now?
-		gt.GWTF.TransactionFromFile("janitor").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Locked", map[string]interface{}{
-				"lockedUntil": "39312003.00000000",
-				"name":        "user1",
-			}))
-
 		gt.expireLease()
-
-		gt.registerUserTransaction("user1").
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Freed", map[string]interface{}{
-				"name":          "user1",
-				"previousOwner": "0x179b6b1cb6755e31",
-			}))
+		gt.registerUser("user1")
 	})
 
 	t.Run("Should be able to lookup address", func(t *testing.T) {

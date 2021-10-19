@@ -309,16 +309,6 @@ func TestAuction(t *testing.T) {
 			listForSale("user1")
 
 		gt.expireLease().tickClock("2.0")
-
-		gt.GWTF.TransactionFromFile("janitor").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(t).AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Locked", map[string]interface{}{
-				"lockedUntil": "39312003.00000000",
-				"name":        "user1",
-			}))
-
 		gt.expireLock().tickClock("2.0")
 
 		gt.GWTF.TransactionFromFile("bid").

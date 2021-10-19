@@ -16,6 +16,18 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 			acct.save(<- fusd, to: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+		}
+
+
+		var hasFusdWallet=false
+		let wallets=profile.getWallets()
+		for wallet in wallets {
+			if wallet.name=="FUSD" {
+				hasFusdWallet=true
+			}
+		}
+
+		if !hasFusdWallet {
 			let fusdWallet=Profile.Wallet(
 				name:"FUSD", 
 				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),

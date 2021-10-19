@@ -14,6 +14,11 @@ transaction(name: String) {
 			destroy <- acct.load<@AnyResource>(from:Profile.storagePath)
 		}
 
+		//TODO we already have a profile
+		if profileCap.check() {
+			return 
+		}
+
 		let profile <-Profile.createUser(name:name, description: "", allowStoringFollowers:true, tags:["find"])
 
 		//Add exising FUSD or create a new one and add it
@@ -23,17 +28,17 @@ transaction(name: String) {
 			acct.save(<- fusd, to: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-
-			let fusdWallet=Profile.Wallet(
-				name:"FUSD", 
-				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
-				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
-				accept: Type<@FUSD.Vault>(),
-				names: ["fusd", "stablecoin"]
-			)
-
-			profile.addWallet(fusdWallet)
 		}
+
+		let fusdWallet=Profile.Wallet(
+			name:"FUSD", 
+			receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
+			balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
+			accept: Type<@FUSD.Vault>(),
+			names: ["fusd", "stablecoin"]
+		)
+
+		profile.addWallet(fusdWallet)
 
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {

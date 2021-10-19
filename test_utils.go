@@ -38,7 +38,6 @@ func (gt *GWTFTestUtils) setupFIND() *GWTFTestUtils {
 	//set up fin network as the fin user
 	gt.GWTF.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("find").
-		UFix64Argument(fmt.Sprintf("%f", leaseDurationFloat)).
 		Test(gt.T).AssertSuccess().AssertNoEvents()
 
 	return gt.tickClock("1.0")
@@ -88,15 +87,19 @@ func (gt *GWTFTestUtils) registerUserTransaction(name string) gwtf.TransactionRe
 	expireTime := gt.currentTime() + leaseDurationFloat
 	expireTimeString := fmt.Sprintf("%f00", expireTime)
 
+	lockedTime := gt.currentTime() + leaseDurationFloat + lockDurationFloat
+	lockedTimeString := fmt.Sprintf("%f00", lockedTime)
+
 	return gt.GWTF.TransactionFromFile("register").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
 		Test(gt.T).
 		AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
-			"expireAt": expireTimeString,
-			"owner":    nameAddress,
-			"name":     name,
+			"validUntil":  expireTimeString,
+			"lockedUntil": lockedTimeString,
+			"owner":       nameAddress,
+			"name":        name,
 		})).
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 			"amount": "5.00000000",
