@@ -262,6 +262,8 @@ pub contract FIND {
 	//struct to expose information about leases
 	pub struct LeaseInformation {
 		pub let name: String
+		pub let address: Address
+		pub let cost: UFix64
 		pub let status: String
 		pub let validUntil: UFix64
 		pub let lockedUntil: UFix64
@@ -274,7 +276,7 @@ pub contract FIND {
 		pub let auctionReservePrice: UFix64?
 		pub let extensionOnLateBid: UFix64?
 
-		init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?) {
+		init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?, address:Address){
 
 			self.name=name
 		  var s="TAKEN"	
@@ -294,6 +296,8 @@ pub contract FIND {
 			self.auctionStartPrice=auctionStartPrice
 			self.auctionReservePrice=auctionReservePrice
 			self.extensionOnLateBid=extensionOnLateBid
+			self.address=address
+			self.cost=FIND.calculateCost(name)
 		}
 
 	}
@@ -364,7 +368,7 @@ pub contract FIND {
 				}
 			}
 
-			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid)
+			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address)
 		}
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -1258,8 +1262,8 @@ pub contract FIND {
 			lockPeriod: 86400.0, //90 days
 			//leasePeriod: 31536000.0, //365 days
 			//lockPeriod: 7776000.0, //90 days
-			secondaryCut: 0.025,
-			defaultPrice: 5.0,
+			secondaryCut: 0.05,
+			defaultPrice: 10.0,
 			lengthPrices: {3: 500.0, 4:100.0},
 			wallet: wallet,
 			publicEnabled: false

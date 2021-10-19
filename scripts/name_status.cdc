@@ -4,15 +4,13 @@ import Profile from "../contracts/Profile.cdc"
 pub struct FINDNameReport{
 	pub let profile:Profile.UserProfile?
 	pub let lease: FIND.LeaseInformation?
-	pub let address:Address?
 	pub let status: String
 	pub let cost: UFix64
 
-	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?, address: Address?, cost: UFix64) {
+	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64) {
 		self.status=status
 		self.profile=profile
 		self.lease=lease
-		self.address=address
 		self.cost=cost
 	}
 }
@@ -35,7 +33,6 @@ pub fun main(name: String) : FINDNameReport{
 			status: lease?.status ?? "taken",
 			profile: profile?.asProfile(),
 			lease: lease,
-			address:address,
 			cost:  cost
 		)
 
@@ -45,7 +42,6 @@ pub fun main(name: String) : FINDNameReport{
 		status: "free",
 		profile: nil, 
 		lease: nil,
-		address:nil,
 		cost: cost
 	)
 
