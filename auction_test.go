@@ -134,7 +134,7 @@ func TestAuction(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should be able to incrase auction bid", func(t *testing.T) {
+	t.Run("Should be able to increase auction bid", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
@@ -157,6 +157,20 @@ func TestAuction(t *testing.T) {
 				"bidder":       "0xf3fcd2c1a78f5eee",
 				"name":         "user1",
 			}))
+
+	})
+
+	t.Run("Should be able to bid twice on", func(t *testing.T) {
+
+		NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForAuction("user1").
+			bid("user2", "user1", "5.0").
+			auctionBid("user2", "user1", "10.0")
 
 	})
 
