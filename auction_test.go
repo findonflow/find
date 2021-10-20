@@ -50,11 +50,11 @@ func TestAuction(t *testing.T) {
 				"name":          "user1",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "19.50000000",
+				"amount": "19.00000000",
 				"to":     "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "0.50000000",
+				"amount": "1.00000000",
 				"to":     "0x1cf0e2f2f715450",
 			}))
 
@@ -87,11 +87,11 @@ func TestAuction(t *testing.T) {
 				"name":          "user1",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "9.75000000",
+				"amount": "9.50000000",
 				"to":     "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "0.25000000",
+				"amount": "0.50000000",
 				"to":     "0x1cf0e2f2f715450",
 			}))
 	})
@@ -135,6 +135,34 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	/*
+		t.Run("Should be able to incrase auction bid", func(t *testing.T) {
+
+			gt := NewGWTFTest(t).
+				setupFIND().
+				createUser("100.0", "user1").
+				createUser("100.0", "user2").
+				registerUser("user1").
+				registerUser("user2").
+				listForAuction("user1").
+				bid("user2", "user1", "5.0")
+
+			gt.GWTF.TransactionFromFile("increaseBid").
+				SignProposeAndPayAs("user2").
+				StringArgument("user1").
+				UFix64Argument("3.0").
+				Test(t).
+				AssertSuccess().
+				AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+					"amount":       "8.00000000",
+					"auctionEndAt": "86401.00000000",
+					"bidder":       "0xf3fcd2c1a78f5eee",
+					"name":         "user1",
+				}))
+
+		})
+
+	*/
 	t.Run("Should be able to manually start auction with lower bid", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
@@ -180,7 +208,6 @@ func TestAuction(t *testing.T) {
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",
 			}))
-
 	})
 
 	t.Run("Should not be able to cancel bid when auction has started", func(t *testing.T) {

@@ -45,5 +45,4 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 
 ### TODO
- - type of bid in bidding on page 
- - create profile 
+ - add flow wallet

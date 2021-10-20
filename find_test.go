@@ -23,7 +23,7 @@ func TestFIND(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
-			createUser("5.0", "user1")
+			createUser("30.0", "user1")
 
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -37,7 +37,7 @@ func TestFIND(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
-			createUser("5.0", "user1")
+			createUser("30.0", "user1")
 
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
@@ -51,7 +51,7 @@ func TestFIND(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
-			createUser("10.0", "user1").
+			createUser("30.0", "user1").
 			registerUser("user1")
 
 		gt.GWTF.TransactionFromFile("register").

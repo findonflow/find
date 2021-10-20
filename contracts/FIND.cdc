@@ -1258,10 +1258,10 @@ pub contract FIND {
 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
 		let network <-  create Network(
 			//TODO: change!
-			leasePeriod: 86400.0, //365 days
-			lockPeriod: 86400.0, //90 days
-			//leasePeriod: 31536000.0, //365 days
-			//lockPeriod: 7776000.0, //90 days
+			//leasePeriod: 86400.0, //365 days
+			//lockPeriod: 86400.0, //90 days
+			leasePeriod: 31536000.0, //365 days
+			lockPeriod: 7776000.0, //90 days
 			secondaryCut: 0.05,
 			defaultPrice: 10.0,
 			lengthPrices: {3: 500.0, 4:100.0},
