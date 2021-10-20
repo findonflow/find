@@ -244,12 +244,13 @@ pub contract FIND {
 			let offer=callback.borrow()!
 			offer.setBidType(name: self.name, type: "auction")
 
-			if offer.getBalance(self.name) <= self.getBalance() {
-				panic("bid must be larger then previous bid")
+			if callback.address != self.latestBidCallback.address {
+				if offer.getBalance(self.name) <= self.getBalance() {
+					panic("bid must be larger then previous bid")
+				}
+				//we send the money back
+				self.latestBidCallback.borrow()!.cancel(self.name)
 			}
-
-			//we send the money back
-			self.latestBidCallback.borrow()!.cancel(self.name)
 			self.latestBidCallback=callback
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
@@ -429,10 +430,19 @@ pub contract FIND {
 		access(contract) fun increaseBid(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
-				!self.auctions.containsKey(name) : "Can only increase bid before auction=".concat(name)
 			}
 
 			let lease = self.borrow(name)
+			let timestamp=Clock.time()
+
+			if self.auctions.containsKey(name) {
+				let auction = self.borrowAuction(name)
+				if auction.endsAt < timestamp {
+					panic("Auction has ended")
+				}
+				auction.addBid(callback:auction.latestBidCallback, timestamp:timestamp)
+				return
+			}
 
 			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
 			Debug.log("Offer is at ".concat(balance.toString()))

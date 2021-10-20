@@ -132,37 +132,34 @@ func TestAuction(t *testing.T) {
 				"bidder":       "0xf3fcd2c1a78f5eee",
 				"name":         "user1",
 			}))
+	})
+
+	t.Run("Should be able to incrase auction bid", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForAuction("user1").
+			bid("user2", "user1", "5.0")
+
+		gt.GWTF.TransactionFromFile("increaseBid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("3.0").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
+				"amount":       "8.00000000",
+				"auctionEndAt": "86401.00000000",
+				"bidder":       "0xf3fcd2c1a78f5eee",
+				"name":         "user1",
+			}))
 
 	})
 
-	/*
-		t.Run("Should be able to incrase auction bid", func(t *testing.T) {
-
-			gt := NewGWTFTest(t).
-				setupFIND().
-				createUser("100.0", "user1").
-				createUser("100.0", "user2").
-				registerUser("user1").
-				registerUser("user2").
-				listForAuction("user1").
-				bid("user2", "user1", "5.0")
-
-			gt.GWTF.TransactionFromFile("increaseBid").
-				SignProposeAndPayAs("user2").
-				StringArgument("user1").
-				UFix64Argument("3.0").
-				Test(t).
-				AssertSuccess().
-				AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-					"amount":       "8.00000000",
-					"auctionEndAt": "86401.00000000",
-					"bidder":       "0xf3fcd2c1a78f5eee",
-					"name":         "user1",
-				}))
-
-		})
-
-	*/
 	t.Run("Should be able to manually start auction with lower bid", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
