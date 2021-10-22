@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bjartek/find.git"
+    "url": "git+https://github.com/findonflow/find.git"
   },
   "keywords": [
     "cadence"
@@ -16,7 +16,7 @@
   "author": "Bjarte Karlsen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bjartek/find/issues"
+    "url": "https://github.com/findonflow/find/issues"
   },
-  "homepage": "https://github.com/bjartek/find#readme"
+  "homepage": "https://github.com/findonflow/find#readme"
 }
