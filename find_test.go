@@ -28,6 +28,7 @@ func TestFIND(t *testing.T) {
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("usr").
+			UFix64Argument("500.0").
 			Test(t).
 			AssertFailure("Amount withdrawn must be less than or equal than the balance of the Vault")
 
@@ -42,6 +43,7 @@ func TestFIND(t *testing.T) {
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("ur").
+			UFix64Argument("10.0").
 			Test(t).
 			AssertFailure("A FIND name has to be minimum 3 letters long")
 
@@ -57,6 +59,7 @@ func TestFIND(t *testing.T) {
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
+			UFix64Argument("10.0").
 			Test(t).
 			AssertFailure("Name already registered")
 

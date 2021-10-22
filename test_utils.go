@@ -93,6 +93,7 @@ func (gt *GWTFTestUtils) registerUserTransaction(name string) gwtf.TransactionRe
 	return gt.GWTF.TransactionFromFile("register").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
+		UFix64Argument("10.0").
 		Test(gt.T).
 		AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
