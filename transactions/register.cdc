@@ -4,7 +4,7 @@ import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 
-transaction(name: String) {
+transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
 
 		//Add exising FUSD or create a new one and add it
@@ -52,6 +52,9 @@ transaction(name: String) {
 		}
 
 		let price=FIND.calculateCost(name)
+		if price != amount {
+			panic("Calculated cost does not match expected cost")
+		}
 		log("The cost for registering this name is ".concat(price.toString()))
 
 		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
