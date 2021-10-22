@@ -75,6 +75,11 @@ pub contract FIND {
 	/// Calculate the cost of an name
 	/// @param _ the name to calculate the cost for
 	pub fun calculateCost(_ name:String) : UFix64 {
+		pre {
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+		}
+
+
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.calculateCost(name)
 		}
@@ -83,6 +88,10 @@ pub contract FIND {
 
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
+		pre {
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+		}
+
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(name)?.owner?.address
 		}
@@ -91,6 +100,10 @@ pub contract FIND {
 
 	/// Lookup the profile registered for a name
 	pub fun lookup(_ name:String): &{Profile.Public}? {
+		pre {
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+		}
+
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(name)
 		}
@@ -101,6 +114,10 @@ pub contract FIND {
 	/// @param to: The name to send money too
 	/// @param from: The vault to send too
 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
+		pre {
+			FIND.validateFindName(to) : "A FIND name has to be a-z0-9 and not a valid flow address"
+		}
+
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
 			profile.deposit(from: <- from)
@@ -112,6 +129,11 @@ pub contract FIND {
 	/// Return the status for a given name
 	/// @return The Name status of a name
 	pub fun status(_ name: String): NameStatus {
+		pre {
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+		}
+
+
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.readStatus(name)
 		}
@@ -280,7 +302,7 @@ pub contract FIND {
 		init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?, address:Address){
 
 			self.name=name
-		  var s="TAKEN"	
+			var s="TAKEN"	
 			if status == LeaseStatus.FREE {
 				s="FREE"
 			} else if status == LeaseStatus.LOCKED {
@@ -494,10 +516,10 @@ pub contract FIND {
 			}
 
 			if lease.salePrice != nil && balance >= lease.salePrice! {
-  				Debug.log("Direct sale!")
-					self.fullfill(name)
+				Debug.log("Direct sale!")
+				self.fullfill(name)
 			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
-					self.startAuction(name)
+				self.startAuction(name)
 			} else {
 				emit BlindBid(name: name, bidder: callback.address, amount: balance)
 			}
@@ -799,7 +821,7 @@ pub contract FIND {
 		access(contract) let lockPeriod: UFix64
 		access(contract) var defaultPrice: UFix64
 		access(contract) let secondaryCut: UFix64
-//		access(contract) var pricesChangedAt: UFix64 //TODO add before mainnet
+		//		access(contract) var pricesChangedAt: UFix64 //TODO add before mainnet
 		access(contract) var lengthPrices: {Int: UFix64}
 		access(contract) var publicEnabled: Bool
 
@@ -811,7 +833,7 @@ pub contract FIND {
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut
 			self.defaultPrice=defaultPrice
-//			self.pricesChangedAt=Clock.time()
+			//			self.pricesChangedAt=Clock.time()
 			self.lengthPrices=lengthPrices
 			self.profiles={}
 			self.wallet=wallet
@@ -901,7 +923,7 @@ pub contract FIND {
 
 			let lease= NetworkLease(
 				validUntil:Clock.time() + self.leasePeriod,
-			  lockedUntil: Clock.time() + self.leasePeriod+ self.lockPeriod,
+				lockedUntil: Clock.time() + self.leasePeriod+ self.lockPeriod,
 				profile: profile,
 				name: name
 			)
@@ -1221,6 +1243,7 @@ pub contract FIND {
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
+			  FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
 			}
 
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
@@ -1250,6 +1273,66 @@ pub contract FIND {
 		}
 
 	}
+
+	pub fun validateFindName(_ value: String) : Bool {
+		if !FIND.validateAlphanumericLower(value) {
+			return false
+		}
+
+
+		let bytes=value.utf8
+		log(bytes)
+		if bytes.length != 18 {
+			return true
+		}
+
+		return FIND.validateHex(value)
+
+	}
+
+	pub fun validateAlphanumericLower(_ value:String) : Bool {
+		let lowerA: UInt8=97
+		let lowerZ: UInt8=122
+
+		let number0:UInt8=48
+		let number9:UInt8=57
+
+		let bytes=value.utf8
+		for byte in bytes {
+			if byte >= lowerA && byte <= lowerZ {
+				continue
+			}
+			if byte >= number0 && byte <= number9  {
+				continue
+			}
+			return false
+
+		}
+		return true
+
+	}
+
+	pub fun validateHex(_ value:String) : Bool {
+		let lowerA: UInt8=97
+		let lowerF: UInt8=102
+
+		let number0:UInt8=48
+		let number9:UInt8=57
+
+		let bytes=value.utf8
+		for byte in bytes {
+			if byte >= lowerA && byte <= lowerF {
+				continue
+			}
+			if byte >= number0 && byte <= number9  {
+				continue
+			}
+			return false
+
+		}
+		return true
+
+	}
 	init() {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
@@ -1268,10 +1351,10 @@ pub contract FIND {
 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
 		let network <-  create Network(
 			//TODO: change!
-			leasePeriod: 86400.0, //365 days
-			lockPeriod: 86400.0, //90 days
-			//leasePeriod: 31536000.0, //365 days
-			//lockPeriod: 7776000.0, //90 days
+			//leasePeriod: 86400.0, //365 days
+			//lockPeriod: 86400.0, //90 days
+			leasePeriod: 31536000.0, //365 days
+			lockPeriod: 7776000.0, //90 days
 			secondaryCut: 0.05,
 			defaultPrice: 10.0,
 			lengthPrices: {3: 500.0, 4:100.0},
