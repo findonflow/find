@@ -2,3 +2,4 @@
 .idea
 node_modules
 .find-testnet.events
+lib/find_tmp.json

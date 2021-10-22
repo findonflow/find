@@ -9,7 +9,7 @@ const convertCadenceToJs = async () => {
         scripts: [ scriptsPath ],
         config: require('./flow.json')
     })
-    fs.writeFile('lib/find.json', JSON.stringify(resultingJs), (err) => {
+    fs.writeFile('lib/find_tmp.json', JSON.stringify(resultingJs), (err) => {
         if (err) {
             console.error("Failed to read CadenceToJs JSON");
             process.exit(1)
