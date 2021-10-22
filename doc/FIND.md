@@ -65,8 +65,6 @@ struct NameStatus {
     status:  LeaseStatus
 
     owner:  Address?
-
-    persisted:  Bool
 }
 ```
 Struct holding information about a lease. Contains both the internal status the owner of the lease and if the state is persisted or not.
@@ -85,6 +83,16 @@ resource Lease {
     networkCap:  Capability<&Network>
 
     salePrice:  UFix64?
+
+    auctionStartPrice:  UFix64?
+
+    auctionReservePrice:  UFix64?
+
+    auctionDuration:  UFix64
+
+    auctionMinBidIncrement:  UFix64
+
+    auctionExtensionOnLateBid:  UFix64
 
     offerCallback:  Capability<&BidCollection{BidCollectionPublic}>?
 }
@@ -122,9 +130,15 @@ struct LeaseInformation {
 
     name:  String
 
-    status:  LeaseStatus
+    address:  Address
 
-    expireTime:  UFix64
+    cost:  UFix64
+
+    status:  String
+
+    validUntil:  UFix64
+
+    lockedUntil:  UFix64
 
     latestBid:  UFix64?
 
@@ -135,6 +149,12 @@ struct LeaseInformation {
     latestBidBy:  Address?
 
     currentTime:  UFix64
+
+    auctionStartPrice:  UFix64?
+
+    auctionReservePrice:  UFix64?
+
+    extensionOnLateBid:  UFix64?
 }
 ```
 
@@ -166,9 +186,11 @@ resource LeaseCollection {
 ```cadence
 struct NetworkLease {
 
-    status:  LeaseStatus
+    registeredTime:  UFix64
 
-    time:  UFix64
+    validUntil:  UFix64
+
+    lockedUntil:  UFix64
 
     profile:  Capability<&{Profile.Public}>
 
@@ -216,6 +238,8 @@ struct BidInfo {
 
     name:  String
 
+    type:  String
+
     amount:  UFix64
 
     timestamp:  UFix64
@@ -234,6 +258,8 @@ resource Bid {
     from:  Capability<&LeaseCollection{LeaseCollectionPublic}>
 
     name:  String
+
+    type:  String
 
     vault:  FUSD.Vault
 
@@ -330,24 +356,6 @@ Parameters:
 
 ---
 
-### fun `outdated()`
-
-```cadence
-func outdated(): [String]
-```
-Used in script to return a list of names that are outdated
-
----
-
-### fun `janitor()`
-
-```cadence
-func janitor(_ String): NameStatus
-```
-Task to janitor a name and lock/free it if appropriate
-
----
-
 ### fun `status()`
 
 ```cadence
@@ -382,21 +390,36 @@ func createAdminProxyClient(): AdminProxy
 ```
 
 ---
-## Events
 
-### event `Locked`
+### fun `validateFindName()`
 
 ```cadence
-event Locked(name String, lockedUntil UFix64)
+func validateFindName(_ String): Bool
 ```
-Emitted when a transaction involving a lease calculates that this lease is now locked
 
 ---
+
+### fun `validateAlphanumericLower()`
+
+```cadence
+func validateAlphanumericLower(_ String): Bool
+```
+
+---
+
+### fun `validateHex()`
+
+```cadence
+func validateHex(_ String): Bool
+```
+
+---
+## Events
 
 ### event `Register`
 
 ```cadence
-event Register(name String, owner Address, expireAt UFix64)
+event Register(name String, owner Address, validUntil UFix64, lockedUntil UFix64)
 ```
 Emitted when a name is registred in FIND
 
@@ -408,15 +431,6 @@ Emitted when a name is registred in FIND
 event Moved(name String, previousOwner Address, newOwner Address, expireAt UFix64)
 ```
 Emitted when a name is moved to a new owner
-
----
-
-### event `Freed`
-
-```cadence
-event Freed(name String, previousOwner Address)
-```
-Emitted when a name is freed
 
 ---
 
@@ -432,9 +446,17 @@ Emitted when a name is sold to a new owner
 ### event `ForSale`
 
 ```cadence
-event ForSale(name String, owner Address, expireAt UFix64, amount UFix64, active Bool)
+event ForSale(name String, owner Address, expireAt UFix64, directSellPrice UFix64, active Bool)
 ```
 Emitted when a name is explicistly put up for sale
+
+---
+
+### event `ForAuction`
+
+```cadence
+event ForAuction(name String, owner Address, expireAt UFix64, auctionStartPrice UFix64, active Bool)
+```
 
 ---
 

@@ -3,9 +3,11 @@
 ```cadence
 struct NetworkLease {
 
-    status:  LeaseStatus
+    registeredTime:  UFix64
 
-    time:  UFix64
+    validUntil:  UFix64
+
+    lockedUntil:  UFix64
 
     profile:  Capability<&{Profile.Public}>
 
@@ -19,7 +21,32 @@ struct NetworkLease {
 ### Initializer
 
 ```cadence
-func init(status LeaseStatus, time UFix64, profile Capability<&{Profile.Public}>, name String)
+func init(validUntil UFix64, lockedUntil UFix64, profile Capability<&{Profile.Public}>, name String)
 ```
 
 
+## Functions
+
+### fun `setValidUntil()`
+
+```cadence
+func setValidUntil(_ UFix64)
+```
+
+---
+
+### fun `setLockedUntil()`
+
+```cadence
+func setLockedUntil(_ UFix64)
+```
+
+---
+
+### fun `status()`
+
+```cadence
+func status(): LeaseStatus
+```
+
+---

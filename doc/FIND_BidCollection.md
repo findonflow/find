@@ -81,6 +81,14 @@ func borrowBid(_ String): &Bid
 
 ---
 
+### fun `setBidType()`
+
+```cadence
+func setBidType(name String, type String)
+```
+
+---
+
 ### fun `getBalance()`
 
 ```cadence

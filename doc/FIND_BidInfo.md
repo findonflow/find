@@ -5,6 +5,8 @@ struct BidInfo {
 
     name:  String
 
+    type:  String
+
     amount:  UFix64
 
     timestamp:  UFix64
@@ -15,7 +17,7 @@ struct BidInfo {
 ### Initializer
 
 ```cadence
-func init(name String, amount UFix64, timestamp UFix64)
+func init(name String, amount UFix64, timestamp UFix64, type String)
 ```
 
 

@@ -63,14 +63,6 @@ func bid(name String, callback Capability<&BidCollection{BidCollectionPublic}>)
 
 ---
 
-### fun `remove()`
-
-```cadence
-func remove(_ String)
-```
-
----
-
 ### fun `fullfillAuction()`
 
 ```cadence

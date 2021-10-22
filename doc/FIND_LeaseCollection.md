@@ -100,10 +100,26 @@ func fullfill(_ String)
 
 ---
 
+### fun `listForAuction()`
+
+```cadence
+func listForAuction(name String, auctionStartPrice UFix64, auctionReservePrice UFix64, auctionDuration UFix64, auctionExtensionOnLateBid UFix64)
+```
+
+---
+
 ### fun `listForSale()`
 
 ```cadence
-func listForSale(name String, amount UFix64)
+func listForSale(name String, directSellPrice UFix64)
+```
+
+---
+
+### fun `delistAuction()`
+
+```cadence
+func delistAuction(_ String)
 ```
 
 ---
@@ -120,14 +136,6 @@ func delistSale(_ String)
 
 ```cadence
 func move(name String, profile Capability<&{Profile.Public}>, to Capability<&LeaseCollection{LeaseCollectionPublic}>)
-```
-
----
-
-### fun `remove()`
-
-```cadence
-func remove(_ String)
 ```
 
 ---

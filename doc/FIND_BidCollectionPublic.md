@@ -38,3 +38,11 @@ func cancel(_ String)
 ```
 
 ---
+
+### fun `setBidType()`
+
+```cadence
+func setBidType(name String, type String)
+```
+
+---

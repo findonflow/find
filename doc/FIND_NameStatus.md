@@ -6,8 +6,6 @@ struct NameStatus {
     status:  LeaseStatus
 
     owner:  Address?
-
-    persisted:  Bool
 }
 ```
 
@@ -16,7 +14,7 @@ Struct holding information about a lease. Contains both the internal status the 
 ### Initializer
 
 ```cadence
-func init(status LeaseStatus, owner Address?, persisted Bool)
+func init(status LeaseStatus, owner Address?)
 ```
 
 

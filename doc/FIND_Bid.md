@@ -7,6 +7,8 @@ resource Bid {
 
     name:  String
 
+    type:  String
+
     vault:  FUSD.Vault
 
     bidAt:  UFix64
@@ -22,6 +24,14 @@ func init(from Capability<&LeaseCollection{LeaseCollectionPublic}>, name String,
 
 
 ## Functions
+
+### fun `setType()`
+
+```cadence
+func setType(_ String)
+```
+
+---
 
 ### fun `setBidAt()`
 

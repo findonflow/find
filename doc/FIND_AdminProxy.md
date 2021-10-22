@@ -48,6 +48,14 @@ Enable or disable public registration
 
 ---
 
+### fun `setPrice()`
+
+```cadence
+func setPrice(default UFix64, additional {Int: UFix64})
+```
+
+---
+
 ### fun `register()`
 
 ```cadence
@@ -60,6 +68,14 @@ func register(name String, vault FUSD.Vault, profile Capability<&{Profile.Public
 
 ```cadence
 func advanceClock(_ UFix64)
+```
+
+---
+
+### fun `debug()`
+
+```cadence
+func debug(_ Bool)
 ```
 
 ---

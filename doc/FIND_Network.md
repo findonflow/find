@@ -31,6 +31,14 @@ func init(leasePeriod UFix64, lockPeriod UFix64, secondaryCut UFix64, defaultPri
 
 ## Functions
 
+### fun `setPrice()`
+
+```cadence
+func setPrice(default UFix64, additionalPrices {Int: UFix64})
+```
+
+---
+
 ### fun `renew()`
 
 ```cadence
@@ -43,6 +51,14 @@ func renew(name String, vault FUSD.Vault)
 
 ```cadence
 func getLeaseExpireTime(_ String): UFix64
+```
+
+---
+
+### fun `getLeaseLocedUntil()`
+
+```cadence
+func getLeaseLocedUntil(_ String): UFix64
 ```
 
 ---
@@ -68,23 +84,6 @@ func register(name String, vault FUSD.Vault, profile Capability<&{Profile.Public
 ```cadence
 func readStatus(_ String): NameStatus
 ```
-
----
-
-### fun `outdated()`
-
-```cadence
-func outdated(): [String]
-```
-
----
-
-### fun `status()`
-
-```cadence
-func status(_ String): NameStatus
-```
-This method is almost like readStatus except that it will mutate state and fix the name it looks up if it is invalid.  Events are emitted when this is done.
 
 ---
 
