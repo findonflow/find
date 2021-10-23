@@ -149,11 +149,12 @@ func (gt *GWTFTestUtils) listForAuction(name string) *GWTFTestUtils {
 		UFix64Argument("300.0").   //extension on late bid
 		Test(gt.T).AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
-			"auctionStartPrice": "5.00000000",
-			"active":            "true",
-			"name":              name,
-			"expireAt":          expireTimeString,
-			"owner":             nameAddress,
+			"auctionStartPrice":   "5.00000000",
+			"auctionReservePrice": "20.00000000",
+			"active":              "true",
+			"name":                name,
+			"expireAt":            expireTimeString,
+			"owner":               nameAddress,
 		}))
 	return gt
 }

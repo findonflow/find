@@ -18,13 +18,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	eventPrefix := "A.dc5299b787551b63.FIND"
+	eventPrefix := "A.85f0d6217184009b.FIND"
 	_, err := g.EventFetcher().
-		Workers(1).
+		Workers(5).
 		BatchSize(25).
 		TrackProgressIn(".find-testnet.events").
-		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Register"), []string{"expireAt"}).
-		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Locked"), []string{"lockedUntil"}).
+		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Register"), []string{}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Sold"), []string{"expireAt"}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Moved"), []string{"expireAt"}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Freed"), []string{}).

@@ -32,7 +32,7 @@ pub contract FIND {
 
 	/// Emitted when a name is explicistly put up for sale
 	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, active: Bool)
-	pub event ForAuction(name: String, owner: Address, expireAt: UFix64,  auctionStartPrice: UFix64, active: Bool)
+	pub event ForAuction(name: String, owner: Address, expireAt: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event BlindBid(name: String, bidder: Address, amount: UFix64)
@@ -231,6 +231,10 @@ pub contract FIND {
 
 		pub fun getLeaseLocedUntil() : UFix64 {
 			return self.networkCap.borrow()!.getLeaseLocedUntil(self.name)
+		}
+
+		pub fun getProfile():&{Profile.Public}? {
+			return self.networkCap.borrow()!.profile(self.name)
 		}
 
 		pub fun getLeaseStatus() : LeaseStatus {
@@ -580,7 +584,11 @@ pub contract FIND {
 			}
 
 			let lease = self.borrow(name)
-			let oldProfile=FIND.lookup(name)!
+			if lease.getLeaseStatus()  ==  LeaseStatus.FREE {
+				panic("cannot fullfill sale name is now free")
+			}
+
+			let oldProfile=lease.getProfile()!
 
 			if let cb= lease.offerCallback {
 				let offer= cb.borrow()!
@@ -653,7 +661,7 @@ pub contract FIND {
 			tokenRef.setReservePrice(auctionReservePrice)
 			tokenRef.setAuctionDuration(auctionDuration)
 			tokenRef.setExtentionOnLateBid(auctionExtensionOnLateBid)
-			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!,  active: true)
+			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!,  active: true)
 		}
 
 		pub fun listForSale(name :String, directSellPrice:UFix64) {
@@ -675,7 +683,7 @@ pub contract FIND {
 
 			let tokenRef = self.borrow(name)
 
-			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!,  active: false)
+			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!,  auctionReservePrice: tokenRef.auctionReservePrice!, active: false)
 			tokenRef.setStartAuctionPrice(nil)
 			tokenRef.setReservePrice(nil)
 		}
@@ -943,36 +951,18 @@ pub contract FIND {
 			return NameStatus(status:LeaseStatus.FREE, owner: nil)
 		}
 
-
-		/*
-		/// This method is almost like readStatus except that it will mutate state and fix the name it looks up if it is invalid.  Events are emitted when this is done.
-		pub fun status(_ name: String): NameStatus {
-			let currentTime=Clock.time()
-			if let lease= self.profiles[name] {
-				let owner=lease.profile.borrow()!.owner!.address
-				if currentTime <= lease.time {
-					return NameStatus(status: lease.status, owner: owner, persisted:true)
-				}
-
-				if lease.status == LeaseStatus.LOCKED {
-					let leaseCollection=getAccount(owner).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()!
-					leaseCollection.remove(name)
-
-					self.profiles.remove(key: name)
-					return NameStatus(status: LeaseStatus.FREE, owner: nil, persisted:true)
-				}
-
-				if lease.status == LeaseStatus.TAKEN {
-					lease.status= LeaseStatus.LOCKED
-					lease.time = currentTime + self.lockPeriod
-					emit Locked(name: name, lockedUntil:lease.time)
-					self.profiles[name] = lease
-				}
-				return NameStatus(status:lease.status, owner:  owner, persisted: true)
+		access(account) fun profile(_ name: String) : &{Profile.Public}? {
+			let nameStatus=self.readStatus(name)
+			if nameStatus.status == LeaseStatus.FREE {
+				return nil
 			}
-			return NameStatus(status:LeaseStatus.FREE, owner: nil, persisted: true)
+
+			if let lease=self.profiles[name] {
+				return lease.profile.borrow()
+			}
+			return nil
 		}
-		*/
+
 
 		//lookup a name that is not locked
 		pub fun lookup(_ name: String) : &{Profile.Public}? {
@@ -1351,10 +1341,10 @@ pub contract FIND {
 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
 		let network <-  create Network(
 			//TODO: change!
-			//leasePeriod: 86400.0, //365 days
-			//lockPeriod: 86400.0, //90 days
-			leasePeriod: 31536000.0, //365 days
-			lockPeriod: 7776000.0, //90 days
+			leasePeriod: 86400.0, //365 days
+			lockPeriod: 86400.0, //90 days
+			//leasePeriod: 31536000.0, //365 days
+			//lockPeriod: 7776000.0, //90 days
 			secondaryCut: 0.05,
 			defaultPrice: 10.0,
 			lengthPrices: {3: 500.0, 4:100.0},

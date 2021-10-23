@@ -379,3 +379,5 @@ func TestAuction(t *testing.T) {
 	})
 
 }
+
+//TODO: Fullfillment of auction that had a name that was locked
