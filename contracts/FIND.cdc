@@ -21,6 +21,10 @@ Taxonomy:
 - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
 */
 pub contract FIND {
+
+	/// An event to singla that there is a name in the network
+	pub event Name(name: String)
+
 	///  Emitted when a name is registred in FIND
 	pub event Register(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64)
 
@@ -945,6 +949,7 @@ pub contract FIND {
 			)
 
 			emit Register(name: name, owner:profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
+			emit Name(name: name)
 			self.profiles[name] =  lease
 
 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
