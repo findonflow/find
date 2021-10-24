@@ -58,6 +58,9 @@ On Mainnet:
 ## FAQ
 
 
+### what happends when i register a lease
+FIND integrates with the profile contract from the Versus project. If you do not have a profile already it will create a new one for you that uses the name you just registered. 
+
 
 ###  what does the money go to?
 (do we need this?)
