@@ -69,4 +69,5 @@ On Mainnet:
  - why is my lease locked?
  - how can i sell my lease
  - other similar solutions
+ - why is lease not an NFT
 
