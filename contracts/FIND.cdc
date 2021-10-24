@@ -401,8 +401,12 @@ pub contract FIND {
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
 			for name in self.leases.keys {
+				//TODO: for testnet
+				if !FIND.validateFindName(name) {
+					continue
+				}
 				let lease=self.getLease(name)
-				if lease != nil {
+				if lease != nil && lease!.status != "FREE" {
 					info.append(lease!)
 				}
 			}
