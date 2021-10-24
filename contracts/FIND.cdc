@@ -1085,6 +1085,8 @@ pub contract FIND {
 
 			token.setSalePrice(nil)
 			token.setCallback(nil)
+			token.setReservePrice(nil)
+			token.setStartAuctionPrice(nil)
 			self.leases.borrow()!.deposit(token: <- token)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
