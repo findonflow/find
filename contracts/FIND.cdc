@@ -439,6 +439,7 @@ pub contract FIND {
 		}
 
 
+		//TODO: Should be allowed to cancel a bid if auction is on an item that is free
 		access(contract) fun cancelBid(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
@@ -703,6 +704,7 @@ pub contract FIND {
 		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
 			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, expireAt: token.getLeaseExpireTime())
+			emit Register(name: name, owner:profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil())
 			token.move(profile: profile)
 			to.borrow()!.deposit(token: <- token)
 		}
