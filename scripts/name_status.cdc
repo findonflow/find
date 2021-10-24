@@ -39,7 +39,7 @@ pub fun main(name: String) : FINDNameReport{
 	}
 
 	return FINDNameReport(
-		status: "free",
+		status: "FREE",
 		profile: nil, 
 		lease: nil,
 		cost: cost
