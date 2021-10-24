@@ -20,6 +20,10 @@ An owner can cancel an auction that is not finished
 
 An user can add a blind bid to an name that is not in an active auction
 
+A user can increase his bid on an auction
+
+A user can fullfill an auction that has ended
+A owner can fullfill an auction that has ended
 
 
 ## I had this in but we remove it

@@ -367,7 +367,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user1").
 			registerUser("user2").
 			listForAuction("user1").
-			bid("user2", "user1", "5.0").
+			bid("user2", "user1", "25.0").
 			expireAuction().tickClock("2.0")
 
 		gt.GWTF.TransactionFromFile("cancelAuction").
