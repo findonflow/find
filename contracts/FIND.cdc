@@ -137,7 +137,6 @@ pub contract FIND {
 			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
 		}
 
-
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.readStatus(name)
 		}
@@ -595,7 +594,7 @@ pub contract FIND {
 			}
 
 			let lease = self.borrow(name)
-			if lease.getLeaseStatus()  ==  LeaseStatus.FREE {
+			if lease.getLeaseStatus() == LeaseStatus.FREE {
 				panic("cannot fullfill sale name is now free")
 			}
 
@@ -958,6 +957,9 @@ pub contract FIND {
 		pub fun readStatus(_ name: String): NameStatus {
 			let currentTime=Clock.time()
 			if let lease= self.profiles[name] {
+				if !lease.profile.check() {
+					return NameStatus(status: LeaseStatus.TAKEN, owner: nil)
+				}
 				let owner=lease.profile.borrow()!.owner!.address
 				return NameStatus(status: lease.status(), owner: owner)
 			}

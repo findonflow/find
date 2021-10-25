@@ -17,15 +17,24 @@ An owner can list a name for auction specifing
 
 An owner can cancel an auction that is not finished
 
-
 An user can add a blind bid to an name that is not in an active auction
-
 A user can increase his bid on an auction
 
-A user can fullfill an auction that has ended
-A owner can fullfill an auction that has ended
 
 
 ## I had this in but we remove it
 A name that is listed both for auction and for sale will sell directly if bid is above sell price 
 A name that is listed both for auction and for sale will start auction if bid is belove sell price but above auction price
+
+
+# DoneDeal
+
+We chose to not expose to any user, only winning bidder and owner
+A user can fullfill an auction that has ended
+A owner can fullfill an auction that has ended
+
+
+## Bugs
+ - if you have a profile the final bid line should be alink to your profile with your name
+ - when you run fillfull if the owner does not have a profile create the profile with the same name they just bought
+ - name_status should not fail if you dont have a profile

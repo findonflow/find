@@ -38,8 +38,12 @@ pub fun main(name: String) : FINDNameReport{
 
 	}
 
+	var statusValue= "FREE"
+	if  status.status == FIND.LeaseStatus.TAKEN {
+		statusValue="NO_PROFILE"
+	}
 	return FINDNameReport(
-		status: "FREE",
+		status: statusValue,
 		profile: nil, 
 		lease: nil,
 		cost: cost
