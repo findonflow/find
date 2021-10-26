@@ -77,8 +77,6 @@ pub contract interface NonFungibleToken {
     // to define a resource called NFT that conforms to INFT
     pub resource NFT: INFT {
         pub let id: UInt64
-        pub var content: String
-        //yes I know this is not in the standard, just want an examle
     }
 
     // Interface to mediate withdraws from the Collection
@@ -95,10 +93,7 @@ pub contract interface NonFungibleToken {
     // Interface to mediate deposits to the Collection
     //
     pub resource interface Receiver {
-
-        // deposit takes an NFT as an argument and adds it to the Collection
-        //
-		pub fun deposit(token: @NFT)
+			pub fun deposit(token: @NFT)
     }
 
     // Interface that an account would commonly 

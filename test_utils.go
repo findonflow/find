@@ -93,7 +93,7 @@ func (gt *GWTFTestUtils) registerUserTransaction(name string) gwtf.TransactionRe
 	return gt.GWTF.TransactionFromFile("register").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
-		UFix64Argument("10.0").
+		UFix64Argument("5.0").
 		Test(gt.T).
 		AssertSuccess().
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
@@ -103,11 +103,11 @@ func (gt *GWTFTestUtils) registerUserTransaction(name string) gwtf.TransactionRe
 			"name":        name,
 		})).
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-			"amount": "10.00000000",
+			"amount": "5.00000000",
 			"to":     "0x1cf0e2f2f715450",
 		})).
 		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
-			"amount": "10.00000000",
+			"amount": "5.00000000",
 			"from":   nameAddress,
 		}))
 

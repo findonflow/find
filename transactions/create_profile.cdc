@@ -2,6 +2,8 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
+import Artifact from "../contracts/Artifact.cdc"
+import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
 
 //really not sure on how to input links here.)
@@ -57,6 +59,16 @@ transaction(name: String) {
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
+
+		let artifactCollection = acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(Artifact.ArtifactPublicPath)
+		if !artifactCollection.check() {
+			acct.unlink(Artifact.ArtifactPublicPath)
+			destroy <- acct.load<@AnyResource>(from:Artifact.AdminStoragePath)
+
+			acct.save(<- Artifact.createEmptyCollection(), to: Artifact.ArtifactStoragePath)
+			acct.link<&{TypedMetadata.ViewResolverCollection}>( Artifact.ArtifactPublicPath, target: Artifact.ArtifactStoragePath)
+		}
+		profile.addCollection(Profile.ResourceCollection(name: "artifacts", collection: artifactCollection, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["artifact", "nft"]))
 
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)

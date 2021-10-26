@@ -1363,7 +1363,7 @@ pub contract FIND {
 			leasePeriod: 31536000.0, //365 days
 			lockPeriod: 7776000.0, //90 days
 			secondaryCut: 0.05,
-			defaultPrice: 10.0,
+			defaultPrice: 5.0,
 			lengthPrices: {3: 500.0, 4:100.0},
 			wallet: wallet,
 			publicEnabled: false

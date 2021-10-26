@@ -35,6 +35,8 @@
 			}
 		},
 		"FIND": "./contracts/FIND.cdc",
+		"Artifact": "./contracts/Artifact.cdc",
+		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": {
 			"source" : "./contracts/Profile.cdc", 
@@ -102,12 +104,16 @@
 			"testnet-find": [
 				"FIND",
 				"Clock",
-				"Debug"
+				"Debug",
+				"Artifact",
+				"TypedMetadata"
 			]
 		},
 		"emulator": {
 			"emulator-account": [
 				"NonFungibleToken",
+				"Artifact",
+				"TypedMetadata",
 				"FIND",
 				"Clock",
 				"Profile",
