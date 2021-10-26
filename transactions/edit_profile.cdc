@@ -1,7 +1,10 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
+import Artifact from "../contracts/Artifact.cdc"
+import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
 
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, links: [{String: String}]) {
@@ -20,11 +23,43 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
 
 		var hasFusdWallet=false
+		var hasFlowWallet=false
 		let wallets=profile.getWallets()
 		for wallet in wallets {
 			if wallet.name=="FUSD" {
 				hasFusdWallet=true
 			}
+
+			if wallet.name =="Flow" {
+				hasFlowWallet=true
+			}
+		}
+
+		var hasArtifacts=false
+		let collections=profile.getCollections()
+		for c in collections {
+			if c.name=="artifacts" {
+				hasArtifacts=true
+			}
+		}
+
+		if !hasArtifacts {
+			acct.save(<- Artifact.createEmptyCollection(), to: Artifact.ArtifactStoragePath)
+			acct.link<&{TypedMetadata.ViewResolverCollection}>( Artifact.ArtifactPublicPath, target: Artifact.ArtifactStoragePath)
+			let artifactCollection = acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(Artifact.ArtifactPublicPath)
+			profile.addCollection(Profile.ResourceCollection(name: "artifacts", collection: artifactCollection, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["artifact", "nft"]))
+		}
+
+
+		if !hasFlowWallet {
+			let flowWallet=Profile.Wallet(
+				name:"Flow", 
+				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
+				accept: Type<@FlowToken.Vault>(),
+				names: ["flow"]
+			)
+			profile.addWallet(flowWallet)
 		}
 
 		if !hasFusdWallet {

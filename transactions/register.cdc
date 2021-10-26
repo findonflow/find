@@ -1,5 +1,6 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Artifact from "../contracts/Artifact.cdc"
@@ -54,6 +55,15 @@ transaction(name: String, amount: UFix64) {
 
 			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"])
 
+			let flowWallet=Profile.Wallet(
+				name:"Flow", 
+				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
+				accept: Type<@FlowToken.Vault>(),
+				names: ["flow"]
+			)
+	
+			profile.addWallet(flowWallet)
 			profile.addWallet(fusdWallet)
 			profile.addCollection(Profile.ResourceCollection(name: "artifacts", collection: artifactCollection, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["artifact", "nft"]))
 			profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))

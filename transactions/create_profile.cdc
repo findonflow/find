@@ -1,5 +1,6 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 import Artifact from "../contracts/Artifact.cdc"
@@ -42,6 +43,15 @@ transaction(name: String) {
 
 		profile.addWallet(fusdWallet)
 
+
+			let flowWallet=Profile.Wallet(
+				name:"Flow", 
+				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
+				accept: Type<@FlowToken.Vault>(),
+				names: ["flow"]
+			)
+			profile.addWallet(flowWallet)
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
 			acct.unlink(FIND.LeasePublicPath)
