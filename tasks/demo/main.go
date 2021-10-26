@@ -93,7 +93,7 @@ func main() {
 	*/
 
 	g.ScriptFromFile("address_status").AccountArgument("user2").Run()
-	g.TransactionFromFile("mint_artifact").SignProposeAndPayAsService().AccountArgument("user2").RunPrintEventsFull()
+	g.TransactionFromFile("mint_artifact").SignProposeAndPayAs("find").AccountArgument("user2").RunPrintEventsFull()
 
 	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
 	g.ScriptFromFile("find-collection").AccountArgument("user2").Run()

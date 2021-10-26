@@ -30,7 +30,7 @@ transaction(name: String, amount: UFix64) {
 		let artifactCollection = acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(Artifact.ArtifactPublicPath)
 		if !artifactCollection.check() {
 			acct.unlink(Artifact.ArtifactPublicPath)
-			destroy <- acct.load<@AnyResource>(from:Artifact.AdminStoragePath)
+			destroy <- acct.load<@AnyResource>(from:Artifact.ArtifactStoragePath)
 
 			acct.save(<- Artifact.createEmptyCollection(), to: Artifact.ArtifactStoragePath)
 			acct.link<&{TypedMetadata.ViewResolverCollection}>( Artifact.ArtifactPublicPath, target: Artifact.ArtifactStoragePath)

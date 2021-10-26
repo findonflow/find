@@ -4,6 +4,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
+import Artifact from "./Artifact.cdc"
 /*
 
 ///FIND
@@ -1255,6 +1256,15 @@ pub contract FIND {
 
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
 		}
+
+		pub fun mintArtifact(name: String, schemas: [AnyStruct]): @Artifact.NFT {
+			pre {
+				self.capability != nil: "Cannot use Minter, set capability first"
+			}
+			return <- Artifact.mintNFT(name: name, schemas: schemas)
+		}
+
+
 
 		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
 		pub fun advanceClock(_ time: UFix64) {
