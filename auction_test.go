@@ -109,6 +109,34 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	/*
+		t.Run("Should start auction if we start out with smaller bid and then increase it with locked user", func(t *testing.T) {
+
+			gt := NewGWTFTest(t).
+				setupFIND().
+				createUser("100.0", "user1").
+				createUser("100.0", "user2").
+				registerUser("user1").
+				registerUser("user2").
+				expireLease().
+				listForAuction("user1").
+				blindBid("user2", "user1", "4.0")
+
+			gt.GWTF.TransactionFromFile("increaseBid").
+				SignProposeAndPayAs("user2").
+				StringArgument("user1").
+				UFix64Argument("4.0").
+				Test(t).
+				AssertSuccess().
+				AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+					"amount":       "8.00000000",
+					"auctionEndAt": "31622401.00000000",
+					"bidder":       "0xf3fcd2c1a78f5eee",
+					"name":         "user1",
+				}))
+		})
+	*/
+
 	t.Run("Should start auction if we start out with smaller bid and then increase it", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
@@ -199,6 +227,7 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	//todo test when user is locked
 	t.Run("Should be able to cancel blind bid", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
@@ -209,6 +238,31 @@ func TestAuction(t *testing.T) {
 			registerUser("user2").
 			listForSale("user1").
 			blindBid("user2", "user1", "4.0")
+
+		gt.GWTF.TransactionFromFile("cancelBid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBidCanceled", map[string]interface{}{
+				"bidder": "0xf3fcd2c1a78f5eee",
+				"name":   "user1",
+			}))
+	})
+
+	t.Run("Should be able to cancel blind bid when user locked", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "4.0").
+			expireLease()
+
+		gt.assertLookupAddress("user2", "")
 
 		gt.GWTF.TransactionFromFile("cancelBid").
 			SignProposeAndPayAs("user2").

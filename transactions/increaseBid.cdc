@@ -6,7 +6,6 @@ transaction(name: String, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
-		let seller=FIND.lookup(name)!.owner
 		
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 

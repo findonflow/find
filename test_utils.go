@@ -125,19 +125,17 @@ pub fun main() :  UFix64 {
 	return res
 }
 
-func (gt *GWTFTestUtils) assertLookupAddress(expected string) {
+func (gt *GWTFTestUtils) assertLookupAddress(user, expected string) {
 	value := gt.GWTF.Script(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {
     return FIND.lookupAddress(name)
 }
-		`).StringArgument("user1").RunReturnsInterface()
+		`).StringArgument(user).RunReturnsInterface()
 
 	assert.Equal(gt.T, expected, value)
 }
 
 func (gt *GWTFTestUtils) listForAuction(name string) *GWTFTestUtils {
-	expireTime := gt.currentTime() + leaseDurationFloat
-	expireTimeString := fmt.Sprintf("%f00", expireTime)
 	nameAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(name).Address().String())
 
 	gt.GWTF.TransactionFromFile("listForAuction").
@@ -148,12 +146,11 @@ func (gt *GWTFTestUtils) listForAuction(name string) *GWTFTestUtils {
 		UFix64Argument("86400.0"). //auction duration
 		UFix64Argument("300.0").   //extension on late bid
 		Test(gt.T).AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+		AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
 			"auctionStartPrice":   "5.00000000",
 			"auctionReservePrice": "20.00000000",
 			"active":              "true",
 			"name":                name,
-			"expireAt":            expireTimeString,
 			"owner":               nameAddress,
 		}))
 	return gt

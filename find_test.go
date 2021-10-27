@@ -43,7 +43,7 @@ func TestFIND(t *testing.T) {
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("ur").
-			UFix64Argument("10.0").
+			UFix64Argument("5.0").
 			Test(t).
 			AssertFailure("A FIND name has to be minimum 3 letters long")
 
@@ -59,7 +59,7 @@ func TestFIND(t *testing.T) {
 		gt.GWTF.TransactionFromFile("register").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
-			UFix64Argument("10.0").
+			UFix64Argument("5.0").
 			Test(t).
 			AssertFailure("Name already registered")
 
@@ -89,7 +89,7 @@ func TestFIND(t *testing.T) {
 			setupFIND().
 			createUser("100.0", "user1").
 			registerUser("user1").
-			assertLookupAddress("0x179b6b1cb6755e31")
+			assertLookupAddress("user1", "0x179b6b1cb6755e31")
 	})
 
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {

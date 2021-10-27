@@ -104,8 +104,8 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/bjartek/go-with-the-flow/v2 v2.1.6 h1:rzAf5U2bSRvP+adNo6SmbPajeynIfCxHNGajeMrIU2c=
-github.com/bjartek/go-with-the-flow/v2 v2.1.6/go.mod h1:aJfyjgrw7bsiryQ7bN3PWSeKvdqK51ryApo2DE+0O/c=
+github.com/bjartek/go-with-the-flow/v2 v2.3.0 h1:H3mO/CeCB7Hc6B58Y0zeN/IkxfRrGATyB9K5+JrCEYQ=
+github.com/bjartek/go-with-the-flow/v2 v2.3.0/go.mod h1:8QJZ16WStrFdXUeYneHJiTkT4aQRUJKdPp4c+JF8dEw=
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/bradfitz/go-smtpd v0.0.0-20170404230938-deb6d6237625/go.mod h1:HYsPBTaaSFSlLx/70C2HPIMNZpVV8+vt/A+FMnYP11g=
 github.com/bsipos/thist v1.0.0/go.mod h1:7i0xwRua1/bmUxcxi2xAxaFL895rLtOpKUwnw3NrT8I=
@@ -806,10 +806,12 @@ github.com/onflow/cadence v0.18.1-0.20210621144040-64e6b6fb2337/go.mod h1:iR/tZp
 github.com/onflow/cadence/languageserver v0.15.2/go.mod h1:hQGE8dYH5CfQ1Oe0nXglchgURzZwR3JQhmuXtv4ROHs=
 github.com/onflow/cadence/languageserver v0.16.0/go.mod h1:UPV1so9LcMrhj27IegrTucoyS4TLRVjNr4DJqjqBhFA=
 github.com/onflow/cadence/languageserver v0.18.2/go.mod h1:ehuDCUevEEavUzgJqLevcZPjfmTzMBX7Sglbi5ur9uU=
+github.com/onflow/cadence/languageserver v0.18.3-0.20210922170423-869cc8faab9b/go.mod h1:6/eWErcmjSo1zxA8MKp6UDtTr3ntAv9qdh9ctMhzULU=
 github.com/onflow/flow-cli v0.20.3-0.20210512000809-474effb7e7db/go.mod h1:Yh4dgrNiZdXhbU+3UVUmo4gRM0TEBVvhW4ITKVo82dg=
 github.com/onflow/flow-cli v0.23.1-0.20210621124332-11c4cd22ffb4/go.mod h1:OD9UVPFIvktnO86dSLavf1tTVFIsKQ5By5KBBDLfC3Q=
-github.com/onflow/flow-cli v0.28.0 h1:Tks5pA98JKy2OzfWgSP6Vif6YeZzBOSP3xBZZkONVuc=
-github.com/onflow/flow-cli v0.28.0/go.mod h1:u3ywH3krvQh1y/suStSu0q2eptLh+ugXQGaG2KmvppU=
+github.com/onflow/flow-cli v0.28.2/go.mod h1:u3ywH3krvQh1y/suStSu0q2eptLh+ugXQGaG2KmvppU=
+github.com/onflow/flow-cli v0.28.3 h1:gC9KYvbKwWxTqxEbgg2KYyB6gtJjW9FLI4hH+bE9p9A=
+github.com/onflow/flow-cli v0.28.3/go.mod h1:U92Ng9z1l7u8G5ie1C8O7xsg9xr6P9FOP/tFquPPHAg=
 github.com/onflow/flow-core-contracts/lib/go/contracts v0.7.2/go.mod h1:IZ2e7UyLCYmpQ8Kd7k0A32uXqdqfiV1r2sKs5/riblo=
 github.com/onflow/flow-core-contracts/lib/go/contracts v0.7.3-0.20210527134022-58c25247091a/go.mod h1:IZ2e7UyLCYmpQ8Kd7k0A32uXqdqfiV1r2sKs5/riblo=
 github.com/onflow/flow-core-contracts/lib/go/contracts v0.7.3 h1:Rxu1KvTPlSfR0pneog/r1HkS4fszJL2AS28QK4qHOTQ=
