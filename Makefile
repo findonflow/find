@@ -21,6 +21,6 @@ dev:
 contract: 
 	npm run prepare && jq '.' lib/find_tmp.json > lib/find.json
 
-contract_publish:
+publish:
 	cd lib && npm publish && cd ..
 
