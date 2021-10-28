@@ -109,33 +109,50 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	/*
-		t.Run("Should start auction if we start out with smaller bid and then increase it with locked user", func(t *testing.T) {
+	t.Run("Should start auction if we start out with smaller bid and then increase it with locked user", func(t *testing.T) {
 
-			gt := NewGWTFTest(t).
-				setupFIND().
-				createUser("100.0", "user1").
-				createUser("100.0", "user2").
-				registerUser("user1").
-				registerUser("user2").
-				expireLease().
-				listForAuction("user1").
-				blindBid("user2", "user1", "4.0")
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			expireLease().
+			listForAuction("user1").
+			blindBid("user2", "user1", "4.0")
 
-			gt.GWTF.TransactionFromFile("increaseBid").
-				SignProposeAndPayAs("user2").
-				StringArgument("user1").
-				UFix64Argument("4.0").
-				Test(t).
-				AssertSuccess().
-				AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-					"amount":       "8.00000000",
-					"auctionEndAt": "31622401.00000000",
-					"bidder":       "0xf3fcd2c1a78f5eee",
-					"name":         "user1",
-				}))
-		})
-	*/
+		gt.GWTF.TransactionFromFile("increaseBid").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("4.0").
+			Test(t).
+			AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+				"amount": "8.00000000",
+				"bidder": "0xf3fcd2c1a78f5eee",
+				"name":   "user1",
+			}))
+	})
+
+	t.Run("Should not allow double bid from same author", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2").
+			expireLease().
+			listForAuction("user1").
+			bid("user2", "user1", "10.0")
+
+		gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("15.0").
+			Test(gt.T).
+			AssertFailure("You already have the latest bid on this item, use the incraseBid transaction")
+
+	})
 
 	t.Run("Should start auction if we start out with smaller bid and then increase it", func(t *testing.T) {
 
@@ -185,20 +202,6 @@ func TestAuction(t *testing.T) {
 				"bidder":       "0xf3fcd2c1a78f5eee",
 				"name":         "user1",
 			}))
-
-	})
-
-	t.Run("Should be able to bid twice on", func(t *testing.T) {
-
-		NewGWTFTest(t).
-			setupFIND().
-			createUser("100.0", "user1").
-			createUser("100.0", "user2").
-			registerUser("user1").
-			registerUser("user2").
-			listForAuction("user1").
-			bid("user2", "user1", "5.0").
-			auctionBid("user2", "user1", "10.0")
 
 	})
 

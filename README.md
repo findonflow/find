@@ -26,3 +26,7 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 ### TODO
  - add flow wallet
  - use https://github.com/marketplace/actions/automated-version-bump or similar in ci
+ - TODO: start auction from blind bid
+ - ERROR: cancel
+Transaction Error: Declined: User rejected signature
+

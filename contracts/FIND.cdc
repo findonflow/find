@@ -504,8 +504,13 @@ pub contract FIND {
 
 			let timestamp=Clock.time()
 			let lease = self.borrow(name)
+
 			if self.auctions.containsKey(name) {
 				let auction = self.borrowAuction(name)
+
+				if auction.latestBidCallback.address == callback.address {
+					panic("You already have the latest bid on this item, use the incraseBid transaction")
+				}
 				if auction.endsAt < timestamp {
 					panic("Auction has ended")
 				}
@@ -514,9 +519,11 @@ pub contract FIND {
 			} 
 
 			if let cb= lease.offerCallback {
+				if cb.address == callback.address {
+					panic("You already have the latest bid on this item, use the incraseBid transaction")
+				}
 				cb.borrow()!.cancel(name)
 			}
-
 
 			lease.setCallback(callback)
 
@@ -1129,6 +1136,8 @@ pub contract FIND {
 
 			let bid <- create Bid(from: from, name:name, vault: <- vault)
 			let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
+
+
 			let callbackCapability =self.owner!.getCapability<&BidCollection{BidCollectionPublic}>(FIND.BidPublicPath)
 			let oldToken <- self.bids[bid.name] <- bid
 			//send info to leaseCollection
