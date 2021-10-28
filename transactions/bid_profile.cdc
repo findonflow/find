@@ -51,7 +51,7 @@ transaction(name: String, amount: UFix64) {
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		}
 
-		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
+		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
 		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
 		let bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)!
 		bids.bid(name: name, vault: <- vault)

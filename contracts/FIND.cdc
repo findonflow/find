@@ -592,7 +592,6 @@ pub contract FIND {
 				self.auctions.containsKey(name) : "Cannot fullfill sale that is not an auction=".concat(name)
 			}
 
-			//TODO: add a check to see if we have reaced min bid price
 			return self.fullfill(name)
 		}
 

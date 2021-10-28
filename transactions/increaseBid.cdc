@@ -5,7 +5,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 transaction(name: String, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
-		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
+		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
 		
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 

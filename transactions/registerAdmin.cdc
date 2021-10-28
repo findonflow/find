@@ -16,7 +16,8 @@ transaction(name: String, user: Address) {
 		let wallet=account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		let adminClient=account.borrow<&FIND.AdminProxy>(from: FIND.AdminProxyStoragePath)!
 
-		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the owner's Vault!")
+		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
+		//TODO calculate sum
 		let payVault <- vaultRef.withdraw(amount: 5.0) as! @FUSD.Vault
 
 		adminClient.register(name: name, vault: <- payVault, profile: profileCap, leases: leaseCollectionCap)

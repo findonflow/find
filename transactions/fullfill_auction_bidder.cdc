@@ -50,7 +50,6 @@ transaction(owner: Address, name: String) {
 			acct.save(<-profile, to: Profile.storagePath)
 			acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		}
-		leaseCollection.borrow()!.fullfillAuction(name)
 
 		let leaseCollectionOwner = getAccount(owner).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		leaseCollectionOwner.borrow()!.fullfillAuction(name)

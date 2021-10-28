@@ -74,7 +74,22 @@ func TestFIND(t *testing.T) {
 
 		gt.expireLease().tickClock("2.0")
 
-		gt.GWTF.TransactionFromFile("status").
+		gt.GWTF.Transaction(`
+import FIND from "../contracts/FIND.cdc"
+
+transaction(name: String) {
+
+    prepare(account: AuthAccount) {
+        let status=FIND.status(name)
+				if status.status == FIND.LeaseStatus.LOCKED {
+					panic("locked")
+				}
+				if status.status == FIND.LeaseStatus.FREE {
+					panic("free")
+				}
+    }
+}
+`).
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(t).AssertFailure("locked")
