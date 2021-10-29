@@ -1030,12 +1030,14 @@ pub contract FIND {
 		pub let type: String
 		pub let amount: UFix64
 		pub let timestamp: UFix64
+		pub let lease: LeaseInformation?
 
-		init(name: String, amount: UFix64, timestamp: UFix64, type: String) {
+		init(name: String, amount: UFix64, timestamp: UFix64, type: String, lease: LeaseInformation?) {
 			self.name=name
 			self.amount=amount
 			self.timestamp=timestamp
 			self.type=type
+			self.lease=lease
 		}
 	}
 
@@ -1120,7 +1122,8 @@ pub contract FIND {
 			var bidInfo: [BidInfo] = []
 			for id in self.bids.keys {
 				let bid = self.borrowBid(id)
-				bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type))
+				let leaseCollection= bid.from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(bid.name))
+				bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type, lease: leaseCollection.getLease(bid.name)))
 			}
 			return bidInfo
 		}
