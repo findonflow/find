@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
 )
 
@@ -28,17 +30,17 @@ func main() {
 	//we advance the clock
 	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
 
-	g.TransactionFromFile("create_profile").
+	g.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("user1").
 		StringArgument("User1").
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("create_profile").
+	g.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("user2").
 		StringArgument("User2").
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mint_fusd").
+	g.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
 		AccountArgument("user1").
 		UFix64Argument("100.0").
@@ -50,7 +52,7 @@ func main() {
 		UFix64Argument("5.0").
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mint_fusd").
+	g.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
 		AccountArgument("user2").
 		UFix64Argument("30.0").
@@ -93,12 +95,19 @@ func main() {
 	*/
 
 	g.ScriptFromFile("address_status").AccountArgument("user2").Run()
-	g.TransactionFromFile("mint_artifact").SignProposeAndPayAs("find").AccountArgument("user2").RunPrintEventsFull()
+	g.TransactionFromFile("mintArtifact").SignProposeAndPayAs("find").AccountArgument("user2").RunPrintEventsFull()
 
-	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
+	fmt.Println("find.xyz/user2")
+	//	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
 	g.ScriptFromFile("find-collection").AccountArgument("user2").Run()
+
+	fmt.Println("find.xyz/user2/artifacts")
 	g.ScriptFromFile("find-ids-profile").AccountArgument("user2").StringArgument("artifacts").Run()
+
+	fmt.Println("find.xyz/user2/artifacts/0")
 	g.ScriptFromFile("find-schemes").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(0).Run()
+
+	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(0).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork").Run()
 
 }

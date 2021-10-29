@@ -36,7 +36,7 @@ func TestAuction(t *testing.T) {
 			auctionBid("user3", "user1", "20.0").
 			expireAuction()
 
-		gt.GWTF.TransactionFromFile("fullfill_auction").
+		gt.GWTF.TransactionFromFile("fullfillAuction").
 			SignProposeAndPayAs("user3"). //the buy
 			AccountArgument("user1").
 			StringArgument("user1").

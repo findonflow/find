@@ -145,3 +145,5 @@ transaction(name: String) {
 
 	})
 }
+
+//TODO: test validate wrong names

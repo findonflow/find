@@ -31,7 +31,7 @@ func main() {
 
 		tags := cadence.NewArray([]cadence.Value{cadence.String("find")})
 
-		g.TransactionFromFile("create_profile").
+		g.TransactionFromFile("createProfile").
 			SignProposeAndPayAs("user1").
 			StringArgument("User1").
 			StringArgument("This is user1").
@@ -39,7 +39,7 @@ func main() {
 			BooleanArgument(true).
 			RunPrintEventsFull()
 
-		g.TransactionFromFile("create_profile").
+		g.TransactionFromFile("createProfile").
 			SignProposeAndPayAs("user2").
 			StringArgument("User2").
 			StringArgument("This is user2").
@@ -47,7 +47,7 @@ func main() {
 			BooleanArgument(true).
 			RunPrintEventsFull()
 
-		g.TransactionFromFile("mint_fusd").
+		g.TransactionFromFile("mintFusd").
 			SignProposeAndPayAsService().
 			AccountArgument("user1").
 			UFix64Argument("100.0").
@@ -58,7 +58,7 @@ func main() {
 			StringArgument("user1").
 			RunPrintEventsFull()
 
-		g.TransactionFromFile("mint_fusd").
+		g.TransactionFromFile("mintFusd").
 			SignProposeAndPayAsService().
 			AccountArgument("user2").
 			UFix64Argument("30.0").

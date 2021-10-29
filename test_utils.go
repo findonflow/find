@@ -61,13 +61,13 @@ func (gt *GWTFTestUtils) tickClock(time string) *GWTFTestUtils {
 
 func (gt *GWTFTestUtils) createUser(fusd string, name string) *GWTFTestUtils {
 
-	gt.GWTF.TransactionFromFile("create_profile").
+	gt.GWTF.TransactionFromFile("createProfile").
 		SignProposeAndPayAs(name).
 		StringArgument(name).
 		Test(gt.T).
 		AssertSuccess()
 
-	gt.GWTF.TransactionFromFile("mint_fusd").
+	gt.GWTF.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
 		AccountArgument(name).
 		UFix64Argument(fusd).

@@ -16,8 +16,9 @@ cd $FLOW_TRANSACTIONS_DIR
 rm -Rf setup*
 rm -Rf clock*
 rm -Rf registerAdmin*
-rm -Rf mint_fusd*
+rm -Rf mintFusd*
 rm -Rf status*
+rm -Rf mintArtifact*
 
 gsed -i 's/0xTypedMetadata/0xFIND_ADDRESS/g' *.cdc
 gsed -i 's/0xArtifact/0xFIND_ADDRESS/g' *.cdc

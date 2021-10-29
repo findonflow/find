@@ -81,7 +81,7 @@ pub contract FIND {
 	/// @param _ the name to calculate the cost for
 	pub fun calculateCost(_ name:String) : UFix64 {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
 		}
 
 
@@ -94,7 +94,7 @@ pub contract FIND {
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -106,7 +106,7 @@ pub contract FIND {
 	/// Lookup the profile registered for a name
 	pub fun lookup(_ name:String): &{Profile.Public}? {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -120,7 +120,7 @@ pub contract FIND {
 	/// @param from: The vault to send too
 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
 		pre {
-			FIND.validateFindName(to) : "A FIND name has to be a-z0-9 and not a valid flow address"
+			FIND.validateFindName(to) : "A FIND name has to be a-z0-9- and not a valid flow address"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -135,7 +135,7 @@ pub contract FIND {
 	/// @return The Name status of a name
 	pub fun status(_ name: String): NameStatus {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -1300,14 +1300,13 @@ pub contract FIND {
 	}
 
 	pub fun validateFindName(_ value: String) : Bool {
-		if !FIND.validateAlphanumericLower(value) {
+		if !FIND.validateAlphanumericLowerDash(value) {
 			return false
 		}
 
 
 		let bytes=value.utf8
-		log(bytes)
-		if bytes.length != 18 {
+		if bytes.length != 18 && bytes.length != 17 {
 			return true
 		}
 
@@ -1315,10 +1314,11 @@ pub contract FIND {
 
 	}
 
-	pub fun validateAlphanumericLower(_ value:String) : Bool {
+	pub fun validateAlphanumericLowerDash(_ value:String) : Bool {
 		let lowerA: UInt8=97
 		let lowerZ: UInt8=122
 
+		let dash:UInt8=45
 		let number0:UInt8=48
 		let number9:UInt8=57
 
@@ -1328,6 +1328,10 @@ pub contract FIND {
 				continue
 			}
 			if byte >= number0 && byte <= number9  {
+				continue
+			}
+
+			if byte == dash {
 				continue
 			}
 			return false
