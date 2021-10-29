@@ -29,12 +29,16 @@ pub contract TypedMetadata {
 		//can be percentage
 		pub let percentage: Bool
 		pub let walletType: Type
+		pub let walletName: String
+		pub let owner: Address
 
 		init(wallet:Capability<&{FungibleToken.Receiver}>, cut: UFix64, type:Type, percentage: Bool ){
 			self.wallet=wallet
 			self.cut=cut
 			self.percentage=percentage
 			self.walletType=type
+			self.walletName=type.identifier
+			self.owner=wallet.address
 		}
 	}
 
