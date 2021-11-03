@@ -42,22 +42,22 @@ pub contract TypedMetadata {
 		}
 	}
 
-	pub struct WebMedia {
-		pub let url: String
-		pub let contentType: String
+	pub struct Medias {
+		pub let media : {String:  Media}
 
-		init(url:String, contentType: String) {
-			self.url=url
-			self.contentType=contentType
+		init(_ items: {String: Media}) {
+			self.media=items
 		}
-	}
+  }
 
-	pub struct IPFSMedia {
-		pub let hash: String
+	pub struct Media {
+		pub let data: String
 		pub let contentType: String
+		pub let protocol: String
 
-		init(hash:String, contentType: String) {
-			self.hash=hash
+		init(data:String, contentType: String, protocol: String) {
+			self.data=data
+			self.protocol=protocol
 			self.contentType=contentType
 		}
 	}
@@ -85,4 +85,5 @@ pub contract TypedMetadata {
 			self.maxEdition=maxEdition
 		}
 	}
+
 }

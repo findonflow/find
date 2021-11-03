@@ -45,7 +45,8 @@
 				"mainnet" : "d796ff17107bbff6"
 			}
 		},
-		"Debug" : "./contracts/Debug.cdc"
+		"Debug" : "./contracts/Debug.cdc",
+		"Market" : "./contracts/Market.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -106,6 +107,7 @@
 				"Clock",
 				"Debug",
 				"Artifact",
+				"Market",
 				"TypedMetadata"
 			]
 		},
@@ -117,6 +119,7 @@
 				"FIND",
 				"Clock",
 				"Profile",
+				"Market",
 				"Debug",
 				"FUSD"
 			], 

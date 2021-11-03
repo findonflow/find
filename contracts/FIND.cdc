@@ -1268,13 +1268,9 @@ pub contract FIND {
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
 		}
 
-		pub fun mintArtifact(name: String, schemas: [AnyStruct]): @Artifact.NFT {
-			pre {
-				self.capability != nil: "Cannot use Minter, set capability first"
-			}
-			return <- Artifact.mintNFT(name: name, schemas: schemas)
+		pub fun createMinter(platform: Artifact.MinterPlatform) : @Artifact.ArtifactMinter {
+			return <- Artifact.createMinter(platform:platform)
 		}
-
 
 
 		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
@@ -1303,18 +1299,14 @@ pub contract FIND {
 	}
 
 	pub fun validateFindName(_ value: String) : Bool {
+		if value.length < 3 || value.length > 16 {
+			return false
+		}
 		if !FIND.validateAlphanumericLowerDash(value) {
 			return false
 		}
 
-
-		let bytes=value.utf8
-		if bytes.length != 18 && bytes.length != 17 {
-			return true
-		}
-
-		return FIND.validateHex(value)
-
+		return true
 	}
 
 	pub fun validateAlphanumericLowerDash(_ value:String) : Bool {

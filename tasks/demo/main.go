@@ -40,6 +40,11 @@ func main() {
 		StringArgument("User2").
 		RunPrintEventsFull()
 
+	g.TransactionFromFile("createProfile").
+		SignProposeAndPayAs("find").
+		StringArgument("Find").
+		RunPrintEventsFull()
+
 	g.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
 		AccountArgument("user1").
@@ -105,9 +110,15 @@ func main() {
 	g.ScriptFromFile("find-ids-profile").AccountArgument("user2").StringArgument("artifacts").Run()
 
 	fmt.Println("find.xyz/user2/artifacts/0")
-	g.ScriptFromFile("find-schemes").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(0).Run()
+	g.ScriptFromFile("find-schemes").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).Run()
 
 	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork")
-	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(0).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Royalties").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.MinterPlatform").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.Profiles").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("String").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Media").Run()
+	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Editioned").Run()
 
 }
