@@ -22,11 +22,29 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
   
  `gotestsum -f testname --watch`
 
+## v1
+ - ERROR: error handling in transaction popup
+  - ask dapper about standard error messages 
+ - regex name max 16 characters
+ - change to flowscan
+ - lookup fix
+ - gui polish
+ - copy
+ - partnership
+ - artifact
 
-### TODO
- - add flow wallet
- - use https://github.com/marketplace/actions/automated-version-bump or similar in ci
- - TODO: start auction from blind bid
- - ERROR: cancel
-Transaction Error: Declined: User rejected signature
+### Press
+ - press release
+ - mission statement
+ - dapper
+ - flowverse
+ - twitter 
+
+### Integration
+ - fcl
+ - versus
+ - flowscan
+
+## v2
+ - notifications, feeds
 

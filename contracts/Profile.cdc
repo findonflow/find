@@ -412,7 +412,7 @@ pub contract Profile {
 
    pub fun find(_ address: Address) : &{Profile.Public} {
         return getAccount(address)
-        .getCapability<&{Profile.Public}>(Profile.publicPath)!
+        .getCapability<&{Profile.Public}>(Profile.publicPath)
         .borrow()!
     }
   
