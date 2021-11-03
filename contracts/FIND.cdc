@@ -81,7 +81,7 @@ pub contract FIND {
 	/// @param _ the name to calculate the cost for
 	pub fun calculateCost(_ name:String) : UFix64 {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 		}
 
 
@@ -94,7 +94,7 @@ pub contract FIND {
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -106,7 +106,7 @@ pub contract FIND {
 	/// Lookup the profile registered for a name
 	pub fun lookup(_ name:String): &{Profile.Public}? {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -120,7 +120,7 @@ pub contract FIND {
 	/// @param from: The vault to send too
 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
 		pre {
-			FIND.validateFindName(to) : "A FIND name has to be a-z0-9- and not a valid flow address"
+			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -135,7 +135,7 @@ pub contract FIND {
 	/// @return The Name status of a name
 	pub fun status(_ name: String): NameStatus {
 		pre {
-			FIND.validateFindName(name) : "A FIND name has to be a-z0-9- and not a valid flow address"
+			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -1262,7 +1262,7 @@ pub contract FIND {
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
-			  FIND.validateFindName(name) : "A FIND name has to be a-z0-9 and not a valid flow address"
+			  FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
 
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)

@@ -45,7 +45,7 @@ func TestFIND(t *testing.T) {
 			StringArgument("ur").
 			UFix64Argument("5.0").
 			Test(t).
-			AssertFailure("A FIND name has to be minimum 3 letters long")
+			AssertFailure("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 
 	})
 
