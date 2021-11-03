@@ -79,11 +79,11 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
-			"address": "7ea21baa981f5db6",
+			"address": "6f265aa45d8b4875",
 			"key": "${TESTNET_FIND}"
 		},
 		"testnet-find-admin": {
-			"address": "8e5b4be263c593a4",
+			"address": "806bd1e080f43683",
 			"key": "${TESTNET_FIND_ADMIN}"
 		},
 		"testnet-user1": {
