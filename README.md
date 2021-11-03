@@ -31,7 +31,6 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
  - gui polish
  - copy
  - partnership
- - artifact
 
 ### Press
  - press release
