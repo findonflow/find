@@ -25,9 +25,8 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 ## v1
  - ERROR: error handling in transaction popup
   - ask dapper about standard error messages 
- - regex name max 16 characters
+ - regex name max 16 characters in frontend
  - change to flowscan
- - lookup fix
  - gui polish
  - copy
  - partnership

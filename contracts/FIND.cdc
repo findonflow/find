@@ -1268,8 +1268,8 @@ pub contract FIND {
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
 		}
 
-		pub fun createMinter(platform: Artifact.MinterPlatform) : @Artifact.ArtifactMinter {
-			return <- Artifact.createMinter(platform:platform)
+		pub fun createFroge(platform: Artifact.MinterPlatform) : @Artifact.Forge {
+			return <- Artifact.createForge(platform:platform)
 		}
 
 

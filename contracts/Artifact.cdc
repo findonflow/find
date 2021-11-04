@@ -225,11 +225,11 @@ pub contract Artifact: NonFungibleToken {
 		}
 	}
 
-	access(account)  fun createMinter(platform: MinterPlatform) : @ArtifactMinter {
-		return <- create ArtifactMinter(platform:platform)
+	access(account)  fun createForge(platform: MinterPlatform) : @Forge {
+		return <- create Forge(platform:platform)
 	}
 
-	pub resource ArtifactMinter {
+	pub resource Forge {
 		access(contract) let platform: MinterPlatform
 
 		init(platform: MinterPlatform) {
