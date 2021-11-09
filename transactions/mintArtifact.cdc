@@ -25,7 +25,7 @@ transaction(name: String) {
 		]
 
 		let sharedNFT <- finLeases.mintArtifact(name: name, nftName: "NeoBike", schemas:sharedSchemas)
-		let sharedPointer= Artifact.Pointer(collection: sharedContentCap, id: sharedNFT.id)
+		let sharedPointer= Artifact.Pointer(collection: sharedContentCap, id: sharedNFT.id, views: [Type<TypedMetadata.Media>(), Type<TypedMetadata.CreativeWork>(), Type<TypedMetadata.Royalties>()])
 		sharedContentCap.borrow()!.deposit(token: <- sharedNFT)
 	
 		let cap = account.getCapability<&{TypedMetadata.ViewResolverCollection}>(Artifact.ArtifactPublicPath)

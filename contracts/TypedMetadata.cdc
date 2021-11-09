@@ -6,9 +6,10 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 pub contract TypedMetadata {
 
 	pub resource interface TypeConverter {
-		//since we do not have generics this is really hard 
-		pub fun convert(from:AnyStruct, to: Type) : AnyStruct
+		//this is identifier for now but it should maybe be type
+		pub fun convert(_ value:AnyStruct) : AnyStruct
 		pub fun convertTo() : [Type]
+		pub fun convertFrom() : Type
 	}
 
 
