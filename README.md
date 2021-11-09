@@ -8,15 +8,19 @@ In order to use FIND you create your Flow Identity/Profile and store that in you
 
 FIND is priced with inspiration from ENS. 5 FUSD for a name a year. If you want 4 characters it is going to cost you 100 FUSD and 3 characters 500 FUSD.
 
+
+## How does it work?
+ - Clone out this repo
+ - install go
+ - `go mod tidy`
+ - `go run tasks/demo/main.go`
+
+This will start the flow emulator in memory and run a 'storyline' consiting of multiple scripts and transactions. Here a name will be registered, sold and then we will use the browse capabilities in find to inspect and view the different views that Artifacts support
+
 ## Flow Identity
 
 Right now an Identity in FIND is a single user.  It uses the Versus profile to represent a user.
 
-
-## Plans
- - github actions
-  - run test
-	- verify that doc is up to date
 
 ## Testing
   
@@ -49,8 +53,11 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 ## TODO
 
- - resolve type adapter
- - pointer should only allow certain views (makes logic so much easier)
  x lease should be a FT.Receiver and delegate to profile for that. 
  x artifacts are tied to a name, royalties go to a name
  x admin should be able to register without paying fusd
+  - github actions
+  - run test
+	- verify that doc is up to date
+
+
