@@ -8,8 +8,8 @@ import (
 
 func main() {
 
-	//g := gwtf.NewGoWithTheFlowInMemoryEmulator()
-	g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
+	g := gwtf.NewGoWithTheFlowInMemoryEmulator()
+	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
 
 	//first step create the adminClient as the fin user
 	g.TransactionFromFile("setup_fin_1_create_client").
@@ -27,7 +27,6 @@ func main() {
 		SignProposeAndPayAs("find").
 		RunPrintEventsFull()
 
-	fmt.Scanln()
 	//we advance the clock
 	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
 
@@ -118,8 +117,6 @@ func main() {
 
 	fmt.Println("find.xyz/user2/artifacts/0")
 	g.ScriptFromFile("find-schemes").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).Run()
-
-	fmt.Scanln()
 
 	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork").Run()
