@@ -27,9 +27,9 @@ func main() {
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Sold"), []string{"expireAt"}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Moved"), []string{"expireAt"}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "Freed"), []string{}).
-		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "BlindBid"), []string{}).
-		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "BlindBidRejected"), []string{}).
-		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "BlindBidCanceled"), []string{}).
+		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "DirectOffer"), []string{}).
+		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "DirectOfferRejected"), []string{}).
+		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "DirectOfferCanceled"), []string{}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "AuctionCancelled"), []string{}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "AuctionStarted"), []string{}).
 		EventIgnoringFields(fmt.Sprintf("%s.%s", eventPrefix, "AuctionBid"), []string{}).

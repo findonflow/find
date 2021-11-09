@@ -14,6 +14,7 @@ import Debug from "./Debug.cdc"
 */
 pub contract Market {
 
+	//TODO: rename DirectOffer to DirectOffer
 
 	pub let SaleItemCollectionStoragePath: StoragePath
 	pub let SaleItemCollectionPublicPath: PublicPath
@@ -29,13 +30,13 @@ pub contract Market {
 	pub event ForAuction(id: UInt64, owner: Address,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event BlindBid(id: UInt64, bidder: Address, amount: UFix64)
+	pub event DirectOffer(id: UInt64, bidder: Address, amount: UFix64)
 
 	/// Emitted if a blind bid is canceled
-	pub event BlindBidCanceled(id: UInt64, bidder: Address)
+	pub event DirectOfferCanceled(id: UInt64, bidder: Address)
 
 	/// Emitted if a blind bid is rejected
-	pub event BlindBidRejected(id: UInt64, bidder: Address, amount: UFix64)
+	pub event DirectOfferRejected(id: UInt64, bidder: Address, amount: UFix64)
 
 	pub event AuctionCancelled(id: UInt64, bidder: Address, amount: UFix64)
 
@@ -225,7 +226,7 @@ pub contract Market {
 
 			let saleItem=self.items[id]!
 			if let callback = saleItem.offerCallback {
-				emit BlindBidCanceled(id: id, bidder: callback.address)
+				emit DirectOfferCanceled(id: id, bidder: callback.address)
 			}
 
 			saleItem.setCallback(nil)
@@ -250,7 +251,7 @@ pub contract Market {
 			let balance=saleItem.offerCallback!.borrow()!.getBalance(id) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil  && saleItem.auctionStartPrice == nil{
-				emit BlindBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
+				emit DirectOffer(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
 				return
 			}
 
@@ -260,7 +261,7 @@ pub contract Market {
 			} else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit BlindBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
+				emit DirectOffer(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
 			}
 
 		}
@@ -291,7 +292,7 @@ pub contract Market {
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil && saleItem.auctionStartPrice == nil {
 				Debug.log("Sale price not set")
-				emit BlindBid(id: id, bidder: callback.address, amount: balance)
+				emit DirectOffer(id: id, bidder: callback.address, amount: balance)
 				return
 			}
 
@@ -301,7 +302,7 @@ pub contract Market {
 			}	 else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit BlindBid(id: id, bidder: callback.address, amount: balance)
+				emit DirectOffer(id: id, bidder: callback.address, amount: balance)
 			}
 
 		}
@@ -316,7 +317,7 @@ pub contract Market {
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= saleItem.offerCallback {
 				Debug.log("we have a blind bid so we cancel that")
-				emit BlindBidRejected(id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id))
+				emit DirectOfferRejected(id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id))
 				cb.borrow()!.cancel(id)
 				saleItem.setCallback(nil)
 				return 

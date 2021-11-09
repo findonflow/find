@@ -12,6 +12,9 @@ pub contract TypedMetadata {
 		pub fun convertFrom() : Type
 	}
 
+	//TODO Rarity
+	//RarityData
+   
 
 	pub resource interface ViewResolverCollection {
 		pub fun borrowViewResolver(id: UInt64): &{ViewResolver}

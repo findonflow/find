@@ -183,7 +183,7 @@ func (gt *GWTFTestUtils) blindBid(buyer, name, amount string) *GWTFTestUtils {
 		UFix64Argument(amount).
 		Test(gt.T).
 		AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBid", map[string]interface{}{
+		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%s0000000", amount),
 			"bidder": bidderAddress,
 			"name":   name,
