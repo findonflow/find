@@ -20,6 +20,8 @@ resource Lease {
     auctionExtensionOnLateBid:  UFix64
 
     offerCallback:  Capability<&BidCollection{BidCollectionPublic}>?
+
+    addons:  {String: Bool}
 }
 ```
 
@@ -32,6 +34,14 @@ func init(name String, networkCap Capability<&Network>)
 
 
 ## Functions
+
+### fun `addAddon()`
+
+```cadence
+func addAddon(_ String)
+```
+
+---
 
 ### fun `setExtentionOnLateBid()`
 
@@ -117,6 +127,14 @@ func getLeaseExpireTime(): UFix64
 
 ```cadence
 func getLeaseLocedUntil(): UFix64
+```
+
+---
+
+### fun `getProfile()`
+
+```cadence
+func getProfile(): &{Profile.Public}?
 ```
 
 ---

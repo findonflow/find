@@ -30,6 +30,8 @@ struct LeaseInformation {
     auctionReservePrice:  UFix64?
 
     extensionOnLateBid:  UFix64?
+
+    addons:  [String]
 }
 ```
 
@@ -37,7 +39,7 @@ struct LeaseInformation {
 ### Initializer
 
 ```cadence
-func init(name String, status LeaseStatus, validUntil UFix64, lockedUntil UFix64, latestBid UFix64?, auctionEnds UFix64?, salePrice UFix64?, latestBidBy Address?, auctionStartPrice UFix64?, auctionReservePrice UFix64?, extensionOnLateBid UFix64?, address Address)
+func init(name String, status LeaseStatus, validUntil UFix64, lockedUntil UFix64, latestBid UFix64?, auctionEnds UFix64?, salePrice UFix64?, latestBidBy Address?, auctionStartPrice UFix64?, auctionReservePrice UFix64?, extensionOnLateBid UFix64?, address Address, addons [String])
 ```
 
 

@@ -27,6 +27,38 @@ func init(networkCut UFix64, networkWallet Capability<&{FungibleToken.Receiver}>
 
 ## Functions
 
+### fun `createPlatform()`
+
+```cadence
+func createPlatform(_ String): Artifact.MinterPlatform
+```
+
+---
+
+### fun `mintArtifact()`
+
+```cadence
+func mintArtifact(name String, nftName String, schemas [AnyStruct]): Artifact.NFT
+```
+
+---
+
+### fun `mintNFTWithSharedData()`
+
+```cadence
+func mintNFTWithSharedData(name String, nftName String, schemas [AnyStruct], sharedPointer Artifact.Pointer): Artifact.NFT
+```
+
+---
+
+### fun `buyAddon()`
+
+```cadence
+func buyAddon(name String, addon String, vault FUSD.Vault)
+```
+
+---
+
 ### fun `getLease()`
 
 ```cadence

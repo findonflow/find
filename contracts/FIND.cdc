@@ -24,6 +24,8 @@ Taxonomy:
 */
 pub contract FIND {
 
+	//TODO: rename DirectOffer to DirectOffer
+
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
 
@@ -43,13 +45,13 @@ pub contract FIND {
 	pub event ForAuction(name: String, owner: Address, expireAt: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event BlindBid(name: String, bidder: Address, amount: UFix64)
+	pub event DirectOffer(name: String, bidder: Address, amount: UFix64)
 
 	/// Emitted if a blind bid is canceled
-	pub event BlindBidCanceled(name: String, bidder: Address)
+	pub event DirectOfferCanceled(name: String, bidder: Address)
 
 	/// Emitted if a blind bid is rejected
-	pub event BlindBidRejected(name: String, bidder: Address, amount: UFix64)
+	pub event DirectOfferRejected(name: String, bidder: Address, amount: UFix64)
 
 	//TODO: spelling error
 	/// Emitted if an auction is canceled
@@ -526,7 +528,7 @@ pub contract FIND {
 
 			let bid= self.borrow(name)
 			if let callback = bid.offerCallback {
-				emit BlindBidCanceled(name: name, bidder: callback.address)
+				emit DirectOfferCanceled(name: name, bidder: callback.address)
 			}
 
 			bid.setCallback(nil)
@@ -552,7 +554,7 @@ pub contract FIND {
 			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if lease.salePrice == nil  && lease.auctionStartPrice == nil{
-				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: balance)
+				emit DirectOffer(name: name, bidder: lease.offerCallback!.address, amount: balance)
 				return
 			}
 
@@ -562,7 +564,7 @@ pub contract FIND {
 			} else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
-				emit BlindBid(name: name, bidder: lease.offerCallback!.address, amount: balance)
+				emit DirectOffer(name: name, bidder: lease.offerCallback!.address, amount: balance)
 			}
 
 		}
@@ -601,7 +603,7 @@ pub contract FIND {
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
 			if lease.salePrice == nil && lease.auctionStartPrice == nil {
 				Debug.log("Sale price not set")
-				emit BlindBid(name: name, bidder: callback.address, amount: balance)
+				emit DirectOffer(name: name, bidder: callback.address, amount: balance)
 				return
 			}
 
@@ -611,7 +613,7 @@ pub contract FIND {
 			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
-				emit BlindBid(name: name, bidder: callback.address, amount: balance)
+				emit DirectOffer(name: name, bidder: callback.address, amount: balance)
 			}
 
 		}
@@ -626,7 +628,7 @@ pub contract FIND {
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= lease.offerCallback {
 				Debug.log("we have a blind bid so we cancel that")
-				emit BlindBidRejected(name: name, bidder: cb.address, amount: cb.borrow()!.getBalance(name))
+				emit DirectOfferRejected(name: name, bidder: cb.address, amount: cb.borrow()!.getBalance(name))
 				cb.borrow()!.cancel(name)
 				lease.setCallback(nil)
 			}

@@ -70,3 +70,11 @@ func fullfillAuction(_ String)
 ```
 
 ---
+
+### fun `buyAddon()`
+
+```cadence
+func buyAddon(name String, addon String, vault FUSD.Vault)
+```
+
+---

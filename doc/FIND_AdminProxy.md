@@ -29,6 +29,14 @@ func addCapability(_ Capability<&Network>)
 
 ---
 
+### fun `setArtifactTypeConverter()`
+
+```cadence
+func setArtifactTypeConverter(from Type, converters [Capability<&{TypedMetadata.TypeConverter}>])
+```
+
+---
+
 ### fun `setWallet()`
 
 ```cadence
@@ -48,6 +56,14 @@ Enable or disable public registration
 
 ---
 
+### fun `setAddonPrice()`
+
+```cadence
+func setAddonPrice(name String, price UFix64)
+```
+
+---
+
 ### fun `setPrice()`
 
 ```cadence
@@ -60,6 +76,14 @@ func setPrice(default UFix64, additional {Int: UFix64})
 
 ```cadence
 func register(name String, vault FUSD.Vault, profile Capability<&{Profile.Public}>, leases Capability<&LeaseCollection{LeaseCollectionPublic}>)
+```
+
+---
+
+### fun `createForge()`
+
+```cadence
+func createForge(platform Artifact.MinterPlatform): Artifact.Forge
 ```
 
 ---

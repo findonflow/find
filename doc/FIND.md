@@ -95,6 +95,8 @@ resource Lease {
     auctionExtensionOnLateBid:  UFix64
 
     offerCallback:  Capability<&BidCollection{BidCollectionPublic}>?
+
+    addons:  {String: Bool}
 }
 ```
 
@@ -155,6 +157,8 @@ struct LeaseInformation {
     auctionReservePrice:  UFix64?
 
     extensionOnLateBid:  UFix64?
+
+    addons:  [String]
 }
 ```
 
@@ -221,6 +225,8 @@ resource Network {
 
     lengthPrices:  {Int: UFix64}
 
+    addonPrices:  {String: UFix64}
+
     publicEnabled:  Bool
 
     profiles:  {String: NetworkLease}
@@ -243,6 +249,8 @@ struct BidInfo {
     amount:  UFix64
 
     timestamp:  UFix64
+
+    lease:  LeaseInformation?
 }
 ```
 
@@ -399,10 +407,10 @@ func validateFindName(_ String): Bool
 
 ---
 
-### fun `validateAlphanumericLower()`
+### fun `validateAlphanumericLowerDash()`
 
 ```cadence
-func validateAlphanumericLower(_ String): Bool
+func validateAlphanumericLowerDash(_ String): Bool
 ```
 
 ---
@@ -415,6 +423,23 @@ func validateHex(_ String): Bool
 
 ---
 ## Events
+
+### event `Name`
+
+```cadence
+event Name(name String)
+```
+An event to singla that there is a name in the network
+
+---
+
+### event `AddonActivated`
+
+```cadence
+event AddonActivated(name String, addon String)
+```
+
+---
 
 ### event `Register`
 
@@ -455,33 +480,33 @@ Emitted when a name is explicistly put up for sale
 ### event `ForAuction`
 
 ```cadence
-event ForAuction(name String, owner Address, expireAt UFix64, auctionStartPrice UFix64, active Bool)
+event ForAuction(name String, owner Address, expireAt UFix64, auctionStartPrice UFix64, auctionReservePrice UFix64, active Bool)
 ```
 
 ---
 
-### event `BlindBid`
+### event `DirectOffer`
 
 ```cadence
-event BlindBid(name String, bidder Address, amount UFix64)
+event DirectOffer(name String, bidder Address, amount UFix64)
 ```
 Emitted if a bid occurs at a name that is too low or not for sale
 
 ---
 
-### event `BlindBidCanceled`
+### event `DirectOfferCanceled`
 
 ```cadence
-event BlindBidCanceled(name String, bidder Address)
+event DirectOfferCanceled(name String, bidder Address)
 ```
 Emitted if a blind bid is canceled
 
 ---
 
-### event `BlindBidRejected`
+### event `DirectOfferRejected`
 
 ```cadence
-event BlindBidRejected(name String, bidder Address, amount UFix64)
+event DirectOfferRejected(name String, bidder Address, amount UFix64)
 ```
 Emitted if a blind bid is rejected
 

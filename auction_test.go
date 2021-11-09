@@ -247,7 +247,7 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBidCanceled", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",
 			}))
@@ -272,7 +272,7 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.BlindBidCanceled", map[string]interface{}{
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",
 			}))

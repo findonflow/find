@@ -15,6 +15,8 @@ resource Network {
 
     lengthPrices:  {Int: UFix64}
 
+    addonPrices:  {String: UFix64}
+
     publicEnabled:  Bool
 
     profiles:  {String: NetworkLease}
@@ -30,6 +32,14 @@ func init(leasePeriod UFix64, lockPeriod UFix64, secondaryCut UFix64, defaultPri
 
 
 ## Functions
+
+### fun `setAddonPrice()`
+
+```cadence
+func setAddonPrice(name String, price UFix64)
+```
+
+---
 
 ### fun `setPrice()`
 
@@ -83,6 +93,14 @@ func register(name String, vault FUSD.Vault, profile Capability<&{Profile.Public
 
 ```cadence
 func readStatus(_ String): NameStatus
+```
+
+---
+
+### fun `profile()`
+
+```cadence
+func profile(_ String): &{Profile.Public}?
 ```
 
 ---

@@ -141,6 +141,6 @@ func main() {
 
 	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.Artifact.Minter")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.Minter").Run()
-	//	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
+	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
 
 }
