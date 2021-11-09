@@ -35,6 +35,8 @@
 			}
 		},
 		"FIND": "./contracts/FIND.cdc",
+		"Art": "./contracts/Art.cdc",
+		"Content": "./contracts/Content.cdc",
 		"Artifact": "./contracts/Artifact.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"Clock": "./contracts/Clock.cdc", 
@@ -120,6 +122,8 @@
 				"Profile",
 				"Market",
 				"Debug",
+				"Content",
+				"Art",
 				"FUSD"
 			], 
 			"emulator-find" : [],

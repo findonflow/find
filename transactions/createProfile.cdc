@@ -94,7 +94,5 @@ transaction(name: String) {
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 
-		let p =acct.borrow<&Profile.User>(from:Profile.storagePath)!
-		p.verify("test")
 	}
 }

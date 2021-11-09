@@ -1,6 +1,9 @@
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import Content from "./Content.cdc"
+import TypedMetadata from "./TypedMetadata.cdc"
+import Artifact from "./Artifact.cdc"
+import FlowToken from "./standard/FlowToken.cdc"
 
 /// A NFT contract to store art
 pub contract Art: NonFungibleToken {
@@ -72,7 +75,7 @@ pub contract Art: NonFungibleToken {
 		}
 	}
 
-	pub resource NFT: NonFungibleToken.INFT, Public {
+	pub resource NFT: NonFungibleToken.INFT, Public, TypedMetadata.ViewResolver {
 		//TODO: tighten up the permission here.
 		pub let id: UInt64
 		pub let name: String
@@ -105,6 +108,53 @@ pub contract Art: NonFungibleToken {
 			self.description=metadata.description
 		}
 
+
+		pub fun getViews() : [Type] {
+			return [
+			Type<String>(), 
+			Type<Artifact.Minter>(), 
+			Type<TypedMetadata.Editioned>(), 
+			Type<TypedMetadata.CreativeWork>(),
+			Type<TypedMetadata.Royalties>(), 
+			Type<TypedMetadata.Media>()
+			]
+		}
+
+		pub fun resolveView(_ type: Type): AnyStruct {
+
+			if type== Type<String>() {
+				return self.name.concat(" ").concat(self.metadata.edition.toString()).concat(" of ").concat(self.metadata.maxEdition.toString())
+			}
+
+			if type == Type<Artifact.Minter>() {
+				return Artifact.Minter("versus")
+			}
+			if type == Type<TypedMetadata.Editioned>() {
+				return TypedMetadata.Editioned(edition: self.metadata.edition, maxEdition:self.metadata.maxEdition)
+			}
+			if type == Type<TypedMetadata.CreativeWork>() {
+					return TypedMetadata.CreativeWork(artist:self.metadata.artist, name: self.metadata.name, description: self.metadata.description, type:self.metadata.type)
+			}
+			//we rewrite from the versus standard to the new proposed standard
+			if type == Type<TypedMetadata.Royalties>() {
+				let standardRoyalty : {String: TypedMetadata.Royalty} = {}
+				for royaltyKey in self.royalty.keys {
+					let royalty = self.royalty[royaltyKey]!
+					standardRoyalty[royaltyKey]= TypedMetadata.Royalty(wallets: {Type<FlowToken>().identifier : royalty.wallet}, cut: royalty.cut, percentage:true, owner: royalty.wallet.address)
+				}
+				return TypedMetadata.Royalties(royalty: standardRoyalty)
+			}
+
+			if type == Type<TypedMetadata.Media>() {
+				if self.url != nil {
+					return TypedMetadata.Media(data: self.url!, contentType: self.metadata.type, protocol: "http")
+				}
+				//return the content blob
+			}
+
+			return nil
+		}
+
 		pub fun cacheKey() : String {
 			if self.url != nil {
 				return self.url!
@@ -134,7 +184,7 @@ pub contract Art: NonFungibleToken {
 	}
 
 
-	pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+	pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, TypedMetadata.ViewResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -142,6 +192,15 @@ pub contract Art: NonFungibleToken {
 		init () {
 			self.ownedNFTs <- {}
 		}
+
+		pub fun borrowViewResolver(id: UInt64): &{TypedMetadata.ViewResolver} {
+			if self.ownedNFTs[id] != nil {
+				let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+				return ref as! &NFT
+			} 
+			panic("could not find NFT")
+		}
+
 
 		// withdraw removes an NFT from the collection and moves it to the caller
 		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
@@ -293,9 +352,6 @@ pub contract Art: NonFungibleToken {
 		self.totalSupply = 0
 		self.CollectionPublicPath=/public/versusArtCollection
 		self.CollectionStoragePath=/storage/versusArtCollection
-
-		self.account.save<@NonFungibleToken.Collection>(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
-		self.account.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
 		emit ContractInitialized()
 	}
 }
