@@ -5,6 +5,7 @@ import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import Artifact from "./Artifact.cdc"
+import TypedMetadata from "./TypedMetadata.cdc"
 /*
 
 ///FIND
@@ -25,6 +26,8 @@ pub contract FIND {
 
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
+
+	pub event AddonActivated(name: String, addon:String)
 
 	///  Emitted when a name is registred in FIND
 	pub event Register(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64)
@@ -178,6 +181,7 @@ pub contract FIND {
 		access(contract) var auctionMinBidIncrement: UFix64
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
+		access(contract) var addons: {String: Bool}
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
@@ -189,6 +193,11 @@ pub contract FIND {
 			self.auctionExtensionOnLateBid=300.0
 			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
+			self.addons={}
+		}
+
+		pub fun addAddon(_ addon:String) {
+			self.addons[addon]=true
 		}
 
 		pub fun setExtentionOnLateBid(_ time: UFix64) {
@@ -306,8 +315,9 @@ pub contract FIND {
 		pub let auctionStartPrice: UFix64?
 		pub let auctionReservePrice: UFix64?
 		pub let extensionOnLateBid: UFix64?
+		pub let addons: [String]
 
-		init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?, address:Address){
+		init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?, address:Address, addons: [String]){
 
 			self.name=name
 			var s="TAKEN"	
@@ -329,6 +339,8 @@ pub contract FIND {
 			self.extensionOnLateBid=extensionOnLateBid
 			self.address=address
 			self.cost=FIND.calculateCost(name)
+			self.addons=addons
+
 		}
 
 	}
@@ -354,6 +366,8 @@ pub contract FIND {
 
 		//anybody should be able to fullfill an auction as long as it is done
 		pub fun fullfillAuction(_ name: String) 
+		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
+
 	}
 
 
@@ -375,6 +389,62 @@ pub contract FIND {
 			self.auctions <- {}
 			self.networkCut=networkCut
 			self.networkWallet=networkWallet
+		}
+
+		access(contract) fun createPlatform(_ name: String) : Artifact.MinterPlatform{
+			//TODO: make it possible to set profile
+
+			let minterCap =self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
+			let platformCap=FIND.account.getCapability<&{Profile.Public}>(Profile.publicPath)
+			//todo check and panic here
+
+			if !minterCap.check() {
+				panic("minter profile is not present")
+
+			}
+
+			if !platformCap.check() {
+				panic("platform cap is not present")
+			}
+
+			return Artifact.MinterPlatform(name:name,  owner: platformCap, minter: minterCap, ownerPercentCut: 0.025)
+		}
+
+		pub fun mintArtifact(name: String, nftName: String, schemas: [AnyStruct]) : @Artifact.NFT {
+
+			let lease = self.borrow(name)
+			if !lease.addons.containsKey("artifact") {
+				panic("You do not have the artifact addon, buy it first")
+			}
+
+			return <- Artifact.mintNFT(platform: self.createPlatform(name), name: nftName, schemas: schemas)
+		}
+
+		//have method to mint without shared
+		pub fun mintNFTWithSharedData(name: String, nftName: String, schemas: [AnyStruct], sharedPointer: Artifact.Pointer) : @Artifact.NFT {
+			let lease = self.borrow(name)
+			if !lease.addons.containsKey("artifact") {
+				panic("You do not have the artifact addon, buy it first")
+			}
+			return <- Artifact.mintNFTWithSharedData(platform: self.createPlatform(name), name: nftName, schemas: schemas, sharedPointer: sharedPointer)
+		}
+
+
+		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
+			pre {
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
+			}
+
+			let lease = self.borrow(name)
+
+			if lease.addons.containsKey(addon) {
+				panic("You already have this addon")
+			}
+
+			lease.addAddon(addon)
+
+			emit AddonActivated(name: name, addon: addon)
+			self.networkWallet.borrow()!.deposit(from: <- vault)
 		}
 
 		pub fun getLease(_ name: String) : LeaseInformation? {
@@ -399,7 +469,7 @@ pub contract FIND {
 				}
 			}
 
-			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address)
+			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.addons.keys)
 		}
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -849,6 +919,8 @@ pub contract FIND {
 		access(contract) let secondaryCut: UFix64
 		//		access(contract) var pricesChangedAt: UFix64 //TODO add before mainnet
 		access(contract) var lengthPrices: {Int: UFix64}
+		access(contract) var addonPrices: {String: UFix64}
+
 		access(contract) var publicEnabled: Bool
 
 		//map from name to lease for that name
@@ -856,6 +928,7 @@ pub contract FIND {
 
 		init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>, publicEnabled:Bool) {
 			self.leasePeriod=leasePeriod
+			self.addonPrices = { "artifact" : 50.0 }
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut
 			self.defaultPrice=defaultPrice
@@ -866,6 +939,10 @@ pub contract FIND {
 			self.publicEnabled=publicEnabled
 		}
 
+
+		pub fun setAddonPrice(name:String, price:UFix64) {
+			self.addonPrices[name]=price
+		}
 
 		pub fun setPrice(default: UFix64, additionalPrices: {Int: UFix64}) {
 			//TODO: pre this that the pricesChangedAt cannot be 
@@ -1231,6 +1308,14 @@ pub contract FIND {
 		}
 
 
+		pub fun setArtifactTypeConverter(from: Type, converters: [Capability<&{TypedMetadata.TypeConverter}>]) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			Artifact.setTypeConverter(from: from, converters: converters)
+		}
+
 		/// Set the wallet used for the network
 		/// @param _ The FT receiver to send the money to
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
@@ -1251,6 +1336,15 @@ pub contract FIND {
 			self.capability!.borrow()!.setPublicEnabled(enabled)
 		}
 
+
+		pub fun setAddonPrice(name: String, price: UFix64) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.setAddonPrice(name: name, price: price)
+		}
+
 		pub fun setPrice(default: UFix64, additional : {Int: UFix64}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -1262,13 +1356,16 @@ pub contract FIND {
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
-			  FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
 
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
 		}
 
-		pub fun createFroge(platform: Artifact.MinterPlatform) : @Artifact.Forge {
+		pub fun createForge(platform: Artifact.MinterPlatform) : @Artifact.Forge {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			return <- Artifact.createForge(platform:platform)
 		}
 

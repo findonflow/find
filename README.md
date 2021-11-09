@@ -49,14 +49,8 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 
 ## TODO
 
- - a royalty should have a collection of wallets -> capability it supports
- - TypeAdapter, convert one type to another. Set in artifact contract. 
- - a lease should be a FT.Receiver and delegate to profile for that. 
- - a Forge can be bought from a lease
- - FIND needs a collection of addons -> price
- - a lease can buy addons
- - mark in lease if they have addons or not
- - artifacts are tied to a name, royalties go to a name
- - make forge usable from lease collection
- - unlock forge 50 usd
- - admin should be able to register without paying fusd
+ - resolve type adapter
+ - pointer should only allow certain views (makes logic so much easier)
+ x lease should be a FT.Receiver and delegate to profile for that. 
+ x artifacts are tied to a name, royalties go to a name
+ x admin should be able to register without paying fusd

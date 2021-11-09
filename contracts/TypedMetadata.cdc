@@ -1,7 +1,16 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
 
 pub contract TypedMetadata {
+
+	pub resource interface TypeConverter {
+		//since we do not have generics this is really hard 
+		pub fun convert(from:AnyStruct, to: Type) : AnyStruct
+		pub fun convertTo() : [Type]
+	}
+
 
 	pub resource interface ViewResolverCollection {
 		pub fun borrowViewResolver(id: UInt64): &{ViewResolver}
@@ -22,23 +31,23 @@ pub contract TypedMetadata {
 		}
 	}
 
+	/*
+	 The idea here is that a platform can register all the types it supporst using the identifier of the type, it would be better if we could use Type as the key here
+	*/
 	pub struct Royalty{
-		pub let wallet:Capability<&{FungibleToken.Receiver}> 
+		pub let wallets: { String : Capability<&{FungibleToken.Receiver}>  }
 		pub let cut: UFix64
 
 		//can be percentage
 		pub let percentage: Bool
-		pub let walletType: Type
-		pub let walletName: String
 		pub let owner: Address
 
-		init(wallet:Capability<&{FungibleToken.Receiver}>, cut: UFix64, type:Type, percentage: Bool ){
-			self.wallet=wallet
+		//Not ideal that type cannot be dictionary key here so we use a identifier
+		init(wallets:{ String: Capability<&{FungibleToken.Receiver}>}, cut: UFix64, percentage: Bool, owner: Address ){
+			self.wallets=wallets
 			self.cut=cut
 			self.percentage=percentage
-			self.walletType=type
-			self.walletName=type.identifier
-			self.owner=wallet.address
+			self.owner=owner
 		}
 	}
 
@@ -85,5 +94,19 @@ pub contract TypedMetadata {
 			self.maxEdition=maxEdition
 		}
 	}
+
+
+	pub fun createPercentageRoyalty(user:Address, cut: UFix64) : Royalty {
+		let userAccount=getAccount(user)
+		let fusdReceiver = userAccount.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+		let flowReceiver = userAccount.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+		let walletDicts :{ String : Capability<&{FungibleToken.Receiver}> }= {}
+		walletDicts[Type<@FUSD.Vault>().identifier]=fusdReceiver
+		walletDicts[Type<@FlowToken.Vault>().identifier]=flowReceiver
+		let userRoyalty = TypedMetadata.Royalty(wallets: walletDicts, cut: cut, percentage:true, owner:user)
+
+		return userRoyalty
+	}
+
 
 }

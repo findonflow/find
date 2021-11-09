@@ -1,6 +1,8 @@
 
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FIND from "../contracts/FIND.cdc"
+import Artifact from "../contracts/Artifact.cdc"
+import TypedMetadata from "../contracts/TypedMetadata.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction() {
@@ -17,6 +19,13 @@ transaction() {
 		let adminClient=account.borrow<&FIND.AdminProxy>(from: FIND.AdminProxyStoragePath)!
 		adminClient.setWallet(wallet)
 		adminClient.setPublicEnabled(true)
+
+		//this is just an example
+		account.save(<- Artifact.createNewMinterTypeConverter(), to: /storage/artifactExampleTypeConverter)
+		account.link<&{TypedMetadata.TypeConverter}>(/public/artifactExampleTypeConverter, target: /storage/artifactExampleTypeConverter)
+		let cap=account.getCapability<&{TypedMetadata.TypeConverter}>(/public/artifactExampleTypeConverter)
+		let typ=Type<Artifact.MinterPlatform>()
+		adminClient.setArtifactTypeConverter(from:typ, converters: [cap])
 	}
 }
 

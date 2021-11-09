@@ -9,6 +9,15 @@ pub contract Artifact: NonFungibleToken {
 	pub let ArtifactPublicPath: PublicPath
 	pub var totalSupply: UInt64
 
+
+	/*store all valid type converters for Artifacts
+	This is to be able to make the contract compatible with the forthcomming NFT standard. 
+
+	If a Artifact supports a type with the same Identifier as a key here all the TypeConverters convertTo types are added to the list of available types
+	When resolving a type if the Artifact does not itself support this type check if any typeConverters do
+	*/
+	access(account) var typeConverters: {String: [Capability<&{TypedMetadata.TypeConverter}>]}
+
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
@@ -22,7 +31,7 @@ pub contract Artifact: NonFungibleToken {
 			self.result=result
 		}
 	}
-
+	
 	pub resource NFT: NonFungibleToken.INFT, TypedMetadata.ViewResolver {
 		pub let id: UInt64
 		access(contract) let schemas: {String : ViewInfo}
@@ -63,6 +72,18 @@ pub contract Artifact: NonFungibleToken {
 				}
 			}
 
+			log(Artifact.typeConverters)
+			for v in views {
+				log(v.identifier)
+				if Artifact.typeConverters.containsKey(v.identifier) {
+					log("has converter")
+					for converter in Artifact.typeConverters[v.identifier]! {
+						//this might lead to conflict if not handlded properly
+						views.appendAll(converter.borrow()!.convertTo())
+					}
+				}
+			}
+
 			//these are locked so cannot override them
 			return views
 		}
@@ -78,6 +99,7 @@ pub contract Artifact: NonFungibleToken {
 
 			if type == Type<TypedMetadata.Royalties>() {
 				let royalties : {String : TypedMetadata.Royalty } = { }
+				let owner=self.minterPlatform.platform.address
 				let minterProfile=self.minterPlatform.platform.borrow()!
 				let wallets=minterProfile.getWallets()
 
@@ -95,8 +117,6 @@ pub contract Artifact: NonFungibleToken {
 
 				let sharedView= self.sharedPointer?.getViews() ?? []
 
-
-
 				if sharedView.contains(Type<TypedMetadata.Royalty>()) {
 					royalties["sharedRoyalty"] = self.sharedPointer!.resolveView(Type<TypedMetadata.Royalty>()) as! TypedMetadata.Royalty
 				}
@@ -104,18 +124,19 @@ pub contract Artifact: NonFungibleToken {
 				if sharedView.contains(Type<TypedMetadata.Royalties>()) {
 					let multipleRoylaties=self.sharedPointer!.resolveView(Type<TypedMetadata.Royalties>()) as! TypedMetadata.Royalties
 					for royalty in multipleRoylaties.royalty.keys {
-						if royalty.length < 9 || royalty.slice(from:0, upTo: "platform-".length) != "platform-" {
+						if royalty != "platform"  {
 							royalties["shared-".concat(royalty)] =  multipleRoylaties.royalty[royalty]
 						}
 					}
 				}
 
-				//we set this late so that if somebody tries to override minter royalties it will fail
+				let walletDicts:{ String: Capability<&{FungibleToken.Receiver}>} = {}
 				for wallet in wallets {
-					let royalty=TypedMetadata.Royalty(wallet: wallet.receiver, cut: self.minterPlatform.platformPercentCut, type: wallet.accept, percentage:true)
-					royalties["platform-".concat(wallet.name)]=royalty
+					walletDicts[wallet.accept.identifier] = wallet.receiver
 				}
 
+				let royalty=TypedMetadata.Royalty(wallets: walletDicts, cut: self.minterPlatform.platformPercentCut,  percentage:true, owner:owner)
+				royalties["platform"]= royalty
 				return TypedMetadata.Royalties(royalties)
 			}
 
@@ -229,6 +250,37 @@ pub contract Artifact: NonFungibleToken {
 		return <- create Forge(platform:platform)
 	}
 
+
+	access(account) fun mintNFT(platform:MinterPlatform, name: String, schemas: [AnyStruct]) : @NFT {
+		let views : {String: ViewInfo} = {}
+		for s in schemas {
+			views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
+		}
+
+		let nft <-  create NFT(initID: Artifact.totalSupply, name: name, schemas:views, sharedPointer:nil, minterPlatform: platform)
+		Artifact.totalSupply = Artifact.totalSupply + 1
+		return <-  nft
+	}
+
+	//have method to mint without shared
+	access(account) fun mintNFTWithSharedData(platform:MinterPlatform, name: String, schemas: [AnyStruct], sharedPointer: Pointer) : @NFT {
+		let views : {String: ViewInfo} = {}
+		for s in schemas {
+			views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
+		}
+
+		let nft <-  create NFT(initID: Artifact.totalSupply, name: name, schemas:views, sharedPointer:sharedPointer, minterPlatform: platform)
+		Artifact.totalSupply = Artifact.totalSupply + 1
+		return <-  nft
+	}
+
+
+
+	access(account) fun setTypeConverter(from: Type, converters: [Capability<&{TypedMetadata.TypeConverter}>]) {
+		Artifact.typeConverters[from.identifier] = converters
+	}
+
+	//THis is not used right now but might be here for white label things
 	pub resource Forge {
 		access(contract) let platform: MinterPlatform
 
@@ -237,28 +289,13 @@ pub contract Artifact: NonFungibleToken {
 		}
 
 		pub fun mintNFT(name: String, schemas: [AnyStruct]) : @NFT {
-			let views : {String: ViewInfo} = {}
-			for s in schemas {
-				views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
-			}
-
-			let nft <-  create NFT(initID: Artifact.totalSupply, name: name, schemas:views, sharedPointer:nil, minterPlatform: self.platform)
-			Artifact.totalSupply = Artifact.totalSupply + 1
-			return <-  nft
+			return <- Artifact.mintNFT(platform: self.platform, name: name, schemas: schemas)
 		}
 
 		//have method to mint without shared
 		pub fun mintNFTWithSharedData(name: String, schemas: [AnyStruct], sharedPointer: Pointer) : @NFT {
-			let views : {String: ViewInfo} = {}
-			for s in schemas {
-				views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
-			}
-
-			let nft <-  create NFT(initID: Artifact.totalSupply, name: name, schemas:views, sharedPointer:sharedPointer, minterPlatform: self.platform)
-			Artifact.totalSupply = Artifact.totalSupply + 1
-			return <-  nft
+			return <- Artifact.mintNFTWithSharedData(platform: self.platform, name: name, schemas: schemas, sharedPointer: sharedPointer)
 		}
-
 	}
 
 	// public function that anyone can call to create a new empty collection
@@ -298,6 +335,34 @@ pub contract Artifact: NonFungibleToken {
 		}
 	}
 
+	/* --- an example typeConverter --*/
+	pub struct Minter {
+		pub let name: String
+		init(name:String) {
+			self.name=name
+		}
+	}
+
+	pub fun createNewMinterTypeConverter() : @MinterTypeConveter {
+		return <-  create MinterTypeConveter()
+	}
+
+	pub resource MinterTypeConveter : TypedMetadata.TypeConverter {
+		pub fun convert(from:AnyStruct, to: Type) : AnyStruct {
+
+			if to.identifier== MinterPlatform.getType().identifier {
+				let converter=from as! MinterPlatform
+				return Minter(name: converter.name)
+			}
+
+			panic("could not convert unknown type")
+		}
+
+		pub fun convertTo() : [Type] {
+			return [Type<Minter>()]
+		}
+
+	}
 
 
 	init() {
@@ -305,6 +370,7 @@ pub contract Artifact: NonFungibleToken {
 		self.totalSupply = 0
 		self.ArtifactPublicPath = /public/artifacts
 		self.ArtifactStoragePath = /storage/artifacts
+		self.typeConverters={}
 
 		emit ContractInitialized()
 	}
