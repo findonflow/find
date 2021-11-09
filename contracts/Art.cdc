@@ -140,7 +140,7 @@ pub contract Art: NonFungibleToken {
 				let standardRoyalty : {String: TypedMetadata.Royalty} = {}
 				for royaltyKey in self.royalty.keys {
 					let royalty = self.royalty[royaltyKey]!
-					standardRoyalty[royaltyKey]= TypedMetadata.Royalty(wallets: {Type<FlowToken>().identifier : royalty.wallet}, cut: royalty.cut, percentage:true, owner: royalty.wallet.address)
+					standardRoyalty[royaltyKey]= TypedMetadata.Royalty(wallets: {Type<@FlowToken.Vault>().identifier : royalty.wallet}, cut: royalty.cut, percentage:true, owner: royalty.wallet.address)
 				}
 				return TypedMetadata.Royalties(royalty: standardRoyalty)
 			}
