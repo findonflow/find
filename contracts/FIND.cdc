@@ -5,6 +5,7 @@ import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import Artifact from "./Artifact.cdc"
+import Art from "./Art.cdc"
 import TypedMetadata from "./TypedMetadata.cdc"
 /*
 
@@ -1391,9 +1392,14 @@ pub contract FIND {
 			Debug.enable(value)
 		}
 
+
+		pub fun createVersusArtWithContent(name: String, artist:String, artistAddress:Address, description: String, url: String, type: String, royalty: {String: Art.Royalty}, edition: UInt64, maxEdition: UInt64) : @Art.NFT {
+			return <- 	Art.createArtWithContent(name: name, artist: artist, artistAddress: artistAddress, description: description, url: url, type: type, royalty: royalty, edition: edition, maxEdition: maxEdition)
+		}
 		init() {
 			self.capability = nil
 		}
+
 
 	}
 

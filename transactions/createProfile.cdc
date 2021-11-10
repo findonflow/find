@@ -4,6 +4,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 import Artifact from "../contracts/Artifact.cdc"
+import Art from "../contracts/Art.cdc"
 import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
 
@@ -80,10 +81,18 @@ transaction(name: String) {
 		}
 		profile.addCollection(Profile.ResourceCollection(name: "artifacts", collection: artifactCollection, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["artifact", "nft"]))
 
+    //Create versus art collection if it does not exist and add it
+    let artCollectionCap=acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(/public/versusArtViewResolver)
+    if !artCollectionCap.check() {
+      acct.save(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
+			//NB! this is not how versus current links this, it is just for convenience for this demo
+			acct.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
+      acct.link<&{TypedMetadata.ViewResolverCollection}>(/public/versusArtViewResolver, target: Art.CollectionStoragePath)
+    }
+    profile.addCollection(Profile.ResourceCollection( name: "versus", collection:artCollectionCap, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["versus", "nft"]))
+
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 
-		let p =acct.borrow<&Profile.User>(from:Profile.storagePath)!
-		p.verify("test")
 	}
 }

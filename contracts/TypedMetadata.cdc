@@ -14,16 +14,16 @@ pub contract TypedMetadata {
 
 	//TODO Rarity
 	//RarityData
-   
+
 
 	pub resource interface ViewResolverCollection {
 		pub fun borrowViewResolver(id: UInt64): &{ViewResolver}
-    pub fun deposit(token: @NonFungibleToken.NFT)
-    pub fun getIDs(): [UInt64]
-    pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+		pub fun deposit(token: @NonFungibleToken.NFT)
+		pub fun getIDs(): [UInt64]
+		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
 	}
 
- 	pub resource interface ViewResolver {
+	pub resource interface ViewResolver {
 		pub fun getViews() : [Type] 
 		pub fun resolveView(_ view:Type): AnyStruct? 
 	}
@@ -36,7 +36,7 @@ pub contract TypedMetadata {
 	}
 
 	/*
-	 The idea here is that a platform can register all the types it supporst using the identifier of the type, it would be better if we could use Type as the key here
+	The idea here is that a platform can register all the types it supporst using the identifier of the type, it would be better if we could use Type as the key here
 	*/
 	pub struct Royalty{
 		pub let wallets: { String : Capability<&{FungibleToken.Receiver}>  }
@@ -61,7 +61,7 @@ pub contract TypedMetadata {
 		init(_ items: {String: Media}) {
 			self.media=items
 		}
-  }
+	}
 
 	pub struct Media {
 		pub let data: String

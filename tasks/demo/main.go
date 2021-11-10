@@ -8,8 +8,8 @@ import (
 
 func main() {
 
-	g := gwtf.NewGoWithTheFlowInMemoryEmulator()
-	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
+	//g := gwtf.NewGoWithTheFlowInMemoryEmulator()
+	g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
 
 	//first step create the adminClient as the fin user
 	g.TransactionFromFile("setup_fin_1_create_client").
@@ -68,6 +68,12 @@ func main() {
 		UFix64Argument("100.0").
 		RunPrintEventsFull()
 
+	g.TransactionFromFile("mintFlow").
+		SignProposeAndPayAsService().
+		AccountArgument("user2").
+		UFix64Argument("100.0").
+		RunPrintEventsFull()
+
 	g.TransactionFromFile("send").
 		SignProposeAndPayAs("user2").
 		StringArgument("user1").
@@ -88,59 +94,58 @@ func main() {
 		UFix64Argument("10.0").
 		RunPrintEventsFull()
 
-	/*
-		g.ScriptFromFile("lease_status").AccountArgument("user1").Run()
-		g.ScriptFromFile("lease_status").AccountArgument("user2").Run()
-		g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("86500.0").RunPrintEventsFull()
-
-		g.TransactionFromFile("fullfill").
-		SignProposeAndPayAs("user1").
-		StringArgument("user1").
-		RunPrintEventsFull()
-
-		g.ScriptFromFile("lease_status").AccountArgument("user1").Run()
-		g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
-	*/
-
 	g.ScriptFromFile("address_status").AccountArgument("user2").Run()
+
 	g.TransactionFromFile("buyAddon").SignProposeAndPayAs("user2").StringArgument("user1").StringArgument("artifact").UFix64Argument("50.0").RunPrintEventsFull()
+
 	g.TransactionFromFile("mintArtifact").SignProposeAndPayAs("user2").StringArgument("user1").RunPrintEventsFull()
 
+	g.TransactionFromFile("mintArt").
+		SignProposeAndPayAs("find").
+		AccountArgument("user1").
+		StringArgument("Kinger9999").
+		StringArgument("Bull").
+		StringArgument("Teh crypto bull").
+		AccountArgument("user2").
+		StringArgument("image/jpeg").
+		UFix64Argument("0.05").
+		UFix64Argument("0.025").
+		StringArgument("http://bull-address-here").
+		RunPrintEventsFull()
+
 	fmt.Println("find.xyz/user2")
-	//	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
 	g.ScriptFromFile("find-collection").AccountArgument("user2").Run()
 
 	fmt.Println("find.xyz/user2/artifacts")
 	g.ScriptFromFile("find-ids-profile").AccountArgument("user2").StringArgument("artifacts").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0")
+	fmt.Println("find.xyz/user2/artifacts/1")
 	g.ScriptFromFile("find-schemes").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.Royalties")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.TypedMetadata.Royalties")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Royalties").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.MinterPlatform")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.TypedMetadata.MinterPlatform")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.MinterPlatform").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.Profiles")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.TypedMetadata.Profiles")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.Profiles").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/String")
+	fmt.Println("find.xyz/user2/artifacts/1/String")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("String").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.Media")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.TypedMetadata.Media")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Media").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.TypedMetadata.Editioned")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.TypedMetadata.Editioned")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Editioned").Run()
 
-	fmt.Println("find.xyz/user2/artifacts/0/A.f8d6e0586b0a20c7.Artifact.Minter")
+	fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.Artifact.Minter")
 	g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.Minter").Run()
+
 	g.ScriptFromFile("find-full").AccountArgument("user2").Run()
 
 }

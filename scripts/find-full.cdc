@@ -15,6 +15,7 @@ pub fun main(address: Address) : {String : { UInt64 : { String : AnyStruct }}} {
 			let name=col.name
 			let collection : { UInt64 : { String : AnyStruct }}={}
 			let vrc= col.collection.borrow<&{TypedMetadata.ViewResolverCollection}>()!
+			log(vrc.getType())
 			for id in vrc.getIDs() {
 				let views : { String : AnyStruct }={}
 				let nft=vrc.borrowViewResolver(id: id)
