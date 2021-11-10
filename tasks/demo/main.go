@@ -8,8 +8,8 @@ import (
 
 func main() {
 
-	g := gwtf.NewGoWithTheFlowInMemoryEmulator()
-	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
+	//g := gwtf.NewGoWithTheFlowInMemoryEmulator()
+	g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
 
 	//first step create the adminClient as the fin user
 	g.TransactionFromFile("setup_fin_1_create_client").

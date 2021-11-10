@@ -65,3 +65,13 @@ Right now an Identity in FIND is a single user.  It uses the Versus profile to r
 //lookup.find.xzy <- lookup an address
 
 //browse.find.xyz/bjartek/artifacts/1/String -> Content/Type  text/plain    Neo Bike 1 of 3, application/json { "name" : "Neo Bike 1 of 3" } application/html
+
+
+## Script to get views
+
+- collection
+ - type
+ - dictionary id ->
+  - name
+  - imageurl
+  - hash
