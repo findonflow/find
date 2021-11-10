@@ -34,10 +34,10 @@
 				"mainnet" : "0x1654653399040a61"
 			}
 		},
+		"Artifact": "./contracts/Artifact.cdc",
 		"FIND": "./contracts/FIND.cdc",
 		"Art": "./contracts/Art.cdc",
 		"Content": "./contracts/Content.cdc",
-		"Artifact": "./contracts/Artifact.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": {
