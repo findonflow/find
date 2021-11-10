@@ -160,7 +160,8 @@ pub contract Artifact: NonFungibleToken {
 
 			if let ptr =self.sharedPointer {
 				if ptr.getViews().contains(type) {
-					return ptr.resolveView(type)
+					let value =ptr.resolveView(type)
+					return value
 				}
 			}
 
@@ -351,7 +352,7 @@ pub contract Artifact: NonFungibleToken {
 
 
 		pub fun resolveView(_ type: Type) : AnyStruct {
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
+			return self.collection.borrow()!.borrowViewResolver(id: self.id).resolveView(type)!
 		}
 
 		pub fun getViews() : [Type]{

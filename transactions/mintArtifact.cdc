@@ -18,6 +18,9 @@ transaction(name: String) {
 			account.link<&{TypedMetadata.ViewResolverCollection}>(/private/sharedContent, target: /storage/sharedContent)
 		}
 
+		//this will panic if you cannot borrow it
+		finLeases.borrow(name) 
+
 		let sharedSchemas : [AnyStruct] = [
 			TypedMetadata.Media(data:"https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp" , contentType: "image/webp", protocol: "http"),
 			TypedMetadata.CreativeWork(artist:"Neo Motorcycles", name:"Neo Bike ", description: "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK", type:"image"),

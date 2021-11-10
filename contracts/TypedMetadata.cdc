@@ -12,9 +12,6 @@ pub contract TypedMetadata {
 		pub fun convertFrom() : Type
 	}
 
-	//TODO Rarity
-	//RarityData
-
 
 	pub resource interface ViewResolverCollection {
 		pub fun borrowViewResolver(id: UInt64): &{ViewResolver}
@@ -25,7 +22,7 @@ pub contract TypedMetadata {
 
 	pub resource interface ViewResolver {
 		pub fun getViews() : [Type] 
-		pub fun resolveView(_ view:Type): AnyStruct? 
+		pub fun resolveView(_ view:Type): AnyStruct
 	}
 
 	pub struct Royalties{
@@ -34,6 +31,10 @@ pub contract TypedMetadata {
 			self.royalty=royalty
 		}
 	}
+
+	// A struct for Rarity
+	// A struct for Rarity Data parts like on flovatar
+	// A Display struct for showing the name/thumbnail of something
 
 	/*
 	The idea here is that a platform can register all the types it supporst using the identifier of the type, it would be better if we could use Type as the key here

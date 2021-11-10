@@ -25,6 +25,16 @@ func main() {
 		SignProposeAndPayAs("find-admin").
 		RunPrintEventsFull()
 
+	g.TransactionFromFile("createProfile").
+		SignProposeAndPayAs("find").
+		StringArgument("find").
+		RunPrintEventsFull()
+
+	g.TransactionFromFile("createProfile").
+		SignProposeAndPayAs("find-admin").
+		StringArgument("find-admin").
+		RunPrintEventsFull()
+
 	/*
 		//we advance the clock
 		//	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
