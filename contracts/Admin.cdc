@@ -5,9 +5,6 @@ import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
-import Artifact from "./Artifact.cdc"
-import Art from "./Art.cdc"
-import TypedMetadata from "./TypedMetadata.cdc"
 
 
 pub contract Admin {
@@ -45,15 +42,6 @@ pub contract Admin {
 			self.capability = cap
 		}
 
-
-		pub fun setArtifactTypeConverter(from: Type, converters: [Capability<&{TypedMetadata.TypeConverter}>]) {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			Artifact.setTypeConverter(from: from, converters: converters)
-		}
-
 		/// Set the wallet used for the network
 		/// @param _ The FT receiver to send the money to
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
@@ -64,7 +52,6 @@ pub contract Admin {
 			self.capability!.borrow()!.setWallet(wallet)
 		}
 
-
 		/// Enable or disable public registration 
 		pub fun setPublicEnabled(_ enabled: Bool) {
 			pre {
@@ -73,7 +60,6 @@ pub contract Admin {
 
 			self.capability!.borrow()!.setPublicEnabled(enabled)
 		}
-
 
 		pub fun setAddonPrice(name: String, price: UFix64) {
 			pre {
@@ -100,12 +86,7 @@ pub contract Admin {
 			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
 		}
 
-		pub fun createForge(platform: Artifact.MinterPlatform) : @Artifact.Forge {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			return <- Artifact.createForge(platform:platform)
-		}
+
 
 
 		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
@@ -128,13 +109,33 @@ pub contract Admin {
 		}
 
 
+
+
+		/*
+		pub fun setArtifactTypeConverter(from: Type, converters: [Capability<&{TypedMetadata.TypeConverter}>]) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			Artifact.setTypeConverter(from: from, converters: converters)
+		}
+
+		pub fun createForge(platform: Artifact.MinterPlatform) : @Artifact.Forge {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			return <- Artifact.createForge(platform:platform)
+		}
+
 		pub fun createVersusArtWithContent(name: String, artist:String, artistAddress:Address, description: String, url: String, type: String, royalty: {String: Art.Royalty}, edition: UInt64, maxEdition: UInt64) : @Art.NFT {
 			return <- 	Art.createArtWithContent(name: name, artist: artist, artistAddress: artistAddress, description: description, url: url, type: type, royalty: royalty, edition: edition, maxEdition: maxEdition)
 		}
+
+		*/
+
 		init() {
 			self.capability = nil
 		}
-
 
 	}
 

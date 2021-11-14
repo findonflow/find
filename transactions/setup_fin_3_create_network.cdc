@@ -21,12 +21,14 @@ transaction() {
 		adminClient.setWallet(wallet)
 		adminClient.setPublicEnabled(true)
 
+		/*
 		//this is just an example
 		account.save(<- Artifact.createNewMinterTypeConverter(), to: /storage/artifactExampleTypeConverter)
 		account.link<&{TypedMetadata.TypeConverter}>(/public/artifactExampleTypeConverter, target: /storage/artifactExampleTypeConverter)
 		let cap=account.getCapability<&{TypedMetadata.TypeConverter}>(/public/artifactExampleTypeConverter)
 		let typ=Type<Artifact.MinterPlatform>()
 		adminClient.setArtifactTypeConverter(from:typ, converters: [cap])
+		*/
 	}
 }
 

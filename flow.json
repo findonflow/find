@@ -106,13 +106,10 @@
 	"deployments": {
 		"testnet": {
 			"testnet-find": [
+				"Admin",
 				"FIND",
 				"Clock",
-				"Debug",
-				"Artifact",
-				"TypedMetadata",
-				"Content",
-				"Art"
+				"Debug"
 			]
 		},
 		"emulator": {
