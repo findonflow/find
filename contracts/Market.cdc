@@ -1,20 +1,21 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
+
 /*
 
 ///Market
 
 ///A market contrat that allows a user to receive bids on his nfts, direct sell and english auction his nfts
 
+The market has 2 collections
+ - BidCollection: This contains all bids you have made, both bids on an auction and direct bids
+ - SaleItemCollection: This collection contains your saleItems and directOffers for your NFTs that others have made
 
 */
 pub contract Market {
-
-	//TODO: rename DirectOffer to DirectOffer
 
 	pub let SaleItemCollectionStoragePath: StoragePath
 	pub let SaleItemCollectionPublicPath: PublicPath
@@ -30,7 +31,7 @@ pub contract Market {
 	pub event ForAuction(id: UInt64, owner: Address,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event DirectOffer(id: UInt64, bidder: Address, amount: UFix64)
+	pub event DirectOfferBid(id: UInt64, bidder: Address, amount: UFix64)
 
 	/// Emitted if a blind bid is canceled
 	pub event DirectOfferCanceled(id: UInt64, bidder: Address)
@@ -50,9 +51,11 @@ pub contract Market {
 	//TODO create SaleItemInformation struct that can be returned to gui
 
 	//can this be a struct?
-	pub struct SaleItem{
+	pub resource SaleItem{
 		//TODO: until NFT standard me need metadata here I think so that we can display properly
-		access(contract) let id: UInt64 
+
+		access(contract) let vaultType: Type //The type of vault to use for this sale Item
+		access(contract) var nft: @NonFungibleToken.NFT? //this has to be optional since we have to send it somewhere
 		access(contract) var salePrice: UFix64?
 		access(contract) var auctionStartPrice: UFix64?
 		access(contract) var auctionReservePrice: UFix64?
@@ -61,9 +64,12 @@ pub contract Market {
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 		access(contract) var auction: Auction?
+		access(contract) var ownerCallback: Capability<&{NonFungibleToken.Receiver}>
 
-		init(id:UInt64) {
-			self.id=id
+		init(nft:@NonFungibleToken.NFT, vaultType: Type, ownerCallback: Capability<&{NonFungibleToken.Receiver}>) {
+			self.ownerCallback=ownerCallback
+			self.vaultType=vaultType
+			self.nft <- nft
 			self.salePrice=nil
 			self.auctionStartPrice=nil
 			self.auctionReservePrice=nil
@@ -74,7 +80,10 @@ pub contract Market {
 			self.auction=nil
 		}
 
-		//TODO getBalance
+		pub fun sellNFT(_ cb : Capability<&BidCollection{BidCollectionPublic}>) : @FungibleToken.Vault {
+			let token <- self.nft <- nil
+			return <- cb.borrow()!.fullfill(<- token!)
+		}
 
 		pub fun setAuction(_ auction: Auction?) {
 			self.auction=auction
@@ -107,26 +116,41 @@ pub contract Market {
 		pub fun setCallback(_ callback: Capability<&BidCollection{BidCollectionPublic}>?) {
 			self.offerCallback=callback
 		}
+
+		destroy () {
+
+
+			if let token <- self.nft {
+				self.ownerCallback.borrow()!.deposit(token: <- token)
+			} else {
+				//DEAD CODE
+				destroy self.nft
+			}
+		}
 	}
 
 
 	pub struct Auction {
+
+		//right now saleItem and bid share id, that is the id of the bid is the id of the saleItem, that does not hold anymore
+		access(contract) var id: UInt64
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
+		access(contract) let minimumBidIncrement: UFix64
 		access(contract) var latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>
-		access(contract) let id: UInt64
 
-		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, id: UInt64) {
+		//let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, id: id)
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, minimumBidIncrement: UFix64, id: UInt64) {
 			pre {
-				startedAt < endsAt : "Cannot start before it will end"
 				extendOnLateBid != 0.0 : "Extends on late bid must be a non zero value"
 			}
-			self.endsAt=endsAt
-			self.startedAt=startedAt
-			self.extendOnLateBid=extendOnLateBid
-			self.latestBidCallback=latestBidCallback
 			self.id=id
+			self.endsAt=self.endsAt
+			self.startedAt=self.startedAt
+			self.extendOnLateBid=extendOnLateBid
+			self.minimumBidIncrement=minimumBidIncrement
+			self.latestBidCallback=latestBidCallback
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -137,35 +161,34 @@ pub contract Market {
 			let offer=callback.borrow()!
 			offer.setBidType(id: self.id, type: "auction")
 
-			//TODO: bid increase minimum check
-			if callback.address != self.latestBidCallback.address {
-				if offer.getBalance(self.id) <= self.getBalance() {
-					panic("bid must be larger then previous bid")
+			let cb = self.latestBidCallback 
+			if callback.address != cb.address {
+
+				let offerBalance=offer.getBalance(self.id)
+				let minBid=self.getBalance() + self.minimumBidIncrement
+
+				if offerBalance < minBid {
+					panic("bid ".concat(offerBalance.toString()).concat(" must be larger then previous bid+bidIncrement").concat(minBid.toString()))
 				}
-				//we send the money back
-				self.latestBidCallback.borrow()!.cancel(self.id)
+				cb.borrow()!.cancel(self.id)
 			}
 			self.latestBidCallback=callback
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
 				self.endsAt=suggestedEndTime
 			}
-			emit AuctionBid(id: self.id, bidder: self.latestBidCallback.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
+			emit AuctionBid(id: self.id, bidder: cb.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
+
 		}
 	}
 
-
-	/*
-	Since a single account can own more then one name there is a collecition of them
-	This collection has build in support for direct sale of a FIND leaseToken. The network owner till take 2.5% cut
-	*/
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
 		//fetch all names that are for sale
 
 		access(contract)fun cancelBid(_ id: UInt64) 
-		access(contract) fun increaseBid(_ id: UInt64) 
+		//		access(contract) fun increaseBid(_ id: UInt64) 
 
 		//place a bid on a token
 		access(contract) fun bid(id: UInt64, callback: Capability<&BidCollection{BidCollectionPublic}>)
@@ -174,10 +197,31 @@ pub contract Market {
 		pub fun fullfillAuction(_ id: UInt64) 
 	}
 
+	pub resource DirectOffer {
+		access(contract) let vaultType: Type //The type of vault to use for this sale Item
+		access(contract) var nftId: UInt64
+		access(contract) var nftCap: Capability<&{NonFungibleToken.CollectionPublic}>
+		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>
+
+		init(cb: Capability<&BidCollection{BidCollectionPublic}>, vaultType: Type, nftId:UInt64, nftCap: Capability<&{NonFungibleToken.CollectionPublic}>) {
+
+			self.offerCallback=cb
+			self.nftCap=nftCap
+			self.nftId=nftId
+			self.vaultType=vaultType
+		}
+
+		pub fun getBalance() : UFix64 {
+			return self.offerCallback.borrow()!.getBalance(self.uuid)
+		}
+
+	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic {
-		access(contract) var nfts: @{UInt64: NonFungibleToken.NFT}
-		access(contract) var items: {UInt64: SaleItem}
+		//is this the best approach now or just put the NFT inside the saleItem?
+		access(contract) var items: @{UInt64: SaleItem}
+
+		access(contract) var directOffers: @{UInt64: DirectOffer}
 		//todo blind bids
 
 		//the cut the network will take, default 2.5%
@@ -187,8 +231,8 @@ pub contract Market {
 		access(contract) let networkWallet: Capability<&{FungibleToken.Receiver}>
 
 		init (networkCut: UFix64, networkWallet: Capability<&{FungibleToken.Receiver}>) {
-			self.nfts <- {}
-			self.items = {}
+			self.items <- {}
+			self.directOffers <- {}
 			self.networkCut=networkCut
 			self.networkWallet=networkWallet
 		}
@@ -197,7 +241,7 @@ pub contract Market {
 		pub fun startAuction(_ id: UInt64) {
 			//TODO: pre id
 			let timestamp=Clock.time()
-			let saleItem = self.items[id]!
+			let saleItem = self.borrow(id)
 			let duration=saleItem.auctionDuration
 			let extensionOnLateBid=saleItem.auctionExtensionOnLateBid
 			if saleItem.offerCallback == nil {
@@ -206,25 +250,23 @@ pub contract Market {
 
 			let callback=saleItem.offerCallback!
 			let offer=callback.borrow()!
-			//TODO: set bid type
 
 			let endsAt=timestamp + duration
 			emit AuctionStarted(id: id, bidder: callback.address, amount: offer.getBalance(id), auctionEndAt: endsAt)
 
-			let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, id: id)
+			let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, minimumBidIncrement: saleItem.auctionMinBidIncrement, id: id)
 			saleItem.setCallback(nil)
 			saleItem.setAuction(auction)
 		}
 
 
-		//TODO: Should be allowed to cancel a bid if auction is on an item that is free
 		access(contract) fun cancelBid(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 				//TODO: handle pre that it should not be an auction
 			}
 
-			let saleItem=self.items[id]!
+			let saleItem=self.borrow(id)
 			if let callback = saleItem.offerCallback {
 				emit DirectOfferCanceled(id: id, bidder: callback.address)
 			}
@@ -232,6 +274,7 @@ pub contract Market {
 			saleItem.setCallback(nil)
 		}
 
+		/*
 		access(contract) fun increaseBid(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -248,6 +291,7 @@ pub contract Market {
 				return
 			}
 
+			add this back when we add DirectOffers again
 			let balance=saleItem.offerCallback!.borrow()!.getBalance(id) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil  && saleItem.auctionStartPrice == nil{
@@ -256,7 +300,7 @@ pub contract Market {
 			}
 
 
-			if saleItem.salePrice != nil && saleItem.salePrice != nil && balance >= saleItem.salePrice! {
+			if saleItem.salePrice != nil && balance >= saleItem.salePrice! {
 				self.fullfill(id)
 			} else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
@@ -265,6 +309,7 @@ pub contract Market {
 			}
 
 		}
+		*/
 
 		access(contract) fun bid(id: UInt64, callback: Capability<&BidCollection{BidCollectionPublic}>) {
 			pre {
@@ -272,7 +317,7 @@ pub contract Market {
 			}
 
 			let timestamp=Clock.time()
-			let saleItem=self.items[id]!
+			let saleItem=self.borrow(id)
 
 			if let auction= saleItem.auction {
 				if auction.endsAt < timestamp {
@@ -282,28 +327,39 @@ pub contract Market {
 				return
 			}
 
+			/*
+			add back when we have DirectOffers
 			if let cb= saleItem.offerCallback {
 				cb.borrow()!.cancel(id)
 			}
+			*/
 
 			saleItem.setCallback(callback)
 
 			let balance=callback.borrow()!.getBalance(id)
+
+			/*
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil && saleItem.auctionStartPrice == nil {
 				Debug.log("Sale price not set")
 				emit DirectOffer(id: id, bidder: callback.address, amount: balance)
 				return
 			}
+			*/
 
-			if saleItem.salePrice != nil && balance >= saleItem.salePrice! {
+			if saleItem.salePrice != nil && balance == saleItem.salePrice! {
 				Debug.log("Direct sale!")
 				self.fullfill(id)
 			}	 else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
-			} else {
+			} 
+
+			/*
+			else {
+
 				emit DirectOffer(id: id, bidder: callback.address, amount: balance)
 			}
+			*/
 
 		}
 
@@ -313,7 +369,7 @@ pub contract Market {
 				self.items.containsKey(id) : "Invalid name=".concat(id.toString())
 			}
 
-			let saleItem=self.items[id]!
+			let saleItem=self.borrow(id)
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= saleItem.offerCallback {
 				Debug.log("we have a blind bid so we cancel that")
@@ -335,14 +391,12 @@ pub contract Market {
 				//the auction has ended
 				Debug.log("Latest bid is ".concat(balance.toString()).concat(" reserve price is ").concat(price))
 				if auctionEnded && hasMetReservePrice {
-					//&& lease.auctionReservePrice != nil && lease.auctionReservePrice! < balance {
 					panic("Cannot cancel finished auction, fullfill it instead")
 				}
 
 				emit AuctionCancelled(id: id, bidder: auction.latestBidCallback.address, amount: balance)
 				auction.latestBidCallback.borrow()!.cancel(id)
-				saleItem.setAuction(nil)
-				//TODO: test that auction is removed from storage here
+				destroy <- self.items.remove(key: id)
 			}
 		}
 
@@ -350,7 +404,7 @@ pub contract Market {
 		pub fun fullfillAuction(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-				self.items[id]!.auction != nil : "Cannot fullfill sale that is not an auction=".concat(id.toString())
+				self.borrow(id).auction != nil : "Cannot fullfill sale that is not an auction=".concat(id.toString())
 			}
 
 			//TODO: add a check to see if we have reaced min bid price
@@ -363,129 +417,119 @@ pub contract Market {
 				//todo more PRE checks
 			}
 
-			let saleItem=self.items.remove(key: id)!
-			let owner=self.owner!.address
-			if let cb= saleItem.offerCallback {
-					let nft <- self.nfts.remove(key:  id) ?? panic("missing NFT")
-					let oldProfile= getAccount(owner).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
+			let saleItemRef = self.borrow(id)
+
+			if let auction=saleItemRef.auction {
+				if auction.endsAt > Clock.time() {
+					panic("Auction has not ended yet")
+				}
+
+				let soldFor=auction.getBalance()
+				let reservePrice=saleItemRef.auctionReservePrice ?? 0.0
+
+				if reservePrice > soldFor {
+					self.cancel(id)
+					return
+				}
+			}
+
+			let saleItem <- self.items.remove(key: id)!
+			let owner=self.owner!.address
+
+			if let cb= saleItem.offerCallback {
+				let oldProfile= getAccount(owner).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
 				let offer= cb.borrow()!
 				let soldFor=offer.getBalance(id)
 				//move the token to the new profile
 				emit Sold(id: id, previousOwner:offer.owner!.address, newOwner: cb.address, amount: soldFor)
 
-
-				//TODO: reset the prices here
-				let vault <- offer.fullfill(<- nft)
+				let vault <- saleItem.sellNFT(cb)
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
 				oldProfile.deposit(from: <- vault)
-				return
-			}
+			} else if let auction = saleItem.auction {
 
-			if let auction = saleItem.auction {
-				if auction.endsAt > Clock.time() {
-					panic("Auction has not ended yet")
-				}
-		
 				let soldFor=auction.getBalance()
-				let reservePrice=saleItem.auctionReservePrice ?? 0.0
-
-				if reservePrice > soldFor {
-					self.cancel(id)
-					return
-				}
-
-				let nft <- self.nfts.remove(key:  id) ?? panic("missing NFT")
-				let oldProfile= getAccount(nft.owner!.address).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
+				let oldProfile= getAccount(saleItem.ownerCallback.address).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
 				emit Sold(id: id, previousOwner:owner, newOwner: auction.latestBidCallback.address, amount: soldFor)
 
-				let vault <- auction.latestBidCallback.borrow()!.fullfill(<- nft)
+				let vault <- saleItem.sellNFT(auction.latestBidCallback)
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
+					//TODO: must  check type of fusd to return 
+					//or just use the profile cap here for royalty?
+					//no better to use NFT standard
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
-				//why not use FIND to send money :P
 				oldProfile.deposit(from: <- vault)
-			} else {
-				panic("Item is not for auction id=".concat(id.toString()))
 			}
+			destroy  saleItem
+
+			panic("Item is not for auction id=".concat(id.toString()))
+			
 
 		}
 
 		//TODO: this needs to be different, need to add NFT here
-		pub fun listForAuction(id :UInt64, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
-			//TODO; Add pre fields
-			pre {
-				self.items.containsKey(id) : "Unknown item with id=".concat(id.toString())
-			}
+		pub fun listForAuction(nft: @NonFungibleToken.NFT, callback: Capability<&{NonFungibleToken.Receiver}>, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 
-			let saleItem=self.items[id]!
+			let saleItem <- create SaleItem(nft: <- nft, vaultType:vaultType, ownerCallback: callback)
+
 			saleItem.setStartAuctionPrice(auctionStartPrice)
 			saleItem.setReservePrice(auctionReservePrice)
 			saleItem.setAuctionDuration(auctionDuration)
 			saleItem.setExtentionOnLateBid(auctionExtensionOnLateBid)
-			emit ForAuction(id: id, owner:self.owner!.address, auctionStartPrice: saleItem.auctionStartPrice!, auctionReservePrice: saleItem.auctionReservePrice!,  active: true)
+			saleItem.setMinBidIncrement(minimumBidIncrement)
+
+			//TODO; need type and id of nft and uuid of saleItem
+			emit ForAuction(id: saleItem.uuid, owner:self.owner!.address, auctionStartPrice: saleItem.auctionStartPrice!, auctionReservePrice: saleItem.auctionReservePrice!,  active: true)
+
+			self.items[saleItem.uuid] <-! saleItem
 		}
 
-		pub fun listForSale(id :UInt64, directSellPrice:UFix64) {
-			//TODO; Add pre fields
-			pre {
-				self.items.containsKey(id) : "Unknown item with id=".concat(id.toString())
-			}
-			let saleItem=self.items[id]!
+		pub fun listForSale(nft: @NonFungibleToken.NFT, callback: Capability<&{NonFungibleToken.Receiver}>, vaultType: Type, directSellPrice:UFix64) {
+
+			let saleItem <- create SaleItem(nft: <- nft, vaultType:vaultType, ownerCallback: callback)
 			saleItem.setSalePrice(directSellPrice)
 
-			emit ForSale(id: id, owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: true)
+			//TODO; need type and id of nft and uuid of saleItem
+			emit ForSale(id: saleItem.uuid, owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: true)
+			self.items[saleItem.uuid] <-! saleItem
+
 		}
 
 
-		pub fun delistAuction(_ id: UInt64) {
+		pub fun delist(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Unknown item with id=".concat(id.toString())
 			}
 
-			let saleItem=self.items[id]!
-			emit ForAuction(id:id, owner:self.owner!.address, auctionStartPrice: saleItem.auctionStartPrice!,  auctionReservePrice: saleItem.auctionReservePrice!, active: false)
-			saleItem.setStartAuctionPrice(nil)
-			saleItem.setReservePrice(nil)
-		}
-
-
-		pub fun delistSale(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Unknown item with id=".concat(id.toString())
-			}
-
-			let saleItem=self.items[id]!
+			let saleItem <- self.items.remove(key: id)!
+			//TODO if this has bids cancel then
 			emit ForSale(id: id, owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: false)
-			saleItem.setSalePrice(nil)
+			//this will transfer the NFT back
+			destroy saleItem
 		}
 
-		//depoit a lease token into the lease collection, not available from the outside
-		access(contract) fun deposit(token: @NonFungibleToken.NFT) {
-			// add the new token to the dictionary which removes the old one
-			let oldToken <- self.nfts[token.uuid] <- token
-
-			destroy oldToken
-		}
 
 		pub fun getIds(): [UInt64] {
-			return self.nfts.keys
+			return self.items.keys
 		}
 
-		pub fun borrow(_ id: UInt64): &NonFungibleToken.NFT {
-			return &self.nfts[id] as &NonFungibleToken.NFT
+		pub fun borrow(_ id: UInt64): &SaleItem {
+			return &self.items[id] as &SaleItem
 		}
 
 		destroy() {
-			destroy self.nfts
+			destroy self.items
+			destroy self.directOffers
 		}
 	}
 
@@ -493,6 +537,8 @@ pub contract Market {
 	pub fun createEmptySaleItemCollection(): @SaleItemCollection {
 		//TODO:: add another ft
 		//TODO: customize this
+		//use royalty here
+
 		let wallet = Market.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
 	}
@@ -518,20 +564,22 @@ pub contract Market {
 		}
 	}
 
-
 	pub resource Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
+		//This cannot be saleItemUUID anymore, as it is UUID of either saleItem or directOffer
 		access(contract) let saleItemUUID: UInt64
+
+		//this should reflect on what the above uuid is for
 		access(contract) var type: String
-		access(contract) let vault: @FUSD.Vault
+		access(contract) let vault: @FungibleToken.Vault
 		access(contract) var bidAt: UFix64
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, saleItemUUID: UInt64, vault: @FUSD.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>){
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, saleItemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>){
 			self.vault <- vault
 			self.saleItemUUID=saleItemUUID
 			self.from=from
-			self.type="blind"
+			self.type="directOffer"
 			self.bidAt=Clock.time()
 			self.nftCap=nftCap
 		}
@@ -544,7 +592,6 @@ pub contract Market {
 		}
 
 		destroy() {
-			//This is kinda bad. find FUSD vault of owner and deploy to that?
 			destroy self.vault
 		}
 	}
@@ -563,6 +610,7 @@ pub contract Market {
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
 
+		//not sure we can store this here anymore. think it needs to be in every bid
 		init(receiver: Capability<&{FungibleToken.Receiver}>) {
 			self.bids <- {}
 			self.receiver=receiver
@@ -589,12 +637,17 @@ pub contract Market {
 			return bidInfo
 		}
 
-		//make a bid on a name
-		pub fun bid(id: UInt64, vault: @FUSD.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		//this is offer on something that is not even listed
+		pub fun directOffer() {
+
+		}
+		//* this is bid on saleItem */
+		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
+		pub fun bid(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			let from=getAccount(self.owner!.address).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
 
 			let bid <- create Bid(from: from, saleItemUUID:id, vault: <- vault, nftCap: nftCap)
-			let  saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(id.toString()))
+			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(id.toString()))
 			let callbackCapability =self.owner!.getCapability<&BidCollection{BidCollectionPublic}>(Market.BidCollectionPublicPath)
 			let oldToken <- self.bids[id] <- bid
 			//send info to leaseCollection
@@ -602,6 +655,7 @@ pub contract Market {
 			saleItemCollection.bid(id: id, callback: callbackCapability) 
 		}
 
+		/*
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
 			let bid =self.borrowBid(id)
@@ -610,6 +664,7 @@ pub contract Market {
 
 			bid.from.borrow()!.increaseBid(id)
 		}
+		*/
 
 		/// The users cancel a bid himself
 		pub fun cancelBid(_ id: UInt64) {

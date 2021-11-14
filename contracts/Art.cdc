@@ -356,3 +356,4 @@ pub contract Art: NonFungibleToken {
 	}
 }
 
+ 
