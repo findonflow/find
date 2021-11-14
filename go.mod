@@ -3,7 +3,7 @@ module github.com/findonflow/find.git
 go 1.17
 
 require (
-	github.com/bjartek/go-with-the-flow/v2 v2.3.0
+	github.com/bjartek/go-with-the-flow/v2 v2.3.2
 	github.com/stretchr/testify v1.7.0
 )
 

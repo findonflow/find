@@ -1,5 +1,6 @@
 
 import FIND from "../contracts/FIND.cdc"
+import Admin from "../contracts/Admin.cdc"
 import Art from "../contracts/Art.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
@@ -17,11 +18,11 @@ transaction(
 	) {
 
     let artistCollection: Capability<&{Art.CollectionPublic}>
-    let client: &FIND.AdminProxy
+    let client: &Admin.AdminProxy
 		let minterWallet: Capability<&{FungibleToken.Receiver}>
 
     prepare(account: AuthAccount) {
-				self.client=account.borrow<&FIND.AdminProxy>(from: FIND.AdminProxyStoragePath)!
+				self.client=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
         self.artistCollection= getAccount(target).getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 				self.minterWallet=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
     }

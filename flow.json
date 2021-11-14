@@ -36,6 +36,7 @@
 		},
 		"Artifact": "./contracts/Artifact.cdc",
 		"FIND": "./contracts/FIND.cdc",
+		"Admin": "./contracts/Admin.cdc",
 		"Art": "./contracts/Art.cdc",
 		"Content": "./contracts/Content.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
@@ -126,7 +127,8 @@
 				"Debug",
 				"Content",
 				"Art",
-				"FUSD"
+				"FUSD",
+				"Admin"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],

@@ -104,8 +104,8 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/bgentry/speakeasy v0.1.0/go.mod h1:+zsyZBPWlz7T6j88CTgSN5bM796AkVf0kBD4zp0CCIs=
-github.com/bjartek/go-with-the-flow/v2 v2.3.0 h1:H3mO/CeCB7Hc6B58Y0zeN/IkxfRrGATyB9K5+JrCEYQ=
-github.com/bjartek/go-with-the-flow/v2 v2.3.0/go.mod h1:8QJZ16WStrFdXUeYneHJiTkT4aQRUJKdPp4c+JF8dEw=
+github.com/bjartek/go-with-the-flow/v2 v2.3.2 h1:3HZViCqRhvwhvIJnjyC1oFKl8QIPD7n/YTX8XT1QTYY=
+github.com/bjartek/go-with-the-flow/v2 v2.3.2/go.mod h1:8QJZ16WStrFdXUeYneHJiTkT4aQRUJKdPp4c+JF8dEw=
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/bradfitz/go-smtpd v0.0.0-20170404230938-deb6d6237625/go.mod h1:HYsPBTaaSFSlLx/70C2HPIMNZpVV8+vt/A+FMnYP11g=
 github.com/bsipos/thist v1.0.0/go.mod h1:7i0xwRua1/bmUxcxi2xAxaFL895rLtOpKUwnw3NrT8I=

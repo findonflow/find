@@ -1,17 +1,17 @@
 
-import "../contracts/FIND.cdc"
+import "../contracts/Admin.cdc"
 
 //set up the adminClient in the contract that will own the network
 transaction() {
 
 	prepare(account: AuthAccount) {
 
-		if account.getCapability(FIND.AdminProxyPublicPath).check<&AnyResource>() {
-			account.unlink(FIND.AdminProxyPublicPath)
-			destroy <- account.load<@AnyResource>(from: FIND.AdminProxyStoragePath)
+		if account.getCapability(Admin.AdminProxyPublicPath).check<&AnyResource>() {
+			account.unlink(Admin.AdminProxyPublicPath)
+			destroy <- account.load<@AnyResource>(from: Admin.AdminProxyStoragePath)
 		}
-		account.save(<- FIND.createAdminProxyClient(), to:FIND.AdminProxyStoragePath)
-		account.link<&{FIND.AdminProxyClient}>(FIND.AdminProxyPublicPath, target: FIND.AdminProxyStoragePath)
+		account.save(<- Admin.createAdminProxyClient(), to:Admin.AdminProxyStoragePath)
+		account.link<&{Admin.AdminProxyClient}>(Admin.AdminProxyPublicPath, target: Admin.AdminProxyStoragePath)
 
 	}
 }
