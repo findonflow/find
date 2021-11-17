@@ -99,7 +99,7 @@ func main() {
 
 		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86500.0").RunPrintEventsFull()
 
-		g.TransactionFromFile("fullfill").
+		g.TransactionFromFile("fulfill").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			RunPrintEventsFull()

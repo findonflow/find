@@ -25,10 +25,10 @@ func init(receiver Capability<&{FungibleToken.Receiver}>, leases Capability<&Lea
 
 ## Functions
 
-### fun `fullfill()`
+### fun `fulfill()`
 
 ```cadence
-func fullfill(_ FIND.Lease): FungibleToken.Vault
+func fulfill(_ FIND.Lease): FungibleToken.Vault
 ```
 
 ---

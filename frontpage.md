@@ -111,13 +111,13 @@ FIND has built in suport for a sophistiated market.
  - a owner can list a lease for direct sale, any bid at that price will sell it instantly
  - a owner cal list a leaes for auction specifying: 
    - the minimum bid to start the auction
-   - the reserve price that must be met to fullfill the sale
+   - the reserve price that must be met to fulfill the sale
    - the duration of the auction
  - an late bid on a auction in FIND will automatically extend the auction to 5 minutes remaining
  - a user can mamage his bids in his profile
   - a bid can be cancelled if it is a blind bid or if the bid is on a lease that is now free 
   - a bid can be increased
- - anybody both a user and a owner can fullfill an ended auction. 
+ - anybody both a user and a owner can fulfill an ended auction. 
 
 ## other similar solutions
 While i created FIND in the spring/summer of 2021 Mynft was also developing flowns.org. I had no idea about this and they did not know abou me. 

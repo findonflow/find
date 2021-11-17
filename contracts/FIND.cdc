@@ -360,8 +360,8 @@ pub contract FIND {
 		//place a bid on a token
 		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
 
-		//anybody should be able to fullfill an auction as long as it is done
-		pub fun fullfillAuction(_ name: String) 
+		//anybody should be able to fulfill an auction as long as it is done
+		pub fun fulfillAuction(_ name: String) 
 		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
 
 	}
@@ -556,7 +556,7 @@ pub contract FIND {
 
 
 			if lease.salePrice != nil && lease.salePrice != nil && balance >= lease.salePrice! {
-				self.fullfill(name)
+				self.fulfill(name)
 			} else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
@@ -605,7 +605,7 @@ pub contract FIND {
 
 			if lease.salePrice != nil && balance >= lease.salePrice! {
 				Debug.log("Direct sale!")
-				self.fullfill(name)
+				self.fulfill(name)
 			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
@@ -644,7 +644,7 @@ pub contract FIND {
 				Debug.log("Latest bid is ".concat(balance.toString()).concat(" reserve price is ").concat(price))
 				if auctionEnded && hasMetReservePrice {
 					//&& lease.auctionReservePrice != nil && lease.auctionReservePrice! < balance {
-					panic("Cannot cancel finished auction, fullfill it instead")
+					panic("Cannot cancel finished auction, fulfill it instead")
 				}
 
 				emit AuctionCancelled(name: name, bidder: auction.latestBidCallback.address, amount: balance)
@@ -653,24 +653,24 @@ pub contract FIND {
 			}
 		}
 
-		/// fullfillAuction wraps the fullfill method and ensure that only a finished auction can be fullfilled by anybody
-		pub fun fullfillAuction(_ name: String) {
+		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
+		pub fun fulfillAuction(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
-				self.auctions.containsKey(name) : "Cannot fullfill sale that is not an auction=".concat(name)
+				self.auctions.containsKey(name) : "Cannot fulfill sale that is not an auction=".concat(name)
 			}
 
-			return self.fullfill(name)
+			return self.fulfill(name)
 		}
 
-		pub fun fullfill(_ name: String) {
+		pub fun fulfill(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
 			let lease = self.borrow(name)
 			if lease.getLeaseStatus() == LeaseStatus.FREE {
-				panic("cannot fullfill sale name is now free")
+				panic("cannot fulfill sale name is now free")
 			}
 
 			let oldProfile=lease.getProfile()!
@@ -684,7 +684,7 @@ pub contract FIND {
 				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!
-				let vault <- offer.fullfill(<- token)
+				let vault <- offer.fulfill(<- token)
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -722,7 +722,7 @@ pub contract FIND {
 
 			let token <- self.leases.remove(key: name)!
 
-			let vault <- auction.latestBidCallback.borrow()!.fullfill(<- token)
+			let vault <- auction.latestBidCallback.borrow()!.fulfill(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -736,7 +736,6 @@ pub contract FIND {
 		}
 
 		pub fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
-			//TODO; Add pre fields
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
@@ -750,7 +749,6 @@ pub contract FIND {
 		}
 
 		pub fun listForSale(name :String, directSellPrice:UFix64) {
-			//TODO; Add pre fields
 			pre {
 				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
 			}
@@ -943,7 +941,6 @@ pub contract FIND {
 		}
 
 		pub fun setPrice(default: UFix64, additionalPrices: {Int: UFix64}) {
-			//TODO: pre this that the pricesChangedAt cannot be 
 			self.defaultPrice=default
 			self.lengthPrices=additionalPrices
 		}
@@ -1148,7 +1145,7 @@ pub contract FIND {
 	pub resource interface BidCollectionPublic {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ name: String) : UFix64
-		access(contract) fun fullfill(_ token: @FIND.Lease) : @FungibleToken.Vault
+		access(contract) fun fulfill(_ token: @FIND.Lease) : @FungibleToken.Vault
 		access(contract) fun cancel(_ name: String)
 		access(contract) fun setBidType(name: String, type: String) 
 	}
@@ -1167,8 +1164,8 @@ pub contract FIND {
 		}
 
 		//called from lease when auction is ended
-		//if purchase if fullfilled then we deposit money back into vault we get passed along and token into your own leases collection
-		access(contract) fun fullfill(_ token: @FIND.Lease) : @FungibleToken.Vault{
+		//if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
+		access(contract) fun fulfill(_ token: @FIND.Lease) : @FungibleToken.Vault{
 
 			let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
@@ -1341,11 +1338,11 @@ pub contract FIND {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
 
-		self.LeasePublicPath=/public/findLeases2
-		self.LeaseStoragePath=/storage/findLeases2
+		self.LeasePublicPath=/public/findLeases
+		self.LeaseStoragePath=/storage/findLeases
 
-		self.BidPublicPath=/public/findBids2
-		self.BidStoragePath=/storage/findBids2
+		self.BidPublicPath=/public/findBids
+		self.BidStoragePath=/storage/findBids
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 

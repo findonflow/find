@@ -30,8 +30,8 @@ A name that is listed both for auction and for sale will start auction if bid is
 # DoneDeal
 
 We chose to not expose to any user, only winning bidder and owner
-A user can fullfill an auction that has ended
-A owner can fullfill an auction that has ended
+A user can fulfill an auction that has ended
+A owner can fulfill an auction that has ended
 
 
 ## Bugs

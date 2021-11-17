@@ -23,10 +23,10 @@ func getBalance(_ String): UFix64
 
 ---
 
-### fun `fullfill()`
+### fun `fulfill()`
 
 ```cadence
-func fullfill(_ FIND.Lease): FungibleToken.Vault
+func fulfill(_ FIND.Lease): FungibleToken.Vault
 ```
 
 ---

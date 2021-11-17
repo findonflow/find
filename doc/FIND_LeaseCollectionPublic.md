@@ -63,10 +63,10 @@ func bid(name String, callback Capability<&BidCollection{BidCollectionPublic}>)
 
 ---
 
-### fun `fullfillAuction()`
+### fun `fulfillAuction()`
 
 ```cadence
-func fullfillAuction(_ String)
+func fulfillAuction(_ String)
 ```
 
 ---

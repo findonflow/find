@@ -52,7 +52,7 @@ transaction(owner: Address, name: String) {
 		}
 
 		let leaseCollectionOwner = getAccount(owner).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		leaseCollectionOwner.borrow()!.fullfillAuction(name)
+		leaseCollectionOwner.borrow()!.fulfillAuction(name)
 
 	}
 }

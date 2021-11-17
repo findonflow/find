@@ -89,7 +89,6 @@ pub contract Admin {
 
 
 
-		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
 		pub fun advanceClock(_ time: UFix64) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -100,7 +99,6 @@ pub contract Admin {
 		}
 
 
-		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
 		pub fun debug(_ value: Bool) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"

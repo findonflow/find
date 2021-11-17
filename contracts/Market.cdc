@@ -82,7 +82,7 @@ pub contract Market {
 
 		pub fun sellNFT(_ cb : Capability<&BidCollection{BidCollectionPublic}>) : @FungibleToken.Vault {
 			let token <- self.nft <- nil
-			return <- cb.borrow()!.fullfill(<- token!)
+			return <- cb.borrow()!.fulfill(<- token!)
 		}
 
 		pub fun setAuction(_ auction: Auction?) {
@@ -193,8 +193,8 @@ pub contract Market {
 		//place a bid on a token
 		access(contract) fun bid(id: UInt64, callback: Capability<&BidCollection{BidCollectionPublic}>)
 
-		//anybody should be able to fullfill an auction as long as it is done
-		pub fun fullfillAuction(_ id: UInt64) 
+		//anybody should be able to fulfill an auction as long as it is done
+		pub fun fulfillAuction(_ id: UInt64) 
 	}
 
 	pub resource DirectOffer {
@@ -301,7 +301,7 @@ pub contract Market {
 
 
 			if saleItem.salePrice != nil && balance >= saleItem.salePrice! {
-				self.fullfill(id)
+				self.fulfill(id)
 			} else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
@@ -349,7 +349,7 @@ pub contract Market {
 
 			if saleItem.salePrice != nil && balance == saleItem.salePrice! {
 				Debug.log("Direct sale!")
-				self.fullfill(id)
+				self.fulfill(id)
 			}	 else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} 
@@ -391,7 +391,7 @@ pub contract Market {
 				//the auction has ended
 				Debug.log("Latest bid is ".concat(balance.toString()).concat(" reserve price is ").concat(price))
 				if auctionEnded && hasMetReservePrice {
-					panic("Cannot cancel finished auction, fullfill it instead")
+					panic("Cannot cancel finished auction, fulfill it instead")
 				}
 
 				emit AuctionCancelled(id: id, bidder: auction.latestBidCallback.address, amount: balance)
@@ -400,18 +400,18 @@ pub contract Market {
 			}
 		}
 
-		/// fullfillAuction wraps the fullfill method and ensure that only a finished auction can be fullfilled by anybody
-		pub fun fullfillAuction(_ id: UInt64) {
+		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
+		pub fun fulfillAuction(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-				self.borrow(id).auction != nil : "Cannot fullfill sale that is not an auction=".concat(id.toString())
+				self.borrow(id).auction != nil : "Cannot fulfill sale that is not an auction=".concat(id.toString())
 			}
 
 			//TODO: add a check to see if we have reaced min bid price
-			return self.fullfill(id)
+			return self.fulfill(id)
 		}
 
-		pub fun fullfill(_ id: UInt64) {
+		pub fun fulfill(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 				//todo more PRE checks
@@ -599,7 +599,7 @@ pub contract Market {
 	pub resource interface BidCollectionPublic {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ id: UInt64) : UFix64
-		access(contract) fun fullfill(_ token: @NonFungibleToken.NFT) : @FungibleToken.Vault
+		access(contract) fun fulfill(_ token: @NonFungibleToken.NFT) : @FungibleToken.Vault
 		access(contract) fun cancel(_ id: UInt64)
 		access(contract) fun setBidType(id: UInt64, type: String) 
 	}
@@ -617,8 +617,8 @@ pub contract Market {
 		}
 
 		//called from lease when auction is ended
-		//if purchase if fullfilled then we deposit money back into vault we get passed along and token into your own leases collection
-		access(contract) fun fullfill(_ token: @NonFungibleToken.NFT) : @FungibleToken.Vault{
+		//if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
+		access(contract) fun fulfill(_ token: @NonFungibleToken.NFT) : @FungibleToken.Vault{
 			let bid <- self.bids.remove(key: token.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			bid.nftCap.borrow()!.deposit(token: <- token)
