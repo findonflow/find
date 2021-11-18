@@ -9,7 +9,8 @@
 		"NonFungibleToken": {
 			"source": "./contracts/standard/NonFungibleToken.cdc",
 			"aliases": {
-				"testnet": "0x631e88ae7f1d7c20"
+				"testnet": "0x631e88ae7f1d7c20",
+				"mainnet": "0x1d7e57aa55817448"
 			}
 		},
 		"FUSD": {
@@ -23,7 +24,8 @@
 			"source": "./contracts/standard/FungibleToken.cdc",
 			"aliases": {
 				"testnet": "9a0766d93b6608b7",
-				"emulator": "ee82856bf20e2aa6"
+				"emulator": "ee82856bf20e2aa6",
+				"mainnet" :"0xf233dcee88fe0abe"
 			}
 		},
 		"FlowToken": {
