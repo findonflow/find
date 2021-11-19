@@ -102,10 +102,25 @@
 		"testnet-user3": {
 			"address": "60635d0971b40946",
 			"key": "${TESTNET_FIND_USER3}"
+		},
+		"mainnet-find": {
+			"address": "0xd136d89c8958d52a",
+			"key": "${MAINNET_FIND}"
+		},
+		"mainnet-find-admin": {
+			"address": "0x09a86f2493ce2e9d",
+			"key": "${MAINNET_FIND_ADMIN}"
 		}
-
 	},
 	"deployments": {
+		"mainnet": {
+			"mainnet-find": [
+				"Admin",
+				"FIND",
+				"Clock",
+				"Debug"
+			]
+		},
 		"testnet": {
 			"testnet-find": [
 				"Admin",
