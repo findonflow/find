@@ -77,19 +77,19 @@
       "0xMarket": null
     },
     "mainnet": {
-      "0xNonFungibleToken": null,
+      "0xNonFungibleToken": "0x1d7e57aa55817448",
       "0xFUSD": "0x3c5959b568896393",
-      "0xFungibleToken": null,
+      "0xFungibleToken": "0xf233dcee88fe0abe",
       "0xFlowToken": "0x1654653399040a61",
       "0xArtifact": null,
-      "0xFIND": null,
-      "0xAdmin": null,
+      "0xFIND": "0xd136d89c8958d52a",
+      "0xAdmin": "0xd136d89c8958d52a",
       "0xArt": null,
       "0xContent": null,
       "0xTypedMetadata": null,
-      "0xClock": null,
+      "0xClock": "0xd136d89c8958d52a",
       "0xProfile": "0xd796ff17107bbff6",
-      "0xDebug": null,
+      "0xDebug": "0xd136d89c8958d52a",
       "0xMarket": null
     }
   }
