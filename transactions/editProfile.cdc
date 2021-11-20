@@ -3,8 +3,6 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import Artifact from "../contracts/Artifact.cdc"
-import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
 
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, links: [{String: String}]) {
@@ -34,22 +32,6 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 				hasFlowWallet=true
 			}
 		}
-
-		var hasArtifacts=false
-		let collections=profile.getCollections()
-		for c in collections {
-			if c.name=="artifacts" {
-				hasArtifacts=true
-			}
-		}
-
-		if !hasArtifacts {
-			acct.save(<- Artifact.createEmptyCollection(), to: Artifact.ArtifactStoragePath)
-			acct.link<&{TypedMetadata.ViewResolverCollection}>( Artifact.ArtifactPublicPath, target: Artifact.ArtifactStoragePath)
-			let artifactCollection = acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(Artifact.ArtifactPublicPath)
-			profile.addCollection(Profile.ResourceCollection(name: "artifacts", collection: artifactCollection, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["artifact", "nft"]))
-		}
-
 
 		if !hasFlowWallet {
 			let flowWallet=Profile.Wallet(
@@ -82,8 +64,11 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		let oldLinks=profile.getLinks()
 
 		for link in links {
+			if !link.containsKey("title") {
+				continue
+			}
 			if link["remove"] == "true" {
-			  profile.removeLink(link["title"]!)	
+				profile.removeLink(link["title"]!)	
 				continue
 			}
 			profile.addLink(Profile.Link(title: link["title"]!, type: link["type"]!, url: link["url"]!))

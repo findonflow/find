@@ -3,9 +3,6 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import Artifact from "../contracts/Artifact.cdc"
-import Art from "../contracts/Art.cdc"
-import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
 
 //really not sure on how to input links here.)
@@ -45,14 +42,14 @@ transaction(name: String) {
 		profile.addWallet(fusdWallet)
 
 
-			let flowWallet=Profile.Wallet(
-				name:"Flow", 
-				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
-				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
-				accept: Type<@FlowToken.Vault>(),
-				names: ["flow"]
-			)
-			profile.addWallet(flowWallet)
+		let flowWallet=Profile.Wallet(
+			name:"Flow", 
+			receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+			balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
+			accept: Type<@FlowToken.Vault>(),
+			names: ["flow"]
+		)
+		profile.addWallet(flowWallet)
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
 			acct.unlink(FIND.LeasePublicPath)
@@ -70,26 +67,6 @@ transaction(name: String) {
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
-
-		let artifactCollection = acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(Artifact.ArtifactPublicPath)
-		if !artifactCollection.check() {
-			acct.unlink(Artifact.ArtifactPublicPath)
-			destroy <- acct.load<@AnyResource>(from:Artifact.ArtifactStoragePath)
-
-			acct.save(<- Artifact.createEmptyCollection(), to: Artifact.ArtifactStoragePath)
-			acct.link<&{TypedMetadata.ViewResolverCollection}>( Artifact.ArtifactPublicPath, target: Artifact.ArtifactStoragePath)
-		}
-		profile.addCollection(Profile.ResourceCollection(name: "artifacts", collection: artifactCollection, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["artifact", "nft"]))
-
-    //Create versus art collection if it does not exist and add it
-    let artCollectionCap=acct.getCapability<&{TypedMetadata.ViewResolverCollection}>(/public/versusArtViewResolver)
-    if !artCollectionCap.check() {
-      acct.save(<- Art.createEmptyCollection(), to: Art.CollectionStoragePath)
-			//NB! this is not how versus current links this, it is just for convenience for this demo
-			acct.link<&{Art.CollectionPublic}>(Art.CollectionPublicPath, target: Art.CollectionStoragePath)
-      acct.link<&{TypedMetadata.ViewResolverCollection}>(/public/versusArtViewResolver, target: Art.CollectionStoragePath)
-    }
-    profile.addCollection(Profile.ResourceCollection( name: "versus", collection:artCollectionCap, type: Type<&{TypedMetadata.ViewResolverCollection}>(), tags: ["versus", "nft"]))
 
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
