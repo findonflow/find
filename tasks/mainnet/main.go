@@ -73,8 +73,6 @@ Prices:
 		Argument(findLinks).
 		RunPrintEventsFull()
 
-	//transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, links: [{String: String}]) {
-
 	/*
 	   //we advance the clock
 	   //	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()

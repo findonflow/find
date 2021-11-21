@@ -1,5 +1,5 @@
 import "../contracts/Admin.cdc"
-
+import "../contracts/FIND.cdc"
 
 //link together the administrator to the client, signed by the owner of the contract
 transaction(ownerAddress: Address) {
