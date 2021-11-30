@@ -18,8 +18,9 @@ transaction(name: String, user: Address) {
 		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
-		//TODO calculate sum
-		let payVault <- vaultRef.withdraw(amount: 5.0) as! @FUSD.Vault
+
+		let cost = FIND.calculateCost(name)
+		let payVault <- vaultRef.withdraw(amount: cost) as! @FUSD.Vault
 
 		adminClient.register(name: name, vault: <- payVault, profile: profileCap, leases: leaseCollectionCap)
 	}

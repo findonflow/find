@@ -4,6 +4,8 @@ go 1.17
 
 require (
 	github.com/bjartek/go-with-the-flow/v2 v2.3.2
+	github.com/davecgh/go-spew v1.1.1
+	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/stretchr/testify v1.7.0
 )
 
@@ -19,7 +21,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/badger/v2 v2.0.3 // indirect
 	github.com/dgraph-io/ristretto v0.0.2 // indirect
 	github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 // indirect
