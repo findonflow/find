@@ -8,7 +8,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
+	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"github.com/meirf/gopart"
+	"github.com/onflow/cadence"
 )
 
 func readCsvFile2(filePath string) ([]string, []string) {
@@ -98,14 +100,52 @@ func main() {
 		os.Exit(1)
 	}
 
-	reservations := readCsvFile(file)
-	spew.Dump(reservations)
+	//g := gwtf.NewGoWithTheFlowMainNet()
+	g := gwtf.NewGoWithTheFlowDevNet()
+
+	findLinks := cadence.NewArray([]cadence.Value{
+		cadence.NewDictionary([]cadence.KeyValuePair{
+			{Key: cadence.NewString("title"), Value: cadence.NewString("twitter")},
+			{Key: cadence.NewString("type"), Value: cadence.NewString("twitter")},
+			{Key: cadence.NewString("url"), Value: cadence.NewString("https://twitter.com/findonflow")},
+		})})
 
 	/*
-		size := 50
-		for idxRange := range gopart.Partition(len(reservations), size) {
-			//run transaction against flow
-			spew.Dump(reservations[idxRange.Low:idxRange.High])
-		}
+		g.TransactionFromFile("createProfile").
+			SignProposeAndPayAs("find-admin").
+			StringArgument("ReservedNames").
+			RunPrintEventsFull()
 	*/
+
+	g.TransactionFromFile("editProfile").
+		SignProposeAndPayAs("find-admin").
+		StringArgument("ReservedNames").
+		StringArgument(`Reserved names:
+
+1. add a direct offer for the apropriate price
+2. ping a mod in find discord to have them approve
+
+Prices:
+ - 3 letter name  500 FUSD
+ - 4 letter name  100 FUSD
+ - 5+ letter name   5 FUSD
+`).
+		StringArgument("https://find.xyz/find.png").
+		StringArrayArgument("find").
+		BooleanArgument(false).
+		Argument(findLinks).
+		RunPrintEventsFull()
+
+	reservations := readCsvFile(file)
+
+	size := 5
+	for idxRange := range gopart.Partition(len(reservations), size) {
+		//run transaction against flow
+		names := reservations[idxRange.Low:idxRange.High]
+		g.TransactionFromFile("registerAdmin").
+			SignProposeAndPayAs("find-admin").
+			StringArrayArgument(names...).
+			AccountArgument("find-admin").
+			RunPrintEventsFull()
+	}
 }
