@@ -21,10 +21,12 @@ func main() {
 		AccountArgument("find-admin").
 		RunPrintEventsFull()
 
-	//set up fin network as the fin user
-	g.TransactionFromFile("setup_fin_3_create_network").
-		SignProposeAndPayAs("find-admin").
-		RunPrintEventsFull()
+		/*
+			//set up fin network as the fin user
+			g.TransactionFromFile("setup_fin_3_create_network").
+				SignProposeAndPayAs("find-admin").
+				RunPrintEventsFull()
+		*/
 
 	g.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find").
@@ -54,7 +56,7 @@ Prices:
  - 5+ letter name   5 FUSD
 
 1. make an offer for that name with the correct price (see above) 
-2. go into the find discord and ping let the mods know you have made the bid
+2. go into the find discord and let the mods know you have made the bid
 
 `).
 		StringArgument("https://find.xyz/find.png").
