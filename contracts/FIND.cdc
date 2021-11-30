@@ -1019,6 +1019,24 @@ pub contract FIND {
 			}
 			self.wallet.borrow()!.deposit(from: <- vault)
 
+			self.internal_register(name: name, profile: profile, leases: leases)
+		}
+
+		access(account) fun internal_register(name: String, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+			pre {
+				name.length >= 3 : "A FIND name has to be minimum 3 letters long"
+			}
+
+			let nameStatus=self.readStatus(name)
+			if nameStatus.status == LeaseStatus.TAKEN {
+				panic("Name already registered")
+			}
+
+			//if we have a locked profile that is not owned by the same identity then panic
+			if nameStatus.status == LeaseStatus.LOCKED {
+				panic("Name is locked")
+			}
+
 			let lease= NetworkLease(
 				validUntil:Clock.time() + self.leasePeriod,
 				lockedUntil: Clock.time() + self.leasePeriod+ self.lockPeriod,
@@ -1031,6 +1049,7 @@ pub contract FIND {
 			self.profiles[name] =  lease
 
 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
+	
 		}
 
 		pub fun readStatus(_ name: String): NameStatus {

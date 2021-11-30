@@ -77,13 +77,13 @@ pub contract Admin {
 			self.capability!.borrow()!.setPrice(default: default, additionalPrices: additional)
 		}
 
-		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>){
+		pub fun register(name: String, profile: Capability<&{Profile.Public}>, leases: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
 
-			self.capability!.borrow()!.register(name:name, vault: <- vault, profile: profile, leases: leases)
+			self.capability!.borrow()!.internal_register(name:name, profile: profile, leases: leases)
 		}
 
 

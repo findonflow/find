@@ -144,6 +144,24 @@ transaction(name: String) {
 			}))
 
 	})
+
+	t.Run("Admin should be able to register without paying FUSD", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("10.0", "find")
+
+		gt.GWTF.TransactionFromFile("registerAdmin").
+			SignProposeAndPayAs("find").
+			StringArrayArgument("find-admin").
+			AccountArgument("find").
+			Test(gt.T).
+			AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+				"name": "find-admin",
+			}))
+
+	})
 }
 
 //TODO: test validate wrong names
