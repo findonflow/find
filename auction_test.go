@@ -21,7 +21,7 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to sell lease from auction, buyer can fulfill auction", func(t *testing.T) {
+	t.Run("Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
@@ -42,9 +42,8 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.SoldAuction", map[string]interface{}{
 				"amount":        "20.00000000",
-				"expireAt":      "31536001.00000000",
 				"newOwner":      "0xe03daebed8ca0615",
 				"previousOwner": "0x179b6b1cb6755e31",
 				"name":          "user1",
@@ -79,9 +78,8 @@ func TestAuction(t *testing.T) {
 			UFix64Argument(amount).
 			Test(gt.T).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
 				"amount":        "10.00000000",
-				"expireAt":      "31536001.00000000",
 				"newOwner":      "0xf3fcd2c1a78f5eee",
 				"previousOwner": "0x179b6b1cb6755e31",
 				"name":          "user1",
@@ -171,7 +169,7 @@ func TestAuction(t *testing.T) {
 			UFix64Argument("4.0").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
 				"amount":       "8.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
@@ -196,7 +194,7 @@ func TestAuction(t *testing.T) {
 			UFix64Argument("3.0").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
 				"amount":       "8.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
@@ -221,7 +219,7 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
 				"amount":       "4.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
@@ -247,7 +245,7 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",
 			}))
@@ -272,7 +270,7 @@ func TestAuction(t *testing.T) {
 			StringArgument("user1").
 			Test(t).
 			AssertSuccess().
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",
 			}))
@@ -319,7 +317,7 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
 				"amount":       "15.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xe03daebed8ca0615",
@@ -353,7 +351,7 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
 				"amount":       "15.00000000",
 				"auctionEndAt": "86681.00000000", //auction is extended
 				"bidder":       "0xe03daebed8ca0615",
@@ -361,6 +359,8 @@ func TestAuction(t *testing.T) {
 			}))
 
 	})
+
+	//TODO: test cancel finished auction that did not meet reserve price
 
 	t.Run("Should be able to cancel unfinished auction", func(t *testing.T) {
 
@@ -385,7 +385,7 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"from":   "0xf3fcd2c1a78f5eee",
 			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionCancelled", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionCanceled", map[string]interface{}{
 				"amount": "5.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",

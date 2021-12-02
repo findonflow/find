@@ -19,7 +19,7 @@ transaction() {
 
 		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 		adminClient.setWallet(wallet)
-//		adminClient.setPublicEnabled(true)
+		adminClient.setPublicEnabled(true)
 
 		/*
 		//this is just an example

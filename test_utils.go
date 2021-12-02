@@ -157,8 +157,6 @@ func (gt *GWTFTestUtils) listForAuction(name string) *GWTFTestUtils {
 }
 
 func (gt *GWTFTestUtils) listForSale(name string) *GWTFTestUtils {
-	expireTime := gt.currentTime() + leaseDurationFloat
-	expireTimeString := fmt.Sprintf("%f00", expireTime)
 	nameAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(name).Address().String())
 
 	gt.GWTF.TransactionFromFile("listForSale").
@@ -166,11 +164,10 @@ func (gt *GWTFTestUtils) listForSale(name string) *GWTFTestUtils {
 		StringArgument(name).
 		UFix64Argument("10.0"). //direct sale price
 		Test(gt.T).AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+		AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 			"directSellPrice": "10.00000000",
 			"active":          "true",
 			"name":            name,
-			"expireAt":        expireTimeString,
 			"owner":           nameAddress,
 		}))
 	return gt
@@ -183,7 +180,7 @@ func (gt *GWTFTestUtils) blindBid(buyer, name, amount string) *GWTFTestUtils {
 		UFix64Argument(amount).
 		Test(gt.T).
 		AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+		AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%s0000000", amount),
 			"bidder": bidderAddress,
 			"name":   name,
@@ -202,7 +199,7 @@ func (gt *GWTFTestUtils) bid(buyer, name, amount string) *GWTFTestUtils {
 		UFix64Argument(amount).
 		Test(gt.T).
 		AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
+		AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
 			"amount":       fmt.Sprintf("%s0000000", amount),
 			"auctionEndAt": endTimeSting,
 			"bidder":       bidderAddress,
@@ -221,7 +218,7 @@ func (gt *GWTFTestUtils) auctionBid(buyer, name, amount string) *GWTFTestUtils {
 		UFix64Argument(amount).
 		Test(gt.T).
 		AssertSuccess().
-		AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
+		AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
 			"amount":       fmt.Sprintf("%s0000000", amount),
 			"auctionEndAt": endTimeSting,
 			"bidder":       bidderAddress,

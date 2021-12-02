@@ -22,8 +22,6 @@ Taxonomy:
 */
 pub contract FIND {
 
-	//TODO: rename DirectOffer to DirectOffer
-
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
 
@@ -33,33 +31,39 @@ pub contract FIND {
 	pub event Register(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64)
 
 	/// Emitted when a name is moved to a new owner
-	pub event Moved(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64)
+	pub event Moved(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64)
 
 	/// Emitted when a name is sold to a new owner
-	pub event Sold(name: String, previousOwner: Address, newOwner: Address, expireAt: UFix64, amount: UFix64)
+	pub event Sold(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64, amount: UFix64)
+
+	pub event SoldAuction(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64, amount: UFix64)
 
 	/// Emitted when a name is explicistly put up for sale
-	pub event ForSale(name: String, owner: Address, expireAt: UFix64, directSellPrice: UFix64, active: Bool)
-	pub event ForAuction(name: String, owner: Address, expireAt: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
+	pub event ForSale(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64, directSellPrice: UFix64, active: Bool)
+	
+	/// Emitted when an name is put up for on-demand auction
+	pub event ForAuction(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event DirectOffer(name: String, bidder: Address, amount: UFix64)
+	pub event DirectOffer(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
 
 	/// Emitted if a blind bid is canceled
-	pub event DirectOfferCanceled(name: String, bidder: Address)
+	pub event DirectOfferCanceled(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String)
 
 	/// Emitted if a blind bid is rejected
-	pub event DirectOfferRejected(name: String, bidder: Address, amount: UFix64)
+	pub event DirectOfferRejected(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String,amount: UFix64)
 
-	//TODO: spelling error
 	/// Emitted if an auction is canceled
-	pub event AuctionCancelled(name: String, bidder: Address, amount: UFix64)
+	pub event AuctionCanceled(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
+
+	/// Emitted if an auction is canceled because it did not reach the reserved price
+	pub event AuctionCanceledReservePrice(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
 
 	/// Emitted when an auction starts. 
-	pub event AuctionStarted(name: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
+	pub event AuctionStarted(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64, auctionEndAt: UFix64)
 
 	/// Emitted when there is a new bid in an auction
-	pub event AuctionBid(name: String, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
+	pub event AuctionBid(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64, auctionEndAt: UFix64)
 
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
@@ -238,8 +242,8 @@ pub contract FIND {
 			return self.networkCap.borrow()!.getLeaseExpireTime(self.name)
 		}
 
-		pub fun getLeaseLocedUntil() : UFix64 {
-			return self.networkCap.borrow()!.getLeaseLocedUntil(self.name)
+		pub fun getLeaseLockedUntil() : UFix64 {
+			return self.networkCap.borrow()!.getLeaseLockedUntil(self.name)
 		}
 
 		pub fun getProfile():&{Profile.Public}? {
@@ -275,7 +279,7 @@ pub contract FIND {
 			return self.latestBidCallback.borrow()!.getBalance(self.name)
 		}
 
-		pub fun addBid(callback: Capability<&BidCollection{BidCollectionPublic}>, timestamp: UFix64) {
+		pub fun addBid(callback: Capability<&BidCollection{BidCollectionPublic}>, timestamp: UFix64, lease: &Lease) {
 			let offer=callback.borrow()!
 			offer.setBidType(name: self.name, type: "auction")
 
@@ -291,7 +295,13 @@ pub contract FIND {
 			if suggestedEndTime > self.endsAt {
 				self.endsAt=suggestedEndTime
 			}
-			emit AuctionBid(name: self.name, bidder: self.latestBidCallback.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
+			let bidder= callback.address
+			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+			let owner=lease.owner!.address
+			let ownerName=lease.getProfile()!.getName()
+
+
+			emit AuctionBid(name: self.name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: self.getBalance(), auctionEndAt: self.endsAt)
 		}
 	}
 
@@ -467,7 +477,7 @@ pub contract FIND {
 				}
 			}
 
-			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.addons.keys)
+			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.addons.keys)
 		}
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -499,8 +509,14 @@ pub contract FIND {
 			let offer=callback.borrow()!
 			offer.setBidType(name: name, type: "auction")
 
+
+			let bidder= callback.address
+			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+			let owner=lease.owner!.address
+			let ownerName=lease.getProfile()!.getName()
+
 			let endsAt=timestamp + duration
-			emit AuctionStarted(name: name, bidder: callback.address, amount: offer.getBalance(name), auctionEndAt: endsAt)
+			emit AuctionStarted(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: offer.getBalance(name), auctionEndAt: endsAt)
 
 			let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, name: name)
 			lease.setCallback(nil)
@@ -514,20 +530,24 @@ pub contract FIND {
 			destroy oldAuction
 		}
 
-
-		//TODO: Should be allowed to cancel a bid if auction is on an item that is free
 		access(contract) fun cancelBid(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				!self.auctions.containsKey(name) : "Cannot cancel a bid that is in an auction=".concat(name)
 			}
 
-			let bid= self.borrow(name)
-			if let callback = bid.offerCallback {
-				emit DirectOfferCanceled(name: name, bidder: callback.address)
+			let lease= self.borrow(name)
+
+			if let callback = lease.offerCallback {
+
+				let bidder= callback.address
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+				let owner=lease.owner!.address
+				let ownerName=lease.getProfile()!.getName()
+				emit DirectOfferCanceled(name: name, bidder: bidder, bidderName: bidderName, owner: owner, ownerName: ownerName)
 			}
 
-			bid.setCallback(nil)
+			lease.setCallback(nil)
 		}
 
 		access(contract) fun increaseBid(_ name: String) {
@@ -543,14 +563,21 @@ pub contract FIND {
 				if auction.endsAt < timestamp {
 					panic("Auction has ended")
 				}
-				auction.addBid(callback:auction.latestBidCallback, timestamp:timestamp)
+				auction.addBid(callback:auction.latestBidCallback, timestamp:timestamp, lease: lease)
 				return
 			}
+
+
+			let bidder= lease.offerCallback!.address
+			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName()
+			let owner=lease.owner!.address
+			let ownerName=lease.getProfile()!.getName()
 
 			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if lease.salePrice == nil  && lease.auctionStartPrice == nil{
-				emit DirectOffer(name: name, bidder: lease.offerCallback!.address, amount: balance)
+
+				emit DirectOffer(name: name, bidder: bidder, bidderName: bidderName, owner: owner, ownerName: ownerName, amount: balance)
 				return
 			}
 
@@ -560,7 +587,7 @@ pub contract FIND {
 			} else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
-				emit DirectOffer(name: name, bidder: lease.offerCallback!.address, amount: balance)
+				emit DirectOffer(name: name, bidder: bidder,bidderName: bidderName, owner: owner, ownerName: ownerName, amount: balance)
 			}
 
 		}
@@ -582,7 +609,7 @@ pub contract FIND {
 				if auction.endsAt < timestamp {
 					panic("Auction has ended")
 				}
-				auction.addBid(callback:callback, timestamp:timestamp)
+				auction.addBid(callback:callback, timestamp:timestamp, lease: lease)
 				return
 			} 
 
@@ -596,10 +623,18 @@ pub contract FIND {
 			lease.setCallback(callback)
 
 			let balance=callback.borrow()!.getBalance(name)
+
+
+			let bidder= callback.address
+			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+			let owner=lease.owner!.address
+			let ownerName=lease.getProfile()!.getName()
+
+
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
 			if lease.salePrice == nil && lease.auctionStartPrice == nil {
 				Debug.log("Sale price not set")
-				emit DirectOffer(name: name, bidder: callback.address, amount: balance)
+				emit DirectOffer(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: balance)
 				return
 			}
 
@@ -609,7 +644,7 @@ pub contract FIND {
 			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
-				emit DirectOffer(name: name, bidder: callback.address, amount: balance)
+				emit DirectOffer(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: balance)
 			}
 
 		}
@@ -623,8 +658,13 @@ pub contract FIND {
 			let lease = self.borrow(name)
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= lease.offerCallback {
+
+				let bidder= cb.address
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+				let owner=lease.owner!.address
+				let ownerName=lease.getProfile()!.getName()
 				Debug.log("we have a blind bid so we cancel that")
-				emit DirectOfferRejected(name: name, bidder: cb.address, amount: cb.borrow()!.getBalance(name))
+				emit DirectOfferRejected(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: cb.borrow()!.getBalance(name))
 				cb.borrow()!.cancel(name)
 				lease.setCallback(nil)
 			}
@@ -647,7 +687,16 @@ pub contract FIND {
 					panic("Cannot cancel finished auction, fulfill it instead")
 				}
 
-				emit AuctionCancelled(name: name, bidder: auction.latestBidCallback.address, amount: balance)
+				let bidder= auction.latestBidCallback.address
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+				let owner=lease.owner!.address
+				let ownerName=lease.getProfile()!.getName()
+
+				if auctionEnded {
+					emit AuctionCanceledReservePrice(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: balance)
+				} else {
+					emit AuctionCanceled(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: balance)
+				}
 				auction.latestBidCallback.borrow()!.cancel(name)
 				destroy <- self.auctions.remove(key: name)!
 			}
@@ -680,7 +729,7 @@ pub contract FIND {
 				let newProfile= getAccount(cb.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 				let soldFor=offer.getBalance(name)
 				//move the token to the new profile
-				emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, expireAt: lease.getLeaseExpireTime(), amount: soldFor)
+				emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), amount: soldFor)
 				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!
@@ -717,7 +766,7 @@ pub contract FIND {
 			let newProfile= getAccount(auction.latestBidCallback.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 
 			//move the token to the new profile
-			emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, expireAt: lease.getLeaseExpireTime(), amount: soldFor)
+			emit SoldAuction(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), amount: soldFor)
 			lease.move(profile: newProfile)
 
 			let token <- self.leases.remove(key: name)!
@@ -745,7 +794,7 @@ pub contract FIND {
 			tokenRef.setReservePrice(auctionReservePrice)
 			tokenRef.setAuctionDuration(auctionDuration)
 			tokenRef.setExtentionOnLateBid(auctionExtensionOnLateBid)
-			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!,  active: true)
+			emit ForAuction(name: name, owner:self.owner!.address, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), auctionStartPrice: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!,  active: true)
 		}
 
 		pub fun listForSale(name :String, directSellPrice:UFix64) {
@@ -755,7 +804,7 @@ pub contract FIND {
 
 			let tokenRef = self.borrow(name)
 			tokenRef.setSalePrice(directSellPrice)
-			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, active: true)
+			emit ForSale(name: name, owner:self.owner!.address, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), directSellPrice: tokenRef.salePrice!, active: true)
 		}
 
 
@@ -766,7 +815,7 @@ pub contract FIND {
 
 			let tokenRef = self.borrow(name)
 
-			emit ForAuction(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), auctionStartPrice: tokenRef.auctionStartPrice!,  auctionReservePrice: tokenRef.auctionReservePrice!, active: false)
+			emit ForAuction(name: name, owner:self.owner!.address, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), auctionStartPrice: tokenRef.auctionStartPrice!,  auctionReservePrice: tokenRef.auctionReservePrice!, active: false)
 			tokenRef.setStartAuctionPrice(nil)
 			tokenRef.setReservePrice(nil)
 		}
@@ -778,15 +827,15 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
-			emit ForSale(name: name, owner:self.owner!.address, expireAt: tokenRef.getLeaseExpireTime(), directSellPrice: tokenRef.salePrice!, active: false)
+			emit ForSale(name: name, owner:self.owner!.address, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), directSellPrice: tokenRef.salePrice!, active: false)
 			tokenRef.setSalePrice(nil)
 		}
 
 		//note that when moving a name
 		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
 			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
-			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, expireAt: token.getLeaseExpireTime())
-			emit Register(name: name, owner:profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLocedUntil())
+			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil())
+			emit Register(name: name, owner:profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil())
 			token.move(profile: profile)
 			to.borrow()!.deposit(token: <- token)
 		}
@@ -913,7 +962,7 @@ pub contract FIND {
 		access(contract) let lockPeriod: UFix64
 		access(contract) var defaultPrice: UFix64
 		access(contract) let secondaryCut: UFix64
-		//		access(contract) var pricesChangedAt: UFix64 //TODO add before mainnet
+		access(contract) var pricesChangedAt: UFix64 
 		access(contract) var lengthPrices: {Int: UFix64}
 		access(contract) var addonPrices: {String: UFix64}
 
@@ -928,10 +977,10 @@ pub contract FIND {
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut
 			self.defaultPrice=defaultPrice
-			//			self.pricesChangedAt=Clock.time()
 			self.lengthPrices=lengthPrices
 			self.profiles={}
 			self.wallet=wallet
+			self.pricesChangedAt= Clock.time()
 			self.publicEnabled=publicEnabled
 		}
 
@@ -980,7 +1029,7 @@ pub contract FIND {
 			panic("Could not find profile with name=".concat(name))
 		}
 
-		access(contract) fun getLeaseLocedUntil(_ name: String) : UFix64{
+		access(contract) fun getLeaseLockedUntil(_ name: String) : UFix64{
 			if let lease= self.profiles[name] {
 				return lease.lockedUntil
 			}
@@ -1200,7 +1249,7 @@ pub contract FIND {
 			return <- vault
 		}
 
-		//called from lease when things are cancelled
+		//called from lease when things are canceled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancel(_ name: String) {
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
