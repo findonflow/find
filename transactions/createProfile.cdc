@@ -20,7 +20,7 @@ transaction(name: String) {
 			return 
 		}
 
-		let profile <-Profile.createUser(name:name, description: "", allowStoringFollowers:true, tags:["find"])
+		let profile <-Profile.createUser(name:name, createdAt: "find")
 
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
@@ -70,6 +70,7 @@ transaction(name: String) {
 
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
+		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
 	}
 }

@@ -43,13 +43,7 @@
 		"Content": "./contracts/Content.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"Clock": "./contracts/Clock.cdc", 
-		"Profile": {
-			"source" : "./contracts/Profile.cdc", 
-			"aliases" : {
-				"testnet" : "99ca04281098b33d",
-				"mainnet" : "d796ff17107bbff6"
-			}
-		},
+		"Profile": "./contracts/Profile.cdc",
 		"Debug" : "./contracts/Debug.cdc",
 		"Market" : "./contracts/Market.cdc"
 	},
@@ -115,26 +109,28 @@
 	"deployments": {
 		"mainnet": {
 			"mainnet-find": [
-				"Admin",
 				"FIND",
+				"Admin",
 				"Clock",
-				"Debug"
+				"Debug",
+				"Profile"
 			]
 		},
 		"testnet": {
 			"testnet-find": [
-				"Admin",
 				"FIND",
+				"Admin",
 				"Clock",
-				"Debug"
+				"Debug",
+				"Profile"
 			]
 		},
 		"emulator": {
 			"emulator-account": [
+				"FIND",
 				"NonFungibleToken",
 				"Artifact",
 				"TypedMetadata",
-				"FIND",
 				"Clock",
 				"Profile",
 				"Market",

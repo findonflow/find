@@ -39,7 +39,7 @@ transaction(name: String, amount: UFix64) {
 			account.unlink(Profile.publicPath)
 			destroy <- account.load<@AnyResource>(from:Profile.storagePath)
 
-			let profile <-Profile.createUser(name:name, description: "", allowStoringFollowers:true, tags:["find"])
+			let profile <-Profile.createUser(name:name, createdAt: "find")
 
 			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"])
 
@@ -49,6 +49,7 @@ transaction(name: String, amount: UFix64) {
 
 			account.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
+			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
