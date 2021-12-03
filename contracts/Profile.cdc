@@ -441,10 +441,9 @@ pub contract Profile {
 
 	}
 
-	pub fun findWallet(_ address: Address) : &{FungibleToken.Receiver} {
+	pub fun findWalletCapability(_ address: Address) : Capability<&{FungibleToken.Receiver}> {
 		return getAccount(address)
 		.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		.borrow()!
 	}
 
 	pub fun find(_ address: Address) : &{Profile.Public} {
