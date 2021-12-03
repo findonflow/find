@@ -268,9 +268,6 @@ pub contract Profile {
 		access(self) var links: {String: Link}
 		access(self) var allowStoringFollowers: Bool
 
-		//this is to have state for dids
-		access(self) var signature: {String : String}
-
 		//this is just a bag of properties if we need more fields here, so that we can do it with contract upgrade
 		access(self) var additionalProperties: {String : String}
 
@@ -289,7 +286,6 @@ pub contract Profile {
 			self.links={}
 			self.allowStoringFollowers=true
 			self.bans={}
-			self.signature={}
 			self.additionalProperties={}
 
 		}
