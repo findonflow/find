@@ -10,7 +10,6 @@ import (
 
 	"github.com/bjartek/go-with-the-flow/v2/gwtf"
 	"github.com/meirf/gopart"
-	"github.com/onflow/cadence"
 )
 
 func readCsvFile2(filePath string) ([]string, []string) {
@@ -101,38 +100,41 @@ func main() {
 	}
 
 	//g := gwtf.NewGoWithTheFlowMainNet()
-	g := gwtf.NewGoWithTheFlowEmulator()
+	g := gwtf.NewGoWithTheFlowDevNet()
+	//	g := gwtf.NewGoWithTheFlowEmulator()
 
-	findLinks := cadence.NewArray([]cadence.Value{
-		cadence.NewDictionary([]cadence.KeyValuePair{
-			{Key: cadence.NewString("title"), Value: cadence.NewString("twitter")},
-			{Key: cadence.NewString("type"), Value: cadence.NewString("twitter")},
-			{Key: cadence.NewString("url"), Value: cadence.NewString("https://twitter.com/findonflow")},
-		})})
+	/*
+			findLinks := cadence.NewArray([]cadence.Value{
+				cadence.NewDictionary([]cadence.KeyValuePair{
+					{Key: cadence.NewString("title"), Value: cadence.NewString("twitter")},
+					{Key: cadence.NewString("type"), Value: cadence.NewString("twitter")},
+					{Key: cadence.NewString("url"), Value: cadence.NewString("https://twitter.com/findonflow")},
+				})})
 
-	g.TransactionFromFile("createProfile").
-		SignProposeAndPayAs("find").
-		StringArgument("ReservedNames").
-		RunPrintEventsFull()
+			g.TransactionFromFile("createProfile").
+				SignProposeAndPayAs("find").
+				StringArgument("ReservedNames").
+				RunPrintEventsFull()
 
-	g.TransactionFromFile("editProfile").
-		SignProposeAndPayAs("find").
-		StringArgument("ReservedNames").
-		StringArgument(`Reserved names:
+			g.TransactionFromFile("editProfile").
+				SignProposeAndPayAs("find").
+				StringArgument("ReservedNames").
+				StringArgument(`Reserved names:
 
-1. add a direct offer for the apropriate price
-2. ping a mod in find discord to have them approve
+		1. add a direct offer for the apropriate price
+		2. ping a mod in find discord to have them approve
 
-Prices:
- - 3 letter name  500 FUSD
- - 4 letter name  100 FUSD
- - 5+ letter name   5 FUSD
-`).
-		StringArgument("https://find.xyz/find.png").
-		StringArrayArgument("find").
-		BooleanArgument(false).
-		Argument(findLinks).
-		RunPrintEventsFull()
+		Prices:
+		 - 3 letter name  500 FUSD
+		 - 4 letter name  100 FUSD
+		 - 5+ letter name   5 FUSD
+		`).
+				StringArgument("https://find.xyz/find.png").
+				StringArrayArgument("find").
+				BooleanArgument(false).
+				Argument(findLinks).
+				RunPrintEventsFull()
+	*/
 
 	reservations := readCsvFile(file)
 
@@ -141,9 +143,9 @@ Prices:
 		//run transaction against flow
 		names := reservations[idxRange.Low:idxRange.High]
 		g.TransactionFromFile("registerAdmin").
-			SignProposeAndPayAs("find").
+			SignProposeAndPayAs("find-admin").
 			StringArrayArgument(names...).
-			AccountArgument("find").
+			AccountArgument("find-admin").
 			RunPrintEventsFull()
 	}
 }

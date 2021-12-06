@@ -18,10 +18,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	g := gwtf.NewGoWithTheFlowEmulator()
+	//	g := gwtf.NewGoWithTheFlowEmulator()
+	g := gwtf.NewGoWithTheFlowDevNet()
 
 	reservedNames := readNameAddresses(file)
-	result := g.ScriptFromFile("reserveStatus").AccountArgument("find").RunReturnsJsonString()
+	result := g.ScriptFromFile("reserveStatus").AccountArgument("find-admin").RunReturnsJsonString()
 	var bids []LeaseBids
 	err := json.Unmarshal([]byte(result), &bids)
 	if err != nil {
@@ -36,13 +37,11 @@ func main() {
 		}
 
 		if bid.LatestBidBy == reservedAddress {
-			g.TransactionFromFile("fulfill").SignProposeAndPayAs("find").StringArgument(bid.Name).RunPrintEventsFull()
+			g.TransactionFromFile("fulfill").SignProposeAndPayAs("find-admin").StringArgument(bid.Name).RunPrintEventsFull()
 		} else {
-			g.TransactionFromFile("rejectDirectOffer").SignProposeAndPayAs("find").StringArgument(bid.Name).RunPrintEventsFull()
+			g.TransactionFromFile("rejectDirectOffer").SignProposeAndPayAs("find-admin").StringArgument(bid.Name).RunPrintEventsFull()
 		}
 	}
-
-	g.ScriptFromFile("name_status").StringArgument("test").Run()
 
 }
 
