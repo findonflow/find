@@ -119,6 +119,7 @@ pub contract Profile {
 	}
 
 	pub struct UserProfile {
+		pub let findName: String
 		pub let createdAt: String
 		pub let address: Address
 		pub let name: String
@@ -134,6 +135,7 @@ pub contract Profile {
 		pub let allowStoringFollowers: Bool
 
 		init(
+			findName:String,
 			address: Address,
 			name: String,
 			gender: String,
@@ -148,6 +150,7 @@ pub contract Profile {
 			allowStoringFollowers:Bool,
 			createdAt: String
 		) {
+			self.findName=findName
 			self.address=address
 			self.name=name
 			self.gender=gender
@@ -165,6 +168,7 @@ pub contract Profile {
 	}
 	pub resource interface Public{
 		pub fun getName(): String
+		pub fun getFindName(): String
 		pub fun getCreatedAt(): String
 		pub fun getGender(): String
 		pub fun getDescription(): String
@@ -254,6 +258,7 @@ pub contract Profile {
 
 	pub resource User: Public, Owner, FungibleToken.Receiver {
 		access(self) var name: String
+		access(self) var findName: String
 		access(self) var createdAt: String
 		access(self) var gender: String
 		access(self) var description: String
@@ -274,6 +279,7 @@ pub contract Profile {
 			let randomNumber = (1 as UInt64) + (unsafeRandom() % 25)
 			self.createdAt=createdAt
 			self.name = name
+			self.findName=""
 			self.gender="" 
 			self.description=""
 			self.tags=[]
@@ -314,6 +320,7 @@ pub contract Profile {
 			}
 
 			return UserProfile(
+				findName: self.getFindName(),
 				address: self.owner!.address,
 				name: self.getName(),
 				gender: self.getGender(),
@@ -391,6 +398,7 @@ pub contract Profile {
 		}
 
 		pub fun getName(): String { return self.name }
+		pub fun getFindName(): String { return self.findName }
 		pub fun getCreatedAt(): String { return self.createdAt }
 		pub fun getGender() : String { return self.gender }
 		pub fun getDescription(): String{ return self.description}
@@ -400,6 +408,7 @@ pub contract Profile {
 		pub fun getFollowing(): [FriendStatus] { return self.following.values }
 
 		pub fun setName(_ val: String) { self.name = val }
+		pub fun setFindName(_ val: String) { self.findName = val }
 		pub fun setGender(_ val: String) { self.gender = val }
 		pub fun setAvatar(_ val: String) { self.avatar = val }
 		pub fun setDescription(_ val: String) { self.description=val}
