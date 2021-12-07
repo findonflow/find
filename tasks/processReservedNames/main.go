@@ -36,9 +36,11 @@ func main() {
 			continue
 		}
 
-		if bid.LatestBidBy == reservedAddress {
+		if bid.LatestBidBy == reservedAddress && bid.LatestBid == bid.Cost {
+			fmt.Printf("Fullfilled bid %v", bid)
 			g.TransactionFromFile("fulfill").SignProposeAndPayAs("find-admin").StringArgument(bid.Name).RunPrintEventsFull()
 		} else {
+			fmt.Printf("Rejected offer on name=%s from bidder=%s\n", bid.Name, bid.LatestBidBy)
 			g.TransactionFromFile("rejectDirectOffer").SignProposeAndPayAs("find-admin").StringArgument(bid.Name).RunPrintEventsFull()
 		}
 	}

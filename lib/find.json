@@ -42,7 +42,8 @@
     "find": "import TypedMetadata from 0xTypedMetadata\nimport Profile from 0xProfile\n\n\npub fun main(address: Address, path: String, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet collections= getAccount(address).getCapability(Profile.publicPath)\n\t.borrow<&{Profile.Public}>()!\n\t.getCollections()\n\n\tfor col in collections {\n\t\tif col.name == path && col.type == Type<&{TypedMetadata.ViewResolverCollection}>() {\n\t\t\tlet cap = col.collection.borrow<&{TypedMetadata.ViewResolverCollection}>()! as &{TypedMetadata.ViewResolverCollection}\n\t\t\tlet nft=cap.borrowViewResolver(id: id)\n\t\t\tfor v in nft.getViews() {\n\t\t\t\tif v.identifier== identifier {\n\t\t\t\t\treturn nft.resolveView(v)\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\treturn nil\n}\n\n",
     "name_status": "import FIND from 0xFIND\nimport Profile from 0xProfile\n\npub struct FINDNameReport{\n\tpub let profile:Profile.UserProfile?\n\tpub let lease: FIND.LeaseInformation?\n\tpub let status: String\n\tpub let cost: UFix64\n\n\tinit(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64) {\n\t\tself.status=status\n\t\tself.profile=profile\n\t\tself.lease=lease\n\t\tself.cost=cost\n\t}\n}\n\n//Check the status of a fin user\npub fun main(name: String) : FINDNameReport{\n\n\tlet status=FIND.status(name)\n\tlet cost=FIND.calculateCost(name)\n\tif let address=status.owner {\n\t\tlet account=getAccount(address)\n\t\tlet leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)\n\n\t\tlet profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()\n\t\tvar lease:FIND.LeaseInformation?=nil\n\t\tif leaseCap.check() {\n\t\t\tlease=leaseCap.borrow()!.getLease(name)\n\t\t}\n\t\treturn FINDNameReport(\n\t\t\tstatus: lease?.status ?? \"taken\",\n\t\t\tprofile: profile?.asProfile(),\n\t\t\tlease: lease,\n\t\t\tcost:  cost\n\t\t)\n\n\t}\n\n\tvar statusValue= \"FREE\"\n\tif  status.status == FIND.LeaseStatus.TAKEN {\n\t\tstatusValue=\"NO_PROFILE\"\n\t}\n\treturn FINDNameReport(\n\t\tstatus: statusValue,\n\t\tprofile: nil, \n\t\tlease: nil,\n\t\tcost: cost\n\t)\n\n}\n",
     "reserveStatus": "import FIND from 0xFIND\n\n\n//Check the status of a fin user\npub fun main(user: Address) : [FIND.LeaseInformation] {\n\n\tlet account=getAccount(user)\n\tlet leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)\n\n\tlet leases=leaseCap.borrow()?.getLeaseInformation() ?? []\n\n\tvar leasesWithBids :[FIND.LeaseInformation] =[]\n\tfor lease in leases {\n\t\tif lease.latestBidBy != nil {\n\t\t\tleasesWithBids.append(lease)\n\t\t}\n\t}\n\n\treturn leasesWithBids\n}\n",
-    "status": "import FIND from 0xFIND\nimport Profile from 0xProfile\n\n//Check the status of a fin user\npub fun main(name: String) :  &{Profile.Public}? {\n    return FIND.lookup(name)\n}\n"
+    "status": "import FIND from 0xFIND\nimport Profile from 0xProfile\n\n//Check the status of a fin user\npub fun main(name: String) :  &{Profile.Public}? {\n    return FIND.lookup(name)\n}\n",
+    "versus-list": "import Art from 0xArt\n\npub struct MetadataCollection{\n\tpub let type: String\n\tpub let items: [MetadataCollectionItem]\n\n\tinit(type:String, items: [MetadataCollectionItem]) {\n\t\tself.type=type\n\t\tself.items=items\n\t}\n}\n\npub struct MetadataCollectionItem {\n\tpub let id:UInt64\n\tpub let name: String\n\tpub let url: String\n\tpub let ipfsHash: String\n\n\n\tinit(id:UInt64, name:String, url:String, ipfsHash:String) {\n\t\tself.id=id\n\t\tself.name=name\n\t\tself.url=url\n\t\tself.ipfsHash=ipfsHash\n\t}\n\n}\n\n\npub fun main(address: Address) : {String : MetadataCollection} {\n\n\tlet results : {String :  MetadataCollection}={}\n\n\t let imageUrlPrefix=\"https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache\"\n\t let items: [MetadataCollectionItem]=[]\n   let artList= Art.getArt(address: address)\n\t for art in artList {\n\t\t items.append(MetadataCollectionItem(id:art.id, name:art.metadata.name.concat(\" edition \").concat(art.metadata.edition.toString()).concat(\"/\").concat(art.metadata.maxEdition.toString()).concat(\" by \").concat(art.metadata.artist),  url:imageUrlPrefix.concat(art.cacheKey), ipfsHash:\"\"))\n\t }\n \t results[\"versus\"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)\n\t return results\n}\n"
   },
   "vars": {
     "emulator": {
@@ -69,7 +70,7 @@
       "0xArtifact": null,
       "0xFIND": "0x37a05b1ecacc80f7",
       "0xAdmin": "0x37a05b1ecacc80f7",
-      "0xArt": null,
+      "0xArt": "0x99ca04281098b33d",
       "0xContent": null,
       "0xTypedMetadata": null,
       "0xClock": "0x37a05b1ecacc80f7",
@@ -85,7 +86,7 @@
       "0xArtifact": null,
       "0xFIND": "0xd136d89c8958d52a",
       "0xAdmin": "0xd136d89c8958d52a",
-      "0xArt": null,
+      "0xArt": "0xd796ff17107bbff6",
       "0xContent": null,
       "0xTypedMetadata": null,
       "0xClock": "0xd136d89c8958d52a",
