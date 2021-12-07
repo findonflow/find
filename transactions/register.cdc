@@ -3,7 +3,6 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
-import Artifact from "../contracts/Artifact.cdc"
 
 transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
