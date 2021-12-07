@@ -27,15 +27,18 @@ pub struct MetadataCollectionItem {
 }
 
 
-pub fun main(address: Address) : {String : MetadataCollection} {
+pub fun main(address: Address) : {String : MetadataCollection}? {
 
-	let results : {String :  MetadataCollection}={}
+	 let results : {String :  MetadataCollection}={}
 
 	 let imageUrlPrefix="https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 	 let items: [MetadataCollectionItem]=[]
    let artList= Art.getArt(address: address)
 	 for art in artList {
 		 items.append(MetadataCollectionItem(id:art.id, name:art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  url:imageUrlPrefix.concat(art.cacheKey), ipfsHash:""))
+	 }
+	 if items.length == 0 {
+		 return nil
 	 }
  	 results["versus"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)
 	 return results

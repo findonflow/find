@@ -272,13 +272,13 @@ pub contract Profile {
 		access(self) var additionalProperties: {String : String}
 
 		init(name:String, createdAt: String) {
+			let randomNumber = (1 as UInt64) + (unsafeRandom() % 25)
 			self.createdAt=createdAt
 			self.name = name
 			self.gender="" 
 			self.description=""
 			self.tags=[]
-			//TODO: find a better standard profile picture
-			self.avatar = "https://avatars.onflow.org/avatar/ghostnote"
+			self.avatar = "https://find.xyz/assets/img/avatars/avatar".concat(randomNumber.toString()).concat(".png")
 			self.followers = {}
 			self.following = {}
 			self.collections={}
