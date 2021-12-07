@@ -454,8 +454,8 @@ pub contract Profile {
 
 	pub fun createUser(name: String, createdAt:String) : @Profile.User {
 		pre {
-			name.length <= 64: "Name must be 16 or less characters"
-			createdAt.length <= 32: "createdAt must be 16 or less characters"
+			name.length <= 64: "Name must be 64 or less characters"
+			createdAt.length <= 32: "createdAt must be 32 or less characters"
 		}
 		return <- create Profile.User(name: name,createdAt: createdAt)
 	}
