@@ -295,8 +295,13 @@ pub contract FIND {
 			if suggestedEndTime > self.endsAt {
 				self.endsAt=suggestedEndTime
 			}
+
 			let bidder= callback.address
-			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+			if profile == nil {
+			   panic("Create a profile before you make a bid")
+			}
+			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
 			let ownerName=lease.getProfile()!.getName()
 
@@ -510,6 +515,7 @@ pub contract FIND {
 			offer.setBidType(name: name, type: "auction")
 
 
+
 			let bidder= callback.address
 			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 			let owner=lease.owner!.address
@@ -626,7 +632,11 @@ pub contract FIND {
 
 
 			let bidder= callback.address
-			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+			if profile == nil {
+			   panic("Create a profile before you make a bid")
+			}
+			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
 			let ownerName=lease.getProfile()!.getName()
 
