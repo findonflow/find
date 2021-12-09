@@ -21,15 +21,14 @@ The network takes a 5% royalty on secondary market sales.
 
 
 ## Technical 1
-On testnet:
- - 0xFIND: 0x85f0d6217184009b
- - 0xProfile - 0x99ca04281098b33d
-
-On Mainnet: 
- - 0xFIND - ??
- - 
+lookup and address from a .find name
 ```
-import FIND from 0xFIND
+
+//testnet
+import FIND from 0x37a05b1ecacc80f7
+
+//mainnet
+//import FIND from ??
 
 pub fun main(name: String) :  Address? {
     return FIND.lookupAddress(name)
@@ -37,23 +36,18 @@ pub fun main(name: String) :  Address? {
 ```
 
 ## Tehnical 2
-If you want to lookup a profile and show it directly you can the following to get a READ only model
+Lookup a profile from a .find name
 ```
-import FIND from 0xFIND
-import Profile from 0xProfile
-pub fun main(name: String) :  Profile.UserProfile? {
+//testnet
+import FIND, Profile from 0x37a05b1ecacc80f7
+
+//mainnet
+//import FIND, Profile from ??
+
+[pub](pub) fun main(name: String) :  Profile.UserProfile? {
     return FIND.lookup(name)?.asProfile()
 }
 ```
-
-On testnet:
- - 0xFIND: 0x85f0d6217184009b
- - 0xProfile - 0x99ca04281098b33d
-
-On Mainnet: 
- - 0xProfile - 0xd796ff17107bbff6
- - 0xFIND - ??
-
 
 ## FAQ
 
