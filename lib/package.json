@@ -1,6 +1,6 @@
 {
   "name": "find-flow-contracts",
-  "version": "3.1.3",
+  "version": "3.2.0",
   "description": "Cadence contracts json for find",
   "main": "index.js",
   "scripts": {
