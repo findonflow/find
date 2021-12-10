@@ -619,16 +619,23 @@ pub contract FIND {
 				return
 			} 
 
+			let balance=callback.borrow()!.getBalance(name)
 			if let cb= lease.offerCallback {
 				if cb.address == callback.address {
 					panic("You already have the latest bid on this item, use the incraseBid transaction")
 				}
+				let currentBalance=cb.borrow()!.getBalance(name)
+
+				Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
+				if currentBalance >= balance {
+					panic("There is already a higher bid on this lease")
+				}
+
 				cb.borrow()!.cancel(name)
 			}
 
 			lease.setCallback(callback)
 
-			let balance=callback.borrow()!.getBalance(name)
 
 
 			let bidder= callback.address

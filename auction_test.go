@@ -107,6 +107,25 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should not accept blind bid less then current one", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			createUser("100.0", "user3").
+			registerUser("user1").
+			registerUser("user2").
+			registerUser("user3").
+			blindBid("user2", "user1", "10.0")
+
+		gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs("user3").
+			StringArgument("user1").
+			UFix64Argument("5.0").
+			Test(gt.T).
+			AssertFailure("There is already a higher bid on this lease")
+	})
+
 	t.Run("Should start auction if we start out with smaller bid and then increase it with locked user", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
