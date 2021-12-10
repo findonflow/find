@@ -58,6 +58,26 @@ func TestAuction(t *testing.T) {
 			}))
 
 	})
+	t.Run("Should not allow auction bid lower then the current one", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			createUser("100.0", "user3").
+			registerUser("user1").
+			registerUser("user2").
+			registerUser("user3").
+			listForAuction("user1").
+			bid("user2", "user1", "8.0").
+			auctionBid("user3", "user1", "20.0")
+
+		gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("10.0").
+			Test(gt.T).
+			AssertFailure("bid must be larger then previous bid")
+	})
 
 	t.Run("Should be able to sell lease from offer directly", func(t *testing.T) {
 
@@ -107,7 +127,7 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	t.Run("Should not accept blind bid less then current one", func(t *testing.T) {
+	t.Run("Should not accept direct offer bid less then current one", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
