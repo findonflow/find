@@ -8,13 +8,15 @@ import (
 func main() {
 
 	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
-	//	g := gwtf.NewGoWithTheFlowMainNet()
-	g := gwtf.NewGoWithTheFlowDevNet()
+	g := gwtf.NewGoWithTheFlowMainNet()
+	//g := gwtf.NewGoWithTheFlowDevNet()
 
-	//first step create the adminClient as the fin user
-	g.TransactionFromFile("setup_fin_1_create_client").
-		SignProposeAndPayAs("find-admin").
-		RunPrintEventsFull()
+	/*
+		//first step create the adminClient as the fin user
+		g.TransactionFromFile("setup_fin_1_create_client").
+			SignProposeAndPayAs("find-admin").
+			RunPrintEventsFull()
+	*/
 
 	//link in the server in the versus client
 	g.TransactionFromFile("setup_fin_2_register_client").
@@ -49,7 +51,7 @@ func main() {
 	g.TransactionFromFile("editProfile").
 		SignProposeAndPayAs("find-admin").
 		StringArgument("ReservedFindNames").
-		StringArgument(`The names owned by this profile are reservd by find. In order to aquire a name here you have to:
+		StringArgument(`The names owned by this profile are reservd by .find. In order to aquire a name here you have to:
 
 Prices:
  - 3 letter name  500 FUSD

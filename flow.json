@@ -104,7 +104,7 @@
 			"key": "${TESTNET_FIND_USER3}"
 		},
 		"mainnet-find": {
-			"address": "0xd136d89c8958d52a",
+			"address": "0x097bafa4e0b48eef",
 			"key": "${MAINNET_FIND}"
 		},
 		"mainnet-find-admin": {
