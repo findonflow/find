@@ -19,20 +19,19 @@ pub struct MetadataCollection{
 	}
 }
 
+
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let name: String
+	pub let image: String
 	pub let url: String
-	pub let ipfsHash: String
-	pub let svg: String
 
 
-	init(id:UInt64, name:String, url:String, ipfsHash:String, svg:String) {
+	init(id:UInt64, name:String, image:String, url:String) {
 		self.id=id
 		self.name=name
 		self.url=url
-		self.ipfsHash=ipfsHash
-		self.svg=svg
+		self.image=image
 	}
 
 }
@@ -48,7 +47,12 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		let imageUrlPrefix="https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 		let items: [MetadataCollectionItem]=[]
 		for art in artList {
-			items.append(MetadataCollectionItem(id:art.id, name:art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  url:imageUrlPrefix.concat(art.cacheKey), ipfsHash:"", svg:""))
+			items.append(MetadataCollectionItem(
+				id:art.id, 
+				name:art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  
+				image:imageUrlPrefix.concat(art.cacheKey), 
+				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/")
+			))
 		}
 		results["versus"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)
 	}
@@ -60,7 +64,12 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
-			items.append(MetadataCollectionItem(id:id, name: "Goober #".concat(id.toString()), url:"", ipfsHash: goober.uri, svg: ""))
+			items.append(MetadataCollectionItem(id:id, 
+			  name: "Goober #".concat(id.toString()), 
+				image: goober.uri,
+				url: "https://partymansion.io/gooberz/".concat(id.toString())
+			))
+
 		}
 		results["goobers"]= MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
 	}
@@ -70,7 +79,12 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		let items: [MetadataCollectionItem]=[]
 		for flovatar in flovatarList  {
       let flovatarDetails = Flovatar.getFlovatar(address: address, flovatarId: flovatar.id)
-			items.append(MetadataCollectionItem(id:flovatar.id, name:flovatar.name, url:"", ipfsHash:"", svg: flovatarDetails?.metadata?.svg ?? ""))
+			items.append(MetadataCollectionItem(
+				id:flovatar.id, 
+				name:flovatar.name, 
+				image:"https://flovatar.com/api/image/".concat(flovatar.id.toString()),
+				url:"https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+			))
 		}
 		results["flovatar"]= MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
 	}

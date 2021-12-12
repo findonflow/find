@@ -99,8 +99,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	//g := gwtf.NewGoWithTheFlowMainNet()
-	g := gwtf.NewGoWithTheFlowDevNet()
+	g := gwtf.NewGoWithTheFlowMainNet()
+	//g := gwtf.NewGoWithTheFlowDevNet()
 	//	g := gwtf.NewGoWithTheFlowEmulator()
 
 	/*

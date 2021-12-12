@@ -19,7 +19,8 @@ func main() {
 	}
 
 	//	g := gwtf.NewGoWithTheFlowEmulator()
-	g := gwtf.NewGoWithTheFlowDevNet()
+	//	g := gwtf.NewGoWithTheFlowDevNet()
+	g := gwtf.NewGoWithTheFlowMainNet()
 
 	reservedNames := readNameAddresses(file)
 	result := g.ScriptFromFile("reserveStatus").AccountArgument("find-admin").RunReturnsJsonString()
