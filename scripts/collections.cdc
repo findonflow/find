@@ -64,8 +64,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
-			items.append(MetadataCollectionItem(id:id, 
-			  name: "Goober #".concat(id.toString()), 
+			items.append(MetadataCollectionItem(id:id,
+			  name: "Goober #".concat(id.toString()),
 				image: goober.uri,
 				url: "https://partymansion.io/gooberz/".concat(id.toString())
 			))
@@ -74,11 +74,11 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		results["goobers"]= MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
 	}
 
-  let flovatarList= Flovatar.getFlovatars(address: address)
-  if flovatarList.length > 0 {
+	let flovatarList= Flovatar.getFlovatars(address: address)
+	if flovatarList.length > 0 {
 		let items: [MetadataCollectionItem]=[]
 		for flovatar in flovatarList  {
-      let flovatarDetails = Flovatar.getFlovatar(address: address, flovatarId: flovatar.id)
+			let flovatarDetails = Flovatar.getFlovatar(address: address, flovatarId: flovatar.id)
 			items.append(MetadataCollectionItem(
 				id:flovatar.id, 
 				name:flovatar.name, 
@@ -88,7 +88,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 		results["flovatar"]= MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
 	}
-	
+
 	/*
 	let bbCap = account.getCapability<&{BasicBeast.BeastCollectionPublic}>(BasicBeast.CollectionPublicPath)
 	if bbCap.check() {
