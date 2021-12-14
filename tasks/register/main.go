@@ -31,7 +31,7 @@ func readCsvFile(filePath string) []string {
 		if i == 0 {
 			continue
 		}
-		name := row[3]
+		name := row[0]
 		results[name] = true
 	}
 
@@ -55,12 +55,34 @@ func main() {
 	//g := gwtf.NewGoWithTheFlowDevNet()
 	//	g := gwtf.NewGoWithTheFlowEmulator()
 
+	names := readCsvFile("names.txt")
+	fmt.Printf("Names is %d long", len(names))
+
 	reservations := readCsvFile(file)
+	fmt.Printf("Reservation is %d long", len(reservations))
+
+	var filtered []string
+	for _, value := range reservations {
+		skip := false
+		for _, name := range names {
+			if value == name {
+				skip = true
+			}
+		}
+
+		if len(value) > 16 {
+			skip = true
+		}
+		if skip {
+			continue
+		}
+		filtered = append(filtered, value)
+	}
 
 	size := 50
-	for idxRange := range gopart.Partition(len(reservations), size) {
+	for idxRange := range gopart.Partition(len(filtered), size) {
 		//run transaction against flow
-		names := reservations[idxRange.Low:idxRange.High]
+		names := filtered[idxRange.Low:idxRange.High]
 		g.TransactionFromFile("registerAdmin").
 			SignProposeAndPayAs("find-admin").
 			StringArrayArgument(names...).

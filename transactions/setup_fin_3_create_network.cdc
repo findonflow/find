@@ -1,10 +1,10 @@
 
 import Admin from "../contracts/Admin.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FIND from "../contracts/FIND.cdc"
+//import FUSD from "../contracts/standard/FUSD.cdc"
+//import FIND from "../contracts/FIND.cdc"
 //import Artifact from "../contracts/Artifact.cdc"
 //import TypedMetadata from "../contracts/TypedMetadata.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+//import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction() {
 
