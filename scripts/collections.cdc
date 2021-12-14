@@ -9,6 +9,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 //mainnet
 import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
+import RareRooms_NFT from 0x329feb3ab062d289
 
 pub struct MetadataCollection{
 	pub let type: String
@@ -123,6 +124,23 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		results["basicbeasts"]= MetadataCollection(type: Type<@BasicBeast.Collection>().identifier, items: items)
 	}
 	*/
+
+	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath).borrow()
+		?? panic("Couldn't get collection")
+
+	let rareRoomNfts = rareRoomCollection.getIDs()
+	let items: [MetadataCollectionItem]=[]
+	for id in rareRoomNfts {
+		let nft = rareRoomCollection.borrowRareRooms_NFT(id: id)!
+		items.append(MetadataCollectionItem(
+			id: id,
+			name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
+			// we use "preview" and not "image" because of potential .glg and .mp4 file types
+			image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
+			url: "https://app.rarerooms.io"  // Or use field "external_url"
+		))
+	}
+	results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
 
 	if results.keys.length == 0 {
 		return nil
