@@ -125,13 +125,13 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	}
 	*/
 
-	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath).borrow()!
 
-	if rareRoomCollection != nil {
-		let rareRoomNfts = rareRoomCollection.getIDs()
-		let items: [MetadataCollectionItem]=[]
-		for id in rareRoomNfts {
-			let nft = rareRoomCollection.borrowRareRooms_NFT(id: id)!
+	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
+	if rareRoomCollection.check() {
+		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
+        let items: [MetadataCollectionItem]=[]
+        for id in rareRoomNfts {
+            let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
 			items.append(MetadataCollectionItem(
 				id: id,
 				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
