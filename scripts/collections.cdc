@@ -125,22 +125,23 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	}
 	*/
 
-	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath).borrow()
-		?? panic("Couldn't get collection")
+	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath).borrow()!
 
-	let rareRoomNfts = rareRoomCollection.getIDs()
-	let items: [MetadataCollectionItem]=[]
-	for id in rareRoomNfts {
-		let nft = rareRoomCollection.borrowRareRooms_NFT(id: id)!
-		items.append(MetadataCollectionItem(
-			id: id,
-			name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
-			// we use "preview" and not "image" because of potential .glg and .mp4 file types
-			image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
-			url: "https://app.rarerooms.io"  // Or use field "external_url"
-		))
+	if rareRoomCollection != nil {
+		let rareRoomNfts = rareRoomCollection.getIDs()
+		let items: [MetadataCollectionItem]=[]
+		for id in rareRoomNfts {
+			let nft = rareRoomCollection.borrowRareRooms_NFT(id: id)!
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
+				url: "https://app.rarerooms.io"  // or use field "external_url"
+			))
+		}
+		results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
 	}
-	results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
 
 	if results.keys.length == 0 {
 		return nil
