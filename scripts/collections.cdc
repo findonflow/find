@@ -138,7 +138,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
 				image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
-				url: "https://app.rarerooms.io"  // or use field "external_url"
+				url: "https://rarerooms.io/tokens/".concat(id.toString())
 			))
 		}
 		results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
