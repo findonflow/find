@@ -6,12 +6,14 @@ pub struct FINDNameReport{
 	pub let lease: FIND.LeaseInformation?
 	pub let status: String
 	pub let cost: UFix64
+	pub let leases: [FIND.LeaseInformation]
 
-	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64) {
+	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64, leases: [FIND.LeaseInformation]) {
 		self.status=status
 		self.profile=profile
 		self.lease=lease
 		self.cost=cost
+		self.leases=leases
 	}
 }
 
@@ -33,7 +35,8 @@ pub fun main(name: String) : FINDNameReport{
 			status: lease?.status ?? "taken",
 			profile: profile?.asProfile(),
 			lease: lease,
-			cost:  cost
+			cost:  cost,
+			leases: leaseCap.borrow()?.getLeaseInformation() ?? []
 		)
 
 	}
@@ -46,7 +49,8 @@ pub fun main(name: String) : FINDNameReport{
 		status: statusValue,
 		profile: nil, 
 		lease: nil,
-		cost: cost
+		cost: cost,
+		leases: [],
 	)
 
 }
