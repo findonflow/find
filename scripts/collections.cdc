@@ -1,12 +1,8 @@
 import Art from "../contracts/Art.cdc"
-import Marketplace from 0xd796ff17107bbff6
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 
-//testnet
-//import Flovatar from 0x3c7e227e52ac6c0d
-//import BasicBeast from 0x4742010dbfe107da
-
 //mainnet
+import Marketplace from 0xd796ff17107bbff6
 import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
@@ -36,9 +32,7 @@ pub struct MetadataCollectionItem {
 		self.url=url
 		self.image=image
 	}
-
 }
-
 
 pub fun main(address: Address) : {String : MetadataCollection}? {
 
@@ -84,8 +78,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
-			items.append(MetadataCollectionItem(id:id,
-			  name: "Goober #".concat(id.toString()),
+			items.append(MetadataCollectionItem(
+				id:id,
+				name: "Goober #".concat(id.toString()),
 				image: goober.uri,
 				url: "https://partymansion.io/gooberz/".concat(id.toString())
 			))
@@ -99,9 +94,13 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		let items: [MetadataCollectionItem]=[]
 		for flovatar in flovatarList  {
 			let flovatarDetails = Flovatar.getFlovatar(address: address, flovatarId: flovatar.id)
+			var name=flovatar.name
+			if name == "" {
+				name="Flovatar #".concat(flovatar.id.toString())
+			}
 			items.append(MetadataCollectionItem(
 				id:flovatar.id, 
-				name:flovatar.name, 
+				name: name, 
 				image:"https://flovatar.com/api/image/".concat(flovatar.id.toString()),
 				url:"https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
 			))
@@ -130,9 +129,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
 	if rareRoomCollection.check() {
 		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
-        let items: [MetadataCollectionItem]=[]
-        for id in rareRoomNfts {
-            let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
+		let items: [MetadataCollectionItem]=[]
+		for id in rareRoomNfts {
+			let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
 			items.append(MetadataCollectionItem(
 				id: id,
 				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
