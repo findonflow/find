@@ -10,6 +10,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
+import MotoGPCard from 0xa49cc0ee46c54bfb
 
 pub struct MetadataCollection{
 	pub let type: String
@@ -142,6 +143,25 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 		results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
 	}
+
+
+	let motoGPCollection = account.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
+	if motoGPCollection.check() {
+		let motoGPNfts = motoGPCollection.borrow()!.getIDs()
+		let items: [MetadataCollectionItem] = []
+		for id in motoGPNfts {
+			let nft = motoGPCollection.borrow()!.borrowCard(id: id)!
+			let metadata = nft.getCardMetadata()!
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: metadata.imageUrl,
+				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
+			))
+		}
+		results["MotoGP"]= MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
+	}
+
 
 	if results.keys.length == 0 {
 		return nil
