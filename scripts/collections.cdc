@@ -156,7 +156,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: id,
 				name: metadata.name,
 				image: metadata.imageUrl,
-				url: "https://motogp-ignition.com/"
+				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
 			))
 		}
 		results["MotoGP"]= MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
