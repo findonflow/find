@@ -7,6 +7,8 @@ import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
+import Gaia from 0x8b148183c28ff88f
+
 
 pub struct MetadataCollection{
 	pub let type: String
@@ -159,6 +161,23 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			))
 		}
 		results["MotoGP"]= MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
+	}
+
+	let gaiaCollection = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
+	if gaiaCollection.check() {
+		let gaiaNfts = gaiaCollection.borrow()!.getIDs()
+		let items: [MetadataCollectionItem] = []
+		for id in gaiaNfts {
+			let nft = gaiaCollection.borrow()!.borrowGaiaNFT(id: id)!
+			let metadata = Gaia.getTemplateMetaData(templateID: nft.data.templateID)!
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: metadata["title"]!,
+				image: metadata["img"]!,
+				url: metadata["uri"]!
+			))
+		}
+		results["Gaia"] = MetadataCollection(type: Type<@Gaia.Collection>().identifier, items: items)
 	}
 
 
