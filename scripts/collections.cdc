@@ -41,15 +41,15 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let account = getAccount(address)
 	let results : {String :  MetadataCollection}={}
 
-	let versusImageUrlPrefix="https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
-	let artList= Art.getArt(address: address)
+	let versusImageUrlPrefix = "https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
+	let artList = Art.getArt(address: address)
 	if artList.length > 0 {
-		let items: [MetadataCollectionItem]=[]
+		let items: [MetadataCollectionItem] = []
 		for art in artList {
 			items.append(MetadataCollectionItem(
-				id:art.id, 
-				name:art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  
-				image:versusImageUrlPrefix.concat(art.cacheKey), 
+				id: art.id, 
+				name: art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  
+				image: versusImageUrlPrefix.concat(art.cacheKey), 
 				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/")
 			))
 		}
@@ -58,14 +58,13 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 
 	let versusMarketplace = account.getCapability<&{Marketplace.SalePublic}>(Marketplace.CollectionPublicPath)
 	if versusMarketplace.check() {
-
-		let items: [MetadataCollectionItem]=[]
+		let items: [MetadataCollectionItem] = []
 		let versusMarket = versusMarketplace.borrow()!.listSaleItems()
 		for saleItem in versusMarket {
 			items.append(MetadataCollectionItem(
-				id:saleItem.id, 
-				name:saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist).concat(" for sale for ").concat(saleItem.price.toString()).concat(" Flow"),  
-				image:versusImageUrlPrefix.concat(saleItem.cacheKey), 
+				id: saleItem.id, 
+				name: saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist).concat(" for sale for ").concat(saleItem.price.toString()).concat(" Flow"),  
+				image: versusImageUrlPrefix.concat(saleItem.cacheKey), 
 				url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/")
 			))
 		}
@@ -76,38 +75,38 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 
 	if goobersCap.check() {
-		let items: [MetadataCollectionItem]=[]
+		let items: [MetadataCollectionItem] = []
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
 			items.append(MetadataCollectionItem(
-				id:id,
+				id: id,
 				name: "Goober #".concat(id.toString()),
 				image: goober.uri,
 				url: "https://partymansion.io/gooberz/".concat(id.toString())
 			))
 
 		}
-		results["goobers"]= MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
+		results["goobers"] = MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
 	}
 
 	let flovatarList= Flovatar.getFlovatars(address: address)
 	if flovatarList.length > 0 {
-		let items: [MetadataCollectionItem]=[]
+		let items: [MetadataCollectionItem] = []
 		for flovatar in flovatarList  {
 			let flovatarDetails = Flovatar.getFlovatar(address: address, flovatarId: flovatar.id)
-			var name=flovatar.name
+			var name = flovatar.name
 			if name == "" {
 				name="Flovatar #".concat(flovatar.id.toString())
 			}
 			items.append(MetadataCollectionItem(
-				id:flovatar.id, 
+				id: flovatar.id, 
 				name: name, 
-				image:"https://flovatar.com/api/image/".concat(flovatar.id.toString()),
-				url:"https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
+				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
 			))
 		}
-		results["flovatar"]= MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
+		results["flovatar"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
 	}
 
 	/*
@@ -123,7 +122,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			items.append(MetadataCollectionItem(id:beast.id, name:name, url:template.image, ipfsHash:"", svg: ""))
 
 		}
-		results["basicbeasts"]= MetadataCollection(type: Type<@BasicBeast.Collection>().identifier, items: items)
+		results["basicbeasts"] = MetadataCollection(type: Type<@BasicBeast.Collection>().identifier, items: items)
 	}
 	*/
 
@@ -131,7 +130,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
 	if rareRoomCollection.check() {
 		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
-		let items: [MetadataCollectionItem]=[]
+		let items: [MetadataCollectionItem] = []
 		for id in rareRoomNfts {
 			let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
 			items.append(MetadataCollectionItem(
@@ -160,7 +159,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
 			))
 		}
-		results["MotoGP"]= MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
+		results["MotoGP"] = MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
 	}
 
 	let gaiaCollection = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
