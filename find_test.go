@@ -162,6 +162,28 @@ transaction(name: String) {
 			}))
 
 	})
+
+	t.Run("Should be able to send lease to another name", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2")
+
+		gt.GWTF.TransactionFromFile("moveNameToName").
+			SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			StringArgument("user2").
+			Test(t).AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+				"name": "user1",
+			})).
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
+				"name": "user1",
+			}))
+	})
 }
 
 //TODO: test validate wrong names
