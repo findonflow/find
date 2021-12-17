@@ -1,7 +1,7 @@
-import Art from "../contracts/Art.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 
 //mainnet
+import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a

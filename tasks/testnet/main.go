@@ -74,12 +74,6 @@ func main() {
 			UFix64Argument("30.0").
 			RunPrintEventsFull()
 
-		g.TransactionFromFile("send").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("13.37").
-			RunPrintEventsFull()
-
 		g.TransactionFromFile("renew").
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").

@@ -106,31 +106,6 @@ pub contract Admin {
 			Debug.enable(value)
 		}
 
-
-
-
-		/*
-		pub fun setArtifactTypeConverter(from: Type, converters: [Capability<&{TypedMetadata.TypeConverter}>]) {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			Artifact.setTypeConverter(from: from, converters: converters)
-		}
-
-		pub fun createForge(platform: Artifact.MinterPlatform) : @Artifact.Forge {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			return <- Artifact.createForge(platform:platform)
-		}
-
-		pub fun createVersusArtWithContent(name: String, artist:String, artistAddress:Address, description: String, url: String, type: String, royalty: {String: Art.Royalty}, edition: UInt64, maxEdition: UInt64) : @Art.NFT {
-			return <- 	Art.createArtWithContent(name: name, artist: artist, artistAddress: artistAddress, description: description, url: url, type: type, royalty: royalty, edition: edition, maxEdition: maxEdition)
-		}
-
-		*/
-
 		init() {
 			self.capability = nil
 		}

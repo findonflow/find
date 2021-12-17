@@ -129,10 +129,11 @@ transaction(name: String) {
 			createUser("100.0", "user2").
 			registerUser("user1")
 
-		gt.GWTF.TransactionFromFile("send").
+		gt.GWTF.TransactionFromFile("sendFT").
 			SignProposeAndPayAs("user2").
 			StringArgument("user1").
 			UFix64Argument("5.0").
+			StringArgument("fusd").
 			Test(t).AssertSuccess().
 			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",

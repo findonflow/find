@@ -36,22 +36,11 @@
 				"mainnet" : "0x1654653399040a61"
 			}
 		},
-		"Artifact": "./contracts/Artifact.cdc",
 		"FIND": "./contracts/FIND.cdc",
 		"Admin": "./contracts/Admin.cdc",
-		"Art": {
-			"source" : "./contracts/Art.cdc",
-			"aliases" : {
-				"testnet" : "0x99ca04281098b33d",
-				"mainnet": "0xd796ff17107bbff6"
-			}
-		},
-		"Content": "./contracts/Content.cdc",
-		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": "./contracts/Profile.cdc",
-		"Debug" : "./contracts/Debug.cdc",
-		"Market" : "./contracts/Market.cdc"
+		"Debug" : "./contracts/Debug.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -135,14 +124,9 @@
 			"emulator-account": [
 				"FIND",
 				"NonFungibleToken",
-				"Artifact",
-				"TypedMetadata",
 				"Clock",
 				"Profile",
-				"Market",
 				"Debug",
-				"Content",
-				"Art",
 				"FUSD",
 				"Admin"
 			], 
