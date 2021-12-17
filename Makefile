@@ -19,7 +19,7 @@ dev:
 	gotestsum -f testname --watch
 
 contract: 
-	npm run prepare && jq '.' lib/find_tmp.json > lib/find.json
+	go run overflow/main.go > lib/find.json
 
 publish:
 	cd lib && npm publish && cd ..
