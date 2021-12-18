@@ -179,6 +179,27 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		results["Gaia"] = MetadataCollection(type: Type<@Gaia.Collection>().identifier, items: items)
 	}
 
+	let chainmonstersRewardsCollection = account
+		.getCapability<&{ChainmonstersRewards.ChainmonstersRewardCollectionPublic}>(/public/ChainmonstersRewardCollection)
+	if chainmonstersRewardsCollection.check() {
+		let nfts = chainmonstersRewardsCollection.borrow()!.getIDs()
+		let items: [MetadataCollectionItem] = []
+		for id in nfts {
+			let nft = chainmonstersRewardsCollection.borrow()!.borrowReward(id: id)!
+			let rewardID = nft.data.rewardID
+			// Other interesting metadata available are:
+			// 		- serialNumber: nft.data.serialNumber
+			// 		- totalMinted: ChainmonstersRewards.getNumRewardsMinted(rewardID: nft.data.rewardID)!
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: ChainmonstersRewards.getRewardMetaData(rewardID: nft.data.rewardID)!,
+				image: "https://chainmonsters.com/_next/image?w=384&q=75&url=/images/rewards/closedbeta/".concat(rewardID.toString()).concat(".png"),
+				url: "https://chainmonsters.com/inventory/".concat(id.toString())
+			))
+		}
+		results["ChainmonstersRewards"] = MetadataCollection(type: Type<@ChainmonstersRewards.Collection>().identifier, items: items)
+	}
+
 
 	if results.keys.length == 0 {
 		return nil
