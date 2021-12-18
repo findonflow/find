@@ -24,3 +24,8 @@ contract:
 publish:
 	cd lib && npm publish && cd ..
 
+patch:
+	json-bump lib/package.json --patch
+
+minor:
+	json-bump lib/package.json --minor
