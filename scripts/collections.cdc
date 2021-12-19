@@ -233,6 +233,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 	}
 
+	let chamonsterSeasonTable :  {UInt32: String} = {0 : "kickstarter", 1 : "alpha", 2 : "genesis", 4 : "flowfest2021" , 3: "closedbeta" }
+
 	let chainmonstersRewardsCollection = account.getCapability<&{ChainmonstersRewards.ChainmonstersRewardCollectionPublic}>(/public/ChainmonstersRewardCollection)
 	if chainmonstersRewardsCollection.check() {
 		let nfts = chainmonstersRewardsCollection.borrow()!.getIDs()
@@ -244,14 +246,16 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			// 		- serialNumber: nft.data.serialNumber
 			// 		- totalMinted: ChainmonstersRewards.getNumRewardsMinted(rewardID: nft.data.rewardID)!
 			let season = ChainmonstersRewards.getRewardSeason(rewardID:nft.data.rewardID)!
-			var seasonName="closedbeta"
-			if season == 3 {
-				seasonName="flowfest2021"
+
+			var seasonName = chamonsterSeasonTable[season] ?? "unknown".concat(season.toString())
+
+			if season == 3 && rewardID < 45 {
+				seasonName = "flowfest2021"
 			}
 			items.append(MetadataCollectionItem(
 				id: id,
 				name: ChainmonstersRewards.getRewardMetaData(rewardID: nft.data.rewardID)!,
-				image: "https://chainmonsters.com/_next/image?w=384&q=75&url=/images/rewards/".concat(seasonName).concat("/").concat(rewardID.toString()).concat(".png"),
+				image: "https://chainmonsters.com/images/rewards/".concat(seasonName).concat("/").concat(rewardID.toString()).concat(".png"),
 				url: "https://chainmonsters.com",
 				listPrice: nil,
 				listToken: nil
