@@ -28,13 +28,17 @@ pub struct MetadataCollectionItem {
 	pub let name: String
 	pub let image: String
 	pub let url: String
+	pub let listPrice: UFix64?
+	pub let listToken: String?
 
 
-	init(id:UInt64, name:String, image:String, url:String) {
+	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?) {
 		self.id=id
 		self.name=name
 		self.url=url
 		self.image=image
+		self.listToken=listToken
+		self.listPrice=listPrice
 	}
 }
 
@@ -56,6 +60,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				name: name, 
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+				listPrice: nil,
+				listToken: nil
 			))
 		}
 
@@ -66,12 +72,14 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	if flovatarMarketDetails.length > 0 {
 		let items: [MetadataCollectionItem] = []
 		for flovatar in flovatarMarketDetails  {
-			var	name="Flovatar #".concat(flovatar.id.toString()).concat("  for sale for ").concat(flovatar.price.toString()).concat( " Flow")
+			var	name="Flovatar #".concat(flovatar.id.toString())
 			items.append(MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+				listPrice: flovatar.price,
+				listToken: "Flow"
 			))
 		}
 
@@ -89,7 +97,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: art.id, 
 				name: art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  
 				image: versusImageUrlPrefix.concat(art.cacheKey), 
-				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/")
+				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/"),
+				listPrice: nil,
+				listToken: nil
 			))
 		}
 		results["versus"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)
@@ -102,9 +112,11 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		for saleItem in versusMarket {
 			items.append(MetadataCollectionItem(
 				id: saleItem.id, 
-				name: saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist).concat(" for sale for ").concat(saleItem.price.toString()).concat(" Flow"),  
+				name: saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist),
 				image: versusImageUrlPrefix.concat(saleItem.cacheKey), 
-				url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/")
+				url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/"),
+				listPrice: saleItem.price,
+				listToken: "Flow"
 			))
 		}
 		if items.length != 0 {
@@ -124,7 +136,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: id,
 				name: "Goober #".concat(id.toString()),
 				image: goober.uri,
-				url: "https://partymansion.io/gooberz/".concat(id.toString())
+				url: "https://partymansion.io/gooberz/".concat(id.toString()),
+				listPrice: nil,
+				listToken: nil
 			))
 
 		}
@@ -163,7 +177,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
 				image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
-				url: "https://rarerooms.io/tokens/".concat(id.toString())
+				url: "https://rarerooms.io/tokens/".concat(id.toString()),
+				listPrice: nil,
+				listToken: nil
 			))
 		}
 
@@ -185,6 +201,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				name: metadata.name,
 				image: metadata.imageUrl,
 				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
+				listPrice: nil,
+				listToken: nil
 			))
 		}
 
@@ -204,7 +222,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: id,
 				name: metadata["title"]!,
 				image: metadata["img"]!,
-				url: metadata["uri"]!
+				url: metadata["uri"]!,
+				listPrice: nil,
+				listToken: nil
 			))
 		}
 
@@ -232,7 +252,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: id,
 				name: ChainmonstersRewards.getRewardMetaData(rewardID: nft.data.rewardID)!,
 				image: "https://chainmonsters.com/_next/image?w=384&q=75&url=/images/rewards/".concat(seasonName).concat("/").concat(rewardID.toString()).concat(".png"),
-				url: "https://chainmonsters.com"
+				url: "https://chainmonsters.com",
+				listPrice: nil,
+				listToken: nil
 			))
 		}
 		if items.length != 0 {

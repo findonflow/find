@@ -29,3 +29,6 @@ patch:
 
 minor:
 	json-bump lib/package.json --minor
+
+major:
+	json-bump lib/package.json --major
