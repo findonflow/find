@@ -5,9 +5,11 @@ import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
+import FlovatarMarketplace from  0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
+import ChainmonstersRewards from 0x93615d25d14fa337
 
 
 pub struct MetadataCollection{
@@ -41,6 +43,43 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let account = getAccount(address)
 	let results : {String :  MetadataCollection}={}
 
+	let flovatarList= Flovatar.getFlovatars(address: address)
+	if flovatarList.length > 0 {
+		let items: [MetadataCollectionItem] = []
+		for flovatar in flovatarList  {
+			var name = flovatar.name
+			if name == "" {
+				name="Flovatar #".concat(flovatar.id.toString())
+			}
+			items.append(MetadataCollectionItem(
+				id: flovatar.id, 
+				name: name, 
+				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
+				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+			))
+		}
+
+		results["flovatar"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
+	}
+
+	let flovatarMarketDetails = FlovatarMarketplace.getFlovatarSales(address: address)
+	if flovatarMarketDetails.length > 0 {
+		let items: [MetadataCollectionItem] = []
+		for flovatar in flovatarMarketDetails  {
+			var	name="Flovatar #".concat(flovatar.id.toString()).concat("  for sale for ").concat(flovatar.price.toString()).concat( " Flow")
+			items.append(MetadataCollectionItem(
+				id: flovatar.id, 
+				name: name, 
+				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
+				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+			))
+		}
+
+		if items.length != 0 {
+			results["flovatarSales"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
+		}
+	}
+
 	let versusImageUrlPrefix = "https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 	let artList = Art.getArt(address: address)
 	if artList.length > 0 {
@@ -68,7 +107,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/")
 			))
 		}
-		results["versusSale"]= MetadataCollection(type: Type<@Marketplace.SaleCollection>().identifier, items: items)
+		if items.length != 0 {
+			results["versusSale"]= MetadataCollection(type: Type<@Marketplace.SaleCollection>().identifier, items: items)
+		}
 	}
 
 
@@ -87,27 +128,11 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			))
 
 		}
-		results["goobers"] = MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
+		if items.length != 0 {
+			results["goobers"] = MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
+		}
 	}
 
-	let flovatarList= Flovatar.getFlovatars(address: address)
-	if flovatarList.length > 0 {
-		let items: [MetadataCollectionItem] = []
-		for flovatar in flovatarList  {
-			let flovatarDetails = Flovatar.getFlovatar(address: address, flovatarId: flovatar.id)
-			var name = flovatar.name
-			if name == "" {
-				name="Flovatar #".concat(flovatar.id.toString())
-			}
-			items.append(MetadataCollectionItem(
-				id: flovatar.id, 
-				name: name, 
-				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
-				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
-			))
-		}
-		results["flovatar"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
-	}
 
 	/*
 	let bbCap = account.getCapability<&{BasicBeast.BeastCollectionPublic}>(BasicBeast.CollectionPublicPath)
@@ -141,7 +166,10 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				url: "https://rarerooms.io/tokens/".concat(id.toString())
 			))
 		}
-		results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
+
+		if items.length != 0 {
+			results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
+		}
 	}
 
 
@@ -159,7 +187,10 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
 			))
 		}
-		results["MotoGP"] = MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
+
+		if items.length != 0 {
+			results["MotoGP"] = MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
+		}
 	}
 
 	let gaiaCollection = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
@@ -176,11 +207,13 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				url: metadata["uri"]!
 			))
 		}
-		results["Gaia"] = MetadataCollection(type: Type<@Gaia.Collection>().identifier, items: items)
+
+		if items.length != 0 {
+			results["Gaia"] = MetadataCollection(type: Type<@Gaia.Collection>().identifier, items: items)
+		}
 	}
 
-	let chainmonstersRewardsCollection = account
-		.getCapability<&{ChainmonstersRewards.ChainmonstersRewardCollectionPublic}>(/public/ChainmonstersRewardCollection)
+	let chainmonstersRewardsCollection = account.getCapability<&{ChainmonstersRewards.ChainmonstersRewardCollectionPublic}>(/public/ChainmonstersRewardCollection)
 	if chainmonstersRewardsCollection.check() {
 		let nfts = chainmonstersRewardsCollection.borrow()!.getIDs()
 		let items: [MetadataCollectionItem] = []
@@ -190,14 +223,21 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			// Other interesting metadata available are:
 			// 		- serialNumber: nft.data.serialNumber
 			// 		- totalMinted: ChainmonstersRewards.getNumRewardsMinted(rewardID: nft.data.rewardID)!
+			let season = ChainmonstersRewards.getRewardSeason(rewardID:nft.data.rewardID)!
+			var seasonName="closedbeta"
+			if season == 3 {
+				seasonName="flowfest2021"
+			}
 			items.append(MetadataCollectionItem(
 				id: id,
 				name: ChainmonstersRewards.getRewardMetaData(rewardID: nft.data.rewardID)!,
-				image: "https://chainmonsters.com/_next/image?w=384&q=75&url=/images/rewards/closedbeta/".concat(rewardID.toString()).concat(".png"),
-				url: "https://chainmonsters.com/inventory/".concat(id.toString())
+				image: "https://chainmonsters.com/_next/image?w=384&q=75&url=/images/rewards/".concat(seasonName).concat("/").concat(rewardID.toString()).concat(".png"),
+				url: "https://chainmonsters.com"
 			))
 		}
-		results["ChainmonstersRewards"] = MetadataCollection(type: Type<@ChainmonstersRewards.Collection>().identifier, items: items)
+		if items.length != 0 {
+			results["ChainmonstersRewards"] = MetadataCollection(type: Type<@ChainmonstersRewards.Collection>().identifier, items: items)
+		}
 	}
 
 
