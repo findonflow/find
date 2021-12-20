@@ -10,6 +10,7 @@ import RareRooms_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
+import Moments from 0xd4ad4740ee426334
 
 
 pub struct MetadataCollection{
@@ -147,25 +148,6 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 	}
 
-
-	/*
-	let bbCap = account.getCapability<&{BasicBeast.BeastCollectionPublic}>(BasicBeast.CollectionPublicPath)
-	if bbCap.check() {
-		let items: [MetadataCollectionItem]=[]
-		let bb = bbCap.borrow()!
-
-		for bid in bb.getIDs() {
-			let beast = bb.borrowBeast(id: bid)!
-			let template=beast.data.beastTemplate
-			let name= beast.nickname ?? template.name
-			items.append(MetadataCollectionItem(id:beast.id, name:name, url:template.image, ipfsHash:"", svg: ""))
-
-		}
-		results["basicbeasts"] = MetadataCollection(type: Type<@BasicBeast.Collection>().identifier, items: items)
-	}
-	*/
-
-
 	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
 	if rareRoomCollection.check() {
 		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
@@ -266,6 +248,28 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 	}
 
+
+  let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
+	if jambbCap.check() {
+		let nfts = jambbCap.borrow()!.getIDs()
+		let items: [MetadataCollectionItem] = []
+		for id in nfts {
+			let nft = jambbCap.borrow()!.borrowMoment(id: id)!
+			let metadata=nft.getMetadata()
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: metadata.contentName,
+				image: metadata.previewImage,
+				url: "http://jambb.com",
+				listPrice: nil,
+				listToken: nil
+			))
+		}
+
+		if items.length != 0 {
+			results["Jambb"] = MetadataCollection(type: Type<@Moments.Collection>().identifier, items: items)
+		}
+	}
 
 	if results.keys.length == 0 {
 		return nil
