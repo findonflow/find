@@ -249,7 +249,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	}
 
 
-  let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
+	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if jambbCap.check() {
 		let nfts = jambbCap.borrow()!.getIDs()
 		let items: [MetadataCollectionItem] = []
