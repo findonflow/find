@@ -3,7 +3,7 @@ module github.com/findonflow/find.git
 go 1.17
 
 require (
-	github.com/bjartek/go-with-the-flow/v2 v2.3.2
+	github.com/bjartek/go-with-the-flow/v2 v2.4.1
 	github.com/bjartek/overflow v0.0.0-20211217172830-9b546d1bc861
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.20.2
@@ -144,3 +144,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
 )
+
+replace github.com/bjartek/overflow => ../overflow

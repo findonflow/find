@@ -226,3 +226,26 @@ func (gt *GWTFTestUtils) auctionBid(buyer, name, amount string) *GWTFTestUtils {
 		}))
 	return gt
 }
+
+func (gt *GWTFTestUtils) setupCharity(user string) *GWTFTestUtils {
+	gt.GWTF.TransactionFromFile("createCharity").SignProposeAndPayAs(user).
+		Test(gt.T).
+		AssertSuccess()
+	return gt
+}
+
+func (gt *GWTFTestUtils) mintCharity(name, image, user string) *GWTFTestUtils {
+
+	userAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(user).Address().String())
+	gt.GWTF.TransactionFromFile("mintCharity").SignProposeAndPayAs("find").
+		StringArgument(name).
+		StringArgument(image).
+		AccountArgument(user).
+		Test(gt.T).
+		AssertSuccess().
+		AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.CharityNFT.Minted", map[string]interface{}{
+			"to": userAddress,
+		}))
+
+	return gt
+}

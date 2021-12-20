@@ -38,9 +38,9 @@ func main() {
 
 	findLinks := cadence.NewArray([]cadence.Value{
 		cadence.NewDictionary([]cadence.KeyValuePair{
-			{Key: cadence.NewString("title"), Value: cadence.NewString("twitter")},
-			{Key: cadence.NewString("type"), Value: cadence.NewString("twitter")},
-			{Key: cadence.NewString("url"), Value: cadence.NewString("https://twitter.com/findonflow")},
+			{Key: NewCadenceSting("title"), Value: NewCadenceSting("twitter")},
+			{Key: NewCadenceSting("type"), Value: NewCadenceSting("twitter")},
+			{Key: NewCadenceSting("url"), Value: NewCadenceSting("https://twitter.com/findonflow")},
 		})})
 
 	g.TransactionFromFile("createProfile").
@@ -90,4 +90,13 @@ Prices:
 		AccountArgument("find-admin").
 		RunPrintEventsFull()
 
+}
+
+func NewCadenceSting(value string) cadence.String {
+	result, err := cadence.NewString(value)
+	if err != nil {
+		panic(err)
+	}
+
+	return result
 }

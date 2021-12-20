@@ -399,8 +399,6 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	//TODO: test cancel finished auction that did not meet reserve price
-
 	t.Run("Should be able to cancel unfinished auction", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
@@ -420,9 +418,8 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
 				"amount": "5.00000000",
-				"from":   "0xf3fcd2c1a78f5eee",
 			})).
 			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionCanceled", map[string]interface{}{
 				"amount": "5.00000000",
