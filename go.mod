@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/bjartek/go-with-the-flow/v2 v2.4.1
-	github.com/bjartek/overflow v0.0.0-20211217172830-9b546d1bc861
+	github.com/bjartek/overflow v0.0.0-20211220201839-9ca2b8f2421a
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.20.2
 	github.com/stretchr/testify v1.7.0
