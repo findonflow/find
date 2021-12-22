@@ -216,6 +216,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 	}
 
+	/*
 	let chamonsterSeasonTable :  {UInt32: String} = {0 : "kickstarter", 1 : "alpha", 2 : "genesis", 4 : "flowfest2021" , 3: "closedbeta" }
 
 	let chainmonstersRewardsCollection = account.getCapability<&{ChainmonstersRewards.ChainmonstersRewardCollectionPublic}>(/public/ChainmonstersRewardCollection)
@@ -248,7 +249,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			results["ChainmonstersRewards"] = MetadataCollection(type: Type<@ChainmonstersRewards.Collection>().identifier, items: items)
 		}
 	}
-
+*/
 
 	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if jambbCap.check() {
