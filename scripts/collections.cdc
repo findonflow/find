@@ -50,7 +50,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let results : {String :  MetadataCollection}={}
 
 	let flovatarList= Flovatar.getFlovatars(address: address)
-	if flovatarList.length > 0 {
+	let flovatarMarketDetails = FlovatarMarketplace.getFlovatarSales(address: address)
+	if flovatarList.length > 0 || flovatarMarketDetails.length > 0 {
 		let items: [MetadataCollectionItem] = []
 		for flovatar in flovatarList  {
 			var name = flovatar.name
@@ -67,12 +68,6 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			))
 		}
 
-		results["flovatar"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
-	}
-
-	let flovatarMarketDetails = FlovatarMarketplace.getFlovatarSales(address: address)
-	if flovatarMarketDetails.length > 0 {
-		let items: [MetadataCollectionItem] = []
 		for flovatar in flovatarMarketDetails  {
 			var	name="Flovatar #".concat(flovatar.id.toString())
 			items.append(MetadataCollectionItem(
@@ -86,13 +81,14 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 
 		if items.length != 0 {
-			results["flovatarSales"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
+			results["Flovatar"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
 		}
 	}
 
+	let versusMarketplace = account.getCapability<&{Marketplace.SalePublic}>(Marketplace.CollectionPublicPath)
 	let versusImageUrlPrefix = "https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 	let artList = Art.getArt(address: address)
-	if artList.length > 0 {
+	if artList.length > 0 || versusMarketplace.check() {
 		let items: [MetadataCollectionItem] = []
 		for art in artList {
 			items.append(MetadataCollectionItem(
@@ -104,27 +100,25 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listToken: nil
 			))
 		}
-		results["versus"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)
-	}
-
-	let versusMarketplace = account.getCapability<&{Marketplace.SalePublic}>(Marketplace.CollectionPublicPath)
-	if versusMarketplace.check() {
-		let items: [MetadataCollectionItem] = []
-		let versusMarket = versusMarketplace.borrow()!.listSaleItems()
-		for saleItem in versusMarket {
-			items.append(MetadataCollectionItem(
-				id: saleItem.id, 
-				name: saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist),
-				image: versusImageUrlPrefix.concat(saleItem.cacheKey), 
-				url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/"),
-				listPrice: saleItem.price,
-				listToken: "Flow"
-			))
+		if versusMarketplace.check() {
+			let versusMarket = versusMarketplace.borrow()!.listSaleItems()
+			for saleItem in versusMarket {
+				items.append(MetadataCollectionItem(
+					id: saleItem.id, 
+					name: saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist),
+					image: versusImageUrlPrefix.concat(saleItem.cacheKey), 
+					url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/"),
+					listPrice: saleItem.price,
+					listToken: "Flow"
+				))
+			}
 		}
 		if items.length != 0 {
-			results["versusSale"]= MetadataCollection(type: Type<@Marketplace.SaleCollection>().identifier, items: items)
+			results["Versus"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)
 		}
 	}
+
+
 
 
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
@@ -145,7 +139,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 
 		}
 		if items.length != 0 {
-			results["goobers"] = MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
+			results["Gooberz"] = MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
 		}
 	}
 
@@ -249,7 +243,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			results["ChainmonstersRewards"] = MetadataCollection(type: Type<@ChainmonstersRewards.Collection>().identifier, items: items)
 		}
 	}
-*/
+	*/
 
 	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if jambbCap.check() {
