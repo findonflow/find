@@ -62,7 +62,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: flovatar.id, 
 				name: name, 
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
-				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: nil,
 				listToken: nil
 			))
@@ -74,7 +74,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				id: flovatar.id, 
 				name: name, 
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
-				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/").concat(address.toString()),
+				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: flovatar.price,
 				listToken: "Flow"
 			))
