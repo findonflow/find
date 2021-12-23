@@ -23,6 +23,10 @@ transaction(name: String, receiverName: String) {
 		let receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let receiverProfile = receiver.getCapability<&{Profile.Public}>(Profile.publicPath)
 
+		if !receiverLease.check() || !receiverProfile.check() {
+			panic("Not a valid FIND user")
+		}
+
 		self.sender.move(name:name, profile:receiverProfile, to: receiverLease)
 	}
 
