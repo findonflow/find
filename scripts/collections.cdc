@@ -12,6 +12,7 @@ import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
 import Moments from 0xd4ad4740ee426334
 import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
+import SturdyItems from 0x427ceada271aa0b1
 
 
 pub struct MetadataCollection{
@@ -287,6 +288,32 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 	}
 
+	let sturdyCollectionCap = account
+        .getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
+	if sturdyCollectionCap.check() {
+		let sturdyNfts = sturdyCollectionCap.borrow()!.getIDs()
+		let items: [MetadataCollectionItem] = []
+		for id in sturdyNfts {
+			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
+			let nft = sturdyCollectionCap.borrow()!.borrowSturdyItem(id: id)!
+			// the only thing we can play with is the nft title which is for example:
+			// 	- "HOODLUM#10"
+			// 	- "HOLIDAY MYSTERY BADGE 2021"
+			//  - "EXCALIBUR"
+			let isHoodlum = nft.tokenTitle.slice(from: 0, upTo: 7) == "HOODLUM"
+			if isHoodlum {
+				// the hoodlum id is needed to retrieve the image but is not in the nft
+				let hoodlumId = nft.tokenTitle.slice(from: 8, upTo: nft.tokenTitle.length)
+				items.append(MetadataCollectionItem(
+					id: id,
+					name: nft.tokenTitle,
+					image: "https://hoodlumsnft.com/_next/image?url=%2Fthumbs%2FsomeHoodlum_".concat(hoodlumId).concat(".png&w=1920&q=75"),
+					url: "https://hoodlumsnft.com/"
+				))
+			}
+		}
+        results["Hoodlums"] = MetadataCollection(type: Type<@SturdyItems.Collection>().identifier, items: items)
+    }
 
 	if results.keys.length == 0 {
 		return nil
