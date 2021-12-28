@@ -185,6 +185,27 @@ transaction(name: String) {
 				"name": "user1",
 			}))
 	})
+
+	t.Run("Should be able to send flow with message", func(t *testing.T) {
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2")
+
+		gt.GWTF.TransactionFromFile("sendFusdWithMessage").
+			SignProposeAndPayAs("user1").
+			StringArgument("user2").
+			UFix64Argument("5.0").
+			StringArgument("Happy to help").
+			Test(t).AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Verification", map[string]interface{}{
+				"message": "user1 sent 5.00 FUSD with message:Happy to help",
+			}))
+
+	})
+
 }
 
 //TODO: test validate wrong names
