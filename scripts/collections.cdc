@@ -289,7 +289,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	}
 
 	let sturdyCollectionCap = account
-        .getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
+	.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
 	if sturdyCollectionCap.check() {
 		let sturdyNfts = sturdyCollectionCap.borrow()!.getIDs()
 		let items: [MetadataCollectionItem] = []
@@ -308,12 +308,16 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 					id: id,
 					name: nft.tokenTitle,
 					image: "https://hoodlumsnft.com/_next/image?url=%2Fthumbs%2FsomeHoodlum_".concat(hoodlumId).concat(".png&w=1920&q=75"),
-					url: "https://hoodlumsnft.com/"
+					url: "https://hoodlumsnft.com/",
+					listPrice:nil,
+					listToken:nil
 				))
 			}
 		}
-        results["Hoodlums"] = MetadataCollection(type: Type<@SturdyItems.Collection>().identifier, items: items)
-    }
+		if items.length != 0 {
+			results["Hoodlums"] = MetadataCollection(type: Type<@SturdyItems.Collection>().identifier, items: items)
+		}
+	}
 
 	if results.keys.length == 0 {
 		return nil
