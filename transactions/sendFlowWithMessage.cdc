@@ -82,7 +82,5 @@ transaction(name: String, amount: UFix64, message:String) {
 
 		let vaultRef = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow reference to the fusdVault!")
 		FIND.deposit(to: name, from: <- vaultRef.withdraw(amount: amount))
-
 	}
-
 }
