@@ -1,4 +1,5 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import CharityNFT from "../contracts/CharityNFT.cdc"
 
 //mainnet
 import Art from 0xd796ff17107bbff6
@@ -316,6 +317,28 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 		}
 		if items.length != 0 {
 			results["Hoodlums"] = MetadataCollection(type: Type<@SturdyItems.Collection>().identifier, items: items)
+		}
+	}
+
+	let charityCap = account.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)
+	if charityCap.check() {
+		let items: [MetadataCollectionItem] = []
+		let collection = charityCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowCharity(id: id)!
+			let metadata = nft.getMetadata()
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: metadata["thumbnail"]!,
+				url: metadata["originUrl"]!,
+				listPrice: nil,
+				listToken: nil
+			))
+
+		}
+		if items.length != 0 {
+			results["Charity"] = MetadataCollection(type: Type<@CharityNFT.Collection>().identifier, items: items)
 		}
 	}
 
