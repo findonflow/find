@@ -94,6 +94,8 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	//TODO: reverse lookup
+
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
 		pre {
@@ -117,6 +119,7 @@ pub contract FIND {
 		}
 		panic("Network is not set up")
 	}
+
 
 	/// Deposit FT to name
 	/// @param to: The name to send money too
@@ -442,6 +445,8 @@ pub contract FIND {
 		}
 		*/
 
+		//TODO: send with Message 
+		//Emit own event
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {
