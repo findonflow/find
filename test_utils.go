@@ -234,12 +234,15 @@ func (gt *GWTFTestUtils) setupCharity(user string) *GWTFTestUtils {
 	return gt
 }
 
-func (gt *GWTFTestUtils) mintCharity(name, image, user string) *GWTFTestUtils {
+func (gt *GWTFTestUtils) mintCharity(name, image, thumbnail, originUrl, description, user string) *GWTFTestUtils {
 
 	userAddress := fmt.Sprintf("0x%s", gt.GWTF.Account(user).Address().String())
 	gt.GWTF.TransactionFromFile("mintCharity").SignProposeAndPayAs("find").
 		StringArgument(name).
 		StringArgument(image).
+		StringArgument(thumbnail).
+		StringArgument(description).
+		StringArgument(originUrl).
 		AccountArgument(user).
 		Test(gt.T).
 		AssertSuccess().
