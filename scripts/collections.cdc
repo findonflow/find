@@ -14,6 +14,7 @@ import ChainmonstersRewards from 0x93615d25d14fa337
 import Moments from 0xd4ad4740ee426334
 import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
 import SturdyItems from 0x427ceada271aa0b1
+import Evolution from 0xf4264ac8f3256818
 
 
 pub struct MetadataCollection{
@@ -34,15 +35,17 @@ pub struct MetadataCollectionItem {
 	pub let url: String
 	pub let listPrice: UFix64?
 	pub let listToken: String?
+	pub let contentType:String
 
 
-	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?) {
+	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String) {
 		self.id=id
 		self.name=name
 		self.url=url
 		self.image=image
 		self.listToken=listToken
 		self.listPrice=listPrice
+		self.contentType=contentType
 	}
 }
 
@@ -66,7 +69,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 
@@ -78,7 +82,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: flovatar.price,
-				listToken: "Flow"
+				listToken: "Flow",
+				contentType: "image"
 			))
 		}
 
@@ -99,7 +104,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: versusImageUrlPrefix.concat(art.cacheKey), 
 				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/"),
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
+
 			))
 		}
 		if versusMarketplace.check() {
@@ -111,7 +118,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 					image: versusImageUrlPrefix.concat(saleItem.cacheKey), 
 					url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/"),
 					listPrice: saleItem.price,
-					listToken: "Flow"
+					listToken: "Flow",
+					contentType: "image"
+
 				))
 			}
 		}
@@ -136,7 +145,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: goober.uri,
 				url: "https://partymansion.io/gooberz/".concat(id.toString()),
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 
 		}
@@ -158,7 +168,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
 				url: "https://rarerooms.io/tokens/".concat(id.toString()),
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 
@@ -181,7 +192,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: metadata.imageUrl,
 				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 
@@ -203,7 +215,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: metadata["img"]!,
 				url: metadata["uri"]!,
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 
@@ -238,7 +251,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: "https://chainmonsters.com/images/rewards/".concat(seasonName).concat("/").concat(rewardID.toString()).concat(".png"),
 				url: "https://chainmonsters.com",
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 		if items.length != 0 {
@@ -260,7 +274,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: metadata.previewImage,
 				url: "http://jambb.com",
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 
@@ -280,7 +295,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: metadata.animationUrl,
 				url: "https://matrixworld.org/",
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType: "image"
 			))
 		}
 
@@ -311,7 +327,8 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 					image: "https://hoodlumsnft.com/_next/image?url=%2Fthumbs%2FsomeHoodlum_".concat(hoodlumId).concat(".png&w=1920&q=75"),
 					url: "https://hoodlumsnft.com/",
 					listPrice:nil,
-					listToken:nil
+					listToken:nil,
+					contentType:"image"
 				))
 			}
 		}
@@ -333,12 +350,38 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				image: metadata["thumbnail"]!,
 				url: metadata["originUrl"]!,
 				listPrice: nil,
-				listToken: nil
+				listToken: nil,
+				contentType:"image"
 			))
 
 		}
 		if items.length != 0 {
 			results["Charity"] = MetadataCollection(type: Type<@CharityNFT.Collection>().identifier, items: items)
+		}
+	}
+
+	let evolutionCap=account.getCapability<&{Evolution.EvolutionCollectionPublic}>(/public/f4264ac8f3256818_Evolution_Collection)
+	if evolutionCap.check() {
+		let evolution=evolutionCap.borrow()!
+		let nfts = evolution.getIDs()
+		let items: [MetadataCollectionItem] = []
+		for id in nfts{
+			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
+			let nft = evolution.borrowCollectible(id: id)!
+			let metadata = Evolution.getItemMetadata(itemId: nft.data.itemId)!
+			items.append(MetadataCollectionItem(
+				id: id,
+				name: metadata["Title"]!,
+				image: "https://storage.viv3.com/0xf4264ac8f3256818/mv/".concat(nft.data.itemId.toString()),
+				url: "https://www.evolution-collect.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType:"video"
+			))
+		}
+
+		if items.length != 0 {
+			results["Evolution"] = MetadataCollection(type: Type<@Evolution.Collection>().identifier, items: items)
 		}
 	}
 
