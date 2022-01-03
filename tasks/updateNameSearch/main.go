@@ -46,6 +46,11 @@ func main() {
 	of := overflow.NewOverflowMainnet().Start()
 
 	spew.Dump(names)
+	if len(names) == 0 {
+		fmt.Println("Writing progress to file")
+		writeProgressToFile(progressFile, now)
+		os.Exit(1)
+	}
 	var result []NameResult
 	err = of.ScriptFromFile("nameCrawler").
 		Args(of.Arguments().StringArray(names...)).

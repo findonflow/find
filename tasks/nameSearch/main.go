@@ -3,9 +3,11 @@ package main
 //TODO: send mail https://medium.com/vacatronics/how-to-use-gmail-with-go-c980295c23b8
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -154,22 +156,24 @@ type SearchResult struct {
 	ValidUntil          int64    `json:"valid_until"`
 }
 
-func writeProgressToFile(fileName string, blockHeight uint64) error {
-	err := ioutil.WriteFile(fileName, []byte(fmt.Sprintf("%d", blockHeight)), 0644)
+func readCsvFile(filePath string) []string {
+	f, err := os.Open(filePath)
 	if err != nil {
-		return fmt.Errorf("Could not create initial progress file %v", err)
+		log.Fatal("Unable to read input file "+filePath, err)
 	}
-	return nil
-}
+	defer f.Close()
 
-func readProgressFromFile(fileName string) (int64, error) {
-	dat, err := ioutil.ReadFile(fileName)
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+
 	if err != nil {
-		return 0, fmt.Errorf("ProgressFile is not valid %v", err)
+		log.Fatal("Unable to parse file as CSV for "+filePath, err)
 	}
 
-	stringValue := strings.TrimSpace(string(dat))
+	resultSlice := make([]string, 0, len(records))
+	for _, k := range records {
+		resultSlice = append(resultSlice, k[0])
+	}
 
-	return strconv.ParseInt(stringValue, 10, 64)
-
+	return resultSlice
 }
