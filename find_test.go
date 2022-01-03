@@ -206,6 +206,41 @@ transaction(name: String) {
 
 	})
 
+	t.Run("Should be able to send ft to another name with tag and message", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			createUser("100.0", "user2").
+			registerUser("user1").
+			registerUser("user2")
+
+		gt.GWTF.TransactionFromFile("sendFusdWithTagAndMessage").
+			SignProposeAndPayAs("user2").
+			StringArgument("user1").
+			UFix64Argument("5.0").
+			StringArgument("This is a test").
+			StringArgument("test").
+			Test(t).AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
+				"from":      "0xf3fcd2c1a78f5eee",
+				"fromName":  "user2",
+				"toAddress": "0x179b6b1cb6755e31",
+				"amount":    "5.00000000",
+				"name":      "user1",
+				"tag":       "test",
+				"message":   "This is a test",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "5.00000000",
+				"to":     "0x179b6b1cb6755e31",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+				"amount": "5.00000000",
+				"from":   "0xf3fcd2c1a78f5eee",
+			}))
+
+	})
 }
 
 //TODO: test validate wrong names

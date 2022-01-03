@@ -22,6 +22,10 @@ Taxonomy:
 */
 pub contract FIND {
 
+
+	//event when FT is sent
+	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
+
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
 
@@ -40,7 +44,7 @@ pub contract FIND {
 
 	/// Emitted when a name is explicistly put up for sale
 	pub event ForSale(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64, directSellPrice: UFix64, active: Bool)
-	
+
 	/// Emitted when an name is put up for on-demand auction
 	pub event ForAuction(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
@@ -120,6 +124,63 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+
+	/// lookup if an address has a .find name, if it does pick either the default one or the first registered
+	pub fun reverseLookup(_ address:Address): String? {
+		let account=getAccount(address)
+		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+
+		if !leaseCap.check() {
+			return nil
+		}
+
+		let profile= Profile.find(address).asProfile()
+		let leases = leaseCap.borrow()!.getLeaseInformation() 
+		var time : UFix64?= nil
+		var name :String?= nil
+		for lease in leases {
+
+			//filter out all leases that are FREE or LOCKED since they are not actice
+			if lease.status != "TAKEN" {
+				continue
+			}
+
+			//if we have not set a 
+			if profile.findName == "" {
+				if time == nil || lease.validUntil < time! {
+					time=lease.validUntil
+					name=lease.name
+				}
+			}
+
+			if profile.findName == lease.name {
+				return lease.name
+			}
+		}
+		return name
+	}
+
+	/// Deposit FT to name
+	/// @param to: The name to send money too
+	/// @param message: The message to send
+	/// @param tag: The tag to add to the event 
+	/// @param from: The vault to send too
+	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Profile.User) {
+		pre {
+			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+		}
+
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			let profile=network.lookup(to) ?? panic("could not find name")
+			let fromAddress= from.owner!.address
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, type:vault.getType()) 
+			profile.deposit(from: <- vault)
+
+			//pub event FungibleTokenSent(from:Address, fromName:String, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
+			return 
+		}
+		panic("Network is not set up")
+	}
 
 	/// Deposit FT to name
 	/// @param to: The name to send money too
@@ -302,7 +363,7 @@ pub contract FIND {
 			let bidder= callback.address
 			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 			if profile == nil {
-			   panic("Create a profile before you make a bid")
+				panic("Create a profile before you make a bid")
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
@@ -444,9 +505,6 @@ pub contract FIND {
 			return <- Artifact.mintNFTWithSharedData(platform: self.createPlatform(name), name: nftName, schemas: schemas, sharedPointer: sharedPointer)
 		}
 		*/
-
-		//TODO: send with Message 
-		//Emit own event
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {
@@ -646,7 +704,7 @@ pub contract FIND {
 			let bidder= callback.address
 			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 			if profile == nil {
-			   panic("Create a profile before you make a bid")
+				panic("Create a profile before you make a bid")
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
@@ -1120,7 +1178,7 @@ pub contract FIND {
 			self.profiles[name] =  lease
 
 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
-	
+
 		}
 
 		pub fun readStatus(_ name: String): NameStatus {

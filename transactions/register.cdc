@@ -53,6 +53,7 @@ transaction(name: String, amount: UFix64) {
 			)
 	
 			profile.addWallet(flowWallet)
+			profile.setFindName(name)
 			profile.addWallet(fusdWallet)
 			profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
 			profile.addCollection(Profile.ResourceCollection("FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))

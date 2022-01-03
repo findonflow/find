@@ -14,6 +14,6 @@ func TestCharity(t *testing.T) {
 			setupFIND().
 			createUser("100.0", "user1").
 			setupCharity("user1").
-			mintCharity("test", "https://test.png", "https://thumbnail.png", "http://origin.url", "user1")
+			mintCharity("test", "https://test.png", "https://thumbnail.png", "http://origin.url", "this is a description", "user1")
 	})
 }
