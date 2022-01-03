@@ -3,52 +3,33 @@ package main
 //TODO: send mail https://medium.com/vacatronics/how-to-use-gmail-with-go-c980295c23b8
 
 import (
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bjartek/overflow/overflow"
 	"github.com/meirf/gopart"
+	"github.com/typesense/typesense-go/typesense"
 )
 
-func readCsvFile(filePath string) []string {
-	f, err := os.Open(filePath)
-	if err != nil {
-		log.Fatal("Unable to read input file "+filePath, err)
-	}
-	defer f.Close()
-
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
-
-	if err != nil {
-		log.Fatal("Unable to parse file as CSV for "+filePath, err)
-	}
-
-	resultSlice := make([]string, 0, len(records))
-	for _, k := range records {
-		resultSlice = append(resultSlice, k[0])
-	}
-
-	return resultSlice
-}
-
 func main() {
+	key := os.Getenv("TYPESENSE_FIND_ADMIN")
+	url := os.Getenv("TYPESENSE_FIND_URL")
 
+	client := typesense.NewClient(
+		typesense.WithServer(url),
+		typesense.WithAPIKey(key),
+		typesense.WithConnectionTimeout(5*time.Second),
+		typesense.WithCircuitBreakerMaxRequests(50),
+		typesense.WithCircuitBreakerInterval(2*time.Minute),
+		typesense.WithCircuitBreakerTimeout(1*time.Minute),
+	)
+	nameDocuments := client.Collection("names").Documents()
 	of := overflow.NewOverflowMainnet().Start()
-
-	/*
-		result := of.ScriptFromFile("nameCrawler").
-			Args(of.Arguments().StringArray("juventus")).RunReturnsJsonString()
-		fmt.Println(result)
-
-		os.Exit(1)
-	*/
 
 	names := readCsvFile("names.txt")
 	fmt.Printf("Names is %d long", len(names))
@@ -99,6 +80,7 @@ func main() {
 				LatestBidBy:         latestBidBy,
 				LockedUntil:         *CadenceUFix64StringToInt64(item.LockedUntil),
 				Name:                item.Name,
+				Id:                  item.Name,
 				SalePrice:           CadenceUFixStringToFloat(item.SalePrice),
 				Status:              item.Status,
 				ValidUntil:          *CadenceUFix64StringToInt64(item.ValidUntil),
@@ -107,6 +89,7 @@ func main() {
 			if *item.Address != "" {
 				result.Address = item.Address
 			}
+			nameDocuments.Upsert(result)
 			fullResult = append(fullResult, result)
 		}
 	}
@@ -157,6 +140,7 @@ type NameResult struct {
 }
 
 type SearchResult struct {
+	Id                  string   `json:"id"`
 	Address             *string  `json:"address"`
 	AuctionEnds         *int64   `json:"auction_ends,omitempty"`
 	AuctionReservePrice *float64 `json:"auction_reserve_price,omitempty"`
@@ -168,4 +152,24 @@ type SearchResult struct {
 	SalePrice           *float64 `json:"sale_price,omitempty"`
 	Status              string   `json:"status"`
 	ValidUntil          int64    `json:"valid_until"`
+}
+
+func writeProgressToFile(fileName string, blockHeight uint64) error {
+	err := ioutil.WriteFile(fileName, []byte(fmt.Sprintf("%d", blockHeight)), 0644)
+	if err != nil {
+		return fmt.Errorf("Could not create initial progress file %v", err)
+	}
+	return nil
+}
+
+func readProgressFromFile(fileName string) (int64, error) {
+	dat, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return 0, fmt.Errorf("ProgressFile is not valid %v", err)
+	}
+
+	stringValue := strings.TrimSpace(string(dat))
+
+	return strconv.ParseInt(stringValue, 10, 64)
+
 }

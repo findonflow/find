@@ -1,17 +1,20 @@
 package main
 
 import (
+	"os"
 	"time"
 
 	"github.com/typesense/typesense-go/typesense"
 	"github.com/typesense/typesense-go/typesense/api"
+	"github.com/typesense/typesense-go/typesense/api/pointer"
 )
 
 func main() {
 
-	key := "xyz"
+	key := os.Getenv("TYPESENSE_FIND_ADMIN")
+	url := os.Getenv("TYPESENSE_FIND_URL")
 	client := typesense.NewClient(
-		typesense.WithServer("http://localhost:8108"),
+		typesense.WithServer(url),
 		typesense.WithAPIKey(key),
 		typesense.WithConnectionTimeout(5*time.Second),
 		typesense.WithCircuitBreakerMaxRequests(50),
@@ -38,7 +41,7 @@ func main() {
 			{
 				Name:  "address",
 				Type:  "string",
-				Facet: BoolPointer(true),
+				Facet: pointer.True(),
 			},
 			{
 				Name: "locked_until",
@@ -51,46 +54,46 @@ func main() {
 			{
 				Name:     "auction_ends",
 				Type:     "int64",
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
 			},
 			{
 				Name:     "auction_reserve_price",
 				Type:     "float",
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
 			},
 			{
 				Name:     "auction_start_price",
 				Type:     "float",
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
 			},
 			{
 				Name:     "latest_bid_by",
 				Type:     "string",
-				Facet:    BoolPointer(true),
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
+				Facet:    pointer.True(),
 			},
 			{
 				Name:     "latest_bid",
 				Type:     "float",
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
 			},
 			{
 				Name:     "sale_price",
 				Type:     "float",
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
 			},
 			{
 				Name:  "status",
 				Type:  "string",
-				Facet: BoolPointer(true),
+				Facet: pointer.True(),
 			},
 			{
 				Name:     "auction_reserve_price",
 				Type:     "float",
-				Optional: BoolPointer(true),
+				Optional: pointer.True(),
 			},
 		},
-		DefaultSortingField: StringPointer("name"),
+		DefaultSortingField: pointer.String("valid_until"),
 	}
 
 	_, err := client.Collections().Create(schema)
@@ -98,11 +101,4 @@ func main() {
 		panic(err)
 	}
 
-}
-
-func StringPointer(s string) *string {
-	return &s
-}
-func BoolPointer(b bool) *bool {
-	return &b
 }
