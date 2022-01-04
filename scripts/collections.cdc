@@ -17,6 +17,18 @@ import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
 
 
+pub struct MetadataCollections {
+
+	pub let items: {String : MetadataCollectionItem}
+	pub let collections: {String : [String]}
+
+	init(items: {String : MetadataCollectionItem}, collections: {String : [String]}) {
+		self.items=items
+		self.collections=collections
+	}
+}
+
+
 pub struct MetadataCollection{
 	pub let type: String
 	pub let items: [MetadataCollectionItem]
@@ -49,21 +61,23 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address) : {String : MetadataCollection}? {
+pub fun main(address: Address) : MetadataCollections? {
 
+	let resultMap : {String : MetadataCollectionItem} = {}
 	let account = getAccount(address)
-	let results : {String :  MetadataCollection}={}
+	let results : {String :  [String]}={}
 
 	let flovatarList= Flovatar.getFlovatars(address: address)
 	let flovatarMarketDetails = FlovatarMarketplace.getFlovatarSales(address: address)
 	if flovatarList.length > 0 || flovatarMarketDetails.length > 0 {
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for flovatar in flovatarList  {
 			var name = flovatar.name
 			if name == "" {
 				name="Flovatar #".concat(flovatar.id.toString())
 			}
-			items.append(MetadataCollectionItem(
+
+			let item=MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
@@ -71,12 +85,15 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
+			)
+			let itemId="Flovatar".concat(flovatar.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		for flovatar in flovatarMarketDetails  {
 			var	name="Flovatar #".concat(flovatar.id.toString())
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
 				image: "https://flovatar.com/api/image/".concat(flovatar.id.toString()),
@@ -84,11 +101,16 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: flovatar.price,
 				listToken: "Flow",
 				contentType: "image"
-			))
+			)
+
+			let itemId="Flovatar".concat(flovatar.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+
 		}
 
 		if items.length != 0 {
-			results["Flovatar"] = MetadataCollection(type: Type<@Flovatar.Collection>().identifier, items: items)
+			results["Flovatar"] = items
 		}
 	}
 
@@ -96,9 +118,9 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let versusImageUrlPrefix = "https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 	let artList = Art.getArt(address: address)
 	if artList.length > 0 || versusMarketplace.check() {
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for art in artList {
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: art.id, 
 				name: art.metadata.name.concat(" edition ").concat(art.metadata.edition.toString()).concat("/").concat(art.metadata.maxEdition.toString()).concat(" by ").concat(art.metadata.artist),  
 				image: versusImageUrlPrefix.concat(art.cacheKey), 
@@ -106,13 +128,16 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
+			)
+			let itemId="Versus".concat(art.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 
-			))
 		}
 		if versusMarketplace.check() {
 			let versusMarket = versusMarketplace.borrow()!.listSaleItems()
 			for saleItem in versusMarket {
-				items.append(MetadataCollectionItem(
+				let item=MetadataCollectionItem(
 					id: saleItem.id, 
 					name: saleItem.art.name.concat(" edition ").concat(saleItem.art.edition.toString()).concat("/").concat(saleItem.art.maxEdition.toString()).concat(" by ").concat(saleItem.art.artist),
 					image: versusImageUrlPrefix.concat(saleItem.cacheKey), 
@@ -120,12 +145,15 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 					listPrice: saleItem.price,
 					listToken: "Flow",
 					contentType: "image"
+				)
 
-				))
+				let itemId="Versus".concat(saleItem.id.toString())
+				items.append(itemId)
+				resultMap[itemId] = item
 			}
 		}
 		if items.length != 0 {
-			results["Versus"]= MetadataCollection(type: Type<@Art.Collection>().identifier, items: items)
+			results["Versus"]= items
 		}
 	}
 
@@ -135,11 +163,11 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 
 	if goobersCap.check() {
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: id,
 				name: "Goober #".concat(id.toString()),
 				image: goober.uri,
@@ -147,21 +175,23 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
-
+			)
+			let itemId="Gooberz".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 		if items.length != 0 {
-			results["Gooberz"] = MetadataCollection(type: Type<@GooberXContract.Collection>().identifier, items: items)
+			results["Gooberz"] = items
 		}
 	}
 
 	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
 	if rareRoomCollection.check() {
 		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for id in rareRoomNfts {
 			let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: id,
 				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
@@ -170,11 +200,15 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
+			)
+
+			let itemId="RareRooms".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["RareRooms"] = MetadataCollection(type: Type<@RareRooms_NFT.Collection>().identifier, items: items)
+			results["RareRooms"] = items
 		}
 	}
 
@@ -182,11 +216,11 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let motoGPCollection = account.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
 	if motoGPCollection.check() {
 		let motoGPNfts = motoGPCollection.borrow()!.getIDs()
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for id in motoGPNfts {
 			let nft = motoGPCollection.borrow()!.borrowCard(id: id)!
 			let metadata = nft.getCardMetadata()!
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: id,
 				name: metadata.name,
 				image: metadata.imageUrl,
@@ -194,22 +228,27 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
+			)
+
+
+			let itemId="MotoGP".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["MotoGP"] = MetadataCollection(type: Type<@MotoGPCard.Collection>().identifier, items: items)
+			results["MotoGP"] = items
 		}
 	}
 
 	let gaiaCollection = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
 	if gaiaCollection.check() {
 		let gaiaNfts = gaiaCollection.borrow()!.getIDs()
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for id in gaiaNfts {
 			let nft = gaiaCollection.borrow()!.borrowGaiaNFT(id: id)!
 			let metadata = Gaia.getTemplateMetaData(templateID: nft.data.templateID)!
-			items.append(MetadataCollectionItem(
+			let item= MetadataCollectionItem(
 				id: id,
 				name: metadata["title"]!,
 				image: metadata["img"]!,
@@ -217,11 +256,15 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
+			)
+
+			let itemId="Gaia".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["Gaia"] = MetadataCollection(type: Type<@Gaia.Collection>().identifier, items: items)
+			results["Gaia"] = items
 		}
 	}
 
@@ -264,11 +307,11 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if jambbCap.check() {
 		let nfts = jambbCap.borrow()!.getIDs()
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for id in nfts {
 			let nft = jambbCap.borrow()!.borrowMoment(id: id)!
 			let metadata=nft.getMetadata()
-			items.append(MetadataCollectionItem(
+			let item  =MetadataCollectionItem(
 				id: id,
 				name: metadata.contentName,
 				image: metadata.previewImage,
@@ -276,20 +319,23 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
+			)
+			let itemId="Jambb".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["Jambb"] = MetadataCollection(type: Type<@Moments.Collection>().identifier, items: items)
+			results["Jambb"] = items
 		}
 	}
 
 	let mw = MatrixWorldFlowFestNFT.getNft(address:address)
 	if mw.length > 0 {
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for nft in mw {
 			let metadata=nft.metadata
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: nft.id,
 				name: metadata.name,
 				image: metadata.animationUrl,
@@ -297,11 +343,14 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
-			))
+			)
+			let itemId="MatrixWorldFlowFest".concat(nft.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["MatrixWorld"] = MetadataCollection(type: Type<@MatrixWorldFlowFestNFT.Collection>().identifier, items: items)
+			results["MatrixWorld"] = items
 		}
 	}
 
@@ -309,7 +358,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
 	if sturdyCollectionCap.check() {
 		let sturdyNfts = sturdyCollectionCap.borrow()!.getIDs()
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for id in sturdyNfts {
 			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
 			let nft = sturdyCollectionCap.borrow()!.borrowSturdyItem(id: id)!
@@ -321,7 +370,7 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 			if isHoodlum {
 				// the hoodlum id is needed to retrieve the image but is not in the nft
 				let hoodlumId = nft.tokenTitle.slice(from: 8, upTo: nft.tokenTitle.length)
-				items.append(MetadataCollectionItem(
+				let item=MetadataCollectionItem(
 					id: id,
 					name: nft.tokenTitle,
 					image: "https://hoodlumsnft.com/_next/image?url=%2Fthumbs%2FsomeHoodlum_".concat(hoodlumId).concat(".png&w=1920&q=75"),
@@ -329,22 +378,25 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 					listPrice:nil,
 					listToken:nil,
 					contentType:"image"
-				))
+				)
+				let itemId="Hoodlums".concat(id.toString())
+				items.append(itemId)
+				resultMap[itemId] = item
 			}
 		}
 		if items.length != 0 {
-			results["Hoodlums"] = MetadataCollection(type: Type<@SturdyItems.Collection>().identifier, items: items)
+			results["Hoodlums"] = items
 		}
 	}
 
 	let charityCap = account.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)
 	if charityCap.check() {
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		let collection = charityCap.borrow()!
 		for id in collection.getIDs() {
 			let nft = collection.borrowCharity(id: id)!
 			let metadata = nft.getMetadata()
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
 				image: metadata["thumbnail"]!,
@@ -352,11 +404,14 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType:"image"
-			))
+			)
+			let itemId="Charity".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 
 		}
 		if items.length != 0 {
-			results["Charity"] = MetadataCollection(type: Type<@CharityNFT.Collection>().identifier, items: items)
+			results["Find"] = items
 		}
 	}
 
@@ -364,12 +419,12 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 	if evolutionCap.check() {
 		let evolution=evolutionCap.borrow()!
 		let nfts = evolution.getIDs()
-		let items: [MetadataCollectionItem] = []
+		let items: [String] = []
 		for id in nfts{
 			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
 			let nft = evolution.borrowCollectible(id: id)!
 			let metadata = Evolution.getItemMetadata(itemId: nft.data.itemId)!
-			items.append(MetadataCollectionItem(
+			let item=MetadataCollectionItem(
 				id: id,
 				name: metadata["Title"]!,
 				image: "https://storage.viv3.com/0xf4264ac8f3256818/mv/".concat(nft.data.itemId.toString()),
@@ -377,16 +432,30 @@ pub fun main(address: Address) : {String : MetadataCollection}? {
 				listPrice: nil,
 				listToken: nil,
 				contentType:"video"
-			))
+			)
+
+			let itemId="Evolution".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["Evolution"] = MetadataCollection(type: Type<@Evolution.Collection>().identifier, items: items)
+			results["Evolution"] = items
 		}
 	}
 
 	if results.keys.length == 0 {
 		return nil
 	}
-	return results
+
+	let publicPath=/public/FindCuratedCollections
+	let link = account.getCapability<&{String: [String]}>(publicPath)
+	if link.check() {
+		let curated = link.borrow()!
+		for curatedKey in curated.keys {
+			results[curatedKey] = curated[curatedKey]!
+		}
+	}
+
+	return MetadataCollections(items: resultMap, collections:results)
 }
