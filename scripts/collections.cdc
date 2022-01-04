@@ -21,10 +21,12 @@ pub struct MetadataCollections {
 
 	pub let items: {String : MetadataCollectionItem}
 	pub let collections: {String : [String]}
+	pub let curatedCollections: {String : [String]}
 
-	init(items: {String : MetadataCollectionItem}, collections: {String : [String]}) {
+	init(items: {String : MetadataCollectionItem}, collections: {String : [String]}, curatedCollections: {String: [String]}) {
 		self.items=items
 		self.collections=collections
+		self.curatedCollections=curatedCollections
 	}
 }
 
@@ -450,12 +452,13 @@ pub fun main(address: Address) : MetadataCollections? {
 
 	let publicPath=/public/FindCuratedCollections
 	let link = account.getCapability<&{String: [String]}>(publicPath)
+	var curatedCollections : {String: [String]} = {}
 	if link.check() {
 		let curated = link.borrow()!
 		for curatedKey in curated.keys {
-			results[curatedKey] = curated[curatedKey]!
+			curatedCollections[curatedKey] = curated[curatedKey]!
 		}
 	}
 
-	return MetadataCollections(items: resultMap, collections:results)
+	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
 }
