@@ -810,6 +810,7 @@ pub contract FIND {
 				let soldFor=offer.getBalance(name)
 				//move the token to the new profile
 				emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), amount: soldFor)
+				//TODO: Note that register event is not emitted here! And I belive it should
 				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!
