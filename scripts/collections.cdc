@@ -253,21 +253,29 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = Gaia.getTemplateMetaData(templateID: nft.data.templateID)!
 
 
-			var series="ballerz"
-			if let seriesFullName=metadata["series"] {
-				if seriesFullName=="Shareef O\u{2019}Neal - Basketball" {
-					series="shareef"
-				}else {
-					//TODO: fix this later
-					series="bryson"
-				}
+			//For ballerz we can do this...
+			var url="http://ongaia.com/ballerz/".concat(id.toString())
+			var name=metadata["title"]!
 
+			if let seriesFullName=metadata["series"] {
+
+				if seriesFullName=="Shareef O\u{2019}Neal - Basketball" {
+					//If the series is basketball with shareef we can do this
+					url="http://ongaia.com/sharef/".concat(id.toString())
+					name=metadata["title"]!.concat(" #").concat(nft.data.mintNumber.toString())
+				}else if seriesFullName=="Bryson DeChambeau - Vegas, Baby!" {
+					//For golf there is yet another way
+					url="http://ongaia.com/bryson/".concat(nft.data.mintNumber.toString())
+					name=metadata["title"]!.concat(" #").concat(nft.data.mintNumber.toString())
+				}
 			}
+
+
 			let item= MetadataCollectionItem(
 				id: id,
-				name: metadata["title"]!,
+				name: name,
 				image: metadata["img"]!,
-				url: "http://ongaia.com/".concat(series).concat("/").concat(id.toString()),
+				url: url,
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
