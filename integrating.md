@@ -17,8 +17,8 @@ This api is published at  https://lookup.find.xyz/api/lookup
 
 It can be called either with a name or an address
 
-https://lookup.find.xyz/api/lookup?name=bjartek -> will resolve to my address
-https://lookup.find.xyz/api/lookup?address=0x886f3aeaf848c535-> will resolve to my primary name 
+- https://lookup.find.xyz/api/lookup?name=bjartek -> will resolve to my address
+- https://lookup.find.xyz/api/lookup?address=0x886f3aeaf848c535-> will resolve to my primary name 
 
 
 ### Using Cadence directly
