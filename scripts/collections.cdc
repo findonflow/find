@@ -245,16 +245,29 @@ pub fun main(address: Address) : MetadataCollections? {
 
 	let gaiaCollection = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
 	if gaiaCollection.check() {
+
 		let gaiaNfts = gaiaCollection.borrow()!.getIDs()
 		let items: [String] = []
 		for id in gaiaNfts {
 			let nft = gaiaCollection.borrow()!.borrowGaiaNFT(id: id)!
 			let metadata = Gaia.getTemplateMetaData(templateID: nft.data.templateID)!
+
+
+			var series="ballerz"
+			if let seriesFullName=metadata["series"] {
+				if seriesFullName=="Shareef O\u{2019}Neal - Basketball" {
+					series="shareef"
+				}else {
+					//TODO: fix this later
+					series="bryson"
+				}
+
+			}
 			let item= MetadataCollectionItem(
 				id: id,
 				name: metadata["title"]!,
 				image: metadata["img"]!,
-				url: metadata["uri"]!,
+				url: "http://ongaia.com/".concat(series).concat("/").concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image"
