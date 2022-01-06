@@ -7,7 +7,7 @@
 This repo is the backend code, there are two other repos in this solutions namely
  - [find-lookup](https://github.com/findonflow/find-lookup) a serverless function to lookup names from web2
  - [find-web](https://github.com/findonflow/find-web) the frontend code
- - 
+ 
 
 ## Tests
 In order to run the tests for .find we recommend using (gotestsum)[https://github.com/gotestyourself/gotestsum] with the following invocation
