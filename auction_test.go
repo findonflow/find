@@ -21,6 +21,19 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to direct offer on name for sale", func(t *testing.T) {
+
+		NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1").
+			createUser("100.0", "user2").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "4.0")
+
+	})
+
 	t.Run("Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
