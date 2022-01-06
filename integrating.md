@@ -6,7 +6,7 @@ We advice anybody that is integrating to contact us in [discord in the technical
 ## Resolving names <> addresses
 In order to integrate with .find you have a couple of options. 
 
- -. use flow-cadut with the [.find plugin](https://codesandbox.io/s/lqcw0)
+ -. use flow-cadut with the [.find plugin](https://codesandbox.io/s/lqcw0). Shout out to the amazing [MaxStarka](https://github.com/maxstalker) for this
  -. integrate using cadence scripts 
  -. use the web2 serverless api
  
@@ -82,3 +82,8 @@ There are lots of examples for how this is done in the collections script alread
 
 Note that if your solution needs to lookup things in an API after the collections script we can accomodate that aswell.
 
+## Login using your .find name
+
+We have a demo of using a .find name to log in with here from a community member. Expect more to come here later
+
+https://github.com/lightbeardao/find-auth-example
