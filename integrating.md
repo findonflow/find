@@ -87,3 +87,14 @@ Note that if your solution needs to lookup things in an API after the collection
 We have a demo of using a .find name to log in with here from a community member. Expect more to come here later
 
 https://github.com/lightbeardao/find-auth-example
+
+## Verifying .find name in discord
+
+Using the [Emerald bot](https://github.com/jacob-tucker/blocto-auth-discord-bot) it is possible to give users that have a valid .find name a role in your discord. 
+
+1. invite Emerald#5944 into your discord
+2. Create a new role that is below the Emerald role in your discord
+3. as admin of discord run `!setup FIND <your role>`
+4. This will give that channel an `Validate` button you can press that pops up a web page that logs you in to your account and verifies if you own atleast one active .find name
+ 
+
