@@ -18,7 +18,7 @@ test:
 dev:
 	gotestsum -f testname --watch
 
-contract: 
+client: 
 	go run overflow/main.go > lib/find.json
 
 publish:
