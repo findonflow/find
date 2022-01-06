@@ -6,9 +6,9 @@ We advice anybody that is integrating to contact us in [discord in the technical
 ## Resolving names <> addresses
 In order to integrate with .find you have a couple of options. 
 
- -. use flow-cadut with the [.find plugin](https://codesandbox.io/s/lqcw0). Shout out to the amazing [MaxStarka](https://github.com/maxstalker) for this
- -. integrate using cadence scripts 
- -. use the web2 serverless api
+ - use flow-cadut with the [.find plugin](https://codesandbox.io/s/lqcw0). Shout out to the amazing [MaxStarka](https://github.com/maxstalker) for this
+ - integrate using cadence scripts 
+ - use the web2 serverless api
  
  
 ### The web2 serverless api
