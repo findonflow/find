@@ -10,7 +10,7 @@ See [developing](developing.md) for how to develop on .find
 ## Integrate with .find
 The following solutions are integrated with .find
  - https://versus.auction
- - https://schamp.io
+ - https://schwap.io
  - https://flovatar.com
 
 see [integrating](integrating.md) for how to integrate with .find
