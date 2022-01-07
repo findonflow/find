@@ -1,0 +1,164 @@
+--- deployed
++++ changes
+@@ -1,9 +1,9 @@
+ import FungibleToken from 0xf233dcee88fe0abe
+ import FUSD from 0x3c5959b568896393
+ import NonFungibleToken from 0x1d7e57aa55817448
+-import Profile from 0x97bafa4e0b48eef
+-import Debug from 0x97bafa4e0b48eef
+-import Clock from 0x97bafa4e0b48eef
++import Profile from 0x097bafa4e0b48eef
++import Debug from 0x097bafa4e0b48eef
++import Clock from 0x097bafa4e0b48eef
+ /*
+ 
+ ///FIND
+@@ -22,6 +22,10 @@
+ */
+ pub contract FIND {
+ 
++
++	//event when FT is sent
++	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
++
+ 	/// An event to singla that there is a name in the network
+ 	pub event Name(name: String)
+ 
+@@ -40,7 +44,7 @@
+ 
+ 	/// Emitted when a name is explicistly put up for sale
+ 	pub event ForSale(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64, directSellPrice: UFix64, active: Bool)
+-	
++
+ 	/// Emitted when an name is put up for on-demand auction
+ 	pub event ForAuction(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
+ 
+@@ -118,9 +122,67 @@
+ 		panic("Network is not set up")
+ 	}
+ 
++
++	/// lookup if an address has a .find name, if it does pick either the default one or the first registered
++	pub fun reverseLookup(_ address:Address): String? {
++		let account=getAccount(address)
++		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
++
++		if !leaseCap.check() {
++			return nil
++		}
++
++		let profile= Profile.find(address).asProfile()
++		let leases = leaseCap.borrow()!.getLeaseInformation() 
++		var time : UFix64?= nil
++		var name :String?= nil
++		for lease in leases {
++
++			//filter out all leases that are FREE or LOCKED since they are not actice
++			if lease.status != "TAKEN" {
++				continue
++			}
++
++			//if we have not set a 
++			if profile.findName == "" {
++				if time == nil || lease.validUntil < time! {
++					time=lease.validUntil
++					name=lease.name
++				}
++			}
++
++			if profile.findName == lease.name {
++				return lease.name
++			}
++		}
++		return name
++	}
++
+ 	/// Deposit FT to name
+ 	/// @param to: The name to send money too
++	/// @param message: The message to send
++	/// @param tag: The tag to add to the event 
+ 	/// @param from: The vault to send too
++	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Profile.User) {
++		pre {
++			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
++		}
++
++		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
++			let profile=network.lookup(to) ?? panic("could not find name")
++			let fromAddress= from.owner!.address
++			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, type:vault.getType()) 
++			profile.deposit(from: <- vault)
++
++			//pub event FungibleTokenSent(from:Address, fromName:String, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
++			return 
++		}
++		panic("Network is not set up")
++	}
++
++	/// Deposit FT to name
++	/// @param to: The name to send money too
++	/// @param from: The vault to send too
+ 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
+ 		pre {
+ 			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+@@ -299,7 +358,7 @@
+ 			let bidder= callback.address
+ 			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+ 			if profile == nil {
+-			   panic("Create a profile before you make a bid")
++				panic("Create a profile before you make a bid")
+ 			}
+ 			let bidderName= profile!.getName()
+ 			let owner=lease.owner!.address
+@@ -442,7 +501,6 @@
+ 		}
+ 		*/
+ 
+-
+ 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
+ 			pre {
+ 				self.leases.containsKey(name) : "Invalid name=".concat(name)
+@@ -488,7 +546,6 @@
+ 		pub fun getLeaseInformation() : [LeaseInformation]  {
+ 			var info: [LeaseInformation]=[]
+ 			for name in self.leases.keys {
+-				//TODO: for testnet
+ 				if !FIND.validateFindName(name) {
+ 					continue
+ 				}
+@@ -641,7 +698,7 @@
+ 			let bidder= callback.address
+ 			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+ 			if profile == nil {
+-			   panic("Create a profile before you make a bid")
++				panic("Create a profile before you make a bid")
+ 			}
+ 			let bidderName= profile!.getName()
+ 			let owner=lease.owner!.address
+@@ -747,6 +804,7 @@
+ 				let soldFor=offer.getBalance(name)
+ 				//move the token to the new profile
+ 				emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), amount: soldFor)
++				//TODO: Note that register event is not emitted here! And I belive it should
+ 				lease.move(profile: newProfile)
+ 
+ 				let token <- self.leases.remove(key: name)!
+@@ -1115,7 +1173,7 @@
+ 			self.profiles[name] =  lease
+ 
+ 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
+-	
++
+ 		}
+ 
+ 		pub fun readStatus(_ name: String): NameStatus {
+@@ -1433,9 +1491,6 @@
+ 
+ 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
+ 		let network <-  create Network(
+-			//TODO: change!
+-			//leasePeriod: 86400.0, //365 days
+-			//lockPeriod: 86400.0, //90 days
+ 			leasePeriod: 31536000.0, //365 days
+ 			lockPeriod: 7776000.0, //90 days
+ 			secondaryCut: 0.05,

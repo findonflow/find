@@ -1,9 +1,9 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import FUSD from "./standard/FUSD.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import Profile from "./Profile.cdc"
-import Debug from "./Debug.cdc"
-import Clock from "./Clock.cdc"
+import FungibleToken from 0xf233dcee88fe0abe
+import FUSD from 0x3c5959b568896393
+import NonFungibleToken from 0x1d7e57aa55817448
+import Profile from 0x097bafa4e0b48eef
+import Debug from 0x097bafa4e0b48eef
+import Clock from 0x097bafa4e0b48eef
 /*
 
 ///FIND
