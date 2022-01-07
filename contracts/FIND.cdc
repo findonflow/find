@@ -4,6 +4,8 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
+import Dandy from "./Dandy.cdc"
+
 /*
 
 ///FIND
@@ -464,45 +466,21 @@ pub contract FIND {
 			self.networkWallet=networkWallet
 		}
 
-		/*
-		access(contract) fun createPlatform(_ name: String) : Artifact.MinterPlatform{
-			//TODO: make it possible to set profile
 
-			let minterCap =self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
-			let platformCap=FIND.account.getCapability<&{Profile.Public}>(Profile.publicPath)
-			//todo check and panic here
-
-			if !minterCap.check() {
-				panic("minter profile is not present")
-
-			}
-
-			if !platformCap.check() {
-				panic("platform cap is not present")
-			}
-
-			return Artifact.MinterPlatform(name:name,  owner: platformCap, minter: minterCap, ownerPercentCut: 0.025)
+		access(contract) fun createPlatform(_ name: String) : Dandy.MinterPlatform{
+			return Dandy.MinterPlatform(name:name, platformPercentCut: 0.025)
 		}
 
-		pub fun mintArtifact(name: String, nftName: String, schemas: [AnyStruct]) : @Artifact.NFT {
+		pub fun mintDandy(name: String, nftName: String, schemas: [AnyStruct]) : @Dandy.NFT {
 
 			let lease = self.borrow(name)
-			if !lease.addons.containsKey("artifact") {
-				panic("You do not have the artifact addon, buy it first")
+			if !lease.addons.containsKey("dandy") {
+				panic("You do not have the dandy addon, buy it first")
 			}
 
-			return <- Artifact.mintNFT(platform: self.createPlatform(name), name: nftName, schemas: schemas)
+			return <- Dandy.mintNFT(platform: self.createPlatform(name), name: nftName, schemas: schemas)
 		}
 
-		//have method to mint without shared
-		pub fun mintNFTWithSharedData(name: String, nftName: String, schemas: [AnyStruct], sharedPointer: Artifact.Pointer) : @Artifact.NFT {
-			let lease = self.borrow(name)
-			if !lease.addons.containsKey("artifact") {
-				panic("You do not have the artifact addon, buy it first")
-			}
-			return <- Artifact.mintNFTWithSharedData(platform: self.createPlatform(name), name: nftName, schemas: schemas, sharedPointer: sharedPointer)
-		}
-		*/
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {

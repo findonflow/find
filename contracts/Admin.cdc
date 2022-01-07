@@ -4,6 +4,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
+import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 
@@ -94,10 +95,6 @@ pub contract Admin {
 			CharityNFT.mintCharity(metadata: metadata, recipient: recipient)
 		}
 
-
-
-
-
 		pub fun advanceClock(_ time: UFix64) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -114,6 +111,23 @@ pub contract Admin {
 			}
 			Debug.enable(value)
 		}
+
+		pub fun setViewConverters(from: Type, converters: [{TypedMetadata.ViewConverter}]) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			Dandy.setViewConverters(from: from, converters: converters)
+		}
+
+		pub fun createForge(platform: Dandy.MinterPlatform) : @Dandy.Forge {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			return <- Dandy.createForge(platform:platform)
+		}
+
+
 
 		init() {
 			self.capability = nil
