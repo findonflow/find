@@ -50,9 +50,10 @@ pub struct MetadataCollectionItem {
 	pub let listPrice: UFix64?
 	pub let listToken: String?
 	pub let contentType:String
+	pub let rarity:String
 
 
-	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String) {
+	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String, rarity: String) {
 		self.id=id
 		self.name=name
 		self.url=url
@@ -60,6 +61,7 @@ pub struct MetadataCollectionItem {
 		self.listToken=listToken
 		self.listPrice=listPrice
 		self.contentType=contentType
+		self.rarity=rarity
 	}
 }
 
@@ -79,6 +81,16 @@ pub fun main(address: Address) : MetadataCollections? {
 				name="Flovatar #".concat(flovatar.id.toString())
 			}
 
+			var rarity="common"
+			if flovatar.metadata.legendaryCount > 0 {
+				rarity="legendary"
+			}else if flovatar.metadata.epicCount > 0 {
+				rarity="epic"
+			}else if flovatar.metadata.rareCount > 0 {
+				rarity="rare"
+			}
+
+
 			let item=MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
@@ -86,7 +98,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: rarity
 			)
 			let itemId="Flovatar".concat(flovatar.id.toString())
 			items.append(itemId)
@@ -95,6 +108,17 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		for flovatar in flovatarMarketDetails  {
 			var	name="Flovatar #".concat(flovatar.id.toString())
+
+			var rarity="common"
+			if flovatar.metadata.legendaryCount > 0 {
+				rarity="legendary"
+			}else if flovatar.metadata.epicCount > 0 {
+				rarity="epic"
+			}else if flovatar.metadata.rareCount > 0 {
+				rarity="rare"
+			}
+
+
 			let item=MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
@@ -102,7 +126,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: flovatar.price,
 				listToken: "Flow",
-				contentType: "image"
+				contentType: "image",
+				rarity: rarity
 			)
 
 			let itemId="Flovatar".concat(flovatar.id.toString())
@@ -129,7 +154,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/"),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 			let itemId="Versus".concat(art.id.toString())
 			items.append(itemId)
@@ -146,7 +173,9 @@ pub fun main(address: Address) : MetadataCollections? {
 					url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/"),
 					listPrice: saleItem.price,
 					listToken: "Flow",
-					contentType: "image"
+					contentType: "image",
+				rarity: ""
+
 				)
 
 				let itemId="Versus".concat(saleItem.id.toString())
@@ -176,7 +205,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://partymansion.io/gooberz/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 			let itemId="Gooberz".concat(id.toString())
 			items.append(itemId)
@@ -201,7 +232,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://rarerooms.io/tokens/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 
 			let itemId="RareRooms".concat(id.toString())
@@ -229,7 +262,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 
 
@@ -278,7 +313,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: url,
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 
 			let itemId="Gaia".concat(id.toString())
@@ -341,7 +378,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "http://jambb.com",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 			let itemId="Jambb".concat(id.toString())
 			items.append(itemId)
@@ -365,7 +404,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://matrixworld.org/",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
+
 			)
 			let itemId="MatrixWorldFlowFest".concat(nft.id.toString())
 			items.append(itemId)
@@ -400,7 +441,9 @@ pub fun main(address: Address) : MetadataCollections? {
 					url: "https://hoodlumsnft.com/",
 					listPrice:nil,
 					listToken:nil,
-					contentType:"image"
+					contentType:"image",
+				rarity: ""
+
 				)
 				let itemId="Hoodlums".concat(id.toString())
 				items.append(itemId)
@@ -426,7 +469,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: metadata["originUrl"]!,
 				listPrice: nil,
 				listToken: nil,
-				contentType:"image"
+				contentType:"image",
+				rarity: ""
+
 			)
 			let itemId="Charity".concat(id.toString())
 			items.append(itemId)
@@ -454,7 +499,9 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://www.evolution-collect.com/",
 				listPrice: nil,
 				listToken: nil,
-				contentType:"video"
+				contentType:"video",
+				rarity: ""
+
 			)
 
 			let itemId="Evolution".concat(id.toString())
