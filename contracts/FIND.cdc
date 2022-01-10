@@ -468,29 +468,34 @@ pub contract FIND {
 
 
 		access(contract) fun createPlatform(_ name: String) : Dandy.MinterPlatform{
-			return Dandy.MinterPlatform(name:name, platformPercentCut: 0.025)
+			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025)
 		}
 
-		pub fun mintDandy(name: String, nftName: String, schemas: [AnyStruct]) : @Dandy.NFT {
+		pub fun mintDandy(minter: String, nftName: String, schemas: [AnyStruct]) : @Dandy.NFT {
 
-			let lease = self.borrow(name)
-			if !lease.addons.containsKey("dandy") {
-				panic("You do not have the dandy addon, buy it first")
+			let lease = self.borrow(minter)
+			if !lease.addons.containsKey("forge") {
+				panic("You do not have the forge addon, buy it first")
 			}
 
-			return <- Dandy.mintNFT(platform: self.createPlatform(name), name: nftName, schemas: schemas)
+			return <- Dandy.mintNFT(name:nftName, platform: self.createPlatform(minter), schemas: schemas)
 		}
-
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
+
 			let lease = self.borrow(name)
 
 			if lease.addons.containsKey(addon) {
 				panic("You already have this addon")
+			}
+
+			if addon=="forge" && vault.balance != 50.0 {
+				panic("Expect 50 FUSD for forge addon")
 			}
 
 			lease.addAddon(addon)

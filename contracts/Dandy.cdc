@@ -4,11 +4,12 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Profile from "../contracts/Profile.cdc"
 import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
-
+//TODO: review all permissions and events
 pub contract Dandy: NonFungibleToken {
 
-	pub let DandyStoragePath: StoragePath
-	pub let DandyPublicPath: PublicPath
+	pub let CollectionStoragePath: StoragePath
+	pub let CollectionPrivatePath: PrivatePath
+	pub let CollectionPublicPath: PublicPath
 	pub var totalSupply: UInt64
 
 
@@ -23,6 +24,7 @@ pub contract Dandy: NonFungibleToken {
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
+	pub event Minted(id:UInt64, name:String)
 
 	pub struct ViewInfo {
 		access(contract) let typ: Type
@@ -40,8 +42,8 @@ pub contract Dandy: NonFungibleToken {
 		access(contract) let minterPlatform: MinterPlatform
 
 
-		init(initID: UInt64, name: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform) {
-			self.id = initID
+		init(name: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform) {
+			self.id = self.uuid
 			self.schemas=schemas
 			self.minterPlatform=minterPlatform
 			self.name=name
@@ -52,6 +54,7 @@ pub contract Dandy: NonFungibleToken {
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
 			views.append(Type<String>())
+			views.append(Type<TypedMetadata.Display>())
 			views.append(Type<{TypedMetadata.Royalty}>())
 
 			//if any specific here they will override
@@ -90,9 +93,51 @@ pub contract Dandy: NonFungibleToken {
 				}
 			}
 
-			let royalty=RoyaltyItem(receiver : "find", cut: self.minterPlatform.platformPercentCut)
+		  let royalty=RoyaltyItem(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut)
 			royalties["platform"]= royalty
 			return Royalties(royalties)
+		}
+
+		pub fun resolveDisplay() : TypedMetadata.Display {
+
+
+			var thumbnail=""
+			var thumbnailMediaType=""
+			var media: &{TypedMetadata.Media}? = nil
+			if self.schemas.containsKey(Type<TypedMetadata.Medias>().identifier) {
+				let medias=self.schemas[Type<TypedMetadata.Medias>().identifier]!.result as! TypedMetadata.Medias
+				if medias.media.containsKey("thumbnail") {
+					thumbnail=medias.media["thumbnail"]!.data()
+					thumbnailMediaType=medias.media["thumbnail"]!.mediaType
+				}
+			}
+
+			if self.schemas.containsKey(Type<TypedMetadata.IPFSMedia>().identifier) {
+				let media=self.schemas[Type<TypedMetadata.IPFSMedia>().identifier]!.result as! TypedMetadata.IPFSMedia
+				thumbnail=media.data()
+				thumbnailMediaType=media.mediaType
+			}
+			
+			if self.schemas.containsKey(Type<TypedMetadata.GenericMedia>().identifier) {
+				let media=self.schemas[Type<TypedMetadata.GenericMedia>().identifier]!.result as! TypedMetadata.GenericMedia
+				thumbnail=media.data()
+				thumbnailMediaType=media.mediaType
+			}
+
+			return TypedMetadata.Display(
+				name: self.name,
+				thumbnail: thumbnail,
+				thumbnailMediaType: thumbnailMediaType,
+				source: TypedMetadata.Identity(id:self.id, uuid: self.uuid, type: Type<@Dandy.NFT>(), discriminator:self.minterPlatform.name),
+				sourceURI: self.resolveSourceUri()
+			)
+
+
+		}
+
+		pub fun resolveSourceUri() : String {
+			return "implement me"
+
 		}
 
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
@@ -107,6 +152,9 @@ pub contract Dandy: NonFungibleToken {
 				return self.resolveRoyalties()
 			}
 
+			if type == Type<TypedMetadata.Display>() {
+				return self.resolveDisplay()
+			}
 
 			if type == Type<String>() {
 				return self.name
@@ -130,6 +178,8 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 	}
+
+	//TODO: create an interface that exposes getIDsForMinter and getMinters()
 
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
 		// dictionary of NFT conforming tokens
@@ -185,31 +235,37 @@ pub contract Dandy: NonFungibleToken {
 		}
 	}
 
-	//TODO: I think this needs a capability to a forge
-	//TODO: I think this needs to be a resource, so that others cannot create it
+	//TODO: this needs some sort of url information to determine the sourceURI of nfts minted with it
+	//TODO: can these fields really be public? Not sure that is wise
 	pub struct MinterPlatform {
+		pub let platform: Capability<&{FungibleToken.Receiver}>
 		pub let platformPercentCut: UFix64
 		pub let name: String
 
-		init(name: String, platformPercentCut: UFix64) {
+		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64) {
+			self.platform=platform
 			self.platformPercentCut=platformPercentCut
 			self.name=name
 		}
 	}
+	
 
 	access(account)  fun createForge(platform: MinterPlatform) : @Forge {
 		return <- create Forge(platform:platform)
 	}
 
 
-	access(account) fun mintNFT(platform:MinterPlatform, name: String, schemas: [AnyStruct]) : @NFT {
+	access(account) fun mintNFT(name: String, platform:MinterPlatform, schemas: [AnyStruct]) : @NFT {
 		let views : {String: ViewInfo} = {}
 		for s in schemas {
-			views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
+			//if you send in display we ignore it, this will be made for you
+			if s.getType() != Type<TypedMetadata.Display>() {
+				views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
+			}
 		}
 
-		let nft <-  create NFT(initID: Dandy.totalSupply, name: name, schemas:views, minterPlatform: platform)
-		Dandy.totalSupply = Dandy.totalSupply + 1
+		let nft <-  create NFT(name: name, schemas:views, minterPlatform: platform)
+		emit Minted(id:nft.id, name:nft.minterPlatform.name)
 		return <-  nft
 	}
 
@@ -217,7 +273,7 @@ pub contract Dandy: NonFungibleToken {
 		Dandy.viewConverters[from.identifier] = converters
 	}
 
-	//THis is not used right now but might be here for white label things
+	//This is not used right now but might be here for white label things
 	pub resource Forge {
 		access(contract) let platform: MinterPlatform
 
@@ -226,7 +282,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun mintNFT(name: String, schemas: [AnyStruct]) : @NFT {
-			return <- Dandy.mintNFT(platform: self.platform, name: name, schemas: schemas)
+			return <- Dandy.mintNFT(name: name, platform: self.platform, schemas: schemas)
 		}
 	}
 
@@ -234,6 +290,7 @@ pub contract Dandy: NonFungibleToken {
 	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
+
 
 	pub struct Royalties : TypedMetadata.Royalty {
 		pub let royalty: { String : RoyaltyItem}
@@ -245,28 +302,18 @@ pub contract Dandy: NonFungibleToken {
 			var sum:UFix64=0.0
 			for key in self.royalty.keys {
 				let item= self.royalty[key]!
-				if let profile=FIND.lookup(item.receiver) {
-					if profile.supportedFungigleTokenTypes().contains(type) {
-						sum=sum+amount*item.cut
-					}
-				}
+				sum=sum+amount*item.cut
 			}
 			return sum
 		}
 
-		// TODO: test this!
 		pub fun distributeRoyalty(vault: @FungibleToken.Vault) {
 			let totalAmount=vault.balance
 			var sumCuts:UFix64=0.0
 			for key in self.royalty.keys {
 				let item= self.royalty[key]!
-				if let profile=FIND.lookup(item.receiver) {
-					if profile.supportedFungigleTokenTypes().contains(vault.getType()) {
-						sumCuts=sumCuts+item.cut
-					}
-				}
+				sumCuts=sumCuts+item.cut
 			}
-			
 
 			let totalKeys=self.royalty.keys.length
 			var currentKey=1
@@ -275,24 +322,15 @@ pub contract Dandy: NonFungibleToken {
 				let item= self.royalty[key]!
 				let relativeCut=item.cut / sumCuts
 
-				if let profile=FIND.lookup(item.receiver) {
-					if profile.supportedFungigleTokenTypes().contains(vault.getType()) {
-						let address=profile.asProfile().address
-						let receiver=Profile.findWalletCapability(address)
-						if currentKey!=totalKeys {
-							//EMIT and event here
-							receiver.borrow()!.deposit(from: <-  vault.withdraw(amount: totalAmount*relativeCut))
-						} else { 
-							//we cannot calculate the last cut as it will have rounding errors
-							lastReceiver=receiver
-						}
-
-					}
+				if currentKey!=totalKeys {
+					item.receiver.borrow()!.deposit(from: <-  vault.withdraw(amount: totalAmount*relativeCut))
+				} else { 
+					//we cannot calculate the last cut as it will have rounding errors
+					lastReceiver=item.receiver
 				}
 				currentKey=currentKey+1
 			}
 			if let r=lastReceiver {
-				//EMIT and event here
 				r.borrow()!.deposit(from: <-  vault)
 			}else {
 				destroy vault
@@ -303,22 +341,20 @@ pub contract Dandy: NonFungibleToken {
 			var text=""
 			for key in self.royalty.keys {
 				let item= self.royalty[key]!
-				let address=FIND.lookupAddress(item.receiver)
-				if address != nil {
-					text.concat(key).concat(" ").concat((item.cut * 100.0).toString()).concat("%\n")
-				} else {
-					text.concat(item.receiver).concat(" is not an active find name so cut of ").concat((item.cut * 100.0).toString()).concat("% is ignored\n")
-				}
+				text.concat(key).concat(" ").concat((item.cut * 100.0).toString()).concat("%\n")
 			}
 			return text
 		}
 	}
 
+
+
 	pub struct RoyaltyItem{
-		pub let receiver: String
+		// note that this receiver should be a Profile receiver if you want to support multiple types, and since we mint from FIND that is ok
+		pub let receiver: Capability<&{FungibleToken.Receiver}> 
 		pub let cut: UFix64
 
-		init(receiver: String, cut: UFix64) {
+		init(receiver: Capability<&{FungibleToken.Receiver}>, cut: UFix64) {
 			self.cut=cut
 			self.receiver=receiver
 		}
@@ -336,8 +372,9 @@ pub contract Dandy: NonFungibleToken {
 	init() {
 		// Initialize the total supply
 		self.totalSupply=0
-		self.DandyPublicPath = /public/findDandy
-		self.DandyStoragePath = /storage/findDandy
+		self.CollectionPublicPath = /public/findDandy
+		self.CollectionPrivatePath = /private/findDandy
+		self.CollectionStoragePath = /storage/findDandy
 		self.viewConverters={}
 
 		emit ContractInitialized()

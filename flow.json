@@ -37,6 +37,9 @@
 			}
 		},
 		"FIND": "./contracts/FIND.cdc",
+		"Dandy": "./contracts/Dandy.cdc",
+		"TypedMetadata": "./contracts/TypedMetadata.cdc",
+		"MetadataViews": "./contracts/standard/MetadataViews.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
 		"Admin": "./contracts/Admin.cdc",
 		"Clock": "./contracts/Clock.cdc", 
@@ -132,7 +135,10 @@
 				"Debug",
 				"FUSD",
 				"Admin",
-				"CharityNFT"
+				"CharityNFT",
+				"TypedMetadata", 
+				"MetadataViews",
+				"Dandy"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],

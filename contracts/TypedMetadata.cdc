@@ -22,6 +22,7 @@ pub contract TypedMetadata {
 	}
 
 	// TODO: Should this contain links to your NFT in the originating/source solution? An simple Dictionary of String:String would do
+	//Todo use identity here
 	pub struct Display{
 		pub let name: String
 		pub let thumbnail: String
@@ -29,7 +30,7 @@ pub contract TypedMetadata {
 		pub let source: Identity
 		pub let sourceURI: String
 
-		init(name:String, thumbnail: String, thumbnailMediaType:String,source:Identity, sourceURI:String) {
+		init(name:String, thumbnail: String, thumbnailMediaType:String, source:Identity, sourceURI:String) {
 			self.source=source
 			self.sourceURI=sourceURI
 			self.name=name
@@ -42,12 +43,14 @@ pub contract TypedMetadata {
 		pub let id:UInt64
 		pub let uuid: UInt64
 		pub let type:Type
+		pub let typeIdentifier:String
 		pub let discriminator: String
 
 		init(id:UInt64, uuid:UInt64, type:Type, discriminator:String) {
 			self.id=id
 			self.uuid=uuid
 			self.type=type
+			self.typeIdentifier=type.identifier
 			self.discriminator=discriminator
 		}
 	}
@@ -81,7 +84,7 @@ pub contract TypedMetadata {
 		}
 
 		pub fun data() : String {
-			return self.cid
+			return "ipfs://".concat(self.cid)
 
 		}
 	}
@@ -124,10 +127,12 @@ pub contract TypedMetadata {
 	pub struct SharedMedia : Media {
 		pub let mediaType: String
 		pub let pointer: ViewReadPointer
+		pub let protocol: String
 
 		init(pointer: ViewReadPointer, mediaType: String) {
 			self.pointer=pointer
 			self.mediaType=mediaType
+			self.protocol="shared"
 
 			if !pointer.getViews().contains(Type<StringMedia>()) {
 				panic("Cannot create shared media if the pointer does not contain StringMedia")
@@ -135,11 +140,11 @@ pub contract TypedMetadata {
 		}
 
 		pub fun data(): String {
-			let result = self.pointer.resolveView(Type<StringMedia>()) 
-			if result== nil {
+			let media = self.pointer.resolveView(Type<StringMedia>()) 
+			if media == nil {
 				return ""
 			}
-			return result as String
+			return media as! String
 		}
 
 	}

@@ -7,6 +7,7 @@ import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
+import TypedMetadata from "./TypedMetadata.cdc"
 
 pub contract Admin {
 
@@ -112,7 +113,7 @@ pub contract Admin {
 			Debug.enable(value)
 		}
 
-		pub fun setViewConverters(from: Type, converters: [{TypedMetadata.ViewConverter}]) {
+		pub fun setViewConverters(from: Type, converters: [{Dandy.ViewConverter}]) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -126,8 +127,6 @@ pub contract Admin {
 			}
 			return <- Dandy.createForge(platform:platform)
 		}
-
-
 
 		init() {
 			self.capability = nil
