@@ -25,6 +25,7 @@ pub contract Dandy: NonFungibleToken {
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id:UInt64, name:String)
+	pub event RoyaltyPaid(name:String, amount: UFix64, type:String)
 
 	pub struct ViewInfo {
 		access(contract) let typ: Type
@@ -80,6 +81,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		access(self) fun resolveRoyalties() : AnyStruct{TypedMetadata.Royalty} {
+			//TODO: i guess we could send in the id of the item here
 			let royalties : {String : RoyaltyItem } = { }
 
 			if self.schemas.containsKey(Type<RoyaltyItem>().identifier) {
@@ -318,19 +320,24 @@ pub contract Dandy: NonFungibleToken {
 			let totalKeys=self.royalty.keys.length
 			var currentKey=1
 			var lastReceiver: Capability<&{FungibleToken.Receiver}>?=nil
+			var lastName:String=""
 			for key in self.royalty.keys {
 				let item= self.royalty[key]!
 				let relativeCut=item.cut / sumCuts
 
 				if currentKey!=totalKeys {
-					item.receiver.borrow()!.deposit(from: <-  vault.withdraw(amount: totalAmount*relativeCut))
+					let amount=totalAmount*relativeCut
+					emit RoyaltyPaid(name: key, amount: amount, type: vault.getType().identifier)
+					item.receiver.borrow()!.deposit(from: <-  vault.withdraw(amount: amount))
 				} else { 
 					//we cannot calculate the last cut as it will have rounding errors
 					lastReceiver=item.receiver
+					lastName=key
 				}
 				currentKey=currentKey+1
 			}
 			if let r=lastReceiver {
+				emit RoyaltyPaid(name: lastName, amount: vault.balance, type: vault.getType().identifier)
 				r.borrow()!.deposit(from: <-  vault)
 			}else {
 				destroy vault

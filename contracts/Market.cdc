@@ -25,6 +25,8 @@ pub contract Market {
 	pub let MarketBidCollectionStoragePath: StoragePath
 	pub let MarketBidCollectionPublicPath: PublicPath
 
+	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, type:String)
+
 	//TODO: always add names as optionals and try to resolve. 
 	/// Emitted when a name is sold to a new owner
 	pub event Sold(id: UInt64, previousOwner: Address, newOwner: Address, amount: UFix64)
@@ -450,6 +452,7 @@ pub contract Market {
 			}
 
 			let saleItem <- self.items.remove(key: id)!
+			let ftType=saleItem.vaultType
 			let owner=self.owner!.address
 
 			if let cb= saleItem.offerCallback {
@@ -460,11 +463,28 @@ pub contract Market {
 				//move the token to the new profile
 				emit Sold(id: id, previousOwner:offer.owner!.address, newOwner: cb.address, amount: soldFor)
 
+
+
+
+				let royaltyType=Type<AnyStruct{TypedMetadata.Royalty}>()
+				var royalty: AnyStruct{TypedMetadata.Royalty}?=nil
+
+				if saleItem.pointer.getViews().contains(royaltyType) {
+					royalty = saleItem.pointer.resolveView(royaltyType) as! AnyStruct{TypedMetadata.Royalty}? 
+				}
+
 				let vault <- saleItem.sellNFT(cb)
+
+				if royalty != nil {
+					let royaltyVault <- vault.withdraw(amount: royalty!.calculateRoyalty(type: ftType, amount: soldFor)!)
+					royalty!.distributeRoyalty(vault: <- royaltyVault)
+				}
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
+					emit RoyaltyPaid(id: id, name: "market", amount: cutAmount,  type: ftType.identifier)
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
+
 
 				oldProfile.deposit(from: <- vault)
 			} else if let auction = saleItem.auction {
@@ -475,11 +495,9 @@ pub contract Market {
 				emit Sold(id: id, previousOwner:owner, newOwner: auction.latestBidCallback.address, amount: soldFor)
 
 				let vault <- saleItem.sellNFT(auction.latestBidCallback)
+
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
-					//TODO: must  check type of fusd to return 
-					//or just use the profile cap here for royalty?
-					//no better to use NFT standard
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
@@ -546,12 +564,8 @@ pub contract Market {
 
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(): @SaleItemCollection {
-		//TODO:: add another ft
-		//TODO: customize this
-		//use royalty here
-
 		let wallet=Market.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
+		return <- create SaleItemCollection(networkCut:0.025, networkWallet: wallet)
 	}
 
 	/*
