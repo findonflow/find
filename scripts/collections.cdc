@@ -542,7 +542,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://www.geniace.com/product/".concat(metadata.name),
 				listPrice: nil,
 				listToken: nil,
-				contentType:"image",
+				contentType: metadata.data["mimetype"]!,
 				rarity: rarity,
 			)
 
