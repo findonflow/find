@@ -218,59 +218,66 @@ pub contract TypedMetadata {
 	}
 
 	pub struct ViewReadPointer{
-		pub let collection: Capability<&{MetadataViews.ResolverCollection}>
+		access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
 		pub let id: UInt64
 
-		init(collection: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
-			self.collection=collection
+		init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
+			self.cap=cap
 			self.id=id
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
 		}
 
     pub fun getUUID() :UInt64{
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).uuid
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).uuid
 		}
 
 		pub fun getViews() : [Type]{
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).getViews()
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).getViews()
 		}
 
 		pub fun owner() : Address {
-			return self.collection.address
+			return self.cap.address
+		}
+
+		pub fun valid() : Bool {
+			return self.cap.borrow()!.getIDs().contains(self.id)
 		}
 	}
 
 	pub struct AuthNFTPointer {
-		pub let collection: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>
+		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>
 		pub let id: UInt64
 
-		init(collection: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>, id: UInt64) {
-			self.collection=collection
+		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>, id: UInt64) {
+			self.cap=cap
 			self.id=id
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
 		}
 
 		pub fun getUUID() :UInt64{
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).uuid
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).uuid
 		}
 
 		pub fun getViews() : [Type]{
-			return self.collection.borrow()!.borrowViewResolver(id: self.id).getViews()
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).getViews()
 		}
 
-		pub fun transfer(_ collection: Capability<&{NonFungibleToken.Receiver}>) {
-			let resource <- self.collection.borrow()!.withdraw(withdrawID: self.id)
-			collection.borrow()!.deposit(token: <- resource)
+		pub fun valid() : Bool {
+			return self.cap.borrow()!.getIDs().contains(self.id)
+		}
+
+		pub fun withdraw() :@NonFungibleToken.NFT {
+			return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
 		}
 
 		pub fun owner() : Address {
-			return self.collection.address
+			return self.cap.address
 		}
 	}
 

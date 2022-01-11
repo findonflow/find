@@ -29,6 +29,11 @@ func main() {
 	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
 
 	g.TransactionFromFile("createProfile").
+		SignProposeAndPayAsService().
+		StringArgument("find").
+		RunPrintEventsFull()
+
+	g.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("user1").
 		StringArgument("User1").
 		RunPrintEventsFull()

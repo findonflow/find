@@ -13,7 +13,7 @@ import Debug from "./Debug.cdc"
 ///A market contrat that allows a user to receive bids on his nfts, direct sell and english auction his nfts
 
 The market has 2 collections
- - BidCollection: This contains all bids you have made, both bids on an auction and direct bids
+ - MarketBidCollection: This contains all bids you have made, both bids on an auction and direct bids
  - SaleItemCollection: This collection contains your saleItems and directOffers for your NFTs that others have made
 
 */
@@ -22,8 +22,8 @@ pub contract Market {
 	pub let SaleItemCollectionStoragePath: StoragePath
 	pub let SaleItemCollectionPublicPath: PublicPath
 
-	pub let BidCollectionStoragePath: StoragePath
-	pub let BidCollectionPublicPath: PublicPath
+	pub let MarketBidCollectionStoragePath: StoragePath
+	pub let MarketBidCollectionPublicPath: PublicPath
 
 	//TODO: always add names as optionals and try to resolve. 
 	/// Emitted when a name is sold to a new owner
@@ -51,12 +51,24 @@ pub contract Market {
 	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 
 
+	pub struct SaleItemInformation {
+
+		pub let salePrice: UFix64?
+		pub let bidder: Address?
+		pub let ftType: Type
+		pub let ftTypeIdentifier: String
+
+
+		init(_ item: &SaleItem) {
+			self.salePrice=item.salePrice
+			self.ftType=item.vaultType
+			self.ftTypeIdentifier=item.vaultType.identifier
+			self.bidder=item.offerCallback?.address
+		}
+	}
+
 	//TODO create SaleItemInformation struct that can be returned to gui
-
-	//can this be a struct?
 	pub resource SaleItem{
-		//TODO: until NFT standard me need metadata here I think so that we can display properly
-
 		access(contract) let vaultType: Type //The type of vault to use for this sale Item
 		access(contract) var pointer: TypedMetadata.AuthNFTPointer
 		access(contract) var salePrice: UFix64?
@@ -65,7 +77,9 @@ pub contract Market {
 		access(contract) var auctionDuration: UFix64
 		access(contract) var auctionMinBidIncrement: UFix64
 		access(contract) var auctionExtensionOnLateBid: UFix64
-		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
+		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
+
+		//This most likely has to be a resource since we want to escrow when this starts
 		access(contract) var auction: Auction?
 
 		init(pointer: TypedMetadata.AuthNFTPointer, vaultType: Type) {
@@ -81,7 +95,7 @@ pub contract Market {
 			self.auction=nil
 		}
 
-		pub fun sellNFT(_ cb : Capability<&BidCollection{BidCollectionPublic}>) : @FungibleToken.Vault {
+		pub fun sellNFT(_ cb : Capability<&MarketBidCollection{MarketBidCollectionPublic}>) : @FungibleToken.Vault {
 			return <- cb.borrow()!.accept(self.pointer)
 		}
 
@@ -113,7 +127,7 @@ pub contract Market {
 			self.auctionStartPrice=price
 		}
 
-		pub fun setCallback(_ callback: Capability<&BidCollection{BidCollectionPublic}>?) {
+		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?) {
 			self.offerCallback=callback
 		}
 	}
@@ -127,10 +141,10 @@ pub contract Market {
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
 		access(contract) let minimumBidIncrement: UFix64
-		access(contract) var latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>
+		access(contract) var latestBidCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
 		//let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, id: id)
-		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, minimumBidIncrement: UFix64, id: UInt64) {
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, minimumBidIncrement: UFix64, id: UInt64) {
 			pre {
 				extendOnLateBid != 0.0 : "Extends on late bid must be a non zero value"
 			}
@@ -146,7 +160,7 @@ pub contract Market {
 			return self.latestBidCallback.borrow()!.getBalance(self.id)
 		}
 
-		pub fun addBid(callback: Capability<&BidCollection{BidCollectionPublic}>, timestamp: UFix64) {
+		pub fun addBid(callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, timestamp: UFix64) {
 			let offer=callback.borrow()!
 			offer.setBidType(id: self.id, type: "auction")
 
@@ -176,11 +190,13 @@ pub contract Market {
 		pub fun getIds(): [UInt64]
 		//fetch all names that are for sale
 
+		pub fun getItemsForSale(): { UInt64:SaleItemInformation}
+
 		access(contract)fun cancelBid(_ id: UInt64) 
 		//		access(contract) fun increaseBid(_ id: UInt64) 
 
 		//place a bid on a token
-		access(contract) fun bid(id: UInt64, callback: Capability<&BidCollection{BidCollectionPublic}>)
+		access(contract) fun registerBid(id: UInt64, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>)
 
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ id: UInt64) 
@@ -190,9 +206,9 @@ pub contract Market {
 		access(contract) let vaultType: Type //The type of vault to use for this sale Item
 
 		access(contract) let pointer: TypedMetadata.ViewReadPointer
-		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>
+		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
-		init(cb: Capability<&BidCollection{BidCollectionPublic}>, vaultType: Type, pointer: TypedMetadata.ViewReadPointer) {
+		init(cb: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType: Type, pointer: TypedMetadata.ViewReadPointer) {
 
 			self.offerCallback=cb
 			self.pointer=pointer
@@ -223,6 +239,15 @@ pub contract Market {
 			self.directOffers <- {}
 			self.networkCut=networkCut
 			self.networkWallet=networkWallet
+		}
+
+
+		pub fun getItemsForSale(): { UInt64: SaleItemInformation} {
+			let info: {UInt64:SaleItemInformation} ={}
+			for id in self.getIds() {
+				info[id]=SaleItemInformation(self.borrow(id))
+			}
+			return info
 		}
 
 		//call this to start an auction for this lease
@@ -299,7 +324,8 @@ pub contract Market {
 		}
 		*/
 
-		access(contract) fun bid(id: UInt64, callback: Capability<&BidCollection{BidCollectionPublic}>) {
+		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
+		access(contract) fun registerBid(id: UInt64, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
@@ -460,9 +486,7 @@ pub contract Market {
 				oldProfile.deposit(from: <- vault)
 			}
 			destroy  saleItem
-
-			panic("Item is not for auction id=".concat(id.toString()))
-			
+//			panic("Item is not for auction id=".concat(id.toString()))
 
 		}
 
@@ -488,12 +512,10 @@ pub contract Market {
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType)
 			saleItem.setSalePrice(directSellPrice)
 
-			//TODO; need type and id of nft and uuid of saleItem
-			emit ForSale(id: saleItem.uuid, owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: true)
-			self.items[saleItem.uuid] <-! saleItem
+			emit ForSale(id: pointer.getUUID(), owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: true)
+			self.items[pointer.getUUID()] <-! saleItem
 
 		}
-
 
 		pub fun delist(_ id: UInt64) {
 			pre {
@@ -528,7 +550,7 @@ pub contract Market {
 		//TODO: customize this
 		//use royalty here
 
-		let wallet = Market.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+		let wallet=Market.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
 	}
 
@@ -588,7 +610,7 @@ pub contract Market {
 		}
 	}
 
-	pub resource interface BidCollectionPublic {
+	pub resource interface MarketBidCollectionPublic {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
@@ -598,7 +620,7 @@ pub contract Market {
 	}
 
 	//A collection stored for bidders/buyers
-	pub resource BidCollection: BidCollectionPublic {
+	pub resource MarketBidCollection: MarketBidCollectionPublic {
 
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
@@ -610,11 +632,12 @@ pub contract Market {
 		}
 
 		//called from lease when auction is ended
+		//TODO: Not sure if sending in pointer here is a good idea, rather send nft
 		access(contract) fun accept(_ pointer: TypedMetadata.AuthNFTPointer) : @FungibleToken.Vault{
 
 			let bid <- self.bids.remove(key: pointer.getUUID()) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
-			pointer.transfer(bid.nftCap)
+			bid.nftCap.borrow()!.deposit(token: <- pointer.withdraw())
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
 			return <- vault
@@ -640,16 +663,16 @@ pub contract Market {
 		}
 		//* this is bid on saleItem */
 		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
-		pub fun bid(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
-			let from=getAccount(self.owner!.address).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
+		pub fun bid(address: Address, id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+			let from=getAccount(address).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
 
 			let bid <- create Bid(from: from, saleItemUUID:id, vault: <- vault, nftCap: nftCap)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(id.toString()))
-			let callbackCapability =self.owner!.getCapability<&BidCollection{BidCollectionPublic}>(Market.BidCollectionPublicPath)
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
 			let oldToken <- self.bids[id] <- bid
 			//send info to leaseCollection
 			destroy oldToken
-			saleItemCollection.bid(id: id, callback: callbackCapability) 
+			saleItemCollection.registerBid(id: id, callback: callbackCapability) 
 		}
 
 		/*
@@ -698,8 +721,8 @@ pub contract Market {
 		}
 	}
 
-	pub fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>) : @BidCollection {
-		return <- create BidCollection(receiver: receiver)
+	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>) : @MarketBidCollection {
+		return <- create MarketBidCollection(receiver: receiver)
 	}
 
 	init() {
@@ -707,7 +730,7 @@ pub contract Market {
 		self.SaleItemCollectionStoragePath=/storage/findMarketSaleItem
 		self.SaleItemCollectionPublicPath=/public/findMarketSaleItem
 
-		self.BidCollectionStoragePath=/storage/findMarketBids
-		self.BidCollectionPublicPath=/public/findMarketBids
+		self.MarketBidCollectionStoragePath=/storage/findMarketBids
+		self.MarketBidCollectionPublicPath=/public/findMarketBids
 	}
 }

@@ -1,8 +1,12 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
+import Market from "../contracts/Market.cdc"
+import Dandy from "../contracts/Dandy.cdc"
 
 
 //really not sure on how to input links here.)
@@ -18,6 +22,20 @@ transaction(name: String) {
 		//TODO we already have a profile
 		if profileCap.check() {
 			return 
+		}
+
+
+		let dandyCap= acct.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		if !dandyCap.check() {
+			acct.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+			acct.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				Dandy.CollectionPublicPath,
+				target: Dandy.CollectionStoragePath
+			)
+			acct.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				Dandy.CollectionPrivatePath,
+				target: Dandy.CollectionStoragePath
+			)
 		}
 
 		let profile <-Profile.createUser(name:name, createdAt: "find")
@@ -68,9 +86,23 @@ transaction(name: String) {
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
+		let saleItemCap= acct.getCapability<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
+		if !saleItemCap.check() {
+				acct.save<@Market.SaleItemCollection>(<- Market.createEmptySaleItemCollection(), to: Market.SaleItemCollectionStoragePath)
+				acct.link<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath, target: Market.SaleItemCollectionStoragePath)
+			}
+			
+
+	
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
+		let receiver = acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let bidCap= acct.getCapability<&Market.MarketBidCollection{Market.MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
+		if !bidCap.check() {
+				acct.save<@Market.MarketBidCollection>(<- Market.createEmptyMarketBidCollection(receiver: receiver), to: Market.MarketBidCollectionStoragePath)
+				acct.link<&Market.MarketBidCollection{Market.MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath, target: Market.MarketBidCollectionStoragePath)
+		}
 	}
 }
