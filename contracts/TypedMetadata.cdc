@@ -1,4 +1,5 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -73,7 +74,7 @@ pub contract TypedMetadata {
 
 	/// IPFS specify media that holds the CID as a field
 	pub struct IPFSMedia : Media {
-	  pub let mediaType: String
+		pub let mediaType: String
 		pub let protocol: String
 		pub let cid:String
 
@@ -219,22 +220,60 @@ pub contract TypedMetadata {
 	pub struct ViewReadPointer{
 		pub let collection: Capability<&{MetadataViews.ResolverCollection}>
 		pub let id: UInt64
-		pub let views: [Type]
 
-		init(collection: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64, views: [Type]) {
+		init(collection: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
 			self.collection=collection
 			self.id=id
-			self.views=views
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
 			return self.collection.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
 		}
 
+    pub fun getUUID() :UInt64{
+			return self.collection.borrow()!.borrowViewResolver(id: self.id).uuid
+		}
+
 		pub fun getViews() : [Type]{
-			return self.views
+			return self.collection.borrow()!.borrowViewResolver(id: self.id).getViews()
+		}
+
+		pub fun owner() : Address {
+			return self.collection.address
 		}
 	}
+
+	pub struct AuthNFTPointer {
+		pub let collection: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>
+		pub let id: UInt64
+
+		init(collection: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>, id: UInt64) {
+			self.collection=collection
+			self.id=id
+		}
+
+		pub fun resolveView(_ type: Type) : AnyStruct? {
+			return self.collection.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
+		}
+
+		pub fun getUUID() :UInt64{
+			return self.collection.borrow()!.borrowViewResolver(id: self.id).uuid
+		}
+
+		pub fun getViews() : [Type]{
+			return self.collection.borrow()!.borrowViewResolver(id: self.id).getViews()
+		}
+
+		pub fun transfer(_ collection: Capability<&{NonFungibleToken.Receiver}>) {
+			let resource <- self.collection.borrow()!.withdraw(withdrawID: self.id)
+			collection.borrow()!.deposit(token: <- resource)
+		}
+
+		pub fun owner() : Address {
+			return self.collection.address
+		}
+	}
+
 
 
 	//TODO NFTAuthPointer?

@@ -38,6 +38,7 @@
 		},
 		"FIND": "./contracts/FIND.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
+		"Market": "./contracts/Market.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"MetadataViews": "./contracts/standard/MetadataViews.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
@@ -138,7 +139,8 @@
 				"CharityNFT",
 				"TypedMetadata", 
 				"MetadataViews",
-				"Dandy"
+				"Dandy",
+				"Market"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],
