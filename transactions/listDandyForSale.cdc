@@ -1,5 +1,6 @@
 import Market from "../contracts/Market.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
@@ -13,6 +14,6 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(Dandy.CollectionPrivatePath)
 
 		let pointer= TypedMetadata.AuthNFTPointer(cap: dandyPrivateCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: Type<FlowToken>(), directSellPrice: directSellPrice)
+		saleItems.listForSale(pointer: pointer, vaultType: Type<@FUSD.Vault>(), directSellPrice: directSellPrice)
 	}
 }
