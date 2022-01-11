@@ -70,12 +70,13 @@ In order to show your nfts in .find we use this [script](scripts/collections.cdc
 In essence what we need for each nft is the fields:
 ```
 	pub let id:UInt64
-	pub let name: String
-	pub let image: String
-	pub let url: String
-	pub let listPrice: UFix64?
-	pub let listToken: String?
-	pub let contentType:String
+	pub let name: String: The name of the nft
+	pub let image: String : the http url to the image, or ipfs://<cid>
+	pub let url: String: the url to go to when an nft is clicked
+	pub let listPrice: UFix64? : if this is item is listed in a marketplace show the price here
+	pub let listToken: String? : the string representation of the token used. Identifier of FT
+	pub let contentType:String : content type of image url, image or video works fine here
+	pub let rarity:String: rarity description for this NFT
 ```
 
 There are lots of examples for how this is done in the collections script already. 
