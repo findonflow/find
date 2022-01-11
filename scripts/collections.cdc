@@ -15,6 +15,7 @@ import Moments from 0xd4ad4740ee426334
 import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
 import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
+import GeniaceNFT from 0xabda6627c70c7f52
 
 
 pub struct MetadataCollections {
@@ -511,6 +512,47 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["Evolution"] = items
+		}
+	}
+
+
+  let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+
+	if geniaceCap.check() {
+		let geniace=geniaceCap.borrow()!
+		let nfts = geniace.getIDs()
+		let items: [String] = []
+		for id in nfts{
+			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
+			let nft = geniace.borrowGeniaceNFT(id: id)!
+			let metadata = nft.metadata
+			var rarity=""
+			if metadata.rarity == GeniaceNFT.Rarity.Collectible {
+				rarity="Collectible"
+			}else if metadata.rarity == GeniaceNFT.Rarity.Rare {
+				rarity="Rare"
+			}else if metadata.rarity == GeniaceNFT.Rarity.UltraRare {
+				rarity="UltraRare"
+			}
+
+			let item=MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: metadata.imageUrl,
+				url: "https://www.geniace.com/product/".concat(metadata.name),
+				listPrice: nil,
+				listToken: nil,
+				contentType:"image",
+				rarity: rarity,
+			)
+
+			let itemId="Geniace".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["Geniace"] = items
 		}
 	}
 
