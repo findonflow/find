@@ -16,6 +16,7 @@ import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
 import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
 import GeniaceNFT from 0xabda6627c70c7f52
+import OneFootballCollectible from 0x6831760534292098
 
 
 pub struct MetadataCollections {
@@ -516,8 +517,7 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 
-  let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
-
+	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if geniaceCap.check() {
 		let geniace=geniaceCap.borrow()!
 		let nfts = geniace.getIDs()
@@ -553,6 +553,35 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["Geniace"] = items
+		}
+	}
+
+	// https://flow-view-source.com/mainnet/account/0x6831760534292098/contract/OneFootballCollectible
+	let OneFootballCollectibleCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
+	if OneFootballCollectibleCap.check() {
+		let items: [String] = []
+		let collection = OneFootballCollectibleCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowOneFootballCollectible(id: id)!
+			let metadata = nft.getTemplate()!
+			let item=MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: "ipfs://".concat(metadata.media),
+				url: "https://xmas.onefootball.com/".concat(account.address.toString()),
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video",
+				rarity: ""
+
+			)
+			let itemId="OneFootballCollectible".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+
+		}
+		if items.length != 0 {
+			results["OneFootballCollectible"] = items
 		}
 	}
 
