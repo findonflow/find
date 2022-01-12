@@ -8,6 +8,7 @@ import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
+import CNN_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
@@ -223,7 +224,7 @@ pub fun main(address: Address) : MetadataCollections? {
 		let items: [String] = []
 		for id in rareRoomNfts {
 			let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
-			let item=MetadataCollectionItem(
+			let item = MetadataCollectionItem(
 				id: id,
 				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
@@ -242,6 +243,34 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["RareRooms"] = items
+		}
+	}
+
+	let cnnCollection = account.getCapability<&CNN_NFT.Collection{CNN_NFT.CNN_NFTCollectionPublic}>(CNN_NFT.CollectionPublicPath)
+	if cnnCollection.check() {
+		let cnnNfts = cnnCollection.borrow()!.getIDs()
+		let items: [String] = []
+		for id in cnnNfts {
+			let nft = cnnCollection.borrow()!.borrowCNN_NFT(id: id)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: CNN_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: CNN_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
+				url: "https://vault.cnn.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+
+			let itemId="CNN".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["CNN"] = items
 		}
 	}
 
