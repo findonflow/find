@@ -157,7 +157,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 			let itemId="Versus".concat(art.id.toString())
 			items.append(itemId)
@@ -175,8 +174,7 @@ pub fun main(address: Address) : MetadataCollections? {
 					listPrice: saleItem.price,
 					listToken: "Flow",
 					contentType: "image",
-				rarity: ""
-
+					rarity: ""
 				)
 
 				let itemId="Versus".concat(saleItem.id.toString())
@@ -208,7 +206,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 			let itemId="Gooberz".concat(id.toString())
 			items.append(itemId)
@@ -235,7 +232,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 
 			let itemId="RareRooms".concat(id.toString())
@@ -265,7 +261,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 
 
@@ -316,7 +311,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 
 			let itemId="Gaia".concat(id.toString())
@@ -381,7 +375,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 			let itemId="Jambb".concat(id.toString())
 			items.append(itemId)
@@ -407,7 +400,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType: "image",
 				rarity: ""
-
 			)
 			let itemId="MatrixWorldFlowFest".concat(nft.id.toString())
 			items.append(itemId)
@@ -443,8 +435,7 @@ pub fun main(address: Address) : MetadataCollections? {
 					listPrice:nil,
 					listToken:nil,
 					contentType:"image",
-				rarity: ""
-
+					rarity: ""
 				)
 				let itemId="Hoodlums".concat(id.toString())
 				items.append(itemId)
@@ -472,7 +463,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				listToken: nil,
 				contentType:"image",
 				rarity: ""
-
 			)
 			let itemId="Charity".concat(id.toString())
 			items.append(itemId)
@@ -495,14 +485,13 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = Evolution.getItemMetadata(itemId: nft.data.itemId)!
 			let item=MetadataCollectionItem(
 				id: id,
-				name: metadata["Title"]!,
+				name: metadata["Title"]!.concat(" #").concat(nft.data.serialNumber.toString()),
 				image: "https://storage.viv3.com/0xf4264ac8f3256818/mv/".concat(nft.data.itemId.toString()),
 				url: "https://www.evolution-collect.com/",
 				listPrice: nil,
 				listToken: nil,
 				contentType:"video",
 				rarity: ""
-
 			)
 
 			let itemId="Evolution".concat(id.toString())
