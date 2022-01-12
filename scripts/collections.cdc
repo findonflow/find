@@ -11,6 +11,7 @@ import RareRooms_NFT from 0x329feb3ab062d289
 import CNN_NFT from 0x329feb3ab062d289
 import Canes_Vault_NFT from 0x329feb3ab062d289
 import DGD_NFT from 0x329feb3ab062d289
+import RaceDay_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
@@ -333,6 +334,35 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["DGD_NFT"] = items
+		}
+	}
+
+	let raceDayCap = account.getCapability<&RaceDay_NFT.Collection{RaceDay_NFT.RaceDay_NFTCollectionPublic}>(RaceDay_NFT.CollectionPublicPath)
+	if raceDayCap.check() {
+		let collection = raceDayCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowRaceDay_NFT(id: id)!
+			let metadata = RaceDay_NFT.getSetMetadata(setId: nft.setId)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: metadata["preview"]!,
+				url: metadata["external_url"]!,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+
+			let itemId="RaceDay_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["RaceDay_NFT"] = items
 		}
 	}
 
