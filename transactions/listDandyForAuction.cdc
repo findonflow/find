@@ -6,15 +6,15 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import TypedMetadata from "../contracts/TypedMetadata.cdc"
 
-transaction(id: UInt64, directSellPrice:UFix64) {
+transaction(id: UInt64, price:UFix64) {
 	prepare(account: AuthAccount) {
-
 
 		let saleItems= account.borrow<&Market.SaleItemCollection>(from: Market.SaleItemCollectionStoragePath)!
 
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(Dandy.CollectionPrivatePath)
 
 		let pointer= TypedMetadata.AuthNFTPointer(cap: dandyPrivateCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: Type<@FUSD.Vault>(), directSellPrice: directSellPrice)
+		saleItems.listForAuction(pointer: pointer, vaultType: Type<@FUSD.Vault>(), auctionStartPrice: price, auctionReservePrice: price+5.0, auctionDuration: 300.0, auctionExtensionOnLateBid: 60.0, minimumBidIncrement: 1.0)
+
 	}
 }

@@ -89,4 +89,11 @@ func main() {
 
 	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user2").AccountArgument("user1").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
 
+	g.TransactionFromFile("listDandyForAuction").SignProposeAndPayAs("user2").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
+
+	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user1").AccountArgument("user2").UInt64Argument(id).UFix64Argument("15.0").RunPrintEventsFull()
+
+	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("400.0").RunPrintEventsFull()
+
+	g.TransactionFromFile("fulfillMarketAuction").SignProposeAndPayAs("user1").AccountArgument("user2").UInt64Argument(id).RunPrintEventsFull()
 }

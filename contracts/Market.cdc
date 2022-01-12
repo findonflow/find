@@ -137,7 +137,7 @@ pub contract Market {
 
 	pub struct Auction {
 
-		//right now saleItem and bid share id, that is the id of the bid is the id of the saleItem, that does not hold anymore
+		//this id is the uuid of the item beeing auctioned
 		access(contract) var id: UInt64
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
@@ -145,14 +145,13 @@ pub contract Market {
 		access(contract) let minimumBidIncrement: UFix64
 		access(contract) var latestBidCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
-		//let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, id: id)
 		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, minimumBidIncrement: UFix64, id: UInt64) {
 			pre {
 				extendOnLateBid != 0.0 : "Extends on late bid must be a non zero value"
 			}
 			self.id=id
-			self.endsAt=self.endsAt
-			self.startedAt=self.startedAt
+			self.endsAt=endsAt
+			self.startedAt=startedAt
 			self.extendOnLateBid=extendOnLateBid
 			self.minimumBidIncrement=minimumBidIncrement
 			self.latestBidCallback=latestBidCallback
@@ -200,27 +199,28 @@ pub contract Market {
 		//place a bid on a token
 		access(contract) fun registerBid(id: UInt64, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>)
 
+		//Add a direct offer to an NFT another user owns
+		access(contract) fun registerDirectOffer(id: UInt64, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>)
+
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ id: UInt64) 
 	}
 
 	pub resource DirectOffer {
-		access(contract) let vaultType: Type //The type of vault to use for this sale Item
-
 		access(contract) let pointer: TypedMetadata.ViewReadPointer
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
-		init(cb: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType: Type, pointer: TypedMetadata.ViewReadPointer) {
+		init(id: UInt64, cb: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, pointer: TypedMetadata.ViewReadPointer) {
 
 			self.offerCallback=cb
 			self.pointer=pointer
-			self.vaultType=vaultType
 		}
 
 		pub fun getBalance() : UFix64 {
-			return self.offerCallback.borrow()!.getBalance(self.uuid)
+			return self.offerCallback.borrow()!.getBalance(self.pointer.getUUID())
 		}
 
+		//TODO: get vault type
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic {
@@ -254,13 +254,15 @@ pub contract Market {
 
 		//call this to start an auction for this lease
 		pub fun startAuction(_ id: UInt64) {
-			//TODO: pre id
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			}
 			let timestamp=Clock.time()
 			let saleItem = self.borrow(id)
 			let duration=saleItem.auctionDuration
 			let extensionOnLateBid=saleItem.auctionExtensionOnLateBid
 			if saleItem.offerCallback == nil {
-				panic("cannot start an auction on a name without a bid, set salePrice")
+				panic("No bid registered for item, cannot start auction without a bid")
 			}
 
 			let callback=saleItem.offerCallback!
@@ -272,6 +274,7 @@ pub contract Market {
 			let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, minimumBidIncrement: saleItem.auctionMinBidIncrement, id: id)
 			saleItem.setCallback(nil)
 			saleItem.setAuction(auction)
+			//TODO: here we should really escrow the NFT 
 		}
 
 
@@ -325,6 +328,12 @@ pub contract Market {
 
 		}
 		*/
+
+
+		access(contract) fun registerDirectOffer(id: UInt64, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+			//TODO: if the item is for sale and the callbacks price is equal or more then panic
+
+		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
 		access(contract) fun registerBid(id: UInt64, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
@@ -508,7 +517,6 @@ pub contract Market {
 
 		}
 
-		//TODO: this needs to be different, need to add NFT here
 		pub fun listForAuction(pointer: TypedMetadata.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType)
@@ -520,9 +528,9 @@ pub contract Market {
 			saleItem.setMinBidIncrement(minimumBidIncrement)
 
 			//TODO; need type and id of nft and uuid of saleItem
-			emit ForAuction(id: saleItem.uuid, owner:self.owner!.address, auctionStartPrice: saleItem.auctionStartPrice!, auctionReservePrice: saleItem.auctionReservePrice!,  active: true)
+			emit ForAuction(id: pointer.getUUID(), owner:self.owner!.address, auctionStartPrice: saleItem.auctionStartPrice!, auctionReservePrice: saleItem.auctionReservePrice!,  active: true)
 
-			self.items[saleItem.uuid] <-! saleItem
+			self.items[pointer.getUUID()] <-! saleItem
 		}
 
 		pub fun listForSale(pointer: TypedMetadata.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64) {
@@ -592,8 +600,7 @@ pub contract Market {
 	pub resource Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
-		//This cannot be saleItemUUID anymore, as it is UUID of either saleItem or directOffer
-		access(contract) let saleItemUUID: UInt64
+		access(contract) let itemUUID: UInt64
 
 		//this should reflect on what the above uuid is for
 		access(contract) var type: String
@@ -601,10 +608,10 @@ pub contract Market {
 		access(contract) let vaultType: Type
 		access(contract) var bidAt: UFix64
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, saleItemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>){
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>){
 			self.vaultType= vault.getType()
 			self.vault <- vault
-			self.saleItemUUID=saleItemUUID
+			self.itemUUID=itemUUID
 			self.from=from
 			self.type="directOffer"
 			self.bidAt=Clock.time()
@@ -666,27 +673,39 @@ pub contract Market {
 			var bidInfo: [BidInfo] = []
 			for id in self.bids.keys {
 				let bid = self.borrowBid(id)
-				bidInfo.append(BidInfo(id: bid.saleItemUUID, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type))
+				bidInfo.append(BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type))
 			}
 			return bidInfo
 		}
 
 		//this is offer on something that is not even listed
-		pub fun directOffer() {
 
+		pub fun directOffer(item: TypedMetadata.ViewReadPointer, vault: @FungibleToken.Vault,nftCap: Capability<&{NonFungibleToken.Receiver}> ) {
+			let uuid=item.getUUID()
+			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
+			let bid <- create Bid(from: from, itemUUID:uuid, vault: <- vault, nftCap: nftCap)
+			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
+			let oldToken <- self.bids[uuid] <- bid
+			//send info to leaseCollection
+			saleItemCollection.registerDirectOffer(id: uuid, callback: callbackCapability) 
+			destroy oldToken
 		}
+
+		//TODO why dont we just send in the ViewReadPointer here, it has all we need and we can have one method for bid/directOffer
 		//* this is bid on saleItem */
 		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
-		pub fun bid(address: Address, id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		pub fun bid(address: Address, uuid: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+			//TODO: pre that bid is not already here
 			let from=getAccount(address).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
 
-			let bid <- create Bid(from: from, saleItemUUID:id, vault: <- vault, nftCap: nftCap)
-			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(id.toString()))
+			let bid <- create Bid(from: from, itemUUID:uuid, vault: <- vault, nftCap: nftCap)
+			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
-			let oldToken <- self.bids[id] <- bid
+			let oldToken <- self.bids[uuid] <- bid
 			//send info to leaseCollection
+			saleItemCollection.registerBid(id: uuid, callback: callbackCapability) 
 			destroy oldToken
-			saleItemCollection.registerBid(id: id, callback: callbackCapability) 
 		}
 
 		/*

@@ -16,6 +16,6 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the flowTokenVault!")
 		let vault <- vaultRef.withdraw(amount: amount) 
 		let bids = account.borrow<&Market.MarketBidCollection>(from: Market.MarketBidCollectionStoragePath)!
-		bids.bid(address: address, id: id, vault: <- vault, nftCap: dandyCap)
+		bids.bid(address: address, uuid: id, vault: <- vault, nftCap: dandyCap)
 	}
 }

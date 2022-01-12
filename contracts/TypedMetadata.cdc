@@ -217,7 +217,24 @@ pub contract TypedMetadata {
 		}
 	}
 
-	pub struct ViewReadPointer{
+	/// A basic pointer that can resolve data and get owner/id/uuid and gype
+	pub struct interface Pointer {
+
+		pub let id: UInt64
+		pub fun resolveView(_ type: Type) : AnyStruct?
+    pub fun getUUID() :UInt64
+		pub fun getViews() : [Type]
+		pub fun owner() : Address 
+		pub fun valid() : Bool 
+		pub fun getItemType() : Type 
+	}
+
+	//An interface to say that this pointer can withdraw
+	pub struct interface AuthPointer {
+		pub fun withdraw() : @AnyResource
+	}
+
+	pub struct ViewReadPointer : Pointer {
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
 		pub let id: UInt64
 
@@ -245,9 +262,13 @@ pub contract TypedMetadata {
 		pub fun valid() : Bool {
 			return self.cap.borrow()!.getIDs().contains(self.id)
 		}
+
+		pub fun getItemType() : Type {
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).getType()
+		}
 	}
 
-	pub struct AuthNFTPointer {
+	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>
 		pub let id: UInt64
 
@@ -279,9 +300,14 @@ pub contract TypedMetadata {
 		pub fun owner() : Address {
 			return self.cap.address
 		}
+		pub fun getItemType() : Type {
+			return self.cap.borrow()!.borrowViewResolver(id: self.id).getType()
+		}
 	}
 
-
-
-	//TODO NFTAuthPointer?
+	pub fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
+		let cap=	getAccount(address).getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)
+		let pointer= TypedMetadata.ViewReadPointer(cap: cap, id: id)
+		return pointer
+	}
 }
