@@ -229,15 +229,22 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowRareRooms_NFT(id: id)!
 			let metadata = RareRooms_NFT.getSetMetadata(setId: nft.setId)!
+
+		  var image= metadata["preview"]!
+			var contentType="image"
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
-				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: metadata["preview"]!,
+				image: image,
 				url: "https://rarerooms.io/tokens/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: contentType,
 				rarity: ""
 			)
 
@@ -258,15 +265,21 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowCNN_NFT(id: id)!
 			let metadata = CNN_NFT.getSetMetadata(setId: nft.setId)!
+
+		  var image= metadata["preview"]!
+			var contentType="image"
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
-				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: metadata["preview"]!,
-				url: metadata["external_url"]!,
+				image: image,
+				url: "http://vault.cnn.com",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: contentType,
 				rarity: ""
 			)
 
@@ -287,15 +300,21 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowCanes_Vault_NFT(id: id)!
 			let metadata = Canes_Vault_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
-				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: metadata["preview"]!,
-				url: metadata["external_url"]!,
+				image: image,
+				url: "https://canesvault.com/",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: contentType,
 				rarity: ""
 			)
 
@@ -316,15 +335,22 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowDGD_NFT(id: id)!
 			let metadata = DGD_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+
+	
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
-				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: metadata["preview"]!,
-				url: metadata["external_url"]!,
+				image: image,
+				url: "https://www.theplayerslounge.io/",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: contentType,
 				rarity: ""
 			)
 
@@ -345,15 +371,22 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowRaceDay_NFT(id: id)!
 			let metadata = RaceDay_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
-				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: metadata["preview"]!,
-				url: metadata["external_url"]!,
+				image: image, 
+				url: "https://www.racedaynft.com",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: contentType,
 				rarity: ""
 			)
 
@@ -374,15 +407,23 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowThe_Next_Cartel_NFT(id: id)!
 			let metadata = The_Next_Cartel_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: metadata["preview"]!,
-				url: metadata["external_url"]!,
+				image: image,
+				url: "https://thenextcartel.com/",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: contentType,
 				rarity: ""
 			)
 
