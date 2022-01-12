@@ -218,17 +218,18 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
-	if rareRoomCollection.check() {
-		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
+	let rareRoomCap = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
+	if rareRoomCap.check() {
+		let collection = rareRoomCap.borrow()!
 		let items: [String] = []
-		for id in rareRoomNfts {
-			let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
+		for id in collection.getIDs() {
+			let nft = collection.borrowRareRooms_NFT(id: id)!
+			let metadata = RareRooms_NFT.getSetMetadata(setId: nft.setId)!
 			let item = MetadataCollectionItem(
 				id: id,
-				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
+				name: metadata["name"]!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
+				image: metadata["preview"]!,
 				url: "https://rarerooms.io/tokens/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
@@ -246,18 +247,19 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	let cnnCollection = account.getCapability<&CNN_NFT.Collection{CNN_NFT.CNN_NFTCollectionPublic}>(CNN_NFT.CollectionPublicPath)
-	if cnnCollection.check() {
-		let cnnNfts = cnnCollection.borrow()!.getIDs()
+	let cnnCap = account.getCapability<&CNN_NFT.Collection{CNN_NFT.CNN_NFTCollectionPublic}>(CNN_NFT.CollectionPublicPath)
+	if cnnCap.check() {
+		let collection = cnnCap.borrow()!
 		let items: [String] = []
-		for id in cnnNfts {
-			let nft = cnnCollection.borrow()!.borrowCNN_NFT(id: id)!
+		for id in collection.getIDs() {
+			let nft = collection.borrowCNN_NFT(id: id)!
+			let metadata = CNN_NFT.getSetMetadata(setId: nft.setId)!
 			let item = MetadataCollectionItem(
 				id: id,
-				name: CNN_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
+				name: metadata["name"]!,
 				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: CNN_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
-				url: "https://vault.cnn.com/",
+				image: metadata["preview"]!,
+				url: metadata["external_url"]!,
 				listPrice: nil,
 				listToken: nil,
 				contentType: "image",
@@ -274,6 +276,34 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
+	let canesVaultCap = account.getCapability<&Canes_Vault_NFT.Collection{Canes_Vault_NFT.Canes_Vault_NFTCollectionPublic}>(Canes_Vault_NFT.CollectionPublicPath)
+	if cnnCap.check() {
+		let collection = cnnCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowCanes_Vault_NFT(id: id)!
+			let metadata = Canes_Vault_NFT.getSetMetadata(setId: nft.setId)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: metadata["preview"]!,
+				url: metadata["external_url"]!,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+
+			let itemId="Canes_Vault_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["Canes_Vault_NFT"] = items
+		}
+	}
 
 	let motoGPCollection = account.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
 	if motoGPCollection.check() {
