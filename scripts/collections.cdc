@@ -12,6 +12,7 @@ import CNN_NFT from 0x329feb3ab062d289
 import Canes_Vault_NFT from 0x329feb3ab062d289
 import DGD_NFT from 0x329feb3ab062d289
 import RaceDay_NFT from 0x329feb3ab062d289
+import The_Next_Cartel_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
@@ -366,6 +367,35 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["RaceDay_NFT"] = items
+		}
+	}
+
+	let nextCartelCap = account.getCapability<&The_Next_Cartel_NFT.Collection{The_Next_Cartel_NFT.The_Next_Cartel_NFTCollectionPublic}>(The_Next_Cartel_NFT.CollectionPublicPath)
+	if nextCartelCap.check() {
+		let collection = nextCartelCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowThe_Next_Cartel_NFT(id: id)!
+			let metadata = The_Next_Cartel_NFT.getSetMetadata(setId: nft.setId)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: metadata["preview"]!,
+				url: metadata["external_url"]!,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+
+			let itemId="The_Next_Cartel_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["The_Next_Cartel_NFT"] = items
 		}
 	}
 
