@@ -9,6 +9,8 @@ import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
 import CNN_NFT from 0x329feb3ab062d289
+import Canes_Vault_NFT from 0x329feb3ab062d289
+import DGD_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
@@ -277,8 +279,8 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 	let canesVaultCap = account.getCapability<&Canes_Vault_NFT.Collection{Canes_Vault_NFT.Canes_Vault_NFTCollectionPublic}>(Canes_Vault_NFT.CollectionPublicPath)
-	if cnnCap.check() {
-		let collection = cnnCap.borrow()!
+	if canesVaultCap.check() {
+		let collection = canesVaultCap.borrow()!
 		let items: [String] = []
 		for id in collection.getIDs() {
 			let nft = collection.borrowCanes_Vault_NFT(id: id)!
@@ -302,6 +304,35 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["Canes_Vault_NFT"] = items
+		}
+	}
+
+	let dgdCap = account.getCapability<&DGD_NFT.Collection{DGD_NFT.DGD_NFTCollectionPublic}>(DGD_NFT.CollectionPublicPath)
+	if dgdCap.check() {
+		let collection = dgdCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowDGD_NFT(id: id)!
+			let metadata = DGD_NFT.getSetMetadata(setId: nft.setId)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: metadata["preview"]!,
+				url: metadata["external_url"]!,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+
+			let itemId="DGD_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["DGD_NFT"] = items
 		}
 	}
 
