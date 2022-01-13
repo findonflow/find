@@ -477,7 +477,7 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 			//For ballerz we can do this...
-			var url="http://ongaia.com/ballerz/".concat(id.toString())
+			var url="http://ongaia.com/ballerz/".concat(metadata["id"])
 			var name=metadata["title"]!
 
 			if let seriesFullName=metadata["series"] {
