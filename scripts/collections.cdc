@@ -229,22 +229,14 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowRareRooms_NFT(id: id)!
 			let metadata = RareRooms_NFT.getSetMetadata(setId: nft.setId)!
-
-		  var image= metadata["preview"]!
-			var contentType="image"
-			if metadata["image_file_type"]! == "mp4" {
-				image=metadata["image"]!
-				contentType="video"
-			}
-
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
-				image: image,
+				image: metadata["preview"]!,
 				url: "https://rarerooms.io/tokens/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: contentType,
+				contentType: "image",
 				rarity: ""
 			)
 
@@ -268,10 +260,12 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		  var image= metadata["preview"]!
 			var contentType="image"
+			/*
 			if metadata["image_file_type"]! == "mp4" {
 				image=metadata["image"]!
 				contentType="video"
 			}
+			*/
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
@@ -302,10 +296,12 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = Canes_Vault_NFT.getSetMetadata(setId: nft.setId)!
 			var image= metadata["preview"]!
 			var contentType="image"
+			/*
 			if metadata["image_file_type"]! == "mp4" {
 				image=metadata["image"]!
 				contentType="video"
 			}
+			*/
 
 			let item = MetadataCollectionItem(
 				id: id,
@@ -337,10 +333,12 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = DGD_NFT.getSetMetadata(setId: nft.setId)!
 			var image= metadata["preview"]!
 			var contentType="image"
+			/*
 			if metadata["image_file_type"]! == "mp4" {
 				image=metadata["image"]!
 				contentType="video"
 			}
+			*/
 
 	
 			let item = MetadataCollectionItem(
@@ -373,10 +371,12 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = RaceDay_NFT.getSetMetadata(setId: nft.setId)!
 			var image= metadata["preview"]!
 			var contentType="image"
+			/*
 			if metadata["image_file_type"]! == "mp4" {
 				image=metadata["image"]!
 				contentType="video"
 			}
+			*/
 
 
 			let item = MetadataCollectionItem(
@@ -409,10 +409,13 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = The_Next_Cartel_NFT.getSetMetadata(setId: nft.setId)!
 			var image= metadata["preview"]!
 			var contentType="image"
+
+			/*
 			if metadata["image_file_type"]! == "mp4" {
 				image=metadata["image"]!
 				contentType="video"
 			}
+			*/
 
 
 			let item = MetadataCollectionItem(
@@ -737,10 +740,10 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 	// https://flow-view-source.com/mainnet/account/0x6831760534292098/contract/OneFootballCollectible
-	let OneFootballCollectibleCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
-	if OneFootballCollectibleCap.check() {
+	let oneFootballCollectibleCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
+	if oneFootballCollectibleCap.check() {
 		let items: [String] = []
-		let collection = OneFootballCollectibleCap.borrow()!
+		let collection = oneFootballCollectibleCap.borrow()!
 		for id in collection.getIDs() {
 			let nft = collection.borrowOneFootballCollectible(id: id)!
 			let metadata = nft.getTemplate()!
