@@ -453,13 +453,13 @@ pub fun main(address: Address) : MetadataCollections? {
 				rarity: ""
 			)
 
-			let itemId="UFC_NFT".concat(id.toString())
+			let itemId="UFC".concat(id.toString())
 			items.append(itemId)
 			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
-			results["UFC_NFT"] = items
+			results["UFC"] = items
 		}
 	}
 
