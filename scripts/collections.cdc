@@ -22,6 +22,7 @@ import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
 import GeniaceNFT from 0xabda6627c70c7f52
 import OneFootballCollectible from 0x6831760534292098
+import CryptoPiggo from 0xd3df824bf81910a4
 
 
 pub struct MetadataCollections {
@@ -409,15 +410,6 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = The_Next_Cartel_NFT.getSetMetadata(setId: nft.setId)!
 			var image= metadata["preview"]!
 			var contentType="image"
-
-			/*
-			if metadata["image_file_type"]! == "mp4" {
-				image=metadata["image"]!
-				contentType="video"
-			}
-			*/
-
-
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
@@ -765,6 +757,35 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 		if items.length != 0 {
 			results["OneFootballCollectible"] = items
+		}
+	}
+
+
+	// https://flow-view-source.com/mainnet/account/0x6831760534292098/contract/OneFootballCollectible
+	let cryptoPiggoCap = account.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
+	if cryptoPiggoCap.check() {
+		let items: [String] = []
+		let collection = cryptoPiggoCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowItem(id: id)!
+			let item=MetadataCollectionItem(
+				id: id,
+				name: "CryptoPiggo #".concat(id.toString()),
+				image: "https://s3.us-west-2.amazonaws.com/crypto-piggo.nft/piggo-".concat(id.toString()).concat(".png"),
+				url: "https://rareworx.com/piggo/details/".concat(id.toString()),
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+
+			)
+			let itemId="CryptoPiggo".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+
+		}
+		if items.length != 0 {
+			results["CryptoPiggo"] = items
 		}
 	}
 
