@@ -89,6 +89,7 @@ pub contract Profile {
 			self.type=type
 		}
 	}
+
 	/*
 	Information about a connection between one profile and another.
 	*/
@@ -166,6 +167,7 @@ pub contract Profile {
 			self.createdAt=createdAt
 		}
 	}
+
 	pub resource interface Public{
 		pub fun getName(): String
 		pub fun getFindName(): String
