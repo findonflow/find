@@ -34,6 +34,40 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to direct offer on name for sale and fulfill it", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1").
+			createUser("100.0", "user2").
+			registerUser("user2").
+			listForSale("user1").
+			blindBid("user2", "user1", "4.0")
+
+		gt.GWTF.TransactionFromFile("fulfill").
+			SignProposeAndPayAs("user1"). //the buy
+			StringArgument("user1").
+			Test(t).
+			AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
+				"amount":        "4.00000000",
+				"newOwner":      "0xf3fcd2c1a78f5eee",
+				"previousOwner": "0x179b6b1cb6755e31",
+				"name":          "user1",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "3.80000000",
+				"to":     "0x179b6b1cb6755e31",
+			})).
+			AssertEmitEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+				"amount": "0.20000000",
+				"to":     "0x1cf0e2f2f715450",
+			}))
+
+		//	spew.Dump(res.Events)
+	})
+
 	t.Run("Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).

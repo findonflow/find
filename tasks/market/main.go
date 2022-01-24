@@ -72,6 +72,17 @@ func main() {
 		UFix64Argument("100.0").
 		RunPrintEventsFull()
 
+	g.TransactionFromFile("mintFusd").
+		SignProposeAndPayAsService().
+		AccountArgument("user1").
+		UFix64Argument("100.0").
+		RunPrintEventsFull()
+
+	g.TransactionFromFile("mintFlow").
+		SignProposeAndPayAsService().
+		AccountArgument("user1").
+		UFix64Argument("100.0").
+		RunPrintEventsFull()
 	g.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").StringArgument("user1").StringArgument("forge").UFix64Argument("50.0").RunPrintEventsFull()
 
 	g.TransactionFromFile("mintDandy").
@@ -79,7 +90,7 @@ func main() {
 		StringArgument("user1").
 		RunPrintEventsFull()
 
-	id := uint64(74)
+	id := uint64(78)
 	g.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(id).Run()
 
 	g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(id).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Display").Run()
@@ -96,4 +107,7 @@ func main() {
 	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("400.0").RunPrintEventsFull()
 
 	g.TransactionFromFile("fulfillMarketAuction").SignProposeAndPayAs("user1").AccountArgument("user2").UInt64Argument(id).RunPrintEventsFull()
+
+	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user2").AccountArgument("user1").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
+	g.TransactionFromFile("fulfillMarketDirectOffer").SignProposeAndPayAs("user1").UInt64Argument(id).RunPrintEventsFull()
 }

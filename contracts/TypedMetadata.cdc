@@ -306,7 +306,7 @@ pub contract TypedMetadata {
 	}
 
 	pub fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-		let cap=	getAccount(address).getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)
+		let cap=	getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
 		let pointer= TypedMetadata.ViewReadPointer(cap: cap, id: id)
 		return pointer
 	}

@@ -1,10 +1,7 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -30,10 +27,12 @@ func TestDandy(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			StringArgument("user1").
 			Test(g.T).
-			AssertSuccess()
+			AssertSuccess().AssertEventCount(6)
 
-		res := g.GWTF.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(23).RunReturnsJsonString()
-		fmt.Println(res)
-		assert.Equal(t, res, "")
+		/*
+			res := g.GWTF.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(23).RunReturnsJsonString()
+			fmt.Println(res)
+			assert.Equal(t, res, "")
+		*/
 	})
 }
