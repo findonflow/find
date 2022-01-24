@@ -77,9 +77,10 @@ transaction(name: String, amount: UFix64, message:String, tag: String) {
 
 		let profile =account.borrow<&Profile.User>(from:Profile.storagePath)!
 
-		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
+		let vaultRef = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow reference to the fusdVault!")
 		let vault <- vaultRef.withdraw(amount: amount)
 		FIND.depositWithTagAndMessage(to: name, message: message, tag: tag, vault: <- vault, from: token)
 	}
 
 }
+

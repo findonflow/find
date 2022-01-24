@@ -4,6 +4,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
+import Sender from "./Sender.cdc"
 /*
 
 ///FIND
@@ -162,8 +163,9 @@ pub contract FIND {
 	/// @param to: The name to send money too
 	/// @param message: The message to send
 	/// @param tag: The tag to add to the event 
-	/// @param from: The vault to send too
-	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Profile.User) {
+	/// @param vault: The vault to send too
+	/// @param from: The sender that sent the funds
+	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token) {
 		pre {
 			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 		}
@@ -173,8 +175,6 @@ pub contract FIND {
 			let fromAddress= from.owner!.address
 			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, type:vault.getType()) 
 			profile.deposit(from: <- vault)
-
-			//pub event FungibleTokenSent(from:Address, fromName:String, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
 			return 
 		}
 		panic("Network is not set up")
@@ -807,7 +807,6 @@ pub contract FIND {
 				let soldFor=offer.getBalance(name)
 				//move the token to the new profile
 				emit Sold(name: name, previousOwner:lease.owner!.address, newOwner: newProfile.address, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), amount: soldFor)
-				//TODO: Note that register event is not emitted here! And I belive it should
 				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!

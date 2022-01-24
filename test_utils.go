@@ -74,6 +74,15 @@ func (gt *GWTFTestUtils) createUser(fusd string, name string) *GWTFTestUtils {
 		Test(gt.T).
 		AssertSuccess().
 		AssertEventCount(3)
+
+	gt.GWTF.TransactionFromFile("mintFlow").
+		SignProposeAndPayAsService().
+		AccountArgument(name).
+		UFix64Argument(fusd).
+		Test(gt.T).
+		AssertSuccess().
+		AssertEventCount(3)
+
 	return gt
 }
 

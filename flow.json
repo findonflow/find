@@ -37,6 +37,7 @@
 			}
 		},
 		"FIND": "./contracts/FIND.cdc",
+		"Sender": "./contracts/Sender.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
 		"Admin": "./contracts/Admin.cdc",
 		"Clock": "./contracts/Clock.cdc", 
@@ -110,7 +111,8 @@
 				"Clock",
 				"Debug",
 				"Profile",
-				"CharityNFT"
+				"CharityNFT",
+				"Sender"
 			]
 		},
 		"testnet": {
@@ -120,7 +122,8 @@
 				"Clock",
 				"Debug",
 				"Profile",
-				"CharityNFT"
+				"CharityNFT",
+				"Sender"
 			]
 		},
 		"emulator": {
@@ -132,7 +135,8 @@
 				"Debug",
 				"FUSD",
 				"Admin",
-				"CharityNFT"
+				"CharityNFT",
+				"Sender"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],
