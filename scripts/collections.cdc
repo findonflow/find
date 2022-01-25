@@ -26,6 +26,7 @@ import OneFootballCollectible from 0x6831760534292098
 import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
+import HaikuNFT from 0xf61e40c19db2a9e2
 
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
@@ -204,7 +205,6 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
-
 	if goobersCap.check() {
 		let items: [String] = []
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
@@ -899,6 +899,32 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["GoatedGoats"] = goats
 	}
 
+  let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
+	if bitkuCap.check() {
+		let collection = bitkuCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowHaiku(id: id)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: "Bitku #".concat(id.toString()),
+				image: nft.text,
+				url: "https://bitku.art",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "text",
+				rarity: ""
+			)
+
+			let itemId="BitKu".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["BitKu"] = items
+		}
+	}
 
 	if results.keys.length == 0 {
 		return nil
