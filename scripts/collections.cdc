@@ -828,10 +828,17 @@ pub fun main(address: Address) : MetadataCollections? {
 	if xtingles.length > 0 {
 		let items: [String] = []
 		for nft in xtingles {
+
+			var image=nft.metadata.link
+
+			let prefix="https://"
+			if image.slice(from:0, upTo:prefix.length) != prefix {
+				image="ipfs://".concat(image)
+			}
 			let item=MetadataCollectionItem(
 				id: nft.id,
 				name: nft.metadata.name.concat(" #").concat(nft.metadata.edition.toString()),
-				image: nft.metadata.link,
+				image: image,
 				url: "http://xtingles.com",
 				listPrice: nil,
 				listToken: nil,
