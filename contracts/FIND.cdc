@@ -435,7 +435,7 @@ pub contract FIND {
 		access(contract) fun increaseBid(_ name: String) 
 
 		//place a bid on a token
-		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
+		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
 
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
@@ -658,7 +658,7 @@ pub contract FIND {
 
 		}
 
-		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
+		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
@@ -810,7 +810,7 @@ pub contract FIND {
 				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!
-				let vault <- offer.fulfill(<- token)
+				let vault <- offer.fulfillLease(<- token)
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -848,7 +848,7 @@ pub contract FIND {
 
 			let token <- self.leases.remove(key: name)!
 
-			let vault <- auction.latestBidCallback.borrow()!.fulfill(<- token)
+			let vault <- auction.latestBidCallback.borrow()!.fulfillLease(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -1290,7 +1290,7 @@ pub contract FIND {
 	pub resource interface BidCollectionPublic {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ name: String) : UFix64
-		access(contract) fun fulfill(_ token: @FIND.Lease) : @FungibleToken.Vault
+		access(contract) fun fulfillLease(_ token: @FIND.Lease) : @FungibleToken.Vault
 		access(contract) fun cancel(_ name: String)
 		access(contract) fun setBidType(name: String, type: String) 
 	}
@@ -1310,7 +1310,7 @@ pub contract FIND {
 
 		//called from lease when auction is ended
 		//if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
-		access(contract) fun fulfill(_ token: @FIND.Lease) : @FungibleToken.Vault{
+		access(contract) fun fulfillLease(_ token: @FIND.Lease) : @FungibleToken.Vault{
 
 			let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
@@ -1351,6 +1351,11 @@ pub contract FIND {
 			if nameStatus.status ==  LeaseStatus.FREE {
 				panic("cannot bid on name that is free")
 			}
+
+			if self.owner!.address == nameStatus.owner {
+				panic("cannot bid on your own name")
+			}
+
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let bid <- create Bid(from: from, name:name, vault: <- vault)
@@ -1361,7 +1366,7 @@ pub contract FIND {
 			let oldToken <- self.bids[bid.name] <- bid
 			//send info to leaseCollection
 			destroy oldToken
-			leaseCollection.bid(name: name, callback: callbackCapability) 
+			leaseCollection.registerBid(name: name, callback: callbackCapability) 
 		}
 
 

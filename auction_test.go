@@ -484,6 +484,21 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should not be able to direct offer on your own name", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1")
+
+		gt.GWTF.TransactionFromFile("bid").SignProposeAndPayAs("user1").
+			StringArgument("user1").
+			UFix64Argument("5.0").
+			Test(gt.T).
+			AssertFailure("cannot bid on your own name")
+
+	})
+
 }
 
 //TODO: Fullfillment of auction that had a name that was locked
