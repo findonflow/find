@@ -25,6 +25,9 @@ import GeniaceNFT from 0xabda6627c70c7f52
 import OneFootballCollectible from 0x6831760534292098
 import CryptoPiggo from 0xd3df824bf81910a4
 
+//xtingles
+import Collectible from 0xf5b0eb433389ac3f
+
 
 pub struct MetadataCollections {
 
@@ -819,7 +822,30 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
+	let xtingles = Collectible.getCollectibleDatas(address:address) 
+	if xtingles.length > 0 {
+		let items: [String] = []
+		for nft in xtingles {
+			let item=MetadataCollectionItem(
+				id: nft.id,
+				name: nft.metadata.name.concat(" #").concat(nft.metadata.edition.toString()),
+				image: nft.metadata.link,
+				url: "http://xtingles.com",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video",
+				rarity: ""
+			)
+			let itemId="Xtingles".concat(nft.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 
+
+		}
+		if items.length != 0 {
+			results["Xtingles"] = items
+		}
+	}
 
 	if results.keys.length == 0 {
 		return nil
