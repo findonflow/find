@@ -24,6 +24,8 @@ import Evolution from 0xf4264ac8f3256818
 import GeniaceNFT from 0xabda6627c70c7f52
 import OneFootballCollectible from 0x6831760534292098
 import CryptoPiggo from 0xd3df824bf81910a4
+import GoatedGoatsVouchers from 0xdfc74d9d561374c0
+import TraitPacksVouchers from 0xdfc74d9d561374c0
 
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
@@ -846,6 +848,57 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["Xtingles"] = items
 		}
 	}
+
+	let goatsCap = account.getCapability<&{GoatedGoatsVouchers.GoatsVoucherCollectionPublic}>(GoatedGoatsVouchers.CollectionPublicPath)
+	var goats : [String]=[]
+	if goatsCap.check() {
+		let goatsImageUrl= GoatedGoatsVouchers.getCollectionMetadata()["mediaURL"]!
+		let collection = goatsCap.borrow()!
+		for id in collection.getIDs() {
+			let item=MetadataCollectionItem(
+				id: id,
+				name: "Goated Goat Base Goat Voucher #".concat(id.toString()),
+				image: goatsImageUrl, 
+				url: "https://goatedgoats.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+
+			)
+			let itemId="GoatedGoatsVoucher".concat(id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+		}
+	}
+
+
+	let goatsTraitCap = account.getCapability<&{TraitPacksVouchers.PackVoucherCollectionPublic}>(TraitPacksVouchers.CollectionPublicPath)
+	if goatsTraitCap.check() {
+		let goatsImageUrl= TraitPacksVouchers.getCollectionMetadata()["mediaURL"]!
+		let collection = goatsTraitCap.borrow()!
+		for id in collection.getIDs() {
+			let item=MetadataCollectionItem(
+				id: id,
+				name: "Goated Goat Trait Pack Voucher #".concat(id.toString()),
+				image: goatsImageUrl, 
+				url: "https://goatedgoats.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+
+			)
+			let itemId="GoatedGoatsTraitVoucher".concat(id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+		}
+	}
+
+	if goats.length != 0 {
+			results["GoatedGoats"] = goats
+	}
+
 
 	if results.keys.length == 0 {
 		return nil
