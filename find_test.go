@@ -278,6 +278,27 @@ transaction(name: String) {
 
 	})
 
-}
+	t.Run("Should be able to register related account", func(t *testing.T) {
 
-//TODO: test validate wrong names
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1")
+
+		gt.GWTF.TransactionFromFile("setRelatedAccount").
+			SignProposeAndPayAs("user1").
+			StringArgument("dapper").
+			AccountArgument("user2").
+			Test(t).AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+				"name":    "dapper",
+				"address": "0x179b6b1cb6755e31",
+				"related": "0xf3fcd2c1a78f5eee",
+			}))
+
+		value := gt.GWTF.ScriptFromFile("address_status").AccountArgument("user1").RunReturnsJsonString()
+		assert.Contains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
+
+	})
+
+}
