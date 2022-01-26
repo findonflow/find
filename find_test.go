@@ -278,7 +278,7 @@ transaction(name: String) {
 
 	})
 
-	t.Run("Should be able to register related account", func(t *testing.T) {
+	t.Run("Should be able to register related account and remove it", func(t *testing.T) {
 
 		gt := NewGWTFTest(t).
 			setupFIND().
@@ -298,6 +298,19 @@ transaction(name: String) {
 
 		value := gt.GWTF.ScriptFromFile("address_status").AccountArgument("user1").RunReturnsJsonString()
 		assert.Contains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
+
+		gt.GWTF.TransactionFromFile("removeRelatedAccount").
+			SignProposeAndPayAs("user1").
+			StringArgument("dapper").
+			Test(t).AssertSuccess().
+			AssertPartialEvent(gwtf.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
+				"name":    "dapper",
+				"address": "0x179b6b1cb6755e31",
+				"related": "0xf3fcd2c1a78f5eee",
+			}))
+
+		value = gt.GWTF.ScriptFromFile("address_status").AccountArgument("user1").RunReturnsJsonString()
+		assert.NotContains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
 
 	})
 
