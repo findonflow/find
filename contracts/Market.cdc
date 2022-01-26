@@ -113,6 +113,7 @@ pub contract Market {
 		}
 
 		//TODO: better error message if it is not there
+		//TODO: is it correct to escrow it in here?
 		pub fun setAuction(_ auction: Auction?) {
 
 			if self.pointer.getType() != Type<TypedMetadata.AuthNFTPointer>() {
@@ -225,7 +226,7 @@ pub contract Market {
 		pub fun getItemsForSale(): { UInt64:SaleItemInformation}
 
 		access(contract)fun cancelBid(_ id: UInt64) 
-		//		access(contract) fun increaseBid(_ id: UInt64) 
+		access(contract) fun registerIncreasedBid(_ id: UInt64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: TypedMetadata.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
@@ -282,8 +283,6 @@ pub contract Market {
 			saleItem.setCallback(nil)
 			saleItem.setAuction(auction)
 
-
-			//TODO: here we should really escrow the NFT 
 		}
 
 
@@ -301,13 +300,12 @@ pub contract Market {
 			saleItem.setCallback(nil)
 		}
 
-		/*
-		access(contract) fun increaseBid(_ id: UInt64) {
+		access(contract) fun registerIncreasedBid(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 
-			let saleItem=self.items[id]!
+			let saleItem=self.borrow(id)
 			let timestamp=Clock.time()
 
 			if let auction= saleItem.auction {
@@ -318,11 +316,10 @@ pub contract Market {
 				return
 			}
 
-			add this back when we add DirectOffers again
 			let balance=saleItem.offerCallback!.borrow()!.getBalance(id) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil  && saleItem.auctionStartPrice == nil{
-				emit DirectOffer(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
+				emit DirectOfferBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
 				return
 			}
 
@@ -332,13 +329,9 @@ pub contract Market {
 			} else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit DirectOffer(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
+				emit DirectOfferBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
 			}
-
 		}
-		*/
-
-
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
 		access(contract) fun registerBid(item: TypedMetadata.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType: Type) {
@@ -714,16 +707,14 @@ pub contract Market {
 			destroy oldToken
 		}
 
-		/*
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
 			let bid =self.borrowBid(id)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
-			bid.from.borrow()!.increaseBid(id)
+			bid.from.borrow()!.registerIncreasedBid(id)
 		}
-		*/
 
 		/// The users cancel a bid himself
 		pub fun cancelBid(_ id: UInt64) {
