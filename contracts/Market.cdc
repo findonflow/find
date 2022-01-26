@@ -25,6 +25,7 @@ pub contract Market {
 	pub let MarketBidCollectionStoragePath: StoragePath
 	pub let MarketBidCollectionPublicPath: PublicPath
 
+	pub event NFTEscrowed(id: UInt64)
 	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, type:String)
 
 	//TODO: always add names as optionals and try to resolve. 
@@ -71,6 +72,8 @@ pub contract Market {
 
 	//TODO create SaleItemInformation struct that can be returned to gui
 	pub resource SaleItem{
+
+		access(contract) var escrow : @NonFungibleToken.NFT?
 		access(contract) let vaultType: Type //The type of vault to use for this sale Item
 		access(contract) var pointer: AnyStruct{TypedMetadata.Pointer}
 		access(contract) var salePrice: UFix64?
@@ -95,15 +98,33 @@ pub contract Market {
 			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
 			self.auction=nil
+			self.escrow <- nil
 		}
 
 		pub fun sellNFT(_ cb : Capability<&MarketBidCollection{MarketBidCollectionPublic}>) : @FungibleToken.Vault {
-			//TODO: check for auction as well here
-//			if self.pointer.getType() != Type<TypedMetadata.AuthNFTPointer>() {
-			return <- cb.borrow()!.accept(self.pointer as! TypedMetadata.AuthNFTPointer)
+
+			if self.auction != nil {
+				let nft <- self.escrow <- nil
+				return <- cb.borrow()!.accept(<- nft!)
+			}
+
+			let pointer= self.pointer as! TypedMetadata.AuthNFTPointer
+			return <- cb.borrow()!.accept(<- pointer.withdraw())
 		}
 
+		//TODO: better error message if it is not there
 		pub fun setAuction(_ auction: Auction?) {
+
+			if self.pointer.getType() != Type<TypedMetadata.AuthNFTPointer>() {
+				panic("cannot start and auction since we do not have permission to withdraw nft")
+			}
+
+			let pointer= self.pointer as! TypedMetadata.AuthNFTPointer
+
+			emit NFTEscrowed(id: pointer.id)
+			let old <- self.escrow <- pointer.withdraw()
+			//TODO: do something here
+			destroy old
 			self.auction=auction
 		}
 
@@ -137,6 +158,10 @@ pub contract Market {
 
 		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?) {
 			self.offerCallback=callback
+		}
+
+		destroy() {
+			destroy self.escrow
 		}
 	}
 
@@ -256,6 +281,8 @@ pub contract Market {
 			let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, minimumBidIncrement: saleItem.auctionMinBidIncrement, id: id)
 			saleItem.setCallback(nil)
 			saleItem.setAuction(auction)
+
+
 			//TODO: here we should really escrow the NFT 
 		}
 
@@ -626,7 +653,7 @@ pub contract Market {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
-		access(contract) fun accept(_ pointer: TypedMetadata.AuthNFTPointer) : @FungibleToken.Vault
+		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
 		access(contract) fun cancel(_ id: UInt64)
 		access(contract) fun setBidType(id: UInt64, type: String) 
 	}
@@ -644,12 +671,12 @@ pub contract Market {
 		}
 
 		//called from lease when auction is ended
-		//TODO: Not sure if sending in pointer here is a good idea, rather send nft
-		access(contract) fun accept(_ pointer: TypedMetadata.AuthNFTPointer) : @FungibleToken.Vault{
+		//TDOO: we need to send NFT since for escrowed auction it will not be a pointer
+		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault{
 
-			let bid <- self.bids.remove(key: pointer.getUUID()) ?? panic("missing bid")
+			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
-			bid.nftCap.borrow()!.deposit(token: <- pointer.withdraw())
+			bid.nftCap.borrow()!.deposit(token: <- nft)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
 			return <- vault
@@ -669,12 +696,10 @@ pub contract Market {
 			return bidInfo
 		}
 
-
-		//TODO why dont we just send in the ViewReadPointer here, it has all we need and we can have one method for bid/directOffer
-		//* this is bid on saleItem */
 		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
 		pub fun bid(item: TypedMetadata.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			//TODO: pre that bid is not already here
+			//TODO: pre that the item.owner is not self.owner
 
 			let uuid=item.getUUID()
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
