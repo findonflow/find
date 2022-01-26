@@ -24,7 +24,7 @@ pub contract Dandy: NonFungibleToken {
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id:UInt64, name:String)
+	pub event Minted(id:UInt64, name:String, description:String)
 	pub event RoyaltyPaid(name:String, amount: UFix64, type:String)
 
 	pub struct ViewInfo {
@@ -40,14 +40,16 @@ pub contract Dandy: NonFungibleToken {
 		pub let id: UInt64
 		access(contract) let schemas: {String : ViewInfo}
 		access(contract) let name: String
+		access(contract) let description: String
 		access(contract) let minterPlatform: MinterPlatform
 
 
-		init(name: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform) {
+		init(name: String, description: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform) {
 			self.id = self.uuid
 			self.schemas=schemas
 			self.minterPlatform=minterPlatform
 			self.name=name
+			self.description=description
 		}
 
 		pub fun getViews() : [Type] {
@@ -55,7 +57,7 @@ pub contract Dandy: NonFungibleToken {
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
 			views.append(Type<String>())
-			views.append(Type<TypedMetadata.Display>())
+			views.append(Type<MetadataViews.Display>())
 			views.append(Type<{TypedMetadata.Royalty}>())
 
 			//if any specific here they will override
@@ -100,38 +102,33 @@ pub contract Dandy: NonFungibleToken {
 			return Royalties(royalties)
 		}
 
-		pub fun resolveDisplay() : TypedMetadata.Display {
+		pub fun resolveDisplay() : MetadataViews.Display {
 
 
-			var thumbnail=""
-			var thumbnailMediaType=""
-			var media: &{TypedMetadata.Media}? = nil
-			if self.schemas.containsKey(Type<TypedMetadata.Medias>().identifier) {
-				let medias=self.schemas[Type<TypedMetadata.Medias>().identifier]!.result as! TypedMetadata.Medias
+			var thumbnail : AnyStruct{MetadataViews.File}? = nil
+			if self.schemas.containsKey(Type<TypedMetadata.Files>().identifier) {
+				let medias=self.schemas[Type<TypedMetadata.Files>().identifier]!.result as! TypedMetadata.Files
 				if medias.media.containsKey("thumbnail") {
-					thumbnail=medias.media["thumbnail"]!.data()
-					thumbnailMediaType=medias.media["thumbnail"]!.mediaType
+					thumbnail=medias.media["thumbnail"] as! AnyStruct{MetadataViews.File}
 				}
 			}
 
-			if self.schemas.containsKey(Type<TypedMetadata.IPFSMedia>().identifier) {
-				let media=self.schemas[Type<TypedMetadata.IPFSMedia>().identifier]!.result as! TypedMetadata.IPFSMedia
-				thumbnail=media.data()
-				thumbnailMediaType=media.mediaType
-			}
-			
-			if self.schemas.containsKey(Type<TypedMetadata.GenericMedia>().identifier) {
-				let media=self.schemas[Type<TypedMetadata.GenericMedia>().identifier]!.result as! TypedMetadata.GenericMedia
-				thumbnail=media.data()
-				thumbnailMediaType=media.mediaType
+			if self.schemas.containsKey(Type<MetadataViews.HTTPFile>().identifier) {
+				thumbnail=self.schemas[Type<MetadataViews.HTTPFile>().identifier]!.result as! MetadataViews.HTTPFile
 			}
 
-			return TypedMetadata.Display(
+			if self.schemas.containsKey(Type<MetadataViews.IPFSFile>().identifier) {
+				thumbnail=self.schemas[Type<MetadataViews.IPFSFile>().identifier]!.result as! MetadataViews.IPFSFile
+			}
+			
+			if self.schemas.containsKey(Type<TypedMetadata.SharedMedia>().identifier) {
+				thumbnail=self.schemas[Type<TypedMetadata.SharedMedia>().identifier]!.result as! AnyStruct{MetadataViews.File}
+			}
+
+			return MetadataViews.Display(
 				name: self.name,
-				thumbnail: thumbnail,
-				thumbnailMediaType: thumbnailMediaType,
-				source: TypedMetadata.Identity(id:self.id, uuid: self.uuid, type: Type<@Dandy.NFT>(), discriminator:self.minterPlatform.name),
-				sourceURI: self.resolveSourceUri()
+				description: self.description,
+				thumbnail: thumbnail!
 			)
 
 
@@ -154,7 +151,7 @@ pub contract Dandy: NonFungibleToken {
 				return self.resolveRoyalties()
 			}
 
-			if type == Type<TypedMetadata.Display>() {
+			if type == Type<MetadataViews.Display>() {
 				return self.resolveDisplay()
 			}
 
@@ -257,17 +254,17 @@ pub contract Dandy: NonFungibleToken {
 	}
 
 
-	access(account) fun mintNFT(name: String, platform:MinterPlatform, schemas: [AnyStruct]) : @NFT {
+	access(account) fun mintNFT(name: String, description: String, platform:MinterPlatform, schemas: [AnyStruct]) : @NFT {
 		let views : {String: ViewInfo} = {}
 		for s in schemas {
 			//if you send in display we ignore it, this will be made for you
-			if s.getType() != Type<TypedMetadata.Display>() {
+			if s.getType() != Type<MetadataViews.Display>() {
 				views[s.getType().identifier]=ViewInfo(typ:s.getType(), result: s)
 			}
 		}
 
-		let nft <-  create NFT(name: name, schemas:views, minterPlatform: platform)
-		emit Minted(id:nft.id, name:nft.minterPlatform.name)
+		let nft <-  create NFT(name: name, description:description, schemas:views, minterPlatform: platform)
+		emit Minted(id:nft.id, name:nft.minterPlatform.name, description:description)
 		return <-  nft
 	}
 
@@ -283,8 +280,8 @@ pub contract Dandy: NonFungibleToken {
 			self.platform=platform
 		}
 
-		pub fun mintNFT(name: String, schemas: [AnyStruct]) : @NFT {
-			return <- Dandy.mintNFT(name: name, platform: self.platform, schemas: schemas)
+		pub fun mintNFT(name: String, description: String, schemas: [AnyStruct]) : @NFT {
+			return <- Dandy.mintNFT(name: name, description: description, platform: self.platform, schemas: schemas)
 		}
 	}
 

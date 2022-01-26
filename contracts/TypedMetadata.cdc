@@ -22,24 +22,6 @@ pub contract TypedMetadata {
 
 	}
 
-	// TODO: Should this contain links to your NFT in the originating/source solution? An simple Dictionary of String:String would do
-	//Todo use identity here
-	pub struct Display{
-		pub let name: String
-		pub let thumbnail: String
-		pub let thumbnailMediaType:String
-		pub let source: Identity
-		pub let sourceURI: String
-
-		init(name:String, thumbnail: String, thumbnailMediaType:String, source:Identity, sourceURI:String) {
-			self.source=source
-			self.sourceURI=sourceURI
-			self.name=name
-			self.thumbnail=thumbnail
-			self.thumbnailMediaType=thumbnailMediaType
-		}
-	}
-
 	pub struct Identity{
 		pub let id:UInt64
 		pub let uuid: UInt64
@@ -56,42 +38,15 @@ pub contract TypedMetadata {
 		}
 	}
 
-	pub struct interface Media {
-		pub fun data() : String
-		pub let mediaType: String
-		pub let protocol: String
+	pub struct Files {
+		pub let media : {String: &{MetadataViews.File}}
 
-	}
-
-	pub struct Medias {
-		pub let media : {String:  &{Media}}
-
-		init(_ items: {String: &{Media}}) {
+		init(_ items: {String: &{MetadataViews.File}}) {
 			self.media=items
 		}
 	}
 
-
-	/// IPFS specify media that holds the CID as a field
-	pub struct IPFSMedia : Media {
-		pub let mediaType: String
-		pub let protocol: String
-		pub let cid:String
-
-		init(cid:String, mediaType: String) {
-			self.cid=cid
-			self.protocol="ipfs"
-			self.mediaType=mediaType
-		}
-
-		pub fun data() : String {
-			return "ipfs://".concat(self.cid)
-
-		}
-	}
-
-	/// This is media that is kept as a String onChain. Most often used with SharedMedia that allow you to share this across multiple NFTS
-	pub struct StringMedia : Media{
+	pub struct OnChainFile : MetadataViews.File{
 		pub let content: String
 		pub let mediaType: String
 		pub let protocol: String
@@ -102,30 +57,12 @@ pub contract TypedMetadata {
 			self.mediaType=mediaType
 		}
 
-		pub fun data(): String {
+		pub fun uri(): String {
 			return self.content
 		}
 	}
 
-
-	/// Generic Media representation that allow you to represent any kind of media you like
-	pub struct GenericMedia : Media{
-		pub let content: String
-		pub let mediaType: String
-		pub let protocol: String
-
-		init(content:String, mediaType: String, protocol:String) {
-			self.content=content
-			self.protocol=protocol
-			self.mediaType=mediaType
-		}
-
-		pub fun data(): String {
-			return self.content
-		}
-	}
-
-	pub struct SharedMedia : Media {
+	pub struct SharedMedia : MetadataViews.File {
 		pub let mediaType: String
 		pub let pointer: ViewReadPointer
 		pub let protocol: String
@@ -135,17 +72,17 @@ pub contract TypedMetadata {
 			self.mediaType=mediaType
 			self.protocol="shared"
 
-			if !pointer.getViews().contains(Type<StringMedia>()) {
+			if !pointer.getViews().contains(Type<OnChainFile>()) {
 				panic("Cannot create shared media if the pointer does not contain StringMedia")
 			}
 		}
 
-		pub fun data(): String {
-			let media = self.pointer.resolveView(Type<StringMedia>()) 
+		pub fun uri(): String {
+			let media = self.pointer.resolveView(Type<OnChainFile>()) 
 			if media == nil {
 				return ""
 			}
-			return media as! String
+			return (media as! OnChainFile).uri()
 		}
 
 	}

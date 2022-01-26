@@ -29,9 +29,7 @@ transaction(name: String) {
 		let creativeWork=
 		TypedMetadata.CreativeWork(artist:"Neo Motorcycles", name:"Neo Bike ", description: "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK", type:"image")
 
-		let media=TypedMetadata.GenericMedia(data:"https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp" , contentType: "image/webp", protocol: "http")
-
-
+		let media=MetadataViews.HTTPFile(url:"https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterRoyalty=Dandy.Royalties(royalty: {"artist" : Dandy.RoyaltyItem(receiver: receiver, cut: 0.05)})
@@ -45,7 +43,10 @@ transaction(name: String) {
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			//TODO: do not send in Display but calculate it, send in thumbnail url if you do not have explicit media
 			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty]
-			let token <- finLeases.mintDandy(minter: name, nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), schemas: schemas)
+			let token <- finLeases.mintDandy(minter: name, 
+			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+				description: creativeWork.description,
+				schemas: schemas)
 
 			collection.deposit(token: <- token)
 			i=i+1

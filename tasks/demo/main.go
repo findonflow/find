@@ -107,10 +107,11 @@ func main() {
 		StringArgument("user1").
 		RunPrintEventsFull()
 
-	g.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(71).Run()
+	var id uint64 = 83
+	g.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(id).Run()
 
-	g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(71).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Display").Run()
-	g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(71).StringArgument("AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}").Run()
+	g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(id).StringArgument("A.f8d6e0586b0a20c7.MetadataViews.Display").Run()
+	g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(id).StringArgument("AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}").Run()
 
 	/*
 		g.TransactionFromFile("mintArtifact").SignProposeAndPayAs("user2").StringArgument("user1").RunPrintEventsFull()

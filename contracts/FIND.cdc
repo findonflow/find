@@ -472,14 +472,14 @@ pub contract FIND {
 			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025)
 		}
 
-		pub fun mintDandy(minter: String, nftName: String, schemas: [AnyStruct]) : @Dandy.NFT {
+		pub fun mintDandy(minter: String, nftName: String, description: String, schemas: [AnyStruct]) : @Dandy.NFT {
 
 			let lease = self.borrow(minter)
 			if !lease.addons.containsKey("forge") {
 				panic("You do not have the forge addon, buy it first")
 			}
 
-			return <- Dandy.mintNFT(name:nftName, platform: self.createPlatform(minter), schemas: schemas)
+			return <- Dandy.mintNFT(name:nftName, description:description, platform: self.createPlatform(minter), schemas: schemas)
 		}
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
