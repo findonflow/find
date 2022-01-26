@@ -8,3 +8,4 @@
  - 7.12.1 : fixed xtingles in collections, use ipfs:// if not start with https://
  - 7.13.1 : added names script to resolve multiple Addresses -> Names, added setRelatedAccount transaction to set related accounts, added relatedAccounts to address_status script
  - 7.13.2 : added removeRelatedAccount and fixed setRelatedAccount
+ - 7.14.0 : setPrivateMode transaction to set if an user wants to be private or not, added privateMode to address_status script

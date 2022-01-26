@@ -186,6 +186,7 @@ pub contract Profile {
 		pub fun supportedFungigleTokenTypes() : [Type]
 		pub fun asProfile() : UserProfile
 		pub fun isBanned(_ val: Address): Bool
+		pub fun isPrivateModeEnabled() : Bool
 		//TODO: should getBanned be here?
 
 		access(contract) fun internal_addFollower(_ val: FriendStatus)
@@ -255,6 +256,9 @@ pub contract Profile {
 
 		//Set if user is allowed to store followers or now
 		pub fun setAllowStoringFollowers(_ val: Bool)
+
+		//set if this user prefers sensitive information about his account to be kept private, no guarantee here but should be honored
+		pub fun setPrivateMode(_ val: Bool)
 	}
 
 
@@ -295,6 +299,24 @@ pub contract Profile {
 			self.bans={}
 			self.additionalProperties={}
 
+		}
+
+		/// We do not have a seperate field for this so we use the additionalProperties 'bag' to store this in
+		pub fun setPrivateMode(_ val: Bool) {
+			var private="true"
+			if !val{
+				private="false"
+			}
+			self.additionalProperties["privateMode"]  = private
+		}
+
+
+		pub fun isPrivateModeEnabled() : Bool {
+			let boolString= self.additionalProperties["privateMode"]
+			if boolString== nil || boolString=="false" {
+				return false
+			}
+			return true
 		}
 
 		pub fun addBan(_ val: Address) { self.bans[val]= true}

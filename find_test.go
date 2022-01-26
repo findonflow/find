@@ -314,4 +314,29 @@ transaction(name: String) {
 
 	})
 
+	t.Run("Should be able to set private mode", func(t *testing.T) {
+
+		gt := NewGWTFTest(t).
+			setupFIND().
+			createUser("100.0", "user1").
+			registerUser("user1")
+
+		gt.GWTF.TransactionFromFile("setPrivateMode").
+			SignProposeAndPayAs("user1").
+			BooleanArgument(true).
+			Test(t).AssertSuccess()
+
+		value := gt.GWTF.ScriptFromFile("address_status").AccountArgument("user1").RunReturnsJsonString()
+		assert.Contains(t, value, `"privateMode": "true"`)
+
+		gt.GWTF.TransactionFromFile("setPrivateMode").
+			SignProposeAndPayAs("user1").
+			BooleanArgument(false).
+			Test(t).AssertSuccess()
+
+		value = gt.GWTF.ScriptFromFile("address_status").AccountArgument("user1").RunReturnsJsonString()
+		assert.Contains(t, value, `"privateMode": "false"`)
+
+	})
+
 }
