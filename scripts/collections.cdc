@@ -593,11 +593,11 @@ pub fun main(address: Address) : MetadataCollections? {
 			let item  =MetadataCollectionItem(
 				id: id,
 				name: metadata.contentName,
-				image: metadata.previewImage,
+				image: "ipfs://".concat(metadata.videoHash),
 				url: "http://jambb.com",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: "video",
 				rarity: ""
 			)
 			let itemId="Jambb".concat(id.toString())
