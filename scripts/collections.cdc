@@ -918,7 +918,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: "Bitku #".concat(id.toString()),
 				image: nft.text,
-				url: "https://bitku.art",
+				url: "https://bitku.art/#".concat(address.toString()).concat("/").concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: "text",
