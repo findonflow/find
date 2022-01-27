@@ -28,6 +28,7 @@ import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
 import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
+import Mynft from 0xf6fcbef550d97aa5
 
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
@@ -956,13 +957,46 @@ pub fun main(address: Address) : MetadataCollections? {
 				contentType: "video", //metadata["mimeType"]!,
 				rarity: ""
 			)
-	  let itemId="KLKTN".concat(id.toString())
+	    let itemId="KLKTN".concat(id.toString())
 			items.append(itemId)
 			resultMap[itemId] = item
 		}
 
 		if items.length != 0 {
 			results["KLKTN"] = items
+		}
+	}
+
+	let mynftCap = account.getCapability<&{Mynft.MynftCollectionPublic}>(Mynft.CollectionPublicPath)
+	if mynftCap.check() {
+		let items: [String] = []
+		let collection = mynftCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowArt(id: id)!
+			let metadata=nft.metadata
+
+			var image= metadata.ipfsLink
+			if image == "" {
+				image="https://arweave.net/".concat(metadata.arLink)
+			}
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: image,
+				url: "http://mynft.io",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+      let itemId="mynft".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+
+		if items.length != 0 {
+			results["mynft"] = items
 		}
 	}
 

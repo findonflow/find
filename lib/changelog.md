@@ -1,1 +1,1 @@
- - 7.16.0 : jambb video support
+ - 7.17.0 : mynft support in collections
