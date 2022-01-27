@@ -953,7 +953,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://klktn.com/",
 				listPrice: nil,
 				listToken: nil,
-				contentType: metadata["mimeType"]!,
+				contentType: "video", //metadata["mimeType"]!,
 				rarity: ""
 			)
 	  let itemId="KLKTN".concat(id.toString())

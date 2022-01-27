@@ -1,1 +1,1 @@
- - 7.15.0 : KLKTN support in collections
+ - 7.15.1 : KLKTN hard code contentType
