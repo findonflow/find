@@ -27,6 +27,7 @@ import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
 import HaikuNFT from 0xf61e40c19db2a9e2
+import KlktnNFT from 0xabd6e80be7e9682c
 
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
@@ -930,6 +931,38 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["BitKu"] = items
+		}
+	}
+	let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
+	if klktnCap.check() {
+		let items: [String] = []
+		let collection = klktnCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowKlktnNFT(id: id)!
+
+			let metadata=nft.getNFTMetadata()
+			/*
+
+			Result: {"uri": "ipfs://bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym", "name": "Kevin Woo - What is KLKTN?", "mimeType": "video/mp4", "media": "https://ipfs.io/ipfs/bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym/fb91ad34d61dde04f02ad240f0ca924902d8b4a3da25daaf0bb1ed769977848c.mp4", "description": "K-pop sensation Kevin Woo has partnered up with KLKTN to enhance his artist to fan interactions and experiences within his fandom. Join our chat to learn more: https://discord.gg/UJxb4erfUw"}
+
+			*/
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: metadata["media"]!,
+				url: "https://klktn.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata["mimeType"]!,
+				rarity: ""
+			)
+	  let itemId="KLKTN".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["KLKTN"] = items
 		}
 	}
 
