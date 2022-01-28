@@ -10,23 +10,22 @@ Tests must be in the same folder as flow.json with contracts and transactions/sc
 func TestDandy(t *testing.T) {
 
 	t.Run("Should be able to mint 3 dandy nfts", func(t *testing.T) {
-		g := NewGWTFTest(t).
+		otu := NewOverflowTest(t).
 			setupFIND().
-			createUser("100.0", "user1").
+			createUser(100.0, "user1").
 			registerUser("user1")
 
-		g.GWTF.TransactionFromFile("buyAddon").
+		otu.O.TransactionFromFile("buyAddon").
 			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			StringArgument("forge").
-			UFix64Argument("50.0").Test(g.T).
+			Args(otu.O.Arguments().String("user1").String("forge").UFix64(50.0)).
+			Test(otu.T).
 			AssertSuccess()
 
 			//TOOD: assert events
-		g.GWTF.TransactionFromFile("mintDandy").
+		otu.O.TransactionFromFile("mintDandy").
 			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			Test(g.T).
+			Args(otu.O.Arguments().String("user1")).
+			Test(otu.T).
 			AssertSuccess().AssertEventCount(6)
 
 		/*

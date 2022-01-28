@@ -1,119 +1,112 @@
 package main
 
 import (
-	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"github.com/bjartek/overflow/overflow"
 )
 
 func main() {
 
-	g := gwtf.NewGoWithTheFlowInMemoryEmulator()
-	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
+	o := overflow.NewOverflowInMemoryEmulator().Start()
 
 	//first step create the adminClient as the fin user
-	g.TransactionFromFile("setup_fin_1_create_client").
+	o.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("find").
 		RunPrintEventsFull()
 
 	//link in the server in the versus client
-	g.TransactionFromFile("setup_fin_2_register_client").
+	o.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAsService().
-		AccountArgument("find").
+		Args(o.Arguments().Account("find")).
 		RunPrintEventsFull()
 
 	//set up fin network as the fin user
-	g.TransactionFromFile("setup_fin_3_create_network").
+	o.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("find").
 		RunPrintEventsFull()
 
 	//we advance the clock
-	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
-
-	g.TransactionFromFile("createProfile").
-		SignProposeAndPayAs("user1").
-		StringArgument("User1").
+	o.TransactionFromFile("clock").SignProposeAndPayAs("find").
+		Args(o.Arguments().UFix64(1.0)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
+		SignProposeAndPayAsService().
+		Args(o.Arguments().String("find")).
+		RunPrintEventsFull()
+
+	o.TransactionFromFile("createProfile").
+		SignProposeAndPayAs("user1").
+		Args(o.Arguments().String("User1")).
+		RunPrintEventsFull()
+
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("user2").
-		StringArgument("User2").
+		Args(o.Arguments().String("User2")).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAsService().
-		StringArgument("Find").
+		Args(o.Arguments().String("Find")).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find").
-		StringArgument("Find").
+		Args(o.Arguments().String("Find")).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mintFusd").
+	o.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
-		AccountArgument("user1").
-		UFix64Argument("100.0").
+		Args(o.Arguments().Account("user1").UFix64(100.0)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("register").
+	o.TransactionFromFile("register").
 		SignProposeAndPayAs("user1").
-		StringArgument("user1").
-		UFix64Argument("5.0").
+		Args(o.Arguments().String("user1").UFix64(5.0)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mintFusd").
+	o.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
-		AccountArgument("user2").
-		UFix64Argument("100.0").
+		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mintFlow").
+	o.TransactionFromFile("mintFlow").
 		SignProposeAndPayAsService().
-		AccountArgument("user2").
-		UFix64Argument("100.0").
+		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mintFusd").
-		SignProposeAndPayAsService().
-		AccountArgument("user1").
-		UFix64Argument("100.0").
+	o.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").
+		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("mintFlow").
-		SignProposeAndPayAsService().
-		AccountArgument("user1").
-		UFix64Argument("100.0").
-		RunPrintEventsFull()
-	g.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").StringArgument("user1").StringArgument("forge").UFix64Argument("50.0").RunPrintEventsFull()
-
-	g.TransactionFromFile("mintDandy").
+	o.TransactionFromFile("mintDandy").
 		SignProposeAndPayAs("user1").
-		StringArgument("user1").
+		Args(o.Arguments().String("user1")).
 		RunPrintEventsFull()
 
+		//TODO; read this from above
 	id := uint64(78)
-	g.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(id).Run()
+	o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
 
-	g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(id).StringArgument("A.f8d6e0586b0a20c7.TypedMetadata.Display").Run()
-	//g.ScriptFromFile("dandy").StringArgument("user1").UInt64Argument(71).StringArgument("AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}").Run()
+	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
 
-	g.TransactionFromFile("listDandyForSale").SignProposeAndPayAs("user1").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
+	o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 
-	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user2").AccountArgument("user1").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
+	o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
 
-	g.TransactionFromFile("listDandyForAuction").SignProposeAndPayAs("user2").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
+	o.SimpleTxArgs("listDandyForAuction", "user2", o.Arguments().UInt64(id).UFix64(10.0))
 
-	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user1").AccountArgument("user2").UInt64Argument(id).UFix64Argument("15.0").RunPrintEventsFull()
+	o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
 
-	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("400.0").RunPrintEventsFull()
+	o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
 
-	g.TransactionFromFile("fulfillMarketAuction").SignProposeAndPayAs("user1").AccountArgument("user2").UInt64Argument(id).RunPrintEventsFull()
+	o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
 
-	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user2").AccountArgument("user1").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
-	g.TransactionFromFile("fulfillMarketDirectOffer").SignProposeAndPayAs("user1").UInt64Argument(id).RunPrintEventsFull()
+	o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
 
-	g.TransactionFromFile("listDandyForSale").SignProposeAndPayAs("user2").UInt64Argument(id).UFix64Argument("10.0").RunPrintEventsFull()
+	o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
 
-	g.TransactionFromFile("bidMarket").SignProposeAndPayAs("user1").AccountArgument("user2").UInt64Argument(id).UFix64Argument("5.0").RunPrintEventsFull()
-	g.TransactionFromFile("increasebidMarket").SignProposeAndPayAs("user1").UInt64Argument(id).UFix64Argument("5.0").RunPrintEventsFull()
+	o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
+	o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
+	o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
 
 }
