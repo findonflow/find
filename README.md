@@ -12,6 +12,7 @@ The following solutions are integrated with .find
  - https://versus.auction
  - https://schwap.io
  - https://flovatar.com
+ - https://flowscan.org
 
 see [integrating](integrating.md) for how to integrate with .find
 
