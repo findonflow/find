@@ -595,7 +595,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: metadata.contentName,
 				image: "ipfs://".concat(metadata.videoHash),
-				url: "http://jambb.com",
+        url: "https://www.jambb.com/c/moment/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: "video",
