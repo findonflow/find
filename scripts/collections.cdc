@@ -931,7 +931,7 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 
 		if items.length != 0 {
-			results["BitKu"] = items
+			results["Bitku"] = items
 		}
 	}
 	let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
