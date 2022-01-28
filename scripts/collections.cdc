@@ -986,7 +986,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "http://mynft.io",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: metadata.type,
 				rarity: ""
 			)
       let itemId="mynft".concat(id.toString())

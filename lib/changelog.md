@@ -16,3 +16,4 @@
  - 7.17.1 : fix url to bitku
  - 7.17.2 : fix bitku collection name
  - 7.17.3 : fix jambb link straight to moment
+ - 7.17.4 : fix mynft contentType
