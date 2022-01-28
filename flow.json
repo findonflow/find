@@ -13,6 +13,14 @@
 				"mainnet": "0x1d7e57aa55817448"
 			}
 		},
+
+		"MetadataViews": {
+			"source" : "./contracts/standard/MetadataViews.cdc",
+			"aliases" : {
+				"testnet": "0x631e88ae7f1d7c20",
+				"mainnet": "0x1d7e57aa55817448"
+			}
+		},
 		"FUSD": {
 			"source": "./contracts/standard/FUSD.cdc",
 			"aliases": {
@@ -40,7 +48,8 @@
 		"Dandy": "./contracts/Dandy.cdc",
 		"Market": "./contracts/Market.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
-		"MetadataViews": "./contracts/standard/MetadataViews.cdc",
+		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
+		"Sender": "./contracts/Sender.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
 		"Admin": "./contracts/Admin.cdc",
 		"Clock": "./contracts/Clock.cdc", 
@@ -114,7 +123,9 @@
 				"Clock",
 				"Debug",
 				"Profile",
-				"CharityNFT"
+				"CharityNFT",
+				"Sender",
+				"RelatedAccounts"
 			]
 		},
 		"testnet": {
@@ -124,7 +135,9 @@
 				"Clock",
 				"Debug",
 				"Profile",
-				"CharityNFT"
+				"CharityNFT",
+				"Sender",
+				"RelatedAccounts"
 			]
 		},
 		"emulator": {
@@ -140,7 +153,9 @@
 				"TypedMetadata", 
 				"MetadataViews",
 				"Dandy",
-				"Market"
+				"Market",
+				"Sender",
+				"RelatedAccounts"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],

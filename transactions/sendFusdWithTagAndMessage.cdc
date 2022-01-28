@@ -3,6 +3,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
+import Sender from "../contracts/Sender.cdc"
 import FIND from "../contracts/FIND.cdc"
 import CharityNFT from "../contracts/CharityNFT.cdc"
 
@@ -31,27 +32,18 @@ transaction(name: String, amount: UFix64, message:String, tag: String) {
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
-			account.unlink(FIND.LeasePublicPath)
-			destroy <- account.load<@AnyResource>(from:FIND.LeaseStoragePath)
-
 			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
 
 		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
-			account.unlink(FIND.BidPublicPath)
-			destroy <- account.load<@AnyResource>(from:FIND.BidStoragePath)
-
 			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
 		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {
-			account.unlink(Profile.publicPath)
-			destroy <- account.load<@AnyResource>(from:Profile.storagePath)
-
 			let profileName = account.address.toString()
 
 			let profile <-Profile.createUser(name:profileName, createdAt: "find")
@@ -77,11 +69,15 @@ transaction(name: String, amount: UFix64, message:String, tag: String) {
 			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
 
-		let profile =account.borrow<&Profile.User>(from:Profile.storagePath)!
+		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+			account.save(<- Sender.create(), to: Sender.storagePath)
+		}
+
+		let token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
 		let vault <- vaultRef.withdraw(amount: amount)
-		FIND.depositWithTagAndMessage(to: name, message: message, tag: tag, vault: <- vault, from: profile)
+		FIND.depositWithTagAndMessage(to: name, message: message, tag: tag, vault: <- vault, from: token)
 	}
 
 }

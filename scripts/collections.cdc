@@ -8,6 +8,12 @@ import GooberXContract from 0x34f2bf4a80bb0f69
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
 import RareRooms_NFT from 0x329feb3ab062d289
+import CNN_NFT from 0x329feb3ab062d289
+import Canes_Vault_NFT from 0x329feb3ab062d289
+import DGD_NFT from 0x329feb3ab062d289
+import RaceDay_NFT from 0x329feb3ab062d289
+import The_Next_Cartel_NFT from 0x329feb3ab062d289
+import UFC_NFT from 0x329feb3ab062d289
 import MotoGPCard from 0xa49cc0ee46c54bfb
 import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
@@ -15,6 +21,17 @@ import Moments from 0xd4ad4740ee426334
 import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
 import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
+import GeniaceNFT from 0xabda6627c70c7f52
+import OneFootballCollectible from 0x6831760534292098
+import CryptoPiggo from 0xd3df824bf81910a4
+import GoatedGoatsVouchers from 0xdfc74d9d561374c0
+import TraitPacksVouchers from 0xdfc74d9d561374c0
+import HaikuNFT from 0xf61e40c19db2a9e2
+import KlktnNFT from 0xabd6e80be7e9682c
+import Mynft from 0xf6fcbef550d97aa5
+
+//xtingles
+import Collectible from 0xf5b0eb433389ac3f
 
 
 pub struct MetadataCollections {
@@ -50,9 +67,10 @@ pub struct MetadataCollectionItem {
 	pub let listPrice: UFix64?
 	pub let listToken: String?
 	pub let contentType:String
+	pub let rarity:String
 
 
-	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String) {
+	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String, rarity: String) {
 		self.id=id
 		self.name=name
 		self.url=url
@@ -60,6 +78,7 @@ pub struct MetadataCollectionItem {
 		self.listToken=listToken
 		self.listPrice=listPrice
 		self.contentType=contentType
+		self.rarity=rarity
 	}
 }
 
@@ -79,6 +98,16 @@ pub fun main(address: Address) : MetadataCollections? {
 				name="Flovatar #".concat(flovatar.id.toString())
 			}
 
+			var rarity="common"
+			if flovatar.metadata.legendaryCount > 0 {
+				rarity="legendary"
+			}else if flovatar.metadata.epicCount > 0 {
+				rarity="epic"
+			}else if flovatar.metadata.rareCount > 0 {
+				rarity="rare"
+			}
+
+
 			let item=MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
@@ -86,7 +115,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: rarity
 			)
 			let itemId="Flovatar".concat(flovatar.id.toString())
 			items.append(itemId)
@@ -95,6 +125,17 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		for flovatar in flovatarMarketDetails  {
 			var	name="Flovatar #".concat(flovatar.id.toString())
+
+			var rarity="common"
+			if flovatar.metadata.legendaryCount > 0 {
+				rarity="legendary"
+			}else if flovatar.metadata.epicCount > 0 {
+				rarity="epic"
+			}else if flovatar.metadata.rareCount > 0 {
+				rarity="rare"
+			}
+
+
 			let item=MetadataCollectionItem(
 				id: flovatar.id, 
 				name: name, 
@@ -102,7 +143,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://flovatar.com/flovatars/".concat(flovatar.id.toString()).concat("/"),
 				listPrice: flovatar.price,
 				listToken: "Flow",
-				contentType: "image"
+				contentType: "image",
+				rarity: rarity
 			)
 
 			let itemId="Flovatar".concat(flovatar.id.toString())
@@ -129,7 +171,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://www.versus.auction/piece/".concat(address.toString()).concat("/").concat(art.id.toString()).concat("/"),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
 			)
 			let itemId="Versus".concat(art.id.toString())
 			items.append(itemId)
@@ -146,7 +189,8 @@ pub fun main(address: Address) : MetadataCollections? {
 					url: "https://www.versus.auction/listing/".concat(saleItem.id.toString()).concat("/"),
 					listPrice: saleItem.price,
 					listToken: "Flow",
-					contentType: "image"
+					contentType: "image",
+					rarity: ""
 				)
 
 				let itemId="Versus".concat(saleItem.id.toString())
@@ -163,7 +207,6 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
-
 	if goobersCap.check() {
 		let items: [String] = []
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
@@ -176,7 +219,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://partymansion.io/gooberz/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
 			)
 			let itemId="Gooberz".concat(id.toString())
 			items.append(itemId)
@@ -187,21 +231,22 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	let rareRoomCollection = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
-	if rareRoomCollection.check() {
-		let rareRoomNfts = rareRoomCollection.borrow()!.getIDs()
+	let rareRoomCap = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
+	if rareRoomCap.check() {
+		let collection = rareRoomCap.borrow()!
 		let items: [String] = []
-		for id in rareRoomNfts {
-			let nft = rareRoomCollection.borrow()!.borrowRareRooms_NFT(id: id)!
-			let item=MetadataCollectionItem(
+		for id in collection.getIDs() {
+			let nft = collection.borrowRareRooms_NFT(id: id)!
+			let metadata = RareRooms_NFT.getSetMetadata(setId: nft.setId)!
+			let item = MetadataCollectionItem(
 				id: id,
-				name: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "name")!,
-				// we use "preview" and not "image" because of potential .glg and .mp4 file types
-				image: RareRooms_NFT.getSetMetadataByField(setId: nft.setId, field: "preview")!,
+				name: metadata["name"]!,
+				image: metadata["preview"]!,
 				url: "https://rarerooms.io/tokens/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
 			)
 
 			let itemId="RareRooms".concat(id.toString())
@@ -214,6 +259,216 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
+	let cnnCap = account.getCapability<&CNN_NFT.Collection{CNN_NFT.CNN_NFTCollectionPublic}>(CNN_NFT.CollectionPublicPath)
+	if cnnCap.check() {
+		let collection = cnnCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowCNN_NFT(id: id)!
+			let metadata = CNN_NFT.getSetMetadata(setId: nft.setId)!
+
+		  var image= metadata["preview"]!
+			var contentType="image"
+			/*
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+			*/
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: image,
+				url: "http://vault.cnn.com",
+				listPrice: nil,
+				listToken: nil,
+				contentType: contentType,
+				rarity: ""
+			)
+
+			let itemId="CNN".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["CNN"] = items
+		}
+	}
+
+	let canesVaultCap = account.getCapability<&Canes_Vault_NFT.Collection{Canes_Vault_NFT.Canes_Vault_NFTCollectionPublic}>(Canes_Vault_NFT.CollectionPublicPath)
+	if canesVaultCap.check() {
+		let collection = canesVaultCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowCanes_Vault_NFT(id: id)!
+			let metadata = Canes_Vault_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			/*
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+			*/
+
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: image,
+				url: "https://canesvault.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: contentType,
+				rarity: ""
+			)
+
+			let itemId="Canes_Vault_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["Canes_Vault_NFT"] = items
+		}
+	}
+
+	let dgdCap = account.getCapability<&DGD_NFT.Collection{DGD_NFT.DGD_NFTCollectionPublic}>(DGD_NFT.CollectionPublicPath)
+	if dgdCap.check() {
+		let collection = dgdCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowDGD_NFT(id: id)!
+			let metadata = DGD_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			/*
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+			*/
+
+	
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: image,
+				url: "https://www.theplayerslounge.io/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: contentType,
+				rarity: ""
+			)
+
+			let itemId="DGD_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["DGD_NFT"] = items
+		}
+	}
+
+	let raceDayCap = account.getCapability<&RaceDay_NFT.Collection{RaceDay_NFT.RaceDay_NFTCollectionPublic}>(RaceDay_NFT.CollectionPublicPath)
+	if raceDayCap.check() {
+		let collection = raceDayCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowRaceDay_NFT(id: id)!
+			let metadata = RaceDay_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			/*
+			if metadata["image_file_type"]! == "mp4" {
+				image=metadata["image"]!
+				contentType="video"
+			}
+			*/
+
+
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: image, 
+				url: "https://www.racedaynft.com",
+				listPrice: nil,
+				listToken: nil,
+				contentType: contentType,
+				rarity: ""
+			)
+
+			let itemId="RaceDay_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["RaceDay_NFT"] = items
+		}
+	}
+
+	let nextCartelCap = account.getCapability<&The_Next_Cartel_NFT.Collection{The_Next_Cartel_NFT.The_Next_Cartel_NFTCollectionPublic}>(The_Next_Cartel_NFT.CollectionPublicPath)
+	if nextCartelCap.check() {
+		let collection = nextCartelCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowThe_Next_Cartel_NFT(id: id)!
+			let metadata = The_Next_Cartel_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["preview"]!
+			var contentType="image"
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				// we use "preview" and not "image" because of potential .glg and .mp4 file types
+				image: image,
+				url: "https://thenextcartel.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: contentType,
+				rarity: ""
+			)
+
+			let itemId="The_Next_Cartel_NFT".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["The_Next_Cartel_NFT"] = items
+		}
+	}
+
+	let ufcCap = account.getCapability<&UFC_NFT.Collection{UFC_NFT.UFC_NFTCollectionPublic}>(UFC_NFT.CollectionPublicPath)
+	if ufcCap.check() {
+		let collection = ufcCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowUFC_NFT(id: id)!
+			let metadata = UFC_NFT.getSetMetadata(setId: nft.setId)!
+			var image= metadata["image"]!
+			var contentType="video"
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: image,
+				url: "https://www.ufcstrike.com",
+				listPrice: nil,
+				listToken: nil,
+				contentType: contentType,
+				rarity: ""
+			)
+
+			let itemId="UFC".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["UFC"] = items
+		}
+	}
 
 	let motoGPCollection = account.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
 	if motoGPCollection.check() {
@@ -229,7 +484,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://motogp-ignition.com/nft/card/".concat(id.toString()).concat("?owner=").concat(address.toString()),
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
 			)
 
 
@@ -254,7 +510,7 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 			//For ballerz we can do this...
-			var url="http://ongaia.com/ballerz/".concat(id.toString())
+			var url="http://ongaia.com/ballerz/".concat(metadata["id"]!)
 			var name=metadata["title"]!
 
 			if let seriesFullName=metadata["series"] {
@@ -278,7 +534,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: url,
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
 			)
 
 			let itemId="Gaia".concat(id.toString())
@@ -337,11 +594,12 @@ pub fun main(address: Address) : MetadataCollections? {
 			let item  =MetadataCollectionItem(
 				id: id,
 				name: metadata.contentName,
-				image: metadata.previewImage,
+				image: "ipfs://".concat(metadata.videoHash),
 				url: "http://jambb.com",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "video",
+				rarity: ""
 			)
 			let itemId="Jambb".concat(id.toString())
 			items.append(itemId)
@@ -365,7 +623,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "https://matrixworld.org/",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image"
+				contentType: "image",
+				rarity: ""
 			)
 			let itemId="MatrixWorldFlowFest".concat(nft.id.toString())
 			items.append(itemId)
@@ -400,7 +659,8 @@ pub fun main(address: Address) : MetadataCollections? {
 					url: "https://hoodlumsnft.com/",
 					listPrice:nil,
 					listToken:nil,
-					contentType:"image"
+					contentType:"image",
+					rarity: ""
 				)
 				let itemId="Hoodlums".concat(id.toString())
 				items.append(itemId)
@@ -426,7 +686,8 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: metadata["originUrl"]!,
 				listPrice: nil,
 				listToken: nil,
-				contentType:"image"
+				contentType:"image",
+				rarity: ""
 			)
 			let itemId="Charity".concat(id.toString())
 			items.append(itemId)
@@ -449,12 +710,13 @@ pub fun main(address: Address) : MetadataCollections? {
 			let metadata = Evolution.getItemMetadata(itemId: nft.data.itemId)!
 			let item=MetadataCollectionItem(
 				id: id,
-				name: metadata["Title"]!,
+				name: metadata["Title"]!.concat(" #").concat(nft.data.serialNumber.toString()),
 				image: "https://storage.viv3.com/0xf4264ac8f3256818/mv/".concat(nft.data.itemId.toString()),
 				url: "https://www.evolution-collect.com/",
 				listPrice: nil,
 				listToken: nil,
-				contentType:"video"
+				contentType:"video",
+				rarity: ""
 			)
 
 			let itemId="Evolution".concat(id.toString())
@@ -464,6 +726,277 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["Evolution"] = items
+		}
+	}
+
+
+	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+	if geniaceCap.check() {
+		let geniace=geniaceCap.borrow()!
+		let nfts = geniace.getIDs()
+		let items: [String] = []
+		for id in nfts{
+			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
+			let nft = geniace.borrowGeniaceNFT(id: id)!
+			let metadata = nft.metadata
+			var rarity=""
+			if metadata.rarity == GeniaceNFT.Rarity.Collectible {
+				rarity="Collectible"
+			}else if metadata.rarity == GeniaceNFT.Rarity.Rare {
+				rarity="Rare"
+			}else if metadata.rarity == GeniaceNFT.Rarity.UltraRare {
+				rarity="UltraRare"
+			}
+
+			let item=MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: metadata.imageUrl,
+				url: "https://www.geniace.com/product/".concat(metadata.name),
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata.data["mimetype"]!,
+				rarity: rarity,
+			)
+
+			let itemId="Geniace".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["Geniace"] = items
+		}
+	}
+
+	// https://flow-view-source.com/mainnet/account/0x6831760534292098/contract/OneFootballCollectible
+	let oneFootballCollectibleCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
+	if oneFootballCollectibleCap.check() {
+		let items: [String] = []
+		let collection = oneFootballCollectibleCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowOneFootballCollectible(id: id)!
+			let metadata = nft.getTemplate()!
+			let item=MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: "ipfs://".concat(metadata.media),
+				url: "https://xmas.onefootball.com/".concat(account.address.toString()),
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video",
+				rarity: ""
+
+			)
+			let itemId="OneFootballCollectible".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+
+		}
+		if items.length != 0 {
+			results["OneFootballCollectible"] = items
+		}
+	}
+
+
+	let cryptoPiggoCap = account.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
+	if cryptoPiggoCap.check() {
+		let items: [String] = []
+		let collection = cryptoPiggoCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowItem(id: id)!
+			let item=MetadataCollectionItem(
+				id: id,
+				name: "CryptoPiggo #".concat(id.toString()),
+				image: "https://s3.us-west-2.amazonaws.com/crypto-piggo.nft/piggo-".concat(id.toString()).concat(".png"),
+				url: "https://rareworx.com/piggo/details/".concat(id.toString()),
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+
+			)
+			let itemId="CryptoPiggo".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+
+		}
+		if items.length != 0 {
+			results["CryptoPiggo"] = items
+		}
+	}
+
+	let xtingles = Collectible.getCollectibleDatas(address:address) 
+	if xtingles.length > 0 {
+		let items: [String] = []
+		for nft in xtingles {
+
+			var image=nft.metadata.link
+
+			let prefix="https://"
+			if image.slice(from:0, upTo:prefix.length) != prefix {
+				image="ipfs://".concat(image)
+			}
+			let item=MetadataCollectionItem(
+				id: nft.id,
+				name: nft.metadata.name.concat(" #").concat(nft.metadata.edition.toString()),
+				image: image,
+				url: "http://xtingles.com",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video",
+				rarity: ""
+			)
+			let itemId="Xtingles".concat(nft.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+
+
+		}
+		if items.length != 0 {
+			results["Xtingles"] = items
+		}
+	}
+
+	let goatsCap = account.getCapability<&{GoatedGoatsVouchers.GoatsVoucherCollectionPublic}>(GoatedGoatsVouchers.CollectionPublicPath)
+	var goats : [String]=[]
+	if goatsCap.check() {
+		let goatsImageUrl= GoatedGoatsVouchers.getCollectionMetadata()["mediaURL"]!
+		let collection = goatsCap.borrow()!
+		for id in collection.getIDs() {
+			let item=MetadataCollectionItem(
+				id: id,
+				name: "Goated Goat Base Goat Voucher #".concat(id.toString()),
+				image: goatsImageUrl, 
+				url: "https://goatedgoats.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+
+			)
+			let itemId="GoatedGoatsVoucher".concat(id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+		}
+	}
+
+
+	let goatsTraitCap = account.getCapability<&{TraitPacksVouchers.PackVoucherCollectionPublic}>(TraitPacksVouchers.CollectionPublicPath)
+	if goatsTraitCap.check() {
+		let goatsImageUrl= TraitPacksVouchers.getCollectionMetadata()["mediaURL"]!
+		let collection = goatsTraitCap.borrow()!
+		for id in collection.getIDs() {
+			let item=MetadataCollectionItem(
+				id: id,
+				name: "Goated Goat Trait Pack Voucher #".concat(id.toString()),
+				image: goatsImageUrl, 
+				url: "https://goatedgoats.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+
+			)
+			let itemId="GoatedGoatsTraitVoucher".concat(id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+		}
+	}
+
+	if goats.length != 0 {
+			results["GoatedGoats"] = goats
+	}
+
+  let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
+	if bitkuCap.check() {
+		let collection = bitkuCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowHaiku(id: id)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: "Bitku #".concat(id.toString()),
+				image: nft.text,
+				url: "https://bitku.art/#".concat(address.toString()).concat("/").concat(id.toString()),
+				listPrice: nil,
+				listToken: nil,
+				contentType: "text",
+				rarity: ""
+			)
+
+			let itemId="BitKu".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["Bitku"] = items
+		}
+	}
+	let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
+	if klktnCap.check() {
+		let items: [String] = []
+		let collection = klktnCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowKlktnNFT(id: id)!
+
+			let metadata=nft.getNFTMetadata()
+			/*
+
+			Result: {"uri": "ipfs://bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym", "name": "Kevin Woo - What is KLKTN?", "mimeType": "video/mp4", "media": "https://ipfs.io/ipfs/bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym/fb91ad34d61dde04f02ad240f0ca924902d8b4a3da25daaf0bb1ed769977848c.mp4", "description": "K-pop sensation Kevin Woo has partnered up with KLKTN to enhance his artist to fan interactions and experiences within his fandom. Join our chat to learn more: https://discord.gg/UJxb4erfUw"}
+
+			*/
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: metadata["media"]!,
+				url: "https://klktn.com/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video", //metadata["mimeType"]!,
+				rarity: ""
+			)
+	    let itemId="KLKTN".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+		if items.length != 0 {
+			results["KLKTN"] = items
+		}
+	}
+
+	let mynftCap = account.getCapability<&{Mynft.MynftCollectionPublic}>(Mynft.CollectionPublicPath)
+	if mynftCap.check() {
+		let items: [String] = []
+		let collection = mynftCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowArt(id: id)!
+			let metadata=nft.metadata
+
+			var image= metadata.ipfsLink
+			if image == "" {
+				image="https://arweave.net/".concat(metadata.arLink)
+			}
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: image,
+				url: "http://mynft.io",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+      let itemId="mynft".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+
+		if items.length != 0 {
+			results["mynft"] = items
 		}
 	}
 

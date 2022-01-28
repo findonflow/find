@@ -3,10 +3,11 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
+import Sender from "../contracts/Sender.cdc"
 import FIND from "../contracts/FIND.cdc"
 import CharityNFT from "../contracts/CharityNFT.cdc"
 
-transaction(name: String, amount: UFix64, message:String) {
+transaction(name: String, amount: UFix64, message:String, tag: String) {
 
 	prepare(account: AuthAccount) {
 
@@ -68,15 +69,16 @@ transaction(name: String, amount: UFix64, message:String) {
 			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
 
-		let profile =account.borrow<&Profile.User>(from:Profile.storagePath)!
+		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+			account.save(<- Sender.create(), to: Sender.storagePath)
+		}
 
-		let strLength = amount.toString().length
-		let amountString = amount.toString().slice(from: 0, upTo: strLength-6)
-		profile.verify(profile.getName().concat(" sent ").concat(amountString).concat(" FUSD with message:").concat(message))
+		let token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
 
-		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
-		FIND.deposit(to: name, from: <- vaultRef.withdraw(amount: amount))
-
+		let vaultRef = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow reference to the fusdVault!")
+		let vault <- vaultRef.withdraw(amount: amount)
+		FIND.depositWithTagAndMessage(to: name, message: message, tag: tag, vault: <- vault, from: token)
 	}
 
 }
+

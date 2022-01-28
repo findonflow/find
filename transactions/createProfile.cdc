@@ -14,12 +14,6 @@ transaction(name: String) {
 	prepare(acct: AuthAccount) {
 		//if we do not have a profile it might be stored under a different address so we will just remove it
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if !profileCap.check() {
-			acct.unlink(Profile.publicPath)
-			destroy <- acct.load<@AnyResource>(from:Profile.storagePath)
-		}
-
-		//TODO we already have a profile
 		if profileCap.check() {
 			return 
 		}
@@ -70,8 +64,6 @@ transaction(name: String) {
 		profile.addWallet(flowWallet)
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
-			acct.unlink(FIND.LeasePublicPath)
-			destroy <- acct.load<@AnyResource>(from:FIND.LeaseStoragePath)
 			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
@@ -79,8 +71,6 @@ transaction(name: String) {
 
 		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
-			acct.unlink(FIND.BidPublicPath)
-			destroy <- acct.load<@AnyResource>(from:FIND.BidStoragePath)
 			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}

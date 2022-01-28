@@ -3,7 +3,6 @@ module github.com/findonflow/find.git
 go 1.17
 
 require (
-	github.com/bjartek/go-with-the-flow/v2 v2.4.1
 	github.com/bjartek/overflow v0.0.0-20211220201839-9ca2b8f2421a
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8

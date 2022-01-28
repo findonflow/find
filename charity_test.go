@@ -10,9 +10,9 @@ Tests must be in the same folder as flow.json with contracts and transactions/sc
 func TestCharity(t *testing.T) {
 
 	t.Run("Should be able to mint a charity nft", func(t *testing.T) {
-		NewGWTFTest(t).
+		NewOverflowTest(t).
 			setupFIND().
-			createUser("100.0", "user1").
+			createUser(100.0, "user1").
 			setupCharity("user1").
 			mintCharity("test", "https://test.png", "https://thumbnail.png", "http://origin.url", "this is a description", "user1")
 	})
