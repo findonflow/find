@@ -2,7 +2,7 @@
 
 .find uses some of the tools that I (bjartek) have made to develop and test cadence code. 
 
- - [gwtf](http://github.com/bjartek/go-with-the-flow) is used by part of the solution and its successor [overflow](https://github.com/bjartek/overflow) is beeing migrated to
+ -  [overflow](https://github.com/bjartek/overflow) is beeing used for testing and running manual `storylines`
 
 This repo is the backend code, there are two other repos in this solutions namely
  - [find-lookup](https://github.com/findonflow/find-lookup) a serverless function to lookup names from web2

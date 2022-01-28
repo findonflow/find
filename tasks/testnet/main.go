@@ -1,38 +1,38 @@
 package main
 
 import (
-	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"github.com/bjartek/overflow/overflow"
 )
 
 func main() {
 
 	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
-	g := gwtf.NewGoWithTheFlowDevNet()
+	o := overflow.NewOverflowTestnet().Start()
 
 	//first step create the adminClient as the fin user
-	g.TransactionFromFile("setup_fin_1_create_client").
+	o.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("find-admin").
 		RunPrintEventsFull()
 
 	//link in the server in the versus client
-	g.TransactionFromFile("setup_fin_2_register_client").
+	o.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAs("find").
-		AccountArgument("find-admin").
+		Args(o.Arguments().Account("find-admin")).
 		RunPrintEventsFull()
 
 	//set up fin network as the fin user
-	g.TransactionFromFile("setup_fin_3_create_network").
+	o.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("find-admin").
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find").
-		StringArgument("find").
+		Args(o.Arguments().String("find")).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find-admin").
-		StringArgument("find-admin").
+		Args(o.Arguments().String("find-admin")).
 		RunPrintEventsFull()
 
 	/*
