@@ -80,11 +80,17 @@ func main() {
 
 	o.TransactionFromFile("mintDandy").
 		SignProposeAndPayAs("user1").
-		Args(o.Arguments().String("user1")).
+		Args(o.Arguments().
+			String("user1").
+			UInt64(3).
+			String("Neo").
+			String("Neo Motorcycle").
+			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
+			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
 		RunPrintEventsFull()
 
 		//TODO; read this from above
-	id := uint64(78)
+	id := uint64(76)
 	o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
 
 	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()

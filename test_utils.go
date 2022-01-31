@@ -51,6 +51,8 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Test(otu.T).AssertSuccess().AssertNoEvents()
 
+	otu.createUser(100.0, "account")
+
 	return otu.tickClock(1.0)
 }
 
@@ -312,5 +314,47 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 			"addon": "forge",
 		}))
 
+	return otu
+}
+
+func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
+	return otu.createUser(100.0, user).
+		registerUser(user).
+		buyForge(user)
+}
+
+func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listDandyForSale").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.ForSale", map[string]interface{}{
+			"active":          "true",
+			"directSellPrice": fmt.Sprintf("%.8f", price),
+			"id":              fmt.Sprintf("%d", id),
+			"owner":           otu.accountAddress(name),
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) buyDandyForSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidMarket").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account(seller).
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
+			"amount":        fmt.Sprintf("%.8f", price),
+			"id":            fmt.Sprintf("%d", id),
+			"previousOwner": otu.accountAddress(seller),
+			"newOwner":      otu.accountAddress(name),
+		}))
+		//TODO: test better events
 	return otu
 }

@@ -485,7 +485,7 @@ pub contract Market {
 				let offer= cb.borrow()!
 				let soldFor=offer.getBalance(id)
 				//move the token to the new profile
-				emit Sold(id: id, previousOwner:offer.owner!.address, newOwner: cb.address, amount: soldFor)
+				emit Sold(id: id, previousOwner:owner, newOwner: cb.address, amount: soldFor)
 
 				let royaltyType=Type<AnyStruct{TypedMetadata.Royalty}>()
 				var royalty: AnyStruct{TypedMetadata.Royalty}?=nil
