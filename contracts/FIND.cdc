@@ -431,7 +431,7 @@ pub contract FIND {
 		//add a new lease token to the collection, can only be called in this contract
 		access(contract) fun deposit(token: @FIND.Lease)
 
-		access(contract)fun cancelBid(_ name: String) 
+		access(contract)fun cancelUserBid(_ name: String) 
 		access(contract) fun increaseBid(_ name: String) 
 
 		//place a bid on a token
@@ -596,7 +596,7 @@ pub contract FIND {
 			destroy oldAuction
 		}
 
-		access(contract) fun cancelBid(_ name: String) {
+		access(contract) fun cancelUserBid(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				!self.auctions.containsKey(name) : "Cannot cancel a bid that is in an auction=".concat(name)
@@ -867,6 +867,19 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
+
+			//if we have a callback there is no auction and it is a blind bid
+			if let cb= tokenRef.offerCallback {
+				let bidder= cb.address
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+				let owner=tokenRef.owner!.address
+				let ownerName=tokenRef.getProfile()!.getName()
+				Debug.log("we have a blind bid so we cancel that")
+				emit DirectOfferRejected(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: cb.borrow()!.getBalance(name))
+				cb.borrow()!.cancel(name)
+				tokenRef.setCallback(nil)
+			}
+
 			tokenRef.setStartAuctionPrice(auctionStartPrice)
 			tokenRef.setReservePrice(auctionReservePrice)
 			tokenRef.setAuctionDuration(auctionDuration)
@@ -1395,7 +1408,7 @@ pub contract FIND {
 				return
 			}
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-			from.borrow()!.cancelBid(name)
+			from.borrow()!.cancelUserBid(name)
 			self.cancel(name)
 		}
 
