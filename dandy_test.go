@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,19 +16,21 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			createUser(100.0, "user1").
 			registerUser("user1").
-			buyForge("user1").
-			mintThreeExampleDandies()
-		res := otu.O.ScriptFromFile("dandyViews").Args(otu.O.Arguments().String("user1").UInt64(54)).RunReturnsJsonString()
-		fmt.Println(res)
+			buyForge("user1")
+
+		dandyIds := otu.mintThreeExampleDandies()
+
+		id := dandyIds[0]
+		res := otu.O.ScriptFromFile("dandyViews").Args(otu.O.Arguments().String("user1").UInt64(id)).RunReturnsJsonString()
 		assert.JSONEq(t, `[
-        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
-        	            	    "String",
-        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-        	            	    "AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}",
-        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.Editioned",
-        	            	    "A.f8d6e0586b0a20c7.Dandy.Royalties",
-        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork",
-        	            	    "A.f8d6e0586b0a20c7.MetadataViews.HTTPFile"
-        	            	]`, res)
+			        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
+			        	            	    "String",
+			        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
+			        	            	    "AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}",
+																	"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
+			        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.Editioned",
+			        	            	    "A.f8d6e0586b0a20c7.Dandy.Royalties",
+			        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork"
+			        	            	]`, res)
 	})
 }

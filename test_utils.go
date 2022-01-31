@@ -274,8 +274,8 @@ func (otu *OverflowTestUtils) mintCharity(name, image, thumbnail, originUrl, des
 	return otu
 }
 
-func (otu *OverflowTestUtils) mintThreeExampleDandies() *OverflowTestUtils {
-	otu.O.TransactionFromFile("mintDandy").
+func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
+	result := otu.O.TransactionFromFile("mintDandy").
 		SignProposeAndPayAs("user1").
 		Args(otu.O.Arguments().
 			String("user1").
@@ -290,12 +290,15 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() *OverflowTestUtils {
 			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 			"minter":      "user1",
 			"name":        "Neo Motorcycle 3 of 3",
-		})).
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Deposit", map[string]interface{}{
-			"to": otu.accountAddress("user1"),
 		}))
+	dandyIds := []uint64{}
+	for _, event := range result.Events {
+		if event.Name == "A.f8d6e0586b0a20c7.Dandy.Deposit" {
+			dandyIds = append(dandyIds, event.GetFieldAsUInt64("id"))
+		}
+	}
 
-	return otu
+	return dandyIds
 }
 
 func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
