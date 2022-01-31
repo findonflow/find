@@ -24,7 +24,7 @@ pub contract Dandy: NonFungibleToken {
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id:UInt64, name:String, description:String)
+	pub event Minted(id:UInt64, minter:String, name:String, description:String)
 	pub event RoyaltyPaid(name:String, amount: UFix64, type:String)
 
 	pub struct ViewInfo {
@@ -264,7 +264,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		let nft <-  create NFT(name: name, description:description, schemas:views, minterPlatform: platform)
-		emit Minted(id:nft.id, name:nft.minterPlatform.name, description:description)
+		emit Minted(id:nft.id, minter:nft.minterPlatform.name, name: name, description:description)
 		return <-  nft
 	}
 

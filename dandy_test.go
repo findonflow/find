@@ -1,7 +1,10 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -13,25 +16,20 @@ func TestDandy(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			createUser(100.0, "user1").
-			registerUser("user1")
-
-		otu.O.TransactionFromFile("buyAddon").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1").String("forge").UFix64(50.0)).
-			Test(otu.T).
-			AssertSuccess()
-
-			//TOOD: assert events
-		otu.O.TransactionFromFile("mintDandy").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1")).
-			Test(otu.T).
-			AssertSuccess().AssertEventCount(6)
-
-		/*
-			res := g.GWTF.ScriptFromFile("dandyViews").StringArgument("user1").UInt64Argument(23).RunReturnsJsonString()
-			fmt.Println(res)
-			assert.Equal(t, res, "")
-		*/
+			registerUser("user1").
+			buyForge("user1").
+			mintThreeExampleDandies()
+		res := otu.O.ScriptFromFile("dandyViews").Args(otu.O.Arguments().String("user1").UInt64(54)).RunReturnsJsonString()
+		fmt.Println(res)
+		assert.JSONEq(t, `[
+        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
+        	            	    "String",
+        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
+        	            	    "AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}",
+        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.Editioned",
+        	            	    "A.f8d6e0586b0a20c7.Dandy.Royalties",
+        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork",
+        	            	    "A.f8d6e0586b0a20c7.MetadataViews.HTTPFile"
+        	            	]`, res)
 	})
 }

@@ -8,7 +8,7 @@ import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-transaction(name: String) {
+transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String) {
 	prepare(account: AuthAccount) {
 
 		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
@@ -27,16 +27,15 @@ transaction(name: String) {
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 
 		let creativeWork=
-		TypedMetadata.CreativeWork(artist:"Neo Motorcycles", name:"Neo Bike ", description: "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK", type:"image")
+		TypedMetadata.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
-		let media=MetadataViews.HTTPFile(url:"https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")
+		let media=MetadataViews.HTTPFile(url:nftUrl)
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterRoyalty=Dandy.Royalties(royalty: {"artist" : Dandy.RoyaltyItem(receiver: receiver, cut: 0.05)})
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
-		let maxEdition:UInt64=3
 		while i <= maxEdition {
 
 			let editioned= TypedMetadata.Editioned(edition:i, maxEdition:maxEdition)

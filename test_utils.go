@@ -273,3 +273,41 @@ func (otu *OverflowTestUtils) mintCharity(name, image, thumbnail, originUrl, des
 
 	return otu
 }
+
+func (otu *OverflowTestUtils) mintThreeExampleDandies() *OverflowTestUtils {
+	otu.O.TransactionFromFile("mintDandy").
+		SignProposeAndPayAs("user1").
+		Args(otu.O.Arguments().
+			String("user1").
+			UInt64(3).
+			String("Neo").
+			String("Neo Motorcycle").
+			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
+			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
+		Test(otu.T).
+		AssertSuccess().AssertEventCount(6).
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
+			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+			"minter":      "user1",
+			"name":        "Neo Motorcycle 3 of 3",
+		})).
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Deposit", map[string]interface{}{
+			"to": otu.accountAddress("user1"),
+		}))
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("buyAddon").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().String(user).String("forge").UFix64(50.0)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
+			"name":  user,
+			"addon": "forge",
+		}))
+
+	return otu
+}
