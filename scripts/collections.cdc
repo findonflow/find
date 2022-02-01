@@ -30,6 +30,9 @@ import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
 
+//Jambb
+import Vouchers from 0x444f5ea22c6ea12c
+
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
 
@@ -584,10 +587,10 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 	*/
 
+	let jambb: [String] = []
 	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if jambbCap.check() {
 		let nfts = jambbCap.borrow()!.getIDs()
-		let items: [String] = []
 		for id in nfts {
 			let nft = jambbCap.borrow()!.borrowMoment(id: id)!
 			let metadata=nft.getMetadata()
@@ -602,13 +605,39 @@ pub fun main(address: Address) : MetadataCollections? {
 				rarity: ""
 			)
 			let itemId="Jambb".concat(id.toString())
-			items.append(itemId)
+			jambb.append(itemId)
 			resultMap[itemId] = item
 		}
+	}
 
-		if items.length != 0 {
-			results["Jambb"] = items
+	let voucherCap = account.getCapability<&{Vouchers.CollectionPublic}>(Vouchers.CollectionPublicPath)
+	if voucherCap.check() {
+		let collection = voucherCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowVoucher(id: id)!
+			let metadata=nft.getMetadata()!
+
+			let url="https://jambb.com"
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: "ipfs://".concat(metadata.mediaHash),
+				url: url,
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata.mediaType,
+				rarity: ""
+			)
+			let itemId="JambbVoucher".concat(id.toString())
+			jambb.append(itemId)
+			resultMap[itemId] = item
 		}
+		
+
+	}
+
+	if jambb.length != 0 {
+			results["Jambb"] = jambb
 	}
 
 	let mw = MatrixWorldFlowFestNFT.getNft(address:address)
