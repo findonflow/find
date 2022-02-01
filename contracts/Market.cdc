@@ -56,17 +56,36 @@ pub contract Market {
 
 	pub struct SaleItemInformation {
 
-		pub let salePrice: UFix64?
-		pub let bidder: Address?
+		//TODO: fix to not beeing var
+		pub var amount: UFix64?
+		pub var bidder: Address?
 		pub let ftType: Type
 		pub let ftTypeIdentifier: String
+		pub var type:String
 
 
 		init(_ item: &SaleItem) {
-			self.salePrice=item.salePrice
+
+			self.type="sale"
+			self.amount=item.salePrice
+			self.bidder=item.offerCallback?.address
+
+			if item.auction != nil {
+				self.type="ongoing_auction"
+				let auction= item.auction
+				self.bidder=item.auction!.latestBidCallback.address
+				self.amount=item.auction!.getBalance()
+			} else if item.pointer.getType() == Type<TypedMetadata.ViewReadPointer>() {
+				self.type="directoffer"
+				self.bidder=item.offerCallback?.address
+				self.amount=item.offerCallback!.borrow()!.getBalance(item.pointer.getUUID()) 
+			} else if item.auctionStartPrice!= nil {
+				self.type="ondemand_auction"
+				self.amount=item.auctionStartPrice
+				self.bidder=nil
+			} 
 			self.ftType=item.vaultType
 			self.ftTypeIdentifier=item.vaultType.identifier
-			self.bidder=item.offerCallback?.address
 		}
 	}
 
@@ -99,6 +118,15 @@ pub contract Market {
 			self.offerCallback=nil
 			self.auction=nil
 			self.escrow <- nil
+		}
+
+		pub fun returnNFT() {
+			if self.auction==nil {
+				return
+			}
+			let pointer= self.pointer as! TypedMetadata.AuthNFTPointer
+			let nft <- self.escrow <- nil
+			pointer.deposit(<- nft!)
 		}
 
 		pub fun sellNFT(_ cb : Capability<&MarketBidCollection{MarketBidCollectionPublic}>) : @FungibleToken.Vault {
@@ -162,6 +190,9 @@ pub contract Market {
 		}
 
 		destroy() {
+			if self.escrow != nil {
+				Debug.log("Destroyed escrow!!!")
+			}
 			destroy self.escrow
 		}
 	}
@@ -386,7 +417,7 @@ pub contract Market {
 		//cancel will cancel and auction or reject a bid if no auction has started
 		pub fun cancel(_ id: UInt64) {
 			pre {
-				self.items.containsKey(id) : "Invalid name=".concat(id.toString())
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 
 			let saleItem=self.borrow(id)
@@ -416,6 +447,8 @@ pub contract Market {
 
 				//TODO: if we chose to escrow auctions nfts in a seperate collection put them back here.
 				emit AuctionCancelled(id: id, bidder: auction.latestBidCallback.address, amount: balance)
+
+				saleItem.returnNFT()
 				auction.latestBidCallback.borrow()!.cancel(id)
 				destroy <- self.items.remove(key: id)
 			}

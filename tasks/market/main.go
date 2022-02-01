@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bjartek/overflow/overflow"
 )
 
@@ -91,28 +93,38 @@ func main() {
 
 		//TODO; read this from above
 	id := uint64(76)
-	o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
+	/*
+		o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
 
-	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
+		o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
 
-	o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+		o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 
-	o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+		o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+	*/
 
-	o.SimpleTxArgs("listDandyForAuction", "user2", o.Arguments().UInt64(id).UFix64(10.0))
+	o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 
-	o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
+	res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
+	fmt.Println(res)
 
-	o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
+	/*
+		o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
 
-	o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
+		res = o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user2")).RunReturnsJsonString()
+		fmt.Println(res)
 
-	o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+			o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
 
-	o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
+			o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
 
-	o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
-	o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
-	o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
+			o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+
+			o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
+
+			o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
+			o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
+			o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
+	*/
 
 }

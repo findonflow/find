@@ -11,7 +11,7 @@ import TypedMetadata from "../contracts/TypedMetadata.cdc"
 transaction(id: UInt64) {
 	prepare(account: AuthAccount) {
 
-		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(Dandy.CollectionPrivatePath)
+		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 		let pointer= TypedMetadata.AuthNFTPointer(cap: dandyPrivateCap, id: id)
 
 		let market = account.borrow<&Market.SaleItemCollection>(from: Market.SaleItemCollectionStoragePath)!

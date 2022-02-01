@@ -206,10 +206,10 @@ pub contract TypedMetadata {
 	}
 
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>
+		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>
 		pub let id: UInt64
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider}>, id: UInt64) {
+		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 		}
@@ -232,6 +232,10 @@ pub contract TypedMetadata {
 
 		pub fun withdraw() :@NonFungibleToken.NFT {
 			return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
+		}
+
+		pub fun deposit(_ nft: @NonFungibleToken.NFT){
+			self.cap.borrow()!.deposit(token: <- nft)
 		}
 
 		pub fun owner() : Address {

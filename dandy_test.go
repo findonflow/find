@@ -58,4 +58,78 @@ func TestDandy(t *testing.T) {
 		otu.buyDandyForSale("user2", "user1", id, price)
 
 	})
+
+	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+
+		otu.directOfferMarket("user2", "user1", id, price)
+
+		otu.acceptDirectOfferMarket("user1", id, "user2", price)
+
+	})
+
+	t.Run("Should be able to sell at auction", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+
+		otu.listDandyForAuction("user1", id, price)
+
+		/*
+			res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+			fmt.Println(res)
+		*/
+
+		otu.auctionBidMarket("user2", "user1", id, price+5.0)
+
+		otu.tickClock(400.0)
+
+		/*
+			res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+			fmt.Println(res)
+		*/
+		otu.fulfillMarketAuction("user1", id, "user2", price+5.0)
+
+	})
+
+	t.Run("Should be able to return nft when item not sold at auction", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+
+		otu.listDandyForAuction("user1", id, price)
+
+		/*
+			res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+			fmt.Println(res)
+		*/
+		otu.auctionBidMarket("user2", "user1", id, price)
+
+		otu.tickClock(400.0)
+
+		/*
+			res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+			fmt.Println(res)
+		*/
+		//TODO: test better events here
+		otu.fulfillMarketAuctionCancelled("user1", id, "user2", price)
+
+	})
 }

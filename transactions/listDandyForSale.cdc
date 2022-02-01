@@ -11,7 +11,7 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 
 
 		let saleItems= account.borrow<&Market.SaleItemCollection>(from: Market.SaleItemCollectionStoragePath)!
-		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(Dandy.CollectionPrivatePath)
+		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 		let pointer= TypedMetadata.AuthNFTPointer(cap: dandyPrivateCap, id: id)
 		saleItems.listForSale(pointer: pointer, vaultType: Type<@FUSD.Vault>(), directSellPrice: directSellPrice)
 	}
