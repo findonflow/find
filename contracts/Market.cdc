@@ -53,6 +53,24 @@ pub contract Market {
 	/// Emitted when there is a new bid in an auction
 	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
 
+	/* From FIND
+	pub struct LeaseInformation {
+		pub let name: String
+		pub let address: Address
+		pub let cost: UFix64
+		pub let status: String
+		pub let validUntil: UFix64
+		pub let lockedUntil: UFix64
+		pub let latestBid: UFix64?
+		pub let auctionEnds: UFix64?
+		pub let salePrice: UFix64?
+		pub let latestBidBy: Address?
+		pub let currentTime: UFix64
+		pub let auctionStartPrice: UFix64?
+		pub let auctionReservePrice: UFix64?
+		pub let extensionOnLateBid: UFix64?
+		pub let addons: [String]
+	*/
 
 	pub struct SaleItemInformation {
 
@@ -626,6 +644,18 @@ pub contract Market {
 	==========================================================================
 	*/
 
+	/*
+
+	From FIND		
+	pub let name: String
+		pub let type: String
+		pub let amount: UFix64
+		pub let timestamp: UFix64
+		pub let lease: LeaseInformation?
+
+
+
+	*/
 	//Struct that is used to return information about bids
 	pub struct BidInfo{
 		pub let id: UInt64
