@@ -18,3 +18,4 @@
  - 7.17.3 : fix jambb link straight to moment
  - 7.17.4 : fix mynft contentType
  - 7.18.0 : added jambb vouchers
+ - 7.19.0 : added fright club.  test with  0x9857effe8da666f5

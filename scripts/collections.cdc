@@ -2,6 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import CharityNFT from "../contracts/CharityNFT.cdc"
 
 //mainnet
+import Beam from 0x86b4a0010a71cfc3 
 import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import GooberXContract from 0x34f2bf4a80bb0f69
@@ -1028,6 +1029,40 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["mynft"] = items
 		}
 	}
+
+
+	let beamCap = account.getCapability<&{Beam.BeamCollectionPublic}>(Beam.CollectionPublicPath)
+	if beamCap.check() {
+		let items: [String] = []
+		let collection = beamCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowCollectible(id: id)!
+
+	    let metadata = Beam.getCollectibleItemMetaData(collectibleItemID: nft.data.collectibleItemID)!
+		  var mediaUrl: String? = metadata["mediaUrl"]
+			if mediaUrl != nil &&  mediaUrl!.slice(from: 0, upTo: 7) != "ipfs://" {
+				mediaUrl = "ipfs://".concat(mediaUrl!)
+			}
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["title"]!,
+				image: mediaUrl ?? "",
+				url: "https://".concat(metadata["domainUrl"]!),
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata["mediaType"]!,
+				rarity: ""
+			)
+			let itemId="FrightClub".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+		if items.length != 0 {
+			results["Fright Club"] = items
+		}
+	}
+
+
 
 	if results.keys.length == 0 {
 		return nil
