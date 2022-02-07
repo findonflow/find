@@ -30,6 +30,9 @@ import TraitPacksVouchers from 0xdfc74d9d561374c0
 import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
+import NeoAvatar from 0xb25138dbf45e5801
+import NeoViews from 0xb25138dbf45e5801
+import MetadataViews from 0x1d7e57aa55817448
 
 //Jambb
 import Vouchers from 0x444f5ea22c6ea12c
@@ -1030,7 +1033,19 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
+	let neoAvatars = getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account: account)
+	let neoItems: [String] = []
+	for item in neoAvatars {
+		  let itemId="NeoAvatar".concat(item.id.toString())
+			neoItems.append(itemId)
+			resultMap[itemId] = item
+	}
+	if neoItems.length != 0 {
+			results["Neo"] = neoItems
+  }
 
+
+	/*
 	let beamCap = account.getCapability<&{Beam.BeamCollectionPublic}>(Beam.CollectionPublicPath)
 	if beamCap.check() {
 		let items: [String] = []
@@ -1060,7 +1075,7 @@ pub fun main(address: Address) : MetadataCollections? {
 		if items.length != 0 {
 			results["Fright Club"] = items
 		}
-	}
+	}*/
 
 
 
@@ -1079,4 +1094,37 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
+}
+
+//This uses a view from Neo until we agree on another for ExternalDomainViewUrl
+pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [MetadataCollectionItem] {
+	let items: [MetadataCollectionItem] = []
+	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	if resolverCollectionCap.check() {
+		let collection = resolverCollectionCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowViewResolver(id: id)!
+
+			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+				let display = displayView as! MetadataViews.Display
+				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
+					let externalUrl= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+					let item = MetadataCollectionItem(
+						id: id,
+						name: display.name,
+						image: display.thumbnail.uri(),
+						url: externalUrl.url,
+						listPrice: nil,
+						listToken: nil,
+						contentType: "image",
+						rarity: ""
+					)
+
+					items.append(item)
+				}
+			}
+		}
+	}
+	return items
+
 }
