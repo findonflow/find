@@ -20,3 +20,4 @@
  - 7.18.0 : added jambb vouchers
  - 7.19.0 : added fright club.  test with  0x9857effe8da666f5
  - 7.20.0 : removed fright club for now, added NeoAvatar! test with bjartek.find
+ - 7.21.0 : fixed geniace url and added listings/collection2 start of new scripts

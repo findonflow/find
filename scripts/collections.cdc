@@ -785,7 +785,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: metadata.name,
 				image: metadata.imageUrl,
-				url: "https://www.geniace.com/product/".concat(metadata.name),
+				url: "https://www.geniace.com/product/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: metadata.data["mimetype"]!,

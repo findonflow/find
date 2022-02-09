@@ -78,9 +78,7 @@ pub fun main(address: Address): {UInt64 :[Listing]} {
 
 
 	let flovatarCap = account.getCapability<&{FlovatarMarketplace.SalePublic}>(FlovatarMarketplace.CollectionPublicPath)  
-
 	if flovatarCap.check(){
-
 		let saleCollection=flovatarCap.borrow()!
 		for id in saleCollection.getFlovatarIDs() {
 			let price = saleCollection.getFlovatarPrice(tokenId: id)!
