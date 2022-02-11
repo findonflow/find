@@ -13,8 +13,8 @@ import Debug from "./Debug.cdc"
 ///A market contrat that allows a user to receive bids on his nfts, direct sell and english auction his nfts
 
 The market has 2 collections
- - MarketBidCollection: This contains all bids you have made, both bids on an auction and direct bids
- - SaleItemCollection: This collection contains your saleItems and directOffers for your NFTs that others have made
+- MarketBidCollection: This contains all bids you have made, both bids on an auction and direct bids
+- SaleItemCollection: This collection contains your saleItems and directOffers for your NFTs that others have made
 
 */
 pub contract Market {
@@ -53,55 +53,48 @@ pub contract Market {
 	/// Emitted when there is a new bid in an auction
 	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64, vaultType:String)
 
-	/* From FIND
-	pub struct LeaseInformation {
-		pub let name: String
-		pub let address: Address
-		pub let cost: UFix64
-		pub let status: String
-		pub let validUntil: UFix64
-		pub let lockedUntil: UFix64
-		pub let latestBid: UFix64?
-		pub let auctionEnds: UFix64?
-		pub let salePrice: UFix64?
-		pub let latestBidBy: Address?
-		pub let currentTime: UFix64
-		pub let auctionStartPrice: UFix64?
-		pub let auctionReservePrice: UFix64?
-		pub let extensionOnLateBid: UFix64?
-		pub let addons: [String]
-	*/
 
+	pub struct SaleItemBidderInfo {
+		pub let amount: UFix64?
+		pub let bidder: Address?
+		pub let saleItemType:String
+
+
+		init(bidder:Address?, type:String, amount:UFix64?) {
+			self.bidder=bidder
+			self.saleItemType=type
+			self.amount=amount
+		}
+
+
+	}
 	pub struct SaleItemInformation {
 
-		//TODO: fix to not beeing var
-		pub var amount: UFix64?
-		pub var bidder: Address?
+		pub let type:Type
+		pub let typeId: UInt64
+		pub let id:UInt64
+		pub let owner: Address
+		pub let amount: UFix64?
+		pub let bidder: Address?
+		pub let saleType:String
 		pub let ftType: Type
 		pub let ftTypeIdentifier: String
-		pub var type:String
+		pub let auctionReservePrice: UFix64?
+		pub let extensionOnLateBid: UFix64?
 
 
 		init(_ item: &SaleItem) {
 
-			self.type="sale"
-			self.amount=item.salePrice
-			self.bidder=item.offerCallback?.address
-
-			if item.auction != nil {
-				self.type="ongoing_auction"
-				let auction= item.auction
-				self.bidder=item.auction!.latestBidCallback.address
-				self.amount=item.auction!.getAuctionBalance()
-			} else if item.pointer.getType() == Type<TypedMetadata.ViewReadPointer>() {
-				self.type="directoffer"
-				self.bidder=item.offerCallback?.address
-				self.amount=item.offerCallback!.borrow()!.getBalance(item.pointer.getUUID()) 
-			} else if item.auctionStartPrice!= nil {
-				self.type="ondemand_auction"
-				self.amount=item.auctionStartPrice
-				self.bidder=nil
-			} 
+			self.type= item.pointer.getItemType()
+			self.typeId=item.pointer.id
+			self.id=item.pointer.getUUID()
+			let bidderInfo=item.getSaleItemBidderInfo()
+			self.amount=bidderInfo.amount
+			self.bidder=bidderInfo.bidder
+			self.saleType=bidderInfo.saleItemType
+			self.owner=item.owner!.address
+			self.auctionReservePrice=item.auctionReservePrice
+			self.extensionOnLateBid=item.auctionExtensionOnLateBid
 			self.ftType=item.vaultType
 			self.ftTypeIdentifier=item.vaultType.identifier
 		}
@@ -138,6 +131,40 @@ pub contract Market {
 			self.escrow <- nil
 		}
 
+
+		pub fun getSaleItemBidderInfo() : SaleItemBidderInfo {
+			if self.auction != nil {
+
+				return SaleItemBidderInfo(
+					bidder :self.auction!.latestBidCallback.address,
+					type:"ongoing_auction",
+					amount:self.auction!.getAuctionBalance()
+				)
+			}
+			if self.pointer.getType() == Type<TypedMetadata.ViewReadPointer>() {
+				return SaleItemBidderInfo(
+					bidder:self.offerCallback?.address,
+					type: "directoffer",
+					amount: self.offerCallback!.borrow()!.getBalance(self.pointer.getUUID())
+				)
+			}
+
+
+			if self.auctionStartPrice!= nil {
+				return SaleItemBidderInfo(
+					bidder: nil,
+					type:"ondemand_auction", 
+					amount:self.auctionStartPrice
+				)
+			} 
+
+			return SaleItemBidderInfo(
+				bidder: self.offerCallback?.address,
+				type: "sale",
+				amount: self.salePrice
+			)
+
+		}
 		pub fun returnNFT() {
 			if self.auction==nil {
 				return
@@ -276,6 +303,8 @@ pub contract Market {
 
 		pub fun getItemsForSale(): { UInt64:SaleItemInformation}
 
+		pub fun getItemForSaleInformation(_ id:UInt64) : SaleItemInformation 
+
 		access(contract)fun cancelBid(_ id: UInt64) 
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
 
@@ -302,6 +331,13 @@ pub contract Market {
 			self.networkWallet=networkWallet
 		}
 
+		pub fun getItemForSaleInformation(_ id:UInt64) : SaleItemInformation {
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			}
+			return SaleItemInformation(self.borrow(id))
+
+		}
 
 		pub fun getItemsForSale(): { UInt64: SaleItemInformation} {
 			let info: {UInt64:SaleItemInformation} ={}
@@ -386,7 +422,7 @@ pub contract Market {
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
 		access(contract) fun registerBid(item: TypedMetadata.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType: Type) {
-				
+
 			let timestamp=Clock.time()
 
 			let id = item.getUUID()
@@ -405,11 +441,11 @@ pub contract Market {
 				return
 			}
 
-			
+
 			//TODO: double check this vs FIND contract, we need to check price if higher or not here
-       if let cb= saleItem.offerCallback {
-        cb.borrow()!.cancelBidFromLease(id)
-      }
+			if let cb= saleItem.offerCallback {
+				cb.borrow()!.cancelBidFromLease(id)
+			}
 
 
 			saleItem.setCallback(callback)
@@ -499,7 +535,7 @@ pub contract Market {
 			if let auction=saleItemRef.auction {
 				panic("This item has an ongoing auction, you cannot fullfill this direct offer")
 			}
-	
+
 			//Set the auth pointer in the saleItem so that it now can be fulfilled
 			saleItemRef.setPointer(pointer)
 
@@ -654,11 +690,10 @@ pub contract Market {
 
 	From FIND		
 	pub let name: String
-		pub let type: String
-		pub let amount: UFix64
-		pub let timestamp: UFix64
-		pub let lease: LeaseInformation?
-
+	pub let type: String
+	pub let amount: UFix64
+	pub let timestamp: UFix64
+	pub let lease: LeaseInformation?
 
 
 	*/
@@ -668,12 +703,14 @@ pub contract Market {
 		pub let type: String
 		pub let amount: UFix64
 		pub let timestamp: UFix64
+		pub let item: SaleItemInformation
 
-		init(id: UInt64, amount: UFix64, timestamp: UFix64, type: String) {
+		init(id: UInt64, amount: UFix64, timestamp: UFix64, type: String, item:SaleItemInformation) {
 			self.id=id
 			self.amount=amount
 			self.timestamp=timestamp
 			self.type=type
+			self.item=item
 		}
 	}
 
@@ -733,7 +770,6 @@ pub contract Market {
 		}
 
 		//called from lease when auction is ended
-		//TDOO: we need to send NFT since for escrowed auction it will not be a pointer
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault{
 
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
@@ -748,12 +784,14 @@ pub contract Market {
 		pub fun getVaultType(_ id:UInt64) : Type {
 			return self.borrowBid(id).vaultType
 		}
-		
+
 		pub fun getBids() : [BidInfo] {
 			var bidInfo: [BidInfo] = []
 			for id in self.bids.keys {
 				let bid = self.borrowBid(id)
-				bidInfo.append(BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type))
+
+				let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
+				bidInfo.append(BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type, item:saleInfo))
 			}
 			return bidInfo
 		}
