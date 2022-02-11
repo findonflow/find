@@ -82,8 +82,6 @@ transaction(name: String) {
 				acct.link<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath, target: Market.SaleItemCollectionStoragePath)
 			}
 			
-
-	
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)

@@ -1,4 +1,5 @@
 import FIND from "../contracts/FIND.cdc"
+import Market from "../contracts/Market.cdc"
 import Profile from "../contracts/Profile.cdc"
 
 pub struct FINDNameReport{
@@ -7,13 +8,18 @@ pub struct FINDNameReport{
 	pub let status: String
 	pub let cost: UFix64
 	pub let leases: [FIND.LeaseInformation]
+	pub let itemsForSale: [Market.SaleItemInformation]
+	pub let marketBids: [Market.BidInfo]
 
-	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64, leases: [FIND.LeaseInformation]) {
+	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64, leases: [FIND.LeaseInformation]
+,itemsForSale: [Market.SaleItemInformation], marketBids: [Market.BidInfo]) {
 		self.status=status
 		self.profile=profile
 		self.lease=lease
 		self.cost=cost
 		self.leases=leases
+		self.itemsForSale=itemsForSale
+		self.marketBids=marketBids
 	}
 }
 
@@ -26,6 +32,9 @@ pub fun main(name: String) : FINDNameReport{
 		let account=getAccount(address)
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
+
+		let marketBidCap= account.getCapability<&Market.MarketBidCollection{Market.MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
+		let saleItemCap= account.getCapability<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
 		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
 		if leaseCap.check() {
@@ -36,7 +45,9 @@ pub fun main(name: String) : FINDNameReport{
 			profile: profile?.asProfile(),
 			lease: lease,
 			cost:  cost,
-			leases: leaseCap.borrow()?.getLeaseInformation() ?? []
+			leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
+			itemsForSale: saleItemCap.borrow()?.getItemsForSale() ?? [],
+			marketBids:marketBidCap.borrow()?.getBids() ?? []
 		)
 
 	}
@@ -51,6 +62,8 @@ pub fun main(name: String) : FINDNameReport{
 		lease: nil,
 		cost: cost,
 		leases: [],
+		itemsForSale: [],
+		marketBids: [],
 	)
 
 }

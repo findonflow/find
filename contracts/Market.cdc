@@ -301,7 +301,7 @@ pub contract Market {
 		pub fun getIds(): [UInt64]
 		//fetch all names that are for sale
 
-		pub fun getItemsForSale(): { UInt64:SaleItemInformation}
+		pub fun getItemsForSale(): [SaleItemInformation]
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : SaleItemInformation 
 
@@ -339,10 +339,10 @@ pub contract Market {
 
 		}
 
-		pub fun getItemsForSale(): { UInt64: SaleItemInformation} {
-			let info: {UInt64:SaleItemInformation} ={}
+		pub fun getItemsForSale(): [SaleItemInformation] {
+			let info: [SaleItemInformation] =[]
 			for id in self.getIds() {
-				info[id]=SaleItemInformation(self.borrow(id))
+				info.append(SaleItemInformation(self.borrow(id)))
 			}
 			return info
 		}
