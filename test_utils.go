@@ -332,10 +332,10 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.ForSale", map[string]interface{}{
-			"active":          "true",
-			"directSellPrice": fmt.Sprintf("%.8f", price),
-			"id":              fmt.Sprintf("%d", id),
-			"owner":           otu.accountAddress(name),
+			"active": "true",
+			"amount": fmt.Sprintf("%.8f", price),
+			"id":     fmt.Sprintf("%d", id),
+			"owner":  otu.accountAddress(name),
 		}))
 	return otu
 }
@@ -350,7 +350,7 @@ func (otu *OverflowTestUtils) listDandyForAuction(name string, id uint64, price 
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.ForAuction", map[string]interface{}{
 			"active":              "true",
-			"auctionStartPrice":   fmt.Sprintf("%.8f", price),
+			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
 			"id":                  fmt.Sprintf("%d", id),
 			"owner":               otu.accountAddress(name),
@@ -418,7 +418,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarket(name string, id uint64, bu
 		Args(otu.O.Arguments().
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
 			"id":            fmt.Sprintf("%d", id),
 			"previousOwner": otu.accountAddress(name),
 			"newOwner":      otu.accountAddress(buyer),
@@ -436,7 +436,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuction(name string, id uint64, buyer
 			Account(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
 			"id":            fmt.Sprintf("%d", id),
 			"previousOwner": otu.accountAddress(name),
 			"newOwner":      otu.accountAddress(buyer),
@@ -454,7 +454,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint
 			Account(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.AuctionCancelled", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.AuctionCancelled", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"bidder": otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),

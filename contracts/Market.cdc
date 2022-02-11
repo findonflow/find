@@ -26,32 +26,32 @@ pub contract Market {
 	pub let MarketBidCollectionPublicPath: PublicPath
 
 	pub event NFTEscrowed(id: UInt64)
-	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, type:String)
+	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, vaultType:String)
 
 	//TODO: always add names as optionals and try to resolve. 
 	/// Emitted when a name is sold to a new owner
-	pub event Sold(id: UInt64, previousOwner: Address, newOwner: Address, amount: UFix64)
+	pub event Sold(id: UInt64, previousOwner: Address, newOwner: Address, amount: UFix64, vaultType:String)
 
 	/// Emitted when a name is explicistly put up for sale
-	pub event ForSale(id: UInt64, owner: Address, directSellPrice: UFix64, active: Bool)
-	pub event ForAuction(id: UInt64, owner: Address,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
+	pub event ForSale(id: UInt64, owner: Address, amount: UFix64, active: Bool, vaultType:String)
+	pub event ForAuction(id: UInt64, owner: Address,  amount: UFix64, auctionReservePrice: UFix64, active: Bool, vaultType:String)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event DirectOfferBid(id: UInt64, bidder: Address, amount: UFix64)
+	pub event DirectOfferBid(id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
 
 	/// Emitted if a blind bid is canceled
-	pub event DirectOfferCanceled(id: UInt64, bidder: Address)
+	pub event DirectOfferCanceled(id: UInt64, bidder: Address, vaultType:String)
 
 	/// Emitted if a blind bid is rejected
-	pub event DirectOfferRejected(id: UInt64, bidder: Address, amount: UFix64)
+	pub event DirectOfferRejected(id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
 
-	pub event AuctionCancelled(id: UInt64, bidder: Address, amount: UFix64)
+	pub event AuctionCancelled(id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
 
 	/// Emitted when an auction starts. 
-	pub event AuctionStarted(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
+	pub event AuctionStarted(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64, vaultType:String)
 
 	/// Emitted when there is a new bid in an auction
-	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64)
+	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64, vaultType:String)
 
 	/* From FIND
 	pub struct LeaseInformation {
@@ -92,7 +92,7 @@ pub contract Market {
 				self.type="ongoing_auction"
 				let auction= item.auction
 				self.bidder=item.auction!.latestBidCallback.address
-				self.amount=item.auction!.getBalance()
+				self.amount=item.auction!.getAuctionBalance()
 			} else if item.pointer.getType() == Type<TypedMetadata.ViewReadPointer>() {
 				self.type="directoffer"
 				self.bidder=item.offerCallback?.address
@@ -238,9 +238,10 @@ pub contract Market {
 			self.latestBidCallback=latestBidCallback
 		}
 
-		pub fun getBalance() : UFix64 {
+		pub fun getAuctionBalance() : UFix64 {
 			return self.latestBidCallback.borrow()!.getBalance(self.id)
 		}
+
 
 		pub fun addBid(callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, timestamp: UFix64) {
 			let offer=callback.borrow()!
@@ -250,19 +251,20 @@ pub contract Market {
 			if callback.address != cb.address {
 
 				let offerBalance=offer.getBalance(self.id)
-				let minBid=self.getBalance() + self.minimumBidIncrement
+				let minBid=self.getAuctionBalance() + self.minimumBidIncrement
 
 				if offerBalance < minBid {
 					panic("bid ".concat(offerBalance.toString()).concat(" must be larger then previous bid+bidIncrement").concat(minBid.toString()))
 				}
-				cb.borrow()!.cancel(self.id)
+				cb.borrow()!.cancelBidFromLease(self.id)
 			}
 			self.latestBidCallback=callback
+
 			let suggestedEndTime=timestamp+self.extendOnLateBid
 			if suggestedEndTime > self.endsAt {
 				self.endsAt=suggestedEndTime
 			}
-			emit AuctionBid(id: self.id, bidder: cb.address, amount: self.getBalance(), auctionEndAt: self.endsAt)
+			emit AuctionBid(id: self.id, bidder: cb.address, amount: self.getAuctionBalance(), auctionEndAt: self.endsAt, vaultType:offer.getVaultType(self.id).identifier)
 
 		}
 	}
@@ -326,7 +328,7 @@ pub contract Market {
 			let offer=callback.borrow()!
 
 			let endsAt=timestamp + duration
-			emit AuctionStarted(id: id, bidder: callback.address, amount: offer.getBalance(id), auctionEndAt: endsAt)
+			emit AuctionStarted(id: id, bidder: callback.address, amount: offer.getBalance(id), auctionEndAt: endsAt, vaultType: saleItem.vaultType.identifier)
 
 			let auction=Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, minimumBidIncrement: saleItem.auctionMinBidIncrement, id: id)
 			saleItem.setCallback(nil)
@@ -343,7 +345,7 @@ pub contract Market {
 
 			let saleItem=self.borrow(id)
 			if let callback = saleItem.offerCallback {
-				emit DirectOfferCanceled(id: id, bidder: callback.address)
+				emit DirectOfferCanceled(id: id, bidder: callback.address, vaultType:saleItem.vaultType.identifier)
 			}
 
 			saleItem.setCallback(nil)
@@ -368,7 +370,7 @@ pub contract Market {
 			let balance=saleItem.offerCallback!.borrow()!.getBalance(id) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil  && saleItem.auctionStartPrice == nil{
-				emit DirectOfferBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
+				emit DirectOfferBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance, vaultType:saleItem.vaultType.identifier)
 				return
 			}
 
@@ -378,7 +380,7 @@ pub contract Market {
 			} else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit DirectOfferBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance)
+				emit DirectOfferBid(id: id, bidder: saleItem.offerCallback!.address, amount: balance, vaultType:saleItem.vaultType.identifier)
 			}
 		}
 
@@ -406,7 +408,7 @@ pub contract Market {
 			
 			//TODO: double check this vs FIND contract, we need to check price if higher or not here
        if let cb= saleItem.offerCallback {
-        cb.borrow()!.cancel(id)
+        cb.borrow()!.cancelBidFromLease(id)
       }
 
 
@@ -417,7 +419,7 @@ pub contract Market {
 			Debug.log("Balance of bid is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil && saleItem.auctionStartPrice == nil {
 				Debug.log("Sale price not set")
-				emit DirectOfferBid(id: id, bidder: callback.address, amount: balance)
+				emit DirectOfferBid(id: id, bidder: callback.address, amount: balance, vaultType: saleItem.vaultType.identifier)
 				return
 			}
 
@@ -427,7 +429,7 @@ pub contract Market {
 			}	 else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit DirectOfferBid(id: id, bidder: callback.address, amount: balance)
+				emit DirectOfferBid(id: id, bidder: callback.address, amount: balance, vaultType:saleItem.vaultType.identifier)
 			}
 
 		}
@@ -439,17 +441,18 @@ pub contract Market {
 			}
 
 			let saleItem=self.borrow(id)
+			let owner=self.owner!.address
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= saleItem.offerCallback {
 				Debug.log("we have a blind bid so we cancel that")
-				emit DirectOfferRejected(id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id))
-				cb.borrow()!.cancel(id)
+				emit DirectOfferRejected(id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id), vaultType:saleItem.vaultType.identifier)
+				cb.borrow()!.cancelBidFromLease(id)
 				saleItem.setCallback(nil)
 				return 
 			}
 
 			if let auction= saleItem.auction {
-				let balance=auction.getBalance()
+				let balance=auction.getAuctionBalance()
 
 				let auctionEnded= auction.endsAt <= Clock.time()
 				var hasMetReservePrice= false
@@ -463,11 +466,11 @@ pub contract Market {
 					panic("Cannot cancel finished auction, fulfill it instead")
 				}
 
-				//TODO: if we chose to escrow auctions nfts in a seperate collection put them back here.
-				emit AuctionCancelled(id: id, bidder: auction.latestBidCallback.address, amount: balance)
+				emit AuctionCancelled(id: id, bidder: auction.latestBidCallback.address, amount: balance, vaultType:saleItem.vaultType.identifier)
+				emit ForAuction(id: id, owner:owner, amount: balance, auctionReservePrice: saleItem.auctionReservePrice!,  active: false, vaultType:saleItem.vaultType.identifier)
 
 				saleItem.returnNFT()
-				auction.latestBidCallback.borrow()!.cancel(id)
+				auction.latestBidCallback.borrow()!.cancelBidFromLease(id)
 				destroy <- self.items.remove(key: id)
 			}
 		}
@@ -517,7 +520,7 @@ pub contract Market {
 					panic("Auction has not ended yet")
 				}
 
-				let soldFor=auction.getBalance()
+				let soldFor=auction.getAuctionBalance()
 				let reservePrice=saleItemRef.auctionReservePrice ?? 0.0
 
 				if reservePrice > soldFor {
@@ -536,7 +539,8 @@ pub contract Market {
 				let offer= cb.borrow()!
 				let soldFor=offer.getBalance(id)
 				//move the token to the new profile
-				emit Sold(id: id, previousOwner:owner, newOwner: cb.address, amount: soldFor)
+				emit Sold(id: id, previousOwner:owner, newOwner: cb.address, amount: soldFor, vaultType: ftType.identifier)
+				emit ForSale(id: id, owner:owner, amount: soldFor, active: false, vaultType: ftType.identifier)
 
 				let royaltyType=Type<AnyStruct{TypedMetadata.Royalty}>()
 				var royalty: AnyStruct{TypedMetadata.Royalty}?=nil
@@ -553,19 +557,20 @@ pub contract Market {
 				}
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
-					emit RoyaltyPaid(id: id, name: "market", amount: cutAmount,  type: ftType.identifier)
+					emit RoyaltyPaid(id: id, name: "market", amount: cutAmount,  vaultType: ftType.identifier)
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
-
+				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			} else if let auction = saleItem.auction {
 
 				//TODO: fix royalty here.
-				let soldFor=auction.getBalance()
+				let soldFor=auction.getAuctionBalance()
 				let oldProfile= getAccount(saleItem.pointer.owner()).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
-				emit Sold(id: id, previousOwner:owner, newOwner: auction.latestBidCallback.address, amount: soldFor)
+				emit Sold(id: id, previousOwner:owner, newOwner: auction.latestBidCallback.address, amount: soldFor, vaultType:ftType.identifier)
+				emit ForAuction(id: id, owner:owner, amount: soldFor, auctionReservePrice: saleItem.auctionReservePrice!,  active: false, vaultType: ftType.identifier)
 
 				let vault <- saleItem.sellNFT(auction.latestBidCallback)
 
@@ -574,6 +579,7 @@ pub contract Market {
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
+				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			}
 			destroy  saleItem
@@ -591,7 +597,7 @@ pub contract Market {
 			saleItem.setMinBidIncrement(minimumBidIncrement)
 
 			//TODO; need type and id of nft and uuid of saleItem
-			emit ForAuction(id: pointer.getUUID(), owner:self.owner!.address, auctionStartPrice: saleItem.auctionStartPrice!, auctionReservePrice: saleItem.auctionReservePrice!,  active: true)
+			emit ForAuction(id: pointer.getUUID(), owner:self.owner!.address, amount: saleItem.auctionStartPrice!, auctionReservePrice: saleItem.auctionReservePrice!,  active: true, vaultType:vaultType.identifier)
 
 			self.items[pointer.getUUID()] <-! saleItem
 		}
@@ -601,7 +607,7 @@ pub contract Market {
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType)
 			saleItem.setSalePrice(directSellPrice)
 
-			emit ForSale(id: pointer.getUUID(), owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: true)
+			emit ForSale(id: pointer.getUUID(), owner:self.owner!.address, amount: saleItem.salePrice!, active: true, vaultType: vaultType.identifier)
 			self.items[pointer.getUUID()] <-! saleItem
 
 		}
@@ -613,7 +619,7 @@ pub contract Market {
 
 			let saleItem <- self.items.remove(key: id)!
 			//TODO if this has bids cancel then
-			emit ForSale(id: id, owner:self.owner!.address, directSellPrice: saleItem.salePrice!, active: false)
+			emit ForSale(id: id, owner:self.owner!.address, amount: saleItem.salePrice!, active: false, vaultType: saleItem.vaultType.identifier)
 			//this will transfer the NFT back
 			destroy saleItem
 		}
@@ -710,7 +716,7 @@ pub contract Market {
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
-		access(contract) fun cancel(_ id: UInt64)
+		access(contract) fun cancelBidFromLease(_ id: UInt64)
 		access(contract) fun setBidType(id: UInt64, type: String) 
 	}
 
@@ -783,12 +789,12 @@ pub contract Market {
 		pub fun cancelBid(_ id: UInt64) {
 			let bid= self.borrowBid(id)
 			bid.from.borrow()!.cancelBid(id)
-			self.cancel(id)
+			self.cancelBidFromLease(id)
 		}
 
 		//called from lease when things are cancelled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
-		access(contract) fun cancel(_ id: UInt64) {
+		access(contract) fun cancelBidFromLease(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
