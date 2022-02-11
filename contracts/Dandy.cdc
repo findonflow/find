@@ -2,7 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Profile from "../contracts/Profile.cdc"
-import TypedMetadata from "../contracts/TypedMetadata.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 
 //TODO: review all permissions and events
 pub contract Dandy: NonFungibleToken {
@@ -58,7 +58,7 @@ pub contract Dandy: NonFungibleToken {
 			views.append(Type<MinterPlatform>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
-			views.append(Type<{TypedMetadata.Royalty}>())
+			views.append(Type<{FindViews.Royalty}>())
 
 			//if any specific here they will override
 			for s in self.schemas.keys {
@@ -82,7 +82,7 @@ pub contract Dandy: NonFungibleToken {
 			return views
 		}
 
-		access(self) fun resolveRoyalties() : AnyStruct{TypedMetadata.Royalty} {
+		access(self) fun resolveRoyalties() : AnyStruct{FindViews.Royalty} {
 			//TODO: i guess we could send in the id of the item here
 			let royalties : {String : RoyaltyItem } = { }
 
@@ -106,8 +106,8 @@ pub contract Dandy: NonFungibleToken {
 
 
 			var thumbnail : AnyStruct{MetadataViews.File}? = nil
-			if self.schemas.containsKey(Type<TypedMetadata.Files>().identifier) {
-				let medias=self.schemas[Type<TypedMetadata.Files>().identifier]!.result as! TypedMetadata.Files
+			if self.schemas.containsKey(Type<FindViews.Files>().identifier) {
+				let medias=self.schemas[Type<FindViews.Files>().identifier]!.result as! FindViews.Files
 				if medias.media.containsKey("thumbnail") {
 					thumbnail=medias.media["thumbnail"] as! AnyStruct{MetadataViews.File}
 				}
@@ -121,8 +121,8 @@ pub contract Dandy: NonFungibleToken {
 				thumbnail=self.schemas[Type<MetadataViews.IPFSFile>().identifier]!.result as! MetadataViews.IPFSFile
 			}
 			
-			if self.schemas.containsKey(Type<TypedMetadata.SharedMedia>().identifier) {
-				thumbnail=self.schemas[Type<TypedMetadata.SharedMedia>().identifier]!.result as! AnyStruct{MetadataViews.File}
+			if self.schemas.containsKey(Type<FindViews.SharedMedia>().identifier) {
+				thumbnail=self.schemas[Type<FindViews.SharedMedia>().identifier]!.result as! AnyStruct{MetadataViews.File}
 			}
 
 			return MetadataViews.Display(
@@ -147,7 +147,7 @@ pub contract Dandy: NonFungibleToken {
 			}
 
 
-			if type == Type<{TypedMetadata.Royalty}>() {
+			if type == Type<{FindViews.Royalty}>() {
 				return self.resolveRoyalties()
 			}
 
@@ -291,7 +291,7 @@ pub contract Dandy: NonFungibleToken {
 	}
 
 
-	pub struct Royalties : TypedMetadata.Royalty {
+	pub struct Royalties : FindViews.Royalty {
 		pub let royalty: { String : RoyaltyItem}
 		init(_ royalty: {String : RoyaltyItem}) {
 			self.royalty=royalty

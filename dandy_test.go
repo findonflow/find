@@ -24,13 +24,12 @@ func TestDandy(t *testing.T) {
 			        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
 			        	            	    "String",
 			        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-			        	            	    "AnyStruct{A.f8d6e0586b0a20c7.TypedMetadata.Royalty}",
+			        	            	    "AnyStruct{A.f8d6e0586b0a20c7.FindViews.Royalty}",
+																	"A.f8d6e0586b0a20c7.FindViews.Editioned",
+																	"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
 																	"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
-			        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.Editioned",
-			        	            	    "A.f8d6e0586b0a20c7.Dandy.Royalties",
-			        	            	    "A.f8d6e0586b0a20c7.TypedMetadata.CreativeWork"
+			        	            	    "A.f8d6e0586b0a20c7.Dandy.Royalties"
 			        	            	]`, res)
-
 		display := `
 	{
      "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",

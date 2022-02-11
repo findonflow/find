@@ -21,7 +21,7 @@ rm -Rf status*
 rm -Rf mintArtifact*
 rm -Rf removeProfile*
 
-gsed -i 's/0xTypedMetadata/0xFIND_ADDRESS/g' *.cdc
+gsed -i 's/0xFindViews/0xFIND_ADDRESS/g' *.cdc
 gsed -i 's/0xArtifact/0xFIND_ADDRESS/g' *.cdc
 gsed -i 's/0xProfile/0xFIND_ADDRESS/g' *.cdc
 gsed -i 's/0xFlowToken/0xFLOW_TOKEN_ADDRESS/g' *.cdc

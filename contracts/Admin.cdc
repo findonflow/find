@@ -7,7 +7,7 @@ import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
-import TypedMetadata from "./TypedMetadata.cdc"
+import FindViews from "./FindViews.cdc"
 
 pub contract Admin {
 

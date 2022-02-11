@@ -4,7 +4,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Dandy from "../contracts/Dandy.cdc"
-import TypedMetadata from "../contracts/TypedMetadata.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction(id: UInt64, amount: UFix64) {

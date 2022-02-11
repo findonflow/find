@@ -47,7 +47,7 @@
 		"FIND": "./contracts/FIND.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
 		"FindMarket": "./contracts/FindMarket.cdc",
-		"TypedMetadata": "./contracts/TypedMetadata.cdc",
+		"FindViews": "./contracts/FindViews.cdc",
 		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
 		"Sender": "./contracts/Sender.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
@@ -125,7 +125,10 @@
 				"Profile",
 				"CharityNFT",
 				"Sender",
-				"RelatedAccounts"
+				"RelatedAccounts",
+				"FindViews", 
+				"Dandy",
+				"FindMarket"
 			]
 		},
 		"testnet": {
@@ -138,7 +141,7 @@
 				"CharityNFT",
 				"Sender",
 				"RelatedAccounts",
-				"TypedMetadata", 
+				"FindViews", 
 				"Dandy",
 				"FindMarket"
 			]
@@ -153,7 +156,7 @@
 				"FUSD",
 				"Admin",
 				"CharityNFT",
-				"TypedMetadata", 
+				"FindViews", 
 				"MetadataViews",
 				"Dandy",
 				"FindMarket",

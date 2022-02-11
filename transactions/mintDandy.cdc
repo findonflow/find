@@ -3,7 +3,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
-import TypedMetadata from "../contracts/TypedMetadata.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -27,7 +27,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 
 		let creativeWork=
-		TypedMetadata.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
+		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
 		let media=MetadataViews.HTTPFile(url:nftUrl)
 
@@ -38,7 +38,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		var i:UInt64=1
 		while i <= maxEdition {
 
-			let editioned= TypedMetadata.Editioned(edition:i, maxEdition:maxEdition)
+			let editioned= FindViews.Editioned(edition:i, maxEdition:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			//TODO: do not send in Display but calculate it, send in thumbnail url if you do not have explicit media
 			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty]
