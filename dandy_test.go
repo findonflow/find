@@ -24,11 +24,10 @@ func TestDandy(t *testing.T) {
 			        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
 			        	            	    "String",
 			        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-			        	            	    "AnyStruct{A.f8d6e0586b0a20c7.FindViews.Royalty}",
-																	"A.f8d6e0586b0a20c7.FindViews.Editioned",
+			        	            	    "A.f8d6e0586b0a20c7.FindViews.Royalties",
 																	"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
 																	"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
-			        	            	    "A.f8d6e0586b0a20c7.Dandy.Royalties"
+																	"A.f8d6e0586b0a20c7.FindViews.SerialNumber"
 			        	            	]`, res)
 		display := `
 	{

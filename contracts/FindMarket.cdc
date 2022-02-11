@@ -65,9 +65,8 @@ pub contract FindMarket {
 			self.saleItemType=type
 			self.amount=amount
 		}
-
-
 	}
+
 	pub struct SaleItemInformation {
 
 		pub let type:Type
@@ -578,18 +577,21 @@ pub contract FindMarket {
 				emit Sold(id: id, previousOwner:owner, newOwner: cb.address, amount: soldFor, vaultType: ftType.identifier)
 				emit ForSale(id: id, owner:owner, amount: soldFor, active: false, vaultType: ftType.identifier)
 
-				let royaltyType=Type<AnyStruct{FindViews.Royalty}>()
-				var royalty: AnyStruct{FindViews.Royalty}?=nil
+				let royaltyType=Type<FindViews.Royalties>()
+				var royalty: FindViews.Royalties?=nil
 
 				if saleItem.pointer.getViews().contains(royaltyType) {
-					royalty = saleItem.pointer.resolveView(royaltyType) as! AnyStruct{FindViews.Royalty}? 
+					royalty = saleItem.pointer.resolveView(royaltyType)! as! FindViews.Royalties
 				}
-
 				let vault <- saleItem.sellNFT(cb)
 
 				if royalty != nil {
-					let royaltyVault <- vault.withdraw(amount: royalty!.calculateRoyalty(type: ftType, amount: soldFor)!)
-					royalty!.distributeRoyalty(vault: <- royaltyVault)
+					for royaltyItem in royalty!.items {
+						let description=royaltyItem.description ?? ""
+						let cutAmount= soldFor * royaltyItem.cut
+						emit RoyaltyPaid(id: id, name: description, amount: cutAmount,  vaultType: ftType.identifier)
+						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+					}
 				}
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
@@ -686,17 +688,6 @@ pub contract FindMarket {
 	==========================================================================
 	*/
 
-	/*
-
-	From FIND		
-	pub let name: String
-	pub let type: String
-	pub let amount: UFix64
-	pub let timestamp: UFix64
-	pub let lease: LeaseInformation?
-
-
-	*/
 	//Struct that is used to return information about bids
 	pub struct BidInfo{
 		pub let id: UInt64

@@ -159,8 +159,8 @@ func main() {
 					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Media")
 					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Media").Run()
 
-					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Editioned")
-					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Editioned").Run()
+					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.SerialNumber")
+					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.SerialNumber").Run()
 
 					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.Artifact.Minter")
 					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.Minter").Run()
@@ -208,8 +208,8 @@ func main() {
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Media")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Media").Run()
 
-				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Editioned")
-				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Editioned").Run()
+				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.SerialNumber")
+				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.SerialNumber").Run()
 
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.Artifact.Minter")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.Minter").Run()

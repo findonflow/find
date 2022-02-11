@@ -32,13 +32,13 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let media=MetadataViews.HTTPFile(url:nftUrl)
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let minterRoyalty=Dandy.Royalties(royalty: {"artist" : Dandy.RoyaltyItem(receiver: receiver, cut: 0.05)})
+		let minterRoyalty=FindViews.Royalties([FindViews.RoyaltyItem(receiver: receiver, cut: 0.05, description: "artist")])
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
 		while i <= maxEdition {
 
-			let editioned= FindViews.Editioned(edition:i, maxEdition:maxEdition)
+			let editioned= FindViews.SerialNumber(edition:i, maxEdition:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			//TODO: do not send in Display but calculate it, send in thumbnail url if you do not have explicit media
 			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty]

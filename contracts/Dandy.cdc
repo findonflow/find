@@ -25,7 +25,6 @@ pub contract Dandy: NonFungibleToken {
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id:UInt64, minter:String, name:String, description:String)
-	pub event RoyaltyPaid(name:String, amount: UFix64, type:String)
 
 	pub struct ViewInfo {
 		access(contract) let typ: Type
@@ -58,7 +57,7 @@ pub contract Dandy: NonFungibleToken {
 			views.append(Type<MinterPlatform>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
-			views.append(Type<{FindViews.Royalty}>())
+			views.append(Type<FindViews.Royalties>())
 
 			//if any specific here they will override
 			for s in self.schemas.keys {
@@ -82,29 +81,24 @@ pub contract Dandy: NonFungibleToken {
 			return views
 		}
 
-		access(self) fun resolveRoyalties() : AnyStruct{FindViews.Royalty} {
-			//TODO: i guess we could send in the id of the item here
-			let royalties : {String : RoyaltyItem } = { }
+		access(self) fun resolveRoyalties() : FindViews.Royalties {
+			let royalties : [FindViews.RoyaltyItem] = []
 
-			if self.schemas.containsKey(Type<RoyaltyItem>().identifier) {
-				royalties["royalty"] = self.schemas[Type<RoyaltyItem>().identifier]!.result as! RoyaltyItem
+			if self.schemas.containsKey(Type<FindViews.RoyaltyItem>().identifier) {
+				royalties.append(self.schemas[Type<FindViews.RoyaltyItem>().identifier]!.result as! FindViews.RoyaltyItem)
 			}
 
-			if self.schemas.containsKey(Type<Royalties>().identifier) {
-				let multipleRoylaties=self.schemas[Type<Royalties>().identifier]!.result as! Royalties
-				for royalty in multipleRoylaties.royalty.keys {
-					royalties[royalty] =  multipleRoylaties.royalty[royalty]
-				}
+			if self.schemas.containsKey(Type<FindViews.Royalties>().identifier) {
+				let multipleRoylaties=self.schemas[Type<FindViews.Royalties>().identifier]!.result as! FindViews.Royalties
+				royalties.appendAll(multipleRoylaties.items)
 			}
 
-		  let royalty=RoyaltyItem(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut)
-			royalties["platform"]= royalty
-			return Royalties(royalties)
+			let royalty=FindViews.RoyaltyItem(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
+			royalties.append(royalty)
+			return FindViews.Royalties(royalties)
 		}
 
 		pub fun resolveDisplay() : MetadataViews.Display {
-
-
 			var thumbnail : AnyStruct{MetadataViews.File}? = nil
 			if self.schemas.containsKey(Type<FindViews.Files>().identifier) {
 				let medias=self.schemas[Type<FindViews.Files>().identifier]!.result as! FindViews.Files
@@ -147,7 +141,7 @@ pub contract Dandy: NonFungibleToken {
 			}
 
 
-			if type == Type<{FindViews.Royalty}>() {
+			if type == Type<FindViews.Royalties>() {
 				return self.resolveRoyalties()
 			}
 
@@ -291,6 +285,7 @@ pub contract Dandy: NonFungibleToken {
 	}
 
 
+	/*
 	pub struct Royalties : FindViews.Royalty {
 		pub let royalty: { String : RoyaltyItem}
 		init(_ royalty: {String : RoyaltyItem}) {
@@ -363,6 +358,7 @@ pub contract Dandy: NonFungibleToken {
 			self.receiver=receiver
 		}
 	}
+	*/
 
 	/// This struct interface is used on a contract level to convert from one View to another. 
 	/// See Dandy nft for an example on how to convert one type to another
