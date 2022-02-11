@@ -2,6 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import CharityNFT from "../contracts/CharityNFT.cdc"
 
 //mainnet
+import Beam from 0x86b4a0010a71cfc3 
 import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import GooberXContract from 0x34f2bf4a80bb0f69
@@ -29,6 +30,12 @@ import TraitPacksVouchers from 0xdfc74d9d561374c0
 import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
+import NeoAvatar from 0xb25138dbf45e5801
+import NeoViews from 0xb25138dbf45e5801
+import MetadataViews from 0x1d7e57aa55817448
+
+//Jambb
+import Vouchers from 0x444f5ea22c6ea12c
 
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
@@ -584,10 +591,10 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 	*/
 
+	let jambb: [String] = []
 	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if jambbCap.check() {
 		let nfts = jambbCap.borrow()!.getIDs()
-		let items: [String] = []
 		for id in nfts {
 			let nft = jambbCap.borrow()!.borrowMoment(id: id)!
 			let metadata=nft.getMetadata()
@@ -595,20 +602,46 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: metadata.contentName,
 				image: "ipfs://".concat(metadata.videoHash),
-				url: "http://jambb.com",
+        url: "https://www.jambb.com/c/moment/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: "video",
 				rarity: ""
 			)
 			let itemId="Jambb".concat(id.toString())
-			items.append(itemId)
+			jambb.append(itemId)
 			resultMap[itemId] = item
 		}
+	}
 
-		if items.length != 0 {
-			results["Jambb"] = items
+	let voucherCap = account.getCapability<&{Vouchers.CollectionPublic}>(Vouchers.CollectionPublicPath)
+	if voucherCap.check() {
+		let collection = voucherCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowVoucher(id: id)!
+			let metadata=nft.getMetadata()!
+
+			let url="https://jambb.com"
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: "ipfs://".concat(metadata.mediaHash),
+				url: url,
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata.mediaType,
+				rarity: ""
+			)
+			let itemId="JambbVoucher".concat(id.toString())
+			jambb.append(itemId)
+			resultMap[itemId] = item
 		}
+		
+
+	}
+
+	if jambb.length != 0 {
+			results["Jambb"] = jambb
 	}
 
 	let mw = MatrixWorldFlowFestNFT.getNft(address:address)
@@ -752,7 +785,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: metadata.name,
 				image: metadata.imageUrl,
-				url: "https://www.geniace.com/product/".concat(metadata.name),
+				url: "https://www.geniace.com/product/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: metadata.data["mimetype"]!,
@@ -986,7 +1019,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				url: "http://mynft.io",
 				listPrice: nil,
 				listToken: nil,
-				contentType: "image",
+				contentType: metadata.type,
 				rarity: ""
 			)
       let itemId="mynft".concat(id.toString())
@@ -999,6 +1032,52 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["mynft"] = items
 		}
 	}
+
+	let neoAvatars = getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account: account)
+	let neoItems: [String] = []
+	for item in neoAvatars {
+		  let itemId="NeoAvatar".concat(item.id.toString())
+			neoItems.append(itemId)
+			resultMap[itemId] = item
+	}
+	if neoItems.length != 0 {
+			results["Neo"] = neoItems
+  }
+
+
+	/*
+	let beamCap = account.getCapability<&{Beam.BeamCollectionPublic}>(Beam.CollectionPublicPath)
+	if beamCap.check() {
+		let items: [String] = []
+		let collection = beamCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowCollectible(id: id)!
+
+	    let metadata = Beam.getCollectibleItemMetaData(collectibleItemID: nft.data.collectibleItemID)!
+		  var mediaUrl: String? = metadata["mediaUrl"]
+			if mediaUrl != nil &&  mediaUrl!.slice(from: 0, upTo: 7) != "ipfs://" {
+				mediaUrl = "ipfs://".concat(mediaUrl!)
+			}
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["title"]!,
+				image: mediaUrl ?? "",
+				url: "https://".concat(metadata["domainUrl"]!),
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata["mediaType"]!,
+				rarity: ""
+			)
+			let itemId="FrightClub".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+		if items.length != 0 {
+			results["Fright Club"] = items
+		}
+	}*/
+
+
 
 	if results.keys.length == 0 {
 		return nil
@@ -1015,4 +1094,37 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
+}
+
+//This uses a view from Neo until we agree on another for ExternalDomainViewUrl
+pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [MetadataCollectionItem] {
+	let items: [MetadataCollectionItem] = []
+	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	if resolverCollectionCap.check() {
+		let collection = resolverCollectionCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowViewResolver(id: id)!
+
+			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+				let display = displayView as! MetadataViews.Display
+				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
+					let externalUrl= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+					let item = MetadataCollectionItem(
+						id: id,
+						name: display.name,
+						image: display.thumbnail.uri(),
+						url: externalUrl.url,
+						listPrice: nil,
+						listToken: nil,
+						contentType: "image",
+						rarity: ""
+					)
+
+					items.append(item)
+				}
+			}
+		}
+	}
+	return items
+
 }

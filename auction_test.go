@@ -535,6 +535,40 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should cancel previous bid if put for auction", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2").
+			directOffer("user2", "user1", 5.0)
+
+		name := "user1"
+		otu.O.TransactionFromFile("listForAuction").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				String(name).
+				UFix64(5.0).  //startAuctionPrice
+				UFix64(20.0). //reserve price
+				UFix64(auctionDurationFloat).
+				UFix64(300.0)). //extention on late bid
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"auctionStartPrice":   "5.00000000",
+				"auctionReservePrice": "20.00000000",
+				"active":              "true",
+				"name":                name,
+				"owner":               otu.accountAddress(name),
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferRejected", map[string]interface{}{
+				"bidder": otu.accountAddress("user2"),
+				"name":   "user1",
+			}))
+
+	})
+
 }
 
 //TODO: Fullfillment of auction that had a name that was locked

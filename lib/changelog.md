@@ -15,3 +15,9 @@
  - 7.17.0 : mynft support in collections
  - 7.17.1 : fix url to bitku
  - 7.17.2 : fix bitku collection name
+ - 7.17.3 : fix jambb link straight to moment
+ - 7.17.4 : fix mynft contentType
+ - 7.18.0 : added jambb vouchers
+ - 7.19.0 : added fright club.  test with  0x9857effe8da666f5
+ - 7.20.0 : removed fright club for now, added NeoAvatar! test with bjartek.find
+ - 7.21.0 : fixed geniace url and added listings/collection2 start of new scripts
