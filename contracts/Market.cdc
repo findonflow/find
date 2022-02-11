@@ -760,8 +760,10 @@ pub contract Market {
 
 		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
 		pub fun bid(item: TypedMetadata.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
-			//TODO: pre that bid is not already here
-			//TODO: pre that the item.owner is not self.owner
+			pre {
+				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
+				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
+			}
 
 			let uuid=item.getUUID()
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
