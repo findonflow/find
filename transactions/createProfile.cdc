@@ -5,7 +5,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import Market from "../contracts/Market.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 
@@ -76,10 +76,10 @@ transaction(name: String) {
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
-		let saleItemCap= acct.getCapability<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
+		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath)
 		if !saleItemCap.check() {
-				acct.save<@Market.SaleItemCollection>(<- Market.createEmptySaleItemCollection(), to: Market.SaleItemCollectionStoragePath)
-				acct.link<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath, target: Market.SaleItemCollectionStoragePath)
+				acct.save<@FindMarket.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(), to: FindMarket.SaleItemCollectionStoragePath)
+				acct.link<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath, target: FindMarket.SaleItemCollectionStoragePath)
 			}
 			
 		acct.save(<-profile, to: Profile.storagePath)
@@ -87,10 +87,10 @@ transaction(name: String) {
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
 		let receiver = acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let bidCap= acct.getCapability<&Market.MarketBidCollection{Market.MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
+		let bidCap= acct.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
 		if !bidCap.check() {
-				acct.save<@Market.MarketBidCollection>(<- Market.createEmptyMarketBidCollection(receiver: receiver), to: Market.MarketBidCollectionStoragePath)
-				acct.link<&Market.MarketBidCollection{Market.MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath, target: Market.MarketBidCollectionStoragePath)
+				acct.save<@FindMarket.MarketBidCollection>(<- FindMarket.createEmptyMarketBidCollection(receiver: receiver), to: FindMarket.MarketBidCollectionStoragePath)
+				acct.link<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath, target: FindMarket.MarketBidCollectionStoragePath)
 		}
 	}
 }

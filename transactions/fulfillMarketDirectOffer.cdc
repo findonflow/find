@@ -1,4 +1,4 @@
-import Market from "../contracts/Market.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
@@ -14,7 +14,7 @@ transaction(id: UInt64) {
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 		let pointer= TypedMetadata.AuthNFTPointer(cap: dandyPrivateCap, id: id)
 
-		let market = account.borrow<&Market.SaleItemCollection>(from: Market.SaleItemCollectionStoragePath)!
+		let market = account.borrow<&FindMarket.SaleItemCollection>(from: FindMarket.SaleItemCollectionStoragePath)!
 		market.fulfillDirectOffer(pointer)
 
 	}

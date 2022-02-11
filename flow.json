@@ -46,7 +46,7 @@
 		},
 		"FIND": "./contracts/FIND.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
-		"Market": "./contracts/Market.cdc",
+		"FindMarket": "./contracts/FindMarket.cdc",
 		"TypedMetadata": "./contracts/TypedMetadata.cdc",
 		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
 		"Sender": "./contracts/Sender.cdc",
@@ -137,7 +137,10 @@
 				"Profile",
 				"CharityNFT",
 				"Sender",
-				"RelatedAccounts"
+				"RelatedAccounts",
+				"TypedMetadata", 
+				"Dandy",
+				"FindMarket"
 			]
 		},
 		"emulator": {
@@ -153,7 +156,7 @@
 				"TypedMetadata", 
 				"MetadataViews",
 				"Dandy",
-				"Market",
+				"FindMarket",
 				"Sender",
 				"RelatedAccounts"
 			], 

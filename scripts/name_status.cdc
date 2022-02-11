@@ -1,5 +1,5 @@
 import FIND from "../contracts/FIND.cdc"
-import Market from "../contracts/Market.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
 
 pub struct FINDNameReport{
@@ -8,11 +8,11 @@ pub struct FINDNameReport{
 	pub let status: String
 	pub let cost: UFix64
 	pub let leases: [FIND.LeaseInformation]
-	pub let itemsForSale: [Market.SaleItemInformation]
-	pub let marketBids: [Market.BidInfo]
+	pub let itemsForSale: [FindMarket.SaleItemInformation]
+	pub let marketBids: [FindMarket.BidInfo]
 
 	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64, leases: [FIND.LeaseInformation]
-,itemsForSale: [Market.SaleItemInformation], marketBids: [Market.BidInfo]) {
+,itemsForSale: [FindMarket.SaleItemInformation], marketBids: [FindMarket.BidInfo]) {
 		self.status=status
 		self.profile=profile
 		self.lease=lease
@@ -33,8 +33,8 @@ pub fun main(name: String) : FINDNameReport{
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 
-		let marketBidCap= account.getCapability<&Market.MarketBidCollection{Market.MarketBidCollectionPublic}>(Market.MarketBidCollectionPublicPath)
-		let saleItemCap= account.getCapability<&Market.SaleItemCollection{Market.SaleItemCollectionPublic}>(Market.SaleItemCollectionPublicPath)
+		let marketBidCap= account.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
+		let saleItemCap= account.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath)
 		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
 		if leaseCap.check() {

@@ -331,7 +331,7 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForSale", map[string]interface{}{
 			"active": "true",
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -348,7 +348,7 @@ func (otu *OverflowTestUtils) listDandyForAuction(name string, id uint64, price 
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForAuction", map[string]interface{}{
 			"active":              "true",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
@@ -367,7 +367,7 @@ func (otu *OverflowTestUtils) buyDandyForSale(name string, seller string, id uin
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.Sold", map[string]interface{}{
 			"amount":        fmt.Sprintf("%.8f", price),
 			"id":            fmt.Sprintf("%d", id),
 			"previousOwner": otu.accountAddress(seller),
@@ -386,7 +386,7 @@ func (otu *OverflowTestUtils) auctionBidMarket(name string, seller string, id ui
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.AuctionStarted", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.AuctionStarted", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"bidder": otu.accountAddress(name),
@@ -403,7 +403,7 @@ func (otu *OverflowTestUtils) directOfferMarket(name string, seller string, id u
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.DirectOfferBid", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.DirectOfferBid", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"bidder": otu.accountAddress(name),
@@ -418,7 +418,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarket(name string, id uint64, bu
 		Args(otu.O.Arguments().
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.Sold", map[string]interface{}{
 			"id":            fmt.Sprintf("%d", id),
 			"previousOwner": otu.accountAddress(name),
 			"newOwner":      otu.accountAddress(buyer),
@@ -436,7 +436,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuction(name string, id uint64, buyer
 			Account(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.Sold", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.Sold", map[string]interface{}{
 			"id":            fmt.Sprintf("%d", id),
 			"previousOwner": otu.accountAddress(name),
 			"newOwner":      otu.accountAddress(buyer),
@@ -454,7 +454,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint
 			Account(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Market.AuctionCancelled", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.AuctionCancelled", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"bidder": otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
