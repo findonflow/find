@@ -20,7 +20,9 @@ func main() {
 		panic(err)
 	}
 
-	file, _ := json.MarshalIndent(res, "", "   ")
+	merged := res.MergeSpecAndCode()
+
+	file, _ := json.MarshalIndent(merged, "", "   ")
 	fmt.Println(string(file))
 
 }
