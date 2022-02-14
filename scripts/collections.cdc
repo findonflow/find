@@ -20,6 +20,8 @@ import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
 import Moments from 0xd4ad4740ee426334
 import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
+import MatrixWorldAssetsNFT from 0xf20df769e658c257
+
 import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
 import GeniaceNFT from 0xabda6627c70c7f52
@@ -645,8 +647,8 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 	let mw = MatrixWorldFlowFestNFT.getNft(address:address)
+	let mwItems: [String] = []
 	if mw.length > 0 {
-		let items: [String] = []
 		for nft in mw {
 			let metadata=nft.metadata
 			let item=MetadataCollectionItem(
@@ -660,17 +662,43 @@ pub fun main(address: Address) : MetadataCollections? {
 				rarity: ""
 			)
 			let itemId="MatrixWorldFlowFest".concat(nft.id.toString())
-			items.append(itemId)
+			mwItems.append(itemId)
 			resultMap[itemId] = item
 		}
 
-		if items.length != 0 {
-			results["MatrixWorld"] = items
+		}
+
+	let matrixworldAsset = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+	if matrixworldAsset.check() {
+		let collection = matrixworldAsset.borrow()!
+		for id in collection.getIDs() {
+			let metadata = collection.getMetadata(id: id)!
+
+
+			/*
+			Result: {"collection": "MW x Flow Holiday Giveaway", "description": "First Edition Matrix World Santa Hat. Only 50 pieces made.", "animation_url": "", "image": "https://d2yoccx42eml7e.cloudfront.net/airdrop/MWxFlowxHoliday/Santa_Hat.png", "name": "First Edition Santa Hat", "external_url": "https://matrixworld.org/home", "version": "assets-v0.1.1", "attributes": ""}
+			*/
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: metadata["image"]!,
+				url: metadata["external_url"]!,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+      let itemId="MatrixWorldAsset".concat(id.toString())
+			mwItems.append(itemId)
+			resultMap[itemId] = item
 		}
 	}
 
-	let sturdyCollectionCap = account
-	.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
+	if mwItems.length != 0 {
+			results["MatrixWorld"] = mwItems
+	}
+
+	let sturdyCollectionCap = account.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
 	if sturdyCollectionCap.check() {
 		let sturdyNfts = sturdyCollectionCap.borrow()!.getIDs()
 		let items: [String] = []
@@ -1012,6 +1040,7 @@ pub fun main(address: Address) : MetadataCollections? {
 			if image == "" {
 				image="https://arweave.net/".concat(metadata.arLink)
 			}
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata.name,
@@ -1043,6 +1072,8 @@ pub fun main(address: Address) : MetadataCollections? {
 	if neoItems.length != 0 {
 			results["Neo"] = neoItems
   }
+
+
 
 
 	/*
