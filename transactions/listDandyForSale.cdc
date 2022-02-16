@@ -12,6 +12,7 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 
 		let saleItems= account.borrow<&FindMarket.SaleItemCollection>(from: FindMarket.SaleItemCollectionStoragePath)!
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
+
 		let pointer= FindViews.AuthNFTPointer(cap: dandyPrivateCap, id: id)
 		saleItems.listForSale(pointer: pointer, vaultType: Type<@FUSD.Vault>(), directSellPrice: directSellPrice)
 	}

@@ -22,6 +22,7 @@ func TestDandy(t *testing.T) {
 		res := otu.O.ScriptFromFile("dandyViews").Args(otu.O.Arguments().String("user1").UInt64(id)).RunReturnsJsonString()
 		assert.JSONEq(t, `[
 			        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
+        	            	          "A.f8d6e0586b0a20c7.FindViews.Nounce",
 			        	            	    "String",
 			        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
 			        	            	    "A.f8d6e0586b0a20c7.FindViews.Royalties",

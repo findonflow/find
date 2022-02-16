@@ -5,6 +5,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
+import Dandy from "./Dandy.cdc"
 
 /*
 
@@ -763,6 +764,9 @@ pub contract FindMarket {
 		//called from lease when auction is ended
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault{
 
+			if nft.getType() == Type<@Dandy.NFT>() {
+				Debug.log("THIS IS A DANDY")
+			}
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			bid.nftCap.borrow()!.deposit(token: <- nft)

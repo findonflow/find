@@ -9,7 +9,6 @@ import FindViews from "../contracts/FindViews.cdc"
 	So primary is total 15%, secondary is total 5%
 */
 
-//TODO: add nounce
 //TODO: review all permissions and events
 pub contract Dandy: NonFungibleToken {
 
@@ -43,6 +42,8 @@ pub contract Dandy: NonFungibleToken {
 	}
 	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
 		pub let id: UInt64
+		access(self) var nounce: UInt64
+		access(self) var primaryCutPaid: Bool
 		access(contract) let schemas: {String : ViewInfo}
 		access(contract) let name: String
 		access(contract) let description: String
@@ -55,12 +56,24 @@ pub contract Dandy: NonFungibleToken {
 			self.minterPlatform=minterPlatform
 			self.name=name
 			self.description=description
+			self.nounce=0
+			self.primaryCutPaid=false
 		}
+
+		access(account) fun setPrimaryCutPaid() {
+			self.primaryCutPaid=true
+
+		}
+		pub fun increaseNounce() {
+			self.nounce=self.nounce+1
+		}
+
 
 		pub fun getViews() : [Type] {
 
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
+			views.append(Type<FindViews.Nounce>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
 			views.append(Type<FindViews.Royalties>())
@@ -148,6 +161,9 @@ pub contract Dandy: NonFungibleToken {
 				return self.minterPlatform
 			}
 
+			if type == Type<FindViews.Nounce>() {
+				return FindViews.Nounce(self.nounce)
+			}
 
 			if type == Type<FindViews.Royalties>() {
 				return self.resolveRoyalties()
@@ -180,6 +196,7 @@ pub contract Dandy: NonFungibleToken {
 
 	}
 
+	
 	//TODO: create an interface that exposes getIDsForMinter and getMinters()
 
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
@@ -195,6 +212,7 @@ pub contract Dandy: NonFungibleToken {
 		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
+
 			emit Withdraw(id: token.id, from: self.owner?.address)
 
 			return <-token
@@ -204,6 +222,8 @@ pub contract Dandy: NonFungibleToken {
 		// and adds the ID to the id array
 		pub fun deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
+
+			token.increaseNounce()
 
 			let id: UInt64 = token.id
 

@@ -209,6 +209,7 @@ pub contract FindViews {
 		}
 
 		pub fun valid() : Bool {
+			//TODO: add support for nounce
 			return self.cap.borrow()!.getIDs().contains(self.id)
 		}
 
@@ -220,11 +221,23 @@ pub contract FindViews {
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>
 		pub let id: UInt64
+		pub let nounce: UInt64
 
 		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
+
+			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
+
+			let nounceType= Type<FindViews.Nounce>()
+			if viewResolver.getViews().contains(nounceType) {
+				let nounce= viewResolver.resolveView(nounceType)! as! FindViews.Nounce
+				self.nounce=nounce.nounce
+			} else {
+				self.nounce=0
+			}
 		}
+
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
 			return self.cap.borrow()!.borrowViewResolver(id: self.id).resolveView(type)
@@ -239,7 +252,19 @@ pub contract FindViews {
 		}
 
 		pub fun valid() : Bool {
-			return self.cap.borrow()!.getIDs().contains(self.id)
+			//TODO: add support for nounce
+			if !self.cap.borrow()!.getIDs().contains(self.id) {
+				return false
+			}
+
+			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
+
+			let nounceType= Type<FindViews.Nounce>()
+			if viewResolver.getViews().contains(nounceType) {
+				let nounce= viewResolver.resolveView(nounceType)! as! FindViews.Nounce
+				return nounce.nounce==self.nounce
+			}
+			return true
 		}
 
 		pub fun withdraw() :@NonFungibleToken.NFT {
@@ -262,5 +287,13 @@ pub contract FindViews {
 		let cap=	getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
 		let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
 		return pointer
+	}
+
+	pub struct Nounce {
+		pub let nounce: UInt64
+
+		init(_ nounce: UInt64) {
+			self.nounce=nounce
+		}
 	}
 }
