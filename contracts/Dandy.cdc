@@ -4,6 +4,12 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
+/*
+  The first time a dandy is sold we will take 10%, on subsequent sales we will take 0% from Dandy. But 5% from market. 
+	So primary is total 15%, secondary is total 5%
+*/
+
+//TODO: add nounce
 //TODO: review all permissions and events
 pub contract Dandy: NonFungibleToken {
 
@@ -93,6 +99,8 @@ pub contract Dandy: NonFungibleToken {
 				royalties.appendAll(multipleRoylaties.items)
 			}
 
+			//Only charge this if not sold at FIND.market. Need flag to set this
+			//TODO: if 0 skip
 			let royalty=FindViews.RoyaltyItem(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
 			royalties.append(royalty)
 			return FindViews.Royalties(royalties)

@@ -465,7 +465,6 @@ pub contract FIND {
 			self.networkWallet=networkWallet
 		}
 
-
 		access(contract) fun createPlatform(_ name: String) : Dandy.MinterPlatform{
 			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025)
@@ -493,6 +492,7 @@ pub contract FIND {
 				panic("You already have this addon")
 			}
 
+			//TODO: get from Network addonPrices
 			if addon=="forge" && vault.balance != 50.0 {
 				panic("Expect 50 FUSD for forge addon")
 			}

@@ -620,8 +620,8 @@ pub contract FindMarket {
 				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			}
+			//TODO: if dandy mark royalty as paid!
 			destroy  saleItem
-
 		}
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
