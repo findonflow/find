@@ -22,3 +22,4 @@
  - 7.20.0 : removed fright club for now, added NeoAvatar! test with bjartek.find
  - 7.21.0 : fixed geniace url and added listings/collection2 start of new scripts
  - 7.22.0 : added matrixworld assets nfts
+ - 7.23.0 : added barter yard club nfts
