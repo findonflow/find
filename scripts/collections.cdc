@@ -35,12 +35,14 @@ import Mynft from 0xf6fcbef550d97aa5
 import NeoAvatar from 0xb25138dbf45e5801
 import NeoViews from 0xb25138dbf45e5801
 import MetadataViews from 0x1d7e57aa55817448
+import BarterYardPackNFT from 0xa95b021cf8a30d80
 
 //Jambb
 import Vouchers from 0x444f5ea22c6ea12c
 
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
+
 
 
 pub struct MetadataCollections {
@@ -1062,7 +1064,7 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	let neoAvatars = getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account: account)
+	let neoAvatars = getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account: account, externalFixedUrl: "")
 	let neoItems: [String] = []
 	for item in neoAvatars {
 		  let itemId="NeoAvatar".concat(item.id.toString())
@@ -1073,7 +1075,37 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["Neo"] = neoItems
   }
 
+	let barterYardCap= account.getCapability<&{BarterYardPackNFT.BarterYardPackNFTCollectionPublic}>(BarterYardPackNFT.CollectionPublicPath)
+	if barterYardCap.check() {
+		let collection = barterYardCap.borrow()!
+		let items: [String] = []
+		for id in collection.getIDs() {
+			let nft = collection.borrowBarterYardPackNFT(id: id)!
 
+			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+				let display = displayView as! MetadataViews.Display
+				let item = MetadataCollectionItem(
+					id: id,
+					name: display.name,
+					image: display.thumbnail.uri(),
+					url: "https://www.barteryard.club",
+					listPrice: nil,
+					listToken: nil,
+					contentType: "image",
+					rarity: ""
+				)
+
+				let itemId="BarterYard".concat(item.id.toString())
+				items.append(itemId)
+				resultMap[itemId] = item
+			}
+		}
+
+
+		if items.length != 0 {
+			results["Barter Yard Club"] = items
+		}
+	}
 
 
 	/*
@@ -1128,7 +1160,7 @@ pub fun main(address: Address) : MetadataCollections? {
 }
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [MetadataCollectionItem] {
+pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
 	let items: [MetadataCollectionItem] = []
 	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
 	if resolverCollectionCap.check() {
@@ -1138,13 +1170,17 @@ pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [M
 
 			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
 				let display = displayView as! MetadataViews.Display
+				var externalUrl=externalFixedUrl
 				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
-					let externalUrl= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+					 let url= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+					 externalUrl=url.url
+				 }
+
 					let item = MetadataCollectionItem(
 						id: id,
 						name: display.name,
 						image: display.thumbnail.uri(),
-						url: externalUrl.url,
+						url: externalUrl,
 						listPrice: nil,
 						listToken: nil,
 						contentType: "image",
@@ -1152,7 +1188,6 @@ pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [M
 					)
 
 					items.append(item)
-				}
 			}
 		}
 	}
