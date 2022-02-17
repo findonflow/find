@@ -5,8 +5,8 @@ import Profile from "../contracts/Profile.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
 /*
-  The first time a dandy is sold we will take 10%, on subsequent sales we will take 0% from Dandy. But 5% from market. 
-	So primary is total 15%, secondary is total 5%
+The first time a dandy is sold we will take 10%, on subsequent sales we will take 0% from Dandy. But 5% from market. 
+So primary is total 15%, secondary is total 5%
 */
 
 //TODO: review all permissions and events
@@ -112,10 +112,11 @@ pub contract Dandy: NonFungibleToken {
 				royalties.appendAll(multipleRoylaties.items)
 			}
 
-			//Only charge this if not sold at FIND.market. Need flag to set this
-			//TODO: if 0 skip
-			let royalty=FindViews.RoyaltyItem(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
-			royalties.append(royalty)
+			//we only charge platform primary sale cut once
+			if !self.primaryCutPaid {
+				let royalty=FindViews.RoyaltyItem(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
+				royalties.append(royalty)
+			}
 			return FindViews.Royalties(royalties)
 		}
 
@@ -135,7 +136,7 @@ pub contract Dandy: NonFungibleToken {
 			if self.schemas.containsKey(Type<MetadataViews.IPFSFile>().identifier) {
 				thumbnail=self.schemas[Type<MetadataViews.IPFSFile>().identifier]!.result as! MetadataViews.IPFSFile
 			}
-			
+
 			if self.schemas.containsKey(Type<FindViews.SharedMedia>().identifier) {
 				thumbnail=self.schemas[Type<FindViews.SharedMedia>().identifier]!.result as! AnyStruct{MetadataViews.File}
 			}
@@ -177,7 +178,6 @@ pub contract Dandy: NonFungibleToken {
 				return self.name
 			}
 
-			//TODO: this is very naive, will not work with interface types aso
 			if self.schemas.keys.contains(type.identifier) {
 				return self.schemas[type.identifier]!.result
 			}
@@ -196,10 +196,14 @@ pub contract Dandy: NonFungibleToken {
 
 	}
 
-	
-	//TODO: create an interface that exposes getIDsForMinter and getMinters()
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource interface CollectionPublic {
+		access(account) fun setPrimaryCutPaid(_ id: UInt64)
+		pub fun getIDsFor(minter: String): [UInt64] 
+		pub fun getMinters(): [String] 
+	}
+
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection, CollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -235,6 +239,31 @@ pub contract Dandy: NonFungibleToken {
 			destroy oldToken
 		}
 
+		pub fun getMinters(): [String] {
+
+			let minters: [String] = []
+			for id in self.ownedNFTs.keys {
+				let nft=self.borrow(id)
+				let minter=nft.minterPlatform.name
+				if !minters.contains(minter) {
+					minters.append(minter)
+				}
+			}
+			return minters
+		}
+
+		pub fun getIDsFor(minter: String): [UInt64] {
+
+			let ids: [UInt64] = []
+			for id in self.ownedNFTs.keys {
+				let nft=self.borrow(id)
+				if nft.minterPlatform.name == minter {
+					ids.append(id)
+				}
+			}
+			return ids
+		}
+
 		// getIDs returns an array of the IDs that are in the collection
 		pub fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
@@ -243,14 +272,36 @@ pub contract Dandy: NonFungibleToken {
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+			pre {
+				self.ownedNFTs[id] != nil : "NFT does not exist"
+			}
+
 			return &self.ownedNFTs[id] as &NonFungibleToken.NFT
 		}
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+			pre {
+				self.ownedNFTs[id] != nil : "NFT does not exist"
+			}
+
 			let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
 			return nft as! &Dandy.NFT
 		}
 
+		pub fun borrow(_ id: UInt64): &NFT {
+				pre {
+				self.ownedNFTs[id] != nil : "NFT does not exist"
+			}
+			let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+			return nft as! &Dandy.NFT
+		}
+
+		access(account) fun setPrimaryCutPaid(_ id: UInt64) {
+			pre {
+				self.ownedNFTs[id] != nil : "NFT does not exist"
+			}
+			self.borrow(id).setPrimaryCutPaid()
+		}
 		destroy() {
 			destroy self.ownedNFTs 
 		}
@@ -269,7 +320,7 @@ pub contract Dandy: NonFungibleToken {
 			self.name=name
 		}
 	}
-	
+
 
 	access(account)  fun createForge(platform: MinterPlatform) : @Forge {
 		return <- create Forge(platform:platform)
@@ -312,81 +363,6 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Collection()
 	}
 
-
-	/*
-	pub struct Royalties : FindViews.Royalty {
-		pub let royalty: { String : RoyaltyItem}
-		init(_ royalty: {String : RoyaltyItem}) {
-			self.royalty=royalty
-		}
-
-		pub fun calculateRoyalty(type:Type, amount:UFix64) : UFix64? {
-			var sum:UFix64=0.0
-			for key in self.royalty.keys {
-				let item= self.royalty[key]!
-				sum=sum+amount*item.cut
-			}
-			return sum
-		}
-
-		pub fun distributeRoyalty(vault: @FungibleToken.Vault) {
-			let totalAmount=vault.balance
-			var sumCuts:UFix64=0.0
-			for key in self.royalty.keys {
-				let item= self.royalty[key]!
-				sumCuts=sumCuts+item.cut
-			}
-
-			let totalKeys=self.royalty.keys.length
-			var currentKey=1
-			var lastReceiver: Capability<&{FungibleToken.Receiver}>?=nil
-			var lastName:String=""
-			for key in self.royalty.keys {
-				let item= self.royalty[key]!
-				let relativeCut=item.cut / sumCuts
-
-				if currentKey!=totalKeys {
-					let amount=totalAmount*relativeCut
-					emit RoyaltyPaid(name: key, amount: amount, type: vault.getType().identifier)
-					item.receiver.borrow()!.deposit(from: <-  vault.withdraw(amount: amount))
-				} else { 
-					//we cannot calculate the last cut as it will have rounding errors
-					lastReceiver=item.receiver
-					lastName=key
-				}
-				currentKey=currentKey+1
-			}
-			if let r=lastReceiver {
-				emit RoyaltyPaid(name: lastName, amount: vault.balance, type: vault.getType().identifier)
-				r.borrow()!.deposit(from: <-  vault)
-			}else {
-				destroy vault
-			}
-		}
-
-		pub fun displayRoyalty() : String?  {
-			var text=""
-			for key in self.royalty.keys {
-				let item= self.royalty[key]!
-				text.concat(key).concat(" ").concat((item.cut * 100.0).toString()).concat("%\n")
-			}
-			return text
-		}
-	}
-
-
-
-	pub struct RoyaltyItem{
-		// note that this receiver should be a Profile receiver if you want to support multiple types, and since we mint from FIND that is ok
-		pub let receiver: Capability<&{FungibleToken.Receiver}> 
-		pub let cut: UFix64
-
-		init(receiver: Capability<&{FungibleToken.Receiver}>, cut: UFix64) {
-			self.cut=cut
-			self.receiver=receiver
-		}
-	}
-	*/
 
 	/// This struct interface is used on a contract level to convert from one View to another. 
 	/// See Dandy nft for an example on how to convert one type to another

@@ -467,7 +467,7 @@ pub contract FIND {
 
 		access(contract) fun createPlatform(_ name: String) : Dandy.MinterPlatform{
 			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025)
+			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.15)
 		}
 
 		pub fun mintDandy(minter: String, nftName: String, description: String, schemas: [AnyStruct]) : @Dandy.NFT {

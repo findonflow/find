@@ -358,6 +358,29 @@ func (otu *OverflowTestUtils) listDandyForAuction(name string, id uint64, price 
 	return otu
 }
 
+func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, expectedPlatformRoyalty float64) *OverflowTestUtils {
+
+	royalty := Royalty{}
+	otu.O.ScriptFromFile("dandy").
+		Args(otu.O.Arguments().
+			String(name).
+			UInt64(id).
+			String("A.f8d6e0586b0a20c7.FindViews.Royalties")).
+		RunMarshalAs(&royalty)
+
+	for _, item := range royalty.Items {
+		if item.Description == royaltyName {
+			assert.Equal(otu.T, fmt.Sprintf("%.8f", expectedPlatformRoyalty), item.Cut)
+
+			return otu
+		}
+	}
+
+	assert.Equal(otu.T, expectedPlatformRoyalty, 0.0)
+	return otu
+
+}
+
 func (otu *OverflowTestUtils) buyDandyForSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("bidMarket").
@@ -461,4 +484,12 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint
 		}))
 		//TODO: test better events
 	return otu
+}
+
+type Royalty struct {
+	Items []struct {
+		Cut         string `json:"cut"`
+		Description string `json:"description"`
+		Receiver    string `json:"receiver"`
+	} `json:"items"`
 }

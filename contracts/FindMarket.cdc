@@ -319,7 +319,7 @@ pub contract FindMarket {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 
-		//the cut the network will take, default 2.5%
+		//the cut the network will take, default 5%
 		access(contract) let networkCut: UFix64
 
 		//the wallet of the network to transfer royalty to
@@ -680,7 +680,7 @@ pub contract FindMarket {
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(): @SaleItemCollection {
 		let wallet=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		return <- create SaleItemCollection(networkCut:0.025, networkWallet: wallet)
+		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
 	}
 
 	/*
@@ -763,13 +763,16 @@ pub contract FindMarket {
 
 		//called from lease when auction is ended
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault{
-
-			if nft.getType() == Type<@Dandy.NFT>() {
-				Debug.log("THIS IS A DANDY")
-			}
+			let isDandy = nft.getType() == Type<@Dandy.NFT>() 
+			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			bid.nftCap.borrow()!.deposit(token: <- nft)
+
+			if isDandy {
+				let address=bid.nftCap.address
+				getAccount(address).getCapability<&{Dandy.CollectionPublic}>(Dandy.CollectionPublicPath).borrow()!.setPrimaryCutPaid(id)
+			}
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
 			return <- vault
