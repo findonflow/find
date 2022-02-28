@@ -33,6 +33,7 @@ import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
 import NeoAvatar from 0xb25138dbf45e5801
+import NeoVoucher from 0xb25138dbf45e5801
 import NeoViews from 0xb25138dbf45e5801
 import MetadataViews from 0x1d7e57aa55817448
 import BarterYardPackNFT from 0xa95b021cf8a30d80
@@ -1073,6 +1074,14 @@ pub fun main(address: Address) : MetadataCollections? {
 			neoItems.append(itemId)
 			resultMap[itemId] = item
 	}
+
+	let neoVouchers = getItemForMetadataStandard(path: NeoVoucher.CollectionPublicPath, account: account, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()))
+	for item in neoVouchers {
+		  let itemId="NeoVoucher".concat(item.id.toString())
+			neoItems.append(itemId)
+			resultMap[itemId] = item
+	}
+
 	if neoItems.length != 0 {
 			results["Neo"] = neoItems
   }

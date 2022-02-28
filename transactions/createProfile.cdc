@@ -35,7 +35,6 @@ transaction(name: String) {
 
 		profile.addWallet(fusdWallet)
 
-
 		let flowWallet=Profile.Wallet(
 			name:"Flow", 
 			receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
