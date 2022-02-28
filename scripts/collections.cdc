@@ -1152,6 +1152,7 @@ pub fun main(address: Address) : MetadataCollections? {
 	}*/
 
 
+	/*
 	let resolverCollectionCap= account.getCapability<&{StarlyCard.StarlyCardCollectionPublic}>(StarlyCard.CollectionPublicPath)
 	if resolverCollectionCap.check() {
 		let items: [String] = []
@@ -1171,7 +1172,7 @@ pub fun main(address: Address) : MetadataCollections? {
 						url:cardEdition.url,
 						listPrice: nil,
 						listToken: nil,
-						contentType: "image",
+						contentType: cardEdition.card.mediaType,
 						rarity: cardEdition.card.rarity
 					)
 					let itemId="Starly".concat(id.toString())
@@ -1184,6 +1185,7 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["Starly"] = items
 		}
 	}
+	*/
 
 	if results.keys.length == 0 {
 		return nil
