@@ -43,6 +43,8 @@ import Vouchers from 0x444f5ea22c6ea12c
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
 
+import StarlyCard from 0x5b82f21c0edf76e3
+import StarlyMetadataViews from 0x5b82f21c0edf76e3
 
 
 pub struct MetadataCollections {
@@ -1141,6 +1143,38 @@ pub fun main(address: Address) : MetadataCollections? {
 	}*/
 
 
+	let resolverCollectionCap= account.getCapability<&{StarlyCard.StarlyCardCollectionPublic}>(StarlyCard.CollectionPublicPath)
+	if resolverCollectionCap.check() {
+		let items: [String] = []
+		let collection = resolverCollectionCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowViewResolver(id: id)!
+
+			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+				let display = displayView as! MetadataViews.Display
+				if let starlyView = nft.resolveView(Type<StarlyMetadataViews.CardEdition>()) {
+					 let cardEdition= starlyView as! StarlyMetadataViews.CardEdition
+
+					let item = MetadataCollectionItem(
+						id: id,
+						name: display.name,
+						image: display.thumbnail.uri(),
+						url:cardEdition.url,
+						listPrice: nil,
+						listToken: nil,
+						contentType: "image",
+						rarity: cardEdition.card.rarity
+					)
+					let itemId="Starly".concat(id.toString())
+					items.append(itemId)
+					resultMap[itemId] = item
+				}
+			}
+		}
+		if items.length != 0 {
+			results["Starly"] = items
+		}
+	}
 
 	if results.keys.length == 0 {
 		return nil
