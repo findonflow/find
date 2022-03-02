@@ -17,7 +17,6 @@ pub struct FINDNameReport{
 	}
 }
 
-//Check the status of a fin user
 pub fun main(name: String) : FINDNameReport{
 
 	let status=FIND.status(name)

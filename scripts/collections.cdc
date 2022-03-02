@@ -46,6 +46,7 @@ import Collectible from 0xf5b0eb433389ac3f
 
 import StarlyCard from 0x5b82f21c0edf76e3
 import StarlyMetadataViews from 0x5b82f21c0edf76e3
+import Momentables from 0x9d21537544d9123d
 
 
 pub struct MetadataCollections {
@@ -1115,6 +1116,35 @@ pub fun main(address: Address) : MetadataCollections? {
 
 		if items.length != 0 {
 			results["Barter Yard Club"] = items
+		}
+	}
+
+	let momentablesCap = account.getCapability<&{Momentables.MomentablesCollectionPublic}>(Momentables.CollectionPublicPath)
+	if momentablesCap.check() {
+		let items: [String] = []
+		let collection = momentablesCap.borrow()!
+
+		for id in collection.getIDs() {
+			let nft = collection.borrowMomentables(id: id)!
+			let traits=nft.getTraits()
+			let commonTrait=traits["common"]!
+
+			let item = MetadataCollectionItem(
+				id: id,
+				name: nft.name,
+				image: "ipfs://".concat(nft.imageCID),
+				url: "https://www.cryptopharaohs.world/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: commonTrait["type"] ?? "",
+			)
+			let itemId="CryptoPharaohs".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+		if items.length != 0 {
+			results["CryptoPharaohs"] = items
 		}
 	}
 

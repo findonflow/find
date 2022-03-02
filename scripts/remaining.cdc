@@ -1,7 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 
 
-//Check the status of a fin user
 pub fun main(user: Address) : [String] {
 
 	let account=getAccount(user)
