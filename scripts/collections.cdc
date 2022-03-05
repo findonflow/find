@@ -29,11 +29,16 @@ import OneFootballCollectible from 0x6831760534292098
 import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
+import GoatedGoats from 0x2068315349bdfce5
+import GoatedGoatsTrait from 0x2068315349bdfce5
+import GoatedGoatsTraitPack from 0x2068315349bdfce5
+
 import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
 import NeoAvatar from 0xb25138dbf45e5801
 import NeoVoucher from 0xb25138dbf45e5801
+import NeoMember from 0xb25138dbf45e5801
 import NeoViews from 0xb25138dbf45e5801
 import MetadataViews from 0x1d7e57aa55817448
 import BarterYardPackNFT from 0xa95b021cf8a30d80
@@ -47,6 +52,7 @@ import Collectible from 0xf5b0eb433389ac3f
 import StarlyCard from 0x5b82f21c0edf76e3
 import StarlyMetadataViews from 0x5b82f21c0edf76e3
 import Momentables from 0x9d21537544d9123d
+import ZeedzINO from 0x62b3063fbe672fc8
 
 
 pub struct MetadataCollections {
@@ -971,6 +977,30 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
+
+	let goatedGoats = getItemForMetadataStandard(path: GoatedGoats.CollectionPublicPath, account: account, externalFixedUrl: "https://goatedgoats.com")
+	for item in goatedGoats {
+		  let itemId="GoatedGoats".concat(item.id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+	}
+
+
+	let goatedGoatsTrait = getItemForMetadataStandard(path: GoatedGoatsTrait.CollectionPublicPath, account: account, externalFixedUrl: "https://goatedgoats.com")
+	for item in goatedGoatsTrait {
+		  let itemId="GoatedGoatsTraits".concat(item.id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+	}
+
+
+	let goatedGoatsTraitPack = getItemForMetadataStandard(path: GoatedGoatsTraitPack.CollectionPublicPath, account: account, externalFixedUrl: "https://goatedgoats.com")
+	for item in goatedGoatsTraitPack {
+		  let itemId="GoatedGoatsTraitsPack".concat(item.id.toString())
+			goats.append(itemId)
+			resultMap[itemId] = item
+	}
+
 	if goats.length != 0 {
 			results["GoatedGoats"] = goats
 	}
@@ -1079,6 +1109,13 @@ pub fun main(address: Address) : MetadataCollections? {
 	let neoVouchers = getItemForMetadataStandard(path: NeoVoucher.CollectionPublicPath, account: account, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()))
 	for item in neoVouchers {
 		  let itemId="NeoVoucher".concat(item.id.toString())
+			neoItems.append(itemId)
+			resultMap[itemId] = item
+	}
+
+	let neoMembers = getItemForMetadataStandard(path: NeoMember.CollectionPublicPath, account: account, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()))
+	for item in neoMembers {
+		  let itemId="NeoMembers".concat(item.id.toString())
 			neoItems.append(itemId)
 			resultMap[itemId] = item
 	}
@@ -1217,6 +1254,33 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 	*/
 
+	let zeedzCap = account.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
+	if zeedzCap.check() {
+		let items: [String] = []
+		let collection = zeedzCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowZeedle(id: id)!
+
+			let item = MetadataCollectionItem(
+				id: id,
+				name: nft.name,
+				image: "ipfs://".concat(nft.imageURI),
+				url: "http://zeedz.io",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: nft.rarity
+			)
+      let itemId="zeedz".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+
+		if items.length != 0 {
+			results["Zeedz"] = items
+		}
+	}
 	if results.keys.length == 0 {
 		return nil
 	}
