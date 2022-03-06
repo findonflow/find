@@ -53,7 +53,7 @@ import StarlyCard from 0x5b82f21c0edf76e3
 import StarlyMetadataViews from 0x5b82f21c0edf76e3
 import Momentables from 0x9d21537544d9123d
 import ZeedzINO from 0x62b3063fbe672fc8
-
+import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 pub struct MetadataCollections {
 
@@ -227,9 +227,9 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 
+	let partyMansion: [String] = []
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 	if goobersCap.check() {
-		let items: [String] = []
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
@@ -244,12 +244,20 @@ pub fun main(address: Address) : MetadataCollections? {
 				rarity: ""
 			)
 			let itemId="Gooberz".concat(id.toString())
-			items.append(itemId)
+			partyMansion.append(itemId)
 			resultMap[itemId] = item
 		}
-		if items.length != 0 {
-			results["Gooberz"] = items
-		}
+	}
+
+	let partyMansionDrinks = getItemForMetadataStandard(path:PartyMansionDrinksContract.CollectionPublicPath, account: account, externalFixedUrl: "https://partymansion.io")
+	for item in partyMansionDrinks {
+		  let itemId="PartyMansionDrinks".concat(item.id.toString())
+			partyMansion.append(itemId)
+			resultMap[itemId] = item
+	}
+
+	if partyMansion.length != 0 {
+		results["PartyMansion"] = partyMansion
 	}
 
 	let rareRoomCap = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
