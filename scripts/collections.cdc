@@ -249,11 +249,27 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	let partyMansionDrinks = getItemForMetadataStandard(path:PartyMansionDrinksContract.CollectionPublicPath, account: account, externalFixedUrl: "https://partymansion.io")
-	for item in partyMansionDrinks {
-		  let itemId="PartyMansionDrinks".concat(item.id.toString())
+
+	let partyMansionDrinksCap = account.getCapability<&{PartyMansionDrinksContract.DrinkCollectionPublic}>(PartyMansionDrinksContract.CollectionPublicPath)
+	if partyMansionDrinksCap.check() {
+		let collection = partyMansionDrinksCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowDrink(id: id)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: nft.data.description,
+				image: "ipfs://".concat(nft.imageCID()),
+				url: "https://partymansion.io",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: PartyMansionDrinksContract.rarityToString(rarity:nft.data.rarity)
+			)
+
+			let itemId="PartyMansionDrinks".concat(id.toString())
 			partyMansion.append(itemId)
 			resultMap[itemId] = item
+		}
 	}
 
 	if partyMansion.length != 0 {
