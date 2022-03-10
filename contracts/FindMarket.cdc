@@ -276,7 +276,7 @@ pub contract FindMarket {
 				if offerBalance < minBid {
 					panic("bid ".concat(offerBalance.toString()).concat(" must be larger then previous bid+bidIncrement").concat(minBid.toString()))
 				}
-				cb.borrow()!.cancelBidFromLease(self.id)
+				cb.borrow()!.cancelBidFromSaleItem(self.id)
 			}
 			self.latestBidCallback=callback
 
@@ -424,6 +424,7 @@ pub contract FindMarket {
 
 			let id = item.getUUID()
 
+			//If this is a DirectOffer we just add a new saleItem with that pointer
 			if !self.items.containsKey(id) {
 				let saleItem <- create SaleItem(pointer: item, vaultType:vaultType)
 				self.items[id] <-! saleItem
@@ -438,16 +439,23 @@ pub contract FindMarket {
 				return
 			}
 
-			//TODO: need to check that bid is not on your own item. see FIND
-			//TODO: double check this vs FIND contract, we need to check price if higher or not here
-			if let cb= saleItem.offerCallback {
-				cb.borrow()!.cancelBidFromLease(id)
-			}
+			let balance=callback.borrow()!.getBalance(id)
 
+			if let cb= saleItem.offerCallback {
+				if cb.address == callback.address {
+					panic("You already have the latest bid on this item, use the incraseBid transaction")
+				}
+
+				let currentBalance=cb.borrow()!.getBalance(id)
+				Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
+				if currentBalance >= balance {
+					panic("There is already a higher bid on this item")
+				}
+				cb.borrow()!.cancelBidFromSaleItem(id)
+			}
 
 			saleItem.setCallback(callback)
 
-			let balance=callback.borrow()!.getBalance(id)
 
 			Debug.log("Balance of bid is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil && saleItem.auctionStartPrice == nil {
@@ -479,7 +487,7 @@ pub contract FindMarket {
 			if let cb= saleItem.offerCallback {
 				Debug.log("we have a direct offer so we cancel that")
 				emit DirectOfferRejected(id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id), vaultType:saleItem.vaultType.identifier)
-				cb.borrow()!.cancelBidFromLease(id)
+				cb.borrow()!.cancelBidFromSaleItem(id)
 				saleItem.setCallback(nil)
 				return 
 			}
@@ -503,7 +511,7 @@ pub contract FindMarket {
 				emit ForAuction(id: id, owner:owner, amount: balance, auctionReservePrice: saleItem.auctionReservePrice!,  active: false, vaultType:saleItem.vaultType.identifier)
 
 				saleItem.returnNFT()
-				auction.latestBidCallback.borrow()!.cancelBidFromLease(id)
+				auction.latestBidCallback.borrow()!.cancelBidFromSaleItem(id)
 				destroy <- self.items.remove(key: id)
 			}
 		}
@@ -515,7 +523,6 @@ pub contract FindMarket {
 				self.borrow(id).auction != nil : "Cannot fulfill sale that is not an auction=".concat(id.toString())
 			}
 
-			//TODO: add a check to see if we have reaced min bid price
 			return self.fulfill(id)
 		}
 
@@ -742,7 +749,7 @@ pub contract FindMarket {
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
-		access(contract) fun cancelBidFromLease(_ id: UInt64)
+		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 		access(contract) fun setBidType(id: UInt64, type: String) 
 	}
 
@@ -824,12 +831,12 @@ pub contract FindMarket {
 		pub fun cancelBid(_ id: UInt64) {
 			let bid= self.borrowBid(id)
 			bid.from.borrow()!.cancelBid(id)
-			self.cancelBidFromLease(id)
+			self.cancelBidFromSaleItem(id)
 		}
 
 		//called from lease when things are cancelled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
-		access(contract) fun cancelBidFromLease(_ id: UInt64) {
+		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))

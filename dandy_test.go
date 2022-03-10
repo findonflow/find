@@ -133,3 +133,5 @@ func TestDandy(t *testing.T) {
 
 	})
 }
+
+//Test auction that does not reach price
