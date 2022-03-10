@@ -20,6 +20,8 @@ import Gaia from 0x8b148183c28ff88f
 import ChainmonstersRewards from 0x93615d25d14fa337
 import Moments from 0xd4ad4740ee426334
 import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
+import MatrixWorldAssetsNFT from 0xf20df769e658c257
+
 import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
 import GeniaceNFT from 0xabda6627c70c7f52
@@ -27,12 +29,20 @@ import OneFootballCollectible from 0x6831760534292098
 import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
+import GoatedGoats from 0x2068315349bdfce5
+import GoatedGoatsTrait from 0x2068315349bdfce5
+import GoatedGoatsTraitPack from 0x2068315349bdfce5
+
 import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
 import NeoAvatar from 0xb25138dbf45e5801
+import NeoVoucher from 0xb25138dbf45e5801
+import NeoMember from 0xb25138dbf45e5801
 import NeoViews from 0xb25138dbf45e5801
 import MetadataViews from 0x1d7e57aa55817448
+import BarterYardPackNFT from 0xa95b021cf8a30d80
+import BarterYardClubWerewolf from  0x28abb9f291cadaf2
 
 //Jambb
 import Vouchers from 0x444f5ea22c6ea12c
@@ -40,6 +50,11 @@ import Vouchers from 0x444f5ea22c6ea12c
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
 
+import StarlyCard from 0x5b82f21c0edf76e3
+import StarlyMetadataViews from 0x5b82f21c0edf76e3
+import Momentables from 0x9d21537544d9123d
+import ZeedzINO from 0x62b3063fbe672fc8
+import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 pub struct MetadataCollections {
 
@@ -213,9 +228,9 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 
+	let partyMansion: [String] = []
 	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 	if goobersCap.check() {
-		let items: [String] = []
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
 			let goober = goobers[id]!
@@ -230,12 +245,36 @@ pub fun main(address: Address) : MetadataCollections? {
 				rarity: ""
 			)
 			let itemId="Gooberz".concat(id.toString())
-			items.append(itemId)
+			partyMansion.append(itemId)
 			resultMap[itemId] = item
 		}
-		if items.length != 0 {
-			results["Gooberz"] = items
+	}
+
+
+	let partyMansionDrinksCap = account.getCapability<&{PartyMansionDrinksContract.DrinkCollectionPublic}>(PartyMansionDrinksContract.CollectionPublicPath)
+	if partyMansionDrinksCap.check() {
+		let collection = partyMansionDrinksCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowDrink(id: id)!
+			let item = MetadataCollectionItem(
+				id: id,
+				name: nft.data.description,
+				image: "ipfs://".concat(nft.imageCID()),
+				url: "https://partymansion.io",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: PartyMansionDrinksContract.rarityToString(rarity:nft.data.rarity)
+			)
+
+			let itemId="PartyMansionDrinks".concat(id.toString())
+			partyMansion.append(itemId)
+			resultMap[itemId] = item
 		}
+	}
+
+	if partyMansion.length != 0 {
+		results["PartyMansion"] = partyMansion
 	}
 
 	let rareRoomCap = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
@@ -274,7 +313,7 @@ pub fun main(address: Address) : MetadataCollections? {
 			let nft = collection.borrowCNN_NFT(id: id)!
 			let metadata = CNN_NFT.getSetMetadata(setId: nft.setId)!
 
-		  var image= metadata["preview"]!
+			var image= metadata["preview"]!
 			var contentType="image"
 			/*
 			if metadata["image_file_type"]! == "mp4" {
@@ -356,7 +395,7 @@ pub fun main(address: Address) : MetadataCollections? {
 			}
 			*/
 
-	
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata["name"]!,
@@ -602,7 +641,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: metadata.contentName,
 				image: "ipfs://".concat(metadata.videoHash),
-        url: "https://www.jambb.com/c/moment/".concat(id.toString()),
+				url: "https://www.jambb.com/c/moment/".concat(id.toString()),
 				listPrice: nil,
 				listToken: nil,
 				contentType: "video",
@@ -636,17 +675,17 @@ pub fun main(address: Address) : MetadataCollections? {
 			jambb.append(itemId)
 			resultMap[itemId] = item
 		}
-		
+
 
 	}
 
 	if jambb.length != 0 {
-			results["Jambb"] = jambb
+		results["Jambb"] = jambb
 	}
 
 	let mw = MatrixWorldFlowFestNFT.getNft(address:address)
+	let mwItems: [String] = []
 	if mw.length > 0 {
-		let items: [String] = []
 		for nft in mw {
 			let metadata=nft.metadata
 			let item=MetadataCollectionItem(
@@ -660,17 +699,43 @@ pub fun main(address: Address) : MetadataCollections? {
 				rarity: ""
 			)
 			let itemId="MatrixWorldFlowFest".concat(nft.id.toString())
-			items.append(itemId)
+			mwItems.append(itemId)
 			resultMap[itemId] = item
 		}
 
-		if items.length != 0 {
-			results["MatrixWorld"] = items
+	}
+
+	let matrixworldAsset = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+	if matrixworldAsset.check() {
+		let collection = matrixworldAsset.borrow()!
+		for id in collection.getIDs() {
+			let metadata = collection.getMetadata(id: id)!
+
+
+			/*
+			Result: {"collection": "MW x Flow Holiday Giveaway", "description": "First Edition Matrix World Santa Hat. Only 50 pieces made.", "animation_url": "", "image": "https://d2yoccx42eml7e.cloudfront.net/airdrop/MWxFlowxHoliday/Santa_Hat.png", "name": "First Edition Santa Hat", "external_url": "https://matrixworld.org/home", "version": "assets-v0.1.1", "attributes": ""}
+			*/
+			let item = MetadataCollectionItem(
+				id: id,
+				name: metadata["name"]!,
+				image: metadata["image"]!,
+				url: metadata["external_url"]!,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+			let itemId="MatrixWorldAsset".concat(id.toString())
+			mwItems.append(itemId)
+			resultMap[itemId] = item
 		}
 	}
 
-	let sturdyCollectionCap = account
-	.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
+	if mwItems.length != 0 {
+		results["MatrixWorld"] = mwItems
+	}
+
+	let sturdyCollectionCap = account.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
 	if sturdyCollectionCap.check() {
 		let sturdyNfts = sturdyCollectionCap.borrow()!.getIDs()
 		let items: [String] = []
@@ -937,11 +1002,35 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	if goats.length != 0 {
-			results["GoatedGoats"] = goats
+
+	let goatedGoats = getItemForMetadataStandard(path: GoatedGoats.CollectionPublicPath, account: account, externalFixedUrl: "https://goatedgoats.com")
+	for item in goatedGoats {
+		let itemId="GoatedGoats".concat(item.id.toString())
+		goats.append(itemId)
+		resultMap[itemId] = item
 	}
 
-  let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
+
+	let goatedGoatsTrait = getItemForMetadataStandard(path: GoatedGoatsTrait.CollectionPublicPath, account: account, externalFixedUrl: "https://goatedgoats.com")
+	for item in goatedGoatsTrait {
+		let itemId="GoatedGoatsTraits".concat(item.id.toString())
+		goats.append(itemId)
+		resultMap[itemId] = item
+	}
+
+
+	let goatedGoatsTraitPack = getItemForMetadataStandard(path: GoatedGoatsTraitPack.CollectionPublicPath, account: account, externalFixedUrl: "https://goatedgoats.com")
+	for item in goatedGoatsTraitPack {
+		let itemId="GoatedGoatsTraitsPack".concat(item.id.toString())
+		goats.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	if goats.length != 0 {
+		results["GoatedGoats"] = goats
+	}
+
+	let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
 	if bitkuCap.check() {
 		let collection = bitkuCap.borrow()!
 		let items: [String] = []
@@ -990,7 +1079,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				contentType: "video", //metadata["mimeType"]!,
 				rarity: ""
 			)
-	    let itemId="KLKTN".concat(id.toString())
+			let itemId="KLKTN".concat(id.toString())
 			items.append(itemId)
 			resultMap[itemId] = item
 		}
@@ -1012,6 +1101,7 @@ pub fun main(address: Address) : MetadataCollections? {
 			if image == "" {
 				image="https://arweave.net/".concat(metadata.arLink)
 			}
+
 			let item = MetadataCollectionItem(
 				id: id,
 				name: metadata.name,
@@ -1022,7 +1112,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				contentType: metadata.type,
 				rarity: ""
 			)
-      let itemId="mynft".concat(id.toString())
+			let itemId="mynft".concat(id.toString())
 			items.append(itemId)
 			resultMap[itemId] = item
 		}
@@ -1033,16 +1123,98 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-	let neoAvatars = getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account: account)
+	let neoAvatars = getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account: account, externalFixedUrl: "")
 	let neoItems: [String] = []
 	for item in neoAvatars {
-		  let itemId="NeoAvatar".concat(item.id.toString())
-			neoItems.append(itemId)
-			resultMap[itemId] = item
+		let itemId="NeoAvatar".concat(item.id.toString())
+		neoItems.append(itemId)
+		resultMap[itemId] = item
 	}
+
+	let neoVouchers = getItemForMetadataStandard(path: NeoVoucher.CollectionPublicPath, account: account, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()))
+	for item in neoVouchers {
+		let itemId="NeoVoucher".concat(item.id.toString())
+		neoItems.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	let neoMembers = getItemForMetadataStandard(path: NeoMember.CollectionPublicPath, account: account, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()))
+	for item in neoMembers {
+		let itemId="NeoMembers".concat(item.id.toString())
+		neoItems.append(itemId)
+		resultMap[itemId] = item
+	}
+
 	if neoItems.length != 0 {
-			results["Neo"] = neoItems
-  }
+		results["Neo"] = neoItems
+	}
+
+	let byc: [String] = []
+	let barterYardCap= account.getCapability<&{BarterYardPackNFT.BarterYardPackNFTCollectionPublic}>(BarterYardPackNFT.CollectionPublicPath)
+	if barterYardCap.check() {
+		let collection = barterYardCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowBarterYardPackNFT(id: id)!
+
+			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+				let display = displayView as! MetadataViews.Display
+				let item = MetadataCollectionItem(
+					id: id,
+					name: display.name,
+					image: display.thumbnail.uri(),
+					url: "https://www.barteryard.club",
+					listPrice: nil,
+					listToken: nil,
+					contentType: "image",
+					rarity: ""
+				)
+
+				let itemId="BarterYard".concat(item.id.toString())
+				byc.append(itemId)
+				resultMap[itemId] = item
+			}
+		}
+	}
+	let werewolves = getItemForMetadataStandard(path: BarterYardClubWerewolf.CollectionPublicPath, account: account, externalFixedUrl: "https://barteryard.club")
+	for item in werewolves {
+		let itemId="BarterYardWerewolf".concat(item.id.toString())
+		byc.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	if byc.length != 0 {
+		results["Barter Yard Club"] = byc
+	}
+
+
+	let momentablesCap = account.getCapability<&{Momentables.MomentablesCollectionPublic}>(Momentables.CollectionPublicPath)
+	if momentablesCap.check() {
+		let items: [String] = []
+		let collection = momentablesCap.borrow()!
+
+		for id in collection.getIDs() {
+			let nft = collection.borrowMomentables(id: id)!
+			let traits=nft.getTraits()
+			let commonTrait=traits["common"]!
+
+			let item = MetadataCollectionItem(
+				id: id,
+				name: nft.name,
+				image: "ipfs://".concat(nft.imageCID),
+				url: "https://www.cryptopharaohs.world/",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: commonTrait["type"] ?? "",
+			)
+			let itemId="CryptoPharaohs".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+		if items.length != 0 {
+			results["CryptoPharaohs"] = items
+		}
+	}
 
 
 	/*
@@ -1053,51 +1225,112 @@ pub fun main(address: Address) : MetadataCollections? {
 		for id in collection.getIDs() {
 			let nft = collection.borrowCollectible(id: id)!
 
-	    let metadata = Beam.getCollectibleItemMetaData(collectibleItemID: nft.data.collectibleItemID)!
-		  var mediaUrl: String? = metadata["mediaUrl"]
+			let metadata = Beam.getCollectibleItemMetaData(collectibleItemID: nft.data.collectibleItemID)!
+			var mediaUrl: String? = metadata["mediaUrl"]
 			if mediaUrl != nil &&  mediaUrl!.slice(from: 0, upTo: 7) != "ipfs://" {
-				mediaUrl = "ipfs://".concat(mediaUrl!)
+			mediaUrl = "ipfs://".concat(mediaUrl!)
+		}
+		let item = MetadataCollectionItem(
+			id: id,
+			name: metadata["title"]!,
+			image: mediaUrl ?? "",
+			url: "https://".concat(metadata["domainUrl"]!),
+			listPrice: nil,
+			listToken: nil,
+			contentType: metadata["mediaType"]!,
+			rarity: ""
+		)
+		let itemId="FrightClub".concat(id.toString())
+		items.append(itemId)
+		resultMap[itemId] = item
+	}
+	if items.length != 0 {
+		results["Fright Club"] = items
+	}
+}*/
+
+
+/*
+let resolverCollectionCap= account.getCapability<&{StarlyCard.StarlyCardCollectionPublic}>(StarlyCard.CollectionPublicPath)
+if resolverCollectionCap.check() {
+	let items: [String] = []
+	let collection = resolverCollectionCap.borrow()!
+	for id in collection.getIDs() {
+		let nft = collection.borrowViewResolver(id: id)!
+
+		if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+			let display = displayView as! MetadataViews.Display
+			if let starlyView = nft.resolveView(Type<StarlyMetadataViews.CardEdition>()) {
+				let cardEdition= starlyView as! StarlyMetadataViews.CardEdition
+
+				let item = MetadataCollectionItem(
+					id: id,
+					name: display.name,
+					image: display.thumbnail.uri(),
+					url:cardEdition.url,
+					listPrice: nil,
+					listToken: nil,
+					contentType: cardEdition.card.mediaType,
+					rarity: cardEdition.card.rarity
+				)
+				let itemId="Starly".concat(id.toString())
+				items.append(itemId)
+				resultMap[itemId] = item
 			}
-			let item = MetadataCollectionItem(
-				id: id,
-				name: metadata["title"]!,
-				image: mediaUrl ?? "",
-				url: "https://".concat(metadata["domainUrl"]!),
-				listPrice: nil,
-				listToken: nil,
-				contentType: metadata["mediaType"]!,
-				rarity: ""
-			)
-			let itemId="FrightClub".concat(id.toString())
-			items.append(itemId)
-			resultMap[itemId] = item
-		}
-		if items.length != 0 {
-			results["Fright Club"] = items
-		}
-	}*/
-
-
-
-	if results.keys.length == 0 {
-		return nil
-	}
-
-	let publicPath=/public/FindCuratedCollections
-	let link = account.getCapability<&{String: [String]}>(publicPath)
-	var curatedCollections : {String: [String]} = {}
-	if link.check() {
-		let curated = link.borrow()!
-		for curatedKey in curated.keys {
-			curatedCollections[curatedKey] = curated[curatedKey]!
 		}
 	}
+	if items.length != 0 {
+		results["Starly"] = items
+	}
+}
+*/
 
-	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
+let zeedzCap = account.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
+if zeedzCap.check() {
+	let items: [String] = []
+	let collection = zeedzCap.borrow()!
+	for id in collection.getIDs() {
+		let nft = collection.borrowZeedle(id: id)!
+
+		let item = MetadataCollectionItem(
+			id: id,
+			name: nft.name,
+			image: "ipfs://".concat(nft.imageURI),
+			url: "http://zeedz.io",
+			listPrice: nil,
+			listToken: nil,
+			contentType: "image",
+			rarity: nft.rarity
+		)
+		let itemId="zeedz".concat(id.toString())
+		items.append(itemId)
+		resultMap[itemId] = item
+	}
+
+
+	if items.length != 0 {
+		results["Zeedz"] = items
+	}
+}
+if results.keys.length == 0 {
+	return nil
+}
+
+let publicPath=/public/FindCuratedCollections
+let link = account.getCapability<&{String: [String]}>(publicPath)
+var curatedCollections : {String: [String]} = {}
+if link.check() {
+	let curated = link.borrow()!
+	for curatedKey in curated.keys {
+		curatedCollections[curatedKey] = curated[curatedKey]!
+	}
+}
+
+return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
 }
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [MetadataCollectionItem] {
+pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
 	let items: [MetadataCollectionItem] = []
 	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
 	if resolverCollectionCap.check() {
@@ -1107,21 +1340,24 @@ pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount) : [M
 
 			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
 				let display = displayView as! MetadataViews.Display
+				var externalUrl=externalFixedUrl
 				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
-					let externalUrl= externalUrlView! as! NeoViews.ExternalDomainViewUrl
-					let item = MetadataCollectionItem(
-						id: id,
-						name: display.name,
-						image: display.thumbnail.uri(),
-						url: externalUrl.url,
-						listPrice: nil,
-						listToken: nil,
-						contentType: "image",
-						rarity: ""
-					)
-
-					items.append(item)
+					let url= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+					externalUrl=url.url
 				}
+
+				let item = MetadataCollectionItem(
+					id: id,
+					name: display.name,
+					image: display.thumbnail.uri(),
+					url: externalUrl,
+					listPrice: nil,
+					listToken: nil,
+					contentType: "image",
+					rarity: ""
+				)
+
+				items.append(item)
 			}
 		}
 	}

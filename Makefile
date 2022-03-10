@@ -1,6 +1,6 @@
 all: dev
 
-.PHONY: setup deploy emulator test dev contract contract_publish
+.PHONY: setup deploy emulator test dev contract contract_publish client
 
 setup: deploy
 	go run ./tasks/setup/main.go

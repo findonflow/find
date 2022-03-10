@@ -24,7 +24,6 @@ Taxonomy:
 */
 pub contract FIND {
 
-
 	//event when FT is sent
 	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
 

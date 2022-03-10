@@ -7,7 +7,19 @@ import (
 func main() {
 
 	o := overflow.NewOverflowInMemoryEmulator().Start()
+	/*
+		o := overflow.NewOverflowMainnet().Start()
 
+
+		path := cadence.Path{Domain: "public", Identifier: "neoAvatarCollection"}
+		o.ScriptFromFile("item").
+			Args(o.Arguments().
+				RawAccount("0x886f3aeaf848c535").
+				Argument(path).
+				UInt64(1)).Run()
+
+		os.Exit(0)
+	*/
 	//first step create the adminClient as the fin user
 	o.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("find").

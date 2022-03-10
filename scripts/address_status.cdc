@@ -23,7 +23,6 @@ pub struct FINDReport{
 	}
 }
 
-//Check the status of a fin user
 pub fun main(user: Address) : FINDReport{
 
 	let account=getAccount(user)

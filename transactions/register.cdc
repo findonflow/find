@@ -20,7 +20,6 @@ transaction(name: String, amount: UFix64) {
 		if !leaseCollection.check() {
 			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
-
 		}
 
 		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
@@ -53,6 +52,8 @@ transaction(name: String, amount: UFix64) {
 			acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 			acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
+
+		//TODO: add find name if it is not set before
 
 		let price=FIND.calculateCost(name)
 		if price != amount {
