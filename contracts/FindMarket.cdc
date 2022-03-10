@@ -7,6 +7,12 @@ import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
 
+/* TODO: add a FindMarketClient Capability receiver that will link a FindMarketTenant. That tenant will be created by us and can be used when listing an item at a tenant. 
+the market field needs to be in all events and it needs to be set at the tenantn
+the cut that find will take will also be in the tenant.
+	
+This allows us to have different marketplaces with different tenants without having to redeploy the contract. And allows a whitelabel to list items for them in a good way.
+}
 /*
 
 ///Market
@@ -18,6 +24,8 @@ The market has 2 collections
 - SaleItemCollection: This collection contains your saleItems and directOffers for your NFTs that others have made
 
 */
+
+//TODO: ensure we have the correct scripts to return the information we need in tests
 pub contract FindMarket {
 
 	pub let SaleItemCollectionStoragePath: StoragePath
@@ -27,6 +35,9 @@ pub contract FindMarket {
 	pub let MarketBidCollectionPublicPath: PublicPath
 
 	pub event NFTEscrowed(id: UInt64)
+
+	//TODO: all these evnets need market and possibly also nftType and display information if any.
+
 	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, vaultType:String)
 
 	//TODO: always add names as optionals and try to resolve. 
@@ -56,7 +67,6 @@ pub contract FindMarket {
 		pub let amount: UFix64?
 		pub let bidder: Address?
 		pub let saleItemType:String
-
 
 		init(bidder:Address?, type:String, amount:UFix64?) {
 			self.bidder=bidder
@@ -813,7 +823,6 @@ pub contract FindMarket {
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
 			let oldToken <- self.bids[uuid] <- bid
-			//send info to leaseCollection
 			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType) 
 			destroy oldToken
 		}
@@ -834,7 +843,7 @@ pub contract FindMarket {
 			self.cancelBidFromSaleItem(id)
 		}
 
-		//called from lease when things are cancelled
+		//called from saleItem when things are cancelled 
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
