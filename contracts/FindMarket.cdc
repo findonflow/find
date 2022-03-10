@@ -30,20 +30,17 @@ pub contract FindMarket {
 	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, vaultType:String)
 
 	//TODO: always add names as optionals and try to resolve. 
-	/// Emitted when a name is sold to a new owner
 	pub event Sold(id: UInt64, previousOwner: Address, newOwner: Address, amount: UFix64, vaultType:String)
 
-	/// Emitted when a name is explicistly put up for sale
+	//TODO: Need more fields in here about what is in the event, so what is for sale, like display information aso
 	pub event ForSale(id: UInt64, owner: Address, amount: UFix64, active: Bool, vaultType:String)
 	pub event ForAuction(id: UInt64, owner: Address,  amount: UFix64, auctionReservePrice: UFix64, active: Bool, vaultType:String)
 
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event DirectOfferBid(id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
 
-	/// Emitted if a blind bid is canceled
 	pub event DirectOfferCanceled(id: UInt64, bidder: Address, vaultType:String)
 
-	/// Emitted if a blind bid is rejected
 	pub event DirectOfferRejected(id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
 
 	pub event AuctionCancelled(id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
@@ -100,7 +97,6 @@ pub contract FindMarket {
 		}
 	}
 
-	//TODO create SaleItemInformation struct that can be returned to gui
 	pub resource SaleItem{
 
 		access(contract) var escrow : @NonFungibleToken.NFT?
@@ -185,19 +181,16 @@ pub contract FindMarket {
 			return <- cb.borrow()!.accept(<- pointer.withdraw())
 		}
 
-		//TODO: better error message if it is not there
-		//TODO: is it correct to escrow it in here?
 		pub fun setAuction(_ auction: Auction?) {
 
 			if self.pointer.getType() != Type<FindViews.AuthNFTPointer>() {
-				panic("cannot start and auction since we do not have permission to withdraw nft")
+				panic("cannot start an auction since we do not have permission to withdraw nft")
 			}
 
 			let pointer= self.pointer as! FindViews.AuthNFTPointer
 
 			emit NFTEscrowed(id: pointer.id)
 			let old <- self.escrow <- pointer.withdraw()
-			//TODO: do something here
 			destroy old
 			self.auction=auction
 		}
@@ -376,10 +369,14 @@ pub contract FindMarket {
 		access(contract) fun cancelBid(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-				//TODO: handle pre that it should not be an auction
 			}
 
 			let saleItem=self.borrow(id)
+
+			if saleItem.auction != nil {
+				panic("cannot cancel bid in auction")
+			}
+
 			if let callback = saleItem.offerCallback {
 				emit DirectOfferCanceled(id: id, bidder: callback.address, vaultType:saleItem.vaultType.identifier)
 			}
@@ -441,7 +438,7 @@ pub contract FindMarket {
 				return
 			}
 
-
+			//TODO: need to check that bid is not on your own item. see FIND
 			//TODO: double check this vs FIND contract, we need to check price if higher or not here
 			if let cb= saleItem.offerCallback {
 				cb.borrow()!.cancelBidFromLease(id)
@@ -480,7 +477,7 @@ pub contract FindMarket {
 			let owner=self.owner!.address
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= saleItem.offerCallback {
-				Debug.log("we have a blind bid so we cancel that")
+				Debug.log("we have a direct offer so we cancel that")
 				emit DirectOfferRejected(id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id), vaultType:saleItem.vaultType.identifier)
 				cb.borrow()!.cancelBidFromLease(id)
 				saleItem.setCallback(nil)
