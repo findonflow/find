@@ -10,10 +10,9 @@ import Dandy from "./Dandy.cdc"
 /* TODO: add a FindMarketClient Capability receiver that will link a FindMarketTenant. That tenant will be created by us and can be used when listing an item at a tenant. 
 the market field needs to be in all events and it needs to be set at the tenantn
 the cut that find will take will also be in the tenant.
-	
+
 This allows us to have different marketplaces with different tenants without having to redeploy the contract. And allows a whitelabel to list items for them in a good way.
 }
-/*
 
 ///Market
 
@@ -36,7 +35,7 @@ pub contract FindMarket {
 
 	pub event NFTEscrowed(id: UInt64)
 
-	//TODO: all these evnets need market and possibly also nftType and display information if any.
+	//TODO: all these evnts need market and possibly also nftType and display information if any.
 
 	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, vaultType:String)
 
@@ -691,12 +690,6 @@ pub contract FindMarket {
 		}
 	}
 
-	//Create an empty lease collection that store your leases to a name
-	pub fun createEmptySaleItemCollection(): @SaleItemCollection {
-		let wallet=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
-	}
-
 	/*
 	==========================================================================
 	Bids are a collection/resource for storing the bids bidder made on leases
@@ -808,6 +801,24 @@ pub contract FindMarket {
 			return bidInfo
 		}
 
+		/**
+		TODO: Tenant
+		Here we need to send in a FindMarketTenant
+
+		- name: The name of this tenant, will be in every event
+		- nftType: [Type]? //optional list of types you can sell here
+		- ftType: [Type]? //optional list of types you can take as payment here
+		- bidPublicPath
+		- bidStoragePath
+		- saleItemPublicPath
+		- saleItemStoragePath
+
+		cuts:
+		- tenant
+		- find
+
+		**/
+
 		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
@@ -869,6 +880,14 @@ pub contract FindMarket {
 		destroy() {
 			destroy self.bids
 		}
+	}
+
+
+	// TODO: this must take FindMarketTenant
+	//Create an empty lease collection that store your leases to a name
+	pub fun createEmptySaleItemCollection(): @SaleItemCollection {
+		let wallet=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
 	}
 
 	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>) : @MarketBidCollection {
