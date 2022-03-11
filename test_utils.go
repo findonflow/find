@@ -365,7 +365,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
-			String("A.f8d6e0586b0a20c7.FindViews.Royalties")).
+			String("A.f8d6e0586b0a20c7.MetadataViews.Royalties")).
 		RunMarshalAs(&royalty)
 
 	for _, item := range royalty.Items {
@@ -491,5 +491,5 @@ type Royalty struct {
 		Cut         string `json:"cut"`
 		Description string `json:"description"`
 		Receiver    string `json:"receiver"`
-	} `json:"items"`
+	} `json:"cutInfos"`
 }

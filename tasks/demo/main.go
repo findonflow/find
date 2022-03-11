@@ -86,35 +86,37 @@ func main() {
 		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("sendFT").
-		SignProposeAndPayAs("user2").
-		Args(o.Arguments().Account("user2").UFix64(100.0).String("fusd")).
-		RunPrintEventsFull()
+		/*
+			o.TransactionFromFile("sendFT").
+				SignProposeAndPayAs("user2").
+				Args(o.Arguments().String("user2").UFix64(100.0).String("fusd")).
+				RunPrintEventsFull()
 
-	o.TransactionFromFile("renew").
-		SignProposeAndPayAs("user1").
-		Args(o.Arguments().String("user1").UFix64(5.0)).
-		RunPrintEventsFull()
+			o.TransactionFromFile("renew").
+				SignProposeAndPayAs("user1").
+				Args(o.Arguments().String("user1").UFix64(5.0)).
+				RunPrintEventsFull()
 
-	o.TransactionFromFile("listForSale").SignProposeAndPayAs("user1").
-		Args(o.Arguments().String("user1").UFix64(10.0)).
-		RunPrintEventsFull()
+			o.TransactionFromFile("listForSale").SignProposeAndPayAs("user1").
+				Args(o.Arguments().String("user1").UFix64(10.0)).
+				RunPrintEventsFull()
 
-	o.TransactionFromFile("bid").
-		SignProposeAndPayAs("user2").
-		Args(o.Arguments().String("user1").UFix64(10.0)).
-		RunPrintEventsFull()
+			o.TransactionFromFile("bid").
+				SignProposeAndPayAs("user2").
+				Args(o.Arguments().String("user1").UFix64(10.0)).
+				RunPrintEventsFull()
 
-	o.ScriptFromFile("address_status").
-		Args(o.Arguments().Account("user2")).
-		Run()
+			o.ScriptFromFile("address_status").
+				Args(o.Arguments().Account("user2")).
+				Run()
+		*/
 
-	o.TransactionFromFile("buyAddon").SignProposeAndPayAs("user2").
+	o.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").
 		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("mintDandy").
-		SignProposeAndPayAs("user2").
+		SignProposeAndPayAs("user1").
 		Args(o.Arguments().String("user1")).
 		RunPrintEventsFull()
 
@@ -125,7 +127,7 @@ func main() {
 		Run()
 
 	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
-	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("AnyStruct{A.f8d6e0586b0a20c7.FindViews.Royalty}")).Run()
+	//	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("AnyStruct{A.f8d6e0586b0a20c7.FindViews.Royalty}")).Run()
 
 	/*
 				o.TransactionFromFile("mintArtifact").SignProposeAndPayAs("user2").StringArgument("user1").RunPrintEventsFull()
@@ -156,7 +158,7 @@ func main() {
 					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.CreativeWork")
 					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.CreativeWork").Run()
 
-					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Royalties")
+					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7..Royalties")
 					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Royalties").Run()
 
 					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.MinterPlatform")
@@ -205,7 +207,7 @@ func main() {
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.CreativeWork")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.CreativeWork").Run()
 
-				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Royalties")
+				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.MetadataViews.Royalties")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Royalties").Run()
 
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.MinterPlatform")

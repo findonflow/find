@@ -6,27 +6,6 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
 
-	pub struct Royalties {
-		pub let items: [RoyaltyItem]
-		init(_ items: [RoyaltyItem] ) {
-			self.items=items
-		}
-	}
-
-	pub struct RoyaltyItem{
-		// note that this receiver should be a Profile receiver if you want to support multiple types, and since we mint from FIND that is ok
-		pub let receiver: Capability<&{FungibleToken.Receiver}> 
-		pub let cut: UFix64
-		pub let description: String?
-
-		init(receiver: Capability<&{FungibleToken.Receiver}>, cut: UFix64, description: String?) {
-			self.cut=cut
-			self.receiver=receiver
-			self.description=description
-		}
-	}
-
-
 	pub struct ExternalDomainViewUrl {
   
 	  pub let url:String

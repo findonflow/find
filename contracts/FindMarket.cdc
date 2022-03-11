@@ -62,6 +62,103 @@ pub contract FindMarket {
 	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64, vaultType:String)
 
 
+/**
+		TODO: Tenant
+		Here we need to send in a FindMarketTenant
+
+		- name: The name of this tenant, will be in every event
+		- nftType: [Type]? //optional list of types you can sell here
+		- ftType: [Type]? //optional list of types you can take as payment here
+		- bidPublicPath
+		- bidStoragePath
+		- saleItemPublicPath
+		- saleItemStoragePath
+
+		cuts:
+		- tenant
+		- find
+
+	pub struct TenantInformation {
+
+		//This is the name of the tenant, it will be in all the events and 
+		pub let name: String
+		//TODO: do we need address in here?
+
+		//if this is set only NFTs of that type can be sold at this tenant
+		pub let validNFTTypes: [Type]?
+
+		//if this is set only FTs of this type can be registered for sale/bid with on this tenant. No matter what the NFT support
+		pub let ftTypes: [Type]?
+
+		//the paths to the bid collection for this tenant
+		pub let bidPublicPath: PublicPath 
+		pub let bidStoreagePath: StoragePath 
+
+		//the paths to the saleItem collection for this tenant
+		pub let saleItemPublicPath: PublicPath 
+		pub let saleItemStoreagePath: StoragePath 
+
+		pub let  
+
+	}
+
+	//this needs to be a resource so that nobody else can make it.
+	pub resource Tenant {
+
+		pub let tenant : TenantInformation
+
+		init(_ tenant: TenantInformation) {
+			self.tenant=tenant
+		}
+	}
+
+	access(account) fun createTenant(_ tenant: TenantInformation) : @Tenant {
+		return <- create Tenant(tenant)
+	}
+
+	// Tenant admin stuff
+	//Admin client to use for capability receiver pattern
+	pub fun createTenantClient() : @TenantClient {
+		return <- create TenantClient()
+	}
+
+	//interface to use for capability receiver pattern
+	pub resource interface TenantPublic  {
+		pub fun addCapability(_ cap: Capability<&Tenant>)
+	}
+
+
+	//admin proxy with capability receiver 
+	pub resource TenantClient: TenantPublic {
+
+		access(self) var capability: Capability<&Tenant>?
+
+		pub fun addCapability(_ cap: Capability<&Tenant>) {
+			pre {
+				cap.check() : "Invalid tenant"
+				self.capability == nil : "Server already set"
+			}
+			self.capability = cap
+		}
+
+		init() {
+			self.capability = nil
+		}
+
+		pub fun getTenant() : &Tenant {
+			pre {
+				self.capability != nil: "TenentClient is not present"
+				self.capability!.check()  : "Tenant client is not linked anymore"
+			}
+
+			return self.capability!.borrow()!
+		}
+	}
+
+
+	// ==================================================================
+
+	**/
 	pub struct SaleItemBidderInfo {
 		pub let amount: UFix64?
 		pub let bidder: Address?
@@ -591,17 +688,17 @@ pub contract FindMarket {
 				emit Sold(id: id, previousOwner:owner, newOwner: cb.address, amount: soldFor, vaultType: ftType.identifier)
 				emit ForSale(id: id, owner:owner, amount: soldFor, active: false, vaultType: ftType.identifier)
 
-				let royaltyType=Type<FindViews.Royalties>()
-				var royalty: FindViews.Royalties?=nil
+				let royaltyType=Type<MetadataViews.Royalties>()
+				var royalty: MetadataViews.Royalties?=nil
 
 				if saleItem.pointer.getViews().contains(royaltyType) {
-					royalty = saleItem.pointer.resolveView(royaltyType)! as! FindViews.Royalties
+					royalty = saleItem.pointer.resolveView(royaltyType)! as! MetadataViews.Royalties
 				}
 				let vault <- saleItem.sellNFT(cb)
 
 				if royalty != nil {
-					for royaltyItem in royalty!.items {
-						let description=royaltyItem.description ?? ""
+					for royaltyItem in royalty!.getRoyalties() {
+						let description=royaltyItem.description 
 						let cutAmount= soldFor * royaltyItem.cut
 						emit RoyaltyPaid(id: id, name: description, amount: cutAmount,  vaultType: ftType.identifier)
 						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -801,25 +898,7 @@ pub contract FindMarket {
 			return bidInfo
 		}
 
-		/**
-		TODO: Tenant
-		Here we need to send in a FindMarketTenant
-
-		- name: The name of this tenant, will be in every event
-		- nftType: [Type]? //optional list of types you can sell here
-		- ftType: [Type]? //optional list of types you can take as payment here
-		- bidPublicPath
-		- bidStoragePath
-		- saleItemPublicPath
-		- saleItemStoragePath
-
-		cuts:
-		- tenant
-		- find
-
-		**/
-
-		//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
+				//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
 				self.owner!.address != item.owner()  : "You cannot bid on your own resource"

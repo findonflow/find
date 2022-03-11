@@ -25,10 +25,10 @@ func TestDandy(t *testing.T) {
         	            	          "A.f8d6e0586b0a20c7.FindViews.Nounce",
 			        	            	    "String",
 			        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-			        	            	    "A.f8d6e0586b0a20c7.FindViews.Royalties",
+			        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 																	"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-																	"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
-																	"A.f8d6e0586b0a20c7.FindViews.SerialNumber"
+																	"A.f8d6e0586b0a20c7.FindViews.SerialNumber",
+																	"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile"
 			        	            	]`, res)
 		display := `
 	{

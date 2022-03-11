@@ -8,7 +8,6 @@ import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
-
 //really not sure on how to input links here.)
 transaction(name: String) {
 	prepare(acct: AuthAccount) {
@@ -91,5 +90,16 @@ transaction(name: String) {
 				acct.save<@FindMarket.MarketBidCollection>(<- FindMarket.createEmptyMarketBidCollection(receiver: receiver), to: FindMarket.MarketBidCollectionStoragePath)
 				acct.link<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath, target: FindMarket.MarketBidCollectionStoragePath)
 		}
+
+
+		/*
+		let tenant= getAccount(marketplaceAddress).getCapability<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath).borrow()!.getTenant()
+		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenant.salePublicPath)
+		if !saleItemCap.check() {
+				acct.save<@FindMarket.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(tenant), to: tenant.saleStoragePath)
+				acct.link<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath, target: tenant.saleStoragePath)
+			}
+			*/
+	
 	}
 }
