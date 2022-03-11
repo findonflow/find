@@ -56,6 +56,8 @@ import Momentables from 0x9d21537544d9123d
 import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
+import DayNFT from 0x1600b04bf033fb99
+
 pub struct MetadataCollections {
 
 	pub let items: {String : MetadataCollectionItem}
@@ -1216,37 +1218,131 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
-
-	/*
-	let beamCap = account.getCapability<&{Beam.BeamCollectionPublic}>(Beam.CollectionPublicPath)
-	if beamCap.check() {
+	let zeedzCap = account.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
+	if zeedzCap.check() {
 		let items: [String] = []
-		let collection = beamCap.borrow()!
+		let collection = zeedzCap.borrow()!
 		for id in collection.getIDs() {
-			let nft = collection.borrowCollectible(id: id)!
+			let nft = collection.borrowZeedle(id: id)!
 
-			let metadata = Beam.getCollectibleItemMetaData(collectibleItemID: nft.data.collectibleItemID)!
-			var mediaUrl: String? = metadata["mediaUrl"]
-			if mediaUrl != nil &&  mediaUrl!.slice(from: 0, upTo: 7) != "ipfs://" {
-			mediaUrl = "ipfs://".concat(mediaUrl!)
+			let item = MetadataCollectionItem(
+				id: id,
+				name: nft.name,
+				image: "ipfs://".concat(nft.imageURI),
+				url: "http://zeedz.io",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: nft.rarity
+			)
+			let itemId="zeedz".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 		}
-		let item = MetadataCollectionItem(
-			id: id,
-			name: metadata["title"]!,
-			image: mediaUrl ?? "",
-			url: "https://".concat(metadata["domainUrl"]!),
-			listPrice: nil,
-			listToken: nil,
-			contentType: metadata["mediaType"]!,
-			rarity: ""
-		)
-		let itemId="FrightClub".concat(id.toString())
-		items.append(itemId)
+
+
+		if items.length != 0 {
+			results["Zeedz"] = items
+		}
+	}
+
+
+	let dayItems: [String] =[]
+  let dayNFT = getItemForMetadataStandard(path: DayNFT.CollectionPublicPath, account: account, externalFixedUrl: "https://day-nft.io")
+	for item in dayNFT {
+		let itemId="DayNFT".concat(item.id.toString())
+		dayItems.append(itemId)
 		resultMap[itemId] = item
 	}
-	if items.length != 0 {
-		results["Fright Club"] = items
+
+	if dayItems.length != 0 {
+		results["DayNFT"] = dayItems
 	}
+
+	if results.keys.length == 0 {
+		return nil
+	}
+
+	let publicPath=/public/FindCuratedCollections
+	let link = account.getCapability<&{String: [String]}>(publicPath)
+	var curatedCollections : {String: [String]} = {}
+	if link.check() {
+		let curated = link.borrow()!
+		for curatedKey in curated.keys {
+			curatedCollections[curatedKey] = curated[curatedKey]!
+		}
+	}
+
+	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
+}
+
+//This uses a view from Neo until we agree on another for ExternalDomainViewUrl
+pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
+	let items: [MetadataCollectionItem] = []
+	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	if resolverCollectionCap.check() {
+		let collection = resolverCollectionCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowViewResolver(id: id)!
+
+			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
+				let display = displayView as! MetadataViews.Display
+				var externalUrl=externalFixedUrl
+				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
+					let url= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+					externalUrl=url.url
+				}
+
+				let item = MetadataCollectionItem(
+					id: id,
+					name: display.name,
+					image: display.thumbnail.uri(),
+					url: externalUrl,
+					listPrice: nil,
+					listToken: nil,
+					contentType: "image",
+					rarity: ""
+				)
+
+				items.append(item)
+			}
+		}
+	}
+	return items
+
+}
+
+
+/*
+let beamCap = account.getCapability<&{Beam.BeamCollectionPublic}>(Beam.CollectionPublicPath)
+if beamCap.check() {
+	let items: [String] = []
+	let collection = beamCap.borrow()!
+	for id in collection.getIDs() {
+		let nft = collection.borrowCollectible(id: id)!
+
+		let metadata = Beam.getCollectibleItemMetaData(collectibleItemID: nft.data.collectibleItemID)!
+		var mediaUrl: String? = metadata["mediaUrl"]
+		if mediaUrl != nil &&  mediaUrl!.slice(from: 0, upTo: 7) != "ipfs://" {
+		mediaUrl = "ipfs://".concat(mediaUrl!)
+	}
+	let item = MetadataCollectionItem(
+		id: id,
+		name: metadata["title"]!,
+		image: mediaUrl ?? "",
+		url: "https://".concat(metadata["domainUrl"]!),
+		listPrice: nil,
+		listToken: nil,
+		contentType: metadata["mediaType"]!,
+		rarity: ""
+	)
+	let itemId="FrightClub".concat(id.toString())
+	items.append(itemId)
+	resultMap[itemId] = item
+}
+if items.length != 0 {
+	results["Fright Club"] = items
+}
 }*/
 
 
@@ -1285,82 +1381,3 @@ if resolverCollectionCap.check() {
 }
 */
 
-let zeedzCap = account.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
-if zeedzCap.check() {
-	let items: [String] = []
-	let collection = zeedzCap.borrow()!
-	for id in collection.getIDs() {
-		let nft = collection.borrowZeedle(id: id)!
-
-		let item = MetadataCollectionItem(
-			id: id,
-			name: nft.name,
-			image: "ipfs://".concat(nft.imageURI),
-			url: "http://zeedz.io",
-			listPrice: nil,
-			listToken: nil,
-			contentType: "image",
-			rarity: nft.rarity
-		)
-		let itemId="zeedz".concat(id.toString())
-		items.append(itemId)
-		resultMap[itemId] = item
-	}
-
-
-	if items.length != 0 {
-		results["Zeedz"] = items
-	}
-}
-if results.keys.length == 0 {
-	return nil
-}
-
-let publicPath=/public/FindCuratedCollections
-let link = account.getCapability<&{String: [String]}>(publicPath)
-var curatedCollections : {String: [String]} = {}
-if link.check() {
-	let curated = link.borrow()!
-	for curatedKey in curated.keys {
-		curatedCollections[curatedKey] = curated[curatedKey]!
-	}
-}
-
-return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
-}
-
-//This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
-	let items: [MetadataCollectionItem] = []
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
-	if resolverCollectionCap.check() {
-		let collection = resolverCollectionCap.borrow()!
-		for id in collection.getIDs() {
-			let nft = collection.borrowViewResolver(id: id)!
-
-			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
-				let display = displayView as! MetadataViews.Display
-				var externalUrl=externalFixedUrl
-				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
-					let url= externalUrlView! as! NeoViews.ExternalDomainViewUrl
-					externalUrl=url.url
-				}
-
-				let item = MetadataCollectionItem(
-					id: id,
-					name: display.name,
-					image: display.thumbnail.uri(),
-					url: externalUrl,
-					listPrice: nil,
-					listToken: nil,
-					contentType: "image",
-					rarity: ""
-				)
-
-				items.append(item)
-			}
-		}
-	}
-	return items
-
-}
