@@ -9,14 +9,13 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 //really not sure on how to input links here.)
-transaction(name: String, marketplace:Address) {
+transaction(name: String) {
 	prepare(acct: AuthAccount) {
 		//if we do not have a profile it might be stored under a different address so we will just remove it
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if profileCap.check() {
 			return 
 		}
-
 
 		let dandyCap= acct.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
 		if !dandyCap.check() {
@@ -79,9 +78,7 @@ transaction(name: String, marketplace:Address) {
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
-		//TODO: this can be a method on FindMarket to get tenantInformation from an address
-		//We fetch the find market tenant and create a saleItem/bid collection for it
-		let tenant= FindMarket.getTenant(marketplace) ?? panic("cannot find tenant information")
+		let tenant= FindMarket.getFindTenant()
 		let tenantInformation=tenant.information
 		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenantInformation.saleItemPublicPath)
 		if !saleItemCap.check() {

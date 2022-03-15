@@ -28,8 +28,8 @@ pub fun main(user: Address) : FINDReport{
 	let account=getAccount(user)
 	let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-	let marketBidCap= account.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
-	let saleItemCap= account.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath)
+	let marketBidCap= FindMarket.getFindBidCapability(user)!
+	let saleItemCap= FindMarket.getFindSaleItemCapability(user)!
 	let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 	return FINDReport(
 		profile: profile?.asProfile(),

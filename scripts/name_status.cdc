@@ -32,8 +32,8 @@ pub fun main(name: String) : FINDNameReport{
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 
-		let marketBidCap= account.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
-		let saleItemCap= account.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath)
+		let marketBidCap= FindMarket.getFindBidCapability(address)!  
+		let saleItemCap= FindMarket.getFindSaleItemCapability(address)!
 		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
 		if leaseCap.check() {

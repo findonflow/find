@@ -14,7 +14,8 @@ transaction(id: UInt64) {
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 		let pointer= FindViews.AuthNFTPointer(cap: dandyPrivateCap, id: id)
 
-		let market = account.borrow<&FindMarket.SaleItemCollection>(from: FindMarket.SaleItemCollectionStoragePath)!
+		let tenant=FindMarket.getFindTenant()
+		let market = account.borrow<&FindMarket.SaleItemCollection>(from: tenant.information.saleItemStoragePath)!
 		market.fulfillDirectOffer(pointer)
 
 	}

@@ -124,7 +124,7 @@ pub contract FindMarket {
 		return <- create TenantClient()
 	}
 
-		//interface to use for capability receiver pattern
+	//interface to use for capability receiver pattern
 	pub resource interface TenantPublic  {
 		pub fun getTenant() : &Tenant 
 		pub fun addCapability(_ cap: Capability<&Tenant>)
@@ -187,9 +187,9 @@ pub contract FindMarket {
 
 		init(_ item: &SaleItem) {
 
-			self.type= item.pointer.getItemType()
-			self.typeId=item.pointer.id
-			self.id=item.pointer.getUUID()
+			self.type= item.escrow?.getType() ?? item.pointer.getItemType()
+			self.typeId=item.escrow?.id ?? item.pointer.id
+			self.id= item.escrow?.uuid ?? item.pointer.getUUID()
 			let bidderInfo=item.getSaleItemBidderInfo()
 			self.amount=bidderInfo.amount
 			self.bidder=bidderInfo.bidder
@@ -674,7 +674,6 @@ pub contract FindMarket {
 			let ftType=saleItem.vaultType
 			let owner=self.owner!.address
 
-			//TODO: generalize code below
 			if let cb= saleItem.offerCallback {
 				let oldProfile= getAccount(owner).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
@@ -712,7 +711,7 @@ pub contract FindMarket {
 					emit RoyaltyPaid(id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier)
 					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-					
+
 				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			} else if let auction = saleItem.auction {
@@ -723,13 +722,15 @@ pub contract FindMarket {
 				emit Sold(id: id, previousOwner:owner, newOwner: auction.latestBidCallback.address, amount: soldFor, vaultType:ftType.identifier)
 				emit ForAuction(id: id, owner:owner, amount: soldFor, auctionReservePrice: saleItem.auctionReservePrice!,  active: false, vaultType: ftType.identifier)
 
+				let vault <- saleItem.sellNFT(auction.latestBidCallback)
+				/*
+				//TODO: handle royalty from the escrowed item
 				let royaltyType=Type<MetadataViews.Royalties>()
 				var royalty: MetadataViews.Royalties?=nil
 
 				if saleItem.pointer.getViews().contains(royaltyType) {
 					royalty = saleItem.pointer.resolveView(royaltyType)! as! MetadataViews.Royalties
 				}
-				let vault <- saleItem.sellNFT(auction.latestBidCallback)
 
 				if royalty != nil {
 					for royaltyItem in royalty!.getRoyalties() {
@@ -751,7 +752,8 @@ pub contract FindMarket {
 					emit RoyaltyPaid(id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier)
 					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-					
+				*/
+
 				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			}
@@ -998,18 +1000,41 @@ pub contract FindMarket {
 		return <- create MarketBidCollection(receiver: receiver, tenant:tenant)
 	}
 
+	pub fun getFindTenant() : &Tenant {
+		return FindMarket.getTenant(FindMarket.account.address) ?? panic("Find market tenant not set up correctly")
+	}
+
+	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>? {
+		return FindMarket.getSaleItemCapability(marketplace: FindMarket.account.address, user:user) 
+	}
+
+	pub fun getFindBidCapability(_ user: Address) :Capability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>? {
+		return FindMarket.getBidCapability(marketplace:FindMarket.account.address, user:user) 
+	}
+
 	pub fun getTenant(_ marketplace:Address) : &Tenant? {
 		return getAccount(marketplace).getCapability<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath).borrow()?.getTenant()
 	}
 
-	pub fun getSaleItemCapability(_ marketplace:Address) : Capability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>? {
-		if let tenant= FindMarket.getTenant(marketplace) {
-			return getAccount(marketplace).getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenant.information.saleItemPublicPath)
+	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>? {
+		if let tenant=FindMarket.getTenant(marketplace) {
+			return getAccount(user).getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenant.information.saleItemPublicPath)
 		}
 		return nil
 	}
 
-init() {
+
+	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>? {
+		if let tenant=FindMarket.getTenant(marketplace) {
+			return getAccount(user).getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(tenant.information.bidPublicPath)
+		}
+		return nil
+
+	}
+
+
+
+	init() {
 		self.TenantClientPublicPath=/public/findMarketClient
 		self.TenantClientStoragePath=/storage/findMarketClient
 

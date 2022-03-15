@@ -8,8 +8,8 @@ import FindViews from "../contracts/FindViews.cdc"
 
 transaction(id: UInt64, price:UFix64) {
 	prepare(account: AuthAccount) {
-
-		let saleItems= account.borrow<&FindMarket.SaleItemCollection>(from: FindMarket.SaleItemCollectionStoragePath)!
+		let tenant=FindMarket.getFindTenant()
+		let saleItems= account.borrow<&FindMarket.SaleItemCollection>(from: tenant.information.saleItemStoragePath) ?? panic("Cannot find saleItems")
 
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 
