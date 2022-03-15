@@ -27,15 +27,16 @@ The market has 2 collections
 //TODO: ensure we have the correct scripts to return the information we need in tests
 pub contract FindMarket {
 
-	pub let SaleItemCollectionStoragePath: StoragePath
-	pub let SaleItemCollectionPublicPath: PublicPath
+	pub let TenantClientPublicPath: PublicPath
+	pub let TenantClientStoragePath: StoragePath
 
-	pub let MarketBidCollectionStoragePath: StoragePath
-	pub let MarketBidCollectionPublicPath: PublicPath
+	pub let TenantPrivatePath: PrivatePath
+	pub let TenantStoragePath: StoragePath
 
 	pub event NFTEscrowed(id: UInt64)
 
 	//TODO: all these evnts need market and possibly also nftType and display information if any.
+	//TODO: all the events need tenant and resolving names
 
 	pub event RoyaltyPaid(id: UInt64, name:String, amount: UFix64, vaultType:String)
 
@@ -61,54 +62,55 @@ pub contract FindMarket {
 	/// Emitted when there is a new bid in an auction
 	pub event AuctionBid(id: UInt64, bidder: Address, amount: UFix64, auctionEndAt: UFix64, vaultType:String)
 
-
-/**
-		TODO: Tenant
-		Here we need to send in a FindMarketTenant
-
-		- name: The name of this tenant, will be in every event
-		- nftType: [Type]? //optional list of types you can sell here
-		- ftType: [Type]? //optional list of types you can take as payment here
-		- bidPublicPath
-		- bidStoragePath
-		- saleItemPublicPath
-		- saleItemStoragePath
-
-		cuts:
-		- tenant
-		- find
-
 	pub struct TenantInformation {
 
 		//This is the name of the tenant, it will be in all the events and 
 		pub let name: String
-		//TODO: do we need address in here?
 
-		//if this is set only NFTs of that type can be sold at this tenant
-		pub let validNFTTypes: [Type]?
+		//TODO; add getters 
+		//if this is not empty, only NFTs of that type can be sold at this tenant
+		access(self) let validNFTTypes: [Type]
 
-		//if this is set only FTs of this type can be registered for sale/bid with on this tenant. No matter what the NFT support
-		pub let ftTypes: [Type]?
+		//if this is not empty, only FTs of this type can be registered for sale/bid with on this tenant. No matter what the NFT support
+		access(self) let ftTypes: [Type]
 
 		//the paths to the bid collection for this tenant
 		pub let bidPublicPath: PublicPath 
-		pub let bidStoreagePath: StoragePath 
+		pub let bidStoragePath: StoragePath 
 
 		//the paths to the saleItem collection for this tenant
 		pub let saleItemPublicPath: PublicPath 
-		pub let saleItemStoreagePath: StoragePath 
+		pub let saleItemStoragePath: StoragePath 
 
-		pub let  
+		pub let findCut: MetadataViews.Royalty?
+		pub let tenantCut: MetadataViews.Royalty?
 
+		pub let auctionsSupported:Bool
+		pub let directOffersSupported:Bool
+		//TODO: needs information about what bid types to allow, a tenenat can only support directOffers
+
+		init(name:String, validNFTTypes: [Type], ftTypes:[Type], findCut: MetadataViews.Royalty?, tenantCut: MetadataViews.Royalty?, bidPublicPath: PublicPath, bidStoragePath:StoragePath, saleItemPublicPath: PublicPath, saleItemStoragePath:StoragePath, auctions: Bool, directOffers:Bool ) {
+			self.name=name
+			self.validNFTTypes=validNFTTypes
+			self.ftTypes=ftTypes
+			self.findCut=findCut
+			self.tenantCut=tenantCut
+			self.bidPublicPath=bidPublicPath
+			self.bidStoragePath=bidStoragePath
+			self.saleItemPublicPath=saleItemPublicPath
+			self.saleItemStoragePath=saleItemStoragePath
+			self.directOffersSupported=directOffers
+			self.auctionsSupported=auctions
+		}
 	}
 
 	//this needs to be a resource so that nobody else can make it.
 	pub resource Tenant {
 
-		pub let tenant : TenantInformation
+		pub let information : TenantInformation
 
 		init(_ tenant: TenantInformation) {
-			self.tenant=tenant
+			self.information=tenant
 		}
 	}
 
@@ -122,11 +124,11 @@ pub contract FindMarket {
 		return <- create TenantClient()
 	}
 
-	//interface to use for capability receiver pattern
+		//interface to use for capability receiver pattern
 	pub resource interface TenantPublic  {
+		pub fun getTenant() : &Tenant 
 		pub fun addCapability(_ cap: Capability<&Tenant>)
 	}
-
 
 	//admin proxy with capability receiver 
 	pub resource TenantClient: TenantPublic {
@@ -156,9 +158,6 @@ pub contract FindMarket {
 	}
 
 
-	// ==================================================================
-
-	**/
 	pub struct SaleItemBidderInfo {
 		pub let amount: UFix64?
 		pub let bidder: Address?
@@ -418,16 +417,10 @@ pub contract FindMarket {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 
-		//the cut the network will take, default 5%
-		access(contract) let networkCut: UFix64
-
-		//the wallet of the network to transfer royalty to
-		access(contract) let networkWallet: Capability<&{FungibleToken.Receiver}>
-
-		init (networkCut: UFix64, networkWallet: Capability<&{FungibleToken.Receiver}>) {
+		access(contract) let tenant: TenantInformation
+		init (_ tenant: &Tenant) {
 			self.items <- {}
-			self.networkCut=networkCut
-			self.networkWallet=networkWallet
+			self.tenant=tenant.information
 		}
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : SaleItemInformation {
@@ -531,6 +524,7 @@ pub contract FindMarket {
 			let id = item.getUUID()
 
 			//If this is a DirectOffer we just add a new saleItem with that pointer
+			//TODO: if this tenant does not support direct offer panic here
 			if !self.items.containsKey(id) {
 				let saleItem <- create SaleItem(pointer: item, vaultType:vaultType)
 				self.items[id] <-! saleItem
@@ -538,6 +532,7 @@ pub contract FindMarket {
 
 			let saleItem=self.borrow(id)
 			if let auction= saleItem.auction {
+				//TODO: if this tenantn does not support auctions panic here
 				if auction.endsAt < timestamp {
 					panic("Auction has ended")
 				}
@@ -679,6 +674,7 @@ pub contract FindMarket {
 			let ftType=saleItem.vaultType
 			let owner=self.owner!.address
 
+			//TODO: generalize code below
 			if let cb= saleItem.offerCallback {
 				let oldProfile= getAccount(owner).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
@@ -704,30 +700,58 @@ pub contract FindMarket {
 						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 					}
 				}
-				if self.networkCut != 0.0 {
-					let cutAmount= soldFor * self.networkCut
-					emit RoyaltyPaid(id: id, name: "market", amount: cutAmount,  vaultType: ftType.identifier)
-					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+
+				if let findCut =self.tenant.findCut {
+					let cutAmount= soldFor * self.tenant.findCut!.cut
+					emit RoyaltyPaid(id: id, name: "find", amount: cutAmount,  vaultType: ftType.identifier)
+					findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
+				if let tenantCut =self.tenant.tenantCut {
+					let cutAmount= soldFor * self.tenant.findCut!.cut
+					emit RoyaltyPaid(id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier)
+					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				}
+					
 				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			} else if let auction = saleItem.auction {
 
-				//TODO: fix royalty here.
 				let soldFor=auction.getAuctionBalance()
 				let oldProfile= getAccount(saleItem.pointer.owner()).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 
 				emit Sold(id: id, previousOwner:owner, newOwner: auction.latestBidCallback.address, amount: soldFor, vaultType:ftType.identifier)
 				emit ForAuction(id: id, owner:owner, amount: soldFor, auctionReservePrice: saleItem.auctionReservePrice!,  active: false, vaultType: ftType.identifier)
 
+				let royaltyType=Type<MetadataViews.Royalties>()
+				var royalty: MetadataViews.Royalties?=nil
+
+				if saleItem.pointer.getViews().contains(royaltyType) {
+					royalty = saleItem.pointer.resolveView(royaltyType)! as! MetadataViews.Royalties
+				}
 				let vault <- saleItem.sellNFT(auction.latestBidCallback)
 
-				if self.networkCut != 0.0 {
-					let cutAmount= soldFor * self.networkCut
-					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				if royalty != nil {
+					for royaltyItem in royalty!.getRoyalties() {
+						let description=royaltyItem.description 
+						let cutAmount= soldFor * royaltyItem.cut
+						emit RoyaltyPaid(id: id, name: description, amount: cutAmount,  vaultType: ftType.identifier)
+						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+					}
 				}
 
+				if let findCut =self.tenant.findCut {
+					let cutAmount= soldFor * self.tenant.findCut!.cut
+					emit RoyaltyPaid(id: id, name: "find", amount: cutAmount,  vaultType: ftType.identifier)
+					findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				}
+
+				if let tenantCut =self.tenant.tenantCut {
+					let cutAmount= soldFor * self.tenant.findCut!.cut
+					emit RoyaltyPaid(id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier)
+					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				}
+					
 				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			}
@@ -858,11 +882,13 @@ pub contract FindMarket {
 
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
+		access(contract) let tenant: TenantInformation
 
 		//not sure we can store this here anymore. think it needs to be in every bid
-		init(receiver: Capability<&{FungibleToken.Receiver}>) {
+		init(receiver: Capability<&{FungibleToken.Receiver}>, tenant: &Tenant) {
 			self.bids <- {}
 			self.receiver=receiver
+			self.tenant=tenant.information
 		}
 
 		//called from lease when auction is ended
@@ -898,7 +924,6 @@ pub contract FindMarket {
 			return bidInfo
 		}
 
-				//the bid collection cannot be indexed on saleItem id since we have some bids that do not have saleItemId
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
 				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
@@ -906,12 +931,12 @@ pub contract FindMarket {
 			}
 
 			let uuid=item.getUUID()
-			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath)
+			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.tenant.saleItemPublicPath)
 			let vaultType=vault.getType()
 
 			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
-			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.tenant.bidPublicPath)
 			let oldToken <- self.bids[uuid] <- bid
 			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType) 
 			destroy oldToken
@@ -964,21 +989,32 @@ pub contract FindMarket {
 
 	// TODO: this must take FindMarketTenant
 	//Create an empty lease collection that store your leases to a name
-	pub fun createEmptySaleItemCollection(): @SaleItemCollection {
+	pub fun createEmptySaleItemCollection(_ tenant: &Tenant): @SaleItemCollection {
 		let wallet=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		return <- create SaleItemCollection(networkCut:0.05, networkWallet: wallet)
+		return <- create SaleItemCollection(tenant)
 	}
 
-	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>) : @MarketBidCollection {
-		return <- create MarketBidCollection(receiver: receiver)
+	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenant: &Tenant) : @MarketBidCollection {
+		return <- create MarketBidCollection(receiver: receiver, tenant:tenant)
 	}
 
-	init() {
+	pub fun getTenant(_ marketplace:Address) : &Tenant? {
+		return getAccount(marketplace).getCapability<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath).borrow()?.getTenant()
+	}
 
-		self.SaleItemCollectionStoragePath=/storage/findMarketSaleItem
-		self.SaleItemCollectionPublicPath=/public/findMarketSaleItem
+	pub fun getSaleItemCapability(_ marketplace:Address) : Capability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>? {
+		if let tenant= FindMarket.getTenant(marketplace) {
+			return getAccount(marketplace).getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenant.information.saleItemPublicPath)
+		}
+		return nil
+	}
 
-		self.MarketBidCollectionStoragePath=/storage/findMarketBids
-		self.MarketBidCollectionPublicPath=/public/findMarketBids
+init() {
+		self.TenantClientPublicPath=/public/findMarketClient
+		self.TenantClientStoragePath=/storage/findMarketClient
+
+		self.TenantPrivatePath=/private/findMarketTenant
+		self.TenantStoragePath=/storage/findMarketTenant
+
 	}
 }

@@ -6,14 +6,13 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-transaction(id: UInt64, directSellPrice:UFix64) {
+transaction(id: UInt64, directSellPrice:UFix64, marketplace:Address) {
 	prepare(account: AuthAccount) {
 
-
-		let saleItems= account.borrow<&FindMarket.SaleItemCollection>(from: FindMarket.SaleItemCollectionStoragePath)!
+		let saleItems= FindMarket.getSaleItemCapability(marketplace) ?? panic("Could not find sale item capability for this tenant")
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 
 		let pointer= FindViews.AuthNFTPointer(cap: dandyPrivateCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: Type<@FUSD.Vault>(), directSellPrice: directSellPrice)
+		saleItems.borrow()!.listForSale(pointer: pointer, vaultType: Type<@FUSD.Vault>(), directSellPrice: directSellPrice)
 	}
 }

@@ -9,7 +9,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 //really not sure on how to input links here.)
-transaction(name: String) {
+transaction(name: String, marketplace:Address) {
 	prepare(acct: AuthAccount) {
 		//if we do not have a profile it might be stored under a different address so we will just remove it
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
@@ -74,32 +74,26 @@ transaction(name: String) {
 		}
 		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
-		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath)
-		if !saleItemCap.check() {
-				acct.save<@FindMarket.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(), to: FindMarket.SaleItemCollectionStoragePath)
-				acct.link<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath, target: FindMarket.SaleItemCollectionStoragePath)
-			}
-			
+
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
-		let receiver = acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let bidCap= acct.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath)
-		if !bidCap.check() {
-				acct.save<@FindMarket.MarketBidCollection>(<- FindMarket.createEmptyMarketBidCollection(receiver: receiver), to: FindMarket.MarketBidCollectionStoragePath)
-				acct.link<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(FindMarket.MarketBidCollectionPublicPath, target: FindMarket.MarketBidCollectionStoragePath)
+		//TODO: this can be a method on FindMarket to get tenantInformation from an address
+		//We fetch the find market tenant and create a saleItem/bid collection for it
+		let tenant= FindMarket.getTenant(marketplace) ?? panic("cannot find tenant information")
+		let tenantInformation=tenant.information
+		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenantInformation.saleItemPublicPath)
+		if !saleItemCap.check() {
+			acct.save<@FindMarket.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(tenant), to: tenantInformation.saleItemStoragePath)
+			acct.link<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenantInformation.saleItemPublicPath, target: tenantInformation.saleItemStoragePath)
 		}
 
-
-		/*
-		let tenant= getAccount(marketplaceAddress).getCapability<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath).borrow()!.getTenant()
-		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenant.salePublicPath)
-		if !saleItemCap.check() {
-				acct.save<@FindMarket.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(tenant), to: tenant.saleStoragePath)
-				acct.link<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(FindMarket.SaleItemCollectionPublicPath, target: tenant.saleStoragePath)
-			}
-			*/
-	
+		let receiver = acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let bidCap= acct.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(tenantInformation.bidPublicPath)
+		if !bidCap.check() {
+			acct.save<@FindMarket.MarketBidCollection>(<- FindMarket.createEmptyMarketBidCollection(receiver: receiver, tenant:tenant), to: tenantInformation.bidStoragePath)
+			acct.link<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(tenantInformation.bidPublicPath, target: tenantInformation.bidStoragePath)
+		}
 	}
 }

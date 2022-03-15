@@ -12,6 +12,5 @@ transaction() {
 		}
 		account.save(<- Admin.createAdminProxyClient(), to:Admin.AdminProxyStoragePath)
 		account.link<&{Admin.AdminProxyClient}>(Admin.AdminProxyPublicPath, target: Admin.AdminProxyStoragePath)
-
 	}
 }

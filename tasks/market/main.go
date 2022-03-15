@@ -1,15 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
 
 	o := overflow.NewOverflowInMemoryEmulator().Start()
 
+	spew.Dump("test")
+	os.Exit(1)
 	//first step create the adminClient as the fin user
 	o.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("find").
@@ -26,6 +29,16 @@ func main() {
 		SignProposeAndPayAs("find").
 		RunPrintEventsFull()
 
+	o.TransactionFromFile("setup_find_market_1").
+		SignProposeAndPayAsService().
+		RunPrintEventsFull()
+
+	//link in the server in the versus client
+	o.TransactionFromFile("setup_find_market_2").
+		SignProposeAndPayAs("find").
+		Args(o.Arguments().Account("account").Boolean(true).Boolean(true)).
+		RunPrintEventsFull()
+
 	//we advance the clock
 	o.TransactionFromFile("clock").SignProposeAndPayAs("find").
 		Args(o.Arguments().UFix64(1.0)).
@@ -33,27 +46,22 @@ func main() {
 
 	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAsService().
-		Args(o.Arguments().String("find")).
+		Args(o.Arguments().String("find").Account("account")).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("user1").
-		Args(o.Arguments().String("User1")).
+		Args(o.Arguments().String("User1").Account("account")).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("user2").
-		Args(o.Arguments().String("User2")).
-		RunPrintEventsFull()
-
-	o.TransactionFromFile("createProfile").
-		SignProposeAndPayAsService().
-		Args(o.Arguments().String("Find")).
+		Args(o.Arguments().String("User2").Account("account")).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find").
-		Args(o.Arguments().String("Find")).
+		Args(o.Arguments().String("Find").Account("account")).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("mintFusd").
@@ -80,7 +88,7 @@ func main() {
 		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("mintDandy").
+	id := o.TransactionFromFile("mintDandy").
 		SignProposeAndPayAs("user1").
 		Args(o.Arguments().
 			String("user1").
@@ -89,42 +97,38 @@ func main() {
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
-		RunPrintEventsFull()
+		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
 
-		//TODO; read this from above
-	id := uint64(76)
+	o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 	/*
-		o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
+			o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
 
-		o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
+			o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
 
-		o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
-
-		o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
-	*/
-
-	o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
-
-	res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
-	fmt.Println(res)
-
-	/*
-		o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
-
-		res = o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user2")).RunReturnsJsonString()
-		fmt.Println(res)
-
-			o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
-
-			o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
 
 			o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
 
-			o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
+		o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 
-			o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
-			o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
-			o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
+		res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(res)
+
+			o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
+
+			res = o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user2")).RunReturnsJsonString()
+			fmt.Println(res)
+
+				o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
+
+				o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
+
+				o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+
+				o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
+
+				o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
+				o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
+				o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
 	*/
 
 }
