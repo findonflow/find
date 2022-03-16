@@ -56,7 +56,6 @@ func TestDandy(t *testing.T) {
 
 		otu.checkRoyalty("user1", id, "platform", 0.15)
 		otu.buyDandyForSale("user2", "user1", id, price)
-		otu.checkRoyalty("user2", id, "platform", 0.0)
 	})
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
