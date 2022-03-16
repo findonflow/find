@@ -80,11 +80,7 @@ pub contract FindMarket {
 
 	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, active: Bool, vaultType:String, nft:NFTInfo, buyer:Address?, buyerName:String?, currentBid: UFix64?)
 
-	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, active: Bool, vaultType:String, nft: NFTInfo, buyer:Address?, buyerName:String?)
-
-	//TODO: need one Event DirectOffer
-	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event DirectOfferBid(tenant:String, id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
+	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, active: Bool, vaultType:String, nft: NFTInfo, buyer:Address?, buyerName:String?, rejected:Bool)
 
 	pub event DirectOfferCanceled(tenant:String, id: UInt64, bidder: Address, vaultType:String)
 
@@ -544,10 +540,14 @@ pub contract FindMarket {
 				return
 			}
 
+			let owner=saleItem.owner!.address
+			let ftType=saleItem.vaultType
+			let nftInfo=NFTInfo(saleItem.pointer.getViewResolver())
+			let buyer=saleItem.offerCallback!.address
 			let balance=saleItem.offerCallback!.borrow()!.getBalance(id) 
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if saleItem.salePrice == nil  && saleItem.auctionStartPrice == nil{
-				emit DirectOfferBid(tenant:self.tenant.name, id: id, bidder: saleItem.offerCallback!.address, amount: balance, vaultType:saleItem.vaultType.identifier)
+				emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, active: true, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected: false)
 				return
 			}
 
@@ -557,7 +557,7 @@ pub contract FindMarket {
 			} else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit DirectOfferBid(tenant:self.tenant.name, id: id, bidder: saleItem.offerCallback!.address, amount: balance, vaultType:saleItem.vaultType.identifier)
+				emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, active: true, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected: false)
 			}
 		}
 
@@ -603,11 +603,15 @@ pub contract FindMarket {
 
 			saleItem.setCallback(callback)
 
-
-			Debug.log("Balance of bid is at ".concat(balance.toString()))
-			if saleItem.salePrice == nil && saleItem.auctionStartPrice == nil {
+			let owner=saleItem.owner!.address 
+			
+			let ftType=saleItem.vaultType
+			let nftInfo=NFTInfo(saleItem.pointer.getViewResolver()) 
+			let buyer=callback.address 
+			Debug.log("Balance of bid is at ".concat(balance.toString())) 
+			if saleItem.salePrice == nil && saleItem.auctionStartPrice == nil { 
 				Debug.log("Sale price not set")
-				emit DirectOfferBid(tenant:self.tenant.name, id: id, bidder: callback.address, amount: balance, vaultType: saleItem.vaultType.identifier)
+				emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, active: true, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected: false)
 				return
 			}
 
@@ -617,7 +621,7 @@ pub contract FindMarket {
 			}	 else if saleItem.auctionStartPrice != nil && balance >= saleItem.auctionStartPrice! {
 				self.startAuction(id)
 			} else {
-				emit DirectOfferBid(tenant:self.tenant.name, id: id, bidder: callback.address, amount: balance, vaultType:saleItem.vaultType.identifier)
+				emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, active: true, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected: false)
 			}
 
 		}
@@ -736,7 +740,7 @@ pub contract FindMarket {
 				if type !="direct" {
 					emit ForSale(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, active: false, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 				} else {
-					emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, active: false, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
+					emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, active: false, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected:false)
 				}
 
 				let royaltyType=Type<MetadataViews.Royalties>()
