@@ -337,6 +337,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		let nft <-  create NFT(name: name, description:description, schemas:views, minterPlatform: platform)
+
 		emit Minted(id:nft.id, minter:nft.minterPlatform.name, name: name, description:description)
 		return <-  nft
 	}

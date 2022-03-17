@@ -435,10 +435,10 @@ func (otu *OverflowTestUtils) directOfferMarket(name string, seller string, id u
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.DirectOfferBid", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
-			"bidder": otu.accountAddress(name),
+			"buyer":  otu.accountAddress(name),
 		}))
 	return otu
 }

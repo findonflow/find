@@ -75,16 +75,11 @@ pub contract FindMarket {
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, name:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	//TODO: Need more fields in here about what is in the event, so what is for sale, like display information aso
 	pub event ForSale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, active: Bool, vaultType:String, nft: NFTInfo, buyer:Address?, buyerName:String?)
 
 	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, active: Bool, vaultType:String, nft:NFTInfo, buyer:Address?, buyerName:String?, currentBid: UFix64?)
 
 	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, active: Bool, vaultType:String, nft: NFTInfo, buyer:Address?, buyerName:String?, rejected:Bool)
-
-	pub event DirectOfferCanceled(tenant:String, id: UInt64, bidder: Address, vaultType:String)
-
-	pub event DirectOfferRejected(tenant:String, id: UInt64, bidder: Address, amount: UFix64, vaultType:String)
 
 	//TODO: a tenant should say if they want escrowed or not!
 	pub struct TenantInformation {
@@ -517,8 +512,14 @@ pub contract FindMarket {
 				panic("cannot cancel bid in auction")
 			}
 
+			let owner=saleItem.owner!.address
+			let ftType=saleItem.vaultType
+			let nftInfo=NFTInfo(saleItem.pointer.getViewResolver())
+			let balance=saleItem.offerCallback!.borrow()!.getBalance(id) 
+
 			if let callback = saleItem.offerCallback {
-				emit DirectOfferCanceled(tenant: self.tenant.name, id: id, bidder: callback.address, vaultType:saleItem.vaultType.identifier)
+				let buyer=callback.address
+				emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, active: false, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected: false)
 			}
 
 			saleItem.setCallback(nil)
@@ -637,7 +638,12 @@ pub contract FindMarket {
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= saleItem.offerCallback {
 				Debug.log("we have a direct offer so we cancel that")
-				emit DirectOfferRejected(tenant:self.tenant.name, id: id, bidder: cb.address, amount: cb.borrow()!.getBalance(id), vaultType:saleItem.vaultType.identifier)
+
+				let balance=cb.borrow()!.getBalance(id)
+				let buyer=cb.address
+				let ftType=saleItem.vaultType
+				let nftInfo=NFTInfo(saleItem.pointer.getViewResolver())
+				emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, active: false, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), rejected: true)
 				cb.borrow()!.cancelBidFromSaleItem(id)
 				saleItem.setCallback(nil)
 				return 
@@ -736,7 +742,6 @@ pub contract FindMarket {
 
 				let nftInfo= NFTInfo(saleItem.pointer.getViewResolver())
 
-				//TODO: emit an different event if type=="direct"
 				if type !="direct" {
 					emit ForSale(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, active: false, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 				} else {
