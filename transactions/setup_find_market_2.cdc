@@ -4,7 +4,6 @@ import "../contracts/Admin.cdc"
 transaction(tenantAddress: Address, auctions:Bool, directOffers:Bool) {
 	//versus account
 	prepare(account: AuthAccount) {
-
 		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 		//We create a tenant that has both auctions and direct offers
 		let tenant <- adminClient.createFindMarketTenant(auctions:auctions, directOffers:directOffers)

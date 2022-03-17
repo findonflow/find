@@ -321,11 +321,9 @@ pub contract Dandy: NonFungibleToken {
 		}
 	}
 
-
 	access(account)  fun createForge(platform: MinterPlatform) : @Forge {
 		return <- create Forge(platform:platform)
 	}
-
 
 	access(account) fun mintNFT(name: String, description: String, platform:MinterPlatform, schemas: [AnyStruct]) : @NFT {
 		let views : {String: ViewInfo} = {}

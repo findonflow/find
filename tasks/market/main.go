@@ -34,7 +34,7 @@ func main() {
 	//link in the server in the versus client
 	o.TransactionFromFile("setup_find_market_2").
 		SignProposeAndPayAs("find").
-		Args(o.Arguments().Account("account").Boolean(true).Boolean(true)).
+		Args(o.Arguments().Account("account").Boolean(true).Boolean(false)). //test with non escrow
 		RunPrintEventsFull()
 
 	//we advance the clock
@@ -120,9 +120,10 @@ func main() {
 
 	o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
 
-	o.SimpleTxArgs("fulfillMarketAuction", "user2", o.Arguments().Account("user1").UInt64(id))
-
+	//o.SimpleTxArgs("fulfillMarketAuction", "user2", o.Arguments().Account("user1").UInt64(id))
+	o.SimpleTxArgs("fulfillMarketAuctionNotEscrowed", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
 	/*
+
 		o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 		o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
 		o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()

@@ -484,7 +484,6 @@ pub contract FIND {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
-
 			let lease = self.borrow(name)
 
 			if lease.addons.containsKey(addon) {
