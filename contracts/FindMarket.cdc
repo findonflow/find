@@ -5,7 +5,6 @@ import FindViews from "../contracts/FindViews.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
-import Dandy from "./Dandy.cdc"
 import FIND from "./FIND.cdc"
 
 /*
@@ -29,7 +28,6 @@ A tenant can chose what NFTTypes to accept and what FTTypes to accept.
 //TODO: test all ! and convert to better error messages
 //TODO: what to do if item implements display when added and does not anymore. does not implement display anymore?
 //TODO: can a owner cancel an auction when it is running, if we do not escrow then he can
-//TODO: consider _not_ escrowing
 pub contract FindMarket {
 
 	pub let TenantClientPublicPath: PublicPath
@@ -72,7 +70,7 @@ pub contract FindMarket {
 
 	pub event NFTEscrowed(tenant:String, id: UInt64, nft:NFTInfo)
 
-	pub event RoyaltyPaid(tenant:String, id: UInt64, name:String, amount: UFix64, vaultType:String, nft:NFTInfo)
+	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, name:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
 	pub event ForSale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: NFTInfo, buyer:Address?, buyerName:String?)
 
@@ -298,6 +296,9 @@ pub contract FindMarket {
 			)
 
 		}
+
+		/*
+		//ESCROW: this can be added back once we can escrow auctions again
 		pub fun returnNFT() {
 			if self.auction==nil {
 				return
@@ -314,6 +315,7 @@ pub contract FindMarket {
 			}
 			panic("Not an auction")
 		}
+		*/
 
 		pub fun setAuction(auction: Auction, tenant: String) {
 
@@ -321,10 +323,11 @@ pub contract FindMarket {
 				panic("cannot start an auction since we do not have permission to withdraw nft")
 			}
 
-			let pointer= self.pointer as! FindViews.AuthNFTPointer
-			emit NFTEscrowed(tenant: tenant, id: pointer.id, nft:auction.nftInfo)
-			let old <- self.escrow <- pointer.withdraw()
-			destroy old
+		  //ESCROW: This code can be added back once we can safely read views from NFTS	
+			//let pointer= self.pointer as! FindViews.AuthNFTPointer
+			//emit NFTEscrowed(tenant: tenant, id: pointer.id, nft:auction.nftInfo)
+			//let old <- self.escrow <- pointer.withdraw()
+			//destroy old
 			self.auction=auction
 		}
 
@@ -380,6 +383,7 @@ pub contract FindMarket {
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
 		access(contract) let minimumBidIncrement: UFix64
+		//TODO: can we just use the same callback we have for SaleItem here? Why do we need our own?
 		access(contract) var latestBidCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
 		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, minimumBidIncrement: UFix64, id: UInt64, nftInfo: NFTInfo) {
@@ -399,7 +403,7 @@ pub contract FindMarket {
 			return self.latestBidCallback.borrow()!.getBalance(self.id)
 		}
 
-
+		//TODO: Move this to SaleItem
 		pub fun addBid(callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, timestamp: UFix64, tenantName: String, saleItem: &SaleItem) {
 			let offer=callback.borrow()!
 			offer.setBidType(id: self.id, type: "auction")
@@ -490,12 +494,9 @@ pub contract FindMarket {
 
 			let nftInfo= NFTInfo(saleItem.pointer.getViewResolver())
 			let callback=saleItem.offerCallback!
-
 			let offer=callback.borrow()!
 			let buyer=callback.address
-
 			let balance=offer.getBalance(id)
-
 			let owner=self.owner!.address
 			let endsAt=timestamp + duration
 
@@ -674,7 +675,8 @@ pub contract FindMarket {
 
 				emit ForAuction(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, auctionReservePrice: saleItem.auctionReservePrice!,  status: "cancelled", vaultType:saleItem.vaultType.identifier, nft: auction.nftInfo,  buyer: buyer, buyerName: FIND.reverseLookup(buyer), endsAt: Clock.time())
 
-				saleItem.returnNFT()
+				//ESCROW: this can be added back again once we can escrow NFTS again
+				//saleItem.returnNFT()
 				auction.latestBidCallback.borrow()!.cancelBidFromSaleItem(id)
 				destroy <- self.items.remove(key: id)
 			}
@@ -687,7 +689,7 @@ pub contract FindMarket {
 				self.borrow(id).auction != nil : "Cannot fulfill sale that is not an auction=".concat(id.toString())
 			}
 
-			return self.fulfill(id, type:"Auction")
+			return self.fulfill(id, type:"auction")
 		}
 
 		//Here we will have a seperate model to fulfill a direct offer since we then need to add the auth pointer to it?
@@ -712,13 +714,14 @@ pub contract FindMarket {
 
 		}
 
+		//TODO: clean up this code
 		pub fun fulfill(_ id: UInt64, type:String) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 
-
 			let saleItemRef = self.borrow(id)
+
 
 			if let auction=saleItemRef.auction {
 				if auction.endsAt > Clock.time() {
@@ -731,12 +734,17 @@ pub contract FindMarket {
 				if reservePrice > soldFor {
 					self.cancel(id)
 					return
+					//TODO: handle better when auction is actually finished here. 
 				}
 			}
 
 			let saleItem <- self.items.remove(key: id)!
 			let ftType=saleItem.vaultType
 			let owner=self.owner!.address
+			let nftInfo= NFTInfo(saleItem.pointer.getViewResolver())
+
+			let royaltyType=Type<MetadataViews.Royalties>()
+			var royalty: MetadataViews.Royalties?=nil
 
 			if let cb= saleItem.offerCallback {
 				let oldProfile= getAccount(owner).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -746,17 +754,12 @@ pub contract FindMarket {
 				let soldFor=offer.getBalance(id)
 				//move the token to the new profile
 
-				let nftInfo= NFTInfo(saleItem.pointer.getViewResolver())
-
 				if type !="direct" {
 					emit ForSale(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status: "finished", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 				} else {
 					//TODO: if non escrow bid, cannot fulfill from sellers account
 					emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"finished", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 				}
-
-				let royaltyType=Type<MetadataViews.Royalties>()
-				var royalty: MetadataViews.Royalties?=nil
 
 				if saleItem.pointer.getViews().contains(royaltyType) {
 					royalty = saleItem.pointer.resolveView(royaltyType)! as! MetadataViews.Royalties
@@ -765,29 +768,29 @@ pub contract FindMarket {
 				let pointer= saleItem.pointer as! FindViews.AuthNFTPointer
  		    let vault <- cb.borrow()!.accept(<- pointer.withdraw())
 
-
 				if royalty != nil {
 					for royaltyItem in royalty!.getRoyalties() {
 						let description=royaltyItem.description 
 						let cutAmount= soldFor * royaltyItem.cut
-						emit RoyaltyPaid(tenant:self.tenant.name, id: id, name: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+						emit RoyaltyPaid(tenant:self.tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), name: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 					}
 				}
 
 				if let findCut =self.tenant.findCut {
 					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(tenant: self.tenant.name, id: id, name: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), name: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 					findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
 				if let tenantCut =self.tenant.tenantCut {
 					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(tenant: self.tenant.name, id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), name: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 				oldProfile.deposit(from: <- vault)
 			} else if let auction = saleItem.auction {
+
 
 				let soldFor=auction.getAuctionBalance()
 				let oldProfile= getAccount(saleItem.pointer.owner()).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -795,45 +798,39 @@ pub contract FindMarket {
 				let buyer=auction.latestBidCallback.address
 				emit ForAuction(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, auctionReservePrice: saleItem.auctionReservePrice!,  status:"finished", vaultType: ftType.identifier, nft:auction.nftInfo, buyer: buyer, buyerName:FIND.reverseLookup(buyer), endsAt: Clock.time())
 
-				let nft <- saleItem.getEscrow()
-				let vault <- auction.latestBidCallback.borrow()!.accept(<- nft)
+				let pointer= saleItem.pointer as! FindViews.AuthNFTPointer
 
-				//let collectionRef = &self.collections[bucket] as! &TopShot.Collection
-				/*
-				//TODO: handle royalty from the escrowed item
-				let royaltyType=Type<MetadataViews.Royalties>()
-				var royalty: MetadataViews.Royalties?=nil
 
 				if saleItem.pointer.getViews().contains(royaltyType) {
 					royalty = saleItem.pointer.resolveView(royaltyType)! as! MetadataViews.Royalties
 				}
 
+				//ESCROW: add this back once we can escrow item again
+				//let nft <- saleItem.getEscrow()
+				let vault <- auction.latestBidCallback.borrow()!.accept(<- pointer.withdraw())
+
 				if royalty != nil {
 					for royaltyItem in royalty!.getRoyalties() {
 						let description=royaltyItem.description 
 						let cutAmount= soldFor * royaltyItem.cut
-						emit RoyaltyPaid(id: id, name: description, amount: cutAmount,  vaultType: ftType.identifier)
+						emit RoyaltyPaid(tenant:self.tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), name: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 					}
 				}
 
 				if let findCut =self.tenant.findCut {
 					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(id: id, name: "find", amount: cutAmount,  vaultType: ftType.identifier)
+					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), name: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 					findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 
 				if let tenantCut =self.tenant.tenantCut {
 					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier)
+					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), name: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-				*/
-
-				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			}
-			//TODO: if dandy mark royalty as paid!
 			destroy  saleItem
 		}
 
@@ -972,19 +969,10 @@ pub contract FindMarket {
 
 		//called from lease when auction is ended
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault {
-			let isDandy = nft.getType() == Type<@Dandy.NFT>() 
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			bid.nftCap.borrow()!.deposit(token: <- nft)
-
-			// TODO: is this a good idea? I do not think so anymore. 
-			/*
-			if isDandy {
-				let address=bid.nftCap.address
-				getAccount(address).getCapability<&{Dandy.CollectionPublic}>(Dandy.CollectionPublicPath).borrow()!.setPrimaryCutPaid(id)
-			}
-			*/
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
 			return <- vault

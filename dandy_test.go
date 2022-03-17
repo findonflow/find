@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -86,19 +87,16 @@ func TestDandy(t *testing.T) {
 
 		otu.listDandyForAuction("user1", id, price)
 
-		/*
-			res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-			fmt.Println(res)
-		*/
+		res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(res)
 
 		otu.auctionBidMarket("user2", "user1", id, price+5.0)
 
 		otu.tickClock(400.0)
 
-		/*
-			res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-			fmt.Println(res)
-		*/
+		res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(res)
+
 		otu.fulfillMarketAuction("user1", id, "user2", price+5.0)
 
 	})
