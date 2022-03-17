@@ -234,7 +234,6 @@ pub contract FindMarket {
 
 	pub resource SaleItem{
 
-
 		//TODO: leve this field here for now but do not use it until default impl is handled
 		access(contract) var escrow : @NonFungibleToken.NFT?
 
@@ -250,6 +249,7 @@ pub contract FindMarket {
 		access(contract) var auctionMinBidIncrement: UFix64
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
+		access(contract) var directOfferAccepted:Bool
 
 		//This most likely has to be a resource since we want to escrow when this starts
 		access(contract) var auction: Auction?
@@ -266,8 +266,12 @@ pub contract FindMarket {
 			self.offerCallback=nil
 			self.auction=nil
 			self.escrow <- nil
+			self.directOfferAccepted=false
 		}
 
+		pub fun acceptDirectOffer() {
+			self.directOfferAccepted=true
+		}
 
 		pub fun getSaleItemBidderInfo() : SaleItemBidderInfo {
 			if self.auction != nil {
@@ -461,10 +465,15 @@ pub contract FindMarket {
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
 
+		access(contract) fun isAcceptedDirectOffer(_ id:UInt64) :Bool
+
+		access(contract) fun fulfillDirectOfferNonEscrowed(id:UInt64, vault: @FungibleToken.Vault)
+
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ id: UInt64) 
 
 		//only if tenant is non escrowed auction
+		//TODO: put this in the bid account
 		pub fun fulfillNonEscrowedAuction(_ id: UInt64, vault: @FungibleToken.Vault) 
 	}
 
@@ -484,6 +493,15 @@ pub contract FindMarket {
 			}
 			return SaleItemInformation(self.borrow(id))
 
+		}
+
+		pub fun isAcceptedDirectOffer(_ id:UInt64) : Bool{
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			}
+			let saleItem = self.borrow(id)
+
+			return saleItem.directOfferAccepted
 		}
 
 		pub fun getItemsForSale(): [SaleItemInformation] {
@@ -583,6 +601,7 @@ pub contract FindMarket {
 				panic("This should never happen")
 			}
 		}
+
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
 		//TODO: clean up this code
@@ -700,6 +719,45 @@ pub contract FindMarket {
 			}
 		}
 
+
+		access(contract) fun fulfillDirectOfferNonEscrowed(id:UInt64, vault: @FungibleToken.Vault) {
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+				!self.tenant.escrowFT : "This tenant uses escrowed auctions"
+			}
+
+			let saleItemRef = self.borrow(id)
+			if !saleItemRef.directOfferAccepted {
+				panic("cannot fulfill a direct offer that is not accepted yet")
+			}
+		
+			if vault.getType() != saleItemRef.vaultType {
+				panic("The FT vault sent in to fulfill does not match the required type")
+			}
+
+			let saleItem <- self.items.remove(key: id)!
+			let pointer= saleItem.pointer as! FindViews.AuthNFTPointer
+			let ftType=saleItem.vaultType
+			let owner=self.owner!.address
+			let nftInfo= NFTInfo(pointer.getViewResolver())
+			let royaltyType=Type<MetadataViews.Royalties>()
+			var royalty: MetadataViews.Royalties?=nil
+			let offerCallback=saleItem.offerCallback!
+
+			let buyer= offerCallback.address
+			let soldFor=offerCallback.borrow()!.getBalance(id)
+
+			emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"accepted", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
+
+			if pointer.getViews().contains(royaltyType) {
+				royalty = saleItem.pointer.resolveView(royaltyType)! as! MetadataViews.Royalties
+			}
+
+			offerCallback.borrow()!.acceptNonEscrowed(<- pointer.withdraw())
+
+			self.pay(id: id, buyer: buyer, saleItem: <- saleItem, vault: <- vault, tenantName: self.tenant.name, royalty: royalty, nftInfo: nftInfo)
+		}
+
 		pub fun fulfillNonEscrowedAuction(_ id: UInt64, vault: @FungibleToken.Vault) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -737,7 +795,6 @@ pub contract FindMarket {
 			let nftInfo= NFTInfo(pointer.getViewResolver())
 			let royaltyType=Type<MetadataViews.Royalties>()
 			var royalty: MetadataViews.Royalties?=nil
-			let oldProfile= getAccount(pointer.owner()).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 			let buyer=auction.latestBidCallback.address
 
 			emit ForAuction(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, auctionReservePrice: saleItem.auctionReservePrice!,  status:"finishedNonEscrow", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName:FIND.reverseLookup(buyer), endsAt: Clock.time())
@@ -747,6 +804,15 @@ pub contract FindMarket {
 			}
 
 			auction.latestBidCallback.borrow()!.acceptNonEscrowed(<- pointer.withdraw())
+
+			self.pay(id: id, buyer: buyer, saleItem: <- saleItem, vault: <- vault, tenantName: self.tenant.name, royalty: royalty, nftInfo:nftInfo)
+		}
+
+		access(self) fun  pay(id: UInt64, buyer: Address, saleItem: @SaleItem, vault: @FungibleToken.Vault, tenantName: String, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo) {
+			let seller=saleItem.pointer.owner()
+			let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
+			let soldFor=vault.balance
+			let ftType=vault.getType()
 
 			if royalty != nil {
 				for royaltyItem in royalty!.getRoyalties() {
@@ -769,10 +835,8 @@ pub contract FindMarket {
 				tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 			oldProfile.deposit(from: <- vault)
-
 			destroy saleItem
 		}
-
 
 		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
 		pub fun fulfillAuction(_ id: UInt64) {
@@ -805,6 +869,32 @@ pub contract FindMarket {
 			//need to singla that this is direct offer somehow
 			self.fulfill(id, type: "direct")
 
+		}
+
+
+		pub fun acceptNonEscrowedDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
+			pre {
+				self.items.containsKey(pointer.getUUID()) : "Invalid id=".concat(pointer.getUUID().toString())
+			}
+
+			let id = pointer.getUUID()
+			let saleItemRef = self.borrow(id)
+
+			if let auction=saleItemRef.auction {
+				panic("This item has an ongoing auction, you cannot fullfill this direct offer")
+			}
+
+			//Set the auth pointer in the saleItem so that it now can be fulfilled
+			saleItemRef.setPointer(pointer)
+			saleItemRef.acceptDirectOffer()
+
+			let owner=self.owner!.address
+			let soldFor=saleItemRef.offerCallback!.borrow()!.getBalance(id)
+			let ftType=saleItemRef.vaultType
+			let nftInfo=NFTInfo(pointer.getViewResolver())
+			let buyer=pointer.owner()
+
+			emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"accepted", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 		}
 
 		
@@ -841,8 +931,6 @@ pub contract FindMarket {
 			var royalty: MetadataViews.Royalties?=nil
 
 			if let cb= saleItem.offerCallback {
-				let oldProfile= getAccount(owner).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
-
 				let offer= cb.borrow()!
 				let buyer= cb.address
 				let soldFor=offer.getBalance(id)
@@ -851,7 +939,6 @@ pub contract FindMarket {
 				if type !="direct" {
 					emit ForSale(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status: "finished", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 				} else {
-					//TODO: if non escrow bid, cannot fulfill from sellers account
 					emit DirectOffer(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"finished", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 				}
 
@@ -862,33 +949,10 @@ pub contract FindMarket {
 				let pointer= saleItem.pointer as! FindViews.AuthNFTPointer
  		    let vault <- cb.borrow()!.accept(<- pointer.withdraw())
 
-				if royalty != nil {
-					for royaltyItem in royalty!.getRoyalties() {
-						let description=royaltyItem.description 
-						let cutAmount= soldFor * royaltyItem.cut
-						emit RoyaltyPaid(tenant:self.tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), name: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-					}
-				}
-
-				if let findCut =self.tenant.findCut {
-					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), name: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-					findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-				}
-
-				if let tenantCut =self.tenant.tenantCut {
-					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), name: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-				}
-				oldProfile.deposit(from: <- vault)
+				self.pay(id: id, buyer: buyer, saleItem: <- saleItem, vault: <- vault, tenantName: self.tenant.name, royalty: royalty, nftInfo: nftInfo)
 			} else if let auction = saleItem.auction {
 
-
 				let soldFor=auction.getAuctionBalance()
-				let oldProfile= getAccount(saleItem.pointer.owner()).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
-
 				let buyer=auction.latestBidCallback.address
 				emit ForAuction(tenant:self.tenant.name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, auctionReservePrice: saleItem.auctionReservePrice!,  status:"finished", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName:FIND.reverseLookup(buyer), endsAt: Clock.time())
 
@@ -901,30 +965,10 @@ pub contract FindMarket {
 				//ESCROW: add this back once we can escrow item again
 				//let nft <- saleItem.getEscrow()
 				let vault <- auction.latestBidCallback.borrow()!.accept(<- pointer.withdraw())
-
-				if royalty != nil {
-					for royaltyItem in royalty!.getRoyalties() {
-						let description=royaltyItem.description 
-						let cutAmount= soldFor * royaltyItem.cut
-						emit RoyaltyPaid(tenant:self.tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), name: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-						royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-					}
-				}
-
-				if let findCut =self.tenant.findCut {
-					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), name: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-					findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-				}
-
-				if let tenantCut =self.tenant.tenantCut {
-					let cutAmount= soldFor * self.tenant.findCut!.cut
-					emit RoyaltyPaid(tenant: self.tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), name: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-				}
-				oldProfile.deposit(from: <- vault)
+				self.pay(id: id, buyer: buyer, saleItem: <- saleItem, vault: <- vault, tenantName: self.tenant.name, royalty: royalty, nftInfo: nftInfo)
+			} else {
+				panic("WTF")
 			}
-			destroy  saleItem
 		}
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
@@ -1133,6 +1177,22 @@ pub contract FindMarket {
 			let oldToken <- self.bids[uuid] <- bid
 			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType) 
 			destroy oldToken
+		}
+
+
+		pub fun fulfillDirectOffer(id:UInt64, vault: @FungibleToken.Vault) {
+			pre {
+				self.bids[id] != nil : "You need to have a bid here already"
+			}
+
+			let bid =self.borrowBid(id)
+			let saleItem=bid.from.borrow()!
+
+			if !saleItem.isAcceptedDirectOffer(id) {
+				panic("offer is not accepted yet")
+			}
+
+			saleItem.fulfillDirectOfferNonEscrowed(id:id, vault: <- vault)
 		}
 
 		//TODO: softIncreaseBid
