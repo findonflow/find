@@ -79,7 +79,7 @@ pub contract FindMarket {
 	/// Status for auction is
 	/// listed : the auction is listed but not started
 	/// active: the auction is live and have bids
-	/// canceled: the auction was cancelled
+	/// cancelled: the auction was cancelled
 	/// finished: the auction was finished
 	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
 
@@ -786,8 +786,6 @@ pub contract FindMarket {
 					emit RoyaltyPaid(tenant: self.tenant.name, id: id, name: "tenant", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 					tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-
-				//TODO: should we use the method that emits good event here?
 				oldProfile.deposit(from: <- vault)
 			} else if let auction = saleItem.auction {
 
