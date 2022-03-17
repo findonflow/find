@@ -25,7 +25,6 @@ A tenant can also turn off auctions/directOffers if he does not want to.
 A tenant can chose what NFTTypes to accept and what FTTypes to accept.
 */
 
-//TODO: add validUntil to saleItem. optional UFix64. 
 //TODO: ensure we have the correct scripts to return the information we need in tests
 //TODO: test all ! and convert to better error messages
 //TODO: what to do if item implements display when added and does not anymore. does not implement display anymore?
