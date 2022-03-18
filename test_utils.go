@@ -166,7 +166,7 @@ func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
 			"directSellPrice": "10.00000000",
-			"status":          "listed",
+			"active":          "true",
 			"name":            name,
 			"owner":           otu.accountAddress(name),
 		}))
@@ -184,7 +184,6 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 			"amount": fmt.Sprintf("%.8f", amount),
 			"bidder": otu.accountAddress(buyer),
 			"name":   name,
-			"status": "offered",
 		}))
 
 	return otu

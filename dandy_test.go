@@ -56,6 +56,10 @@ func TestDandy(t *testing.T) {
 		otu.listDandyForSale("user1", id, price)
 
 		otu.checkRoyalty("user1", id, "platform", 0.15)
+
+		res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(res)
+
 		otu.buyDandyForSale("user2", "user1", id, price)
 	})
 
@@ -101,34 +105,33 @@ func TestDandy(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to return nft when item not sold at auction", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2")
+	/*
+			//TODO: this test does not make much difference anymore
+			t.Run("Should be able to return nft when item not sold at auction", func(t *testing.T) {
+				otu := NewOverflowTest(t).
+					setupFIND().
+					setupDandy("user1").
+					createUser(100.0, "user2").
+					registerUser("user2")
 
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
+				price := 10.0
+				id := otu.mintThreeExampleDandies()[0]
 
-		otu.listDandyForAuction("user1", id, price)
+				otu.listDandyForAuction("user1", id, price)
 
-		/*
-			res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-			fmt.Println(res)
-		*/
+					res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+					fmt.Println(res)
 		otu.auctionBidMarket("user2", "user1", id, price)
 
 		otu.tickClock(400.0)
 
-		/*
-			res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-			fmt.Println(res)
-		*/
-		//TODO: test better events here
-		otu.fulfillMarketAuctionCancelled("user1", id, "user2", price)
+					res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+					fmt.Println(res)
+				//TODO: test better events here
+				otu.fulfillMarketAuctionCancelled("user1", id, "user2", price)
 
-	})
+			})
+	*/
 }
 
 //Test auction that does not reach price

@@ -16,7 +16,7 @@ transaction(id: UInt64) {
 
 		let tenant=FindMarket.getFindTenant()
 		let market = account.borrow<&FindMarket.SaleItemCollection>(from: tenant.information.saleItemStoragePath)!
-		market.fulfillDirectOffer(pointer)
+		market.acceptDirectOffer(pointer)
 
 	}
 }

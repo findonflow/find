@@ -3,10 +3,12 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 
 transaction(owner: Address, id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
-		let saleItems=FindMarket.getFindSaleItemCapability(owner)!.borrow()!
+		let tenant=FindMarket.getFindTenant()
+		let bids= account.borrow<&FindMarket.MarketBidCollection>(from: tenant.information.bidStoragePath)!
 
-		let walletReference = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No FUSD wallet linked for this account")
-		let vault <- walletReference.withdraw(amount: amount)
-		saleItems.fulfillNonEscrowedAuction(id, vault: <- vault)
+		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the flowTokenVault!")
+		let vault <- vaultRef.withdraw(amount: amount) 
+
+		bids.fulfillAuction(id:id, vault: <- vault)
 	}
 }
