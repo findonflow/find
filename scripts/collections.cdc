@@ -57,6 +57,7 @@ import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 import DayNFT from 0x1600b04bf033fb99
+import RaribleNFT from 0x01ab36aaf654a13e
 
 pub struct MetadataCollections {
 
@@ -1257,6 +1258,40 @@ pub fun main(address: Address) : MetadataCollections? {
 
 	if dayItems.length != 0 {
 		results["DayNFT"] = dayItems
+	}
+
+
+	let sockIds : [UInt64] = [14813, 15013, 14946, 14808, 14899, 14792, 15016, 14961, 14816, 14796, 14992, 14977, 14815, 14863, 14817, 14814, 14875, 14960, 14985, 14850, 14849, 14966, 14826, 14972, 14795, 15021, 14950, 14847, 14970, 14833, 14786, 15010, 14953, 14799, 14883, 14947, 14844, 14801, 14886, 15015, 15023, 15027, 15029, 14802, 14810, 14948, 14955, 14957, 14988, 15007, 15009, 14837, 15024, 14803, 14973, 14969, 15002, 15017, 14797, 14894, 14881, 15025, 14791, 14979, 14789, 14993, 14873, 14939, 15005, 15006, 14869, 14889, 15004, 15008, 15026, 14990, 14998, 14898, 14819, 14840, 14974, 15019, 14856, 14838, 14787, 14876, 14996, 14798, 14855, 14824, 14843, 14959, 15020, 14862, 14822, 14897, 14830, 14790, 14867, 14878, 14991, 14835, 14818, 14892, 14800, 15000, 14857, 14986, 14805, 14812, 14962]
+
+
+	let raribleCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(RaribleNFT.collectionPublicPath)
+	if raribleCap.check() {
+		let items: [String] = []
+		let collection = raribleCap.borrow()!
+		for id in collection.getIDs() {
+			if !sockIds.contains(id) {
+				continue
+			}
+
+			let item = MetadataCollectionItem(
+				id: id,
+				name: "Flowverse socks",
+				image: "https://img.rarible.com/prod/video/upload/t_video_big/prod-itemAnimations/FLOW-A.01ab36aaf654a13e.RaribleNFT:15029/b1cedf3",
+				url: "https://www.flowverse.co/socksh",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video",
+				rarity: ""
+			)
+			let itemId="FlowverseSocks".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+
+
+		if items.length != 0 {
+			results["FlowverseSocks"] = items
+		}
 	}
 
 	if results.keys.length == 0 {
