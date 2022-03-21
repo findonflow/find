@@ -788,6 +788,7 @@ pub contract FindMarket {
 			destroy <- self.items.remove(key: id)
 		}
 
+		//This method is called from a bid to fulfill a non escrowed auction
 		access(contract) fun fulfillNonEscrowedAuction(_ id: UInt64, vault: @FungibleToken.Vault) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -900,6 +901,7 @@ pub contract FindMarket {
 
 		//This is called by the owner of the sale item collection
 		//Here we will have a seperate model to fulfill a direct offer since we then need to add the auth pointer to it?
+		//TODO: this cannot be called the same as a method on saleItem
 		pub fun acceptDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
 			pre {
 				self.items.containsKey(pointer.getUUID()) : "Invalid id=".concat(pointer.getUUID().toString())
