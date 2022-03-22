@@ -58,6 +58,7 @@ import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 import DayNFT from 0x1600b04bf033fb99
 import RaribleNFT from 0x01ab36aaf654a13e
+import Necryptolis from 0x718efe5e88fe48ea
 
 pub struct MetadataCollections {
 
