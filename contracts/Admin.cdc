@@ -9,6 +9,7 @@ import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FindViews from "./FindViews.cdc"
 import FindMarket from "./FindMarket.cdc"
+import FindMarketSale from "./FindMarketSale.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 
 pub contract Admin {
@@ -98,22 +99,18 @@ pub contract Admin {
 			CharityNFT.mintCharity(metadata: metadata, recipient: recipient)
 		}
 
-		//TODO: fix propper input here later
-		pub fun createFindMarketTenant(auctions:Bool, directOffers:Bool) : @FindMarket.Tenant {
+		pub fun createFindMarketTenant() : @FindMarket.Tenant {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			//TODO: create these from a name later on
-			let bidPublicPath= /public/findfindMarketBids 
-			let bidStoragePath= /storage/findfindMarketBids
-
-			let saleItemPublicPath= /public/findfindMarketSaleItems
-			let saleItemStoragePath= /storage/findfindMarketSaleItems
+			let saleItemPublicPath= /public/findfindMarketSale
+			let saleItemStoragePath= /storage/findfindMarketSale
 
 			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 			let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
-			let tenant=FindMarket.TenantInformation( name: "find", validNFTTypes: [], ftTypes:[], findCut: findRoyalty, tenantCut: nil, bidPublicPath:bidPublicPath, bidStoragePath:bidStoragePath, saleItemPublicPath:saleItemPublicPath, saleItemStoragePath:saleItemStoragePath, auctionsSupported:auctions, directOffersSupported:directOffers)
+			let tenant=FindMarket.TenantInformation( name: "find", validNFTTypes: [], ftTypes:[], findCut: findRoyalty, tenantCut: nil)
+			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
 			return <- FindMarket.createTenant(tenant)
 		}
 

@@ -6,6 +6,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 //really not sure on how to input links here.)
@@ -79,18 +80,14 @@ transaction(name: String) {
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
 		let tenant= FindMarket.getFindTenant()
-		let tenantInformation=tenant.information
-		let saleItemCap= acct.getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenantInformation.saleItemPublicPath)
-		if !saleItemCap.check() {
-			acct.save<@FindMarket.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(tenant), to: tenantInformation.saleItemStoragePath)
-			acct.link<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenantInformation.saleItemPublicPath, target: tenantInformation.saleItemStoragePath)
-		}
+		let publicPath= tenant.getPublicPath(Type<FindMarketSale.SaleItemCollection>()) ?? panic("Direct sale not active for this tenant")
+		let storagePath= tenant.getStoragePath(Type<FindMarketSale.SaleItemCollection>()) ?? panic("Direct sale not active for this tenant")
 
-		let receiver = acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let bidCap= acct.getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(tenantInformation.bidPublicPath)
-		if !bidCap.check() {
-			acct.save<@FindMarket.MarketBidCollection>(<- FindMarket.createEmptyMarketBidCollection(receiver: receiver, tenant:tenant), to: tenantInformation.bidStoragePath)
-			acct.link<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(tenantInformation.bidPublicPath, target: tenantInformation.bidStoragePath)
+		let saleItemCap= acct.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>(publicPath) 
+		if !saleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			acct.save<@FindMarketSale.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(tenant), to: storagePath)
+			acct.link<&FindMarketSale.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
 	}
 }

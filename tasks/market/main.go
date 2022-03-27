@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/bjartek/overflow/overflow"
 )
 
 func main() {
 
-	//o := overflow.NewOverflowEmulator().Start()
-	o := overflow.NewOverflowInMemoryEmulator().Start()
+	o := overflow.NewOverflowEmulator().Start()
+	//	o := overflow.NewOverflowInMemoryEmulator().Start()
 
 	//first step create the adminClient as the fin user
 	o.TransactionFromFile("setup_fin_1_create_client").
@@ -34,7 +32,7 @@ func main() {
 	//link in the server in the versus client
 	o.TransactionFromFile("setup_find_market_2").
 		SignProposeAndPayAs("find").
-		Args(o.Arguments().Account("account").Boolean(true).Boolean(false)). //test with non escrow
+		Args(o.Arguments().Account("account")).
 		RunPrintEventsFull()
 
 	//we advance the clock
@@ -107,50 +105,53 @@ func main() {
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
 		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
 
-		//	o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+	o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
 
-	o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
-	res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
-	fmt.Println(res)
-
-	o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
-
-	res2 := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
-	fmt.Println(res2)
-
-	o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
-
-	//o.SimpleTxArgs("fulfillMarketAuction", "user2", o.Arguments().Account("user1").UInt64(id))
-	o.SimpleTxArgs("fulfillMarketAuctionNotEscrowed", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
 	/*
+		o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+		res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(res)
+	*/
 
-		o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
-		o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
-		o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
+	o.SimpleTxArgs("buyItemForSale", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
 
-		o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0).Account("account"))
+	/*
+		res2 := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(res2)
 
+		o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
+
+		//o.SimpleTxArgs("fulfillMarketAuction", "user2", o.Arguments().Account("user1").UInt64(id))
+		o.SimpleTxArgs("fulfillMarketAuctionNotEscrowed", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
 		/*
 
-			res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
-			fmt.Println(res)
+			o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+			o.ScriptFromFile("dandyViews").Args(o.Arguments().String("user1").UInt64(id)).Run()
+			o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
 
-				o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
+			o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0).Account("account"))
 
-				res = o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user2")).RunReturnsJsonString()
+			/*
+
+				res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
 				fmt.Println(res)
 
-					o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
+					o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(15.0))
 
-					o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
+					res = o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user2")).RunReturnsJsonString()
+					fmt.Println(res)
 
-					o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+						o.SimpleTxArgs("clock", "find", o.Arguments().UFix64(400.0))
 
-					o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
+						o.SimpleTxArgs("fulfillMarketAuction", "user1", o.Arguments().Account("user2").UInt64(id))
 
-					o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
-					o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
-					o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
+						o.SimpleTxArgs("bidMarket", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+
+						o.SimpleTxArgs("fulfillMarketDirectOffer", "user1", o.Arguments().UInt64(id))
+
+						o.SimpleTxArgs("listDandyForSale", "user2", o.Arguments().UInt64(id).UFix64(10.0))
+						o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
+						o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
 	*/
 
 }

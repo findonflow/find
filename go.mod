@@ -3,7 +3,7 @@ module github.com/findonflow/onefootball
 go 1.17
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220315114058-448386195ec1
+	github.com/bjartek/overflow v0.0.0-20220324134157-28e9afd70295
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
