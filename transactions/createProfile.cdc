@@ -79,15 +79,16 @@ transaction(name: String) {
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
+		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenant= FindMarket.getFindTenant()
-		let publicPath= tenant.getPublicPath(Type<FindMarketSale.SaleItemCollection>()) ?? panic("Direct sale not active for this tenant")
-		let storagePath= tenant.getStoragePath(Type<FindMarketSale.SaleItemCollection>()) ?? panic("Direct sale not active for this tenant")
+		let publicPath= tenant.getPublicPath(saleItemType) ?? panic("Direct sale not active for this tenant")
+		let storagePath= tenant.getStoragePath(saleItemType) ?? panic("Direct sale not active for this tenant")
 
 		let saleItemCap= acct.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>(publicPath) 
 		if !saleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
-			acct.save<@FindMarketSale.SaleItemCollection>(<- FindMarket.createEmptySaleItemCollection(tenant), to: storagePath)
-			acct.link<&FindMarketSale.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+			acct.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenant), to: storagePath)
+			acct.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
 	}
 }

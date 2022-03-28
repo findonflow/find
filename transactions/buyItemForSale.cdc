@@ -12,25 +12,26 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FUSD.Vault
-	let saleItems: &FindMarketSale.SaleItemCollection
+
+	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> 
 	let balanceBeforeBid: UFix64
 
 	prepare(account: AuthAccount) {
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(Dandy.CollectionPublicPath)
 		self.walletReference = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No FUSD wallet linked for this account")
 		self.balanceBeforeBid=self.walletReference.balance
-		self.saleItems= FindMarketSale.getFindSaleItemCapability(address)
+		self.saleItemsCap= FindMarketSale.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
 	}
 
 	pre {
-		self.saleItems != nil : "This account does not items for sale"
+		self.saleItemsCap.check() : "The sale item cap is not linked"
 		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
 		self.targetCapability.check() : "The target collection for the item your are bidding on does not exist"
 	}
 
 	execute {
 		let vault <- self.walletReference.withdraw(amount: amount) 
-		self.saleItems!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
+		self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
 	}
 
 	post {

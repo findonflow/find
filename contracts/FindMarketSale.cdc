@@ -28,12 +28,12 @@ pub contract FindMarketSale {
 		access(contract) var pointer: FindViews.AuthNFTPointer
 
 		//this field is set if this is a saleItem
-		access(contract) var salePrice: UFix64?
+		access(contract) var salePrice: UFix64
 
-		init(pointer: FindViews.AuthNFTPointer, vaultType: Type) {
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, price:UFix64) {
 			self.vaultType=vaultType
 			self.pointer=pointer
-			self.salePrice=nil
+			self.salePrice=price
 			self.buyer=nil
 		}
 
@@ -80,11 +80,7 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getBalance() : UFix64 {
-			return self.salePrice ?? 0.0
-		}
-
-	  pub fun setSalePrice(_ price: UFix64?) {
-			self.salePrice=price
+			return self.salePrice
 		}
 
 		pub fun getAuction(): AnyStruct{FindMarket.AuctionItem}? {
@@ -100,7 +96,6 @@ pub contract FindMarketSale {
 		}
 	}
 
-
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
@@ -110,7 +105,7 @@ pub contract FindMarketSale {
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
 
-		pub fun buy(_ id: UInt64, vault: @FungibleToken.Vault, let nftCap: Capability<&{NonFungibleToken.Receiver}>) 
+		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic {
@@ -139,12 +134,21 @@ pub contract FindMarketSale {
 			return info
 		}
 	
-		pub fun buy(_ id: UInt64, vault: @FungibleToken.Vault, let nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 
 			let saleItem=self.borrow(id)
+
+			if saleItem.salePrice != vault.balance {
+				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
+			}
+
+			if saleItem.vaultType != vault.getType() {
+				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
+			}
+
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
 			let nftInfo= saleItem.toNFTInfo()
@@ -163,13 +167,13 @@ pub contract FindMarketSale {
 		}
 
 		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64) {
-
-			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType)
-			saleItem.setSalePrice(directSellPrice)
-
+      
+			// What happends if we relist  
+			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice)
 			let owner=self.owner!.address
-			emit ForSale(tenant: self.tenant.name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice!, status: "listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver()), buyer: nil, buyerName:nil)
-			self.items[pointer.getUUID()] <-! saleItem
+			emit ForSale(tenant: self.tenant.name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver()), buyer: nil, buyerName:nil)
+			let old <- self.items[pointer.getUUID()] <- saleItem
+			destroy old
 
 		}
 
@@ -180,7 +184,7 @@ pub contract FindMarketSale {
 
 			let saleItem <- self.items.remove(key: id)!
 			let owner=self.owner!.address
-			emit ForSale(tenant:self.tenant.name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice!, status: "cancelled", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver()), buyer:nil, buyerName:nil)
+			emit ForSale(tenant:self.tenant.name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancelled", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver()), buyer:nil, buyerName:nil)
 			destroy saleItem
 		}
 

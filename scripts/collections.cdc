@@ -554,7 +554,6 @@ pub fun main(address: Address) : MetadataCollections? {
 			let nft = gaiaCollection.borrow()!.borrowGaiaNFT(id: id)!
 			let metadata = Gaia.getTemplateMetaData(templateID: nft.data.templateID)!
 
-
 			//For ballerz we can do this...
 			var url="http://ongaia.com/ballerz/".concat(metadata["id"]!)
 			var name=metadata["title"]!
@@ -571,7 +570,6 @@ pub fun main(address: Address) : MetadataCollections? {
 					name=metadata["title"]!.concat(" #").concat(nft.data.mintNumber.toString())
 				}
 			}
-
 
 			let item= MetadataCollectionItem(
 				id: id,

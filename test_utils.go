@@ -58,7 +58,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	//link in the server in the versus client
 	otu.O.TransactionFromFile("setup_find_market_2").
 		SignProposeAndPayAs("find").
-		Args(otu.O.Arguments().Account("account").Boolean(true).Boolean(true)).
+		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess().AssertNoEvents()
 
 	otu.createUser(100.0, "account")
@@ -333,6 +333,21 @@ func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
 		buyForge(user)
 }
 
+func (otu *OverflowTestUtils) cancelDandyForSale(name string, id uint64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelDandyForSale").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			"status": "cancelled",
+			"id":     fmt.Sprintf("%d", id),
+			"seller": otu.accountAddress(name),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listDandyForSale").
@@ -341,7 +356,7 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
 			"status": "listed",
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -390,21 +405,21 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 }
 
-func (otu *OverflowTestUtils) buyDandyForSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) buyDandyForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("bidMarket").
+	otu.O.TransactionFromFile("buyItemForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 			"buyer":  otu.accountAddress(name),
-			"status": "finished",
+			"status": "sold",
 		}))
 		//TODO: test better events
 	return otu
@@ -505,4 +520,26 @@ type Royalty struct {
 		Description string `json:"description"`
 		Receiver    string `json:"receiver"`
 	} `json:"cutInfos"`
+}
+
+func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItem {
+	var saleItems []SaleItem
+	otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&saleItems)
+	return saleItems
+
+}
+
+type SaleItem struct {
+	Amount              string `json:"amount"`
+	AuctionReservePrice string `json:"auctionReservePrice"`
+	Bidder              string `json:"bidder"`
+	ExtensionOnLateBid  string `json:"extensionOnLateBid"`
+	FtType              string `json:"ftType"`
+	FtTypeIdentifier    string `json:"ftTypeIdentifier"`
+	ID                  string `json:"id"`
+	ListingValidUntil   string `json:"listingValidUntil"`
+	Owner               string `json:"owner"`
+	SaleType            string `json:"saleType"`
+	Type                string `json:"type"`
+	TypeID              string `json:"typeId"`
 }

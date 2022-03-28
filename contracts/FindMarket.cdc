@@ -17,6 +17,8 @@ pub contract FindMarket {
 	pub let TenantStoragePath: StoragePath
 
 
+	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
+
 	access(account) fun pay(tenant: TenantInformation, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
@@ -28,24 +30,25 @@ pub contract FindMarket {
 			for royaltyItem in royalty!.getRoyalties() {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
-				emit RoyaltyPaid(tenant:tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), name: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				emit RoyaltyPaid(tenant:tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 		}
 
 		if let findCut =tenant.findCut {
 			let cutAmount= soldFor * tenant.findCut!.cut
-			emit RoyaltyPaid(tenant: tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), name: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			emit RoyaltyPaid(tenant: tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		if let tenantCut =tenant.tenantCut {
 			let cutAmount= soldFor * tenant.findCut!.cut
-			emit RoyaltyPaid(tenant: tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), name: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			emit RoyaltyPaid(tenant: tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 		oldProfile.deposit(from: <- vault)
 	}
+
 	pub struct NFTInfo{
 		pub let name:String
 		pub let description:String
@@ -62,9 +65,6 @@ pub contract FindMarket {
 		}
 	}
 
-	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, name:String, amount: UFix64, vaultType:String, nft:NFTInfo)
-
-	//TODO: a tenant should say if they want escrowed or not!
 	pub struct TenantInformation {
 
 		//This is the name of the tenant, it will be in all the events and 
@@ -117,7 +117,7 @@ pub contract FindMarket {
 			return self.information.publicPaths[type.identifier]
 		}
 
-		pub fun getStoragePathF(_ type: Type) : StoragePath? {
+		pub fun getStoragePath(_ type: Type) : StoragePath? {
 			return self.information.storagePaths[type.identifier]
 		}
 	}

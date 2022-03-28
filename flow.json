@@ -47,6 +47,7 @@
 		"FIND": "./contracts/FIND.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
 		"FindMarket": "./contracts/FindMarket.cdc",
+		"FindMarketSale": "./contracts/FindMarketSale.cdc",
 		"FindViews": "./contracts/FindViews.cdc",
 		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
 		"Sender": "./contracts/Sender.cdc",
@@ -160,6 +161,7 @@
 				"MetadataViews",
 				"Dandy",
 				"FindMarket",
+				"FindMarketSale",
 				"Sender",
 				"RelatedAccounts"
 			], 

@@ -44,25 +44,6 @@ func TestDandy(t *testing.T) {
 		assert.JSONEq(t, display, result)
 	})
 
-	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2")
-
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
-		otu.listDandyForSale("user1", id, price)
-
-		otu.checkRoyalty("user1", id, "platform", 0.15)
-
-		res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-		fmt.Println(res)
-
-		otu.buyDandyForSale("user2", "user1", id, price)
-	})
-
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
