@@ -44,22 +44,6 @@ func TestDandy(t *testing.T) {
 		assert.JSONEq(t, display, result)
 	})
 
-	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2")
-
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
-
-		otu.directOfferMarket("user2", "user1", id, price)
-
-		otu.acceptDirectOfferMarket("user1", id, "user2", price)
-
-	})
-
 	t.Run("Should be able to sell at auction", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().

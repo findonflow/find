@@ -38,7 +38,6 @@ pub contract FindMarketSale {
 		}
 
 
-
 		pub fun getSaleType() : String {
 			return "directSale"
 		}

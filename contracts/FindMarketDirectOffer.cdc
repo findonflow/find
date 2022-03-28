@@ -11,9 +11,9 @@ import FindMarket from "./FindMarket.cdc"
 
 pub contract FindMarketDirectOffer {
 
-	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: NFTInfo, buyer:Address?, buyerName:String?)
+	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
 
-	pub resource SaleItem{
+	pub resource SaleItem : FindMarket.SaleItem{
 
 		access(contract) let vaultType: Type //The type of vault to use for this sale Item
 		access(contract) var pointer: AnyStruct{FindViews.Pointer}
@@ -61,105 +61,18 @@ pub contract FindMarketDirectOffer {
 			return nil
 		}
 
-		pub fun toNFTInfo() : NFTInfo{
+		pub fun toNFTInfo() : FindMarket.NFTInfo{
 			return NFTInfo(self.pointer.getViewResolver())
-		}
-
-	  pub fun acceptDirectOffer() {
-			self.directOfferAccepted=true
-		}
-
-		pub fun getSaleItemBidderInfo() : SaleItemBidderInfo {
-			if self.auctionEndsAt != nil {
-				return SaleItemBidderInfo(
-					bidder : self.getBuyer(),
-					type:"ongoing_auction",
-					amount:self.getBalance()
-				)
-			}
-			if self.pointer.getType() == Type<FindViews.ViewReadPointer>() {
-				return SaleItemBidderInfo(
-					bidder: self.getBuyer(),
-					type: "directoffer",
-					amount: self.getBalance()
-				)
-			}
-
-
-			if self.auctionStartPrice!= nil {
-				return SaleItemBidderInfo(
-					bidder: nil,
-					type:"ondemand_auction", 
-					amount:self.auctionStartPrice
-				)
-			} 
-
-			return SaleItemBidderInfo(
-				bidder: self.getBuyer(),
-				type: "sale",
-				amount: self.salePrice
-			)
-
-		}
-
-		/*
-		//ESCROW: this can be added back once we can escrow auctions again
-		pub fun returnNFT() {
-			if self.auction==nil {
-				return
-			}
-			let pointer= self.pointer as! FindViews.AuthNFTPointer
-			let nft <- self.escrow <- nil
-			pointer.deposit(<- nft!)
-		}
-
-		pub fun getEscrow() :@NonFungibleToken.NFT {
-			if self.auction != nil {
-				let nft <- self.escrow <- nil
-				return <- nft!
-			}
-			panic("Not an auction")
-		}
-		*/
-
-		pub fun setExtentionOnLateBid(_ time: UFix64) {
-			self.auctionExtensionOnLateBid=time
 		}
 
 		pub fun setPointer(_ pointer: FindViews.AuthNFTPointer) {
 			self.pointer=pointer
 		}
 
-		pub fun setAuctionDuration(_ duration: UFix64) {
-			self.auctionDuration=duration
-		}
-
-		pub fun setSalePrice(_ price: UFix64?) {
-			self.salePrice=price
-		}
-
-		pub fun setReservePrice(_ price: UFix64?) {
-			self.auctionReservePrice=price
-		}
-
-		pub fun setMinBidIncrement(_ price: UFix64) {
-			self.auctionMinBidIncrement=price
-		}
-
-		pub fun setStartAuctionPrice(_ price: UFix64?) {
-			self.auctionStartPrice=price
-		}
-
 		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?) {
 			self.offerCallback=callback
 		}
 
-		destroy() {
-			if self.escrow != nil {
-				Debug.log("Destroyed escrow!!!")
-			}
-			destroy self.escrow
-		}
 	}
 
 
@@ -168,9 +81,9 @@ pub contract FindMarketDirectOffer {
 		pub fun getIds(): [UInt64]
 		//fetch all names that are for sale
 
-		pub fun getItemsForSale(): [SaleItemInformation]
+		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : SaleItemInformation 
+		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
 
 		access(contract)fun cancelBid(_ id: UInt64) 
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
@@ -687,8 +600,8 @@ pub contract FindMarketDirectOffer {
 	}
 
 	//Create an empty lease collection that store your leases to a name
-	pub fun createEmptySaleItemCollection(_ tenant: &Tenant): @SaleItemCollection {
-		let wallet=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+	pub fun createEmptySaleItemCollection(_ tenant: &FindMarket.Tenant): @SaleItemCollection {
+		let wallet=FindMarketDirectOffer.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		return <- create SaleItemCollection(tenant)
 	}
 
@@ -714,7 +627,7 @@ pub contract FindMarketDirectOffer {
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>? {
 		if let tenant=FindMarket.getTenant(marketplace) {
-			return getAccount(user).getCapability<&FindMarket.SaleItemCollection{FindMarket.SaleItemCollectionPublic}>(tenant.information.saleItemPublicPath)
+			return getAccount(user).getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())!)
 		}
 		return nil
 	}
@@ -724,14 +637,5 @@ pub contract FindMarketDirectOffer {
 			return getAccount(user).getCapability<&FindMarket.MarketBidCollection{FindMarket.MarketBidCollectionPublic}>(tenant.information.bidPublicPath)
 		}
 		return nil
-	}
-
-	init() {
-		self.TenantClientPublicPath=/public/findMarketClient
-		self.TenantClientStoragePath=/storage/findMarketClient
-
-		self.TenantPrivatePath=/private/findMarketTenant
-		self.TenantStoragePath=/storage/findMarketTenant
-
 	}
 }

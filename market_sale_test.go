@@ -109,7 +109,7 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
-	t.Run("Should not be able to buy if too low price", func(t *testing.T) {
+	t.Run("Should not be able to buy if wrong type", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			setupDandy("user1").

@@ -105,7 +105,8 @@ func main() {
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
 		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
 
-	o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+	o.SimpleTxArgs("bidMarketDirectOfferEscrowed", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+	o.SimpleTxArgs("fulfillMarketDirectOfferEscrowed", "user1", o.Arguments().UInt64(id))
 
 	/*
 		o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
@@ -113,7 +114,9 @@ func main() {
 		fmt.Println(res)
 	*/
 
-	o.SimpleTxArgs("buyItemForSale", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
+	//Buy market sale
+	//o.SimpleTxArgs("listDandyForSale", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+	//o.SimpleTxArgs("buyItemForSale", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(15.0))
 
 	/*
 		res2 := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()

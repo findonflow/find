@@ -10,6 +10,7 @@ import CharityNFT from "./CharityNFT.cdc"
 import FindViews from "./FindViews.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindMarketSale from "./FindMarketSale.cdc"
+import FindMarketDirectOfferEscrow from "./FindMarketDirectOfferEscrow.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 
 pub contract Admin {
@@ -111,6 +112,16 @@ pub contract Admin {
 			let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 			let tenant=FindMarket.TenantInformation( name: "find", validNFTTypes: [], ftTypes:[], findCut: findRoyalty, tenantCut: nil)
 			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
+
+
+			let doeSaleItemPublicPath= /public/findfindMarketDOE
+			let doeSaleItemStoragePath= /storage/findfindMarketDOE
+			tenant.addSaleType(type: Type<@FindMarketDirectOfferEscrow.SaleItemCollection>(), public: doeSaleItemPublicPath, storage:doeSaleItemStoragePath) 
+
+			let doeBidPublicPath= /public/findfindMarketDOEBid
+			let doeBidStoragePath= /storage/findfindMarketDOEBid
+			tenant.addSaleType(type: Type<@FindMarketDirectOfferEscrow.MarketBidCollection>(), public: doeBidPublicPath, storage:doeBidStoragePath) 
+
 			return <- FindMarket.createTenant(tenant)
 		}
 

@@ -22,6 +22,16 @@ const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
 
+func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
+	otu.setupFIND().
+		setupDandy("user1").
+		createUser(100.0, "user2").
+		registerUser("user2")
+
+	id := otu.mintThreeExampleDandies()[0]
+	return id
+}
+
 func (otu *OverflowTestUtils) assertLookupAddress(user, expected string) {
 	value := otu.O.Script(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {
@@ -443,16 +453,33 @@ func (otu *OverflowTestUtils) auctionBidMarket(name string, seller string, id ui
 	return otu
 }
 
-func (otu *OverflowTestUtils) directOfferMarket(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("bidMarket").
+	otu.O.TransactionFromFile("increaseBidMarketDirectOfferEscrowed").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", totalPrice),
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"status": "offered",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.DirectOffer", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
@@ -460,21 +487,36 @@ func (otu *OverflowTestUtils) directOfferMarket(name string, seller string, id u
 	return otu
 }
 
-func (otu *OverflowTestUtils) acceptDirectOfferMarket(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("fulfillMarketDirectOffer").
+	otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.DirectOffer", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
-			"status": "finished",
+			"status": "sold",
 		}))
-		//TODO: test better events
+	return otu
+}
+
+func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"status": "rejected",
+			"id":     fmt.Sprintf("%d", id),
+			"seller": otu.accountAddress(name),
+			"amount": fmt.Sprintf("%.8f", price),
+		}))
 	return otu
 }
 
