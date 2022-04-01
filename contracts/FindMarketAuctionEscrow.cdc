@@ -335,7 +335,12 @@ pub contract FindMarketAuctionEscrow {
 			self.emitEvent(saleItem: saleItem, status: "active")
 		}
 
+<<<<<<< Updated upstream
 
+=======
+		//TODO:should a seller be allowed to call this directly?
+		//TODO: and if he/she should should we have a different event if it was rejected because the price did not match
+>>>>>>> Stashed changes
 		pub fun cancel(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -343,6 +348,7 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 			let owner=saleItem.getSeller()
+<<<<<<< Updated upstream
 			if saleItem.auctionEndsAt != nil {
 				let balance=saleItem.getBalance()
 				let price= saleItem.auctionReservePrice.toString()
@@ -357,7 +363,19 @@ pub contract FindMarketAuctionEscrow {
 				self.emitEvent(saleItem: saleItem, status: "cancelled")
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
 				destroy <- self.items.remove(key: id)
+=======
+			if saleItem.auctionEndsAt == nil {
+				panic("auction is not ongoing")
 			}
+
+			if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
+				panic("Cannot cancel finished auction, fulfill it instead")
+>>>>>>> Stashed changes
+			}
+
+			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			destroy <- self.items.remove(key: id)
 		}
 
 
