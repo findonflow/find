@@ -48,6 +48,7 @@
 		"Dandy": "./contracts/Dandy.cdc",
 		"FindMarket": "./contracts/FindMarket.cdc",
 		"FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
+		"FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
 		"FindMarketSale": "./contracts/FindMarketSale.cdc",
 		"FindViews": "./contracts/FindViews.cdc",
 		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
@@ -164,6 +165,7 @@
 				"FindMarket",
 				"FindMarketSale",
 				"FindMarketDirectOfferEscrow",
+				"FindMarketAuctionEscrow",
 				"Sender",
 				"RelatedAccounts"
 			], 

@@ -375,7 +375,7 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForAuction(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listDandyForAuction").
 		SignProposeAndPayAs(name).
@@ -383,7 +383,7 @@ func (otu *OverflowTestUtils) listDandyForAuction(name string, id uint64, price 
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
 			"status":              "listed",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
@@ -435,16 +435,16 @@ func (otu *OverflowTestUtils) buyDandyForMarketSale(name string, seller string, 
 	return otu
 }
 
-func (otu *OverflowTestUtils) auctionBidMarket(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("bidMarket").
+	otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
@@ -520,20 +520,20 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 	return otu
 }
 
-func (otu *OverflowTestUtils) fulfillMarketAuction(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("fulfillMarketAuction").
+	otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
-			"status": "finished",
+			"status": "sold",
 		}))
 	return otu
 }

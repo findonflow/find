@@ -8,6 +8,7 @@ import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
+import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 //really not sure on how to input links here.)
@@ -110,6 +111,26 @@ transaction(name: String) {
 			acct.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenant:tenant), to: doeBidStoragePath)
 			acct.link<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic}>(doeBidPublicPath, target: doeBidStoragePath)
 		}
+
+		/// auctions that escrow ft
+		let aeSaleType= Type<@FindMarketAuctionEscrow.SaleItemCollection>()
+		let aeSalePublicPath= tenant.getPublicPath(aeSaleType) ?? panic("Auction escrow not active for this tenant")
+		let aeSaleStoragePath= tenant.getStoragePath(aeSaleType) ?? panic("Auction escrow not active for this tenant")
+		let aeSaleCap= acct.getCapability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}>(aeSalePublicPath) 
+		if !aeSaleCap.check() {
+			acct.save<@FindMarketAuctionEscrow.SaleItemCollection>(<- FindMarketAuctionEscrow.createEmptySaleItemCollection(tenant), to: aeSaleStoragePath)
+			acct.link<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}>(aeSalePublicPath, target: aeSaleStoragePath)
+		}
+
+		let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
+		let aeBidPublicPath= tenant.getPublicPath(aeBidType) ?? panic("Auction escrow not active for this tenant")
+		let aeBidStoragePath= tenant.getStoragePath(aeBidType) ?? panic("Auction escrow not active for this tenant")
+		let aeBidCap= acct.getCapability<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic}>(aeBidPublicPath) 
+		if !aeBidCap.check() {
+			acct.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenant:tenant), to: aeBidStoragePath)
+			acct.link<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic}>(aeBidPublicPath, target: aeBidStoragePath)
+		}
+
 
 	}
 }

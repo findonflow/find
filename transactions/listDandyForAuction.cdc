@@ -1,4 +1,5 @@
 import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -9,7 +10,7 @@ import FindViews from "../contracts/FindViews.cdc"
 transaction(id: UInt64, price:UFix64) {
 	prepare(account: AuthAccount) {
 		let tenant=FindMarket.getFindTenant()
-		let saleItems= account.borrow<&FindMarket.SaleItemCollection>(from: tenant.information.saleItemStoragePath) ?? panic("Cannot find saleItems")
+		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>())!)!
 
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 

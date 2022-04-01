@@ -11,6 +11,7 @@ import FindViews from "./FindViews.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindMarketSale from "./FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "./FindMarketDirectOfferEscrow.cdc"
+import FindMarketAuctionEscrow from "./FindMarketAuctionEscrow.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 
 pub contract Admin {
@@ -114,6 +115,7 @@ pub contract Admin {
 			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
 
 
+			//direct offfer escrowed
 			let doeSaleItemPublicPath= /public/findfindMarketDOE
 			let doeSaleItemStoragePath= /storage/findfindMarketDOE
 			tenant.addSaleType(type: Type<@FindMarketDirectOfferEscrow.SaleItemCollection>(), public: doeSaleItemPublicPath, storage:doeSaleItemStoragePath) 
@@ -121,6 +123,16 @@ pub contract Admin {
 			let doeBidPublicPath= /public/findfindMarketDOEBid
 			let doeBidStoragePath= /storage/findfindMarketDOEBid
 			tenant.addSaleType(type: Type<@FindMarketDirectOfferEscrow.MarketBidCollection>(), public: doeBidPublicPath, storage:doeBidStoragePath) 
+
+
+			//auction escrowed
+			let aeSaleItemPublicPath= /public/findfindMarketAE
+			let aeSaleItemStoragePath= /storage/findfindMarketAE
+			tenant.addSaleType(type: Type<@FindMarketAuctionEscrow.SaleItemCollection>(), public: aeSaleItemPublicPath, storage:aeSaleItemStoragePath) 
+
+			let aeBidPublicPath= /public/findfindMarketAEBid
+			let aeBidStoragePath= /storage/findfindMarketAEBid
+			tenant.addSaleType(type: Type<@FindMarketAuctionEscrow.MarketBidCollection>(), public: aeBidPublicPath, storage:aeBidStoragePath) 
 
 			return <- FindMarket.createTenant(tenant)
 		}

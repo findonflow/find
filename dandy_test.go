@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,60 +42,4 @@ func TestDandy(t *testing.T) {
 		result := otu.O.ScriptFromFile("dandy").Args(otu.O.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
 		assert.JSONEq(t, display, result)
 	})
-
-	t.Run("Should be able to sell at auction", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2")
-
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
-
-		otu.listDandyForAuction("user1", id, price)
-
-		res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-		fmt.Println(res)
-
-		otu.auctionBidMarket("user2", "user1", id, price+5.0)
-
-		otu.tickClock(400.0)
-
-		res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-		fmt.Println(res)
-
-		otu.fulfillMarketAuction("user1", id, "user2", price+5.0)
-
-	})
-
-	/*
-			//TODO: this test does not make much difference anymore
-			t.Run("Should be able to return nft when item not sold at auction", func(t *testing.T) {
-				otu := NewOverflowTest(t).
-					setupFIND().
-					setupDandy("user1").
-					createUser(100.0, "user2").
-					registerUser("user2")
-
-				price := 10.0
-				id := otu.mintThreeExampleDandies()[0]
-
-				otu.listDandyForAuction("user1", id, price)
-
-					res := otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-					fmt.Println(res)
-		otu.auctionBidMarket("user2", "user1", id, price)
-
-		otu.tickClock(400.0)
-
-					res = otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-					fmt.Println(res)
-				//TODO: test better events here
-				otu.fulfillMarketAuctionCancelled("user1", id, "user2", price)
-
-			})
-	*/
 }
-
-//Test auction that does not reach price

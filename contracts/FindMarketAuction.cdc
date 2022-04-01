@@ -19,7 +19,6 @@ pub contract FindMarketAuction {
 	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
 
 
-
 	pub resource SaleItem{
 
 		access(contract) let vaultType: Type //The type of vault to use for this sale Item
