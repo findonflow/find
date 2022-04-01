@@ -16,7 +16,7 @@ pub contract FindMarketAuctionEscrow {
 
 
 	pub resource SaleItem : FindMarket.SaleItem {
-		access(contract) var pointer: AnyStruct{FindViews.Pointer}
+		access(contract) var pointer: FindViews.AuthNFTPointer
 
 		access(contract) var vaultType: Type
 		access(contract) var auctionStartPrice: UFix64
@@ -28,7 +28,7 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
 
-		init(pointer: AnyStruct{FindViews.Pointer}, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64) {
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.auctionStartPrice=auctionStartPrice
@@ -46,8 +46,7 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
-			let pointer= self.pointer as! FindViews.AuthNFTPointer
-			let vault <- self.offerCallback!.borrow()!.accept(<- pointer.withdraw())
+			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 			return <- vault
 		}
 
@@ -335,42 +334,21 @@ pub contract FindMarketAuctionEscrow {
 			self.emitEvent(saleItem: saleItem, status: "active")
 		}
 
-<<<<<<< Updated upstream
-
-=======
 		//TODO:should a seller be allowed to call this directly?
 		//TODO: and if he/she should should we have a different event if it was rejected because the price did not match
->>>>>>> Stashed changes
 		pub fun cancel(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 
 			let saleItem=self.borrow(id)
-			let owner=saleItem.getSeller()
-<<<<<<< Updated upstream
-			if saleItem.auctionEndsAt != nil {
-				let balance=saleItem.getBalance()
-				let price= saleItem.auctionReservePrice.toString()
 
-				let nftInfo=saleItem.toNFTInfo()
-				//the auction has ended
-				Debug.log("Latest bid is ".concat(balance.toString()).concat(" reserve price is ").concat(price))
-				if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
-					panic("Cannot cancel finished auction, fulfill it instead")
-				}
-
-				self.emitEvent(saleItem: saleItem, status: "cancelled")
-				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
-				destroy <- self.items.remove(key: id)
-=======
 			if saleItem.auctionEndsAt == nil {
 				panic("auction is not ongoing")
 			}
 
 			if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
 				panic("Cannot cancel finished auction, fulfill it instead")
->>>>>>> Stashed changes
 			}
 
 			self.emitEvent(saleItem: saleItem, status: "cancelled")
