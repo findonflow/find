@@ -5,24 +5,19 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketDirectOfferEscrow(t *testing.T) {
 
+	price := 10.0
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
 
-		price := 10.0
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
-
+		otu.saleItemListed("user1", "directoffer", price)
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
 
 	})
@@ -31,35 +26,19 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.directOfferMarketEscrowed("user2", "user1", id, 10.0)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", 10.0), itemsForSale[0].Amount)
-
+		otu.directOfferMarketEscrowed("user2", "user1", id, price)
+		otu.saleItemListed("user1", "directoffer", price)
 		otu.increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0)
-
-		itemsForSale = otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", 15.0), itemsForSale[0].Amount)
-
+		otu.saleItemListed("user1", "directoffer", 15.0)
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
-
 	})
 
 	t.Run("Should be able to reject offer", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.directOfferMarketEscrowed("user2", "user1", id, 10.0)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", 10.0), itemsForSale[0].Amount)
-
+		otu.directOfferMarketEscrowed("user2", "user1", id, price)
+		otu.saleItemListed("user1", "directoffer", price)
 		otu.rejectDirectOfferEscrowed("user1", id, 10.0)
 	})
 
@@ -69,14 +48,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-
-		price := 10.0
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		otu.saleItemListed("user1", "directoffer", price)
 
 		otu.createUser(100.0, "user3").registerUser("user3")
 

@@ -435,6 +435,33 @@ func (otu *OverflowTestUtils) buyDandyForMarketSale(name string, seller string, 
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", totalPrice),
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"status": "active",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) saleItemListed(name string, saleType string, price float64) *OverflowTestUtils {
+
+	t := otu.T
+	itemsForSale := otu.getItemsForSale(name)
+	assert.Equal(t, 1, len(itemsForSale))
+	assert.Equal(t, saleType, itemsForSale[0].SaleType)
+	assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+	return otu
+}
+
 func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
@@ -516,6 +543,22 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillMarketAuctionEscrowFromBidder(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"amount": fmt.Sprintf("%.8f", price),
+			"status": "sold",
 		}))
 	return otu
 }

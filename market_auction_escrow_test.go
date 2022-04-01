@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketAuctionEscrow(t *testing.T) {
@@ -16,22 +15,28 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		price := 10.0
 		id := otu.setupMarketAndDandy()
 		otu.listDandyForEscrowedAuction("user1", id, price)
+		otu.saleItemListed("user1", "ondemand_auction", price)
+		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ondemand_auction", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		otu.tickClock(400.0)
+		//TODO: Should status be something else while time has not run out? I think so
+		otu.saleItemListed("user1", "ongoing_auction", price+5.0)
+		otu.fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+	})
 
+	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.listDandyForEscrowedAuction("user1", id, price)
+		otu.saleItemListed("user1", "ondemand_auction", price)
 		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
 		otu.tickClock(400.0)
 
-		itemsForSale = otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price+5.0), itemsForSale[0].Amount)
-
-		otu.fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+		otu.saleItemListed("user1", "ongoing_auction", price+5.0)
+		otu.fulfillMarketAuctionEscrowFromBidder("user2", id, price+5.0)
 	})
 
 	t.Run("Should return funds if auction does not meet reserve price", func(t *testing.T) {
@@ -40,20 +45,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		price := 10.0
 		id := otu.setupMarketAndDandy()
 		otu.listDandyForEscrowedAuction("user1", id, price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ondemand_auction", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
-
+		otu.saleItemListed("user1", "ondemand_auction", price)
 		otu.auctionBidMarketEscrow("user2", "user1", id, price+1.0)
 
 		otu.tickClock(400.0)
-
-		itemsForSale = otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price+1.0), itemsForSale[0].Amount)
+		otu.saleItemListed("user1", "ongoing_auction", 11.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -70,6 +66,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": fmt.Sprintf("%.8f", 11.0),
 				"status": "cancelled",
 			}))
+		//TODO: should this be cancelled or should it be something else?
 
 	})
 
@@ -79,20 +76,12 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		price := 10.0
 		id := otu.setupMarketAndDandy()
 		otu.listDandyForEscrowedAuction("user1", id, price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ondemand_auction", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		otu.saleItemListed("user1", "ondemand_auction", price)
 
 		otu.auctionBidMarketEscrow("user2", "user1", id, price+1.0)
+		otu.saleItemListed("user1", "ongoing_auction", 11.0)
 
 		otu.tickClock(2.0)
-
-		itemsForSale = otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price+1.0), itemsForSale[0].Amount)
 
 		buyer := "user2"
 		name := "user1"
@@ -111,6 +100,23 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			}))
 
 	})
+
+	t.Run("Should be able to bid and increase bid by same user", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.listDandyForEscrowedAuction("user1", id, price)
+		otu.saleItemListed("user1", "ondemand_auction", price)
+
+		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+		otu.saleItemListed("user1", "ongoing_auction", 15.0)
+		otu.increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0)
+		otu.saleItemListed("user1", "ongoing_auction", 20.0)
+
+	})
+
 }
 
-//TODO: fulfill when auction did not meet reserve price
+//TODO: add bid when there is a higher bid by another user
+//TODO: add bid should return money from another user that has bid before
