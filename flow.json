@@ -49,7 +49,7 @@
 		"FindMarket": "./contracts/FindMarket.cdc",
 		"FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
 		"FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
-		"FindMarketAuction": "./contracts/FindMarketAuction.cdc",
+		"FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
 		"FindMarketSale": "./contracts/FindMarketSale.cdc",
 		"FindViews": "./contracts/FindViews.cdc",
 		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
@@ -167,7 +167,7 @@
 				"FindMarketSale",
 				"FindMarketDirectOfferEscrow",
 				"FindMarketAuctionEscrow",
-				"FindMarketAuction",
+				"FindMarketAuctionSoft",
 				"Sender",
 				"RelatedAccounts"
 			], 

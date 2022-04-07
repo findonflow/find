@@ -10,7 +10,7 @@ import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
-pub contract FindMarketAuction {
+pub contract FindMarketAuctionSoft {
 
 	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
 
@@ -110,6 +110,7 @@ pub contract FindMarketAuction {
 				return false
 			}
 
+
 			return balance >= self.auctionReservePrice
 		}
 
@@ -199,8 +200,8 @@ pub contract FindMarketAuction {
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
 
-		//anybody should be able to fulfill an auction as long as it is done
-		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) 
+		//only buyer can fulfill auctions since he needs to send funds for this type
+		access(contract) fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) 
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic {
@@ -334,8 +335,6 @@ pub contract FindMarketAuction {
 			self.emitEvent(saleItem: saleItem, status: "active")
 		}
 
-		//TODO:should a seller be allowed to call this directly?
-		//TODO: and if he/she should should we have a different event if it was rejected because the price did not match
 		pub fun cancel(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -347,17 +346,19 @@ pub contract FindMarketAuction {
 				panic("auction is not ongoing")
 			}
 
-			if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
-				panic("Cannot cancel finished auction, fulfill it instead")
+			var status="cancelled"
+			//TODO: this should maybe just emit a different event here if the auction did not meet reserve price
+			if saleItem.hasAuctionEnded() && !saleItem.hasAuctionMetReservePrice() {
+				status="failed"
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			self.emitEvent(saleItem: saleItem, status: status)
 			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)
 		}
 
 
-		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) {
+		access(contract) fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
@@ -372,14 +373,15 @@ pub contract FindMarketAuction {
 				panic("The FT vault sent in to fulfill does not match the required type")
 			}
 
-			if vault.balance < saleItem.auctionReservePrice! {
-				panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice!.toString()))
+			if vault.balance < saleItem.auctionReservePrice {
+				panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
 			}
 
 
 			let nftInfo=saleItem.toNFTInfo()
 			let royalty=saleItem.getRoyalty()
 
+			self.emitEvent(saleItem: saleItem, status: "sold")
 			saleItem.acceptNonEscrowedBid()
 
 			FindMarket.pay(tenant:self.tenant, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
@@ -544,7 +546,7 @@ pub contract FindMarketAuction {
 
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(_ tenant: &FindMarket.Tenant): @SaleItemCollection {
-		let wallet=FindMarketAuction.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let wallet=FindMarketAuctionSoft.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		return <- create SaleItemCollection(tenant)
 	}
 
@@ -553,11 +555,11 @@ pub contract FindMarketAuction {
 	}
 
 	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
-		return FindMarketAuction.getSaleItemCapability(marketplace: FindMarketAuction.account.address, user:user) 
+		return FindMarketAuctionSoft.getSaleItemCapability(marketplace: FindMarketAuctionSoft.account.address, user:user) 
 	}
 
 	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic}>? {
-		return FindMarketAuction.getBidCapability(marketplace:FindMarketAuction.account.address, user:user) 
+		return FindMarketAuctionSoft.getBidCapability(marketplace:FindMarketAuctionSoft.account.address, user:user) 
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {

@@ -9,6 +9,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
+import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 //really not sure on how to input links here.)
@@ -132,5 +133,23 @@ transaction(name: String) {
 		}
 
 
+	 /// auctions that refers FT so 'soft' auction
+		let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
+		let asSalePublicPath= tenant.getPublicPath(asSaleType) ?? panic("Auction not active for this tenant")
+		let asSaleStoragePath= tenant.getStoragePath(asSaleType) ?? panic("Auction not active for this tenant")
+		let asSaleCap= acct.getCapability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}>(asSalePublicPath) 
+		if !asSaleCap.check() {
+			acct.save<@FindMarketAuctionSoft.SaleItemCollection>(<- FindMarketAuctionSoft.createEmptySaleItemCollection(tenant), to: asSaleStoragePath)
+			acct.link<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}>(asSalePublicPath, target: asSaleStoragePath)
+		}
+
+		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
+		let asBidPublicPath= tenant.getPublicPath(asBidType) ?? panic("Auction not active for this tenant")
+		let asBidStoragePath= tenant.getStoragePath(asBidType) ?? panic("Auction not active for this tenant")
+		let asBidCap= acct.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic}>(asBidPublicPath) 
+		if !asBidCap.check() {
+			acct.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenant:tenant), to: asBidStoragePath)
+			acct.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
+		}
 	}
 }

@@ -377,6 +377,7 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 
 func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
+	//TODO: rename to listDandyForAuctionEscrow
 	otu.O.TransactionFromFile("listDandyForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
@@ -384,6 +385,24 @@ func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			"status":              "listed",
+			"amount":              fmt.Sprintf("%.8f", price),
+			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
+			"id":                  fmt.Sprintf("%d", id),
+			"seller":              otu.accountAddress(name),
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) listDandyForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listDandyForAuctionSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
 			"status":              "listed",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
@@ -452,6 +471,23 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", totalPrice),
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"status": "active",
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) saleItemListed(name string, saleType string, price float64) *OverflowTestUtils {
 
 	t := otu.T
@@ -472,6 +508,24 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", price),
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"status": "active",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidMarketAuctionSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account(seller).
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
@@ -578,6 +632,23 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
 		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"amount": fmt.Sprintf("%.8f", price),
+			"status": "sold",
+		}))
+		//TODO: test that funds leave the account here
 	return otu
 }
 

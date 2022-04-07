@@ -12,6 +12,7 @@ import FindMarket from "./FindMarket.cdc"
 import FindMarketSale from "./FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "./FindMarketDirectOfferEscrow.cdc"
 import FindMarketAuctionEscrow from "./FindMarketAuctionEscrow.cdc"
+import FindMarketAuctionSoft from "./FindMarketAuctionSoft.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 
 pub contract Admin {
@@ -133,6 +134,16 @@ pub contract Admin {
 			let aeBidPublicPath= /public/findfindMarketAEBid
 			let aeBidStoragePath= /storage/findfindMarketAEBid
 			tenant.addSaleType(type: Type<@FindMarketAuctionEscrow.MarketBidCollection>(), public: aeBidPublicPath, storage:aeBidStoragePath) 
+
+			//auction 
+			let asSaleItemPublicPath= /public/findfindMarketAS
+			let asSaleItemStoragePath= /storage/findfindMarketAS
+			tenant.addSaleType(type: Type<@FindMarketAuctionSoft.SaleItemCollection>(), public: asSaleItemPublicPath, storage:asSaleItemStoragePath) 
+
+			let asBidPublicPath= /public/findfindMarketASBid
+			let asBidStoragePath= /storage/findfindMarketASBid
+			tenant.addSaleType(type: Type<@FindMarketAuctionSoft.MarketBidCollection>(), public: asBidPublicPath, storage:asBidStoragePath) 
+
 
 			return <- FindMarket.createTenant(tenant)
 		}
