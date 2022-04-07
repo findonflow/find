@@ -59,6 +59,8 @@ import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 import DayNFT from 0x1600b04bf033fb99
 import RaribleNFT from 0x01ab36aaf654a13e
 
+import FLOAT from 0x2d4c3caffbeab845
+
 pub struct MetadataCollections {
 
 	pub let items: {String : MetadataCollectionItem}
@@ -1294,6 +1296,18 @@ pub fun main(address: Address) : MetadataCollections? {
 		}
 	}
 
+
+	let floatItems: [String] = []
+	let floats = getItemForMetadataStandard(path: FLOAT.FLOATCollectionPublicPath, account: account, externalFixedUrl: "https://floats.city/".concat(address.toString()))
+	for item in floats {
+		let itemId="FLOAT".concat(item.id.toString())
+		floatItems.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	if floatItems.length != 0 {
+		results["FLOAT"] = floatItems
+	}
 	if results.keys.length == 0 {
 		return nil
 	}
