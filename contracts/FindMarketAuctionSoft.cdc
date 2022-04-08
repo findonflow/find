@@ -14,7 +14,6 @@ pub contract FindMarketAuctionSoft {
 
 	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
 
-
 	pub resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer
 
@@ -138,6 +137,7 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback=callback
 		}
 
+		//TODO: what should the type be here, how to diff on soft vs not?
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
 				return "ongoing_auction"

@@ -6,7 +6,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
-import FIND from "./FIND.cdc"
+//import FIND from "./FIND.cdc"
 
 pub contract FindMarket {
 
@@ -30,20 +30,26 @@ pub contract FindMarket {
 			for royaltyItem in royalty!.getRoyalties() {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
-				emit RoyaltyPaid(tenant:tenant.name, id: id, address:royaltyItem.receiver.address, findName: FIND.reverseLookup(royaltyItem.receiver.address), royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+//				let name=FIND.reverseLookup(royaltyItem.receiver.address)
+				let name=""
+				emit RoyaltyPaid(tenant:tenant.name, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 		}
 
 		if let findCut =tenant.findCut {
 			let cutAmount= soldFor * tenant.findCut!.cut
-			emit RoyaltyPaid(tenant: tenant.name, id: id, address:findCut.receiver.address, findName: FIND.reverseLookup(findCut.receiver.address), royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			//let name =FIND.reverseLookup(findCut.receiver.address)
+			let name=""
+			emit RoyaltyPaid(tenant: tenant.name, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		if let tenantCut =tenant.tenantCut {
 			let cutAmount= soldFor * tenant.findCut!.cut
-			emit RoyaltyPaid(tenant: tenant.name, id: id, address:tenantCut.receiver.address, findName: FIND.reverseLookup(tenantCut.receiver.address), royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			//let name=FIND.reverseLookup(tenantCut.receiver.address)
+			let name=""
+			emit RoyaltyPaid(tenant: tenant.name, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 		oldProfile.deposit(from: <- vault)

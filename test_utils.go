@@ -568,6 +568,23 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 	return otu
 }
 
+func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account(seller).
+			UInt64(id).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", price),
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
@@ -581,6 +598,23 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("acceptDirectOfferSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"id":     fmt.Sprintf("%d", id),
+			"seller": otu.accountAddress(name),
+			"buyer":  otu.accountAddress(buyer),
+			"amount": fmt.Sprintf("%.8f", price),
+			"status": "accepted",
 		}))
 	return otu
 }
@@ -643,6 +677,23 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+			"id":     fmt.Sprintf("%d", id),
+			"buyer":  otu.accountAddress(name),
+			"amount": fmt.Sprintf("%.8f", price),
+			"status": "sold",
+		}))
+		//TODO: test that funds leave the account here
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			UInt64(id)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),

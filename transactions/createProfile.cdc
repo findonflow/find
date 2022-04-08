@@ -8,6 +8,7 @@ import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
+import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import Dandy from "../contracts/Dandy.cdc"
@@ -121,6 +122,24 @@ transaction(name: String) {
 		if !aeSaleCap.check() {
 			acct.save<@FindMarketAuctionEscrow.SaleItemCollection>(<- FindMarketAuctionEscrow.createEmptySaleItemCollection(tenant), to: aeSaleStoragePath)
 			acct.link<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}>(aeSalePublicPath, target: aeSaleStoragePath)
+		}
+
+		let dosSaleType= Type<@FindMarketDirectOfferSoft.SaleItemCollection>()
+		let dosSalePublicPath= tenant.getPublicPath(dosSaleType) ?? panic("Direct offer sof not active for this tenant")
+		let dosSaleStoragePath= tenant.getStoragePath(dosSaleType) ?? panic("Direct offer soft not active for this tenant")
+		let dosSaleCap= acct.getCapability<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic}>(dosSalePublicPath) 
+		if !dosSaleCap.check() {
+			acct.save<@FindMarketDirectOfferSoft.SaleItemCollection>(<- FindMarketDirectOfferSoft.createEmptySaleItemCollection(tenant), to: dosSaleStoragePath)
+			acct.link<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic}>(dosSalePublicPath, target: dosSaleStoragePath)
+		}
+
+		let dosBidType= Type<@FindMarketDirectOfferSoft.MarketBidCollection>()
+		let dosBidPublicPath= tenant.getPublicPath(dosBidType) ?? panic("Direct offer soft not active for this tenant")
+		let dosBidStoragePath= tenant.getStoragePath(dosBidType) ?? panic("Direct offer soft not active for this tenant")
+		let dosBidCap= acct.getCapability<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic}>(dosBidPublicPath) 
+		if !dosBidCap.check() {
+			acct.save<@FindMarketDirectOfferSoft.MarketBidCollection>(<- FindMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenant:tenant), to: dosBidStoragePath)
+			acct.link<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic}>(dosBidPublicPath, target: dosBidStoragePath)
 		}
 
 		let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
