@@ -116,7 +116,33 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	})
 
+	/*
+		//TODO: does not work
+		t.Run("Relist", func(t *testing.T) {
+			otu := NewOverflowTest(t)
+
+			price := 10.0
+			id := otu.setupMarketAndDandy()
+			otu.listDandyForEscrowedAuction("user1", id, price)
+			otu.saleItemListed("user1", "ondemand_auction", price)
+			otu.listDandyForEscrowedAuction("user1", id, 20.0)
+		})
+	*/
+
+	t.Run("Add bid that is not above minimumBidIncrement", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+
+		otu.listDandyForEscrowedAuction("user1", id, price)
+		otu.saleItemListed("user1", "ondemand_auction", price)
+		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+		otu.saleItemListed("user1", "ongoing_auction", 20.0)
+		otu.increaseAuctioBidMarketEscrow("user2", id, 0.1, 20.0)
+	})
 }
 
+//TODO: list item twice for auction
 //TODO: add bid when there is a higher bid by another user
 //TODO: add bid should return money from another user that has bid before

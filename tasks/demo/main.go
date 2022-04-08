@@ -111,7 +111,6 @@ func main() {
 		Args(o.Arguments().String("user1")).
 		RunPrintEventsFull()
 
-		//TODO: read from events of above
 	var id uint64 = 83
 	o.ScriptFromFile("dandyViews").
 		Args(o.Arguments().String("user1").UInt64(id)).

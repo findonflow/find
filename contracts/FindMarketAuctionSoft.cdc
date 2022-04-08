@@ -27,6 +27,7 @@ pub contract FindMarketAuctionSoft {
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
 
+		//TODO: look at escrow
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64) {
 			self.vaultType=vaultType
 			self.pointer=pointer
@@ -53,7 +54,6 @@ pub contract FindMarketAuctionSoft {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
 			}
-
 			return  nil
 		}
 
@@ -468,7 +468,10 @@ pub contract FindMarketAuctionSoft {
 
 		//called from lease when auction is ended
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) {
-			let id= nft.id
+			pre {
+				self.bids[nft.uuid] != nil : "You need to have a bid here already"
+			}
+
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			destroy bid
@@ -515,6 +518,7 @@ pub contract FindMarketAuctionSoft {
 			saleItem.fulfillAuction(id:id, vault: <- vault)
 		}
 
+		//TODO: need to send in the old balance here!
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, increaseBy: UFix64) {
 			let bid =self.borrowBid(id)
@@ -535,6 +539,9 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun getBalance(_ id: UInt64) : UFix64 {
+			pre {
+				self.bids[id] != nil : "You need to have a bid here already"
+			}
 			let bid= self.borrowBid(id)
 			return bid.balance
 		}

@@ -28,14 +28,15 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
 
-		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64) {
+
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.auctionStartPrice=auctionStartPrice
 			self.auctionReservePrice=auctionReservePrice
-			self.auctionDuration=86400.0
-			self.auctionExtensionOnLateBid=300.0
-			self.auctionMinBidIncrement=10.0
+			self.auctionDuration=auctionDuration
+			self.auctionExtensionOnLateBid=extentionOnLateBid
+			self.auctionMinBidIncrement=minimumBidIncrement
 			self.offerCallback=nil
 			self.auctionStartedAt=nil
 			self.auctionEndsAt=nil
@@ -288,7 +289,6 @@ pub contract FindMarketAuctionEscrow {
 				panic("Auction has ended")
 			}
 
-
 			//TODO: is this right? get the same item and send it in again?
 			self.addBid(id: id, newOffer: saleItem.offerCallback!)
 
@@ -297,7 +297,6 @@ pub contract FindMarketAuctionEscrow {
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType: Type) {
 
-			//TODO: check that bid is there
 			let timestamp=Clock.time()
 
 			let id = item.getUUID()
@@ -335,7 +334,6 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		//TODO:should a seller be allowed to call this directly?
-		//TODO: and if he/she should should we have a different event if it was rejected because the price did not match
 		pub fun cancel(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -351,7 +349,13 @@ pub contract FindMarketAuctionEscrow {
 				panic("Cannot cancel finished auction, fulfill it instead")
 			}
 
+			self.internalCancelAuction(saleItem: saleItem, status: "cancelled")
+
+		}
+
+		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
 			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			let id=saleItem.getId()
 			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)
 		}
@@ -370,7 +374,7 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			if !saleItem.hasAuctionMetReservePrice() {
-				self.cancel(id)
+				self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
 				return
 			}
 
@@ -379,8 +383,6 @@ pub contract FindMarketAuctionEscrow {
 
 			self.emitEvent(saleItem: saleItem, status: "sold")
 
-			//ESCROW: add this back once we can escrow item again
-			//let nft <- saleItem.getEscrow()
 			let vault <- saleItem.acceptEscrowedBid()
 			FindMarket.pay(tenant:self.tenant, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
 
@@ -388,16 +390,12 @@ pub contract FindMarketAuctionEscrow {
 
 		} 
 
-
-
+		//TODO: right now changing options does not work
+		//TODO: what parameters should be able to be changed after auction has started and before?
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 
-			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice)
+			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement)
 
-			//TODO: inline these in contructor
-			saleItem.setAuctionDuration(auctionDuration)
-			saleItem.setExtentionOnLateBid(auctionExtensionOnLateBid)
-			saleItem.setMinBidIncrement(minimumBidIncrement)
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
 			self.emitEvent(saleItem: saleItemRef, status: "listed")
@@ -519,6 +517,9 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
+			pre {
+				self.bids[id] != nil : "You need to have a bid here already"
+			}
 			let bid =self.borrowBid(id)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)

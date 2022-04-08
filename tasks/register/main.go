@@ -1,7 +1,5 @@
 package main
 
-//TODO: send mail https://medium.com/vacatronics/how-to-use-gmail-with-go-c980295c23b8
-
 import (
 	"encoding/csv"
 	"fmt"

@@ -23,13 +23,13 @@ pub struct FINDReport{
 	}
 }
 
-pub fun main(user: Address) : FINDReport{
+pub fun main(user: Address) : FINDReport {
 
 	let account=getAccount(user)
 	let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-	let marketBidCap= FindMarket.getFindBidCapability(user)!
-	let saleItemCap= FindMarket.getFindSaleItemCapability(user)!
+//	let marketBidCap= FindMarket.getFindBidCapability(user)!
+//	let saleItemCap= FindMarket.getFindSaleItemCapability(user)!
 	let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 	return FINDReport(
 		profile: profile?.asProfile(),
@@ -37,8 +37,8 @@ pub fun main(user: Address) : FINDReport{
 		bids: bidCap.borrow()?.getBids() ?? [],
 		leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 		privateMode: profile?.isPrivateModeEnabled() ?? false,
-		itemsForSale: saleItemCap.borrow()?.getItemsForSale() ?? [],
-		marketBids:marketBidCap.borrow()?.getBids() ?? []
+		itemsForSale: [],
+		marketBids: [],
 	)
 
 }
