@@ -407,10 +407,10 @@ pub contract FindMarketDirectOfferSoft {
 			saleItem.fulfillDirectOfferNonEscrowed(id:id, vault: <- vault)
 		}
 
-		pub fun increaseBid(id: UInt64, amount: UFix64) {
+		pub fun increaseBid(id: UInt64, increaseBy: UFix64) {
 			let bid =self.borrowBid(id)
 			bid.setBidAt(Clock.time())
-			bid.increaseBid(amount)
+			bid.increaseBid(increaseBy)
 			bid.from.borrow()!.registerIncreasedBid(id)
 		}
 
