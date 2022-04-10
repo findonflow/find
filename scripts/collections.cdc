@@ -1279,7 +1279,7 @@ pub fun main(address: Address) : MetadataCollections? {
 				id: id,
 				name: "Flowverse socks",
 				image: "https://img.rarible.com/prod/video/upload/t_video_big/prod-itemAnimations/FLOW-A.01ab36aaf654a13e.RaribleNFT:15029/b1cedf3",
-				url: "https://www.flowverse.co/socksh",
+				url: "https://www.flowverse.co/socks",
 				listPrice: nil,
 				listToken: nil,
 				contentType: "video",
