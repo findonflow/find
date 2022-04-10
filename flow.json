@@ -92,11 +92,11 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
-			"address": "0xe4561cec27a8ec3b",
+			"address": "0xf86400fced7b74f0",
 			"key": "${TESTNET_FIND2}"
 		},
 		"testnet-find-admin": {
-			"address": "0xf797609358edb4c0",
+			"address": "0x1c03b921fc81742f",
 			"key": "${TESTNET_FIND2_ADMIN}"
 		},
 		"testnet-user1": {
