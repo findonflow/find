@@ -31,25 +31,49 @@ pub struct FINDReport{
 }
 
 pub fun main(user: Address) : FINDReport {
-
 	let account=getAccount(user)
 	let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 	let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
 	let items : [FindMarket.SaleItemInformation] = []
-	items.appendAll(FindMarketSale.getFindSaleItemCapability(user)!.borrow()!.getItemsForSale())
-	items.appendAll(FindMarketDirectOfferEscrow.getFindSaleItemCapability(user)!.borrow()!.getItemsForSale())
-	items.appendAll(FindMarketAuctionEscrow.getFindSaleItemCapability(user)!.borrow()!.getItemsForSale())
-	items.appendAll(FindMarketAuctionSoft.getFindSaleItemCapability(user)!.borrow()!.getItemsForSale())
-	items.appendAll(FindMarketDirectOfferSoft.getFindSaleItemCapability(user)!.borrow()!.getItemsForSale())
+	if let sale =FindMarketSale.getFindSaleItemCapability(user) {
+		items.appendAll(sale.borrow()!.getItemsForSale())
+	}
+
+	if let doe=FindMarketDirectOfferEscrow.getFindSaleItemCapability(user) {
+		items.appendAll(doe.borrow()!.getItemsForSale())
+	}
+
+	if let ae = FindMarketAuctionEscrow.getFindSaleItemCapability(user) {
+		items.appendAll(ae.borrow()!.getItemsForSale())
+	}
+
+	if let as = FindMarketAuctionSoft.getFindSaleItemCapability(user) {
+		items.appendAll(as.borrow()!.getItemsForSale())
+	}
+
+	if let dos = FindMarketDirectOfferSoft.getFindSaleItemCapability(user) {
+		items.appendAll(dos.borrow()!.getItemsForSale())
+	}
 
 
 	let bids : [FindMarket.BidInfo] = []
-	bids.appendAll(FindMarketDirectOfferEscrow.getFindBidCapability(user)!.borrow()!.getBids())
-	bids.appendAll(FindMarketDirectOfferSoft.getFindBidCapability(user)!.borrow()!.getBids())
-	bids.appendAll(FindMarketAuctionSoft.getFindBidCapability(user)!.borrow()!.getBids())
-	bids.appendAll(FindMarketAuctionEscrow.getFindBidCapability(user)!.borrow()!.getBids())
+	if let bDoe= FindMarketDirectOfferEscrow.getFindBidCapability(user) {
+		bids.appendAll(bDoe.borrow()!.getBids())
+	}
+
+	if let bDos= FindMarketDirectOfferSoft.getFindBidCapability(user) {
+		bids.appendAll(bDos.borrow()!.getBids())
+	}
+
+	if let bAs= FindMarketAuctionSoft.getFindBidCapability(user) {
+		bids.appendAll(bAs.borrow()!.getBids())
+	}
+
+	if let bAe= FindMarketAuctionEscrow.getFindBidCapability(user) {
+		bids.appendAll(bAe.borrow()!.getBids())
+	}
 
 	return FINDReport(
 		profile: profile?.asProfile(),
