@@ -15,6 +15,7 @@ import FindMarketDirectOfferEscrow from "./FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "./FindMarketDirectOfferSoft.cdc"
 import FindMarketAuctionEscrow from "./FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "./FindMarketAuctionSoft.cdc"
+import FTRegistry from "./FTRegistry.cdc"
 
 pub contract Admin {
 
@@ -187,6 +188,20 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			return <- Dandy.createForge(platform:platform)
+		}
+
+		/// ===================================================================================
+		// Fungible Token Registry 
+		/// ===================================================================================
+
+		// Registry FungibleToken Information
+		pub fun setFTInfo(alias: String, type: Type, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+			FTRegistry.setFTInfo(alias: alias, type: type, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
+		}
+
+		// Remove FungibleToken Information
+		pub fun removeFTInfo(typeIdentifier: String) {
+			FTRegistry.removeFTInfo(typeIdentifier: typeIdentifier)
 		}
 
 		//TODO: set that primary cut has been paid
