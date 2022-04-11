@@ -133,7 +133,12 @@
 				"RelatedAccounts",
 				"FindViews", 
 				"Dandy",
-				"FindMarket"
+				"FindMarket",
+				"FindMarketSale",
+				"FindMarketDirectOfferEscrow",
+				"FindMarketDirectOfferSoft",
+				"FindMarketAuctionEscrow",
+				"FindMarketAuctionSoft"
 			]
 		},
 		"testnet": {
