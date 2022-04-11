@@ -6,7 +6,6 @@ import FindViews from "../contracts/FindViews.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
-//import FIND from "./FIND.cdc"
 
 pub contract FindMarket {
 
@@ -19,7 +18,7 @@ pub contract FindMarket {
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	access(account) fun pay(tenant: TenantInformation, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo) {
+	access(account) fun pay(tenant: TenantInformation, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: FindViews.Royalties?, nftInfo:NFTInfo) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -87,11 +86,11 @@ pub contract FindMarket {
 		pub let publicPaths: { String: PublicPath}
 		pub let storagePaths : { String: StoragePath}
 
-		pub let findCut: MetadataViews.Royalty?
-		pub let tenantCut: MetadataViews.Royalty?
+		pub let findCut: FindViews.Royalty?
+		pub let tenantCut: FindViews.Royalty?
 
 
-		init(name:String, validNFTTypes: [Type], ftTypes:[Type], findCut: MetadataViews.Royalty?, tenantCut: MetadataViews.Royalty?) {
+		init(name:String, validNFTTypes: [Type], ftTypes:[Type], findCut: FindViews.Royalty?, tenantCut: FindViews.Royalty?) {
 			self.name=name
 			self.validNFTTypes=validNFTTypes
 			self.ftTypes=ftTypes

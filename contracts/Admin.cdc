@@ -58,7 +58,7 @@ pub contract Admin {
 			let saleItemStoragePath= /storage/findfindMarketSale
 
 			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
+			let findRoyalty=FindViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 			let tenant=FindMarket.TenantInformation( name: "find", validNFTTypes: [], ftTypes:[], findCut: findRoyalty, tenantCut: nil)
 			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
 

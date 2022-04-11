@@ -7,6 +7,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 
 transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String) {
 	prepare(account: AuthAccount) {
@@ -33,7 +34,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let media=MetadataViews.HTTPFile(url:nftUrl)
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
+		let minterRoyalty=FindViews.Royalties(cutInfos:[FindViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1

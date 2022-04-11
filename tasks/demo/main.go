@@ -197,7 +197,7 @@ func main() {
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.CreativeWork")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.CreativeWork").Run()
 
-				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.MetadataViews.Royalties")
+				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Royalties")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Royalties").Run()
 
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.MinterPlatform")
