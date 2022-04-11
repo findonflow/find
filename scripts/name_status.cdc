@@ -1,6 +1,12 @@
 import FIND from "../contracts/FIND.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
+import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
+import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
+import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
+import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+
 
 pub struct FINDNameReport{
 	pub let profile:Profile.UserProfile?
@@ -12,7 +18,7 @@ pub struct FINDNameReport{
 	pub let marketBids: [FindMarket.BidInfo]
 
 	init(status: String, profile: Profile.UserProfile?, lease : FIND.LeaseInformation?,  cost: UFix64, leases: [FIND.LeaseInformation]
-,itemsForSale: [FindMarket.SaleItemInformation], marketBids: [FindMarket.BidInfo]) {
+	,itemsForSale: [FindMarket.SaleItemInformation], marketBids: [FindMarket.BidInfo]) {
 		self.status=status
 		self.profile=profile
 		self.lease=lease
@@ -32,8 +38,21 @@ pub fun main(name: String) : FINDNameReport{
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 
-		let marketBidCap= FindMarket.getFindBidCapability(address)!  
-		let saleItemCap= FindMarket.getFindSaleItemCapability(address)!
+		let items : [FindMarket.SaleItemInformation] = []
+		items.appendAll(FindMarketSale.getFindSaleItemCapability(address)!.borrow()!.getItemsForSale())
+		items.appendAll(FindMarketDirectOfferEscrow.getFindSaleItemCapability(address)!.borrow()!.getItemsForSale())
+		items.appendAll(FindMarketAuctionEscrow.getFindSaleItemCapability(address)!.borrow()!.getItemsForSale())
+		items.appendAll(FindMarketAuctionSoft.getFindSaleItemCapability(address)!.borrow()!.getItemsForSale())
+		items.appendAll(FindMarketDirectOfferSoft.getFindSaleItemCapability(address)!.borrow()!.getItemsForSale())
+
+
+		let bids : [FindMarket.BidInfo] = []
+		bids.appendAll(FindMarketDirectOfferEscrow.getFindBidCapability(address)!.borrow()!.getBids())
+		bids.appendAll(FindMarketDirectOfferSoft.getFindBidCapability(address)!.borrow()!.getBids())
+		bids.appendAll(FindMarketAuctionSoft.getFindBidCapability(address)!.borrow()!.getBids())
+		bids.appendAll(FindMarketAuctionEscrow.getFindBidCapability(address)!.borrow()!.getBids())
+
+
 		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
 		if leaseCap.check() {
@@ -45,8 +64,8 @@ pub fun main(name: String) : FINDNameReport{
 			lease: lease,
 			cost:  cost,
 			leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
-			itemsForSale: saleItemCap.borrow()?.getItemsForSale() ?? [],
-			marketBids:marketBidCap.borrow()?.getBids() ?? []
+			itemsForSale: items,
+			marketBids:bids
 		)
 
 	}
@@ -64,5 +83,4 @@ pub fun main(name: String) : FINDNameReport{
 		itemsForSale: [],
 		marketBids: [],
 	)
-
 }

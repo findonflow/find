@@ -1,4 +1,4 @@
-dimport FindMarket from "../contracts/FindMarket.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -7,6 +7,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+
 transaction(address: Address, id: UInt64, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>

@@ -10,29 +10,36 @@ func main() {
 	o := overflow.NewOverflowTestnet().Start()
 
 	/*
-		//first step create the adminClient as the fin user
-		o.TransactionFromFile("setup_fin_1_create_client").
-			SignProposeAndPayAs("find-admin").
-			RunPrintEventsFull()
+			//first step create the adminClient as the fin user
+			o.TransactionFromFile("setup_fin_1_create_client").
+				SignProposeAndPayAs("find-admin").
+				RunPrintEventsFull()
 
-		//link in the server in the versus client
-		o.TransactionFromFile("setup_fin_2_register_client").
-			SignProposeAndPayAs("find").
-			Args(o.Arguments().Account("find-admin")).
-			RunPrintEventsFull()
+			//link in the server in the versus client
+			o.TransactionFromFile("setup_fin_2_register_client").
+				SignProposeAndPayAs("find").
+				Args(o.Arguments().Account("find-admin")).
+				RunPrintEventsFull()
 
-		//set up fin network as the fin user
-		o.TransactionFromFile("setup_fin_3_create_network").
-			SignProposeAndPayAs("find-admin").
-			RunPrintEventsFull()
+			//set up fin network as the fin user
+			o.TransactionFromFile("setup_fin_3_create_network").
+				SignProposeAndPayAs("find-admin").
+				RunPrintEventsFull()
 
-		createProfileAndGiftName(o, "find")
-		createProfileAndGiftName(o, "find-admin")
 
+		o.TransactionFromFile("setup_find_market_1").
+			SignProposeAndPayAs("find").RunPrintEventsFull()
 	*/
-	createProfileAndGiftName(o, "user1")
-	createProfileAndGiftName(o, "user2")
-	createProfileAndGiftName(o, "user3")
+
+	//link in the server in the versus client
+	o.TransactionFromFile("setup_find_market_2").
+		SignProposeAndPayAs("find-admin").
+		Args(o.Arguments().Account("find")).
+		RunPrintEventsFull()
+
+	createProfileAndGiftName(o, "find")
+	createProfileAndGiftName(o, "find-admin")
+
 }
 
 func createProfileAndGiftName(o *overflow.Overflow, name string) {
