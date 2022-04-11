@@ -1,12 +1,13 @@
+import Admin from "../contracts/Admin.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 transaction(alias: String) {
 
-    let adminRef : &FTRegistry.Admin
+    let adminRef : &Admin.AdminProxy
 
     prepare(account: AuthAccount){
-        self.adminRef = account.borrow<&FTRegistry.Admin>(from: FTRegistry.FTRegistryStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
         
     }
 
