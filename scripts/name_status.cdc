@@ -37,45 +37,45 @@ pub fun main(name: String) : FINDNameReport{
 		let account=getAccount(user)
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
+
 		let items : [FindMarket.SaleItemInformation] = []
-		if let sale =FindMarketSale.getFindSaleItemCapability(user) {
-			items.appendAll(sale.borrow()!.getItemsForSale())
+		if let sale =FindMarketSale.getFindSaleItemCapability(user)!.borrow() {
+			items.appendAll(sale.getItemsForSale())
 		}
 
-		if let doe=FindMarketDirectOfferEscrow.getFindSaleItemCapability(user) {
-			items.appendAll(doe.borrow()!.getItemsForSale())
+		if let doe=FindMarketDirectOfferEscrow.getFindSaleItemCapability(user)!.borrow() {
+			items.appendAll(doe.getItemsForSale())
 		}
 
-		if let ae = FindMarketAuctionEscrow.getFindSaleItemCapability(user) {
-			items.appendAll(ae.borrow()!.getItemsForSale())
+		if let ae = FindMarketAuctionEscrow.getFindSaleItemCapability(user)!.borrow() {
+			items.appendAll(ae.getItemsForSale())
 		}
 
-		if let as = FindMarketAuctionSoft.getFindSaleItemCapability(user) {
-			items.appendAll(as.borrow()!.getItemsForSale())
+		if let as = FindMarketAuctionSoft.getFindSaleItemCapability(user)!.borrow() {
+			items.appendAll(as.getItemsForSale())
 		}
 
-		if let dos = FindMarketDirectOfferSoft.getFindSaleItemCapability(user) {
-			items.appendAll(dos.borrow()!.getItemsForSale())
+		if let dos = FindMarketDirectOfferSoft.getFindSaleItemCapability(user)!.borrow() {
+			items.appendAll(dos.getItemsForSale())
 		}
 
 
 		let bids : [FindMarket.BidInfo] = []
-		if let bDoe= FindMarketDirectOfferEscrow.getFindBidCapability(user) {
-			bids.appendAll(bDoe.borrow()!.getBids())
+		if let bDoe= FindMarketDirectOfferEscrow.getFindBidCapability(user)!.borrow() {
+			bids.appendAll(bDoe.getBids())
 		}
 
-		if let bDos= FindMarketDirectOfferSoft.getFindBidCapability(user) {
-			bids.appendAll(bDos.borrow()!.getBids())
+		if let bDos= FindMarketDirectOfferSoft.getFindBidCapability(user)!.borrow() {
+			bids.appendAll(bDos.getBids())
 		}
 
-		if let bAs= FindMarketAuctionSoft.getFindBidCapability(user) {
-			bids.appendAll(bAs.borrow()!.getBids())
+		if let bAs= FindMarketAuctionSoft.getFindBidCapability(user)!.borrow() {
+			bids.appendAll(bAs.getBids())
 		}
 
-		if let bAe= FindMarketAuctionEscrow.getFindBidCapability(user) {
-			bids.appendAll(bAe.borrow()!.getBids())
+		if let bAe= FindMarketAuctionEscrow.getFindBidCapability(user)!.borrow() {
+			bids.appendAll(bAe.getBids())
 		}
-
 		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
 		if leaseCap.check() {
