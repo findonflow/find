@@ -778,12 +778,52 @@ func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected stri
 func (otu *OverflowTestUtils) registerFlowInFtRegistry() *OverflowTestUtils {
 	otu.O.TransactionFromFile("setFTInfo_flow").
 		SignProposeAndPayAs("find").
-		Args(otu.O.Arguments()).
 		Test(otu.T).
 		AssertSuccess().
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 			"alias":          "Flow",
 			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		}))
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) removeFlowInFtRegistry(transactionFile string, argument string) *OverflowTestUtils {
+	otu.O.TransactionFromFile(transactionFile).
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().String(argument)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
+			"alias":          "Flow",
+			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		}))
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
+	otu.O.TransactionFromFile("setNFTInfo_Dandy").
+		SignProposeAndPayAs("find").
+		Test(otu.T).
+		AssertSuccess().
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
+			"name":           "Dandy",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.Collection",
+		}))
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, argument string) *OverflowTestUtils {
+	otu.O.TransactionFromFile(transactionFile).
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().String(argument)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRemoved", map[string]interface{}{
+			"name":           "Dandy",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.Collection",
 		}))
 
 	return otu

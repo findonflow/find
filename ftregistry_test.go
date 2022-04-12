@@ -93,4 +93,42 @@ func TestFTRegistry(t *testing.T) {
 			AssertFailure("This FungibleToken Register already exist")
 	})
 
+	t.Run("Should be able to registry and remove flow token by Alias, as well as return nil on scripts", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			registerFlowInFtRegistry().
+			removeFlowInFtRegistry("removeFTInfoByAlias", "Flow")
+
+		o := otu.O
+		aliasResult := o.ScriptFromFile("getFTInfoByAlias").
+			Args(o.Arguments().String("Flow")).
+			RunReturnsInterface()
+		assert.Equal(t, "", aliasResult)
+
+		infoResult := o.ScriptFromFile("getFTInfoByAlias").
+			Args(o.Arguments().String("Flow")).
+			RunReturnsInterface()
+		assert.Equal(t, "", infoResult)
+
+	})
+
+	t.Run("Should be able to registry and remove flow token by Type Identifier, as well as return nil on scripts", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			registerFlowInFtRegistry().
+			removeFlowInFtRegistry("removeFTInfoByTypeIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault")
+
+		o := otu.O
+		aliasResult := o.ScriptFromFile("getFTInfoByTypeIdentifier").
+			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
+			RunReturnsInterface()
+		assert.Equal(t, "", aliasResult)
+
+		infoResult := o.ScriptFromFile("getFTInfoByAlias").
+			Args(o.Arguments().String("Flow")).
+			RunReturnsInterface()
+		assert.Equal(t, "", infoResult)
+
+	})
+
 }

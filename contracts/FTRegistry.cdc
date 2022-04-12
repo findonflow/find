@@ -78,3 +78,4 @@ pub contract FTRegistry {
         self.aliasMap = {}
     }
 }
+ 
