@@ -58,6 +58,7 @@ import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 import DayNFT from 0x1600b04bf033fb99
 import RaribleNFT from 0x01ab36aaf654a13e
+import Necryptolis from 0x718efe5e88fe48ea
 
 import FLOAT from 0x2d4c3caffbeab845
 
@@ -1260,6 +1261,19 @@ pub fun main(address: Address) : MetadataCollections? {
 
 	if dayItems.length != 0 {
 		results["DayNFT"] = dayItems
+	}
+
+	let necryptolisItems: [String] =[]
+	let necryptolisNFT = getItemForMetadataStandard(path: Necryptolis.ResolverCollectionPublicPath, account: account, externalFixedUrl: "https://www.necryptolis.com")
+	
+	for item in necryptolisNFT {
+		let itemId="Necryptolis".concat(item.id.toString())
+		necryptolisItems.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	if necryptolisItems.length != 0 {
+		results["Necryptolis"] = necryptolisItems
 	}
 
 
