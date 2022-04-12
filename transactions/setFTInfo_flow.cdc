@@ -8,14 +8,10 @@ transaction() {
 
     prepare(account: AuthAccount){
         self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
-        
     }
 
     execute{
-        let vaultInstance <- FlowToken.createEmptyVault()
-        let type: Type = vaultInstance.getType()
-        destroy vaultInstance
+        let type: Type = Type<@FlowToken.Vault>()
         self.adminRef.setFTInfo(alias: "Flow", type: type, icon: nil, receiverPath: /public/flowTokenReceiver, balancePath: /public/flowTokenBalance, vaultPath: /storage/flowTokenVault)
-
     }
 }

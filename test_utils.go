@@ -769,6 +769,26 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItem {
 
 }
 
+func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected string) *OverflowTestUtils {
+	result := otu.O.ScriptFromFile(scriptFile).RunReturnsJsonString()
+	assert.JSONEq(otu.T, expected, result)
+	return otu
+}
+
+func (otu *OverflowTestUtils) registerFlowInFtRegistry() *OverflowTestUtils {
+	otu.O.TransactionFromFile("setFTInfo_flow").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments()).
+		Test(otu.T).
+		AssertSuccess().
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "Flow",
+			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		}))
+
+	return otu
+}
+
 type SaleItem struct {
 	Amount              string `json:"amount"`
 	AuctionReservePrice string `json:"auctionReservePrice"`

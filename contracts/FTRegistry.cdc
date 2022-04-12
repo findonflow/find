@@ -77,6 +77,4 @@ pub contract FTRegistry {
         self.fungibleTokenList = {}
         self.aliasMap = {}
     }
-
-
 }
