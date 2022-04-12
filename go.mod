@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.17
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220405114508-d7c781679e0e
+	github.com/bjartek/overflow v0.0.0-20220407214147-f74f6ea0f10b
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
@@ -129,5 +129,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
 )
-
-replace github.com/bjartek/overflow => ../overflow
