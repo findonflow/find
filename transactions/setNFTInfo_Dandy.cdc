@@ -13,7 +13,7 @@ transaction() {
     }
 
     execute{
-        let type: Type = Type<@Dandy.Collection>()
+        let type: Type = Type<@Dandy.NFT>()
         self.adminRef.setNFTInfo(name: "Dandy", type: type, icon: nil, providerPath: Dandy.CollectionPrivatePath, publicPath: Dandy.CollectionPublicPath, storagePath: Dandy.CollectionStoragePath, allowedFTTypes: nil, address: 0xf8d6e0586b0a20c7)
 
     }
