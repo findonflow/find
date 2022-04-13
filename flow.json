@@ -59,7 +59,8 @@
 		"Admin": "./contracts/Admin.cdc",
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": "./contracts/Profile.cdc",
-		"Debug" : "./contracts/Debug.cdc"
+		"Debug" : "./contracts/Debug.cdc",
+		"FTRegistry" : "./contracts/FTRegistry.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -181,7 +182,8 @@
 				"FindMarketAuctionEscrow",
 				"FindMarketAuctionSoft",
 				"Sender",
-				"RelatedAccounts"
+				"RelatedAccounts",
+				"FTRegistry"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],
