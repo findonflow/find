@@ -809,7 +809,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 		AssertSuccess().
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
 			"name":           "Dandy",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.Collection",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
 	return otu
@@ -823,7 +823,7 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 		AssertSuccess().
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRemoved", map[string]interface{}{
 			"name":           "Dandy",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.Collection",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
 	return otu
