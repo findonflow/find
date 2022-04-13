@@ -40,6 +40,13 @@ pub contract FTRegistry {
         return FTRegistry.fungibleTokenList[typeIdentifier]
     }
 
+		pub fun getFTInfoByAlias(_ alias: String) : FTInfo? {
+			  if let identifier = FTRegistry.aliasMap[alias] {
+					return FTRegistry.fungibleTokenList[identifier]
+				}
+				return nil
+    }
+
     pub fun getTypeIdentifier(alias: String) : String? {
         return FTRegistry.aliasMap[alias]
     }

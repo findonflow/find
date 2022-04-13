@@ -360,11 +360,13 @@ func (otu *OverflowTestUtils) cancelDandyForSale(name string, id uint64) *Overfl
 
 func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listDandyForSale").
+	otu.O.TransactionFromFile("listNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			UInt64(id).
-			UFix64(price)).
+			UFix64(price).
+			String("Dandy").
+			String("Flow")).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
 			"status": "listed",

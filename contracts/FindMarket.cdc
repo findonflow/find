@@ -234,6 +234,8 @@ pub contract FindMarket {
 
 	pub struct SaleItemInformation {
 
+		//TODO: should we add typeIdentifier here?
+		//TODO: call this nftType?
 		pub let type:Type
 		pub let typeId: UInt64
 		pub let id:UInt64

@@ -60,7 +60,8 @@
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": "./contracts/Profile.cdc",
 		"Debug" : "./contracts/Debug.cdc",
-		"FTRegistry" : "./contracts/FTRegistry.cdc"
+		"FTRegistry" : "./contracts/FTRegistry.cdc",
+		"NFTRegistry" : "./contracts/NFTRegistry.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -183,7 +184,8 @@
 				"FindMarketAuctionSoft",
 				"Sender",
 				"RelatedAccounts",
-				"FTRegistry"
+				"FTRegistry",
+				"NFTRegistry"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],

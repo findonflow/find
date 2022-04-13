@@ -46,10 +46,19 @@ pub contract NFTRegistry {
     } 
 
     /* getters */
+		//BAM: use _ for single paramter functions
     pub fun getNFTInfo(typeIdentifier: String) : NFTInfo? {
         return NFTRegistry.nonFungibleTokenList[typeIdentifier]
     }
 
+		pub fun getNFTInfoByAlias(_ alias: String) : NFTInfo? {
+			  if let identifier = NFTRegistry.namingMap[alias] {
+					return NFTRegistry.nonFungibleTokenList[identifier]
+				}
+				return nil
+    }
+
+		//BAM: use _ for single paramter functions
     pub fun getTypeIdentifier(name: String) : String? {
         return NFTRegistry.namingMap[name]
     }
