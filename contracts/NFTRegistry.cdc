@@ -18,7 +18,7 @@ pub contract NFTRegistry {
     /* Struct */
     pub struct NFTInfo {
         pub let name : String
-        // Pass in @Collection type
+        // Pass in @NFT type
         pub let type : Type              
         pub let typeIdentifier : String
         pub let icon : String?
