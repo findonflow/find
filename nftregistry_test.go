@@ -21,7 +21,7 @@ func TestNFTRegistry(t *testing.T) {
 
 		o := otu.O
 		result := o.ScriptFromFile("getNFTInfoByTypeIdentifier").
-			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.Collection")).
+			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 			RunReturnsInterface()
 
 		expected := map[string]interface{}{
@@ -32,8 +32,8 @@ func TestNFTRegistry(t *testing.T) {
 			"providerPath":   "/private/findDandy",
 			"publicPath":     "/public/findDandy",
 			"storagePath":    "/storage/findDandy",
-			"type":           "Type<A.f8d6e0586b0a20c7.Dandy.Collection>()",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.Collection",
+			"type":           "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}
 		assert.Equal(t, expected, result)
 
@@ -57,8 +57,8 @@ func TestNFTRegistry(t *testing.T) {
 			"providerPath":   "/private/findDandy",
 			"publicPath":     "/public/findDandy",
 			"storagePath":    "/storage/findDandy",
-			"type":           "Type<A.f8d6e0586b0a20c7.Dandy.Collection>()",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.Collection",
+			"type":           "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}
 		assert.Equal(t, expected, result)
 
@@ -67,7 +67,7 @@ func TestNFTRegistry(t *testing.T) {
 	t.Run("Should be able to registry Dandy token and list it", func(t *testing.T) {
 		expected := `
 		{
-			"A.f8d6e0586b0a20c7.Dandy.Collection": {
+			"A.f8d6e0586b0a20c7.Dandy.NFT": {
 				"address":"0xf8d6e0586b0a20c7",
 				"allowedFTTypes":"",
 				"icon":"",
@@ -75,8 +75,8 @@ func TestNFTRegistry(t *testing.T) {
 				"providerPath":"/private/findDandy",
 				"publicPath":"/public/findDandy",
 				"storagePath":"/storage/findDandy",
-				"type": "Type\u003cA.f8d6e0586b0a20c7.Dandy.Collection\u003e()",
-				"typeIdentifier":"A.f8d6e0586b0a20c7.Dandy.Collection"}
+				"type": "Type\u003cA.f8d6e0586b0a20c7.Dandy.NFT\u003e()",
+				"typeIdentifier":"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		}
 		`
 
@@ -123,11 +123,11 @@ func TestNFTRegistry(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			registerDandyInNFTRegistry().
-			removeDandyInNFtRegistry("removeNFTInfoByTypeIdentifier", "A.f8d6e0586b0a20c7.Dandy.Collection")
+			removeDandyInNFtRegistry("removeNFTInfoByTypeIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT")
 
 		o := otu.O
 		aliasResult := o.ScriptFromFile("getNFTInfoByTypeIdentifier").
-			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.Collection")).
+			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 			RunReturnsInterface()
 		assert.Equal(t, "", aliasResult)
 
