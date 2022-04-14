@@ -14,14 +14,22 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-
-		otu.tickClock(400.0)
-		//TODO: Should status be something else while time has not run out? I think so
-		otu.saleItemListed("user1", "ongoing_auction", price+5.0)
-		otu.fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			// //TODO: Should status be something else while time has not run out? I think so
+			saleItemListed("user1", "ongoing_auction", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
 
 	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
@@ -29,9 +37,18 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
 		otu.tickClock(400.0)
 
@@ -44,12 +61,20 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+1.0)
-
-		otu.tickClock(400.0)
-		otu.saleItemListed("user1", "ongoing_auction", 11.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+1.0).
+			tickClock(400.0).
+			saleItemListed("user1", "ongoing_auction", 11.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -75,13 +100,20 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+1.0)
-		otu.saleItemListed("user1", "ongoing_auction", 11.0)
-
-		otu.tickClock(2.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+1.0).
+			saleItemListed("user1", "ongoing_auction", 11.0).
+			tickClock(2.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -106,13 +138,21 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 15.0)
-		otu.increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0)
-		otu.saleItemListed("user1", "ongoing_auction", 20.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			saleItemListed("user1", "ongoing_auction", 15.0).
+			increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0).
+			saleItemListed("user1", "ongoing_auction", 20.0)
 
 	})
 
@@ -129,18 +169,45 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		})
 	*/
 
+	// Ben note : If the same buyer increase the bid, even under min bid increment, will still go thru
 	t.Run("Add bid that is not above minimumBidIncrement", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		price := 10.0
+		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+preIncrement).
+			saleItemListed("user1", "ongoing_auction", price+preIncrement)
 
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 20.0)
-		otu.increaseAuctioBidMarketEscrow("user2", id, 0.1, 20.0)
+		name := "user2"
+		postIncrement := 0.1
+		totalPrice := price + preIncrement + postIncrement
+
+		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				UInt64(id).
+				UFix64(postIncrement)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", totalPrice),
+				"id":     fmt.Sprintf("%d", id),
+				"buyer":  otu.accountAddress(name),
+				"status": "active",
+			}))
 	})
+
 }
 
 //TODO: list item twice for auction

@@ -363,10 +363,10 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 	otu.O.TransactionFromFile("listNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			UInt64(id).
-			UFix64(price).
 			String("Dandy").
-			String("FUSD")).
+			UInt64(id).
+			String("FUSD").
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
 			"status": "listed",
@@ -383,7 +383,9 @@ func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64
 	otu.O.TransactionFromFile("listDandyForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			String("Dandy").
 			UInt64(id).
+			String("FUSD").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{

@@ -6,10 +6,10 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(id: UInt64, directSellPrice:UFix64, nftAlias: String, ftAlias: String) {
+transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix64) {
 	prepare(account: AuthAccount) {
 
-		// Get the sales Item from tenant
+		// Get the salesItemRef from tenant
 		let tenant=FindMarket.getFindTenant() 
 		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>())!)!
 
