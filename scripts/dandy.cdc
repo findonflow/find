@@ -1,13 +1,18 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import Profile from "../contracts/Profile.cdc"
-import Dandy from "../contracts/Dandy.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
-pub fun main(name: String, id: UInt64, identifier: String) : AnyStruct? {
+pub fun main(name: String, id: UInt64, nftAlias: String, identifier: String) : AnyStruct? {
 
+	/* Ben : Question -> Do we panic here? */
 	let address =FIND.lookupAddress(name)!
-	let collection= getAccount(address).getCapability(Dandy.CollectionPublicPath).borrow<&{MetadataViews.ResolverCollection}>()!
+
+	// Get collection public path from NFT Registry
+	let nftInfo = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")
+	let collectionPublicPath = nftInfo.publicPath
+	let collection= getAccount(address).getCapability(collectionPublicPath).borrow<&{MetadataViews.ResolverCollection}>()!
 
 	let nft=collection.borrowViewResolver(id: id)
 	for v in nft.getViews() {

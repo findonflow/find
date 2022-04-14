@@ -366,7 +366,7 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 			UInt64(id).
 			UFix64(price).
 			String("Dandy").
-			String("Flow")).
+			String("FUSD")).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
 			"status": "listed",
@@ -414,13 +414,14 @@ func (otu *OverflowTestUtils) listDandyForSoftAuction(name string, id uint64, pr
 	return otu
 }
 
-func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, expectedPlatformRoyalty float64) *OverflowTestUtils {
-
+func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
+	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
 	otu.O.ScriptFromFile("dandy").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
+			String(nftAlias).
 			String("A.f8d6e0586b0a20c7.FindViews.Royalties")).
 		RunMarshalAs(&royalty)
 
@@ -777,29 +778,23 @@ func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected stri
 	return otu
 }
 
-func (otu *OverflowTestUtils) registerFlowInFtRegistry() *OverflowTestUtils {
-	otu.O.TransactionFromFile("setFTInfo_flow").
+func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setFTInfo_" + alias).
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "Flow",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		}))
+		AssertEmitEvent(overflow.NewTestEvent(eventName, eventResult))
 
 	return otu
 }
 
-func (otu *OverflowTestUtils) removeFlowInFtRegistry(transactionFile string, argument string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
 	otu.O.TransactionFromFile(transactionFile).
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().String(argument)).
 		Test(otu.T).
 		AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
-			"alias":          "Flow",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		}))
+		AssertEmitEvent(overflow.NewTestEvent(eventName, eventResult))
 
 	return otu
 }
