@@ -12,9 +12,8 @@ transaction(alias: String) {
     }
 
     execute{
-        if let typeIdentifier = FTRegistry.getTypeIdentifier(alias: alias) {
-           self.adminRef.removeFTInfo(typeIdentifier: typeIdentifier) 
-        }
-        
+
+        self.adminRef.removeFTInfoByAlias(alias)
+
     }
 }

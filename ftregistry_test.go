@@ -59,20 +59,21 @@ func TestFTRegistry(t *testing.T) {
 		assert.Equal(t, expected, result)
 
 	})
-	t.Run("Should be able to registry flow token and list it", func(t *testing.T) {
+
+	t.Run("Should be able to registry flow token and get list from it", func(t *testing.T) {
 		expected := `
-{
-    "A.0ae53cb6e3f42a79.FlowToken.Vault": {
-        "alias": "Flow",
-        "balancePath": "/public/flowTokenBalance",
-        "icon": "",
-        "receiverPath": "/public/flowTokenReceiver",
-        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
-        "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        "vaultPath": "/storage/flowTokenVault"
-    }
-}
-`
+		{
+		    "A.0ae53cb6e3f42a79.FlowToken.Vault": {
+		        "alias": "Flow",
+		        "balancePath": "/public/flowTokenBalance",
+		        "icon": "",
+		        "receiverPath": "/public/flowTokenReceiver",
+		        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
+		        "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		        "vaultPath": "/storage/flowTokenVault"
+		    }
+		}
+		`
 		NewOverflowTest(t).
 			setupFIND().
 			registerFlowInFtRegistry().

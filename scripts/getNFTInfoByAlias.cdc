@@ -1,10 +1,7 @@
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
-pub fun main(name: String) : NFTRegistry.NFTInfo?{
+pub fun main(alias: String) : NFTRegistry.NFTInfo?{
 
-    if let typeIdentifier = NFTRegistry.getTypeIdentifier(name: name) {
-        return NFTRegistry.getNFTInfo(typeIdentifier: typeIdentifier)
-    }
+    return NFTRegistry.getNFTInfoByAlias(alias)
 
-    return nil
 }

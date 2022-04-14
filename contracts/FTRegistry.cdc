@@ -36,18 +36,18 @@ pub contract FTRegistry {
     } 
 
     /* getters */
-    pub fun getFTInfo(typeIdentifier: String) : FTInfo? {
+    pub fun getFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo? {
         return FTRegistry.fungibleTokenList[typeIdentifier]
     }
 
-		pub fun getFTInfoByAlias(_ alias: String) : FTInfo? {
-			  if let identifier = FTRegistry.aliasMap[alias] {
-					return FTRegistry.fungibleTokenList[identifier]
-				}
-				return nil
+	pub fun getFTInfoByAlias(_ alias: String) : FTInfo? {
+		  if let identifier = FTRegistry.aliasMap[alias] {
+				return FTRegistry.fungibleTokenList[identifier]
+			}
+			return nil
     }
 
-    pub fun getTypeIdentifier(alias: String) : String? {
+    pub fun getTypeIdentifier(_ alias: String) : String? {
         return FTRegistry.aliasMap[alias]
     }
 
@@ -73,11 +73,16 @@ pub contract FTRegistry {
         emit FTInfoRegistered(alias: alias, typeIdentifier: typeIdentifier)
     }
 
-    access(account) fun removeFTInfo(typeIdentifier: String) : FTInfo? {
+    access(account) fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo {
         let info = FTRegistry.fungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this Fungible Token Registry.")
         FTRegistry.aliasMap.remove(key: info.alias)
         emit FTInfoRemoved(alias:info!.alias, typeIdentifier: info!.typeIdentifier)
         return info 
+    }
+
+    access(account) fun removeFTInfoByAlias(_ alias: String) : FTInfo {
+        let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias.")
+        return self.removeFTInfoByTypeIdentifier(typeIdentifier)
     }
 
     init() {
