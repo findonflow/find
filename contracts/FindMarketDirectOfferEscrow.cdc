@@ -318,8 +318,6 @@ pub contract FindMarketDirectOfferEscrow {
 
 			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
 			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt,item:saleInfo)
-			
-
 		}
 
 		pub fun getBids() : [FindMarket.BidInfo] {

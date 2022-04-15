@@ -20,8 +20,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(400.0).
 			//TODO: Should status be something else while time has not run out? I think so
-			saleItemListed("user1", "ongoing_auction", price+5.0)
-		otu.fulfillMarketAuctionSoft("user2", id, price+5.0)
+			saleItemListed("user1", "ongoing_auction", price+5.0).
+			fulfillMarketAuctionSoft("user2", id, price+5.0)
 	})
 
 	t.Run("Should allow seller to cancel auction if it failed to meet reserve price", func(t *testing.T) {
