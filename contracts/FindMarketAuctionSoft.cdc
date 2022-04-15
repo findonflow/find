@@ -477,6 +477,12 @@ pub contract FindMarketAuctionSoft {
 			destroy bid
 		}
 
+		pub fun getBid(_ id: UInt64) : FindMarket.BidInfo {
+			let bid = self.borrowBid(id)
+
+			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
+			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo)
+		}
 
 		pub fun getBids() : [FindMarket.BidInfo] {
 			var bidInfo: [FindMarket.BidInfo] = []

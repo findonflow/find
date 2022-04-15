@@ -14,13 +14,21 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForSoftAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
-
-		otu.tickClock(400.0)
-		//TODO: Should status be something else while time has not run out? I think so
-		otu.saleItemListed("user1", "ongoing_auction", price+5.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForSoftAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			//TODO: Should status be something else while time has not run out? I think so
+			saleItemListed("user1", "ongoing_auction", price+5.0)
 		otu.fulfillMarketAuctionSoft("user2", id, price+5.0)
 	})
 
@@ -29,12 +37,20 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForSoftAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketSoft("user2", "user1", id, price+1.0)
-
-		otu.tickClock(400.0)
-		otu.saleItemListed("user1", "ongoing_auction", 11.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForSoftAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketSoft("user2", "user1", id, price+1.0).
+			tickClock(400.0).
+			saleItemListed("user1", "ongoing_auction", 11.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -51,18 +67,27 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"status": "failed",
 			}))
 	})
+
 	t.Run("Should be able to bid and increase bid by same user", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForSoftAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-
-		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 15.0)
-		otu.increaseAuctionBidMarketSoft("user2", id, 5.0, 20.0)
-		otu.saleItemListed("user1", "ongoing_auction", 20.0)
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		}).
+			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "Flow",
+				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}).
+			registerDandyInNFTRegistry().
+			listDandyForSoftAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			saleItemListed("user1", "ongoing_auction", 15.0).
+			increaseAuctionBidMarketSoft("user2", id, 5.0, 20.0).
+			saleItemListed("user1", "ongoing_auction", 20.0)
 
 	})
 
