@@ -18,11 +18,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			}).
-			registerDandyInNFTRegistry()
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
@@ -44,11 +40,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			}).
-			registerDandyInNFTRegistry()
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
@@ -75,11 +67,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			}).
-			registerDandyInNFTRegistry()
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
@@ -103,11 +91,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			}).
-			registerDandyInNFTRegistry()
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
@@ -135,15 +119,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			}).
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			registerDandyInNFTRegistry()
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]

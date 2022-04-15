@@ -14,15 +14,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "FUSD",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-		}).
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			registerDandyInNFTRegistry().
+		otu.registerFlowFUSDDandyInRegistry().
 			listDandyForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
@@ -37,15 +29,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "FUSD",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-		}).
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			registerDandyInNFTRegistry().
+		otu.registerFlowFUSDDandyInRegistry().
 			listDandyForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
 			auctionBidMarketSoft("user2", "user1", id, price+1.0).
@@ -73,15 +57,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "FUSD",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-		}).
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			registerDandyInNFTRegistry().
+		otu.registerFlowFUSDDandyInRegistry().
 			listDandyForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).

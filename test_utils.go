@@ -581,7 +581,9 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
+			String("Dandy").
 			UInt64(id).
+			String("FUSD").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
@@ -827,6 +829,19 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
+	return otu
+}
+
+func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUtils {
+	otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+		"alias":          "FUSD",
+		"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+	}).
+		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "Flow",
+			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		}).
+		registerDandyInNFTRegistry()
 	return otu
 }
 
