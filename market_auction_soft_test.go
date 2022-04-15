@@ -15,7 +15,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		price := 10.0
 		id := otu.setupMarketAndDandy()
 		otu.registerFlowFUSDDandyInRegistry().
-			listDandyForSoftAuction("user1", id, price).
+			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(400.0).
@@ -30,7 +30,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		price := 10.0
 		id := otu.setupMarketAndDandy()
 		otu.registerFlowFUSDDandyInRegistry().
-			listDandyForSoftAuction("user1", id, price).
+			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
 			auctionBidMarketSoft("user2", "user1", id, price+1.0).
 			tickClock(400.0).
@@ -58,7 +58,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		price := 10.0
 		id := otu.setupMarketAndDandy()
 		otu.registerFlowFUSDDandyInRegistry().
-			listDandyForSoftAuction("user1", id, price).
+			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			saleItemListed("user1", "ongoing_auction", 15.0).

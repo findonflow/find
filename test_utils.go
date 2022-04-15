@@ -343,9 +343,9 @@ func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
 		buyForge(user)
 }
 
-func (otu *OverflowTestUtils) cancelDandyForSale(name string, id uint64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("cancelDandyForSale").
+	otu.O.TransactionFromFile("cancelNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			UInt64(id)).
@@ -358,7 +358,7 @@ func (otu *OverflowTestUtils) cancelDandyForSale(name string, id uint64) *Overfl
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listNFTForSale").
 		SignProposeAndPayAs(name).
@@ -377,10 +377,10 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	//TODO: rename to listDandyForAuctionEscrow
-	otu.O.TransactionFromFile("listDandyForAuction").
+	//TODO: rename to listNFTForAuctionEscrow
+	otu.O.TransactionFromFile("listNFTForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			String("Dandy").
@@ -398,9 +398,9 @@ func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listDandyForAuctionSoft").
+	otu.O.TransactionFromFile("listNFTForAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			String("Dandy").
@@ -421,7 +421,7 @@ func (otu *OverflowTestUtils) listDandyForSoftAuction(name string, id uint64, pr
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
-	otu.O.ScriptFromFile("dandy").
+	otu.O.ScriptFromFile("checkRoyalty").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
@@ -441,7 +441,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 }
 
-func (otu *OverflowTestUtils) buyDandyForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("buyItemForSale").
 		SignProposeAndPayAs(name).
