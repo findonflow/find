@@ -5,19 +5,19 @@ pub contract NFTRegistry {
 
     /* Event */
     pub event ContractInitialized()
-    pub event NFTInfoRegistered(name: String, typeIdentifier: String)
-    pub event NFTInfoRemoved(name: String, typeIdentifier: String)
+    pub event NFTInfoRegistered(alias: String, typeIdentifier: String)
+    pub event NFTInfoRemoved(alias: String, typeIdentifier: String)
 
     /* Variables */
     // Mapping of {Type Identifier : NFT Info Struct}
     access(contract) var nonFungibleTokenList : {String : NFTInfo}
 
-    // Mapping of {Name : Type Identifier}
-    access(contract) var namingMap : {String : String}
+    // Mapping of {Alias : Type Identifier}
+    access(contract) var aliasMap : {String : String}
 
     /* Struct */
     pub struct NFTInfo {
-        pub let name : String
+        pub let alias : String
         // Pass in @NFT type
         pub let type : Type              
         pub let typeIdentifier : String
@@ -31,8 +31,8 @@ pub contract NFTRegistry {
         // Pass in the Contract Address
         pub let address : Address
 
-        init(name: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
-            self.name = name
+        init(alias: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
+            self.alias = alias
             self.type = type
             self.typeIdentifier = typeIdentifier
             self.icon = icon
@@ -46,21 +46,19 @@ pub contract NFTRegistry {
     } 
 
     /* getters */
-		//BAM: use _ for single paramter functions
-    pub fun getNFTInfo(typeIdentifier: String) : NFTInfo? {
+    pub fun getNFTInfoByTypeIdentifier(_ typeIdentifier: String) : NFTInfo? {
         return NFTRegistry.nonFungibleTokenList[typeIdentifier]
     }
 
-		pub fun getNFTInfoByAlias(_ alias: String) : NFTInfo? {
-			  if let identifier = NFTRegistry.namingMap[alias] {
-					return NFTRegistry.nonFungibleTokenList[identifier]
-				}
-				return nil
+	pub fun getNFTInfoByAlias(_ alias: String) : NFTInfo? {
+		  if let identifier = NFTRegistry.aliasMap[alias] {
+				return NFTRegistry.nonFungibleTokenList[identifier]
+			}
+			return nil
     }
 
-		//BAM: use _ for single paramter functions
-    pub fun getTypeIdentifier(name: String) : String? {
-        return NFTRegistry.namingMap[name]
+    pub fun getTypeIdentifier(_ alias: String) : String? {
+        return NFTRegistry.aliasMap[alias]
     }
 
     pub fun getNFTInfoAll() : {String : NFTInfo} {
@@ -68,12 +66,12 @@ pub contract NFTRegistry {
     }
 
     /* setters */
-    access(account) fun setNFTInfo(name: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
+    access(account) fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
         pre{
             !NFTRegistry.nonFungibleTokenList.containsKey(type.identifier) : "This NonFungibleToken Register already exist"
         }
         let typeIdentifier : String = type.identifier
-        NFTRegistry.nonFungibleTokenList[typeIdentifier] = NFTInfo(name: name,
+        NFTRegistry.nonFungibleTokenList[typeIdentifier] = NFTInfo(alias: alias,
                                                                    type: type,
                                                                    typeIdentifier: typeIdentifier,
                                                                    icon: icon,
@@ -83,20 +81,25 @@ pub contract NFTRegistry {
                                                                    allowedFTTypes: allowedFTTypes,
                                                                    address: address)
         
-        NFTRegistry.namingMap[name] = typeIdentifier
-        emit NFTInfoRegistered(name: name, typeIdentifier: typeIdentifier)
+        NFTRegistry.aliasMap[alias] = typeIdentifier
+        emit NFTInfoRegistered(alias: alias, typeIdentifier: typeIdentifier)
     }
 
-    access(account) fun removeNFTInfo(typeIdentifier: String) : NFTInfo? {
+    access(account) fun removeNFTInfoByTypeIdentifier(_ typeIdentifier: String) : NFTInfo {
         let info = NFTRegistry.nonFungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this NonFungibleToken Registry.")
-        NFTRegistry.namingMap.remove(key: info.name)
-        emit NFTInfoRemoved(name:info!.name, typeIdentifier: info!.typeIdentifier)
+        NFTRegistry.aliasMap.remove(key: info.alias)
+        emit NFTInfoRemoved(alias:info!.alias, typeIdentifier: info!.typeIdentifier)
         return info 
+    }
+
+    access(account) fun removeNFTInfoByAlias(_ alias: String) : NFTInfo {
+        let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias.")
+        return self.removeNFTInfoByTypeIdentifier(typeIdentifier)
     }
 
     init() {
         self.nonFungibleTokenList = {}
-        self.namingMap = {}
+        self.aliasMap = {}
     }
 
 

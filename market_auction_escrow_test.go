@@ -14,14 +14,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-
-		otu.tickClock(400.0)
-		//TODO: Should status be something else while time has not run out? I think so
-		otu.saleItemListed("user1", "ongoing_auction", price+5.0)
-		otu.fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+		otu.registerFlowFUSDDandyInRegistry().
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			// //TODO: Should status be something else while time has not run out? I think so
+			saleItemListed("user1", "ongoing_auction", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
 
 	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
@@ -29,9 +29,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+		otu.registerFlowFUSDDandyInRegistry().
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
 		otu.tickClock(400.0)
 
@@ -44,12 +45,12 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+1.0)
-
-		otu.tickClock(400.0)
-		otu.saleItemListed("user1", "ongoing_auction", 11.0)
+		otu.registerFlowFUSDDandyInRegistry().
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+1.0).
+			tickClock(400.0).
+			saleItemListed("user1", "ongoing_auction", 11.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -75,13 +76,12 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+1.0)
-		otu.saleItemListed("user1", "ongoing_auction", 11.0)
-
-		otu.tickClock(2.0)
+		otu.registerFlowFUSDDandyInRegistry().
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+1.0).
+			saleItemListed("user1", "ongoing_auction", 11.0).
+			tickClock(2.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -106,13 +106,13 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 15.0)
-		otu.increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0)
-		otu.saleItemListed("user1", "ongoing_auction", 20.0)
+		otu.registerFlowFUSDDandyInRegistry().
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			saleItemListed("user1", "ongoing_auction", 15.0).
+			increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0).
+			saleItemListed("user1", "ongoing_auction", 20.0)
 
 	})
 
@@ -123,9 +123,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 			price := 10.0
 			id := otu.setupMarketAndDandy()
-			otu.listDandyForEscrowedAuction("user1", id, price)
+			otu.listNFTForEscrowedAuction("user1", id, price)
 			otu.saleItemListed("user1", "ondemand_auction", price)
-			otu.listDandyForEscrowedAuction("user1", id, 20.0)
+			otu.listNFTForEscrowedAuction("user1", id, 20.0)
 		})
 	*/
 
@@ -133,12 +133,13 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		price := 10.0
+		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
-
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 15.0)
+		otu.registerFlowFUSDDandyInRegistry().
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+preIncrement).
+			saleItemListed("user1", "ongoing_auction", price+preIncrement)
 
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
@@ -149,6 +150,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertFailure("must be larger then previous bid+bidIncrement")
 
 	})
+
 }
 
 //TODO: list item twice for auction

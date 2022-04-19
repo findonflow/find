@@ -13,7 +13,7 @@ transaction(typeIdentifier: String) {
 
     execute{
 
-        self.adminRef.removeFTInfo(typeIdentifier: typeIdentifier) 
+        self.adminRef.removeFTInfoByTypeIdentifier(typeIdentifier) 
        
     }
 }

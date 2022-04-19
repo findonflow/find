@@ -475,6 +475,14 @@ pub contract FindMarketAuctionEscrow {
 			return <- vault
 		}
 
+		pub fun getBid(_ id: UInt64) : FindMarket.BidInfo {
+			let bid = self.borrowBid(id)
+
+			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id) 
+			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt,item:saleInfo)
+			
+		}
+
 		pub fun getBids() : [FindMarket.BidInfo] {
 			var bidInfo: [FindMarket.BidInfo] = []
 			for id in self.bids.keys {
