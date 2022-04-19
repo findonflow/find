@@ -244,6 +244,7 @@ pub contract FindMarketAuctionSoft {
 			return info
 		}
 
+		//TODO: add previousBalance like Escrowed auction
 		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
 			let saleItem=self.borrow(id)
 
@@ -391,6 +392,8 @@ pub contract FindMarketAuctionSoft {
 
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
+
+			//TODO: check if this is dreprecated or stopped
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice)
 

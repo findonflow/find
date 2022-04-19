@@ -129,7 +129,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		})
 	*/
 
-	t.Run("Add bid that is not above minimumBidIncrement", func(t *testing.T) {
+	t.Run("Should not be able to add bid that is not above minimumBidIncrement", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		price := 10.0
@@ -138,8 +138,16 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.listDandyForEscrowedAuction("user1", id, price)
 		otu.saleItemListed("user1", "ondemand_auction", price)
 		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 20.0)
-		otu.increaseAuctioBidMarketEscrow("user2", id, 0.1, 20.0)
+		otu.saleItemListed("user1", "ongoing_auction", 15.0)
+
+		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id).
+				UFix64(0.1)).
+			Test(otu.T).
+			AssertFailure("must be larger then previous bid+bidIncrement")
+
 	})
 }
 
