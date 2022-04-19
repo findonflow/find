@@ -6,7 +6,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
-transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64) {
+transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 	prepare(account: AuthAccount) {
 		let tenant=FindMarket.getFindTenant()
 		let saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>())!)!
@@ -17,7 +17,7 @@ transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64) {
 
 		let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(nft.providerPath)
 
-		/* Ben : Question -> can we set up the provider cap with generic interfaces? */
+		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
 		if !providerCap.check() {
 				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
 					nft.providerPath,
@@ -26,7 +26,13 @@ transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64) {
 		}
 		
 		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: price+5.0, auctionDuration: 300.0, auctionExtensionOnLateBid: 60.0, minimumBidIncrement: 1.0)
+		// Ben : panic on some unreasonable inputs in trxn 
+		assert(minimumBidIncrement > 0.0, message:"Minimum bid increment should be larger than 0.")
+		assert((auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0, message:"Acution ReservePrice should be in step of minimum bid increment." )
+		assert(auctionDuration > 0.0, message: "Auction Duration should be greater than 0.")
+		assert(auctionExtensionOnLateBid > 0.0, message: "Auction Duration should be greater than 0.")
+		
+		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement)
 
 	}
 }

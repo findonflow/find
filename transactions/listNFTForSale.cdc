@@ -30,7 +30,6 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 		}
 
 		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		//BAM: fetch the FTRegistry using identifier and sending in the type
 		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice)
 	}
 }
