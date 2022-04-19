@@ -21,7 +21,7 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 		// If they didn't set up the private capability, set one up for them
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(nft.providerPath)
 
-		/* Ben : Question -> can we set up the provider cap with generic interfaces? */
+		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
 		if !providerCap.check() {
 				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
 					nft.providerPath,

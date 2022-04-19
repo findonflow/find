@@ -386,7 +386,11 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			String("Dandy").
 			UInt64(id).
 			String("FUSD").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
 			"status":              "listed",
@@ -406,7 +410,11 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			String("Dandy").
 			UInt64(id).
 			String("FUSD").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
 			"status":              "listed",

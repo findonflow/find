@@ -6,7 +6,6 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
 pub fun main(name: String, id: UInt64, nftAlias: String, identifier: String) : AnyStruct? {
 
-	/* Ben : Question -> Do we panic here? */
 	let address =FIND.lookupAddress(name)!
 
 	// Get collection public path from NFT Registry

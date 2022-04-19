@@ -56,14 +56,21 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		price := 10.0
+		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
 		otu.registerFlowFUSDDandyInRegistry().
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price).
-			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			saleItemListed("user1", "ongoing_auction", 15.0).
-			increaseAuctionBidMarketSoft("user2", id, 5.0, 20.0).
-			saleItemListed("user1", "ongoing_auction", 20.0)
+			auctionBidMarketSoft("user2", "user1", id, price+preIncrement).
+			saleItemListed("user1", "ongoing_auction", price+preIncrement)
+
+		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id).
+				UFix64(0.1)).
+			Test(otu.T).
+			AssertFailure("must be larger then previous bid+bidIncrement")
 
 	})
 

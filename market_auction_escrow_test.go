@@ -141,11 +141,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			auctionBidMarketEscrow("user2", "user1", id, price+preIncrement).
 			saleItemListed("user1", "ongoing_auction", price+preIncrement)
 
-		otu.listDandyForEscrowedAuction("user1", id, price)
-		otu.saleItemListed("user1", "ondemand_auction", price)
-		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-		otu.saleItemListed("user1", "ongoing_auction", 15.0)
-
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().

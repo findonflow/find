@@ -196,8 +196,8 @@ pub contract Admin {
 		/// ===================================================================================
 
 		// Registry FungibleToken Information
-		pub fun setFTInfo(alias: String, type: Type, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
-			FTRegistry.setFTInfo(alias: alias, type: type, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
+		pub fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+			FTRegistry.setFTInfo(alias: alias, type: type, tag: tag, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
 		}
 
 		// Remove FungibleToken Information by type identifier

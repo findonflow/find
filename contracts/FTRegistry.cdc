@@ -18,15 +18,18 @@ pub contract FTRegistry {
         pub(set) var alias : String
         pub(set) var type : Type
         pub(set) var typeIdentifier : String
+        // Whether it is stable coin or other type of coins. 
+        pub(set) var tag : [String ] 
         pub(set) var icon : String?
         pub(set) var receiverPath : PublicPath
         pub(set) var balancePath : PublicPath
         pub(set) var vaultPath : StoragePath
 
-        init(alias : String, type: Type, typeIdentifier: String, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+        init(alias : String, type: Type, typeIdentifier: String, tag:[String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
             self.alias = alias
             self.type = type
             self.typeIdentifier = typeIdentifier
+            self.tag = tag
             self.icon = icon
             self.receiverPath = receiverPath
             self.balancePath = balancePath
@@ -56,7 +59,7 @@ pub contract FTRegistry {
     }
 
     /* setters */
-    access(account) fun setFTInfo(alias: String, type: Type, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+    access(account) fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
         pre{
             !FTRegistry.fungibleTokenList.containsKey(type.identifier) : "This FungibleToken Register already exist"
         }
@@ -64,6 +67,7 @@ pub contract FTRegistry {
         FTRegistry.fungibleTokenList[typeIdentifier] = FTInfo(alias: alias,
                                                               type: type,
                                                               typeIdentifier: typeIdentifier,
+                                                              tag : tag,
                                                               icon: icon,
                                                               receiverPath: receiverPath,
                                                               balancePath: balancePath,
