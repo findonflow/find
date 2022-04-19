@@ -129,8 +129,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		})
 	*/
 
-	// Ben note : If the same buyer increase the bid, even under min bid increment, will still go thru
-	t.Run("Add bid that is not above minimumBidIncrement", func(t *testing.T) {
+	t.Run("Should not be able to add bid that is not above minimumBidIncrement", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		price := 10.0
@@ -142,22 +141,19 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			auctionBidMarketEscrow("user2", "user1", id, price+preIncrement).
 			saleItemListed("user1", "ongoing_auction", price+preIncrement)
 
-		name := "user2"
-		postIncrement := 0.1
-		totalPrice := price + preIncrement + postIncrement
+		otu.listDandyForEscrowedAuction("user1", id, price)
+		otu.saleItemListed("user1", "ondemand_auction", price)
+		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+		otu.saleItemListed("user1", "ongoing_auction", 15.0)
 
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
-			SignProposeAndPayAs(name).
+			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				UInt64(id).
-				UFix64(postIncrement)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", totalPrice),
-				"id":     fmt.Sprintf("%d", id),
-				"buyer":  otu.accountAddress(name),
-				"status": "active",
-			}))
+				UFix64(0.1)).
+			Test(otu.T).
+			AssertFailure("must be larger then previous bid+bidIncrement")
+
 	})
 
 }

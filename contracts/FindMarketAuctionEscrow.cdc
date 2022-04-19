@@ -195,7 +195,7 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) 
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
@@ -244,23 +244,24 @@ pub contract FindMarketAuctionEscrow {
 			return info
 		}
 
-		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance:UFix64) {
 			let saleItem=self.borrow(id)
 
 			let timestamp=Clock.time()
 			let newOfferBalance=newOffer.borrow()!.getBalance(id)
 
 			let previousOffer = saleItem.offerCallback!
-			let previousBalance=previousOffer.borrow()!.getBalance(id) 
+
+			let minBid=oldBalance + saleItem.auctionMinBidIncrement
+
+			if newOfferBalance < minBid {
+				panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement ").concat(minBid.toString()))
+			}
 
 			if newOffer.address != previousOffer.address {
-				let minBid=previousBalance + saleItem.auctionMinBidIncrement
-
-				if newOfferBalance < minBid {
-					panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement").concat(minBid.toString()))
-				}
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
 			}
+
 			saleItem.setCallback(newOffer)
 
 			let suggestedEndTime=timestamp+saleItem.auctionExtensionOnLateBid
@@ -272,7 +273,7 @@ pub contract FindMarketAuctionEscrow {
 
 		}
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) {
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
@@ -289,9 +290,7 @@ pub contract FindMarketAuctionEscrow {
 				panic("Auction has ended")
 			}
 
-			//TODO: is this right? get the same item and send it in again?
-			self.addBid(id: id, newOffer: saleItem.offerCallback!)
-
+			self.addBid(id: id, newOffer: saleItem.offerCallback!, oldBalance:oldBalance)
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
@@ -306,7 +305,7 @@ pub contract FindMarketAuctionEscrow {
 				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
-				self.addBid(id: id, newOffer: callback)
+				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
 				return
 			}
 
@@ -529,11 +528,13 @@ pub contract FindMarketAuctionEscrow {
 				self.bids[id] != nil : "You need to have a bid here already"
 			}
 			let bid =self.borrowBid(id)
+
+			let oldBalance=bid.vault.balance
+
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
-			//TODO: need to send in the old balance here first or verify that this is allowed here....
-			bid.from.borrow()!.registerIncreasedBid(id)
+			bid.from.borrow()!.registerIncreasedBid(id, oldBalance:oldBalance)
 		}
 
 		//called from saleItem when things are cancelled 
