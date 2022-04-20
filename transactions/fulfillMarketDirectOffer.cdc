@@ -8,7 +8,8 @@ import FindViews from "../contracts/FindViews.cdc"
 transaction(id: UInt64) {
 	prepare(account: AuthAccount) {
 
-		let tenant=FindMarket.getFindTenant()
+
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 
 		let bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)
@@ -27,9 +28,7 @@ transaction(id: UInt64) {
 		}
 		
 		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-
-		let tenant=FindMarket.getFindTenant()
-		let market = account.borrow<&FindMarket.SaleItemCollection>(from: tenant.information.saleItemStoragePath)!
+		let market = account.borrow<&FindMarket.SaleItemCollection>(from: tenant.getTenantInformation().saleItemStoragePath)!
 		market.acceptDirectOffer(pointer)
 
 	}

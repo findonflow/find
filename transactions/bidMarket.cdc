@@ -19,8 +19,8 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(Dandy.CollectionPublicPath)
 		self.walletReference = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No FUSD wallet linked for this account")
-		let tenant=FindMarket.getFindTenant()
-		self.bidsReference= account.borrow<&FindMarket.MarketBidCollection>(from: tenant.information.bidStoragePath)
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		self.bidsReference= account.borrow<&FindMarket.MarketBidCollection>(from: tenant.getTenantInformation().bidStoragePath)
 		self.balanceBeforeBid=self.walletReference.balance
 		self.pointer= FindViews.createViewReadPointer(address: address, path:Dandy.CollectionPublicPath, id: id)
 	}

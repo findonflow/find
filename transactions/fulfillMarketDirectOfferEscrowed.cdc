@@ -14,7 +14,7 @@ transaction(id: UInt64) {
 
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 		let pointer= FindViews.AuthNFTPointer(cap: dandyPrivateCap, id: id)
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath =tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())!
 		let market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)!
 		market.acceptDirectOffer(pointer)

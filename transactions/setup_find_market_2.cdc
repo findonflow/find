@@ -14,7 +14,7 @@ transaction(tenantAddress: Address) {
 		let tenantCap=account.getCapability<&FindMarket.Tenant>(FindMarket.TenantPrivatePath)
 
 		let tenantAccount=getAccount(tenantAddress)
-		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath).borrow()!
+		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!
 		tenantClient.addCapability(tenantCap)
 	}
 }

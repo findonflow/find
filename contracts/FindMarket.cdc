@@ -109,7 +109,6 @@ pub contract FindMarket {
 	}
 
 	/*
-
 	A tenant client needs to be able to list his own rules and add/modify them.
 
 	A Tenant rule can match on
@@ -138,16 +137,31 @@ pub contract FindMarket {
   
 	A tenant and an admin must be allowed to ban a user, if they do all listings from that user becomes invalid and that user cannot interact with the market.
 	*/
+	
+	pub resource interface TenantPublic {
+
+		pub fun getTenantInformation() : TenantInformation
+
+		//Check if an action is allowed
+//		pub fun isActionAllowed() : Bool //TODO: what parameters is available here
+
+		pub fun getStoragePath(_ type: Type) : StoragePath? 
+		pub fun getPublicPath(_ type: Type) : PublicPath? 
+	}
+
+
 
 	//this needs to be a resource so that nobody else can make it.
-	pub resource Tenant {
+	pub resource Tenant : TenantPublic{
 
 		pub let information : TenantInformation
 
 		init(_ tenant: TenantInformation) {
 			self.information=tenant
 		}
-
+		pub fun getTenantInformation() : TenantInformation {
+			return self.information
+		}
 
 		pub fun getPublicPath(_ type: Type) : PublicPath? {
 			return self.information.publicPaths[type.identifier]
@@ -168,19 +182,21 @@ pub contract FindMarket {
 		return <- create TenantClient()
 	}
 
+
 	//interface to use for capability receiver pattern
-	pub resource interface TenantPublic  {
-		pub fun getTenant() : &Tenant 
+	pub resource interface TenantClientPublic  {
+		pub fun getTenantCapability() : Capability<&Tenant{TenantPublic}>
 		pub fun addCapability(_ cap: Capability<&Tenant>)
 	}
 
 	/*
-	A tenentClient should be able to:
+
+	A tenantClient should be able to:
 	 - deprecte a certain market type: No new listings can be made
 
 	*/
 	//admin proxy with capability receiver 
-	pub resource TenantClient: TenantPublic {
+	pub resource TenantClient: TenantClientPublic {
 
 		access(self) var capability: Capability<&Tenant>?
 
@@ -196,14 +212,29 @@ pub contract FindMarket {
 			self.capability = nil
 		}
 
-		//Needs to return a capablity
-		pub fun getTenant() : &Tenant {
+
+		//BAM: do admin operations on a tenant
+		/*
+		 - not allow a certain market type
+		*/
+		// This is a function only for private use. Not exposed through public interface
+		pub fun getTenantRef() : &Tenant {
 			pre {
-				self.capability != nil: "TenentClient is not present"
+				self.capability != nil: "TenantClient is not present"
 				self.capability!.check()  : "Tenant client is not linked anymore"
 			}
 
 			return self.capability!.borrow()!
+		}
+
+		//Needs to return a capablity
+		pub fun getTenantCapability() : Capability<&Tenant{TenantPublic}> {
+			pre {
+				self.capability != nil: "TenantClient is not present"
+				self.capability!.check()  : "Tenant client is not linked anymore"
+			}
+
+			return self.capability! as Capability<&Tenant{TenantPublic}>
 		}
 	}
 
@@ -283,12 +314,13 @@ pub contract FindMarket {
 		}
 	}
 
-	pub fun getFindTenant() : &Tenant {
-		return FindMarket.getTenant(FindMarket.account.address) ?? panic("Find market tenant not set up correctly")
+	pub fun getFindTenantCapability() : Capability<&Tenant{TenantPublic}> {
+		return FindMarket.getTenantCapability(FindMarket.account.address) ?? panic("Find market tenant not set up correctly")
 	}
 
-	pub fun getTenant(_ marketplace:Address) : &Tenant? {
-		return getAccount(marketplace).getCapability<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath).borrow()?.getTenant()
+	//return Capability<Tenant{TenantPublic}>
+	pub fun getTenantCapability(_ marketplace:Address) : Capability<&Tenant{TenantPublic}>? {
+		return getAccount(marketplace).getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()?.getTenantCapability()
 	}
 
 	init() {

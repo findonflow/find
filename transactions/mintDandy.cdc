@@ -54,3 +54,4 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 	}
 }
 
+

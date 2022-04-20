@@ -10,15 +10,13 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 	prepare(account: AuthAccount) {
 
 		// Get the salesItemRef from tenant
-		let tenant=FindMarket.getFindTenant() 
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>())!)!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")
 		let ft = FTRegistry.getFTInfoByAlias(ftAlias) ?? panic("This FT is not supported by the Find Market yet")
 
-		// Addition from Ben : Add a checker for private capability as well.
-		// If they didn't set up the private capability, set one up for them
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(nft.providerPath)
 
 		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
@@ -33,3 +31,4 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice)
 	}
 }
+
