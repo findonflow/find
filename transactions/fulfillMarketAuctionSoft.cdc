@@ -17,7 +17,7 @@ transaction(id: UInt64) {
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 
 		let ftIdentifier = self.bidsReference.getBid(id).item.ftTypeIdentifier
-		// Ben: If this returns error, there is sth wrong in FIND setup
+
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
 
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

@@ -138,7 +138,6 @@ pub contract FindMarket {
 	A tenant and an admin must be allowed to ban a user, if they do all listings from that user becomes invalid and that user cannot interact with the market.
 	*/
 	
-	//BAM: rename to TenantPublic
 	pub resource interface TenantPublic {
 
 		pub fun getTenantInformation() : TenantInformation
@@ -151,7 +150,6 @@ pub contract FindMarket {
 	}
 
 
-	//BAM: implement TenantPublic
 	//this needs to be a resource so that nobody else can make it.
 	pub resource Tenant : TenantPublic{
 
@@ -184,7 +182,6 @@ pub contract FindMarket {
 	}
 
 
-	//BAM: rename to TenantClientPublic
 	//interface to use for capability receiver pattern
 	pub resource interface TenantClientPublic  {
 		pub fun getTenantCapability() : Capability<&Tenant{TenantPublic}>
@@ -217,7 +214,7 @@ pub contract FindMarket {
 		/*
 		 - not allow a certain market type
 		*/
-
+		// This is a function only for private use. Not exposed through public interface
 		pub fun getTenantRef() : &Tenant {
 			pre {
 				self.capability != nil: "TenantClient is not present"

@@ -17,8 +17,6 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 		let nft = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")
 		let ft = FTRegistry.getFTInfoByAlias(ftAlias) ?? panic("This FT is not supported by the Find Market yet")
 
-		// Addition from Ben : Add a checker for private capability as well.
-		// If they didn't set up the private capability, set one up for them
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(nft.providerPath)
 
 		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
