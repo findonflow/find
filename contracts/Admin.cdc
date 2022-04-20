@@ -196,26 +196,36 @@ pub contract Admin {
 		/// ===================================================================================
 
 		// Registry FungibleToken Information
-		pub fun setFTInfo(alias: String, type: Type, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
-			FTRegistry.setFTInfo(alias: alias, type: type, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
+		pub fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+			FTRegistry.setFTInfo(alias: alias, type: type, tag: tag, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
 		}
 
-		// Remove FungibleToken Information
-		pub fun removeFTInfo(typeIdentifier: String) {
-			FTRegistry.removeFTInfo(typeIdentifier: typeIdentifier)
+		// Remove FungibleToken Information by type identifier
+		pub fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) {
+			FTRegistry.removeFTInfoByTypeIdentifier(typeIdentifier)
+		}
+
+		// Remove FungibleToken Information by alias
+		pub fun removeFTInfoByAlias(_ alias: String) {
+			FTRegistry.removeFTInfoByAlias(alias)
 		}
 
 		/// ===================================================================================
 		// NonFungibleToken Registry 
 		/// ===================================================================================
 		// Registry NonFungibleToken Information
-		pub fun setNFTInfo(name: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
-			NFTRegistry.setNFTInfo(name: name, type: type, icon: icon, providerPath: providerPath, publicPath: publicPath, storagePath: storagePath, allowedFTTypes: allowedFTTypes, address: address)
+		pub fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
+			NFTRegistry.setNFTInfo(alias: alias, type: type, icon: icon, providerPath: providerPath, publicPath: publicPath, storagePath: storagePath, allowedFTTypes: allowedFTTypes, address: address)
 		}
 
-		// Remove NonFungibleToken Information
-		pub fun removeNFTInfo(typeIdentifier: String) {
-			NFTRegistry.removeNFTInfo(typeIdentifier: typeIdentifier)
+		// Remove NonFungibleToken Information by type identifier
+		pub fun removeNFTInfoByTypeIdentifier(_ typeIdentifier: String) {
+			NFTRegistry.removeNFTInfoByTypeIdentifier(typeIdentifier)
+		}
+
+		// Remove NonFungibleToken Information by alias
+		pub fun removeNFTInfoByAlias(_ alias: String) {
+			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
 
 		//TODO: set that primary cut has been paid
