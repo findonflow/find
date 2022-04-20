@@ -1,23 +1,31 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 
 transaction(id: UInt64, amount: UFix64) {
 
-	let walletReference : &FUSD.Vault
-	let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection?
+	let walletReference : &FungibleToken.Vault
+	let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection
 	let balanceBeforeBid: UFix64
 
 	prepare(account: AuthAccount) {
-		self.walletReference = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No FUSD wallet linked for this account")
-		let tenant=FindMarket.getFindTenant()
+
+		// Get the accepted vault type from BidInfo
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())!
-		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
-		self.balanceBeforeBid=self.walletReference.balance
+		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
+		let bidInfo = self.bidsReference.getBid(id)
+		let saleInformation = bidInfo.item
+		let ftIdentifier = saleInformation.ftTypeIdentifier
+
+		//If this is nil, there must be something wrong with FIND setup
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
+		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.balanceBeforeBid = self.walletReference.balance
 	}
 
 	pre {
-		self.bidsReference != nil : "This account does not have a bid collection"
 		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
 	}
 

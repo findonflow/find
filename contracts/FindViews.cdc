@@ -147,7 +147,6 @@ pub contract FindViews {
 
 	/// A basic pointer that can resolve data and get owner/id/uuid and gype
 	pub struct interface Pointer {
-
 		pub let id: UInt64
 		pub fun resolveView(_ type: Type) : AnyStruct?
     pub fun getUUID() :UInt64

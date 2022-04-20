@@ -1,6 +1,6 @@
 import Admin from "../contracts/Admin.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
 
 transaction() {
 
@@ -11,7 +11,7 @@ transaction() {
     }
 
     execute{
-        let type: Type = Type<@FlowToken.Vault>()
-        self.adminRef.setFTInfo(alias: "Flow", type: type, tag:["utility coin"] , icon: nil, receiverPath: /public/flowTokenReceiver, balancePath: /public/flowTokenBalance, vaultPath: /storage/flowTokenVault)
+        let type: Type = Type<@FUSD.Vault>()
+        self.adminRef.setFTInfo(alias: "FUSD", type: type, tag:["stablecoin"], icon: nil, receiverPath: /public/fusdReceiver, balancePath: /public/fusdBalance, vaultPath: /storage/fusdVault)
     }
 }

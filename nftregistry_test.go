@@ -28,7 +28,7 @@ func TestNFTRegistry(t *testing.T) {
 			"address":        "0xf8d6e0586b0a20c7",
 			"allowedFTTypes": "",
 			"icon":           "",
-			"name":           "Dandy",
+			"alias":          "Dandy",
 			"providerPath":   "/private/findDandy",
 			"publicPath":     "/public/findDandy",
 			"storagePath":    "/storage/findDandy",
@@ -53,7 +53,7 @@ func TestNFTRegistry(t *testing.T) {
 			"address":        "0xf8d6e0586b0a20c7",
 			"allowedFTTypes": "",
 			"icon":           "",
-			"name":           "Dandy",
+			"alias":          "Dandy",
 			"providerPath":   "/private/findDandy",
 			"publicPath":     "/public/findDandy",
 			"storagePath":    "/storage/findDandy",
@@ -66,19 +66,19 @@ func TestNFTRegistry(t *testing.T) {
 
 	t.Run("Should be able to registry Dandy token and list it", func(t *testing.T) {
 		expected := `
-		{
-			"A.f8d6e0586b0a20c7.Dandy.NFT": {
-				"address":"0xf8d6e0586b0a20c7",
-				"allowedFTTypes":"",
-				"icon":"",
-				"name":"Dandy",
-				"providerPath":"/private/findDandy",
-				"publicPath":"/public/findDandy",
-				"storagePath":"/storage/findDandy",
-				"type": "Type\u003cA.f8d6e0586b0a20c7.Dandy.NFT\u003e()",
-				"typeIdentifier":"A.f8d6e0586b0a20c7.Dandy.NFT"}
-		}
-		`
+			{
+				"A.f8d6e0586b0a20c7.Dandy.NFT": {
+					"address":"0xf8d6e0586b0a20c7",
+					"allowedFTTypes":"",
+					"icon":"",
+					"alias":"Dandy",
+					"providerPath":"/private/findDandy",
+					"publicPath":"/public/findDandy",
+					"storagePath":"/storage/findDandy",
+					"type": "Type\u003cA.f8d6e0586b0a20c7.Dandy.NFT\u003e()",
+					"typeIdentifier":"A.f8d6e0586b0a20c7.Dandy.NFT"}
+			}
+			`
 
 		NewOverflowTest(t).
 			setupFIND().
@@ -139,3 +139,4 @@ func TestNFTRegistry(t *testing.T) {
 	})
 
 }
+

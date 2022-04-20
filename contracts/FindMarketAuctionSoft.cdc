@@ -195,7 +195,7 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) 
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance: UFix64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
@@ -208,10 +208,18 @@ pub contract FindMarketAuctionSoft {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 
-		access(contract) let tenant: FindMarket.TenantInformation
-		init (_ tenant: &FindMarket.Tenant) {
+		access(contract) let tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>
+
+		init (_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) {
 			self.items <- {}
-			self.tenant=tenant.information
+			self.tenantCapability=tenantCapability
+		}
+
+		access(self) fun getTenant() : FindMarket.TenantInformation {
+			pre{
+				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			}
+			return self.tenantCapability.borrow()!.getTenantInformation()
 		}
 
 		access(self) fun emitEvent(saleItem: &SaleItem, status: String) {
@@ -225,7 +233,7 @@ pub contract FindMarketAuctionSoft {
 			let id=saleItem.getId()
 
 
-			emit ForAuction(tenant:self.tenant.name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, endsAt: saleItem.auctionEndsAt)
+			emit ForAuction(tenant:self.getTenant().name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, endsAt: saleItem.auctionEndsAt)
 		}
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation {
@@ -245,23 +253,24 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		//TODO: add previousBalance like Escrowed auction
-		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
 			let saleItem=self.borrow(id)
 
 			let timestamp=Clock.time()
 			let newOfferBalance=newOffer.borrow()!.getBalance(id)
 
 			let previousOffer = saleItem.offerCallback!
-			let previousBalance=previousOffer.borrow()!.getBalance(id) 
+
+			let minBid=oldBalance + saleItem.auctionMinBidIncrement
+
+			if newOfferBalance < minBid {
+				panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement ").concat(minBid.toString()))
+			}
 
 			if newOffer.address != previousOffer.address {
-				let minBid=previousBalance + saleItem.auctionMinBidIncrement
-
-				if newOfferBalance < minBid {
-					panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement").concat(minBid.toString()))
-				}
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
 			}
+
 			saleItem.setCallback(newOffer)
 
 			let suggestedEndTime=timestamp+saleItem.auctionExtensionOnLateBid
@@ -273,7 +282,7 @@ pub contract FindMarketAuctionSoft {
 
 		}
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) {
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
@@ -292,7 +301,7 @@ pub contract FindMarketAuctionSoft {
 
 
 			//TODO: is this right? get the same item and send it in again?
-			self.addBid(id: id, newOffer: saleItem.offerCallback!)
+			self.addBid(id: id, newOffer: saleItem.offerCallback!, oldBalance: oldBalance)
 
 		}
 
@@ -309,7 +318,7 @@ pub contract FindMarketAuctionSoft {
 				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
-				self.addBid(id: id, newOffer: callback)
+				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
 				return
 			}
 
@@ -385,7 +394,7 @@ pub contract FindMarketAuctionSoft {
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			saleItem.acceptNonEscrowedBid()
 
-			FindMarket.pay(tenant:self.tenant, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
+			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
 
 			destroy <- self.items.remove(key: id)
 		}
@@ -459,15 +468,21 @@ pub contract FindMarketAuctionSoft {
 
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-		access(contract) let tenant: FindMarket.TenantInformation
+		access(contract) let tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>
 
 		//not sure we can store this here anymore. think it needs to be in every bid
-		init(receiver: Capability<&{FungibleToken.Receiver}>, tenant: &FindMarket.Tenant) {
+		init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) {
 			self.bids <- {}
 			self.receiver=receiver
-			self.tenant=tenant.information
+			self.tenantCapability=tenantCapability
 		}
 
+		access(contract) fun getTenant() : FindMarket.TenantInformation {
+			pre{
+				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			}
+			return self.tenantCapability.borrow()!.getTenantInformation()
+		}
 
 		//called from lease when auction is ended
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) {
@@ -480,6 +495,12 @@ pub contract FindMarketAuctionSoft {
 			destroy bid
 		}
 
+		pub fun getBid(_ id: UInt64) : FindMarket.BidInfo {
+			let bid = self.borrowBid(id)
+
+			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
+			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo)
+		}
 
 		pub fun getBids() : [FindMarket.BidInfo] {
 			var bidInfo: [FindMarket.BidInfo] = []
@@ -501,12 +522,12 @@ pub contract FindMarketAuctionSoft {
 
 			let uuid=item.getUUID()
 
-			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.tenant.publicPaths[Type<@SaleItemCollection>().identifier]!)
+			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().publicPaths[Type<@SaleItemCollection>().identifier]!)
 
 			let bid <- create Bid(from: from, itemUUID:item.getUUID(), nftCap: nftCap, vaultType: vaultType, balance:amount)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 
-			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.tenant.publicPaths[Type<@MarketBidCollection>().identifier]!)
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().publicPaths[Type<@MarketBidCollection>().identifier]!)
 			let oldToken <- self.bids[uuid] <- bid
 			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType) 
 			destroy oldToken
@@ -524,10 +545,17 @@ pub contract FindMarketAuctionSoft {
 		//TODO: need to send in the old balance here!
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, increaseBy: UFix64) {
+			pre {
+				self.bids[id] != nil : "You need to have a bid here already"
+			}
 			let bid =self.borrowBid(id)
+
+			let oldBalance=bid.balance 
+
 			bid.setBidAt(Clock.time())
 			bid.setBalance(bid.balance + increaseBy)
-			bid.from.borrow()!.registerIncreasedBid(id)
+
+			bid.from.borrow()!.registerIncreasedBid(id, oldBalance: oldBalance)
 		}
 
 		//called from saleItem when things are cancelled 
@@ -555,13 +583,13 @@ pub contract FindMarketAuctionSoft {
 	}
 
 	//Create an empty lease collection that store your leases to a name
-	pub fun createEmptySaleItemCollection(_ tenant: &FindMarket.Tenant): @SaleItemCollection {
+	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
 		let wallet=FindMarketAuctionSoft.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		return <- create SaleItemCollection(tenant)
+		return <- create SaleItemCollection(tenantCapability)
 	}
 
-	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenant: &FindMarket.Tenant) : @MarketBidCollection {
-		return <- create MarketBidCollection(receiver: receiver, tenant:tenant)
+	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
+		return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
 	}
 
 	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
@@ -573,14 +601,20 @@ pub contract FindMarketAuctionSoft {
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
-		if let tenant=FindMarket.getTenant(marketplace) {
+		pre{
+			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		}
+		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>())!)
 		}
 		return nil
 	}
 
 	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic}>? {
-		if let tenant=FindMarket.getTenant(marketplace) {
+		pre{
+			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		}
+		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>())!)
 		}
 		return nil

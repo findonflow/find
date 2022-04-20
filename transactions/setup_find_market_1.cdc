@@ -6,6 +6,6 @@ transaction() {
 	prepare(account: AuthAccount) {
 		//in finds case the 
 		account.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
-		account.link<&{FindMarket.TenantPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)
+		account.link<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)
 	}
 }

@@ -10,7 +10,7 @@ transaction(id: UInt64) {
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 
 	prepare(account: AuthAccount) {
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())!
 
 		self.walletReference = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No FUSD wallet linked for this account")
