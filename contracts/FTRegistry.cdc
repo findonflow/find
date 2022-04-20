@@ -18,15 +18,18 @@ pub contract FTRegistry {
         pub(set) var alias : String
         pub(set) var type : Type
         pub(set) var typeIdentifier : String
+        // Whether it is stable coin or other type of coins. 
+        pub(set) var tag : [String ] 
         pub(set) var icon : String?
         pub(set) var receiverPath : PublicPath
         pub(set) var balancePath : PublicPath
         pub(set) var vaultPath : StoragePath
 
-        init(alias : String, type: Type, typeIdentifier: String, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+        init(alias : String, type: Type, typeIdentifier: String, tag:[String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
             self.alias = alias
             self.type = type
             self.typeIdentifier = typeIdentifier
+            self.tag = tag
             self.icon = icon
             self.receiverPath = receiverPath
             self.balancePath = balancePath
@@ -36,11 +39,18 @@ pub contract FTRegistry {
     } 
 
     /* getters */
-    pub fun getFTInfo(typeIdentifier: String) : FTInfo? {
+    pub fun getFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo? {
         return FTRegistry.fungibleTokenList[typeIdentifier]
     }
 
-    pub fun getTypeIdentifier(alias: String) : String? {
+	pub fun getFTInfoByAlias(_ alias: String) : FTInfo? {
+		  if let identifier = FTRegistry.aliasMap[alias] {
+				return FTRegistry.fungibleTokenList[identifier]
+			}
+			return nil
+    }
+
+    pub fun getTypeIdentifier(_ alias: String) : String? {
         return FTRegistry.aliasMap[alias]
     }
 
@@ -49,7 +59,7 @@ pub contract FTRegistry {
     }
 
     /* setters */
-    access(account) fun setFTInfo(alias: String, type: Type, icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+    access(account) fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
         pre{
             !FTRegistry.fungibleTokenList.containsKey(type.identifier) : "This FungibleToken Register already exist"
         }
@@ -57,6 +67,7 @@ pub contract FTRegistry {
         FTRegistry.fungibleTokenList[typeIdentifier] = FTInfo(alias: alias,
                                                               type: type,
                                                               typeIdentifier: typeIdentifier,
+                                                              tag : tag,
                                                               icon: icon,
                                                               receiverPath: receiverPath,
                                                               balancePath: balancePath,
@@ -66,11 +77,16 @@ pub contract FTRegistry {
         emit FTInfoRegistered(alias: alias, typeIdentifier: typeIdentifier)
     }
 
-    access(account) fun removeFTInfo(typeIdentifier: String) : FTInfo? {
+    access(account) fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo {
         let info = FTRegistry.fungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this Fungible Token Registry.")
         FTRegistry.aliasMap.remove(key: info.alias)
         emit FTInfoRemoved(alias:info!.alias, typeIdentifier: info!.typeIdentifier)
         return info 
+    }
+
+    access(account) fun removeFTInfoByAlias(_ alias: String) : FTInfo {
+        let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias.")
+        return self.removeFTInfoByTypeIdentifier(typeIdentifier)
     }
 
     init() {

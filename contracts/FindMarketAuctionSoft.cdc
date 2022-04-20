@@ -195,7 +195,7 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) 
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance: UFix64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
@@ -244,23 +244,25 @@ pub contract FindMarketAuctionSoft {
 			return info
 		}
 
-		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+		//TODO: add previousBalance like Escrowed auction
+		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
 			let saleItem=self.borrow(id)
 
 			let timestamp=Clock.time()
 			let newOfferBalance=newOffer.borrow()!.getBalance(id)
 
 			let previousOffer = saleItem.offerCallback!
-			let previousBalance=previousOffer.borrow()!.getBalance(id) 
+
+			let minBid=oldBalance + saleItem.auctionMinBidIncrement
+
+			if newOfferBalance < minBid {
+				panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement ").concat(minBid.toString()))
+			}
 
 			if newOffer.address != previousOffer.address {
-				let minBid=previousBalance + saleItem.auctionMinBidIncrement
-
-				if newOfferBalance < minBid {
-					panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement").concat(minBid.toString()))
-				}
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
 			}
+
 			saleItem.setCallback(newOffer)
 
 			let suggestedEndTime=timestamp+saleItem.auctionExtensionOnLateBid
@@ -272,7 +274,7 @@ pub contract FindMarketAuctionSoft {
 
 		}
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) {
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
@@ -291,7 +293,7 @@ pub contract FindMarketAuctionSoft {
 
 
 			//TODO: is this right? get the same item and send it in again?
-			self.addBid(id: id, newOffer: saleItem.offerCallback!)
+			self.addBid(id: id, newOffer: saleItem.offerCallback!, oldBalance: oldBalance)
 
 		}
 
@@ -308,7 +310,7 @@ pub contract FindMarketAuctionSoft {
 				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
-				self.addBid(id: id, newOffer: callback)
+				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
 				return
 			}
 
@@ -391,6 +393,8 @@ pub contract FindMarketAuctionSoft {
 
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
+
+			//TODO: check if this is dreprecated or stopped
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice)
 
@@ -477,6 +481,12 @@ pub contract FindMarketAuctionSoft {
 			destroy bid
 		}
 
+		pub fun getBid(_ id: UInt64) : FindMarket.BidInfo {
+			let bid = self.borrowBid(id)
+
+			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
+			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo)
+		}
 
 		pub fun getBids() : [FindMarket.BidInfo] {
 			var bidInfo: [FindMarket.BidInfo] = []
@@ -521,10 +531,17 @@ pub contract FindMarketAuctionSoft {
 		//TODO: need to send in the old balance here!
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, increaseBy: UFix64) {
+			pre {
+				self.bids[id] != nil : "You need to have a bid here already"
+			}
 			let bid =self.borrowBid(id)
+
+			let oldBalance=bid.balance 
+
 			bid.setBidAt(Clock.time())
 			bid.setBalance(bid.balance + increaseBy)
-			bid.from.borrow()!.registerIncreasedBid(id)
+
+			bid.from.borrow()!.registerIncreasedBid(id, oldBalance: oldBalance)
 		}
 
 		//called from saleItem when things are cancelled 

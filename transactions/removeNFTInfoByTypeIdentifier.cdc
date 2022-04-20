@@ -12,7 +12,7 @@ transaction(typeIdentifier: String) {
 
     execute{
 
-        self.adminRef.removeNFTInfo(typeIdentifier: typeIdentifier) 
+        self.adminRef.removeNFTInfoByTypeIdentifier(typeIdentifier) 
        
     }
 }

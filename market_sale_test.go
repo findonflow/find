@@ -17,19 +17,20 @@ func TestMarketSale(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
-		otu.listDandyForSale("user1", id, price)
-
-		otu.checkRoyalty("user1", id, "platform", 0.15)
+		otu.listNFTForSale("user1", id, price)
+		/* Ben : Should we rename the check royalty script name? */
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.15)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
 
-		otu.buyDandyForMarketSale("user2", "user1", id, price)
+		otu.buyNFTForMarketSale("user2", "user1", id, price)
 	})
 
 	//TODO: Should there be a seperate status?
@@ -38,13 +39,14 @@ func TestMarketSale(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
-		otu.listDandyForSale("user1", id, price)
+		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", 0.15)
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.15)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -52,7 +54,7 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		newPrice := 15.0
-		otu.listDandyForSale("user1", id, newPrice)
+		otu.listNFTForSale("user1", id, newPrice)
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, fmt.Sprintf("%.8f", newPrice), itemsForSale[0].Amount)
@@ -64,20 +66,21 @@ func TestMarketSale(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
-		otu.listDandyForSale("user1", id, price)
+		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", 0.15)
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.15)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
-		otu.cancelDandyForSale("user1", id)
+		otu.cancelNFTForSale("user1", id)
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 0, len(itemsForSale))
 	})
@@ -87,11 +90,12 @@ func TestMarketSale(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
-		otu.listDandyForSale("user1", id, price)
+		otu.listNFTForSale("user1", id, price)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -114,11 +118,12 @@ func TestMarketSale(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			registerFlowFUSDDandyInRegistry()
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
-		otu.listDandyForSale("user1", id, price)
+		otu.listNFTForSale("user1", id, price)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))

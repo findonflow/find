@@ -137,9 +137,8 @@ pub contract FindMarket {
 	 - stopped means they are not valid anymore and will not be shown
   
 	A tenant and an admin must be allowed to ban a user, if they do all listings from that user becomes invalid and that user cannot interact with the market.
-
-		
 	*/
+
 	//this needs to be a resource so that nobody else can make it.
 	pub resource Tenant {
 
@@ -175,6 +174,11 @@ pub contract FindMarket {
 		pub fun addCapability(_ cap: Capability<&Tenant>)
 	}
 
+	/*
+	A tenentClient should be able to:
+	 - deprecte a certain market type: No new listings can be made
+
+	*/
 	//admin proxy with capability receiver 
 	pub resource TenantClient: TenantPublic {
 
@@ -192,6 +196,7 @@ pub contract FindMarket {
 			self.capability = nil
 		}
 
+		//Needs to return a capablity
 		pub fun getTenant() : &Tenant {
 			pre {
 				self.capability != nil: "TenentClient is not present"
@@ -234,6 +239,8 @@ pub contract FindMarket {
 
 	pub struct SaleItemInformation {
 
+		//TODO: should we add typeIdentifier here?
+		//TODO: call this nftType?
 		pub let type:Type
 		pub let typeId: UInt64
 		pub let id:UInt64

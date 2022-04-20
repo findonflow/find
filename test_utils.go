@@ -343,9 +343,9 @@ func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
 		buyForge(user)
 }
 
-func (otu *OverflowTestUtils) cancelDandyForSale(name string, id uint64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("cancelDandyForSale").
+	otu.O.TransactionFromFile("cancelNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			UInt64(id)).
@@ -358,12 +358,14 @@ func (otu *OverflowTestUtils) cancelDandyForSale(name string, id uint64) *Overfl
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listDandyForSale").
+	otu.O.TransactionFromFile("listNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			String("Dandy").
 			UInt64(id).
+			String("FUSD").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
@@ -375,14 +377,20 @@ func (otu *OverflowTestUtils) listDandyForSale(name string, id uint64, price flo
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	//TODO: rename to listDandyForAuctionEscrow
-	otu.O.TransactionFromFile("listDandyForAuction").
+	//TODO: rename to listNFTForAuctionEscrow
+	otu.O.TransactionFromFile("listNFTForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			String("Dandy").
 			UInt64(id).
-			UFix64(price)).
+			String("FUSD").
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
 			"status":              "listed",
@@ -394,13 +402,19 @@ func (otu *OverflowTestUtils) listDandyForEscrowedAuction(name string, id uint64
 	return otu
 }
 
-func (otu *OverflowTestUtils) listDandyForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listDandyForAuctionSoft").
+	otu.O.TransactionFromFile("listNFTForAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			String("Dandy").
 			UInt64(id).
-			UFix64(price)).
+			String("FUSD").
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
 			"status":              "listed",
@@ -412,13 +426,14 @@ func (otu *OverflowTestUtils) listDandyForSoftAuction(name string, id uint64, pr
 	return otu
 }
 
-func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, expectedPlatformRoyalty float64) *OverflowTestUtils {
-
+func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
+	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
-	otu.O.ScriptFromFile("dandy").
+	otu.O.ScriptFromFile("checkRoyalty").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
+			String(nftAlias).
 			String("A.f8d6e0586b0a20c7.FindViews.Royalties")).
 		RunMarshalAs(&royalty)
 
@@ -434,7 +449,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 }
 
-func (otu *OverflowTestUtils) buyDandyForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("buyItemForSale").
 		SignProposeAndPayAs(name).
@@ -574,7 +589,9 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
+			String("Dandy").
 			UInt64(id).
+			String("FUSD").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
@@ -591,7 +608,9 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
+			String("Dandy").
 			UInt64(id).
+			String("FUSD").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
@@ -775,30 +794,23 @@ func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected stri
 	return otu
 }
 
-func (otu *OverflowTestUtils) registerFlowInFtRegistry() *OverflowTestUtils {
-	otu.O.TransactionFromFile("setFTInfo_flow").
+func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setFTInfo_" + alias).
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "Flow",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		}))
+		AssertEmitEvent(overflow.NewTestEvent(eventName, eventResult))
 
 	return otu
 }
 
-
-func (otu *OverflowTestUtils) removeFlowInFtRegistry(transactionFile string, argument string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
 	otu.O.TransactionFromFile(transactionFile).
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().String(argument)).
 		Test(otu.T).
 		AssertSuccess().
-		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
-			"alias":          "Flow",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		}))
+		AssertEmitEvent(overflow.NewTestEvent(eventName, eventResult))
 
 	return otu
 }
@@ -809,7 +821,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 		Test(otu.T).
 		AssertSuccess().
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
-			"name":           "Dandy",
+			"alias":          "Dandy",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
@@ -823,10 +835,23 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 		Test(otu.T).
 		AssertSuccess().
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRemoved", map[string]interface{}{
-			"name":           "Dandy",
+			"alias":          "Dandy",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
+	return otu
+}
+
+func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUtils {
+	otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+		"alias":          "FUSD",
+		"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+	}).
+		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "Flow",
+			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		}).
+		registerDandyInNFTRegistry()
 	return otu
 }
 
