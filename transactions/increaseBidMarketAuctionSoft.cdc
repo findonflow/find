@@ -16,7 +16,6 @@ transaction(id: UInt64, amount: UFix64) {
 
 		// get Bidding Fungible Token Vault
 		let ftIdentifier = self.bidsReference.getBid(id).item.ftTypeIdentifier
-
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
 
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

@@ -31,3 +31,4 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice)
 	}
 }
+

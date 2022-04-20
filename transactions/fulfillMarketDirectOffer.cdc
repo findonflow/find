@@ -8,6 +8,7 @@ import FindViews from "../contracts/FindViews.cdc"
 transaction(id: UInt64) {
 	prepare(account: AuthAccount) {
 
+
 		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 

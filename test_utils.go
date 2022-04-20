@@ -869,3 +869,4 @@ type SaleItem struct {
 	Type                string `json:"type"`
 	TypeID              string `json:"typeId"`
 }
+

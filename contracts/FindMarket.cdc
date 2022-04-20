@@ -150,6 +150,7 @@ pub contract FindMarket {
 	}
 
 
+
 	//this needs to be a resource so that nobody else can make it.
 	pub resource Tenant : TenantPublic{
 
@@ -189,6 +190,7 @@ pub contract FindMarket {
 	}
 
 	/*
+
 	A tenantClient should be able to:
 	 - deprecte a certain market type: No new listings can be made
 
@@ -209,6 +211,7 @@ pub contract FindMarket {
 		init() {
 			self.capability = nil
 		}
+
 
 		//BAM: do admin operations on a tenant
 		/*

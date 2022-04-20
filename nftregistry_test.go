@@ -139,3 +139,4 @@ func TestNFTRegistry(t *testing.T) {
 	})
 
 }
+
