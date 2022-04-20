@@ -18,6 +18,7 @@ import FindMarketAuctionSoft from "./FindMarketAuctionSoft.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
 
+
 pub contract Admin {
 
 	//store the proxy for the admin
@@ -227,6 +228,7 @@ pub contract Admin {
 		pub fun removeNFTInfoByAlias(_ alias: String) {
 			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
+
 
 		//TODO: set that primary cut has been paid
 		//TODO; ban a user and modify scripts/tx to honor ban
