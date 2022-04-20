@@ -130,5 +130,4 @@ func TestFTRegistry(t *testing.T) {
 		assert.Equal(t, "", infoResult)
 
 	})
-
 }
