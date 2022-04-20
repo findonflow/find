@@ -8,7 +8,7 @@ transaction(id: UInt64, amount: UFix64) {
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 
 	prepare(account: AuthAccount) {
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")
 	}

@@ -12,7 +12,7 @@ transaction(id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		// Get the accepted vault type from BidInfo
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let bidInfo = self.bidsReference.getBid(id)

@@ -11,7 +11,7 @@ transaction(id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let bidInfo = self.bidsReference.getBid(id)

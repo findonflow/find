@@ -10,7 +10,7 @@ transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix6
 	prepare(account: AuthAccount) {
 
 		// Get the salesItemRef from tenant
-		let tenant=FindMarket.getFindTenant() 
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>())!)!
 
 		// Get supported NFT and FT Information from Registries from input alias

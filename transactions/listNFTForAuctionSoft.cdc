@@ -8,7 +8,7 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
 transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 	prepare(account: AuthAccount) {
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>())!)!
 
 		// Get supported NFT and FT Information from Registries from input alias

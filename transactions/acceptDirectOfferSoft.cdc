@@ -12,7 +12,7 @@ transaction(id: UInt64) {
 	
 	prepare(account: AuthAccount) {
 
-		let tenant=FindMarket.getFindTenant()
+		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())!
 		let market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let saleInformation = market.getItemForSaleInformation(id)
