@@ -14,8 +14,6 @@ A Find Market for direct sales
 */
 pub contract FindMarketSale {
 
-	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, name:String, amount: UFix64, vaultType:String, nft:FindMarket.NFTInfo)
-
 	pub event ForSale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
 
 	//A sale item for a direct sale
