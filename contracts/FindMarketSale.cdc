@@ -146,6 +146,14 @@ pub contract FindMarketSale {
 
 			let saleItem=self.borrow(id)
 
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
+
 			if saleItem.salePrice != vault.balance {
 				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
 			}
@@ -153,6 +161,8 @@ pub contract FindMarketSale {
 			if saleItem.vaultType != vault.getType() {
 				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
 			}
+
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
@@ -165,7 +175,7 @@ pub contract FindMarketSale {
 
 			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 
-			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
+			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 
   		destroy <- self.items.remove(key: id)
