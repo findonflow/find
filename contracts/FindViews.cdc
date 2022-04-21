@@ -6,15 +6,6 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
 
-	pub struct ExternalDomainViewUrl {
-
-		pub let url:String
-
-		init(url: String) {
-			self.url=url
-		}
-	}
-
 	pub struct Identity{
 		pub let id:UInt64
 		pub let uuid: UInt64
