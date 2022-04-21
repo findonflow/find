@@ -1,9 +1,6 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import CharityNFT from "../contracts/CharityNFT.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-
-import Dandy from "../contracts/Dandy.cdc"
 
 pub struct MetadataCollections {
 
@@ -59,25 +56,25 @@ pub fun main(address: Address) : MetadataCollections? {
 	let account = getAccount(address)
 	let results : {String :  [String]}={}
 
-for nftInfo in NFTRegistry.getNFTInfoAll().values {
-	let mappings = getItemForMetadataStandard(alias:nftInfo.alias, path: nftInfo.publicPath, account:account, externalFixedUrl: nftInfo.externalFixedUrl)
-	for key in mappings.keys {
-		resultMap.insert(key:key, mappings[key]! )
-	}
-	
-}
+	for nftInfo in NFTRegistry.getNFTInfoAll().values {
+		let mappings = getItemForMetadataStandard(alias:nftInfo.alias, path: nftInfo.publicPath, account:account, externalFixedUrl: nftInfo.externalFixedUrl)
+		for key in mappings.keys {
+			resultMap.insert(key:key, mappings[key]! )
+		}
 
-let publicPath=/public/FindCuratedCollections
-let link = account.getCapability<&{String: [String]}>(publicPath)
-var curatedCollections : {String: [String]} = {}
-if link.check() {
-	let curated = link.borrow()!
-	for curatedKey in curated.keys {
-		curatedCollections[curatedKey] = curated[curatedKey]!
 	}
-}
 
-return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
+	let publicPath=/public/FindCuratedCollections
+	let link = account.getCapability<&{String: [String]}>(publicPath)
+	var curatedCollections : {String: [String]} = {}
+	if link.check() {
+		let curated = link.borrow()!
+		for curatedKey in curated.keys {
+			curatedCollections[curatedKey] = curated[curatedKey]!
+		}
+	}
+
+	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
 }
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
@@ -92,13 +89,13 @@ pub fun getItemForMetadataStandard(alias:String, path: PublicPath, account:Publi
 			if nft.resolveView(Type<MetadataViews.Display>()) != nil {
 				let displayView = nft.resolveView(Type<MetadataViews.Display>())!
 				let display = displayView as! MetadataViews.Display
+
+
 				var externalUrl=externalFixedUrl
-				/* 
-				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
-					let url= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+				if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
+					let url= externalUrlView as! MetadataViews.ExternalURL
 					externalUrl=url.url
 				}
-				*/
 				let item = MetadataCollectionItem(
 					id: id,
 					name: display.name,

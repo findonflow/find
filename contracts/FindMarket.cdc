@@ -18,7 +18,7 @@ pub contract FindMarket {
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: FindViews.Royalties?, nftInfo:NFTInfo, cuts:TenantCuts) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:TenantCuts) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -126,11 +126,11 @@ pub contract FindMarket {
 
 	pub struct TenantSaleItem {
 		pub let name:String
-		pub let cut:FindViews.Royalty?
+		pub let cut:MetadataViews.Royalty?
 		pub let rules:[TenantRule]
 		pub let status:String
 
-		init(name:String, cut:FindViews.Royalty?, rules:[TenantRule], status:String){
+		init(name:String, cut:MetadataViews.Royalty?, rules:[TenantRule], status:String){
 			self.name=name
 			self.cut=cut
 			self.rules=rules
@@ -139,10 +139,10 @@ pub contract FindMarket {
 	}
 
 	pub struct TenantCuts {
-		pub let findCut:FindViews.Royalty?
-		pub let tenantCut:FindViews.Royalty?
+		pub let findCut:MetadataViews.Royalty?
+		pub let tenantCut:MetadataViews.Royalty?
 
-		init(findCut:FindViews.Royalty?, tenantCut:FindViews.Royalty?) {
+		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
 			self.findCut=findCut
 			self.tenantCut=tenantCut
 		}
