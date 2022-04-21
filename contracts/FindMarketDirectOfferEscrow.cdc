@@ -122,12 +122,13 @@ pub contract FindMarketDirectOfferEscrow {
 			self.tenantCapability=tenantCapability
 		}
 
-		access(self) fun getTenant() : FindMarket.TenantInformation {
+		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
 			pre{
 				self.tenantCapability.check() : "Tenant client is not linked anymore"
 			}
-			return self.tenantCapability.borrow()!.getTenantInformation()
+			return self.tenantCapability.borrow()!
 		}
+
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation {
 			pre {
@@ -243,7 +244,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant: self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
+			FindMarket.pay(tenant: self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -311,11 +312,11 @@ pub contract FindMarketDirectOfferEscrow {
 			self.tenantCapability=tenantCapability
 		}
 
-		access(contract) fun getTenant() : FindMarket.TenantInformation {
+		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
 			pre{
 				self.tenantCapability.check() : "Tenant client is not linked anymore"
 			}
-			return self.tenantCapability.borrow()!.getTenantInformation()
+			return self.tenantCapability.borrow()!
 		}
 
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault {
@@ -357,11 +358,11 @@ pub contract FindMarketDirectOfferEscrow {
 			}
 
 			let uuid=item.getUUID()
-			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().publicPaths[Type<@SaleItemCollection>().identifier]!)
+			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
 			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
-			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().publicPaths[Type<@MarketBidCollection>().identifier]!)
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[uuid] <- bid
 			saleItemCollection.registerBid(item: item, callback: callbackCapability)
 			destroy oldToken
@@ -430,7 +431,7 @@ pub contract FindMarketDirectOfferEscrow {
 			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>())!)
+			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 		}
 		return nil
 	}
@@ -440,7 +441,7 @@ pub contract FindMarketDirectOfferEscrow {
 			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>())!)
+			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 		}
 		return nil
 	}

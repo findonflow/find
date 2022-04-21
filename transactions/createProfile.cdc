@@ -86,9 +86,9 @@ transaction(name: String) {
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenantCapability= FindMarket.getFindTenantCapability()
-		let tenant = tenantCapability.borrow() ?? panic("Cannot borrow reference to this tenant")
-		let publicPath= tenant.getPublicPath(saleItemType) ?? panic("Direct sale not active for this tenant")
-		let storagePath= tenant.getStoragePath(saleItemType) ?? panic("Direct sale not active for this tenant")
+		let tenant = tenantCapability.borrow()!
+		let publicPath= tenant.getPublicPath(saleItemType) 
+		let storagePath= tenant.getStoragePath(saleItemType) 
 
 		let saleItemCap= acct.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>(publicPath) 
 		if !saleItemCap.check() {
@@ -98,8 +98,8 @@ transaction(name: String) {
 		}
 
 		let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
-		let doeSalePublicPath= tenant.getPublicPath(doeSaleType) ?? panic("Direct offer escrow not active for this tenant")
-		let doeSaleStoragePath= tenant.getStoragePath(doeSaleType) ?? panic("Direct offer escrow not active for this tenant")
+		let doeSalePublicPath= tenant.getPublicPath(doeSaleType) 
+		let doeSaleStoragePath= tenant.getStoragePath(doeSaleType)
 		let doeSaleCap= acct.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>(doeSalePublicPath) 
 		if !doeSaleCap.check() {
 			acct.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
@@ -107,8 +107,8 @@ transaction(name: String) {
 		}
 
 		let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
-		let doeBidPublicPath= tenant.getPublicPath(doeBidType) ?? panic("Direct offer escrow not active for this tenant")
-		let doeBidStoragePath= tenant.getStoragePath(doeBidType) ?? panic("Direct offer escrow not active for this tenant")
+		let doeBidPublicPath= tenant.getPublicPath(doeBidType) 
+		let doeBidStoragePath= tenant.getStoragePath(doeBidType)
 		let doeBidCap= acct.getCapability<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic}>(doeBidPublicPath) 
 		if !doeBidCap.check() {
 			acct.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: doeBidStoragePath)
@@ -117,8 +117,8 @@ transaction(name: String) {
 
 		/// auctions that escrow ft
 		let aeSaleType= Type<@FindMarketAuctionEscrow.SaleItemCollection>()
-		let aeSalePublicPath= tenant.getPublicPath(aeSaleType) ?? panic("Auction escrow not active for this tenant")
-		let aeSaleStoragePath= tenant.getStoragePath(aeSaleType) ?? panic("Auction escrow not active for this tenant")
+		let aeSalePublicPath= tenant.getPublicPath(aeSaleType) 
+		let aeSaleStoragePath= tenant.getStoragePath(aeSaleType)
 		let aeSaleCap= acct.getCapability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}>(aeSalePublicPath) 
 		if !aeSaleCap.check() {
 			acct.save<@FindMarketAuctionEscrow.SaleItemCollection>(<- FindMarketAuctionEscrow.createEmptySaleItemCollection(tenantCapability), to: aeSaleStoragePath)
@@ -126,8 +126,8 @@ transaction(name: String) {
 		}
 
 		let dosSaleType= Type<@FindMarketDirectOfferSoft.SaleItemCollection>()
-		let dosSalePublicPath= tenant.getPublicPath(dosSaleType) ?? panic("Direct offer sof not active for this tenant")
-		let dosSaleStoragePath= tenant.getStoragePath(dosSaleType) ?? panic("Direct offer soft not active for this tenant")
+		let dosSalePublicPath= tenant.getPublicPath(dosSaleType)
+		let dosSaleStoragePath= tenant.getStoragePath(dosSaleType)
 		let dosSaleCap= acct.getCapability<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic}>(dosSalePublicPath) 
 		if !dosSaleCap.check() {
 			acct.save<@FindMarketDirectOfferSoft.SaleItemCollection>(<- FindMarketDirectOfferSoft.createEmptySaleItemCollection(tenantCapability), to: dosSaleStoragePath)
@@ -135,8 +135,8 @@ transaction(name: String) {
 		}
 
 		let dosBidType= Type<@FindMarketDirectOfferSoft.MarketBidCollection>()
-		let dosBidPublicPath= tenant.getPublicPath(dosBidType) ?? panic("Direct offer soft not active for this tenant")
-		let dosBidStoragePath= tenant.getStoragePath(dosBidType) ?? panic("Direct offer soft not active for this tenant")
+		let dosBidPublicPath= tenant.getPublicPath(dosBidType) 
+		let dosBidStoragePath= tenant.getStoragePath(dosBidType) 
 		let dosBidCap= acct.getCapability<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic}>(dosBidPublicPath) 
 		if !dosBidCap.check() {
 			acct.save<@FindMarketDirectOfferSoft.MarketBidCollection>(<- FindMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: dosBidStoragePath)
@@ -144,8 +144,8 @@ transaction(name: String) {
 		}
 
 		let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
-		let aeBidPublicPath= tenant.getPublicPath(aeBidType) ?? panic("Auction escrow not active for this tenant")
-		let aeBidStoragePath= tenant.getStoragePath(aeBidType) ?? panic("Auction escrow not active for this tenant")
+		let aeBidPublicPath= tenant.getPublicPath(aeBidType) 
+		let aeBidStoragePath= tenant.getStoragePath(aeBidType) 
 		let aeBidCap= acct.getCapability<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic}>(aeBidPublicPath) 
 		if !aeBidCap.check() {
 			acct.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: aeBidStoragePath)
@@ -155,8 +155,8 @@ transaction(name: String) {
 
 	 /// auctions that refers FT so 'soft' auction
 		let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
-		let asSalePublicPath= tenant.getPublicPath(asSaleType) ?? panic("Auction not active for this tenant")
-		let asSaleStoragePath= tenant.getStoragePath(asSaleType) ?? panic("Auction not active for this tenant")
+		let asSalePublicPath= tenant.getPublicPath(asSaleType)
+		let asSaleStoragePath= tenant.getStoragePath(asSaleType) 
 		let asSaleCap= acct.getCapability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}>(asSalePublicPath) 
 		if !asSaleCap.check() {
 			acct.save<@FindMarketAuctionSoft.SaleItemCollection>(<- FindMarketAuctionSoft.createEmptySaleItemCollection(tenantCapability), to: asSaleStoragePath)
@@ -164,8 +164,8 @@ transaction(name: String) {
 		}
 
 		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
-		let asBidPublicPath= tenant.getPublicPath(asBidType) ?? panic("Auction not active for this tenant")
-		let asBidStoragePath= tenant.getStoragePath(asBidType) ?? panic("Auction not active for this tenant")
+		let asBidPublicPath= tenant.getPublicPath(asBidType) 
+		let asBidStoragePath= tenant.getStoragePath(asBidType)
 		let asBidCap= acct.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic}>(asBidPublicPath) 
 		if !asBidCap.check() {
 			acct.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)

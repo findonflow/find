@@ -116,11 +116,11 @@ pub contract FindMarketSale {
 			self.tenantCapability=tenantCapability
 		}
 
-		access(self) fun getTenant() : FindMarket.TenantInformation {
+		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
 			pre{
 				self.tenantCapability.check() : "Tenant client is not linked anymore"
 			}
-			return self.tenantCapability.borrow()!.getTenantInformation()
+			return self.tenantCapability.borrow()!
 		}
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation {
@@ -173,7 +173,7 @@ pub contract FindMarketSale {
 
 			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 
-			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
+			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 
   		destroy <- self.items.remove(key: id)
@@ -231,7 +231,7 @@ pub contract FindMarketSale {
 			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@FindMarketSale.SaleItemCollection>())!)
+			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@FindMarketSale.SaleItemCollection>()))
 		}
 		return nil
 	}

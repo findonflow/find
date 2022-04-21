@@ -18,7 +18,7 @@ pub contract FindMarket {
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	access(account) fun pay(tenant: TenantInformation, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: FindViews.Royalties?, nftInfo:NFTInfo, cuts:TenantCuts) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: FindViews.Royalties?, nftInfo:NFTInfo, cuts:TenantCuts) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -31,7 +31,7 @@ pub contract FindMarket {
 				let cutAmount= soldFor * royaltyItem.cut
 				//let name=FIND.reverseLookup(royaltyItem.receiver.address)
 				let name=""
-				emit RoyaltyPaid(tenant:tenant.name, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				emit RoyaltyPaid(tenant:name, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 		}
@@ -40,7 +40,7 @@ pub contract FindMarket {
 			let cutAmount= soldFor * findCut.cut
 			//let name =FIND.reverseLookup(findCut.receiver.address)
 			let name=""
-			emit RoyaltyPaid(tenant: tenant.name, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			emit RoyaltyPaid(tenant: name, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
@@ -48,7 +48,7 @@ pub contract FindMarket {
 			let cutAmount= soldFor * tenantCut.cut
 			//let name=FIND.reverseLookup(tenantCut.receiver.address)
 			let name=""
-			emit RoyaltyPaid(tenant: tenant.name, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			emit RoyaltyPaid(tenant: name, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 		oldProfile.deposit(from: <- vault)
@@ -70,8 +70,6 @@ pub contract FindMarket {
 		}
 	}
 
-
-
 	pub struct MarketAction{
 		pub let mutating:Bool
 		pub let name:String
@@ -82,8 +80,85 @@ pub contract FindMarket {
 		}
 	}
 
-	pub struct TenantInformation {
+	pub struct ActionResult {
+		pub let allowed:Bool
+		pub let message:String
+		pub let name:String
 
+		init(allowed:Bool, message:String, name:String) {
+			self.allowed=allowed
+			self.message=message
+			self.name =name
+		}
+	}
+
+	pub struct TenantRule{
+		pub let name:String
+		pub let types:[Type]
+		pub let ruleType:String
+		pub let allow:Bool
+
+		init(name:String, types:[Type], ruleType:String, allow:Bool){
+
+			pre {
+				ruleType == "nft" || ruleType == "ft" || ruleType == "listing" : "Must be nft/ft/listing"
+			}
+			self.name=name
+			self.types=types
+			self.ruleType=ruleType
+			self.allow=allow
+		}
+
+
+		pub fun accept(_ relevantType: Type): Bool {
+			let contains=self.types.contains(relevantType)
+
+			if self.allow && contains{
+				return true
+			}
+
+			if !self.allow && !contains {
+				return true
+			}
+			return false
+		}
+	}
+
+	pub struct TenantSaleItem {
+		pub let name:String
+		pub let cut:FindViews.Royalty?
+		pub let rules:[TenantRule]
+		pub let status:String
+
+		init(name:String, cut:FindViews.Royalty?, rules:[TenantRule], status:String){
+			self.name=name
+			self.cut=cut
+			self.rules=rules
+			self.status=status
+		}
+	}
+
+	pub struct TenantCuts {
+		pub let findCut:FindViews.Royalty?
+		pub let tenantCut:FindViews.Royalty?
+
+		init(findCut:FindViews.Royalty?, tenantCut:FindViews.Royalty?) {
+			self.findCut=findCut
+			self.tenantCut=tenantCut
+		}
+	}
+
+	pub resource interface TenantPublic {
+
+		pub fun getStoragePath(_ type: Type) : StoragePath 
+		pub fun getPublicPath(_ type: Type) : PublicPath
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
+		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
+		pub let name:String
+	}
+
+	//this needs to be a resource so that nobody else can make it.
+	pub resource Tenant : TenantPublic{
 
 		access(self) let findSaleItems : {String : TenantSaleItem}
 		access(self) let tenantSaleItems : {String : TenantSaleItem}
@@ -94,7 +169,7 @@ pub contract FindMarket {
 
 		pub let name: String
 
-		init(name:String) {
+		init(_ name:String) {
 			self.name=name
 			self.tenantSaleItems={}
 			self.findSaleItems={}
@@ -103,20 +178,13 @@ pub contract FindMarket {
 			self.storagePaths={}
 		}
 
-		//TODO: this needs way more information now like findSaleCuts aso
 		pub fun addSaleType(type:Type, public: PublicPath, storage:StoragePath) {
 			let identifier= type.identifier
 			self.publicPaths[identifier] = public
 			self.storagePaths[identifier]=storage
 		}
 
-		/*
-		TenantSaleItem{name: "FindCutDapper", cut: nil
-		[ { name : "Find cut for DUC", type: [Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:true } ]}
 
-		TenantSaleItem{name: "FindCutBlocto", cut: 0.25
-		[ { name : "blocto cut", type: [Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:false } ]}
-		*/
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts {
 
 			let item = self.tenantSaleItems[name]!
@@ -221,180 +289,18 @@ pub contract FindMarket {
 
 			return ActionResult(allowed:false, message:"Nothing matches", name:"")
 		}
-	}
 
-	pub struct ActionResult {
-		pub let allowed:Bool
-		pub let message:String
-		pub let name:String
+		pub fun getPublicPath(_ type: Type) : PublicPath {
+			return self.publicPaths[type.identifier] ?? panic("Cannot find public path for type ".concat(type.identifier))
+		}
 
-		init(allowed:Bool, message:String, name:String) {
-			self.allowed=allowed
-			self.message=message
-			self.name =name
+		pub fun getStoragePath(_ type: Type) : StoragePath {
+			return self.storagePaths[type.identifier] ?? panic("Cannot find storage path for type ".concat(type.identifier))
 		}
 	}
 
-	pub struct TenantRule{
-		pub let name:String
-		pub let types:[Type]
-		pub let ruleType:String
-		pub let allow:Bool
-
-		init(name:String, types:[Type], ruleType:String, allow:Bool){
-
-			pre {
-				ruleType == "nft" || ruleType == "ft" || ruleType == "listing" : "Must be nft/ft/listing"
-			}
-			self.name=name
-			self.types=types
-			self.ruleType=ruleType
-			self.allow=allow
-		}
-
-
-		pub fun accept(_ relevantType: Type): Bool {
-			let contains=self.types.contains(relevantType)
-
-			if self.allow && contains{
-				return true
-			}
-
-			if !self.allow && !contains {
-				return true
-			}
-			return false
-		}
-	}
-
-	pub struct TenantSaleItem {
-		pub let name:String
-		pub let cut:FindViews.Royalty?
-		pub let rules:[TenantRule]
-		pub let status:String
-
-		init(name:String, cut:FindViews.Royalty?, rules:[TenantRule], status:String){
-			self.name=name
-			self.cut=cut
-			self.rules=rules
-			self.status=status
-		}
-	}
-
-	pub struct TenantCuts {
-		pub let findCut:FindViews.Royalty?
-		pub let tenantCut:FindViews.Royalty?
-
-		init(findCut:FindViews.Royalty?, tenantCut:FindViews.Royalty?) {
-			self.findCut=findCut
-			self.tenantCut=tenantCut
-		}
-	}
-
-	/*
-	FIND:
-	A soft auction requires DUC of HattricksNFT //royalties handled offchain
-	A escrowed auction blocks DUC of HattricksNFT and has royalty to find
-	*/
-
-	/*
-
-
-	TenantSaleItem{name: "DapperAuction", findCut: nil, tenantCut: nil, rules:
-	[
-	{ name : "Deny other types", type: [Type<@HatttricksNFT.NFT>()], ruleType:"nft" allow: true },
-	{ name : "Block only this FT", type: [Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:true },
-	{ name : "Soft Sales", ruleType: "listing" type: [Type<@FindMarketDirectOfferSoft.SaleItem>(),Type<@FindMarketAuctionSoft.SaleItem>()], allow:true }
-	]}
-
-	TenantSaleItem{name: "Blocto", findCut: 0.25, tenantCut: 0.5, rules:
-	[
-	{ name : "Deny other types", type: [Type<@HatttricksNFT.NFT>()], ruleType:"nft" allow:true },
-	{ name : "Block only this FT", type: [Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:false },
-	{ name : "Not soft Sales", ruleType: "listing" type: [Type<@FindMarketDirectOfferSoft.SaleItem>(),Type<@FindMarketAuctionSoft.SaleItem>()], allow:false }
-	]}
-
-
-
-
-	A tenant client needs to be able to list his own rules and add/modify them.
-
-	A Tenant rule can match on
-	- FT Type
-	- NFT Type 
-	- listing type
-
-	//rules needs to be ordred. 
-
-	struct {
-		name: String
-		type: [Type]
-		allow: Bool //true means it must be in list, false means it cannot be in list
-		ruleType: String //ft/nft/listing
-	}
-
-	[
-	{ name : "Sell using Flow", type: [Type<@FlowToken.Vault>()], mode: "allow", ruleType:"ft" }
-	]
-
-	In the tenant rule we will have a dict {String:[Type]} that can be used to be flexible. So you can have keys here that are
-	- denyFT
-	- allowFT
-	- denyNFT
-	- allowNFT
-	- denyListing
-
-	A tenant rule will have the following data
-	- a name
-	- the cut of the underlying middlelayer (only set by us/find)?
-	- each sale type will have a NFT Type, a PrivatePath for Provider and a PublicPath for Receiver/MetadataView
-	- contains paths of all valid types that you want to sell (see addSaleType above) 
-
-	A tenant owner must be able to set cuts based on types that cannot be overwritten
-
-	Both must be able to stop listings of all types or deprecate listings of all type
-	- deprecation means existing ones are valid, but you cannot list new ones
-	- stopped means they are not valid anymore and will not be shown/marked as stopped
-
-	A tenant and an admin must be allowed to ban a user, if they do all listings from that user becomes invalid and that user cannot interact with the market. Profile ban
-	*/
-
-	pub resource interface TenantPublic {
-
-		pub fun getTenantInformation() : TenantInformation
-
-		//Check if an action is allowed
-		//pub fun isActionAllowed() : Bool //TODO: what parameters is available here
-
-		pub fun getStoragePath(_ type: Type) : StoragePath? 
-		pub fun getPublicPath(_ type: Type) : PublicPath? 
-	}
-
-
-
-	//this needs to be a resource so that nobody else can make it.
-	pub resource Tenant : TenantPublic{
-
-		pub let information : TenantInformation
-
-		init(_ tenant: TenantInformation) {
-			self.information=tenant
-		}
-		pub fun getTenantInformation() : TenantInformation {
-			return self.information
-		}
-
-		pub fun getPublicPath(_ type: Type) : PublicPath? {
-			return self.information.publicPaths[type.identifier]
-		}
-
-		pub fun getStoragePath(_ type: Type) : StoragePath? {
-			return self.information.storagePaths[type.identifier]
-		}
-	}
-
-	access(account) fun createTenant(_ tenant: TenantInformation) : @Tenant {
-		return <- create Tenant(tenant)
+	access(account) fun createTenant(_ name: String) : @Tenant {
+		return <- create Tenant(name)
 	}
 
 	// Tenant admin stuff

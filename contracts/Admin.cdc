@@ -52,6 +52,17 @@ pub contract Admin {
 			self.capability = cap
 		}
 
+		/*
+		pub fun addTenantItem(_ item: FindMarket.TenantSaleItem) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.addTenantItem(item)
+
+		}
+		*/
+
 		pub fun createFindMarketTenant() : @FindMarket.Tenant {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -62,8 +73,8 @@ pub contract Admin {
 
 			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 			let findRoyalty=FindViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
-			//TODO set the find cut
-			let tenant=FindMarket.TenantInformation( name: "find")
+
+			let tenant <- FindMarket.createTenant("find")
 
 			let flowType=Type<@FlowToken.Vault>()
 			let fusdType=Type<@FUSD.Vault>()
@@ -124,7 +135,7 @@ pub contract Admin {
 			tenant.addSaleType(type: Type<@FindMarketAuctionSoft.MarketBidCollection>(), public: asBidPublicPath, storage:asBidStoragePath) 
 
 
-			return <- FindMarket.createTenant(tenant)
+			return <- tenant
 		}
 
 		/// Set the wallet used for the network
