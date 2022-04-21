@@ -720,6 +720,7 @@ pub fun main(name: String) : MetadataCollections? {
 
   let evolutionCap=account.getCapability<&{Evolution.EvolutionCollectionPublic}>(/public/f4264ac8f3256818_Evolution_Collection)
 	if evolutionCap.check() {
+		let evolution=evolutionCap.borrow()!
 		let nfts = evolution.getIDs()
 
 		let mc= MetadataCollection(path: /public/f4264ac8f3256818_Evolution_Collection, type: nfts.getType() , conformance: "Evolution.EvolutionCollectionPublic", domainUrl: "https://evolution-collect.com", category: "Evolution", legacyIdentifierPrefix: "Evolution", transferable:true)
@@ -745,6 +746,7 @@ pub fun main(name: String) : MetadataCollections? {
 		}
 	}
 
+	/* //TODO fix
   let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if geniaceCap.check() {
 		let geniace=geniaceCap.borrow()!
@@ -806,6 +808,7 @@ pub fun main(name: String) : MetadataCollections? {
 			items.append(item)
 		}
 	}
+	*/
 
   let cryptoPiggoCap = account.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
 	if cryptoPiggoCap.check() {
@@ -878,6 +881,8 @@ pub fun main(name: String) : MetadataCollections? {
 	}
 	*/
 
+
+	/* //TODO fix
   let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
 	if bitkuCap.check() {
 		let nfts = bitkuCap.borrow()!
@@ -903,6 +908,7 @@ pub fun main(name: String) : MetadataCollections? {
 		}
 	}
 
+	*/
 	let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
 	if klktnCap.check() {
 		let nfts = klktnCap.borrow()!
