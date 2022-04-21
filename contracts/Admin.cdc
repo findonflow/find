@@ -232,11 +232,6 @@ pub contract Admin {
 			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
 
-		// Remove NonFungibleToken Information by alias
-		pub fun removeNFTInfoByAlias(_ alias: String) {
-			NFTRegistry.removeNFTInfoByAlias(alias)
-		}
-
 
 		//TODO: set that primary cut has been paid
 		//TODO; ban a user and modify scripts/tx to honor ban
