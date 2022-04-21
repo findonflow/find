@@ -387,6 +387,10 @@ pub contract FindMarketAuctionSoft {
 				panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
 			}
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
+
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
 
 			let nftInfo=saleItem.toNFTInfo()
 			let royalty=saleItem.getRoyalty()
@@ -394,7 +398,7 @@ pub contract FindMarketAuctionSoft {
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			saleItem.acceptNonEscrowedBid()
 
-			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
+			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 
 			destroy <- self.items.remove(key: id)
 		}

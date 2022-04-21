@@ -18,7 +18,6 @@ import FindMarketAuctionSoft from "./FindMarketAuctionSoft.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
 
-
 pub contract Admin {
 
 	//store the proxy for the admin
@@ -62,7 +61,8 @@ pub contract Admin {
 
 			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 			let findRoyalty=FindViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
-			let tenant=FindMarket.TenantInformation( name: "find", validNFTTypes: [], ftTypes:[], findCut: findRoyalty, tenantCut: nil)
+			//TODO set the find cut
+			let tenant=FindMarket.TenantInformation( name: "find")
 			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
 
 
@@ -231,12 +231,6 @@ pub contract Admin {
 		pub fun removeNFTInfoByAlias(_ alias: String) {
 			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
-
-		// Remove NonFungibleToken Information by alias
-		pub fun removeNFTInfoByAlias(_ alias: String) {
-			NFTRegistry.removeNFTInfoByAlias(alias)
-		}
-
 
 		//TODO: set that primary cut has been paid
 		//TODO; ban a user and modify scripts/tx to honor ban

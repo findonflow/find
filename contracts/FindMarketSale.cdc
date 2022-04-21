@@ -147,6 +147,7 @@ pub contract FindMarketSale {
 			let saleItem=self.borrow(id)
 
 
+
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
 
 			if !actionResult.allowed {

@@ -89,6 +89,9 @@ pub contract FindMarket {
 		access(self) let tenantSaleItems : {String : TenantSaleItem}
 		access(self) let findCuts : {String : TenantSaleItem}
 
+		pub let publicPaths: { String: PublicPath}
+		pub let storagePaths : { String: StoragePath}
+
 		pub let name: String
 
 		init(name:String) {
@@ -96,6 +99,15 @@ pub contract FindMarket {
 			self.tenantSaleItems={}
 			self.findSaleItems={}
 			self.findCuts= {}
+			self.publicPaths={}
+			self.storagePaths={}
+		}
+
+		//TODO: this needs way more information now like findSaleCuts aso
+		pub fun addSaleType(type:Type, public: PublicPath, storage:StoragePath) {
+			let identifier= type.identifier
+			self.publicPaths[identifier] = public
+			self.storagePaths[identifier]=storage
 		}
 
 		/*
@@ -350,7 +362,7 @@ pub contract FindMarket {
 		pub fun getTenantInformation() : TenantInformation
 
 		//Check if an action is allowed
-		//		pub fun isActionAllowed() : Bool //TODO: what parameters is available here
+		//pub fun isActionAllowed() : Bool //TODO: what parameters is available here
 
 		pub fun getStoragePath(_ type: Type) : StoragePath? 
 		pub fun getPublicPath(_ type: Type) : PublicPath? 

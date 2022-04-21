@@ -380,6 +380,11 @@ pub contract FindMarketAuctionEscrow {
 				panic("Auction has not ended yet")
 			}
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
+
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
+
 			if !saleItem.hasAuctionMetReservePrice() {
 				self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
 				return
@@ -391,7 +396,7 @@ pub contract FindMarketAuctionEscrow {
 			self.emitEvent(saleItem: saleItem, status: "sold")
 
 			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
+			FindMarket.pay(tenant:self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 
 			destroy <- self.items.remove(key: id)
 

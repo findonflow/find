@@ -231,6 +231,10 @@ pub contract FindMarketDirectOfferEscrow {
 			let id = pointer.getUUID()
 			let saleItem = self.borrow(id)
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
+
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
 			//Set the auth pointer in the saleItem so that it now can be fulfilled
 			saleItem.setPointer(pointer)
 
@@ -239,7 +243,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant: self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo)
+			FindMarket.pay(tenant: self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 			destroy <- self.items.remove(key: id)
 		}
 

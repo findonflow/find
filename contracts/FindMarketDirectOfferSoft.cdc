@@ -280,12 +280,16 @@ pub contract FindMarketDirectOfferSoft {
 			if vault.getType() != saleItem.getFtType() {
 				panic("The FT vault sent in to fulfill does not match the required type")
 			}
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
+
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
 
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			let nftInfo=saleItem.toNFTInfo()
 			let royalty=saleItem.getRoyalty()
 			saleItem.acceptNonEscrowedBid()
-			FindMarket.pay(tenant: self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo: nftInfo)
+			FindMarket.pay(tenant: self.getTenant(), id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo: nftInfo, cuts:cuts)
 
 			destroy <- self.items.remove(key: id)
 		}
