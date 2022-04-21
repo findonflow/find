@@ -149,8 +149,9 @@ pub contract FindMarket {
 				self.tenantSaleItems[item.name]=item
 			} else if type=="cut" {
 				self.findCuts[item.name]=item
+			} else{
+				panic("Not valid type to add sale item for")
 			}
-			panic("Not valid type to add sale item for")
 		}
 
 		access(account) fun removeSaleItem(_ name:String, type:String) {
@@ -160,8 +161,9 @@ pub contract FindMarket {
 				self.tenantSaleItems.remove(key: name)
 			} else if type=="cut" {
 				self.findCuts.remove(key: name)
+			} else{
+				panic("Not valid type to add sale item for")
 			}
-			panic("Not valid type to add sale item for")
 		}
 
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{

@@ -5,6 +5,7 @@ import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
+import FlowToken from "./standard/FlowToken.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FindViews from "./FindViews.cdc"
@@ -63,6 +64,24 @@ pub contract Admin {
 			let findRoyalty=FindViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 			//TODO set the find cut
 			let tenant=FindMarket.TenantInformation( name: "find")
+
+			let flowType=Type<@FlowToken.Vault>()
+			let fusdType=Type<@FUSD.Vault>()
+
+			tenant.addSaleItem(FindMarket.TenantSaleItem(
+				name:"FlowFusdCut", 
+				cut:findRoyalty, 
+				rules:[FindMarket.TenantRule( name:"standard ft", types:[flowType, fusdType], ruleType:"ft", allow:true)], 
+				status:"active"
+			), type: "cut")
+
+			tenant.addSaleItem(FindMarket.TenantSaleItem(
+				name:"DandyFlow", 
+				cut:nil, 
+				rules:[ FindMarket.TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
+				status:"active"
+			), type: "tenant")
+
 			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
 
 

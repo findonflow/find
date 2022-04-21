@@ -146,21 +146,18 @@ pub contract FindMarketSale {
 
 			let saleItem=self.borrow(id)
 
-
-
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
-
-
 			if saleItem.salePrice != vault.balance {
 				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
 			}
 
 			if saleItem.vaultType != vault.getType() {
 				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
+			}
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(mutating:true, "buy"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
 			}
 
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
