@@ -58,6 +58,14 @@ pub contract FTRegistry {
         return FTRegistry.fungibleTokenList
     }
 
+    pub fun getSupportedFTAlias() : [String] {
+        return FTRegistry.aliasMap.keys
+    }
+
+    pub fun getSupportedFTTypeIdentifier() : [String] {
+        return FTRegistry.aliasMap.values
+    }
+
     /* setters */
     access(account) fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
         pre{
