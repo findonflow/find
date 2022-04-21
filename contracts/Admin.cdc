@@ -72,7 +72,7 @@ pub contract Admin {
 			let saleItemStoragePath= /storage/findfindMarketSale
 
 			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let findRoyalty=FindViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
+			let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 
 			let tenant <- FindMarket.createTenant("find")
 

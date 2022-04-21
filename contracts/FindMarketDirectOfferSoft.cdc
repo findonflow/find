@@ -41,9 +41,9 @@ pub contract FindMarketDirectOfferSoft {
 			self.offerCallback.borrow()!.acceptNonEscrowed(<- pointer.withdraw())
 		}
 
-		pub fun getRoyalty() : FindViews.Royalties? {
-			if self.pointer.getViews().contains(Type<FindViews.Royalties>()) {
-				return self.pointer.resolveView(Type<FindViews.Royalties>())! as! FindViews.Royalties
+		pub fun getRoyalty() : MetadataViews.Royalties? {
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
+				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
 			}
 
 			return  nil

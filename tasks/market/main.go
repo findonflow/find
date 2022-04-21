@@ -7,7 +7,7 @@ import (
 func main() {
 
 	//o := overflow.NewOverflowEmulator().Start()
-	o := overflow.NewOverflowEmulator().Start()
+	o := overflow.NewOverflowInMemoryEmulator().Start()
 
 	//first step create the adminClient as the fin user
 	o.TransactionFromFile("setup_fin_1_create_client").
