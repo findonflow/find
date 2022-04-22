@@ -379,7 +379,6 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	//TODO: rename to listNFTForAuctionEscrow
 	otu.O.TransactionFromFile("listNFTForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
@@ -869,4 +868,3 @@ type SaleItem struct {
 	Type                string `json:"type"`
 	TypeID              string `json:"typeId"`
 }
-

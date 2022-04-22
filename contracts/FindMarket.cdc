@@ -76,7 +76,6 @@ pub contract FindMarket {
 		pub let name: String
 
 		//consider making an array of listingRules
-		//TODO; add getters 
 		//if this is not empty, only NFTs of that type can be sold at this tenant
 		access(self) let validNFTTypes: [Type]
 
@@ -252,7 +251,6 @@ pub contract FindMarket {
 		pub fun getSeller(): Address
 		pub fun getBuyer(): Address?
 
-		//TODO: The Path to store it in?
 		//the Type of the item for sale
 		pub fun getItemType(): Type
 		//The id of the item for sale

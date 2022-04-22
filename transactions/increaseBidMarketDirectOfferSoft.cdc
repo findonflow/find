@@ -3,6 +3,7 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import FUSD from "../contracts/standard/FUSD.cdc"
 
 //TODO: this needs work for DUC
+//TODO: this will not work for DUC, we need totally seperate TX for them or we need to just not check bid balance.
 transaction(id: UInt64, amount: UFix64) {
 
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection

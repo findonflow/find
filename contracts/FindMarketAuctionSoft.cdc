@@ -27,7 +27,6 @@ pub contract FindMarketAuctionSoft {
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
 
-		//TODO: look at escrow
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64) {
 			self.vaultType=vaultType
 			self.pointer=pointer
@@ -252,7 +251,6 @@ pub contract FindMarketAuctionSoft {
 			return info
 		}
 
-		//TODO: add previousBalance like Escrowed auction
 		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
 			let saleItem=self.borrow(id)
 
@@ -299,8 +297,6 @@ pub contract FindMarketAuctionSoft {
 				panic("Auction has ended")
 			}
 
-
-			//TODO: is this right? get the same item and send it in again?
 			self.addBid(id: id, newOffer: saleItem.offerCallback!, oldBalance: oldBalance)
 
 		}
@@ -308,7 +304,6 @@ pub contract FindMarketAuctionSoft {
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType: Type) {
 
-			//TODO: check that bid is there
 			let timestamp=Clock.time()
 
 			let id = item.getUUID()
@@ -357,7 +352,6 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			var status="cancelled"
-			//TODO: this should maybe just emit a different event here if the auction did not meet reserve price
 			if saleItem.hasAuctionEnded() && !saleItem.hasAuctionMetReservePrice() {
 				status="failed"
 			}
@@ -401,8 +395,6 @@ pub contract FindMarketAuctionSoft {
 
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
-
-			//TODO: check if this is dreprecated or stopped
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice)
 
@@ -542,7 +534,6 @@ pub contract FindMarketAuctionSoft {
 			saleItem.fulfillAuction(id:id, vault: <- vault)
 		}
 
-		//TODO: need to send in the old balance here!
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, increaseBy: UFix64) {
 			pre {

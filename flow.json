@@ -88,9 +88,81 @@
 		"emulator-user3": {
 			"address": "e03daebed8ca0615",
 			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+		},
+		"testnet-account": {
+			"address": "0x1ff7e32d71183db0",
+			"key": "${TESTNET_ACCOUNT}"
+		},
+		"testnet-find": {
+			"address": "0xf86400fced7b74f0",
+			"key": "${TESTNET_FIND2}"
+		},
+		"testnet-find-admin": {
+			"address": "0x1c03b921fc81742f",
+			"key": "${TESTNET_FIND2_ADMIN}"
+		},
+		"testnet-user1": {
+			"address": "0xe1c305a0c1e9bea1",
+			"key": "${TESTNET_FIND2_USER1}"
+		},
+		"testnet-user2": {
+			"address": "0xeae937390d6cc088",
+			"key": "${TESTNET_FIND2_USER2}"
+		},
+		"testnet-user3": {
+			"address": "0x0e8e8ee41c96c057",
+			"key": "${TESTNET_FIND2_USER3}"
+		},
+		"mainnet-find": {
+			"address": "0x097bafa4e0b48eef",
+			"key": "${MAINNET_FIND}"
+		},
+		"mainnet-find-admin": {
+			"address": "0x09a86f2493ce2e9d",
+			"key": "${MAINNET_FIND_ADMIN}"
 		}
 	},
 	"deployments": {
+		"mainnet": {
+			"mainnet-find": [
+				"FIND",
+				"Admin",
+				"Clock",
+				"Debug",
+				"Profile",
+				"CharityNFT",
+				"Sender",
+				"RelatedAccounts",
+				"FindViews", 
+				"Dandy",
+				"FindMarket",
+				"FindMarketSale",
+				"FindMarketDirectOfferEscrow",
+				"FindMarketDirectOfferSoft",
+				"FindMarketAuctionEscrow",
+				"FindMarketAuctionSoft"
+			]
+		},
+		"testnet": {
+			"testnet-find": [
+				"FIND",
+				"Admin",
+				"Clock",
+				"Debug",
+				"Profile",
+				"CharityNFT",
+				"Sender",
+				"RelatedAccounts",
+				"FindViews", 
+				"Dandy",
+				"FindMarket",
+				"FindMarketSale",
+				"FindMarketDirectOfferEscrow",
+				"FindMarketDirectOfferSoft",
+				"FindMarketAuctionEscrow",
+				"FindMarketAuctionSoft"
+			]
+		},
 		"emulator": {
 			"emulator-account": [
 				"FIND",

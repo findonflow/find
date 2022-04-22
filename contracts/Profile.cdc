@@ -187,7 +187,7 @@ pub contract Profile {
 		pub fun asProfile() : UserProfile
 		pub fun isBanned(_ val: Address): Bool
 		pub fun isPrivateModeEnabled() : Bool
-		//TODO: should getBanned be here?
+		//TODO: getBanned
 
 		access(contract) fun internal_addFollower(_ val: FriendStatus)
 		access(contract) fun internal_removeFollower(_ address: Address) 

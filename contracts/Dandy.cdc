@@ -4,11 +4,6 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-/*
-The first time a dandy is sold we will take 10%, on subsequent sales we will take 0% from Dandy. But 5% from market. 
-So primary is total 15%, secondary is total 5%
-*/
-
 //TODO: review all permissions and events
 pub contract Dandy: NonFungibleToken {
 
@@ -120,6 +115,8 @@ pub contract Dandy: NonFungibleToken {
 			return FindViews.Royalties(cutInfos:royalties)
 		}
 
+		//TODO: This should honor Media if it is an image aswell.
+		//TODO: it should also exit out the first time it finds and thumbnail image
 		pub fun resolveDisplay() : MetadataViews.Display {
 			var thumbnail : AnyStruct{MetadataViews.File}? = nil
 			if self.schemas.containsKey(Type<FindViews.Files>().identifier) {
