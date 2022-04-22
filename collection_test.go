@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCollectionScipts(t *testing.T) {
+func TestCollectionScripts(t *testing.T) {
 
 	t.Run("Should be able to mint Dandy and then get it by script", func(t *testing.T) {
 
