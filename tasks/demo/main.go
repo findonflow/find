@@ -117,7 +117,7 @@ func main() {
 		Run()
 
 	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
-	//	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("AnyStruct{A.f8d6e0586b0a20c7.FindViews.Royalty}")).Run()
+	//	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("AnyStruct{A.f8d6e0586b0a20c7.MetadataViews.Royalty}")).Run()
 
 	/*
 				o.TransactionFromFile("mintArtifact").SignProposeAndPayAs("user2").StringArgument("user1").RunPrintEventsFull()
@@ -149,7 +149,7 @@ func main() {
 					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.CreativeWork").Run()
 
 					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7..Royalties")
-					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Royalties").Run()
+					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.MetadataViews.Royalties").Run()
 
 					fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.MinterPlatform")
 					g.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.MinterPlatform").Run()
@@ -197,8 +197,8 @@ func main() {
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.CreativeWork")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.CreativeWork").Run()
 
-				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.Royalties")
-				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.FindViews.Royalties").Run()
+				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.MetadataViews.Royalties")
+				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.MetadataViews.Royalties").Run()
 
 				fmt.Println("find.xyz/user2/artifacts/1/A.f8d6e0586b0a20c7.FindViews.MinterPlatform")
 				o.ScriptFromFile("find").AccountArgument("user2").StringArgument("artifacts").UInt64Argument(1).StringArgument("A.f8d6e0586b0a20c7.Artifact.MinterPlatform").Run()

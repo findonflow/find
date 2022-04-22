@@ -25,15 +25,16 @@ func TestNFTRegistry(t *testing.T) {
 			RunReturnsInterface()
 
 		expected := map[string]interface{}{
-			"address":        "0xf8d6e0586b0a20c7",
-			"allowedFTTypes": "",
-			"icon":           "",
-			"alias":          "Dandy",
-			"providerPath":   "/private/findDandy",
-			"publicPath":     "/public/findDandy",
-			"storagePath":    "/storage/findDandy",
-			"type":           "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+			"address":          "0xf8d6e0586b0a20c7",
+			"allowedFTTypes":   "",
+			"icon":             "",
+			"externalFixedUrl": "find.xyz",
+			"alias":            "Dandy",
+			"providerPath":     "/private/findDandy",
+			"publicPath":       "/public/findDandy",
+			"storagePath":      "/storage/findDandy",
+			"type":             "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
+			"typeIdentifier":   "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}
 		assert.Equal(t, expected, result)
 
@@ -50,15 +51,16 @@ func TestNFTRegistry(t *testing.T) {
 			RunReturnsInterface()
 
 		expected := map[string]interface{}{
-			"address":        "0xf8d6e0586b0a20c7",
-			"allowedFTTypes": "",
-			"icon":           "",
-			"alias":          "Dandy",
-			"providerPath":   "/private/findDandy",
-			"publicPath":     "/public/findDandy",
-			"storagePath":    "/storage/findDandy",
-			"type":           "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+			"address":          "0xf8d6e0586b0a20c7",
+			"allowedFTTypes":   "",
+			"icon":             "",
+			"externalFixedUrl": "find.xyz",
+			"alias":            "Dandy",
+			"providerPath":     "/private/findDandy",
+			"publicPath":       "/public/findDandy",
+			"storagePath":      "/storage/findDandy",
+			"type":             "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
+			"typeIdentifier":   "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}
 		assert.Equal(t, expected, result)
 
@@ -71,6 +73,7 @@ func TestNFTRegistry(t *testing.T) {
 					"address":"0xf8d6e0586b0a20c7",
 					"allowedFTTypes":"",
 					"icon":"",
+					"externalFixedUrl" : "find.xyz",
 					"alias":"Dandy",
 					"providerPath":"/private/findDandy",
 					"publicPath":"/public/findDandy",
@@ -139,4 +142,3 @@ func TestNFTRegistry(t *testing.T) {
 	})
 
 }
-

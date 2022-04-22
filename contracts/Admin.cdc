@@ -72,7 +72,7 @@ pub contract Admin {
 			let saleItemStoragePath= /storage/findfindMarketSale
 
 			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let findRoyalty=FindViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
+			let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 
 			let tenant <- FindMarket.createTenant("find")
 
@@ -247,8 +247,8 @@ pub contract Admin {
 		// NonFungibleToken Registry 
 		/// ===================================================================================
 		// Registry NonFungibleToken Information
-		pub fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
-			NFTRegistry.setNFTInfo(alias: alias, type: type, icon: icon, providerPath: providerPath, publicPath: publicPath, storagePath: storagePath, allowedFTTypes: allowedFTTypes, address: address)
+		pub fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
+			NFTRegistry.setNFTInfo(alias: alias, type: type, icon: icon, providerPath: providerPath, publicPath: publicPath, storagePath: storagePath, allowedFTTypes: allowedFTTypes, address: address, externalFixedUrl: externalFixedUrl)
 
 		}
 
