@@ -1,21 +1,15 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FindViews from "./FindViews.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarket from "./FindMarket.cdc"
-import FindMarketSale from "./FindMarketSale.cdc"
-import FindMarketDirectOfferEscrow from "./FindMarketDirectOfferEscrow.cdc"
-import FindMarketDirectOfferSoft from "./FindMarketDirectOfferSoft.cdc"
-import FindMarketAuctionEscrow from "./FindMarketAuctionEscrow.cdc"
-import FindMarketAuctionSoft from "./FindMarketAuctionSoft.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
 
@@ -53,7 +47,7 @@ pub contract Admin {
 		}
 
 		/*
-		pub fun addTenantItem(_ item: FindMarket.TenantSaleItem) {
+		pub fun addTenantItem(_ item: FindMarketTenant.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -63,79 +57,12 @@ pub contract Admin {
 		}
 		*/
 
-		pub fun createFindMarketTenant() : @FindMarket.Tenant {
+		pub fun createFindMarketTenant(name: String, address:Address) : Capability<&FindMarketTenant.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			let saleItemPublicPath= /public/findfindMarketSale
-			let saleItemStoragePath= /storage/findfindMarketSale
-
-			let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
-
-			let tenant <- FindMarket.createTenant("find")
-
-			let flowType=Type<@FlowToken.Vault>()
-			let fusdType=Type<@FUSD.Vault>()
-
-			tenant.addSaleItem(FindMarket.TenantSaleItem(
-				name:"FlowFusdCut", 
-				cut:findRoyalty, 
-				rules:[FindMarket.TenantRule( name:"standard ft", types:[flowType, fusdType], ruleType:"ft", allow:true)], 
-				status:"active"
-			), type: "cut")
-
-			tenant.addSaleItem(FindMarket.TenantSaleItem(
-				name:"DandyFlow", 
-				cut:nil, 
-				rules:[ FindMarket.TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
-				status:"active"
-			), type: "tenant")
-
-			tenant.addSaleType(type: Type<@FindMarketSale.SaleItemCollection>(), public: saleItemPublicPath, storage: saleItemStoragePath) 
-
-
-			//direct offfer escrowed
-			let doeSaleItemPublicPath= /public/findfindMarketDOE
-			let doeSaleItemStoragePath= /storage/findfindMarketDOE
-			tenant.addSaleType(type: Type<@FindMarketDirectOfferEscrow.SaleItemCollection>(), public: doeSaleItemPublicPath, storage:doeSaleItemStoragePath) 
-
-			let doeBidPublicPath= /public/findfindMarketDOEBid
-			let doeBidStoragePath= /storage/findfindMarketDOEBid
-			tenant.addSaleType(type: Type<@FindMarketDirectOfferEscrow.MarketBidCollection>(), public: doeBidPublicPath, storage:doeBidStoragePath) 
-
-
-			//direct offfer soft
-			let dosSaleItemPublicPath= /public/findfindMarketDOS
-			let dosSaleItemStoragePath= /storage/findfindMarketDOS
-			tenant.addSaleType(type: Type<@FindMarketDirectOfferSoft.SaleItemCollection>(), public: dosSaleItemPublicPath, storage:dosSaleItemStoragePath) 
-
-			let dosBidPublicPath= /public/findfindMarketDOSBid
-			let dosBidStoragePath= /storage/findfindMarketDOSBid
-			tenant.addSaleType(type: Type<@FindMarketDirectOfferSoft.MarketBidCollection>(), public: dosBidPublicPath, storage:dosBidStoragePath) 
-
-
-			//auction escrowed
-			let aeSaleItemPublicPath= /public/findfindMarketAE
-			let aeSaleItemStoragePath= /storage/findfindMarketAE
-			tenant.addSaleType(type: Type<@FindMarketAuctionEscrow.SaleItemCollection>(), public: aeSaleItemPublicPath, storage:aeSaleItemStoragePath) 
-
-			let aeBidPublicPath= /public/findfindMarketAEBid
-			let aeBidStoragePath= /storage/findfindMarketAEBid
-			tenant.addSaleType(type: Type<@FindMarketAuctionEscrow.MarketBidCollection>(), public: aeBidPublicPath, storage:aeBidStoragePath) 
-
-			//auction 
-			let asSaleItemPublicPath= /public/findfindMarketAS
-			let asSaleItemStoragePath= /storage/findfindMarketAS
-			tenant.addSaleType(type: Type<@FindMarketAuctionSoft.SaleItemCollection>(), public: asSaleItemPublicPath, storage:asSaleItemStoragePath) 
-
-			let asBidPublicPath= /public/findfindMarketASBid
-			let asBidStoragePath= /storage/findfindMarketASBid
-			tenant.addSaleType(type: Type<@FindMarketAuctionSoft.MarketBidCollection>(), public: asBidPublicPath, storage:asBidStoragePath) 
-
-
-			return <- tenant
+			return  FindMarketTenant.createFindMarketTenant(name:name, address:address)
 		}
 
 		/// Set the wallet used for the network

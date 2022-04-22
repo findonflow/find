@@ -277,4 +277,24 @@ pub contract FindViews {
 			self.nounce=nounce
 		}
 	}
+
+
+	pub fun typeToPathIdentifier(_ type:Type) : String {
+		let identifier=type.identifier
+
+		var i=0
+		var newIdentifier=""
+		while i < identifier.length {
+
+			let item= identifier.slice(from: i, upTo: i+1) 
+			if item=="." {
+				newIdentifier=newIdentifier.concat("_")
+			} else {
+				newIdentifier=newIdentifier.concat(item)
+			}
+			i=i+1
+		}
+		return newIdentifier
+	}
+
 }

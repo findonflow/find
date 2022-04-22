@@ -5,7 +5,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
@@ -69,6 +69,7 @@ transaction(name: String) {
 			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
+		//TODO:this can be remove
 		profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
 
 		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
@@ -85,8 +86,9 @@ transaction(name: String) {
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let tenantCapability= FindMarket.getFindTenantCapability()
+		let tenantCapability= FindMarketTenant.getFindTenantCapability()
 		let tenant = tenantCapability.borrow()!
+
 		let publicPath= tenant.getPublicPath(saleItemType) 
 		let storagePath= tenant.getStoragePath(saleItemType) 
 

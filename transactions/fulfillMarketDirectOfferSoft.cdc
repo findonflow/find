@@ -1,5 +1,5 @@
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
 //TODO: should these include the amount for safety reason, i belive they should
@@ -10,7 +10,7 @@ transaction(id: UInt64) {
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 
 	prepare(account: AuthAccount) {
-		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())!
 
 		self.walletReference = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No FUSD wallet linked for this account")
