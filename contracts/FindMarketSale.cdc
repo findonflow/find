@@ -185,6 +185,13 @@ pub contract FindMarketSale {
       
 			// What happends if we relist  
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for sale"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			let owner=self.owner!.address
 			emit ForSale(tenant: self.getTenant().name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver()), buyer: nil, buyerName:nil)
 			let old <- self.items[pointer.getUUID()] <- saleItem

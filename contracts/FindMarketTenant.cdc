@@ -276,6 +276,26 @@ pub contract FindMarketTenant {
 			self.capability = nil
 		}
 
+
+		/*
+		//Add that i can list Dandy for Flow
+		//list it
+		//deprecte it
+		//list another
+
+		Add a new tenant rule, remove it from the above market tenant
+		test that a tenant can then turn deprecate  a rule
+		//TODO: creat a method to add these
+		//TODO: put this in another transaction
+		tenant.addSaleItem(TenantSaleItem(
+			name:"AnyNFTFlow", 
+			cut:nil, 
+			rules:[ TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
+			status:"active"
+		), type: "tenant")
+		*/
+
+
 		//BAM: do admin operations on a tenant
 		/*
 		- not allow a certain market type
