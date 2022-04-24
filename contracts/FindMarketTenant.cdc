@@ -74,13 +74,18 @@ pub contract FindMarketTenant {
 		pub let name:String
 		pub let cut:MetadataViews.Royalty?
 		pub let rules:[TenantRule]
-		pub let status:String
+		pub var status:String
 
+		//TODO : pre all the names that are unique
 		init(name:String, cut:MetadataViews.Royalty?, rules:[TenantRule], status:String){
 			self.name=name
 			self.cut=cut
 			self.rules=rules
 			self.status=status
+		}
+
+		access(contract) fun alterStatus(_ status : String) {
+			self.status = status
 		}
 	}
 
@@ -116,6 +121,41 @@ pub contract FindMarketTenant {
 			self.tenantSaleItems={}
 			self.findSaleItems={}
 			self.findCuts= {}
+		}
+
+		access(contract) fun alterMarketOption(name: String, status: String) {
+			pre{
+				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
+			}
+			self.tenantSaleItems[name]!.alterStatus(status)
+		}
+
+		access(contract) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
+			pre{
+				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
+			}
+			/* 
+			let rules = self.tenantSaleItems[optionName]!.rules
+			for rule in rules {
+				assert(rule.name == tenantRule.name, message: "Rule with same name already exist. Name: ".concat(rule.name))
+			}
+			*/
+			self.tenantSaleItems[optionName]!.rules.append(tenantRule)
+		}
+
+		access(contract) fun removeTenantRule(optionName: String, tenantRuleName: String) {
+			pre{
+				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
+			}
+			let rules : [TenantRule] = self.tenantSaleItems[optionName]!.rules
+			var counter = 0
+			while counter < rules.length {
+				if rules[counter]!.name == tenantRuleName {
+					break
+				}
+				counter = counter + 1
+			}
+			self.tenantSaleItems[optionName]!.rules.remove(at: counter)
 		}
 
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts {
@@ -192,7 +232,6 @@ pub contract FindMarketTenant {
 				}
 			}
 
-
 			for item in self.tenantSaleItems.values {
 				for rule in item.rules {
 
@@ -206,7 +245,7 @@ pub contract FindMarketTenant {
 					if rule.accept(relevantType) {
 						continue
 					}
-
+					//TODO : BAM : Might want a better error message.
 					return ActionResult(allowed:false, message: rule.name, name:item.name)
 				}
 
@@ -295,6 +334,41 @@ pub contract FindMarketTenant {
 		), type: "tenant")
 		*/
 
+		pub fun setMarketOption(name: String, cut: MetadataViews.Royalty?, rules: [TenantRule]) {
+			let tenant = self.getTenantRef() 
+			tenant.addSaleItem(TenantSaleItem(
+				name: name, 
+				cut: cut, 
+				rules: rules, 
+				status:"active"
+				), type: "tenant")
+			//Emit Event here
+		}
+
+		pub fun enableMarketOption(_ name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.alterMarketOption(name: name, status: "active")
+		}
+
+		pub fun deprecateMarketOption(_ name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.alterMarketOption(name: name, status: "deprecated")
+		}
+
+		pub fun stopMarketOption(_ name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.alterMarketOption(name: name, status: "stopped")
+		}
+
+		pub fun setTenantRule(optionName: String, tenantRule: TenantRule) {
+			let tenantRef = self.getTenantRef()
+			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
+		}
+
+		pub fun removeTenantRule(optionName: String, tenantRuleName: String) {
+			let tenantRef = self.getTenantRef()
+			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
+		}
 
 		//BAM: do admin operations on a tenant
 		/*
@@ -336,12 +410,14 @@ pub contract FindMarketTenant {
 		), type: "cut")
 
 		//TODO: put this in another transaction
+		/* 
 		tenant.addSaleItem(TenantSaleItem(
 			name:"AnyNFTFlow", 
 			cut:nil, 
 			rules:[ TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
 			status:"active"
 		), type: "tenant")
+		*/
 		let tenantPath=self.getTenantPathForName(name)
 		let sp=StoragePath(identifier: tenantPath)!
 		let pp=PrivatePath(identifier: tenantPath)!

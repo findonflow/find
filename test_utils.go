@@ -25,6 +25,7 @@ const auctionDurationFloat = 86400.0
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
 		setupDandy("user1").
+		createUser(100.0, "user1").
 		createUser(100.0, "user2").
 		registerUser("user2")
 
@@ -365,7 +366,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 		Args(otu.O.Arguments().
 			String("Dandy").
 			UInt64(id).
-			String("FUSD").
+			String("Flow").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
@@ -385,7 +386,7 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 		Args(otu.O.Arguments().
 			String("Dandy").
 			UInt64(id).
-			String("FUSD").
+			String("Flow").
 			UFix64(price).
 			UFix64(price + 5.0).
 			UFix64(300.0).
@@ -451,7 +452,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("buyItemForSale").
+	otu.O.TransactionFromFile("buyItemForSaleFlowToken").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
@@ -852,6 +853,24 @@ func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUti
 			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 		}).
 		registerDandyInNFTRegistry()
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setSellDandyForFlow").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().String(marketType)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("alterMarketOption").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().String(marketType).String(ruleName)).
+		Test(otu.T).
+		AssertSuccess()
 	return otu
 }
 

@@ -257,6 +257,12 @@ pub contract FindMarketAuctionSoft {
 		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
 			let saleItem=self.borrow(id)
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "add bit in soft-auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			let timestamp=Clock.time()
 			let newOfferBalance=newOffer.borrow()!.getBalance(id)
 
@@ -321,6 +327,12 @@ pub contract FindMarketAuctionSoft {
 				}
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
 				return
+			}
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "bid item in soft-auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
 			}
 
 			let balance=callback.borrow()!.getBalance(id)
@@ -390,6 +402,10 @@ pub contract FindMarketAuctionSoft {
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "buy item for soft-auction"))
 
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 
@@ -410,6 +426,12 @@ pub contract FindMarketAuctionSoft {
 			//TODO: check if this is dreprecated or stopped
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for soft-auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
 
 			//TODO: inline these in contructor
 			saleItem.setAuctionDuration(auctionDuration)

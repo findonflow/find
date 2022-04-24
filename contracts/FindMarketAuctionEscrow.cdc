@@ -257,6 +257,12 @@ pub contract FindMarketAuctionEscrow {
 		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance:UFix64) {
 			let saleItem=self.borrow(id)
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "add bid in auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			let timestamp=Clock.time()
 			let newOfferBalance=newOffer.borrow()!.getBalance(id)
 
@@ -319,6 +325,12 @@ pub contract FindMarketAuctionEscrow {
 				return
 			}
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "bid in auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			let balance=callback.borrow()!.getBalance(id)
 
 			if let cb= saleItem.offerCallback {
@@ -358,6 +370,12 @@ pub contract FindMarketAuctionEscrow {
 				panic("Cannot cancel finished auction, fulfill it instead")
 			}
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.internalCancelAuction(saleItem: saleItem, status: "cancelled")
 
 		}
@@ -384,8 +402,11 @@ pub contract FindMarketAuctionEscrow {
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
 
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
 
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			if !saleItem.hasAuctionMetReservePrice() {
 				self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
@@ -409,6 +430,12 @@ pub contract FindMarketAuctionEscrow {
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement)
+			
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
 
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())

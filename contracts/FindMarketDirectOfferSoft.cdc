@@ -175,6 +175,13 @@ pub contract FindMarketDirectOfferSoft {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 			let saleItem=self.borrow(id)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "cancel bid in direct offer soft"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+			
 			self.emitEvent(saleItem: saleItem, status: "cancelled")
 			destroy <- self.items.remove(key: id)
 		}
@@ -196,6 +203,13 @@ pub contract FindMarketDirectOfferSoft {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 			let saleItem=self.borrow(id)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "increase bid in direct offer soft"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.emitEvent(saleItem: saleItem, status: "offered")
 		}
 
@@ -218,6 +232,12 @@ pub contract FindMarketDirectOfferSoft {
 			let saleItem=self.borrow(id)
 			if self.borrow(id).getBuyer()! == callback.address {
 				panic("You already have the latest bid on this item, use the incraseBid transaction")
+			}
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in direct offer soft"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
 			}
 
 			let balance=callback.borrow()!.getBalance(id)
@@ -245,6 +265,12 @@ pub contract FindMarketDirectOfferSoft {
 
 			let saleItem=self.borrow(id)
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "reject offer in direct offer soft"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.emitEvent(saleItem: saleItem, status: "rejected")
 
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
@@ -257,13 +283,19 @@ pub contract FindMarketDirectOfferSoft {
 			}
 
 			let id = pointer.getUUID()
-			let saleItemRef = self.borrow(id)
+			let saleItem = self.borrow(id)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "accept offer in direct offer soft"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
 
 			//Set the auth pointer in the saleItem so that it now can be fulfilled
-			saleItemRef.setPointer(pointer)
-			saleItemRef.acceptDirectOffer()
+			saleItem.setPointer(pointer)
+			saleItem.acceptDirectOffer()
 
-			self.emitEvent(saleItem: saleItemRef, status: "accepted")
+			self.emitEvent(saleItem: saleItem, status: "accepted")
 		}
 
 		/// this is called from a bid when a seller accepts

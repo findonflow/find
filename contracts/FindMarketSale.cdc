@@ -205,6 +205,13 @@ pub contract FindMarketSale {
 			}
 
 			let saleItem <- self.items.remove(key: id)!
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+			
 			let owner=self.owner!.address
 			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancelled", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver()), buyer:nil, buyerName:nil)
 			destroy saleItem

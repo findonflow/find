@@ -153,6 +153,13 @@ pub contract FindMarketDirectOfferEscrow {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 			let saleItem=self.borrow(id)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "cancel in direct offer"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.emitEvent(saleItem: saleItem, status: "cancelled")
 			destroy <- self.items.remove(key: id)
 		}
@@ -172,6 +179,13 @@ pub contract FindMarketDirectOfferEscrow {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 			let saleItem=self.borrow(id)
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "add bid in direct offer"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.emitEvent(saleItem: saleItem, status: "offered")
 		}
 
@@ -191,8 +205,15 @@ pub contract FindMarketDirectOfferEscrow {
 
 
 			let saleItem=self.borrow(id)
+
 			if self.borrow(id).getBuyer()! == callback.address {
 				panic("You already have the latest bid on this item, use the incraseBid transaction")
+			}
+
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in soft-auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
 			}
 
 			let balance=callback.borrow()!.getBalance(id)
@@ -219,6 +240,12 @@ pub contract FindMarketDirectOfferEscrow {
 
 			let saleItem=self.borrow(id)
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "reject in direct offer"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.emitEvent(saleItem: saleItem, status: "rejected")
 
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
@@ -234,6 +261,10 @@ pub contract FindMarketDirectOfferEscrow {
 			let saleItem = self.borrow(id)
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill directOffer"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
 
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
