@@ -10,47 +10,51 @@ import (
 func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	price := 10.0
-	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
-		otu := NewOverflowTest(t)
+	// t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
+	// 	otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
-			directOfferMarketEscrowed("user2", "user1", id, price)
+	// 	id := otu.setupMarketAndDandy()
+	// 	otu.registerFlowFUSDDandyInRegistry().
+	//		setFlowDandyMarketOption("DirectOfferEscrow").
+	// 		directOfferMarketEscrowed("user2", "user1", id, price)
 
-		otu.saleItemListed("user1", "directoffer", price)
-		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
+	// 	otu.saleItemListed("user1", "directoffer", price)
+	// 	otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
 
-	})
+	// })
 
-	t.Run("Should be able to increase offer", func(t *testing.T) {
-		otu := NewOverflowTest(t)
+	// t.Run("Should be able to increase offer", func(t *testing.T) {
+	// 	otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
-			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
-			increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
-			saleItemListed("user1", "directoffer", 15.0).
-			acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
-	})
+	// 	id := otu.setupMarketAndDandy()
+	// 	otu.registerFlowFUSDDandyInRegistry().
+	//		setFlowDandyMarketOption("DirectOfferEscrow").
+	// 		directOfferMarketEscrowed("user2", "user1", id, price).
+	// 		saleItemListed("user1", "directoffer", price).
+	// 		increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
+	// 		saleItemListed("user1", "directoffer", 15.0).
+	// 		acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
+	// })
 
-	t.Run("Should be able to reject offer", func(t *testing.T) {
-		otu := NewOverflowTest(t)
+	// t.Run("Should be able to reject offer", func(t *testing.T) {
+	// 	otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
-			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
-			rejectDirectOfferEscrowed("user1", id, 10.0)
-	})
+	// 	id := otu.setupMarketAndDandy()
+	// 	otu.registerFlowFUSDDandyInRegistry().
+	// 	setFlowDandyMarketOption("DirectOfferEscrow").
+	// 		directOfferMarketEscrowed("user2", "user1", id, price).
+	// 		saleItemListed("user1", "directoffer", price).
+	// 		rejectDirectOfferEscrowed("user1", id, 10.0)
+	// })
 
-	//return money when outbid
+	// //return money when outbid
 
 	t.Run("Should return money when outbid", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
 		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "directoffer", price).
 			createUser(100.0, "user3").registerUser("user3")
@@ -77,6 +81,162 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			}))
 		//TODO: should there be an event emitted that you get your money back?
 
+	})
+
+	/* Tests on Rules */
+	t.Run("Should not be able to direct offer after deprecated", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow")
+
+		otu.alterMarketOption("DirectOfferEscrow", "deprecate")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("user1").
+				String("Dandy").
+				UInt64(id).
+				String("FUSD").
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Tenant has deprected mutation options on this item")
+
+	})
+
+	t.Run("Should not be able to increase offer if deprecated but able to accept offer", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer", price)
+
+		otu.alterMarketOption("DirectOfferEscrow", "deprecate")
+
+		otu.O.TransactionFromFile("increaseBidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id).
+				UFix64(5)).
+			Test(otu.T).
+			AssertFailure("fewjvjwn")
+
+		otu.saleItemListed("user1", "directoffer", 10.0).
+			acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
+	})
+
+	t.Run("Should be able to reject offer when deprecated", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer", price).
+			alterMarketOption("DirectOfferEscrow", "deprecate").
+			rejectDirectOfferEscrowed("user1", id, 10.0)
+	})
+
+	t.Run("Should not be able to direct offer after stopped", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow")
+
+		otu.alterMarketOption("DirectOfferEscrow", "stop")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("user1").
+				String("Dandy").
+				UInt64(id).
+				String("FUSD").
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Tenant has stopped mutation options on this item")
+
+	})
+
+	t.Run("Should not be able to increase offer nor buy if stopped", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer", price)
+
+		otu.alterMarketOption("DirectOfferEscrow", "stop")
+
+		otu.O.TransactionFromFile("increaseBidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id).
+				UFix64(5)).
+			Test(otu.T).
+			AssertFailure("fewjvjwn")
+
+		otu.saleItemListed("user1", "directoffer", 10.0).
+			acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
+
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				UInt64(id)).
+			Test(otu.T).
+			AssertFailure("fbiwubifeubw")
+	})
+
+	t.Run("Should not be able to reject offer after stopped", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer", price).
+			alterMarketOption("DirectOfferEscrow", "stop")
+
+		otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				UInt64(id)).
+			Test(otu.T).
+			AssertFailure("bfieuwbiuvbwe")
+	})
+
+	t.Run("Should be able to able to direct offer, add bit and accept offer after enabled", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			alterMarketOption("DirectOfferEscrow", "deprecate").
+			alterMarketOption("DirectOfferEscrow", "enable").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer", price).
+			increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
+			saleItemListed("user1", "directoffer", 15.0).
+			acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
+	})
+
+	t.Run("Should be able to able to direct offerand reject after enabled", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			alterMarketOption("DirectOfferEscrow", "deprecate").
+			alterMarketOption("DirectOfferEscrow", "enable").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer", price).
+			rejectDirectOfferEscrowed("user1", id, 10.0)
 	})
 
 }
