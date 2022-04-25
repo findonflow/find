@@ -122,14 +122,12 @@
 	"deployments": {
 		"mainnet": {
 			"mainnet-find": [
-				"FIND",
-				"Admin",
+			  "FIND",
 				"Clock",
-				"Debug",
 				"Profile",
+				"Debug",
+				"Admin",
 				"CharityNFT",
-				"Sender",
-				"RelatedAccounts",
 				"FindViews", 
 				"Dandy",
 				"FindMarket",
@@ -138,7 +136,11 @@
 				"FindMarketDirectOfferEscrow",
 				"FindMarketDirectOfferSoft",
 				"FindMarketAuctionEscrow",
-				"FindMarketAuctionSoft"
+				"FindMarketAuctionSoft",
+				"Sender",
+				"RelatedAccounts",
+				"FTRegistry",
+				"NFTRegistry"
 			]
 		},
 		"testnet": {
