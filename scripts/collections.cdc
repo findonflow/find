@@ -57,11 +57,40 @@ pub fun main(address: Address) : MetadataCollections? {
 	let results : {String :  [String]}={}
 
 	for nftInfo in NFTRegistry.getNFTInfoAll().values {
-		let mappings = getItemForMetadataStandard(alias:nftInfo.alias, path: nftInfo.publicPath, account:account, externalFixedUrl: nftInfo.externalFixedUrl)
-		for key in mappings.keys {
-			resultMap.insert(key:key, mappings[key]! )
-		}
+		let items: [String] = []
+		let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo.publicPath)
+		if resolverCollectionCap.check() {
+			let collection = resolverCollectionCap.borrow()!
+			for id in collection.getIDs() {
+				let nft = collection.borrowViewResolver(id: id) 
+				
+				if nft.resolveView(Type<MetadataViews.Display>()) != nil {
+					let displayView = nft.resolveView(Type<MetadataViews.Display>())!
+					let display = displayView as! MetadataViews.Display
 
+
+					var externalUrl=nftInfo.externalFixedUrl
+					if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
+						let url= externalUrlView as! MetadataViews.ExternalURL
+						externalUrl=url.url
+					}
+					let item = MetadataCollectionItem(
+						id: id,
+						name: display.name,
+						image: display.thumbnail.uri(),
+						url: externalUrl,
+						listPrice: nil,
+						listToken: nil,
+						contentType: "image",
+						rarity: ""
+					)
+					let itemId = nftInfo.alias.concat(item.id.toString())
+					items.append(itemId)
+					resultMap.insert(key:itemId, item)
+				}
+			}
+			results[nftInfo.alias] = items
+		}
 	}
 
 	let publicPath=/public/FindCuratedCollections
@@ -77,6 +106,7 @@ pub fun main(address: Address) : MetadataCollections? {
 	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
 }
 
+/*
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
 pub fun getItemForMetadataStandard(alias:String, path: PublicPath, account:PublicAccount, externalFixedUrl: String) : {String : MetadataCollectionItem} {
 	let items: {String : MetadataCollectionItem} = {}
@@ -114,3 +144,4 @@ pub fun getItemForMetadataStandard(alias:String, path: PublicPath, account:Publi
 	return items
 
 }
+*/
