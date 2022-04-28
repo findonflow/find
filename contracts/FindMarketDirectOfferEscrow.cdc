@@ -197,6 +197,12 @@ pub contract FindMarketDirectOfferEscrow {
 			//If there are no bids from anybody else before we need to make the item
 			if !self.items.containsKey(id) {
 				let saleItem <- create SaleItem(pointer: item, callback: callback)
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in direct offer"))
+
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
+				
 				self.items[id] <-! saleItem
 				let item=self.borrow(id)
 				self.emitEvent(saleItem: item, status: "offered")
@@ -210,7 +216,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic("You already have the latest bid on this item, use the incraseBid transaction")
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in soft-auction"))
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in direct offer"))
 
 			if !actionResult.allowed {
 				panic(actionResult.message)

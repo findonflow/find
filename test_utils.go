@@ -27,7 +27,9 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 		setupDandy("user1").
 		createUser(100.0, "user1").
 		createUser(100.0, "user2").
-		registerUser("user2")
+		createUser(100.0, "user3").
+		registerUser("user2").
+		registerUser("user3")
 
 	id := otu.mintThreeExampleDandies()[0]
 	return id
@@ -410,7 +412,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 		Args(otu.O.Arguments().
 			String("Dandy").
 			UInt64(id).
-			String("FUSD").
+			String("Flow").
 			UFix64(price).
 			UFix64(price + 5.0).
 			UFix64(300.0).
@@ -592,7 +594,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			Account(seller).
 			String("Dandy").
 			UInt64(id).
-			String("FUSD").
+			String("Flow").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
@@ -611,7 +613,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			Account(seller).
 			String("Dandy").
 			UInt64(id).
-			String("FUSD").
+			String("Flow").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
