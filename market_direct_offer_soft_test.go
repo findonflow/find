@@ -54,6 +54,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			retractOfferDirectOfferSoft("user2", "user1", id)
 	})
 
+
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

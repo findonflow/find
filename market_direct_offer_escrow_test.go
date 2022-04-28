@@ -56,6 +56,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "directoffer", price).
 			retractOfferDirectOfferEscrowed("user2", "user1", id)
+
 	})
 
 	//return money when outbid
