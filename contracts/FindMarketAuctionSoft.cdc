@@ -375,6 +375,12 @@ pub contract FindMarketAuctionSoft {
 				status="failed"
 			}
 
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item from soft-auction"))
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
 			self.emitEvent(saleItem: saleItem, status: status)
 			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)

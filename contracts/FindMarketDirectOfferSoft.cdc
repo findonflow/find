@@ -222,6 +222,11 @@ pub contract FindMarketDirectOfferSoft {
 			//If there are no bids from anybody else before we need to make the item
 			if !self.items.containsKey(id) {
 				let saleItem <- create SaleItem(pointer: item, callback: callback)
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in direct offer soft"))
+
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
 				self.items[id] <-! saleItem
 				let item=self.borrow(id)
 				self.emitEvent(saleItem: item, status: "offered")
@@ -317,6 +322,9 @@ pub contract FindMarketDirectOfferSoft {
 
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
 
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			let nftInfo=saleItem.toNFTInfo()
@@ -413,6 +421,14 @@ pub contract FindMarketDirectOfferSoft {
 
 		pub fun getVaultType(_ id:UInt64) : Type {
 			return self.borrowBid(id).vaultType
+		}
+
+		pub fun getBid(_ id: UInt64) : FindMarket.BidInfo {
+			let bid = self.borrowBid(id)
+
+			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
+			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo)
+		
 		}
 
 		pub fun getBids() : [FindMarket.BidInfo] {
