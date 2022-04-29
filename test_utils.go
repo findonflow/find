@@ -906,6 +906,36 @@ func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *Ov
 	return otu
 }
 
+func (otu *OverflowTestUtils) removeMarketOption(marketType string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("removeMarketOption").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().String(marketType)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) removeTenantRule(optionName, tenantRuleName string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("removeTenantRule").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			String(optionName).
+			String(tenantRuleName)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setTenantRuleFUSD").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			String(optionName)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 type SaleItem struct {
 	Amount              string `json:"amount"`
 	AuctionReservePrice string `json:"auctionReservePrice"`

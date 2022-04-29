@@ -87,6 +87,23 @@ pub contract FindMarketTenant {
 		access(contract) fun alterStatus(_ status : String) {
 			self.status = status
 		}
+
+		access(contract) fun isValid(nftType: Type, ftType: Type, listingType: Type) : Bool {
+			for rule in self.rules {
+
+				var relevantType=nftType
+				if rule.ruleType == "listing" {
+					relevantType=listingType
+				} else if rule.ruleType=="ft" {
+					relevantType=ftType 
+				} 
+
+				if !rule.accept(relevantType) {
+					return false
+				}
+			}		
+			return true	
+		}
 	}
 
 	pub struct TenantCuts {
@@ -104,6 +121,7 @@ pub contract FindMarketTenant {
 		pub fun getPublicPath(_ type: Type) : PublicPath
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
+		pub fun getSaleItems() : {String: {String: TenantSaleItem}} 
 		pub let name:String
 	}
 
@@ -145,7 +163,7 @@ pub contract FindMarketTenant {
 
 		access(contract) fun removeTenantRule(optionName: String, tenantRuleName: String) {
 			pre{
-				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
+				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
 			}
 			let rules : [TenantRule] = self.tenantSaleItems[optionName]!.rules
 			var counter = 0
@@ -154,6 +172,7 @@ pub contract FindMarketTenant {
 					break
 				}
 				counter = counter + 1
+				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
 			}
 			self.tenantSaleItems[optionName]!.rules.remove(at: counter)
 		}
@@ -163,19 +182,7 @@ pub contract FindMarketTenant {
 			let item = self.tenantSaleItems[name]!
 
 			for findCut in self.findCuts.values {
-				var valid=true
-				for rule in findCut.rules {
-					var relevantType=nftType
-					if rule.ruleType == "listing" {
-						relevantType=listingType
-					} else if rule.ruleType=="ft" {
-						relevantType=ftType 
-					} 
-
-					if !rule.accept(relevantType) {
-						valid=false
-					}
-				}
+				let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 				if valid{
 					return TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
 				}
@@ -197,11 +204,11 @@ pub contract FindMarketTenant {
 
 		access(account) fun removeSaleItem(_ name:String, type:String) {
 			if type=="find" {
-				self.findSaleItems.remove(key: name)
+				self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
 			} else if type=="tenant" {
-				self.tenantSaleItems.remove(key: name)
+				self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
 			} else if type=="cut" {
-				self.findCuts.remove(key: name)
+				self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
 			} else{
 				panic("Not valid type to add sale item for")
 			}
@@ -233,22 +240,12 @@ pub contract FindMarketTenant {
 			}
 
 			for item in self.tenantSaleItems.values {
-				for rule in item.rules {
+				let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 
-					var relevantType=nftType
-					if rule.ruleType == "listing" {
-						relevantType=listingType
-					} else if rule.ruleType=="ft" {
-						relevantType=ftType 
-					} 
-
-					if rule.accept(relevantType) {
-						continue
-					}
-					//TODO : BAM : Might want a better error message.
-					return ActionResult(allowed:false, message: rule.name, name:item.name)
+				if !valid {
+					continue
 				}
-
+				
 				if item.status=="stopped" {
 					return ActionResult(allowed:false, message: "Tenant has stopped this item", name:item.name)
 				}
@@ -277,6 +274,15 @@ pub contract FindMarketTenant {
 			let path=pathPrefix.concat("_").concat(self.name)
 
 			return StoragePath(identifier: path) ?? panic("Cannot find storage path for type ".concat(type.identifier))
+		}
+
+		pub fun getSaleItems() : {String: {String: TenantSaleItem}} {
+			var saleItems : {String: {String: TenantSaleItem} } = {}
+			saleItems["findSaleItems"] = self.findSaleItems
+			saleItems["tenantSaleItems"] = self.tenantSaleItems
+			saleItems["findCuts"] = self.findCuts
+
+			return saleItems
 		}
 	}
 
@@ -343,6 +349,11 @@ pub contract FindMarketTenant {
 				status:"active"
 				), type: "tenant")
 			//Emit Event here
+		}
+
+		pub fun removeMarketOption(name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.removeSaleItem(name, type: "tenant")
 		}
 
 		pub fun enableMarketOption(_ name: String) {
