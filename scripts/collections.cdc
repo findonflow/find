@@ -1374,6 +1374,11 @@ pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, exte
 			if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
 				let display = displayView as! MetadataViews.Display
 				var externalUrl=externalFixedUrl
+
+				if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
+					let url= externalUrlView! as! MetadataViews.ExternalURL
+					externalUrl=url.url
+				}
 				if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
 					let url= externalUrlView! as! NeoViews.ExternalDomainViewUrl
 					externalUrl=url.url
