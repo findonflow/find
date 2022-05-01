@@ -1,6 +1,8 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import CharityNFT from "../contracts/CharityNFT.cdc"
 
+import Bl0x from 0x7620acf6d7f2468a
+import Bl0xPack from 0x7620acf6d7f2468a
 //mainnet
 import Beam from 0x86b4a0010a71cfc3 
 import Art from 0xd796ff17107bbff6
@@ -961,6 +963,27 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["Xtingles"] = items
 		}
 	}
+
+
+	let bl0xItems : [String] = []
+	let bl0xPacks = getItemForMetadataStandard(path: Bl0xPack.CollectionPublicPath, account: account, externalFixedUrl: "http://bl0x.xyz")
+	for item in bl0xPacks {
+		let itemId="Bl0xPack".concat(item.id.toString())
+		bl0xItems.append(itemId)
+		resultMap[itemId] = item
+	}
+	let bl0x = getItemForMetadataStandard(path: Bl0x.CollectionPublicPath, account: account, externalFixedUrl: "http://bl0x.xyz")
+	for item in bl0x {
+		let itemId="Bl0x".concat(item.id.toString())
+		bl0xItems.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	if bl0xItems.length != 0 {
+		results["Bl0x"] = bl0xItems
+	}
+
+
 
 	let goatsCap = account.getCapability<&{GoatedGoatsVouchers.GoatsVoucherCollectionPublic}>(GoatedGoatsVouchers.CollectionPublicPath)
 	var goats : [String]=[]
