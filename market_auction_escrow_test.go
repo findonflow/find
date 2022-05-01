@@ -3,8 +3,9 @@ package test_main
 import (
 	"fmt"
 
-	"github.com/bjartek/overflow/overflow"
 	"testing"
+
+	"github.com/bjartek/overflow/overflow"
 )
 
 func TestMarketAuctionEscrow(t *testing.T) {
@@ -93,7 +94,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
-				UInt64(id)).
+				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
@@ -227,7 +228,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				UInt64(id)).
+				UInt64Array(id)).
 			Test(otu.T).AssertSuccess()
 
 	})
@@ -285,7 +286,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
-				UInt64(id)).
+				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 

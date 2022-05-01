@@ -43,6 +43,18 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			rejectDirectOfferSoft("user1", id, 10.0)
 	})
 
+	t.Run("Should be able to retract offer", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer_soft", price).
+			retractOfferDirectOfferSoft("user2", "user1", id)
+	})
+
+
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
@@ -177,7 +189,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
-				UInt64(id)).
+				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 	})
@@ -243,6 +255,27 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(price + 10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
+	})
+
+	t.Run("Should be able to retract offer when deprecated , but not when stopped", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "directoffer_soft", price)
+
+		otu.alterMarketOption("DirectOfferSoft", "stop")
+
+		otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id)).
+			Test(otu.T).AssertFailure("Tenant has stopped this item")
+
+		otu.alterMarketOption("DirectOfferSoft", "deprecate").
+			retractOfferDirectOfferSoft("user2", "user1", id)
 	})
 
 }
