@@ -69,15 +69,12 @@ transaction(name: String) {
 			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
-		//TODO:this can be remove
-		profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
 
 		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
 			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
-		profile.addCollection(Profile.ResourceCollection( "FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)

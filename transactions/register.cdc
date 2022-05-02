@@ -45,15 +45,18 @@ transaction(name: String, amount: UFix64) {
 			profile.addWallet(flowWallet)
 			profile.setFindName(name)
 			profile.addWallet(fusdWallet)
-			profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
-			profile.addCollection(Profile.ResourceCollection("FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
 			acct.save(<-profile, to: Profile.storagePath)
 			acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 			acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
 
-		//TODO: add find name if it is not set before
+
+		//If find name not set and we have a profile set it.
+	  let profile=acct.borrow<&Profile.User>(from: Profile.storagePath)!
+		if profile.getFindName() == "" {
+			profile.setFindName(name)
+		}
 
 		let price=FIND.calculateCost(name)
 		if price != amount {

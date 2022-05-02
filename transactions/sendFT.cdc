@@ -62,8 +62,6 @@ transaction(name: String, amount: UFix64, type: String) {
 			)
 	
 			profile.addWallet(flowWallet)
-			profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
-			profile.addCollection(Profile.ResourceCollection("FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
 			account.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
