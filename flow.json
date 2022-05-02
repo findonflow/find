@@ -21,6 +21,13 @@
 				"mainnet": "0x1d7e57aa55817448"
 			}
 		},
+		"FiatToken": {
+			"source": "./contracts/standard/FiatToken.cdc",
+			"aliases": {
+				"testnet": "0xa983fecbed621163",
+				"mainnet" : "0xb19436aae4d94622"
+			}
+		},
 		"FUSD": {
 			"source": "./contracts/standard/FUSD.cdc",
 			"aliases": {
