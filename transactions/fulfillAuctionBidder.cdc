@@ -35,8 +35,6 @@ transaction(owner: Address, name: String) {
 			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"])
 
 			profile.addWallet(fusdWallet)
-			profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
-			profile.addCollection(Profile.ResourceCollection("FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
 			acct.save(<-profile, to: Profile.storagePath)
 			acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)

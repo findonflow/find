@@ -189,7 +189,6 @@ pub contract Admin {
 			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
 
-		//TODO: set that primary cut has been paid
 		//TODO; ban a user and modify scripts/tx to honor ban
 		init() {
 			self.capability = nil
