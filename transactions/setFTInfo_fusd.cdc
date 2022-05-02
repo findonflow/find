@@ -12,6 +12,6 @@ transaction() {
 
     execute{
         let type: Type = Type<@FUSD.Vault>()
-        self.adminRef.setFTInfo(alias: "FUSD", type: type, tag:["stablecoin"], icon: nil, receiverPath: /public/fusdReceiver, balancePath: /public/fusdBalance, vaultPath: /storage/fusdVault)
+        self.adminRef.setFTInfo(alias: "FUSD", type: type, tag:["stablecoin"], icon: "https://static.flowscan.org/mainnet/icons/A.3c5959b568896393.FUSD.png", receiverPath: /public/fusdReceiver, balancePath: /public/fusdBalance, vaultPath: /storage/fusdVault)
     }
 }

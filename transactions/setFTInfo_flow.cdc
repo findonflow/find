@@ -12,6 +12,6 @@ transaction() {
 
     execute{
         let type: Type = Type<@FlowToken.Vault>()
-        self.adminRef.setFTInfo(alias: "Flow", type: type, tag:["utility coin"] , icon: nil, receiverPath: /public/flowTokenReceiver, balancePath: /public/flowTokenBalance, vaultPath: /storage/flowTokenVault)
+        self.adminRef.setFTInfo(alias: "Flow", type: type, tag:["utility coin"] , icon: "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png", receiverPath: /public/flowTokenReceiver, balancePath: /public/flowTokenBalance, vaultPath: /storage/flowTokenVault)
     }
 }
