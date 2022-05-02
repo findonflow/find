@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -12,7 +12,7 @@ transaction(id: UInt64) {
 	
 	prepare(account: AuthAccount) {
 
-		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())!
 		let market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let saleInformation = market.getItemForSaleInformation(id)

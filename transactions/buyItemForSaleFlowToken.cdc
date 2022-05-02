@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"

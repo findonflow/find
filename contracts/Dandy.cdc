@@ -71,7 +71,7 @@ pub contract Dandy: NonFungibleToken {
 			views.append(Type<FindViews.Nounce>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
-			views.append(Type<FindViews.Royalties>())
+			views.append(Type<MetadataViews.Royalties>())
 
 			//if any specific here they will override
 			for s in self.schemas.keys {
@@ -95,24 +95,24 @@ pub contract Dandy: NonFungibleToken {
 			return views
 		}
 
-		access(self) fun resolveRoyalties() : FindViews.Royalties {
-			let royalties : [FindViews.Royalty] = []
+		access(self) fun resolveRoyalties() : MetadataViews.Royalties {
+			let royalties : [MetadataViews.Royalty] = []
 
-			if self.schemas.containsKey(Type<FindViews.Royalty>().identifier) {
-				royalties.append(self.schemas[Type<FindViews.Royalty>().identifier]!.result as! FindViews.Royalty)
+			if self.schemas.containsKey(Type<MetadataViews.Royalty>().identifier) {
+				royalties.append(self.schemas[Type<MetadataViews.Royalty>().identifier]!.result as! MetadataViews.Royalty)
 			}
 
-			if self.schemas.containsKey(Type<FindViews.Royalties>().identifier) {
-				let multipleRoylaties=self.schemas[Type<FindViews.Royalties>().identifier]!.result as! FindViews.Royalties
+			if self.schemas.containsKey(Type<MetadataViews.Royalties>().identifier) {
+				let multipleRoylaties=self.schemas[Type<MetadataViews.Royalties>().identifier]!.result as! MetadataViews.Royalties
 				royalties.appendAll(multipleRoylaties.getRoyalties())
 			}
 
 			//we only charge platform primary sale cut once
 			if !self.primaryCutPaid {
-				let royalty=FindViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
+				let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
 				royalties.append(royalty)
 			}
-			return FindViews.Royalties(cutInfos:royalties)
+			return MetadataViews.Royalties(cutInfos:royalties)
 		}
 
 		//TODO: This should honor Media if it is an image aswell.
@@ -163,7 +163,7 @@ pub contract Dandy: NonFungibleToken {
 				return FindViews.Nounce(self.nounce)
 			}
 
-			if type == Type<FindViews.Royalties>() {
+			if type == Type<MetadataViews.Royalties>() {
 				return self.resolveRoyalties()
 			}
 

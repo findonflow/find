@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -10,8 +10,8 @@ transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64, auctionRe
 	prepare(account: AuthAccount) {
 		// get saleItemsRef from tenant
 
-		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>())!)!
+		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>()))!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")

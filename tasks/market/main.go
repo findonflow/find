@@ -105,13 +105,26 @@ func main() {
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
 		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
 
-	o.SimpleTxArgs("bidMarketDirectOfferEscrowed", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
-	o.SimpleTxArgs("fulfillMarketDirectOfferEscrowed", "user1", o.Arguments().UInt64(id))
+	o.SimpleTxArgs("setNFTInfo_Dandy", "find", o.Arguments())
+	o.SimpleTxArgs("setFTInfo_flow", "find", o.Arguments())
 
+	o.SimpleTxArgs("listNFTForSale", "user1", o.Arguments().
+		String("Dandy").
+		UInt64(id).
+		String("Flow").
+		UFix64(10.0))
+
+	o.SimpleTxArgs("buyItemForSale", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+
+	//transaction(address: Address, id: UInt64, amount: UFix64) {
 	/*
-		o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
-		res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
-		fmt.Println(res)
+		o.SimpleTxArgs("bidMarketDirectOfferEscrowed", "user2", o.Arguments().Account("user1").UInt64(id).UFix64(10.0))
+		o.SimpleTxArgs("fulfillMarketDirectOfferEscrowed", "user1", o.Arguments().UInt64(id))
+
+		/*
+			o.SimpleTxArgs("listDandyForAuction", "user1", o.Arguments().UInt64(id).UFix64(10.0))
+			res := o.ScriptFromFile("listSaleItems").Args(o.Arguments().Account("user1")).RunReturnsJsonString()
+			fmt.Println(res)
 	*/
 
 	//Buy market sale

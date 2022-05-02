@@ -15,6 +15,10 @@ func main() {
 		"^mint*",
 		"clock",
 		"registerAdmin",
+		"adminSendFlow",
+		"transferAllFusd",
+		"fillUpTheChest",
+		"setSellDandyForFlow.cdc",
 	}, []string{})
 	if err != nil {
 		panic(err)

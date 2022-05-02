@@ -47,6 +47,7 @@
 		"FIND": "./contracts/FIND.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
 		"FindMarket": "./contracts/FindMarket.cdc",
+		"FindMarketTenant": "./contracts/FindMarketTenant.cdc",
 		"FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
 		"FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
 		"FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
@@ -94,24 +95,21 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
-			"address": "0xf86400fced7b74f0",
-			"key": "${TESTNET_FIND2}"
+
+			"address": "0xca06fc7b4529c6f8",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find-admin": {
-			"address": "0x1c03b921fc81742f",
-			"key": "${TESTNET_FIND2_ADMIN}"
+			"address": "0xc3e64244fa887c7d",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user1": {
-			"address": "0xe1c305a0c1e9bea1",
-			"key": "${TESTNET_FIND2_USER1}"
+			"address": "0xd5b22777638c761c",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user2": {
-			"address": "0xeae937390d6cc088",
-			"key": "${TESTNET_FIND2_USER2}"
-		},
-		"testnet-user3": {
-			"address": "0x0e8e8ee41c96c057",
-			"key": "${TESTNET_FIND2_USER3}"
+			"address": "0x31d59eaa727676c3",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"mainnet-find": {
 			"address": "0x097bafa4e0b48eef",
@@ -125,42 +123,50 @@
 	"deployments": {
 		"mainnet": {
 			"mainnet-find": [
-				"FIND",
-				"Admin",
+			  "FIND",
 				"Clock",
-				"Debug",
 				"Profile",
+				"Debug",
+				"Admin",
 				"CharityNFT",
-				"Sender",
-				"RelatedAccounts",
 				"FindViews", 
 				"Dandy",
 				"FindMarket",
 				"FindMarketSale",
+				"FindMarketTenant",
 				"FindMarketDirectOfferEscrow",
 				"FindMarketDirectOfferSoft",
 				"FindMarketAuctionEscrow",
-				"FindMarketAuctionSoft"
+				"FindMarketAuctionSoft",
+				"Sender",
+				"RelatedAccounts",
+				"FTRegistry",
+				"NFTRegistry"
 			]
 		},
 		"testnet": {
 			"testnet-find": [
 				"FIND",
-				"Admin",
 				"Clock",
-				"Debug",
 				"Profile",
+				"Debug",
+				"Admin",
 				"CharityNFT",
-				"Sender",
-				"RelatedAccounts",
+
 				"FindViews", 
 				"Dandy",
 				"FindMarket",
 				"FindMarketSale",
+				"FindMarketTenant",
 				"FindMarketDirectOfferEscrow",
 				"FindMarketDirectOfferSoft",
 				"FindMarketAuctionEscrow",
-				"FindMarketAuctionSoft"
+				"FindMarketAuctionSoft",
+				"Sender",
+				"RelatedAccounts",
+				"FTRegistry",
+				"NFTRegistry"
+
 			]
 		},
 		"emulator": {
@@ -177,6 +183,7 @@
 				"MetadataViews",
 				"Dandy",
 				"FindMarket",
+				"FindMarketTenant",
 				"FindMarketSale",
 				"FindMarketDirectOfferEscrow",
 				"FindMarketDirectOfferSoft",

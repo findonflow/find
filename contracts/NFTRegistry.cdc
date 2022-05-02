@@ -30,8 +30,9 @@ pub contract NFTRegistry {
         pub let allowedFTTypes : [Type]?  
         // Pass in the Contract Address
         pub let address : Address
+        pub let externalFixedUrl : String
 
-        init(alias: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
+        init(alias: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
             self.alias = alias
             self.type = type
             self.typeIdentifier = typeIdentifier
@@ -41,6 +42,7 @@ pub contract NFTRegistry {
             self.storagePath = storagePath
             self.allowedFTTypes = allowedFTTypes
             self.address = address
+            self.externalFixedUrl = externalFixedUrl
         }
 
     } 
@@ -65,8 +67,16 @@ pub contract NFTRegistry {
         return NFTRegistry.nonFungibleTokenList
     }
 
+    pub fun getSupportedNFTAlias() : [String] {
+        return NFTRegistry.aliasMap.keys
+    }
+
+    pub fun getSupportedNFTTypeIdentifier() : [String] {
+        return NFTRegistry.aliasMap.values
+    }
+
     /* setters */
-    access(account) fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address) {
+    access(account) fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String ) {
         pre{
             !NFTRegistry.nonFungibleTokenList.containsKey(type.identifier) : "This NonFungibleToken Register already exist"
         }
@@ -79,7 +89,8 @@ pub contract NFTRegistry {
                                                                    publicPath: publicPath,
                                                                    storagePath: storagePath,
                                                                    allowedFTTypes: allowedFTTypes,
-                                                                   address: address)
+                                                                   address: address,
+                                                                   externalFixedUrl: externalFixedUrl)
         
         NFTRegistry.aliasMap[alias] = typeIdentifier
         emit NFTInfoRegistered(alias: alias, typeIdentifier: typeIdentifier)

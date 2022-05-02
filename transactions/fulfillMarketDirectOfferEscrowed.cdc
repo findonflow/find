@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -14,7 +14,7 @@ transaction(id: UInt64) {
 
 		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
 		let pointer= FindViews.AuthNFTPointer(cap: dandyPrivateCap, id: id)
-		let tenant=FindMarket.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath =tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())!
 		let market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)!
 		market.acceptDirectOffer(pointer)
