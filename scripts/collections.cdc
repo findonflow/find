@@ -1,11 +1,13 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 
 pub struct MetadataCollections {
 
 	pub let items: {String : MetadataCollectionItem}
 	pub let collections: {String : [String]}
+	// supports new contracts that supports metadataViews 
 	pub let curatedCollections: {String : [String]}
 
 	init(items: {String : MetadataCollectionItem}, collections: {String : [String]}, curatedCollections: {String: [String]}) {
@@ -26,27 +28,37 @@ pub struct MetadataCollection{
 	}
 }
 
+// Collection Index.cdc Address : 
+// Need : A metadata collection index : -> path, id, collection (Where do you want to group them)
+// A list of these for all the items (Like collections and cur)
+
+// Resolve Partial Collection.cdc Address, {path : [IDs]}
+// Another list -> take these path, id, collection and return the specific collection information (similar in collections)
 
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
+	pub let typeIdentifier: String
+	pub let uuid: UInt64 
 	pub let name: String
 	pub let image: String
 	pub let url: String
-	pub let listPrice: UFix64?
-	pub let listToken: String?
 	pub let contentType:String
 	pub let rarity:String
+	//Refine later 
+	pub let metadata: {String : String}
+	pub let collection: String // <- This will be Alias unless they want something else
 
-
-	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String, rarity: String) {
+	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentType: String, rarity: String, collection: String) {
 		self.id=id
+		self.typeIdentifier = type.identifier
+		self.uuid = uuid
 		self.name=name
 		self.url=url
 		self.image=image
-		self.listToken=listToken
-		self.listPrice=listPrice
 		self.contentType=contentType
 		self.rarity=rarity
+		self.metadata={}
+		self.collection=collection
 	}
 }
 
@@ -74,15 +86,22 @@ pub fun main(address: Address) : MetadataCollections? {
 						let url= externalUrlView as! MetadataViews.ExternalURL
 						externalUrl=url.url
 					}
+
+					var rarity=""
+					if let rarityView = nft.resolveView(Type<FindViews.Rarity>()) {
+						let r= rarityView as! FindViews.Rarity
+						rarity=r.rarityName
+					}
 					let item = MetadataCollectionItem(
 						id: id,
+						type: nft.getType() ,
+						uuid: nft.uuid ,
 						name: display.name,
 						image: display.thumbnail.uri(),
 						url: externalUrl,
-						listPrice: nil,
-						listToken: nil,
 						contentType: "image",
-						rarity: ""
+						rarity: rarity,
+						collection: nftInfo.alias
 					)
 					let itemId = nftInfo.alias.concat(item.id.toString())
 					items.append(itemId)
