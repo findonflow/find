@@ -116,7 +116,7 @@ func main() {
 		Args(o.Arguments().String("user1").UInt64(id)).
 		Run()
 
-	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
+	o.ScriptFromFile("view").Args(o.Arguments().String("user1").PublicPath("findDandy").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).Run()
 	//	o.ScriptFromFile("dandy").Args(o.Arguments().String("user1").UInt64(id).String("AnyStruct{A.f8d6e0586b0a20c7.MetadataViews.Royalty}")).Run()
 
 	/*

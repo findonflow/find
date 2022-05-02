@@ -38,6 +38,8 @@ pub contract Dandy: NonFungibleToken {
 	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
 		pub let id: UInt64
 		access(self) var nounce: UInt64
+
+		//TODO: remove this before mainnet
 		access(self) var primaryCutPaid: Bool
 		access(contract) let schemas: {String : ViewInfo}
 		access(contract) let name: String
@@ -45,7 +47,8 @@ pub contract Dandy: NonFungibleToken {
 		access(contract) let minterPlatform: MinterPlatform
 
 
-		init(name: String, description: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform) {
+		init(name: String, description: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform, externalUrlPrefix: String?) {
+
 			self.id = self.uuid
 			self.schemas=schemas
 			self.minterPlatform=minterPlatform
@@ -53,12 +56,12 @@ pub contract Dandy: NonFungibleToken {
 			self.description=description
 			self.nounce=0
 			self.primaryCutPaid=false
+			if externalUrlPrefix != nil {
+				let mvt = Type<MetadataViews.ExternalURL>()
+				self.schemas[mvt.identifier] = ViewInfo(typ:mvt, result: MetadataViews.ExternalURL(externalUrlPrefix!.concat("/").concat(self.id.toString())))
+			}
 		}
 
-		access(account) fun setPrimaryCutPaid() {
-			self.primaryCutPaid=true
-
-		}
 		pub fun increaseNounce() {
 			self.nounce=self.nounce+1
 		}
@@ -107,11 +110,9 @@ pub contract Dandy: NonFungibleToken {
 				royalties.appendAll(multipleRoylaties.getRoyalties())
 			}
 
-			//we only charge platform primary sale cut once
-			if !self.primaryCutPaid {
-				let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
-				royalties.append(royalty)
-			}
+			let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
+			royalties.append(royalty)
+		
 			return MetadataViews.Royalties(cutInfos:royalties)
 		}
 
@@ -144,11 +145,6 @@ pub contract Dandy: NonFungibleToken {
 				thumbnail: thumbnail!
 			)
 
-
-		}
-
-		pub fun resolveSourceUri() : String {
-			return "implement me"
 
 		}
 
@@ -195,7 +191,6 @@ pub contract Dandy: NonFungibleToken {
 
 
 	pub resource interface CollectionPublic {
-		access(account) fun setPrimaryCutPaid(_ id: UInt64)
 		pub fun getIDsFor(minter: String): [UInt64] 
 		pub fun getMinters(): [String] 
 	}
@@ -293,12 +288,6 @@ pub contract Dandy: NonFungibleToken {
 			return nft as! &Dandy.NFT
 		}
 
-		access(account) fun setPrimaryCutPaid(_ id: UInt64) {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
-			}
-			self.borrow(id).setPrimaryCutPaid()
-		}
 		destroy() {
 			destroy self.ownedNFTs 
 		}
@@ -322,7 +311,7 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Forge(platform:platform)
 	}
 
-	access(account) fun mintNFT(name: String, description: String, platform:MinterPlatform, schemas: [AnyStruct]) : @NFT {
+	access(account) fun mintNFT(name: String, description: String, platform:MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
 		let views : {String: ViewInfo} = {}
 		for s in schemas {
 			//if you send in display we ignore it, this will be made for you
@@ -331,7 +320,7 @@ pub contract Dandy: NonFungibleToken {
 			}
 		}
 
-		let nft <-  create NFT(name: name, description:description, schemas:views, minterPlatform: platform)
+		let nft <-  create NFT(name: name, description:description, schemas:views, minterPlatform: platform, externalUrlPrefix:externalUrlPrefix)
 
 		emit Minted(id:nft.id, minter:nft.minterPlatform.name, name: name, description:description)
 		return <-  nft
@@ -349,8 +338,8 @@ pub contract Dandy: NonFungibleToken {
 			self.platform=platform
 		}
 
-		pub fun mintNFT(name: String, description: String, schemas: [AnyStruct]) : @NFT {
-			return <- Dandy.mintNFT(name: name, description: description, platform: self.platform, schemas: schemas)
+		pub fun mintNFT(name: String, description: String, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
+			return <- Dandy.mintNFT(name: name, description: description, platform: self.platform, schemas: schemas, externalUrlPrefix:externalUrlPrefix)
 		}
 	}
 

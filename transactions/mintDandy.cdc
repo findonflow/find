@@ -46,7 +46,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
-				schemas: schemas)
+				schemas: schemas, 
+				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"))
 
 			collection.deposit(token: <- token)
 			i=i+1

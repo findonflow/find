@@ -27,14 +27,14 @@ func TestDandy(t *testing.T) {
 			        	            	          "A.f8d6e0586b0a20c7.FindViews.Nounce",
 						        	            	    "String",
 						        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-						        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+					        	            	      "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+																				"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
 																				"A.f8d6e0586b0a20c7.FindViews.SerialNumber",
 																				"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
 																				"A.f8d6e0586b0a20c7.FindViews.CreativeWork"
 						        	            	]`, res)
-		//this script is gone
-		/*
-			display := `
+
+		display := `
 						{
 					     "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 					     "name": "Neo Motorcycle 1 of 3",
@@ -43,8 +43,24 @@ func TestDandy(t *testing.T) {
 					     }
 					 }
 					`
-			result := otu.O.ScriptFromFile("dandy").Args(otu.O.Arguments().String("user1").UInt64(id).String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
-			assert.JSONEq(t, display, result)
-		*/
+
+		result := otu.O.ScriptFromFile("view").Args(otu.O.Arguments().
+			Account("user1").
+			PublicPath("findDandy").
+			UInt64(id).
+			String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
+		assert.JSONEq(t, display, result)
+
+		externalUrl := `
+{ "url" : "https://find.xyz/collection/user1/dandy/100"}
+
+`
+		urlResult := otu.O.ScriptFromFile("view").Args(otu.O.Arguments().
+			Account("user1").
+			PublicPath("findDandy").
+			UInt64(id).
+			String("A.f8d6e0586b0a20c7.MetadataViews.ExternalURL")).RunReturnsJsonString()
+		assert.JSONEq(t, externalUrl, urlResult)
+
 	})
 }
