@@ -95,6 +95,7 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
+
 			"address": "0xca06fc7b4529c6f8",
 			"key": "${TESTNET_ACCOUNT}"
 		},
@@ -151,6 +152,7 @@
 				"Debug",
 				"Admin",
 				"CharityNFT",
+
 				"FindViews", 
 				"Dandy",
 				"FindMarket",
@@ -164,6 +166,7 @@
 				"RelatedAccounts",
 				"FTRegistry",
 				"NFTRegistry"
+
 			]
 		},
 		"emulator": {

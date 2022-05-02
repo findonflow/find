@@ -1,3 +1,4 @@
+
 import FIND from "../contracts/FIND.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
@@ -53,5 +54,3 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 	}
 }
-
-

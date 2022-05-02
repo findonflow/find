@@ -231,7 +231,6 @@ pub contract FindMarketDirectOfferEscrow {
 			}
 			//somebody else has the highest item so we cancel it
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
-			//TODO: consider emitting a "outbid" event here?
 			saleItem.setCallback(callback)
 
 			self.emitEvent(saleItem: saleItem, status: "offered")
@@ -299,7 +298,6 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 	}
 
-	//TODO: can not be escrowed
 	pub resource Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
@@ -406,13 +404,13 @@ pub contract FindMarketDirectOfferEscrow {
 			destroy oldToken
 		}
 
+		//TODO: fix send in old balance like in auctionSoft
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
 			let bid =self.borrowBid(id)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
-			//TODO: need to send in the old balance here first or verify that this is allowed here....
 			bid.from.borrow()!.registerIncreasedBid(id)
 		}
 
@@ -423,7 +421,6 @@ pub contract FindMarketDirectOfferEscrow {
 			self.cancelBidFromSaleItem(id)
 		}
 
-		//TODO: should we emit an event here?
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault

@@ -254,7 +254,6 @@ pub contract FindMarketDirectOfferSoft {
 			}
 			//somebody else has the highest item so we cancel it
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
-			//TODO: consider emitting a "outbid" event here?
 			saleItem.setCallback(callback)
 
 			self.emitEvent(saleItem: saleItem, status: "offered")
@@ -310,7 +309,6 @@ pub contract FindMarketDirectOfferSoft {
 			}
 
 			let saleItem = self.borrow(id)
-			//TODO: check thaat the pointer is of the correct type
 			if !saleItem.directOfferAccepted {
 				panic("cannot fulfill a direct offer that is not accepted yet")
 			}

@@ -139,6 +139,7 @@ pub contract FindMarketAuctionEscrow {
 			self.offerCallback=callback
 		}
 
+		//TODO: Should we have a different status if auction is ended can be finished?
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
 				return "ongoing_auction"
@@ -354,7 +355,6 @@ pub contract FindMarketAuctionEscrow {
 			self.emitEvent(saleItem: saleItem, status: "active")
 		}
 
-		//TODO:should a seller be allowed to call this directly?
 		pub fun cancel(_ id: UInt64) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -457,7 +457,6 @@ pub contract FindMarketAuctionEscrow {
 		}
 	}
 
-	//TODO: can not be escrowed
 	pub resource Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
