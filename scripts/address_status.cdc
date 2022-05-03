@@ -18,8 +18,9 @@ pub struct FINDReport{
 	pub let privateMode: Bool
 	pub let itemsForSale: [FindMarket.SaleItemInformation]
 	pub let marketBids: [FindMarket.BidInfo]
+	pub let ghosts:  [FindMarket.GhostListing]
 
-	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: [FindMarket.SaleItemInformation], marketBids: [FindMarket.BidInfo]) {
+	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: [FindMarket.SaleItemInformation], marketBids: [FindMarket.BidInfo], ghosts:[FindMarket.GhostListing]) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -27,6 +28,7 @@ pub struct FINDReport{
 		self.privateMode=privateMode
 		self.itemsForSale=itemsForSale
 		self.marketBids=marketBids
+		self.ghosts=ghosts
 	}
 }
 
@@ -96,5 +98,6 @@ pub fun main(user: Address) : FINDReport {
 		privateMode: profile?.isPrivateModeEnabled() ?? false,
 		itemsForSale: items,
 		marketBids: bids,
+		ghosts: ghosts
 	)
 }
