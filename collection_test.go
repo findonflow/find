@@ -60,6 +60,7 @@ func TestCollectionScripts(t *testing.T) {
 				}
 			}
 		}
+
 		`
 
 		otu := NewOverflowTest(t)
