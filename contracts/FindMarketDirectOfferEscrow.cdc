@@ -9,6 +9,8 @@ import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferEscrow {
 
@@ -52,8 +54,21 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.pointer.owner()
 		}
 
+		pub fun getSellerName() : String? {
+			let address = self.pointer.owner()
+			return FIND.reverseLookup(address)
+		}
+
+
 		pub fun getBuyer() : Address? {
 			return self.offerCallback.address
+		}
+
+		pub fun getBuyerName() : String? {
+			if let name = FIND.reverseLookup(self.offerCallback.address) {
+				return name 
+			}
+			return nil
 		}
 
 		pub fun toNFTInfo() : FindMarket.NFTInfo{
@@ -76,6 +91,10 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.pointer.getItemType()
 		}
 
+		pub fun getItemCollectionAlias() : String {
+			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
+		}
+
 		pub fun getAuction(): AnyStruct{FindMarket.AuctionItem}? {
 			return nil
 		}
@@ -84,12 +103,20 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.offerCallback.borrow()!.getVaultType(self.getId())
 		}
 
+		pub fun getFtAlias() : String {
+			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
+		}
+
 		pub fun getValidUntil() : UFix64? {
 			return nil 
 		}
 
 		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
 			self.offerCallback=callback
+		}
+
+		pub fun getPointer() : AnyStruct{FindViews.Pointer} {
+			return self.pointer as AnyStruct{FindViews.Pointer}
 		}
 	}
 
@@ -102,6 +129,10 @@ pub contract FindMarketDirectOfferEscrow {
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
+
+		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation 
+
+		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] 
 
 		access(contract)fun cancelBid(_ id: UInt64) 
 
@@ -143,6 +174,22 @@ pub contract FindMarketDirectOfferEscrow {
 			let info: [FindMarket.SaleItemInformation] =[]
 			for id in self.getIds() {
 				info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+			}
+			return info
+		}
+
+		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation {
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			}
+			return FindMarket.SaleInformation(self.borrow(id))
+
+		}
+
+		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] {
+			let info: [FindMarket.SaleInformation] =[]
+			for id in self.getIds() {
+				info.append(FindMarket.SaleInformation(self.borrow(id)))
 			}
 			return info
 		}

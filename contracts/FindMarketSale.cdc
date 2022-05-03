@@ -9,6 +9,8 @@ import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 
 /*
 
@@ -50,6 +52,13 @@ pub contract FindMarketSale {
 			return self.buyer
 		}
 
+		pub fun getBuyerName() : String? {
+			if let address = self.buyer {
+				return FIND.reverseLookup(address)
+			}
+			return nil
+		}
+
 		pub fun getId() : UInt64{
 			return self.pointer.getUUID()
 		}
@@ -62,6 +71,10 @@ pub contract FindMarketSale {
 			return self.pointer.getItemType()
 		}
 
+		pub fun getItemCollectionAlias() : String {
+			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
+		}
+
 		pub fun getRoyalty() : MetadataViews.Royalties? {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
@@ -72,6 +85,11 @@ pub contract FindMarketSale {
 
 		pub fun getSeller() : Address {
 			return self.pointer.owner()
+		}
+
+		pub fun getSellerName() : String? {
+			let address = self.pointer.owner()
+			return FIND.reverseLookup(address)
 		}
 
 		pub fun toNFTInfo() : FindMarket.NFTInfo{
@@ -90,8 +108,16 @@ pub contract FindMarketSale {
 			return self.vaultType
 		}
 
+		pub fun getFtAlias() : String {
+			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
+		}
+
 		pub fun getValidUntil() : UFix64? {
 			return nil 
+		}
+
+		pub fun getPointer() : FindViews.AuthNFTPointer{FindViews.Pointer} {
+			return self.pointer as FindViews.AuthNFTPointer{FindViews.Pointer}
 		}
 	}
 
@@ -103,6 +129,10 @@ pub contract FindMarketSale {
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
+
+		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation 
+
+		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] 
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
@@ -141,6 +171,22 @@ pub contract FindMarketSale {
 			return info
 		}
 	
+		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation {
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			}
+			return FindMarket.SaleInformation(self.borrow(id))
+
+		}
+
+		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] {
+			let info: [FindMarket.SaleInformation] =[]
+			for id in self.getIds() {
+				info.append(FindMarket.SaleInformation(self.borrow(id)))
+			}
+			return info
+		}
+
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())

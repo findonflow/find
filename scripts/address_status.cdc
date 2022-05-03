@@ -16,10 +16,10 @@ pub struct FINDReport{
 	pub let relatedAccounts: { String: Address}
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
-	pub let itemsForSale: [FindMarket.SaleItemInformation]
+	pub let itemsForSale: [FindMarket.SaleInformation]
 	pub let marketBids: [FindMarket.BidInfo]
 
-	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: [FindMarket.SaleItemInformation], marketBids: [FindMarket.BidInfo]) {
+	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: [FindMarket.SaleInformation], marketBids: [FindMarket.BidInfo]) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -36,25 +36,25 @@ pub fun main(user: Address) : FINDReport {
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 	let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
-	let items : [FindMarket.SaleItemInformation] = []
+	let items : [FindMarket.SaleInformation] = []
 	if let sale =FindMarketSale.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(sale.getItemsForSale())
+		items.appendAll(sale.getItemsForSaleWithSaleInformationStruct())
 	}
 
 	if let doe=FindMarketDirectOfferEscrow.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(doe.getItemsForSale())
+		items.appendAll(doe.getItemsForSaleWithSaleInformationStruct())
 	}
 
 	if let ae = FindMarketAuctionEscrow.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(ae.getItemsForSale())
+		items.appendAll(ae.getItemsForSaleWithSaleInformationStruct())
 	}
 
 	if let as = FindMarketAuctionSoft.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(as.getItemsForSale())
+		items.appendAll(as.getItemsForSaleWithSaleInformationStruct())
 	}
 
 	if let dos = FindMarketDirectOfferSoft.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(dos.getItemsForSale())
+		items.appendAll(dos.getItemsForSaleWithSaleInformationStruct())
 	}
 
 
