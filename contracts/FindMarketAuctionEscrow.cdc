@@ -9,6 +9,8 @@ import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionEscrow {
@@ -69,6 +71,11 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getSeller() : Address {
 			return self.pointer.owner()
+		}
+
+		pub fun getSellerName() : String? {
+			let address = self.pointer.owner()
+			return FIND.reverseLookup(address)
 		}
 
 		pub fun getBuyer() : Address? {
@@ -156,28 +163,50 @@ pub contract FindMarketAuctionEscrow {
 			return self.pointer.getItemType()
 		}
 
+		pub fun getItemCollectionAlias() : String {
+			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
+		}
+
 		pub fun getAuction(): AnyStruct{FindMarket.AuctionItem}? {
-			return AuctionItem(reservePrice: self.auctionReservePrice, extentionOnLateBid: self.auctionExtensionOnLateBid)
+			return AuctionItem(startPrice: self.auctionStartPrice, minimumBidIncrement: self.auctionMinBidIncrement ,reservePrice: self.auctionReservePrice, extentionOnLateBid: self.auctionExtensionOnLateBid)
 		}
 
 		pub fun getFtType() : Type {
 			return self.vaultType
 		}
 
+		pub fun getFtAlias() : String {
+			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
+		}
+
 		pub fun getValidUntil() : UFix64? {
 			return self.auctionEndsAt
 
+		}
+
+		pub fun getPointer() : FindViews.AuthNFTPointer{FindViews.Pointer} {
+			return self.pointer as FindViews.AuthNFTPointer{FindViews.Pointer}
 		}
 	}
 
 	pub struct AuctionItem : FindMarket.AuctionItem{
 
+		pub let startPrice: UFix64
+		pub let minimumBidIncrement: UFix64
 		pub let reservePrice: UFix64
 		pub let extentionOnLateBid:UFix64 
 
-		init(reservePrice:UFix64, extentionOnLateBid: UFix64) {
+		init(startPrice: UFix64, minimumBidIncrement: UFix64, reservePrice:UFix64, extentionOnLateBid: UFix64) {
+			self.startPrice=startPrice 
+			self.minimumBidIncrement=minimumBidIncrement
 			self.reservePrice=reservePrice
 			self.extentionOnLateBid=extentionOnLateBid
+		}
+		pub fun getStartPrice(): UFix64 {
+			return self.startPrice
+		}
+		pub fun getMinimumBidIncrement(): UFix64{
+			return self.minimumBidIncrement
 		}
 		pub fun getReservePrice(): UFix64  {
 			return self.reservePrice
@@ -197,6 +226,10 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
 
+		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation 
+
+		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] 
+		
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) 
 
 		//place a bid on a token
@@ -251,6 +284,22 @@ pub contract FindMarketAuctionEscrow {
 			let info: [FindMarket.SaleItemInformation] =[]
 			for id in self.getIds() {
 				info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+			}
+			return info
+		}
+
+		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation {
+			pre {
+				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			}
+			return FindMarket.SaleInformation(self.borrow(id))
+
+		}
+
+		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] {
+			let info: [FindMarket.SaleInformation] =[]
+			for id in self.getIds() {
+				info.append(FindMarket.SaleInformation(self.borrow(id)))
 			}
 			return info
 		}

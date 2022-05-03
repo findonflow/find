@@ -65,6 +65,8 @@ pub contract FindMarket {
 	}
 
 	pub struct interface AuctionItem {
+		pub fun getStartPrice(): UFix64
+		pub fun getMinimumBidIncrement(): UFix64
 		pub fun getReservePrice(): UFix64
 		pub fun getExtentionOnLateBid(): UFix64
 	}
@@ -77,6 +79,12 @@ pub contract FindMarket {
 		pub fun getSeller(): Address
 		pub fun getBuyer(): Address?
 
+		pub fun getSellerName() : String?
+		pub fun getBuyerName() : String?
+		pub fun getPointer() : AnyStruct{FindViews.Pointer}
+
+		pub fun getItemCollectionAlias(): String
+		pub fun getFtAlias(): String 
 		//the Type of the item for sale
 		pub fun getItemType(): Type
 		//The id of the item for sale
@@ -123,6 +131,54 @@ pub contract FindMarket {
 			self.ftType=item.getFtType()
 			self.ftTypeIdentifier=item.getFtType().identifier
 			self.listingValidUntil=item.getValidUntil()
+		}
+	}
+
+	pub struct SaleInformation {
+
+		//TODO: should we add typeIdentifier here?
+		//TODO: call this nftType?
+		pub let nftAlias: String 
+		pub let nftId: UInt64
+		pub let seller: Address
+		pub let sellerName: String?
+		pub let amount: UFix64?
+		pub let bidder: Address?
+		pub var bidderName: String?
+		pub let listingId:UInt64
+		pub let saleType:String
+		pub let ftAlias: String 
+		pub let auctionReservePrice: UFix64?
+		pub let extensionOnLateBid: UFix64?
+		pub let listingValidUntil: UFix64?
+		pub let startPrice: UFix64?
+		pub let minimumBidIncrement: UFix64?
+
+		pub let nftName: String 
+		pub let nftDescription: String 
+		pub let nftThumbnail: String 
+
+		init(_ item: &{SaleItem}) {
+			self.nftAlias= item.getItemCollectionAlias()
+			self.nftId=item.getItemID()
+			self.saleType=item.getSaleType()
+			self.listingId= item.getId()
+			self.amount=item.getBalance()
+			self.bidder=item.getBuyer()
+			self.bidderName=item.getBuyerName()
+			self.seller=item.getSeller()
+			self.sellerName=item.getSellerName()
+			self.auctionReservePrice=item.getAuction()?.getReservePrice()
+			self.extensionOnLateBid=item.getAuction()?.getExtentionOnLateBid()
+			self.ftAlias=item.getFtAlias()
+			self.listingValidUntil=item.getValidUntil()
+			self.startPrice=item.getAuction()?.getStartPrice()
+			self.minimumBidIncrement=item.getAuction()?.getMinimumBidIncrement()
+
+			let view = item.getPointer().getViewResolver().resolveView(Type<MetadataViews.Display>()) as! MetadataViews.Display
+			self.nftName=view.name
+			self.nftDescription=view.description
+			self.nftThumbnail=view.thumbnail.uri()
 		}
 	}
 
