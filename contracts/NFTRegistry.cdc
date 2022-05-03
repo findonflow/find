@@ -23,9 +23,12 @@ pub contract NFTRegistry {
         pub let typeIdentifier : String
         pub let icon : String?
         pub let providerPath : PrivatePath
+        pub let providerPathIdentifier : String
         // Must implement {MetadataViews.ResolverCollection}
         pub let publicPath : PublicPath
+        pub let publicPathIdentifier : String
         pub let storagePath : StoragePath
+        pub let storagePathIdentifier : String
         // Pass in arrays of allowed Token Vault, nil => support  all types of FTs
         pub let allowedFTTypes : [Type]?  
         // Pass in the Contract Address
@@ -38,8 +41,11 @@ pub contract NFTRegistry {
             self.typeIdentifier = typeIdentifier
             self.icon = icon
             self.providerPath = providerPath
+            self.providerPathIdentifier = providerPath.toString().slice(from: "/private/".length, upTo: providerPath.toString().length)
             self.publicPath = publicPath
+            self.publicPathIdentifier = publicPath.toString().slice(from: "/public/".length, upTo: publicPath.toString().length)
             self.storagePath = storagePath
+            self.storagePathIdentifier = storagePath.toString().slice(from: "/storage/".length, upTo: storagePath.toString().length)
             self.allowedFTTypes = allowedFTTypes
             self.address = address
             self.externalFixedUrl = externalFixedUrl

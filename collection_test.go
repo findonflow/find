@@ -74,18 +74,13 @@ func TestCollectionScripts(t *testing.T) {
 	t.Run("Should be able to mint Dandy and then get it by script Index", func(t *testing.T) {
 
 		expected := `
-		[{
-			"id": "81",
-			"publicPath": "/public/findDandy"
-		},
-		{
-			"id": "82",
-			"publicPath": "/public/findDandy"
-		},
-		{
-			"id": "80",
-			"publicPath": "/public/findDandy"
-		}]
+		[
+			"findDandy/81"
+		,
+			"findDandy/82"
+		,
+			"findDandy/80"
+		]
 		`
 
 		otu := NewOverflowTest(t)
