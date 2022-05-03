@@ -21,6 +21,93 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should be able list names for sale and delist them", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			registerUser("user1").
+			registerUserWithName("user1", "name1").
+			registerUserWithName("user1", "name2").
+			listForSale("user1").
+			listNameForSale("user1", "name1").
+			listNameForSale("user1", "name1")
+
+		expected := []*overflow.FormatedEvent{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"active":          "false",
+				"directSellPrice": "10.00000000",
+				"lockedUntil":     "39312001.00000000",
+				"name":            "user1",
+				"owner":           "0x179b6b1cb6755e31",
+				"validUntil":      "31536001.00000000",
+			}),
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"active":          "false",
+				"directSellPrice": "10.00000000",
+				"lockedUntil":     "39312001.00000000",
+				"name":            "name1",
+				"owner":           "0x179b6b1cb6755e31",
+				"validUntil":      "31536001.00000000",
+			}),
+		}
+
+		otu.O.TransactionFromFile("delistSale").
+			SignProposeAndPayAs("user1"). //the buy
+			Args(otu.O.Arguments().StringArray("user1", "name1")).
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(expected...)
+
+	})
+
+	t.Run("Should be able list names for sale and delist them ALL", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			registerUser("user1").
+			registerUserWithName("user1", "name1").
+			registerUserWithName("user1", "name2").
+			listForSale("user1").
+			listNameForSale("user1", "name1").
+			listNameForSale("user1", "name2")
+
+		expected := []*overflow.FormatedEvent{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"active":          "false",
+				"directSellPrice": "10.00000000",
+				"lockedUntil":     "39312001.00000000",
+				"name":            "user1",
+				"owner":           "0x179b6b1cb6755e31",
+				"validUntil":      "31536001.00000000",
+			}),
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"active":          "false",
+				"directSellPrice": "10.00000000",
+				"lockedUntil":     "39312001.00000000",
+				"name":            "name1",
+				"owner":           "0x179b6b1cb6755e31",
+				"validUntil":      "31536001.00000000",
+			}),
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"active":          "false",
+				"directSellPrice": "10.00000000",
+				"lockedUntil":     "39312001.00000000",
+				"name":            "name2",
+				"owner":           "0x179b6b1cb6755e31",
+				"validUntil":      "31536001.00000000",
+			}),
+		}
+
+		otu.O.TransactionFromFile("delistAllSale").
+			SignProposeAndPayAs("user1"). //the buy
+			Test(t).
+			AssertSuccess().
+			AssertEmitEvent(expected...)
+
+	})
+
 	t.Run("Should be able to direct offer on name for sale", func(t *testing.T) {
 
 		NewOverflowTest(t).

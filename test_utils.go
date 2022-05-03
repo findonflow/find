@@ -153,6 +153,43 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) overflow.Tran
 
 }
 
+func (otu *OverflowTestUtils) registerUserWithName(buyer, name string) *OverflowTestUtils {
+	otu.registerUserWithNameTransaction(buyer, name)
+	return otu
+}
+
+func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string) overflow.TransactionResult {
+	nameAddress := otu.accountAddress(buyer)
+	expireTime := otu.currentTime() + leaseDurationFloat
+	expireTimeString := fmt.Sprintf("%f00", expireTime)
+
+	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
+	lockedTimeString := fmt.Sprintf("%f00", lockedTime)
+
+	return otu.O.TransactionFromFile("register").
+		SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(5.0)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+			"validUntil":  expireTimeString,
+			"lockedUntil": lockedTimeString,
+			"owner":       nameAddress,
+			"name":        name,
+		})).
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			"amount": "5.00000000",
+			"to":     "0x1cf0e2f2f715450",
+		})).
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+			"amount": "5.00000000",
+			"from":   nameAddress,
+		}))
+
+}
+
 func (out *OverflowTestUtils) currentTime() float64 {
 	value, err := out.O.Script(`import Clock from "../contracts/Clock.cdc"
 pub fun main() :  UFix64 {
@@ -182,6 +219,23 @@ func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 			"active":          "true",
 			"name":            name,
 			"owner":           otu.accountAddress(name),
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listForSale").
+		SignProposeAndPayAs(seller).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(10.0)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			"directSellPrice": "10.00000000",
+			"active":          "true",
+			"name":            name,
+			"owner":           otu.accountAddress(seller),
 		}))
 	return otu
 }
