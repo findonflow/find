@@ -74,13 +74,7 @@ func TestCollectionScripts(t *testing.T) {
 	t.Run("Should be able to mint Dandy and then get it by script Index", func(t *testing.T) {
 
 		expected := `
-		[
-			"findDandy/81"
-		,
-			"findDandy/82"
-		,
-			"findDandy/80"
-		]
+		{"Dandy": ["81", "82", "80"]}
 		`
 
 		otu := NewOverflowTest(t)
@@ -146,11 +140,12 @@ func TestCollectionScripts(t *testing.T) {
 		result := otu.O.ScriptFromFile("resolvePartialCollection").
 			Args(otu.O.Arguments().
 				Address("user1").
-				StringArray("findDandy", "findDandy", "findDandy").
+				StringArray("Dandy", "Dandy", "Dandy").
 				UInt64Array(80, 81, 82)).
 			RunReturnsJsonString()
 
 		fmt.Println(result)
 		assert.JSONEq(otu.T, expected, result)
+
 	})
 }

@@ -3,108 +3,86 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-// Collection Index.cdc Address : [{Path, ID}]
-/* 
-	pub struct CollectionItemPointer {
-		pub let path 
-		pub let id 
-	}
- */
-// Need : A metadata collection index : -> path, id, collection (Where do you want to group them)
-// A list of these for all the items (Like collections and cur)
-
-// Resolve Partial Collection.cdc Address, {path : [IDs]}
-// Address
-// [path1 , path1, path2]
-// [id1 , id2, id3]
-// Another list -> take these path, id, collection and return the specific collection information (similar in collections)
-pub struct ViewReadPointer : FindViews.Pointer {
+pub struct ViewCollectionPointer {
 	access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
-	pub let id: UInt64
+	pub let nftInfo: NFTRegistry.NFTInfo
 
-	init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
+	init(cap: Capability<&{MetadataViews.ResolverCollection}>, alias: String) {
 		self.cap=cap
-		self.id=id
+		self.nftInfo=NFTRegistry.getNFTInfoByAlias(alias)!
 	}
 
-	pub fun resolveView(_ type: Type) : AnyStruct? {
-		return self.getViewResolver().resolveView(type)
+	pub fun resolveView(_ type: Type, id: UInt64) : AnyStruct? {
+		return self.getViewResolver(id).resolveView(type)
 	}
 
-	pub fun getUUID() :UInt64{
-		return self.getViewResolver().uuid
+	pub fun getUUID(_ id: UInt64) :UInt64{
+		return self.getViewResolver(id).uuid
 	}
 
-	pub fun getViews() : [Type]{
-		return self.getViewResolver().getViews()
+	pub fun getViews(_ id: UInt64) : [Type]{
+		return self.getViewResolver(id).getViews()
 	}
 
 	pub fun owner() : Address {
 		return self.cap.address
 	}
 
-	pub fun valid() : Bool {
-		if !self.cap.borrow()!.getIDs().contains(self.id) {
+	pub fun valid(_ id: UInt64) : Bool {
+		if !self.cap.borrow()!.getIDs().contains(id) {
 			return false
 		}
 		return true
 	}
 
-	pub fun getItemType() : Type {
-		return self.getViewResolver().getType()
+	pub fun getItemType(_ id: UInt64) : Type {
+		return self.getViewResolver(id).getType()
 	}
 
-	pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-		return self.cap.borrow()!.borrowViewResolver(id: self.id)
+	pub fun getViewResolver(_ id: UInt64) : &AnyResource{MetadataViews.Resolver} {
+		return self.cap.borrow()!.borrowViewResolver(id: id)
 	}
 
-	pub fun getNFTInfo() : NFTRegistry.NFTInfo {
-		return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!
+	pub fun resolveDisplayViews(_ id: UInt64) : MetadataViews.Display {
+		return self.resolveView(Type<MetadataViews.Display>(), id: id)! as! MetadataViews.Display
 	}
 
-	pub fun getCollection() : String {
-		return self.getNFTInfo().alias
+	pub fun getName(_ id: UInt64) : String {
+		return self.resolveDisplayViews(id).name
 	}
 
-	pub fun resolveDisplayViews() : MetadataViews.Display {
-		return self.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+	pub fun getImage(_ id: UInt64) : String {
+		return self.resolveDisplayViews(id).thumbnail.uri()
 	}
 
-	pub fun getName() : String {
-		return self.resolveDisplayViews().name
+	pub fun getRarityView(_ id: UInt64) : FindViews.Rarity? {
+		return self.resolveView(Type<FindViews.Rarity>(), id:id) as? FindViews.Rarity
 	}
 
-	pub fun getImage() : String {
-		return self.resolveDisplayViews().thumbnail.uri()
-	}
-
-	pub fun getRarityView() : FindViews.Rarity? {
-		return self.resolveView(Type<FindViews.Rarity>()) as? FindViews.Rarity
-	}
-
-	pub fun getRarity() : String {
-		if let rarity = self.getRarityView() {
+	pub fun getRarity(_ id: UInt64) : String {
+		if let rarity = self.getRarityView(id) {
 			return rarity.rarityName
 		}
 		return ""
 	}
 
-	pub fun getExternalUrlView() : MetadataViews.ExternalURL? {
-		return  self.resolveView(Type<MetadataViews.ExternalURL>()) as? MetadataViews.ExternalURL
+	pub fun getExternalUrlView(_ id: UInt64) : MetadataViews.ExternalURL? {
+		return  self.resolveView(Type<MetadataViews.ExternalURL>(), id:id) as? MetadataViews.ExternalURL
 	}
 
-	pub fun getExternalUrl() : String {
-		if let url = self.getExternalUrlView() {
+	pub fun getExternalUrl(_ id: UInt64) : String {
+		if let url = self.getExternalUrlView(id) {
 			return url.url
 		}
-		return self.getNFTInfo().externalFixedUrl
+		return self.nftInfo.externalFixedUrl
 	}
 
 }
 
-pub fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-	let cap=	getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
-	let pointer= ViewReadPointer(cap: cap, id: id)
+pub fun createViewReadPointer(address:Address, alias:String) : ViewCollectionPointer {
+	let path= NFTRegistry.getNFTInfoByAlias(alias)!.publicPath
+	let cap= getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
+	let pointer= ViewCollectionPointer(cap: cap, alias: alias)
 	return pointer
 }
 
@@ -119,7 +97,7 @@ pub struct MetadataCollectionItem {
 	pub let rarity:String
 	//Refine later 
 	pub let metadata: {String : String}
-	pub let collection: String // <- This will be Alias unless they want something else
+	pub let collection: String 
 
 	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentType: String, rarity: String, collection: String) {
 		self.id=id
@@ -135,29 +113,30 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address, publicPathIdentifiers: [String], ids:[UInt64]) : [MetadataCollectionItem] {
+pub fun main(address: Address, aliases: [String], ids:[UInt64]) : [MetadataCollectionItem] {
+
+	var pointerMap: {String : ViewCollectionPointer} = {}
 
 	var resultMap : [MetadataCollectionItem] = []
-	var publicPaths : [PublicPath] = []
-	for identifier in publicPathIdentifiers {
-		publicPaths.append(PublicPath(identifier:identifier)!)
-	}
 
-	assert(publicPaths.length == ids.length, message: "The length of publicPath passed in does not match with that of the IDs.")
+	assert(aliases.length == ids.length, message: "The length of alias passed in does not match with that of the IDs.")
 	var i = 0
-	while i < publicPaths.length {
-		let path = publicPaths[i]
+	while i < aliases.length {
+		let alias = aliases[i]
 		let id = ids[i]
-		let pointer = createViewReadPointer(address: address, path: path, id: id)
+		if pointerMap[alias] == nil {
+			pointerMap[alias] = createViewReadPointer(address: address, alias: alias)
+		}
+		let pointer = pointerMap[alias]!
 		resultMap.append(MetadataCollectionItem(id: id, 
-												type: pointer.getItemType(), 
-												uuid: pointer.getUUID(), 
-												name: pointer.getName(), 
-												image: pointer.getImage(), 
-												url: pointer.getExternalUrl(), 
+												type: pointer.getItemType(id), 
+												uuid: pointer.getUUID(id), 
+												name: pointer.getName(id), 
+												image: pointer.getImage(id), 
+												url: pointer.getExternalUrl(id), 
 												contentType: "image", 
-												rarity: pointer.getRarity(), 
-												collection: pointer.getCollection())
+												rarity: pointer.getRarity(id), 
+												collection: alias)
 		)
 		i = i + 1
 	}
