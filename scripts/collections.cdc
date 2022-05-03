@@ -28,11 +28,20 @@ pub struct MetadataCollection{
 	}
 }
 
-// Collection Index.cdc Address : 
+// Collection Index.cdc Address : [{Path, ID}]
+/* 
+	pub struct CollectionItemPointer {
+		pub let path 
+		pub let id 
+	}
+ */
 // Need : A metadata collection index : -> path, id, collection (Where do you want to group them)
 // A list of these for all the items (Like collections and cur)
 
 // Resolve Partial Collection.cdc Address, {path : [IDs]}
+// Address
+// [path1 , path1, path2]
+// [id1 , id2, id3]
 // Another list -> take these path, id, collection and return the specific collection information (similar in collections)
 
 pub struct MetadataCollectionItem {
@@ -79,7 +88,6 @@ pub fun main(address: Address) : MetadataCollections? {
 				if nft.resolveView(Type<MetadataViews.Display>()) != nil {
 					let displayView = nft.resolveView(Type<MetadataViews.Display>())!
 					let display = displayView as! MetadataViews.Display
-
 
 					var externalUrl=nftInfo.externalFixedUrl
 					if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {

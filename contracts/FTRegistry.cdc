@@ -15,15 +15,18 @@ pub contract FTRegistry {
 
     /* Struct */
     pub struct FTInfo {
-        pub(set) var alias : String
-        pub(set) var type : Type
-        pub(set) var typeIdentifier : String
+        pub let alias : String
+        pub let type : Type
+        pub let typeIdentifier : String
         // Whether it is stable coin or other type of coins. 
-        pub(set) var tag : [String ] 
-        pub(set) var icon : String?
-        pub(set) var receiverPath : PublicPath
-        pub(set) var balancePath : PublicPath
-        pub(set) var vaultPath : StoragePath
+        pub let tag : [String ] 
+        pub let icon : String?
+        pub let receiverPath : PublicPath
+        pub let receiverPathIdentifier : String
+        pub let balancePath : PublicPath
+        pub let balancePathIdentifier : String
+        pub let vaultPath : StoragePath
+        pub let vaultPathIdentifier : String
 
         init(alias : String, type: Type, typeIdentifier: String, tag:[String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
             self.alias = alias
@@ -32,8 +35,11 @@ pub contract FTRegistry {
             self.tag = tag
             self.icon = icon
             self.receiverPath = receiverPath
+            self.receiverPathIdentifier = receiverPath.toString().slice(from: "/public/".length, upTo: receiverPath.toString().length)
             self.balancePath = balancePath
+            self.balancePathIdentifier = balancePath.toString().slice(from: "/public/".length, upTo: balancePath.toString().length)
             self.vaultPath = vaultPath
+            self.vaultPathIdentifier = vaultPath.toString().slice(from: "/storage/".length, upTo: vaultPath.toString().length)
         }
 
     } 
