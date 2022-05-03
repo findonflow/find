@@ -13,10 +13,13 @@ transaction(id: UInt64, amount: UFix64) {
 
 		// Get the accepted vault type from BidInfo
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())!
+		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let bidInfo = self.bidsReference.getBid(id)
-		let saleInformation = bidInfo.item
+		if bidInfo==nil {
+			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
+		}
+		let saleInformation = bidInfo!.item
 		let ftIdentifier = saleInformation.ftTypeIdentifier
 
 		//If this is nil, there must be something wrong with FIND setup

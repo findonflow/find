@@ -100,8 +100,9 @@ pub contract FindMarketDirectOfferEscrow {
 		//fetch all names that are for sale
 
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
+		pub fun getGhostListings(): [FindMarket.GhostListing]
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
+		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
 
 		access(contract)fun cancelBid(_ id: UInt64) 
 
@@ -131,21 +132,41 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation {
+		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation? {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
-			return FindMarket.SaleItemInformation(self.borrow(id))
+
+			let item=self.borrow(id)
+			if item.pointer.valid() {
+				return FindMarket.SaleItemInformation(self.borrow(id))
+			}
+			return nil
 
 		}
 
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation] {
 			let info: [FindMarket.SaleItemInformation] =[]
 			for id in self.getIds() {
-				info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+				let item=self.borrow(id)
+				if item.pointer.valid() {
+					info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+				}
 			}
 			return info
 		}
+
+		pub fun getGhostListings() : [FindMarket.GhostListing] {
+			let info: [FindMarket.GhostListing] =[]
+			for id in self.getIds() {
+				let item=self.borrow(id)
+				if !item.pointer.valid() {
+					info.append(FindMarket.GhostListing(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), id:id))
+				}
+			}
+			return info
+		}
+
 
 		//this is called when a buyer cancel a direct offer
 		access(contract) fun cancelBid(_ id: UInt64) {
@@ -328,6 +349,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBids() : [FindMarket.BidInfo]
+		pub fun getGhostListings(): [FindMarket.GhostListing]
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
@@ -369,11 +391,15 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.borrowBid(id).vaultType
 		}
 
-		pub fun getBid(_ id:UInt64) : FindMarket.BidInfo {
+		pub fun getBid(_ id:UInt64) : FindMarket.BidInfo? {
 			let bid = self.borrowBid(id)
 
 			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
-			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt,item:saleInfo)
+			if saleInfo==nil {
+				return nil
+
+			}
+			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt,item:saleInfo!)
 		}
 
 		pub fun getBids() : [FindMarket.BidInfo] {
@@ -382,9 +408,24 @@ pub contract FindMarketDirectOfferEscrow {
 				let bid = self.borrowBid(id)
 
 				let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
-				bidInfo.append(FindMarket.BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt,item:saleInfo))
+				if saleInfo!=nil {
+					bidInfo.append(FindMarket.BidInfo(id: bid.itemUUID, amount: bid.vault.balance, timestamp: bid.bidAt,item:saleInfo!))
+				}
 			}
 			return bidInfo
+		}
+
+		pub fun getGhostListings() : [FindMarket.GhostListing] {
+			let info: [FindMarket.GhostListing] =[]
+			for id in self.bids.keys {
+				let bid = self.borrowBid(id)
+
+				let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
+				if saleInfo==nil {
+					info.append(FindMarket.GhostListing(listingType: Type<@Bid>(), id:id))
+				}
+			}
+			return info
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
