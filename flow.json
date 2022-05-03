@@ -95,20 +95,19 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
-
-			"address": "0xca06fc7b4529c6f8",
+			"address": "0xe756e20fbe194b92",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find-admin": {
-			"address": "0xc3e64244fa887c7d",
+			"address": "0xfa28b5a5eb983fda",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user1": {
-			"address": "0xd5b22777638c761c",
+			"address": "0x0d8e7007852767fe",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user2": {
-			"address": "0x31d59eaa727676c3",
+			"address": "0xffbdace90dd96d40",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"mainnet-find": {
