@@ -22,7 +22,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		let saleInformation =self.saleItemsCap.borrow()!.getItemForSaleInformation(id)
 
 		if saleInformation==nil {
-			panic("This item is a ghost listing")
+			panic("This listing is a ghost listing")
 
 		}
 		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(saleInformation!.type.identifier) ?? panic("This NFT is not supported by the Find Market yet")
