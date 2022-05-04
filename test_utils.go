@@ -35,6 +35,19 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	return id
 }
 
+func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
+	otu.setupFIND().
+		setupDandy("user1").
+		createUser(100.0, "user1").
+		createUser(100.0, "user2").
+		createUser(100.0, "user3").
+		registerUser("user2").
+		registerUser("user3")
+
+	ids := otu.mintThreeExampleDandies()
+	return ids
+}
+
 func (otu *OverflowTestUtils) assertLookupAddress(user, expected string) {
 	value := otu.O.Script(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {
