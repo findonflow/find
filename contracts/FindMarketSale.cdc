@@ -128,7 +128,9 @@ pub contract FindMarketSale {
 
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
+		pub fun getGhostListings(): [FindMarket.GhostListing]
+
+		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
 
 		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation 
 
@@ -155,18 +157,37 @@ pub contract FindMarketSale {
 			return self.tenantCapability.borrow()!
 		}
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation {
+		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation? {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
-			return FindMarket.SaleItemInformation(self.borrow(id))
+			let item=self.borrow(id)
+			if item.pointer.valid() {
+				return FindMarket.SaleItemInformation(self.borrow(id))
+			}
+
+			return nil
 
 		}
 
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation] {
 			let info: [FindMarket.SaleItemInformation] =[]
 			for id in self.getIds() {
-				info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+				let item=self.borrow(id)
+				if item.pointer.valid() {
+					info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+				}
+			}
+			return info
+		}
+
+		pub fun getGhostListings() : [FindMarket.GhostListing] {
+			let info: [FindMarket.GhostListing] =[]
+			for id in self.getIds() {
+				let item=self.borrow(id)
+				if !item.pointer.valid() {
+					info.append(FindMarket.GhostListing(listingType: Type<@FindMarketSale.SaleItem>(), id:id))
+				}
 			}
 			return info
 		}

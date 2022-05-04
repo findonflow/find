@@ -11,12 +11,15 @@ transaction(id: UInt64) {
 
 	
 	prepare(account: AuthAccount) {
-
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())!
 		let market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let saleInformation = market.getItemForSaleInformation(id)
-		let nftIdentifier = saleInformation.type.identifier
+		if saleInformation==nil {
+			panic("This offer is made on a ghost listing")
+
+		}
+		let nftIdentifier = saleInformation!.type.identifier
 
 		//If this is nil, there must be something wrong with FIND setup
 		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftIdentifier)!

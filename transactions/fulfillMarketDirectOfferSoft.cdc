@@ -15,8 +15,13 @@ transaction(id: UInt64) {
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
+		let bid = self.bidsReference.getBid(id)
+		if bid==nil {
+			panic("Cannot fulfill market offer on ghost listing")
 
-		let ftIdentifier = self.bidsReference.getBid(id).item.ftTypeIdentifier
+		}
+
+		let ftIdentifier= bid!.item.ftTypeIdentifier
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
 
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

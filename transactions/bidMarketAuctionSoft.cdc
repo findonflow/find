@@ -22,8 +22,11 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		self.saleItemsCap= FindMarketAuctionSoft.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
 		let saleInformation =self.saleItemsCap.borrow()!.getItemForSaleInformation(id)
 
-		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(saleInformation.type.identifier) ?? panic("This NFT is not supported by the Find Market yet")
-		let ft = FTRegistry.getFTInfoByTypeIdentifier(saleInformation.ftTypeIdentifier) ?? panic("This FT is not supported by the Find Market yet")
+		if saleInformation==nil {
+			panic("This listing is a ghost listing")
+		}
+		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(saleInformation!.type.identifier) ?? panic("This NFT is not supported by the Find Market yet")
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(saleInformation!.ftTypeIdentifier) ?? panic("This FT is not supported by the Find Market yet")
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No FUSD wallet linked for this account")
