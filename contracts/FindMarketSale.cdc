@@ -166,7 +166,10 @@ pub contract FindMarketSale {
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation] {
 			let info: [FindMarket.SaleItemInformation] =[]
 			for id in self.getIds() {
-				info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+				let item=self.borrow(id)
+				if item.pointer.valid() {
+					info.append(FindMarket.SaleItemInformation(item))
+				}
 			}
 			return info
 		}
@@ -175,6 +178,7 @@ pub contract FindMarketSale {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
+
 			return FindMarket.SaleInformation(self.borrow(id))
 
 		}
@@ -182,7 +186,10 @@ pub contract FindMarketSale {
 		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] {
 			let info: [FindMarket.SaleInformation] =[]
 			for id in self.getIds() {
-				info.append(FindMarket.SaleInformation(self.borrow(id)))
+				let item=self.borrow(id)
+				if item.pointer.valid() {
+					info.append(FindMarket.SaleInformation(item))
+				}
 			}
 			return info
 		}
