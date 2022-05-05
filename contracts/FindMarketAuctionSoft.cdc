@@ -102,7 +102,7 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver())
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
 		}
 
 		pub fun setAuctionStarted(_ startedAt: UFix64) {
@@ -164,6 +164,10 @@ pub contract FindMarketAuctionSoft {
 			return "ondemand_auction"
 		}
 
+		pub fun getListingTypeIdentifier() : String {
+			return Type<@SaleItem>().identifier
+		}
+
 
 		pub fun getItemID() : UInt64 {
 			return self.pointer.id
@@ -178,8 +182,8 @@ pub contract FindMarketAuctionSoft {
 			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
 		}
 
-		pub fun getAuction(): AnyStruct{FindMarket.AuctionItem}? {
-			return AuctionItem(startPrice: self.auctionStartPrice, minimumBidIncrement: self.auctionMinBidIncrement ,reservePrice: self.auctionReservePrice, extentionOnLateBid: self.auctionExtensionOnLateBid)
+		pub fun getAuction(): FindMarket.AuctionItem? {
+			return FindMarket.AuctionItem(startPrice: self.auctionStartPrice, minimumBidIncrement: self.auctionMinBidIncrement ,reservePrice: self.auctionReservePrice, extentionOnLateBid: self.auctionExtensionOnLateBid)
 		}
 
 		pub fun getFtType() : Type {
@@ -194,53 +198,17 @@ pub contract FindMarketAuctionSoft {
 			return self.auctionEndsAt
 
 		}
-
-		pub fun getPointer() : FindViews.AuthNFTPointer{FindViews.Pointer} {
-			return self.pointer as FindViews.AuthNFTPointer{FindViews.Pointer}
-		}
 	}
-
-	pub struct AuctionItem : FindMarket.AuctionItem{
-
-		pub let startPrice: UFix64
-		pub let minimumBidIncrement: UFix64
-		pub let reservePrice: UFix64
-		pub let extentionOnLateBid:UFix64 
-
-		init(startPrice: UFix64, minimumBidIncrement: UFix64, reservePrice:UFix64, extentionOnLateBid: UFix64) {
-			self.startPrice=startPrice 
-			self.minimumBidIncrement=minimumBidIncrement
-			self.reservePrice=reservePrice
-			self.extentionOnLateBid=extentionOnLateBid
-		}
-		pub fun getStartPrice(): UFix64 {
-			return self.startPrice
-		}
-		pub fun getMinimumBidIncrement(): UFix64{
-			return self.minimumBidIncrement
-		}
-		pub fun getReservePrice(): UFix64  {
-			return self.reservePrice
-		}
-		pub fun getExtentionOnLateBid(): UFix64 {
-			return self.extentionOnLateBid
-		}
-	}
-
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-		//fetch all names that are for sale
-
+		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
 		pub fun getGhostListings(): [FindMarket.GhostListing]
+		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
 
-		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation? 
-
-		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] 
 
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance: UFix64) 
 
@@ -251,7 +219,7 @@ pub contract FindMarketAuctionSoft {
 		access(contract) fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) 
 	}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic {
+	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic  {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 
@@ -290,7 +258,7 @@ pub contract FindMarketAuctionSoft {
 
 			let item=self.borrow(id)
 			if item.pointer.valid() {
-				return FindMarket.SaleItemInformation(self.borrow(id))
+				return FindMarket.SaleItemInformation(item)
 			}
 			return nil
 		}
@@ -301,7 +269,7 @@ pub contract FindMarketAuctionSoft {
 			for id in self.getIds() {
 				let item=self.borrow(id)
 				if item.pointer.valid() {
-					info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+					info.append(FindMarket.SaleItemInformation(item))
 				}
 			}
 			return info
@@ -318,27 +286,8 @@ pub contract FindMarketAuctionSoft {
 			return info
 		}
 
-		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation? {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-			}
-
-			let item=self.borrow(id)
-			if item.pointer.valid() {
-				return FindMarket.SaleInformation(self.borrow(id))
-			}
-			return nil
-		}
-
-		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] {
-			let info: [FindMarket.SaleInformation] =[]
-			for id in self.getIds() {
-				let item=self.borrow(id)
-				if item.pointer.valid() {
-					info.append(FindMarket.SaleInformation(self.borrow(id)))
-				}
-			}
-			return info
+		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport {
+			return FindMarket.SaleItemCollectionReport(items: self.getItemsForSale(), ghosts: self.getGhostListings())
 		}
 
 		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
@@ -573,13 +522,14 @@ pub contract FindMarketAuctionSoft {
 		pub fun getBids() : [FindMarket.BidInfo]
 		pub fun getGhostListings() :  [FindMarket.GhostListing]
 		pub fun getBalance(_ id: UInt64) : UFix64
+		pub fun getBidsReport() : FindMarket.BidItemCollectionReport 
 
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT)
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
 
 	//A collection stored for bidders/buyers
-	pub resource MarketBidCollection: MarketBidCollectionPublic {
+	pub resource MarketBidCollection: MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic {
 
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
@@ -619,7 +569,7 @@ pub contract FindMarketAuctionSoft {
 				return nil
 
 			}
-			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo!)
+			return FindMarket.BidInfo(id: bid.itemUUID, bidTypeIdentifier: bid.getType().identifier, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo!)
 		}
 
 
@@ -643,10 +593,14 @@ pub contract FindMarketAuctionSoft {
 
 				let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
 				if saleInfo!=nil {
-					bidInfo.append(FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo!))
+					bidInfo.append(FindMarket.BidInfo(id: bid.itemUUID, bidTypeIdentifier: bid.getType().identifier, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo!))
 				}
 			}
 			return bidInfo
+		}
+
+		pub fun getBidsReport() : FindMarket.BidItemCollectionReport {
+			return FindMarket.BidItemCollectionReport(items: self.getBids(), ghosts: self.getGhostListings())
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, amount:UFix64, vaultType:Type, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
@@ -726,30 +680,30 @@ pub contract FindMarketAuctionSoft {
 		return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
 	}
 
-	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
+	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
 		return FindMarketAuctionSoft.getSaleItemCapability(marketplace: FindMarketAuctionSoft.account.address, user:user) 
 	}
 
-	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic}>? {
+	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
 		return FindMarketAuctionSoft.getBidCapability(marketplace:FindMarketAuctionSoft.account.address, user:user) 
 	}
 
-	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
+	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
 		pre{
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 		}
 		return nil
 	}
 
-	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic}>? {
+	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
 		pre{
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
+			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 		}
 		return nil
 	}

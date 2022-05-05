@@ -19,7 +19,7 @@ transaction(id: UInt64) {
 			panic("This offer is made on a ghost listing")
 
 		}
-		let nftIdentifier = saleInformation!.type.identifier
+		let nftIdentifier = saleInformation!.nftIdentifier
 
 		//If this is nil, there must be something wrong with FIND setup
 		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftIdentifier)!

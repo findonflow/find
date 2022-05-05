@@ -25,7 +25,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 			panic("This listing is a ghost listing")
 
 		}
-		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(saleInformation!.type.identifier) ?? panic("This NFT is not supported by the Find Market yet")
+		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(saleInformation!.nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet")
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(saleInformation!.ftTypeIdentifier) ?? panic("This FT is not supported by the Find Market yet")
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)

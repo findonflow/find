@@ -43,6 +43,10 @@ pub contract FindMarketSale {
 			return "directSale"
 		}
 
+		pub fun getListingTypeIdentifier(): String {
+			return Type<@SaleItem>().identifier
+		}
+ 
 		pub fun setBuyer(_ address:Address) {
 			self.buyer=address
 		}
@@ -91,15 +95,11 @@ pub contract FindMarketSale {
 			return FIND.reverseLookup(address)
 		}
 
-		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
-		}
-
 		pub fun getBalance() : UFix64 {
 			return self.salePrice
 		}
 
-		pub fun getAuction(): AnyStruct{FindMarket.AuctionItem}? {
+		pub fun getAuction(): FindMarket.AuctionItem? {
 			return nil
 		}
 
@@ -115,9 +115,10 @@ pub contract FindMarketSale {
 			return nil 
 		}
 
-		pub fun getPointer() : FindViews.AuthNFTPointer{FindViews.Pointer} {
-			return self.pointer as FindViews.AuthNFTPointer{FindViews.Pointer}
+		pub fun toNFTInfo() : FindMarket.NFTInfo{
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
 		}
+
 	}
 
 	pub resource interface SaleItemCollectionPublic {
@@ -126,6 +127,7 @@ pub contract FindMarketSale {
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
 		pub fun getGhostListings(): [FindMarket.GhostListing]
 		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
+		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
@@ -154,19 +156,20 @@ pub contract FindMarketSale {
 			}
 			let item=self.borrow(id)
 			if item.pointer.valid() {
-				return FindMarket.SaleItemInformation(self.borrow(id))
+				return FindMarket.SaleItemInformation(item)
 			}
 
 			return nil
-
 		}
+
+
 
 		pub fun getItemsForSale(): [FindMarket.SaleItemInformation] {
 			let info: [FindMarket.SaleItemInformation] =[]
 			for id in self.getIds() {
 				let item=self.borrow(id)
 				if item.pointer.valid() {
-					info.append(FindMarket.SaleItemInformation(self.borrow(id)))
+					info.append(FindMarket.SaleItemInformation(item))
 				}
 			}
 			return info
@@ -182,7 +185,10 @@ pub contract FindMarketSale {
 			}
 			return info
 		}
-	
+
+		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport {
+			return FindMarket.SaleItemCollectionReport(items: self.getItemsForSale(), ghosts: self.getGhostListings())
+		}
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {

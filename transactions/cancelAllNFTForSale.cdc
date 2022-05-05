@@ -11,7 +11,7 @@ transaction() {
 		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))!
 
 		for item in items {
-			saleItems.delist(item.id)
+			saleItems.delist(item.listingId)
 		}
 		
 	}

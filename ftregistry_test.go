@@ -32,14 +32,17 @@ func TestFTRegistry(t *testing.T) {
 			RunReturnsInterface()
 
 		expected := map[string]interface{}{
-			"alias":          "Flow",
-			"balancePath":    "/public/flowTokenBalance",
-			"icon":           "",
-			"receiverPath":   "/public/flowTokenReceiver",
-			"tag":            []interface{}{"utility coin"},
-			"type":           "Type<A.0ae53cb6e3f42a79.FlowToken.Vault>()",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			"vaultPath":      "/storage/flowTokenVault",
+			"alias":                  "Flow",
+			"balancePath":            "/public/flowTokenBalance",
+			"balancePathIdentifier":  "flowTokenBalance",
+			"icon":                   "",
+			"receiverPath":           "/public/flowTokenReceiver",
+			"receiverPathIdentifier": "flowTokenReceiver",
+			"tag":                    []interface{}{"utility coin"},
+			"type":                   "Type<A.0ae53cb6e3f42a79.FlowToken.Vault>()",
+			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			"vaultPath":              "/storage/flowTokenVault",
+			"vaultPathIdentifier":    "flowTokenVault",
 		}
 		assert.Equal(t, expected, result)
 
@@ -59,14 +62,17 @@ func TestFTRegistry(t *testing.T) {
 			RunReturnsInterface()
 
 		expected := map[string]interface{}{
-			"alias":          "Flow",
-			"balancePath":    "/public/flowTokenBalance",
-			"icon":           "",
-			"receiverPath":   "/public/flowTokenReceiver",
-			"tag":            []interface{}{"utility coin"},
-			"type":           "Type<A.0ae53cb6e3f42a79.FlowToken.Vault>()",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			"vaultPath":      "/storage/flowTokenVault",
+			"alias":                  "Flow",
+			"balancePath":            "/public/flowTokenBalance",
+			"balancePathIdentifier":  "flowTokenBalance",
+			"icon":                   "",
+			"receiverPath":           "/public/flowTokenReceiver",
+			"receiverPathIdentifier": "flowTokenReceiver",
+			"tag":                    []interface{}{"utility coin"},
+			"type":                   "Type<A.0ae53cb6e3f42a79.FlowToken.Vault>()",
+			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			"vaultPath":              "/storage/flowTokenVault",
+			"vaultPathIdentifier":    "flowTokenVault",
 		}
 		assert.Equal(t, expected, result)
 
@@ -78,22 +84,28 @@ func TestFTRegistry(t *testing.T) {
 		    "A.0ae53cb6e3f42a79.FlowToken.Vault": {
 		        "alias": "Flow",
 		        "balancePath": "/public/flowTokenBalance",
+				"balancePathIdentifier":"flowTokenBalance",
 		        "icon": "",
 				"tag" : ["utility coin"],
 		        "receiverPath": "/public/flowTokenReceiver",
+				"receiverPathIdentifier":"flowTokenReceiver",
 		        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
 		        "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		        "vaultPath": "/storage/flowTokenVault"
+		        "vaultPath": "/storage/flowTokenVault",
+				"vaultPathIdentifier":"flowTokenVault"
 		    },
 			"A.f8d6e0586b0a20c7.FUSD.Vault": {
 		        "alias": "FUSD",
 		        "balancePath": "/public/fusdBalance",
+				"balancePathIdentifier":"fusdBalance",
 		        "icon": "",
 				"tag" : ["stablecoin"],
 		        "receiverPath": "/public/fusdReceiver",
+				"receiverPathIdentifier":"fusdReceiver",
 		        "type": "Type\u003cA.f8d6e0586b0a20c7.FUSD.Vault\u003e()",
 		        "typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-		        "vaultPath": "/storage/fusdVault"
+		        "vaultPath": "/storage/fusdVault",
+				"vaultPathIdentifier":"fusdVault"
 		    }
 		}
 		`
