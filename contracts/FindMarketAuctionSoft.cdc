@@ -43,6 +43,7 @@ pub contract FindMarketAuctionSoft {
 			self.auctionEndsAt=nil
 		}
 
+		//TODO: Should we rename this?
 		pub fun getId() : UInt64{
 			return self.pointer.getUUID()
 		}
@@ -52,10 +53,21 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 		}
 
+		//BAM: copy this to the other options
 		pub fun getRoyalty() : MetadataViews.Royalties? {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
 			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				return MetadataViews.Royalties([royalty])
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				return MetadataViews.Royalties(royalty)
+			}
+
+			//BAM: if we explose Royalty just 1 return that as a Royalties? 
 			return  nil
 		}
 
@@ -161,6 +173,7 @@ pub contract FindMarketAuctionSoft {
 			return self.pointer.getItemType()
 		}
 
+		//BAM: remove these ones
 		pub fun getItemCollectionAlias() : String {
 			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
 		}

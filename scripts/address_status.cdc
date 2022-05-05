@@ -9,7 +9,6 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 
 
-
 pub struct FINDReport{
 	pub let profile:Profile.UserProfile?
 	pub let bids: [FIND.BidInfo]
@@ -39,9 +38,24 @@ pub fun main(user: Address) : FINDReport {
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 	let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
-	//TODO: I think we should make this a little more efficient, now we are looping twice
+
+	//Bam:will this work?
+	let caps : [&{FindMarket.SaleItemCollectionPublic}]= []
+
+	if let sale =FindMarketSale.getFindSaleItemCapability(user)!.borrow() {
+		caps.append(sale)
+	}
+
+
 	let items : [FindMarket.SaleInformation] = []
 	let ghosts: [FindMarket.GhostListing] = []
+	for cap in caps {
+		let report=caps[cap].getReport()
+		items.appendAll(report.items)
+		items.appendAll(report.ghost)
+	}
+
+	//TODO: I think we should make this a little more efficient, now we are looping twice
 	if let sale =FindMarketSale.getFindSaleItemCapability(user)!.borrow() {
 		items.appendAll(sale.getItemsForSaleWithSaleInformationStruct())
 		ghosts.appendAll(sale.getGhostListings())
