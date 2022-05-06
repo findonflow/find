@@ -49,18 +49,31 @@ pub contract FindMarket {
 	}
 
 	pub struct NFTInfo {
+		pub let id: UInt64 
 		pub let name:String
-		pub let description:String
 		pub let thumbnail:String
 		pub let type: String
-		pub let id: UInt64 //id of item
-		//TODO: add more views here, like rarity
+		pub let grouping: String?
+		pub let rarity:String?
 
-		//BAM: fix this 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
+
+			if let view = item.resolveView(Type<FindViews.Grouping>()) {
+				let grouping = view as! FindViews.Grouping
+				self.grouping=grouping.name
+			} else {
+				self.grouping=nil
+			}
+
+			if let view = item.resolveView(Type<FindViews.Rarity>()) {
+				let rarity = view as! FindViews.Rarity
+				self.rarity=rarity.rarityName
+			} else {
+				self.rarity=nil
+			}
+
 			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 			self.name=display.name
-			self.description=display.description
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
 			self.id=id
@@ -82,6 +95,8 @@ pub contract FindMarket {
 
 	//BAM: make this a struct with fields
 	pub struct AuctionItem {
+		//end time
+		//current time
 		pub let startPrice: UFix64 
 		pub let minimumBidIncrement: UFix64 
 		pub let reservePrice: UFix64 
@@ -97,10 +112,7 @@ pub contract FindMarket {
 
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getIds(): [UInt64]
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
-		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
-		pub fun getGhostListings(): [FindMarket.GhostListing]
-		//BAM: implement
+		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
 		pub fun getSaleItemReport() : SaleItemCollectionReport
 	}
 
@@ -115,9 +127,6 @@ pub contract FindMarket {
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getBids() : [BidInfo]
-		pub fun getGhostListings() : [GhostListing]
-		//TODO: do we need a get bid? to get a single bid?
 		pub fun getBidsReport() : BidItemCollectionReport
 	}
 
@@ -160,9 +169,9 @@ pub contract FindMarket {
 		
 	}
 
+	//BAM; this needs to know if an item is deprectaed or stopped in some way
 	pub struct SaleItemInformation {
 
-		//BAM: nftIdentifier
 		pub let nftIdentifier: String 
 		pub let nftId: UInt64
 		pub let seller: Address
@@ -172,7 +181,6 @@ pub contract FindMarket {
 		pub var bidderName: String?
 		pub let listingId: UInt64
 
-		//add listingIdentifer
 		pub let saleType: String
 		pub let listingTypeIdentifier: String
 		pub let ftAlias: String 
@@ -181,9 +189,10 @@ pub contract FindMarket {
 
 		pub let nft: NFTInfo
 		pub let auction: AuctionItem?
-//TOOD: end time, current time
+		pub let listingStatus:String
 
-		init(_ item: &{SaleItem}) {
+		init(item: &{SaleItem}, status:String) {
+			self.listingStatus=status
 			self.nftIdentifier= item.getItemType().identifier
 			self.nftId=item.getItemID()
 			self.saleType=item.getSaleType()

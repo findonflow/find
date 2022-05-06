@@ -6,6 +6,15 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
 
+	//This is added if you have a colletion with multiple groupings, like starly cards or rarible or mint store or dandy
+	pub struct Grouping {
+		pub let name: String
+
+		init(_ name:String) {
+			self.name =name
+		}
+	}
+
 	pub struct Identity{
 		pub let id:UInt64
 		pub let uuid: UInt64
