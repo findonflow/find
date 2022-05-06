@@ -154,53 +154,57 @@ pub contract FindMarketSale {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 			}
 			let item=self.borrow(id)
-			if item.pointer.valid() {
-				let tenant=self.getTenant()
-				let stopped=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
-				var status="active"
-				if !stopped.allowed {
-					status="stopped"
-				}
-				let deprecated=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "delist item for sale"))
-
-				if !deprecated.allowed {
-					status="deprecated"
-				}
-				return FindMarket.SaleItemInformation(item: item, status:status)
+			let tenant=self.getTenant()
+			let info = self.checkSaleInformation(tenant: tenant, ids: [id], getGhost: false)
+			if info.items.length > 0 {
+				return info.items[0]
 			}
-
 			return nil
 		}
 
 		// todo: do we need this here?
 		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport {
-
 			let tenant=self.getTenant()
+			return self.checkSaleInformation(tenant: tenant, ids: self.getIds(), getGhost: true)
+		}
+
+		access(contract) fun checkSaleInformation(tenant: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
 			let ghost: [FindMarket.GhostListing] =[]
 			let info: [FindMarket.SaleItemInformation] =[]
-			for id in self.getIds() {
+			let listingType = self.getListingType()
+			for id in ids {
 				let item=self.borrow(id)
 				if !item.pointer.valid() {
-					ghost.append(FindMarket.GhostListing(listingType: Type<@FindMarketSale.SaleItem>(), id:id))
-				}	else {
-
-					//TODO: do we need to be smarter about this?
-					let stopped=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
-					var status="active"
-					if !stopped.allowed {
-						status="stopped"
+					if getGhost {
+						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
 					}
-					let deprecated=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "delist item for sale"))
-
-					if !deprecated.allowed {
-						status="deprecated"
-					}
-					//TODO: expired?
-					info.append(FindMarket.SaleItemInformation(item, status))
+					continue
+				} 
+				//TODO: do we need to be smarter about this?
+				let stopped=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
+				var status="active"
+				if !stopped.allowed {
+					status="stopped"
 				}
+				let deprecated=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "delist item for sale"))
+
+				if !deprecated.allowed {
+					status="deprecated"
+				}
+
+				if let validTime = item.getValidUntil() {
+					if validTime >= getCurrentBlock().timestamp{
+						status="ended"
+					}
+				}
+				info.append(FindMarket.SaleItemInformation(item, status))
 			}
 
 			return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
+		}
+
+		pub fun getListingType() : Type {
+			return Type<@SaleItem>()
 		}
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {

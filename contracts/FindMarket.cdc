@@ -98,15 +98,21 @@ pub contract FindMarket {
 		//end time
 		//current time
 		pub let startPrice: UFix64 
+		pub let currentPrice: UFix64
 		pub let minimumBidIncrement: UFix64 
 		pub let reservePrice: UFix64 
 		pub let extentionOnLateBid: UFix64 
+		pub let auctionEndsAt: UFix64? 
+		pub let timestamp: UFix64 
 
-		init(startPrice: UFix64, minimumBidIncrement: UFix64, reservePrice: UFix64, extentionOnLateBid: UFix64){
+		init(startPrice: UFix64, currentPrice: UFix64, minimumBidIncrement: UFix64, reservePrice: UFix64, extentionOnLateBid: UFix64, auctionEndsAt: UFix64? , timestamp: UFix64){
 			self.startPrice = startPrice 
+			self.currentPrice = currentPrice
 			self.minimumBidIncrement = minimumBidIncrement 
 			self.reservePrice = reservePrice
 			self.extentionOnLateBid = extentionOnLateBid
+			self.auctionEndsAt = auctionEndsAt 
+			self.timestamp = timestamp
 		}
 	}
 
@@ -216,12 +222,14 @@ pub contract FindMarket {
 
 	pub struct BidInfo{
 		pub let id: UInt64
+		pub let bidAmount: UFix64
 		pub let bidTypeIdentifier: String 
 		pub let timestamp: UFix64
 		pub let item: SaleItemInformation
 
-		init(id: UInt64, bidTypeIdentifier: String,  amount: UFix64, timestamp: UFix64, item:SaleItemInformation) {
+		init(id: UInt64, bidTypeIdentifier: String, bidAmount: UFix64, timestamp: UFix64, item:SaleItemInformation) {
 			self.id=id
+			self.bidAmount=bidAmount
 			self.bidTypeIdentifier=bidTypeIdentifier
 			self.timestamp=timestamp
 			self.item=item
