@@ -14,7 +14,7 @@ transaction(id: UInt64) {
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())!
 		let market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
-		let saleInformation = market.getItemForSaleInformation(id)
+		let saleInformation = market.getSaleInformation(id)
 		if saleInformation==nil {
 			panic("This offer is made on a ghost listing")
 

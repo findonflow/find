@@ -17,7 +17,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 		self.saleItemsCap= FindMarketSale.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
-		let saleInformation =self.saleItemsCap.borrow()!.getItemForSaleInformation(id)
+		let saleInformation =self.saleItemsCap.borrow()!.getSaleInformation(id)
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")
 		}
