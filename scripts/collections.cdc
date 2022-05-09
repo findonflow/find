@@ -64,6 +64,9 @@ import Necryptolis from 0x718efe5e88fe48ea
 
 import FLOAT from 0x2d4c3caffbeab845
 
+import MintStoreItem from 0x20187093790b9aef
+import SomePlaceCollectible from 0x667a16294a089ef8
+
 pub struct MetadataCollections {
 
 	pub let items: {String : MetadataCollectionItem}
@@ -1345,7 +1348,86 @@ pub fun main(address: Address) : MetadataCollections? {
 	if floatItems.length != 0 {
 		results["FLOAT"] = floatItems
 	}
-	if results.keys.length == 0 {
+
+
+
+	//let col = owner.getCapability(MintStoreItem.CollectionPublicPath)
+  let mintStoreCap = account.getCapability<&{MintStoreItem.MintStoreItemCollectionPublic}>(MintStoreItem.CollectionPublicPath)
+	if mintStoreCap.check() {
+		let items: [String] = []
+		let collection = mintStoreCap.borrow()!
+		for id in collection.getIDs() {
+			let nft = collection.borrowMintStoreItem(id: id)!
+			let display= nft.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+
+			let merchantName = MintStoreItem.getMerchant(merchantID:nft.data.merchantID)!
+			let editionData = MintStoreItem.EditionData(editionID: nft.data.editionID)!
+      var external_domain = ""
+       switch merchantName {
+        case "Bulls":
+            external_domain =  "https://bulls.mint.store"
+            break;
+        case "Charlotte Hornets":
+            external_domain =  "https://hornets.mint.store"
+            break;
+        default:
+            external_domain =  ""
+      }
+      if editionData!.metadata["nftType"]! == "Type C" {
+         external_domain =  "https://misa.art/collections/nft"
+      }
+
+			let name=editionData.name
+			let image = editionData.metadata["thumbnail"] ?? ""
+			let item = MetadataCollectionItem(
+				id: id,
+				name: name,
+				image: image,
+				url: external_domain,
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+			let itemId="MintStore".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+		if items.length != 0 {
+			results["MintStore"] = items
+		}
+	}
+
+
+    let somePlaceCap =account.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
+		if somePlaceCap.check() {
+		  let items: [String] = []
+		  let collection = somePlaceCap.borrow()!
+		  for id in collection.getIDs() {
+				let nft = collection.borrowCollectible(id: id)!
+		    let setID = nft.setID
+				let setMetadata = SomePlaceCollectible.getMetadataForSetID(setID: setID)!
+				let editionMetadata = SomePlaceCollectible.getMetadataForNFTByUUID(uuid: nft.id)!
+        let item = MetadataCollectionItem(
+				id: id,
+				name: editionMetadata.getMetadata()["title"] ?? setMetadata.getMetadata()["title"] ?? "",
+				image: editionMetadata.getMetadata()["mediaURL"] ?? setMetadata.getMetadata()["mediaURL"] ?? "",
+				url: "https://some.place",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "image",
+				rarity: ""
+			)
+			let itemId="SomePlace".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
+		if items.length != 0 {
+			results["some.place"] = items
+		}
+ 
+  }
+ 	if results.keys.length == 0 {
 		return nil
 	}
 
