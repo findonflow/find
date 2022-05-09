@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/bjartek/overflow/overflow"
 )
 
@@ -11,8 +9,12 @@ func main() {
 	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
 	o := overflow.NewOverflowTestnet().Start()
 
-	os.Exit(0)
+	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find").UFix64(1.0))
 
+	//Deploy contracts to testnet
+	o.InitializeContracts()
+
+	//send flow to admin and user account
 	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find-admin").UFix64(1000.0))
 	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("user1").UFix64(1000.0))
 
@@ -55,7 +57,6 @@ func main() {
 		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
 		RunPrintEventsFull()
 
-	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
 }
 
 func createProfileAndGiftName(o *overflow.Overflow, name string) {
