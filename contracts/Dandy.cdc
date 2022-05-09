@@ -72,6 +72,7 @@ pub contract Dandy: NonFungibleToken {
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
 			views.append(Type<FindViews.Nounce>())
+			views.append(Type<FindViews.Grouping>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
 			views.append(Type<MetadataViews.Royalties>())
@@ -150,6 +151,10 @@ pub contract Dandy: NonFungibleToken {
 
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
 		pub fun resolveView(_ type: Type): AnyStruct {
+
+			if type == Type<FindViews.Grouping>() {
+				return FindViews.Grouping(self.minterPlatform.name)
+			}
 
 			if type == Type<MinterPlatform>() {
 				return self.minterPlatform
