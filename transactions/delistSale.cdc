@@ -1,8 +1,10 @@
 import FIND from "../contracts/FIND.cdc"
 
-transaction(name: String) {
+transaction(names: [String]) {
 	prepare(acct: AuthAccount) {
 		let finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		finLeases.delistSale(name)
+		for name in names {
+			finLeases.delistSale(name)
+		}
 	}
 }

@@ -4,6 +4,8 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
+import Dandy from "./Dandy.cdc"
+import Sender from "./Sender.cdc"
 /*
 
 ///FIND
@@ -21,6 +23,9 @@ Taxonomy:
 - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
 */
 pub contract FIND {
+
+	//event when FT is sent
+	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
 
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
@@ -40,7 +45,7 @@ pub contract FIND {
 
 	/// Emitted when a name is explicistly put up for sale
 	pub event ForSale(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64, directSellPrice: UFix64, active: Bool)
-	
+
 	/// Emitted when an name is put up for on-demand auction
 	pub event ForAuction(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
 
@@ -114,6 +119,63 @@ pub contract FIND {
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(name)
+		}
+		panic("Network is not set up")
+	}
+
+
+	/// lookup if an address has a .find name, if it does pick either the default one or the first registered
+	pub fun reverseLookup(_ address:Address): String? {
+		let account=getAccount(address)
+		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+
+		if !leaseCap.check() {
+			return nil
+		}
+
+		let profile= Profile.find(address).asProfile()
+		let leases = leaseCap.borrow()!.getLeaseInformation() 
+		var time : UFix64?= nil
+		var name :String?= nil
+		for lease in leases {
+
+			//filter out all leases that are FREE or LOCKED since they are not actice
+			if lease.status != "TAKEN" {
+				continue
+			}
+
+			//if we have not set a 
+			if profile.findName == "" {
+				if time == nil || lease.validUntil < time! {
+					time=lease.validUntil
+					name=lease.name
+				}
+			}
+
+			if profile.findName == lease.name {
+				return lease.name
+			}
+		}
+		return name
+	}
+
+	/// Deposit FT to name
+	/// @param to: The name to send money too
+	/// @param message: The message to send
+	/// @param tag: The tag to add to the event 
+	/// @param vault: The vault to send too
+	/// @param from: The sender that sent the funds
+	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token) {
+		pre {
+			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+		}
+
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			let profile=network.lookup(to) ?? panic("could not find name")
+			let fromAddress= from.owner!.address
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, type:vault.getType()) 
+			profile.deposit(from: <- vault)
+			return 
 		}
 		panic("Network is not set up")
 	}
@@ -299,7 +361,7 @@ pub contract FIND {
 			let bidder= callback.address
 			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 			if profile == nil {
-			   panic("Create a profile before you make a bid")
+				panic("Create a profile before you make a bid")
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
@@ -369,11 +431,11 @@ pub contract FIND {
 		//add a new lease token to the collection, can only be called in this contract
 		access(contract) fun deposit(token: @FIND.Lease)
 
-		access(contract)fun cancelBid(_ name: String) 
+		access(contract)fun cancelUserBid(_ name: String) 
 		access(contract) fun increaseBid(_ name: String) 
 
 		//place a bid on a token
-		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
+		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
 
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
@@ -402,46 +464,20 @@ pub contract FIND {
 			self.networkWallet=networkWallet
 		}
 
-		/*
-		access(contract) fun createPlatform(_ name: String) : Artifact.MinterPlatform{
-			//TODO: make it possible to set profile
-
-			let minterCap =self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
-			let platformCap=FIND.account.getCapability<&{Profile.Public}>(Profile.publicPath)
-			//todo check and panic here
-
-			if !minterCap.check() {
-				panic("minter profile is not present")
-
-			}
-
-			if !platformCap.check() {
-				panic("platform cap is not present")
-			}
-
-			return Artifact.MinterPlatform(name:name,  owner: platformCap, minter: minterCap, ownerPercentCut: 0.025)
+		access(contract) fun createPlatform(_ name: String) : Dandy.MinterPlatform{
+			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.15)
 		}
 
-		pub fun mintArtifact(name: String, nftName: String, schemas: [AnyStruct]) : @Artifact.NFT {
+		pub fun mintDandy(minter: String, nftName: String, description: String, schemas: [AnyStruct], externalUrlPrefix: String?) : @Dandy.NFT {
 
-			let lease = self.borrow(name)
-			if !lease.addons.containsKey("artifact") {
-				panic("You do not have the artifact addon, buy it first")
+			let lease = self.borrow(minter)
+			if !lease.addons.containsKey("forge") {
+				panic("You do not have the forge addon, buy it first")
 			}
 
-			return <- Artifact.mintNFT(platform: self.createPlatform(name), name: nftName, schemas: schemas)
+			return <- Dandy.mintNFT(name:nftName, description:description, platform: self.createPlatform(minter), schemas: schemas, externalUrlPrefix:externalUrlPrefix)
 		}
-
-		//have method to mint without shared
-		pub fun mintNFTWithSharedData(name: String, nftName: String, schemas: [AnyStruct], sharedPointer: Artifact.Pointer) : @Artifact.NFT {
-			let lease = self.borrow(name)
-			if !lease.addons.containsKey("artifact") {
-				panic("You do not have the artifact addon, buy it first")
-			}
-			return <- Artifact.mintNFTWithSharedData(platform: self.createPlatform(name), name: nftName, schemas: schemas, sharedPointer: sharedPointer)
-		}
-		*/
-
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {
@@ -452,6 +488,11 @@ pub contract FIND {
 
 			if lease.addons.containsKey(addon) {
 				panic("You already have this addon")
+			}
+
+			//TODO: get from Network addonPrices
+			if addon=="forge" && vault.balance != 50.0 {
+				panic("Expect 50 FUSD for forge addon")
 			}
 
 			lease.addAddon(addon)
@@ -488,7 +529,6 @@ pub contract FIND {
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
 			for name in self.leases.keys {
-				//TODO: for testnet
 				if !FIND.validateFindName(name) {
 					continue
 				}
@@ -536,7 +576,7 @@ pub contract FIND {
 			destroy oldAuction
 		}
 
-		access(contract) fun cancelBid(_ name: String) {
+		access(contract) fun cancelUserBid(_ name: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 				!self.auctions.containsKey(name) : "Cannot cancel a bid that is in an auction=".concat(name)
@@ -598,7 +638,7 @@ pub contract FIND {
 
 		}
 
-		access(contract) fun bid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
+		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
@@ -641,7 +681,7 @@ pub contract FIND {
 			let bidder= callback.address
 			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 			if profile == nil {
-			   panic("Create a profile before you make a bid")
+				panic("Create a profile before you make a bid")
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
@@ -750,7 +790,7 @@ pub contract FIND {
 				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!
-				let vault <- offer.fulfill(<- token)
+				let vault <- offer.fulfillLease(<- token)
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -788,7 +828,7 @@ pub contract FIND {
 
 			let token <- self.leases.remove(key: name)!
 
-			let vault <- auction.latestBidCallback.borrow()!.fulfill(<- token)
+			let vault <- auction.latestBidCallback.borrow()!.fulfillLease(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
@@ -807,6 +847,19 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
+
+			//if we have a callback there is no auction and it is a blind bid
+			if let cb= tokenRef.offerCallback {
+				let bidder= cb.address
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
+				let owner=tokenRef.owner!.address
+				let ownerName=tokenRef.getProfile()!.getName()
+				Debug.log("we have a blind bid so we cancel that")
+				emit DirectOfferRejected(name: name, bidder: bidder, bidderName:bidderName, owner:owner, ownerName:ownerName, amount: cb.borrow()!.getBalance(name))
+				cb.borrow()!.cancel(name)
+				tokenRef.setCallback(nil)
+			}
+
 			tokenRef.setStartAuctionPrice(auctionStartPrice)
 			tokenRef.setReservePrice(auctionReservePrice)
 			tokenRef.setAuctionDuration(auctionDuration)
@@ -1115,7 +1168,7 @@ pub contract FIND {
 			self.profiles[name] =  lease
 
 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))
-	
+
 		}
 
 		pub fun readStatus(_ name: String): NameStatus {
@@ -1230,7 +1283,7 @@ pub contract FIND {
 	pub resource interface BidCollectionPublic {
 		pub fun getBids() : [BidInfo]
 		pub fun getBalance(_ name: String) : UFix64
-		access(contract) fun fulfill(_ token: @FIND.Lease) : @FungibleToken.Vault
+		access(contract) fun fulfillLease(_ token: @FIND.Lease) : @FungibleToken.Vault
 		access(contract) fun cancel(_ name: String)
 		access(contract) fun setBidType(name: String, type: String) 
 	}
@@ -1250,7 +1303,7 @@ pub contract FIND {
 
 		//called from lease when auction is ended
 		//if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
-		access(contract) fun fulfill(_ token: @FIND.Lease) : @FungibleToken.Vault{
+		access(contract) fun fulfillLease(_ token: @FIND.Lease) : @FungibleToken.Vault{
 
 			let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
@@ -1291,6 +1344,11 @@ pub contract FIND {
 			if nameStatus.status ==  LeaseStatus.FREE {
 				panic("cannot bid on name that is free")
 			}
+
+			if self.owner!.address == nameStatus.owner {
+				panic("cannot bid on your own name")
+			}
+
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let bid <- create Bid(from: from, name:name, vault: <- vault)
@@ -1301,7 +1359,7 @@ pub contract FIND {
 			let oldToken <- self.bids[bid.name] <- bid
 			//send info to leaseCollection
 			destroy oldToken
-			leaseCollection.bid(name: name, callback: callbackCapability) 
+			leaseCollection.registerBid(name: name, callback: callbackCapability) 
 		}
 
 
@@ -1330,7 +1388,7 @@ pub contract FIND {
 				return
 			}
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-			from.borrow()!.cancelBid(name)
+			from.borrow()!.cancelUserBid(name)
 			self.cancel(name)
 		}
 
@@ -1423,19 +1481,16 @@ pub contract FIND {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
 
-		self.LeasePublicPath=/public/findLeases
-		self.LeaseStoragePath=/storage/findLeases
+		self.LeasePublicPath=/public/findLeases2
+		self.LeaseStoragePath=/storage/findLeases2
 
-		self.BidPublicPath=/public/findBids
-		self.BidStoragePath=/storage/findBids
+		self.BidPublicPath=/public/findBids2
+		self.BidStoragePath=/storage/findBids2
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
 		let network <-  create Network(
-			//TODO: change!
-			//leasePeriod: 86400.0, //365 days
-			//lockPeriod: 86400.0, //90 days
 			leasePeriod: 31536000.0, //365 days
 			lockPeriod: 7776000.0, //90 days
 			secondaryCut: 0.05,

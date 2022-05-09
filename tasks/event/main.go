@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"github.com/bjartek/overflow/overflow"
 )
 
 func main() {
 
 	// cronjob ready, read blockHeight from file
-	g := gwtf.NewGoWithTheFlowDevNet()
+	o := overflow.NewOverflowTestnet().Start()
 
 	url, ok := os.LookupEnv("DISCORD_WEBHOOK_URL")
 	if !ok {
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	eventPrefix := "A.85f0d6217184009b.FIND"
-	_, err := g.EventFetcher().
+	_, err := o.EventFetcher().
 		Workers(5).
 		BatchSize(25).
 		TrackProgressIn(".find-testnet.events").

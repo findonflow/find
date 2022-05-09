@@ -1,6 +1,6 @@
 all: dev
 
-.PHONY: setup deploy emulator test dev contract contract_publish
+.PHONY: setup deploy emulator test dev contract contract_publish client
 
 setup: deploy
 	go run ./tasks/setup/main.go
@@ -18,7 +18,7 @@ test:
 dev:
 	gotestsum -f testname --watch
 
-contract: 
+client: 
 	go run overflow/main.go > lib/find.json
 
 publish:

@@ -15,12 +15,18 @@ func main() {
 		"^mint*",
 		"clock",
 		"registerAdmin",
+		"adminSendFlow",
+		"transferAllFusd",
+		"fillUpTheChest",
+		"setSellDandyForFlow.cdc",
 	}, []string{})
 	if err != nil {
 		panic(err)
 	}
 
-	file, _ := json.MarshalIndent(res, "", "   ")
+	merged := res.MergeSpecAndCode()
+
+	file, _ := json.MarshalIndent(merged, "", "   ")
 	fmt.Println(string(file))
 
 }

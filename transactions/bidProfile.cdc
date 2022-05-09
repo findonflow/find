@@ -18,34 +18,23 @@ transaction(name: String, amount: UFix64) {
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
-			account.unlink(FIND.LeasePublicPath)
-			destroy <- account.load<@AnyResource>(from:FIND.LeaseStoragePath)
-
 			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 		}
 
 		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
-			account.unlink(FIND.BidPublicPath)
-			destroy <- account.load<@AnyResource>(from:FIND.BidStoragePath)
-
 			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
 		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {
-			account.unlink(Profile.publicPath)
-			destroy <- account.load<@AnyResource>(from:Profile.storagePath)
-
 			let profile <-Profile.createUser(name:name, createdAt: "find")
 
 			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"])
 
 			profile.addWallet(fusdWallet)
-			profile.addCollection(Profile.ResourceCollection("FINDLeases",leaseCollection, Type<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(), ["find", "leases"]))
-			profile.addCollection(Profile.ResourceCollection("FINDBids", bidCollection, Type<&FIND.BidCollection{FIND.BidCollectionPublic}>(), ["find", "bids"]))
 
 			account.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)

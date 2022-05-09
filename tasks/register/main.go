@@ -1,14 +1,12 @@
 package main
 
-//TODO: send mail https://medium.com/vacatronics/how-to-use-gmail-with-go-c980295c23b8
-
 import (
 	"encoding/csv"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"github.com/bjartek/overflow/overflow"
 	"github.com/meirf/gopart"
 )
 
@@ -51,9 +49,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	g := gwtf.NewGoWithTheFlowMainNet()
-	//g := gwtf.NewGoWithTheFlowDevNet()
-	//	g := gwtf.NewGoWithTheFlowEmulator()
+	o := overflow.NewOverflowMainnet().Start()
 
 	names := readCsvFile("names.txt")
 	fmt.Printf("Names is %d long", len(names))
@@ -83,10 +79,9 @@ func main() {
 	for idxRange := range gopart.Partition(len(filtered), size) {
 		//run transaction against flow
 		names := filtered[idxRange.Low:idxRange.High]
-		g.TransactionFromFile("registerAdmin").
+		o.TransactionFromFile("registerAdmin").
 			SignProposeAndPayAs("find-admin").
-			StringArrayArgument(names...).
-			AccountArgument("find-admin").
+			Args(o.Arguments().StringArray(names...).Account("find-admin")).
 			RunPrintEventsFull()
 	}
 }

@@ -1,18 +1,23 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FUSD from "./standard/FUSD.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
+import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
+import FindViews from "./FindViews.cdc"
+import MetadataViews from "./standard/MetadataViews.cdc"
+import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarket from "./FindMarket.cdc"
+import FTRegistry from "./FTRegistry.cdc"
+import NFTRegistry from "./NFTRegistry.cdc"
 
 pub contract Admin {
 
 	//store the proxy for the admin
 	pub let AdminProxyPublicPath: PublicPath
 	pub let AdminProxyStoragePath: StoragePath
-
 
 	/// ===================================================================================
 	// Admin things
@@ -28,7 +33,6 @@ pub contract Admin {
 		pub fun addCapability(_ cap: Capability<&FIND.Network>)
 	}
 
-
 	//admin proxy with capability receiver 
 	pub resource AdminProxy: AdminProxyClient {
 
@@ -40,6 +44,25 @@ pub contract Admin {
 				self.capability == nil : "Server already set"
 			}
 			self.capability = cap
+		}
+
+		/*
+		pub fun addTenantItem(_ item: FindMarketTenant.TenantSaleItem) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			self.capability!.borrow()!.addTenantItem(item)
+
+		}
+		*/
+
+		pub fun createFindMarketTenant(name: String, address:Address) : Capability<&FindMarketTenant.Tenant> {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			return  FindMarketTenant.createFindMarketTenant(name:name, address:address)
 		}
 
 		/// Set the wallet used for the network
@@ -94,10 +117,6 @@ pub contract Admin {
 			CharityNFT.mintCharity(metadata: metadata, recipient: recipient)
 		}
 
-
-
-
-
 		pub fun advanceClock(_ time: UFix64) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -113,6 +132,61 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			Debug.enable(value)
+		}
+
+		pub fun setViewConverters(from: Type, converters: [{Dandy.ViewConverter}]) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			Dandy.setViewConverters(from: from, converters: converters)
+		}
+
+		pub fun createForge(platform: Dandy.MinterPlatform) : @Dandy.Forge {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			return <- Dandy.createForge(platform:platform)
+		}
+
+		/// ===================================================================================
+		// Fungible Token Registry 
+		/// ===================================================================================
+
+		// Registry FungibleToken Information
+		pub fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+			FTRegistry.setFTInfo(alias: alias, type: type, tag: tag, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
+
+		}
+
+		// Remove FungibleToken Information by type identifier
+		pub fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) {
+			FTRegistry.removeFTInfoByTypeIdentifier(typeIdentifier)
+		}
+
+
+		// Remove FungibleToken Information by alias
+		pub fun removeFTInfoByAlias(_ alias: String) {
+			FTRegistry.removeFTInfoByAlias(alias)
+		}
+
+		/// ===================================================================================
+		// NonFungibleToken Registry 
+		/// ===================================================================================
+		// Registry NonFungibleToken Information
+		pub fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
+			NFTRegistry.setNFTInfo(alias: alias, type: type, icon: icon, providerPath: providerPath, publicPath: publicPath, storagePath: storagePath, allowedFTTypes: allowedFTTypes, address: address, externalFixedUrl: externalFixedUrl)
+
+		}
+
+		// Remove NonFungibleToken Information by type identifier
+		pub fun removeNFTInfoByTypeIdentifier(_ typeIdentifier: String) {
+			NFTRegistry.removeNFTInfoByTypeIdentifier(typeIdentifier)
+		}
+
+		// Remove NonFungibleToken Information by alias
+		pub fun removeNFTInfoByAlias(_ alias: String) {
+			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
 
 		init() {

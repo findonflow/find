@@ -13,6 +13,14 @@
 				"mainnet": "0x1d7e57aa55817448"
 			}
 		},
+
+		"MetadataViews": {
+			"source" : "./contracts/standard/MetadataViews.cdc",
+			"aliases" : {
+				"testnet": "0x631e88ae7f1d7c20",
+				"mainnet": "0x1d7e57aa55817448"
+			}
+		},
 		"FUSD": {
 			"source": "./contracts/standard/FUSD.cdc",
 			"aliases": {
@@ -37,11 +45,24 @@
 			}
 		},
 		"FIND": "./contracts/FIND.cdc",
+		"Dandy": "./contracts/Dandy.cdc",
+		"FindMarket": "./contracts/FindMarket.cdc",
+		"FindMarketTenant": "./contracts/FindMarketTenant.cdc",
+		"FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
+		"FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
+		"FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
+		"FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
+		"FindMarketSale": "./contracts/FindMarketSale.cdc",
+		"FindViews": "./contracts/FindViews.cdc",
+		"RelatedAccounts": "./contracts/RelatedAccounts.cdc",
+		"Sender": "./contracts/Sender.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
 		"Admin": "./contracts/Admin.cdc",
 		"Clock": "./contracts/Clock.cdc", 
 		"Profile": "./contracts/Profile.cdc",
-		"Debug" : "./contracts/Debug.cdc"
+		"Debug" : "./contracts/Debug.cdc",
+		"FTRegistry" : "./contracts/FTRegistry.cdc",
+		"NFTRegistry" : "./contracts/NFTRegistry.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -70,28 +91,24 @@
 			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
 		},
 		"testnet-account": {
-			"address": "1ff7e32d71183db0",
+			"address": "0x1ff7e32d71183db0",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
-			"address": "0xa16ab1d0abde3625",
-			"key": "${TESTNET_FIND}"
+			"address": "0xe756e20fbe194b92",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find-admin": {
-			"address": "0x523c2b6d1ab6063d",
-			"key": "${TESTNET_FIND_ADMIN}"
+			"address": "0xfa28b5a5eb983fda",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user1": {
-			"address": "96a0def8269d6bc4",
-			"key": "${TESTNET_FIND_USER1}"
+			"address": "0x0d8e7007852767fe",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user2": {
-			"address": "72c7672537676b1b",
-			"key": "${TESTNET_FIND_USER2}"
-		},
-		"testnet-user3": {
-			"address": "60635d0971b40946",
-			"key": "${TESTNET_FIND_USER3}"
+			"address": "0xffbdace90dd96d40",
+			"key": "${TESTNET_ACCOUNT}"
 		},
 		"mainnet-find": {
 			"address": "0x097bafa4e0b48eef",
@@ -105,22 +122,50 @@
 	"deployments": {
 		"mainnet": {
 			"mainnet-find": [
-				"FIND",
-				"Admin",
+			  "FIND",
 				"Clock",
-				"Debug",
 				"Profile",
-				"CharityNFT"
+				"Debug",
+				"Admin",
+				"CharityNFT",
+				"FindViews", 
+				"Dandy",
+				"FindMarket",
+				"FindMarketSale",
+				"FindMarketTenant",
+				"FindMarketDirectOfferEscrow",
+				"FindMarketDirectOfferSoft",
+				"FindMarketAuctionEscrow",
+				"FindMarketAuctionSoft",
+				"Sender",
+				"RelatedAccounts",
+				"FTRegistry",
+				"NFTRegistry"
 			]
 		},
 		"testnet": {
 			"testnet-find": [
 				"FIND",
-				"Admin",
 				"Clock",
-				"Debug",
 				"Profile",
-				"CharityNFT"
+				"Debug",
+				"Admin",
+				"CharityNFT",
+
+				"FindViews", 
+				"Dandy",
+				"FindMarket",
+				"FindMarketSale",
+				"FindMarketTenant",
+				"FindMarketDirectOfferEscrow",
+				"FindMarketDirectOfferSoft",
+				"FindMarketAuctionEscrow",
+				"FindMarketAuctionSoft",
+				"Sender",
+				"RelatedAccounts",
+				"FTRegistry",
+				"NFTRegistry"
+
 			]
 		},
 		"emulator": {
@@ -132,7 +177,21 @@
 				"Debug",
 				"FUSD",
 				"Admin",
-				"CharityNFT"
+				"CharityNFT",
+				"FindViews", 
+				"MetadataViews",
+				"Dandy",
+				"FindMarket",
+				"FindMarketTenant",
+				"FindMarketSale",
+				"FindMarketDirectOfferEscrow",
+				"FindMarketDirectOfferSoft",
+				"FindMarketAuctionEscrow",
+				"FindMarketAuctionSoft",
+				"Sender",
+				"RelatedAccounts",
+				"FTRegistry",
+				"NFTRegistry"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],

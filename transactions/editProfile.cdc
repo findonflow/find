@@ -4,7 +4,6 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 
-
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, links: [{String: String}]) {
 	prepare(acct: AuthAccount) {
 
@@ -72,6 +71,19 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 				continue
 			}
 			profile.addLink(Profile.Link(title: link["title"]!, type: link["type"]!, url: link["url"]!))
+		}
+
+		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+		if !leaseCollection.check() {
+			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
+			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
+
+		}
+
+		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
+		if !bidCollection.check() {
+			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
+			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 	}
 }

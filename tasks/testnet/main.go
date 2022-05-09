@@ -1,106 +1,72 @@
 package main
 
 import (
-	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"os"
+
+	"github.com/bjartek/overflow/overflow"
 )
 
 func main() {
 
 	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
-	g := gwtf.NewGoWithTheFlowDevNet()
+	o := overflow.NewOverflowTestnet().Start()
+
+	os.Exit(0)
+
+	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find-admin").UFix64(1000.0))
+	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("user1").UFix64(1000.0))
 
 	//first step create the adminClient as the fin user
-	g.TransactionFromFile("setup_fin_1_create_client").
+	o.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("find-admin").
 		RunPrintEventsFull()
 
 	//link in the server in the versus client
-	g.TransactionFromFile("setup_fin_2_register_client").
+	o.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAs("find").
-		AccountArgument("find-admin").
+		Args(o.Arguments().Account("find-admin")).
 		RunPrintEventsFull()
 
 	//set up fin network as the fin user
-	g.TransactionFromFile("setup_fin_3_create_network").
+	o.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("find-admin").
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("setup_find_market_1").
 		SignProposeAndPayAs("find").
-		StringArgument("find").
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("createProfile").
+	//link in the server in the versus client
+	o.TransactionFromFile("setup_find_market_2").
 		SignProposeAndPayAs("find-admin").
-		StringArgument("find-admin").
+		Args(o.Arguments().Account("find")).
 		RunPrintEventsFull()
 
-	/*
-		//we advance the clock
-		//	g.TransactionFromFile("clock").SignProposeAndPayAs("find").UFix64Argument("1.0").RunPrintEventsFull()
+	o.SimpleTxArgs("setNFTInfo_Dandy", "find-admin", o.Arguments())
+	o.SimpleTxArgs("setFTInfo_flow", "find-admin", o.Arguments())
 
-		tags := cadence.NewArray([]cadence.Value{cadence.String("find")})
+	createProfileAndGiftName(o, "find")
+	createProfileAndGiftName(o, "find-admin")
+	createProfileAndGiftName(o, "user1")
 
-		g.TransactionFromFile("createProfile").
-			SignProposeAndPayAs("user1").
-			StringArgument("User1").
-			StringArgument("This is user1").
-			Argument(tags).
-			BooleanArgument(true).
-			RunPrintEventsFull()
+	o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(100.0))
 
-		g.TransactionFromFile("createProfile").
-			SignProposeAndPayAs("user2").
-			StringArgument("User2").
-			StringArgument("This is user2").
-			Argument(tags).
-			BooleanArgument(true).
-			RunPrintEventsFull()
+	o.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").
+		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
+		RunPrintEventsFull()
 
-		g.TransactionFromFile("mintFusd").
-			SignProposeAndPayAsService().
-			AccountArgument("user1").
-			UFix64Argument("100.0").
-			RunPrintEventsFull()
+	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
+}
 
-		g.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			RunPrintEventsFull()
+func createProfileAndGiftName(o *overflow.Overflow, name string) {
+	o.TransactionFromFile("createProfile").
+		SignProposeAndPayAs(name).
+		Args(o.Arguments().String(name)).
+		RunPrintEventsFull()
 
-		g.TransactionFromFile("mintFusd").
-			SignProposeAndPayAsService().
-			AccountArgument("user2").
-			UFix64Argument("30.0").
-			RunPrintEventsFull()
+	o.TransactionFromFile("registerAdmin").
+		SignProposeAndPayAs("find-admin").
+		Args(o.Arguments().StringArray(name).Account(name)).
+		RunPrintEventsFull()
 
-		g.TransactionFromFile("renew").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			RunPrintEventsFull()
-
-		g.TransactionFromFile("sell").SignProposeAndPayAs("user1").StringArgument("user1").UFix64Argument("10.0").RunPrintEventsFull()
-
-		g.TransactionFromFile("bid").
-			SignProposeAndPayAs("user2").
-			StringArgument("user1").
-			UFix64Argument("10.0").
-			RunPrintEventsFull()
-
-		g.ScriptFromFile("lease_status").AccountArgument("user1").Run()
-		g.ScriptFromFile("lease_status").AccountArgument("user2").Run()
-		g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
-
-		g.TransactionFromFile("clock").SignProposeAndPayAs("fin").UFix64Argument("86500.0").RunPrintEventsFull()
-
-		g.TransactionFromFile("fulfill").
-			SignProposeAndPayAs("user1").
-			StringArgument("user1").
-			RunPrintEventsFull()
-
-		g.ScriptFromFile("lease_status").AccountArgument("user2").Run()
-		g.ScriptFromFile("lease_status").AccountArgument("user1").Run()
-		g.ScriptFromFile("bid_status").AccountArgument("user2").Run()
-
-	*/
 }

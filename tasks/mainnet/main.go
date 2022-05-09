@@ -1,15 +1,13 @@
 package main
 
 import (
-	"github.com/bjartek/go-with-the-flow/v2/gwtf"
+	"github.com/bjartek/overflow/overflow"
 	"github.com/onflow/cadence"
 )
 
 func main() {
 
-	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
-	g := gwtf.NewGoWithTheFlowMainNet()
-	//g := gwtf.NewGoWithTheFlowDevNet()
+	o := overflow.NewOverflowMainnet().Start()
 
 	/*
 		//first step create the adminClient as the fin user
@@ -19,9 +17,9 @@ func main() {
 	*/
 
 	//link in the server in the versus client
-	g.TransactionFromFile("setup_fin_2_register_client").
+	o.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAs("find").
-		AccountArgument("find-admin").
+		Args(o.Arguments().Account("find-admin")).
 		RunPrintEventsFull()
 
 		/*
@@ -31,9 +29,9 @@ func main() {
 				RunPrintEventsFull()
 		*/
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find").
-		StringArgument("find").
+		Args(o.Arguments().String("find")).
 		RunPrintEventsFull()
 
 	findLinks := cadence.NewArray([]cadence.Value{
@@ -43,15 +41,16 @@ func main() {
 			{Key: NewCadenceSting("url"), Value: NewCadenceSting("https://twitter.com/findonflow")},
 		})})
 
-	g.TransactionFromFile("createProfile").
+	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs("find-admin").
-		StringArgument("ReservedNames").
+		Args(o.Arguments().String("ReservedNames")).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("editProfile").
+	o.TransactionFromFile("editProfile").
 		SignProposeAndPayAs("find-admin").
-		StringArgument("ReservedFindNames").
-		StringArgument(`The names owned by this profile are reservd by .find. In order to aquire a name here you have to:
+		Args(o.Arguments().
+			String("ReservedFindNames").
+			String(`The names owned by this profile are reservd by .find. In order to aquire a name here you have to:
 
 Prices:
  - 3 letter name  500 FUSD
@@ -62,32 +61,31 @@ Prices:
 2. go into the find discord and let the mods know you have made the bid
 
 `).
-		StringArgument("https://find.xyz/find.png").
-		StringArrayArgument("find").
-		BooleanArgument(false).
-		Argument(findLinks).
+			String("https://find.xyz/find.png").
+			StringArray("find").
+			Boolean(false).
+			Argument(findLinks)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("editProfile").
+	o.TransactionFromFile("editProfile").
 		SignProposeAndPayAs("find").
-		StringArgument("find").
-		StringArgument(`.find will allow you to find people and NFTS on flow!`).
-		StringArgument("https://find.xyz/find.png").
-		StringArrayArgument("find").
-		BooleanArgument(true).
-		Argument(findLinks).
+		Args(o.Arguments().
+			String("find").
+			String(`.find will allow you to find people and NFTS on flow!`).
+			String("https://find.xyz/find.png").
+			StringArray("find").
+			Boolean(true).
+			Argument(findLinks)).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("registerAdmin").
+	o.TransactionFromFile("registerAdmin").
 		SignProposeAndPayAs("find-admin").
-		StringArrayArgument("find").
-		AccountArgument("find").
+		Args(o.Arguments().StringArray("find").Account("find")).
 		RunPrintEventsFull()
 
-	g.TransactionFromFile("registerAdmin").
+	o.TransactionFromFile("registerAdmin").
 		SignProposeAndPayAs("find-admin").
-		StringArrayArgument("reserved-names").
-		AccountArgument("find-admin").
+		Args(o.Arguments().StringArray("reserved-names").Account("find-admin")).
 		RunPrintEventsFull()
 
 }

@@ -1,7 +1,6 @@
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-//Check the status of a fin user
 pub fun main(user: Address) : Bool {
 
 	let account=getAccount(user)
