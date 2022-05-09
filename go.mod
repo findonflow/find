@@ -1,6 +1,6 @@
 module github.com/findonflow/find
 
-go 1.17
+go 1.18
 
 require (
 	github.com/bjartek/overflow v0.0.0-20220407214147-f74f6ea0f10b
