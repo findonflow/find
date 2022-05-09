@@ -55,12 +55,14 @@ pub fun main(user: Address) : FINDReport {
 			var listingTypeIdentifier: String = ""
 			if report.items.length > 0 {
 				listingTypeIdentifier = report.items[0].listingTypeIdentifier
-				items[listingTypeIdentifier] = report 
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
+				items[identifier] = report 
 				continue
 			} 
 			if report.ghosts.length > 0 {
 				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
-				items[listingTypeIdentifier] = report 
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
+				items[identifier] = report 
 			}
 		}
 	}
@@ -81,12 +83,14 @@ pub fun main(user: Address) : FINDReport {
 			var listingTypeIdentifier: String = ""
 			if report.items.length > 0 {
 				listingTypeIdentifier = report.items[0].bidTypeIdentifier
-				marketBids[listingTypeIdentifier] = report 
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-4)
+				marketBids[identifier] = report 
 				continue
 			} 
 			if report.ghosts.length > 0 {
 				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
-				marketBids[listingTypeIdentifier] = report 
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-4)
+				marketBids[identifier] = report 
 			}
 		}
 	}
@@ -101,3 +105,5 @@ pub fun main(user: Address) : FINDReport {
 		marketBids: marketBids,
 	)
 }
+
+
