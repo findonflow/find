@@ -4,7 +4,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 
-transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, links: [{String: String}]) {
+transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitles : {String: String}, linkTypes: {String:String}, linkUrls : {String:String}, removeLinks : [String]) {
 	prepare(acct: AuthAccount) {
 
 		let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
@@ -57,20 +57,18 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		profile.setName(name)
 		profile.setDescription(description)
 		profile.setAvatar(avatar)
+		profile.setTags(tags)
 
-		let existingTags=profile.setTags(tags)
+		for link in removeLinks {
+			profile.removeLink(link)
+		}
 
-		let oldLinks=profile.getLinks()
+		for titleName in linkTitles.keys {
+			let title=linkTitles[titleName]!
+			let url = linkUrls[titleName]!
+			let type = linkTypes[titleName]!
 
-		for link in links {
-			if !link.containsKey("title") {
-				continue
-			}
-			if link["remove"] == "true" {
-				profile.removeLink(link["title"]!)	
-				continue
-			}
-			profile.addLink(Profile.Link(title: link["title"]!, type: link["type"]!, url: link["url"]!))
+			profile.addLinkWithName(name:titleName, link: Profile.Link(title: title, type: type, url: type))
 		}
 
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)

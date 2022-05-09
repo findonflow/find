@@ -56,11 +56,15 @@ pub fun main(name: String) : FINDNameReport{
 			var listingTypeIdentifier: String = ""
 			if report.items.length > 0 {
 				listingTypeIdentifier = report.items[0].listingTypeIdentifier
-				items[listingTypeIdentifier] = report 
+
+				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
 				continue
 			} 
 			if report.ghosts.length > 0 {
 				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
+				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
 				items[listingTypeIdentifier] = report 
 			}
 		}
@@ -81,13 +85,15 @@ pub fun main(name: String) : FINDNameReport{
 			let report=ref.getBidsReport()
 			var listingTypeIdentifier: String = ""
 			if report.items.length > 0 {
-				listingTypeIdentifier = report.items[0].bidTypeIdentifier
-				marketBids[listingTypeIdentifier] = report 
+				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-4)
+				marketBids[identifier] = report 
 				continue
 			} 
 			if report.ghosts.length > 0 {
 				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
-				marketBids[listingTypeIdentifier] = report 
+				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-4)
+				marketBids[identifier] = report 
 			}
 		}
 	}

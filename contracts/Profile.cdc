@@ -119,6 +119,56 @@ pub contract Profile {
 		}
 	}
 
+	//This is the new return struct from the profile
+	pub struct UserReport {
+		pub let findName: String
+		pub let createdAt: String
+		pub let address: Address
+		pub let name: String
+		pub let gender: String
+		pub let description: String
+		pub let tags: [String]
+		pub let avatar: String
+		pub let links: {String:Link}
+		pub let wallets: [WalletProfile]
+		pub let following: [FriendStatus]
+		pub let followers: [FriendStatus]
+		pub let allowStoringFollowers: Bool
+
+		init(
+			findName:String,
+			address: Address,
+			name: String,
+			gender: String,
+			description: String, 
+			tags: [String],
+			avatar: String, 
+			links: {String:Link},
+			wallets: [WalletProfile],
+			following: [FriendStatus],
+			followers: [FriendStatus],
+			allowStoringFollowers:Bool,
+			createdAt: String
+		) {
+			self.findName=findName
+			self.address=address
+			self.name=name
+			self.gender=gender
+			self.description=description
+			self.tags=tags
+			self.avatar=avatar
+			self.links=links
+			self.wallets=wallets
+			self.following=following
+			self.followers=followers
+			self.allowStoringFollowers=allowStoringFollowers
+			self.createdAt=createdAt
+		}
+	}
+
+
+
+	//This format is deperated
 	pub struct UserProfile {
 		pub let findName: String
 		pub let createdAt: String
@@ -185,6 +235,7 @@ pub contract Profile {
 		pub fun deposit(from: @FungibleToken.Vault)
 		pub fun supportedFungigleTokenTypes() : [Type]
 		pub fun asProfile() : UserProfile
+		pub fun asReport() : UserReport
 		pub fun isBanned(_ val: Address): Bool
 		pub fun isPrivateModeEnabled() : Bool
 		//TODO: getBanned
@@ -241,6 +292,8 @@ pub contract Profile {
 		pub fun setWallets(_ val: [Wallet])
 
 		pub fun addLink(_ val: Link)
+		pub fun addLinkWithName(name:String, link:Link)
+
 		pub fun removeLink(_ val: String)
 
 		//Verify that this user has signed something.
@@ -332,6 +385,30 @@ pub contract Profile {
 			emit Verification(account: self.owner!.address, message:val)
 		}
 
+
+		pub fun asReport() : UserReport {
+			let wallets: [WalletProfile]=[]
+			for w in self.wallets {
+				wallets.append(WalletProfile(w))
+			}
+
+			return UserReport(
+				findName: self.getFindName(),
+				address: self.owner!.address,
+				name: self.getName(),
+				gender: self.getGender(),
+				description: self.getDescription(),
+				tags: self.getTags(),
+				avatar: self.getAvatar(),
+				links: self.getLinksMap(),
+				wallets: wallets, 
+				following: self.getFollowing(),
+				followers: self.getFollowers(),
+				allowStoringFollowers: self.allowStoringFollowers,
+				createdAt:self.getCreatedAt()
+			)
+		}
+
 		pub fun asProfile() : UserProfile {
 			let wallets: [WalletProfile]=[]
 			for w in self.wallets {
@@ -361,8 +438,16 @@ pub contract Profile {
 			)
 		}
 
+		pub fun getLinksMap() : {String: Link} {
+			return self.links
+		}
+
 		pub fun getLinks() : [Link] {
 			return self.links.values
+		}
+
+		pub fun addLinkWithName(name:String, link:Link) {
+			self.links[name]=link
 		}
 
 		pub fun addLink(_ val: Link) {
