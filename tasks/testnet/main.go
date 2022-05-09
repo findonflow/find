@@ -47,6 +47,9 @@ func main() {
 	o.SimpleTxArgs("setNFTInfo_Dandy", "find-admin", o.Arguments())
 	o.SimpleTxArgs("setFTInfo_flow", "find-admin", o.Arguments())
 
+	//You are allowed to sell dandies for flow
+	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
+
 	createProfileAndGiftName(o, "find")
 	createProfileAndGiftName(o, "find-admin")
 	createProfileAndGiftName(o, "user1")
