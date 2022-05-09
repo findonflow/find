@@ -25,6 +25,7 @@ func TestDandy(t *testing.T) {
 		assert.JSONEq(t, `[
 						        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
 			        	            	          "A.f8d6e0586b0a20c7.FindViews.Nounce",
+																				"A.f8d6e0586b0a20c7.FindViews.Grouping",
 						        	            	    "String",
 						        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
 					        	            	      "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
@@ -46,7 +47,7 @@ func TestDandy(t *testing.T) {
 
 		result := otu.O.ScriptFromFile("view").Args(otu.O.Arguments().
 			Account("user1").
-			PublicPath("findDandy").
+			String("findDandy").
 			UInt64(id).
 			String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
 		assert.JSONEq(t, display, result)
@@ -57,7 +58,7 @@ func TestDandy(t *testing.T) {
 `
 		urlResult := otu.O.ScriptFromFile("view").Args(otu.O.Arguments().
 			Account("user1").
-			PublicPath("findDandy").
+			String("findDandy").
 			UInt64(id).
 			String("A.f8d6e0586b0a20c7.MetadataViews.ExternalURL")).RunReturnsJsonString()
 		assert.JSONEq(t, externalUrl, urlResult)

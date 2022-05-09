@@ -390,7 +390,7 @@
                }
             },
             "view": {
-               "code": "import NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\n//Fetch a single view from a nft on a given path\npub fun main(address: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet collection= getAccount(address).getCapability(path).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n\tlet nft=collection.borrowViewResolver(id: id)\n\tfor v in nft.getViews() {\n\t\tif v.identifier== identifier {\n\t\t\treturn nft.resolveView(v)\n\t\t}\n\t}\n\treturn nil\n}",
+               "code": "import NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\n//Fetch a single view from a nft on a given path\npub fun main(address: Address, path:String, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet pp = PublicPath(identifier:path)!\n\tlet collection= getAccount(address).getCapability(pp).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n\tlet nft=collection.borrowViewResolver(id: id)\n\tfor v in nft.getViews() {\n\t\tif v.identifier== identifier {\n\t\t\treturn nft.resolveView(v)\n\t\t}\n\t}\n\treturn nil\n}",
                "spec": {
                   "order": [
                      "address",
@@ -402,12 +402,12 @@
                      "address": "Address",
                      "id": "UInt64",
                      "identifier": "String",
-                     "path": "PublicPath"
+                     "path": "String"
                   }
                }
             },
             "views": {
-               "code": "import NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\n//get all the views for an nft and address/path/id\npub fun main(address: Address, path:PublicPath, id: UInt64) : [String] {\n\tlet collection= getAccount(address).getCapability(path).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\tlet nft=collection.borrowViewResolver(id: id)\n\tlet views:[String]=[]\n\tfor v in nft.getViews() {\n\t\tviews.append(v.identifier)\n\t}\n\treturn views\n}",
+               "code": "import NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\n//get all the views for an nft and address/path/id\npub fun main(address: Address, path:String, id: UInt64) : [String] {\n\tlet pp = PublicPath(identifier: path)!\n\tlet collection= getAccount(address).getCapability(pp).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\tlet nft=collection.borrowViewResolver(id: id)\n\tlet views:[String]=[]\n\tfor v in nft.getViews() {\n\t\tviews.append(v.identifier)\n\t}\n\treturn views\n}",
                "spec": {
                   "order": [
                      "address",
@@ -417,7 +417,7 @@
                   "parameters": {
                      "address": "Address",
                      "id": "UInt64",
-                     "path": "PublicPath"
+                     "path": "String"
                   }
                }
             }
@@ -1829,7 +1829,7 @@
                }
             },
             "view": {
-               "code": "import NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\n\n//Fetch a single view from a nft on a given path\npub fun main(address: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet collection= getAccount(address).getCapability(path).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n\tlet nft=collection.borrowViewResolver(id: id)\n\tfor v in nft.getViews() {\n\t\tif v.identifier== identifier {\n\t\t\treturn nft.resolveView(v)\n\t\t}\n\t}\n\treturn nil\n}",
+               "code": "import NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\n\n//Fetch a single view from a nft on a given path\npub fun main(address: Address, path:String, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet pp = PublicPath(identifier:path)!\n\tlet collection= getAccount(address).getCapability(pp).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n\tlet nft=collection.borrowViewResolver(id: id)\n\tfor v in nft.getViews() {\n\t\tif v.identifier== identifier {\n\t\t\treturn nft.resolveView(v)\n\t\t}\n\t}\n\treturn nil\n}",
                "spec": {
                   "order": [
                      "address",
@@ -1841,12 +1841,12 @@
                      "address": "Address",
                      "id": "UInt64",
                      "identifier": "String",
-                     "path": "PublicPath"
+                     "path": "String"
                   }
                }
             },
             "views": {
-               "code": "import NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\n\n//get all the views for an nft and address/path/id\npub fun main(address: Address, path:PublicPath, id: UInt64) : [String] {\n\tlet collection= getAccount(address).getCapability(path).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\tlet nft=collection.borrowViewResolver(id: id)\n\tlet views:[String]=[]\n\tfor v in nft.getViews() {\n\t\tviews.append(v.identifier)\n\t}\n\treturn views\n}",
+               "code": "import NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\n\n//get all the views for an nft and address/path/id\npub fun main(address: Address, path:String, id: UInt64) : [String] {\n\tlet pp = PublicPath(identifier: path)!\n\tlet collection= getAccount(address).getCapability(pp).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\tlet nft=collection.borrowViewResolver(id: id)\n\tlet views:[String]=[]\n\tfor v in nft.getViews() {\n\t\tviews.append(v.identifier)\n\t}\n\treturn views\n}",
                "spec": {
                   "order": [
                      "address",
@@ -1856,7 +1856,7 @@
                   "parameters": {
                      "address": "Address",
                      "id": "UInt64",
-                     "path": "PublicPath"
+                     "path": "String"
                   }
                }
             }
@@ -3268,7 +3268,7 @@
                }
             },
             "view": {
-               "code": "import NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\n\n//Fetch a single view from a nft on a given path\npub fun main(address: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet collection= getAccount(address).getCapability(path).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n\tlet nft=collection.borrowViewResolver(id: id)\n\tfor v in nft.getViews() {\n\t\tif v.identifier== identifier {\n\t\t\treturn nft.resolveView(v)\n\t\t}\n\t}\n\treturn nil\n}",
+               "code": "import NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\n\n//Fetch a single view from a nft on a given path\npub fun main(address: Address, path:String, id: UInt64, identifier: String) : AnyStruct? {\n\n\tlet pp = PublicPath(identifier:path)!\n\tlet collection= getAccount(address).getCapability(pp).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n\tlet nft=collection.borrowViewResolver(id: id)\n\tfor v in nft.getViews() {\n\t\tif v.identifier== identifier {\n\t\t\treturn nft.resolveView(v)\n\t\t}\n\t}\n\treturn nil\n}",
                "spec": {
                   "order": [
                      "address",
@@ -3280,12 +3280,12 @@
                      "address": "Address",
                      "id": "UInt64",
                      "identifier": "String",
-                     "path": "PublicPath"
+                     "path": "String"
                   }
                }
             },
             "views": {
-               "code": "import NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\n\n//get all the views for an nft and address/path/id\npub fun main(address: Address, path:PublicPath, id: UInt64) : [String] {\n\tlet collection= getAccount(address).getCapability(path).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\tlet nft=collection.borrowViewResolver(id: id)\n\tlet views:[String]=[]\n\tfor v in nft.getViews() {\n\t\tviews.append(v.identifier)\n\t}\n\treturn views\n}",
+               "code": "import NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\n\n//get all the views for an nft and address/path/id\npub fun main(address: Address, path:String, id: UInt64) : [String] {\n\tlet pp = PublicPath(identifier: path)!\n\tlet collection= getAccount(address).getCapability(pp).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\tlet nft=collection.borrowViewResolver(id: id)\n\tlet views:[String]=[]\n\tfor v in nft.getViews() {\n\t\tviews.append(v.identifier)\n\t}\n\treturn views\n}",
                "spec": {
                   "order": [
                      "address",
@@ -3295,7 +3295,7 @@
                   "parameters": {
                      "address": "Address",
                      "id": "UInt64",
-                     "path": "PublicPath"
+                     "path": "String"
                   }
                }
             }
