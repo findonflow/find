@@ -93,7 +93,7 @@ pub contract FiatToken: FungibleToken {
         // was a temporary holder of the tokens. The Vault's balance has
         // been consumed and therefore can be destroyed.
         pub fun deposit(from: @FungibleToken.Vault) {
-            let vault <- from as! @FUSD.Vault
+            let vault <- from as! @FiatToken.Vault
             self.balance = self.balance + vault.balance
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
             vault.balance = 0.0
@@ -101,7 +101,7 @@ pub contract FiatToken: FungibleToken {
         }
 
         destroy() {
-            FUSD.totalSupply = FUSD.totalSupply - self.balance
+            FiatToken.totalSupply = FiatToken.totalSupply - self.balance
         }
     }
 
@@ -112,7 +112,7 @@ pub contract FiatToken: FungibleToken {
     // and store the returned Vault in their storage in order to allow their
     // account to be able to receive deposits of this token type.
     //
-    pub fun createEmptyVault(): @FUSD.Vault {
+    pub fun createEmptyVault(): @FiatToken.Vault {
         return <-create Vault(balance: 0.0)
     }
 
@@ -128,11 +128,11 @@ pub contract FiatToken: FungibleToken {
         // Function that mints new tokens, adds them to the total supply,
         // and returns them to the calling context.
         //
-        pub fun mintTokens(amount: UFix64): @FUSD.Vault {
+        pub fun mintTokens(amount: UFix64): @Vault {
             pre {
                 amount > 0.0: "Amount minted must be greater than zero"
             }
-            FUSD.totalSupply = FUSD.totalSupply + amount
+            FiatToken.totalSupply = FiatToken.totalSupply + amount
             emit TokensMinted(amount: amount)
             return <-create Vault(balance: amount)
         }
@@ -192,17 +192,6 @@ pub contract FiatToken: FungibleToken {
     // and cache all of this information to enable easy revocation but String/Path comversion isn't yet supported.
     //
     pub resource Administrator {
-
-        // createNewMinter
-        //
-        // Function that creates a Minter resource.
-        // This should be stored at a unique path in storage then a capability to it wrapped
-        // in a MinterProxy to be stored in a minter account's storage.
-        // This is done by the minter account running:
-        // transactions/FUSD/minter/setup_minter_account.cdc
-        // then the admin account running:
-        // transactions/flowArcaddeToken/admin/deposit_minter_capability.cdc
-        //
         pub fun createNewMinter(): @Minter {
             emit MinterCreated()
             return <- create Minter()
