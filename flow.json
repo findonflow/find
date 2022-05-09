@@ -198,7 +198,8 @@
 				"Sender",
 				"RelatedAccounts",
 				"FTRegistry",
-				"NFTRegistry"
+				"NFTRegistry",
+				"FiatToken"
 			], 
 			"emulator-find" : [],
 			"emulator-user1" : [],
