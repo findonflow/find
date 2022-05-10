@@ -57,12 +57,13 @@ pub fun main(name: String) : FINDNameReport{
 			if report.items.length > 0 {
 				listingTypeIdentifier = report.items[0].listingTypeIdentifier
 				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
+				items[identifier] = report 
 				continue
 			} 
 			if report.ghosts.length > 0 {
 				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
 				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
-				items[listingTypeIdentifier] = report 
+				items[identifier] = report 
 			}
 		}
 	}
