@@ -50,6 +50,8 @@ func main() {
 	//You are allowed to sell dandies for flow
 	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
 
+	o.SimpleTxArgs("setupMarketOptionsTypes", "find-admin", o.Arguments())
+
 	createProfileAndGiftName(o, "find")
 	createProfileAndGiftName(o, "find-admin")
 	createProfileAndGiftName(o, "user1")
