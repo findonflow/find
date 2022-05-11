@@ -22,6 +22,8 @@ func main() {
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+			String("rare").
+			UFix64(50.0).
 			RawAddress(user)).
 		RunPrintEventsFull()
 }
