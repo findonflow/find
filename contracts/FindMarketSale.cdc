@@ -44,6 +44,10 @@ pub contract FindMarketSale {
 			return "directSale"
 		}
 
+		pub fun getListingType() : Type {
+			return Type<@SaleItem>()
+		}
+
 		pub fun getListingTypeIdentifier(): String {
 			return Type<@SaleItem>().identifier
 		}
@@ -120,13 +124,15 @@ pub contract FindMarketSale {
 			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
 		}
 
+		pub fun checkPointer() : Bool {
+			return self.pointer.valid()
+		}
+
 	}
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
-		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
@@ -147,60 +153,6 @@ pub contract FindMarketSale {
 				self.tenantCapability.check() : "Tenant client is not linked anymore"
 			}
 			return self.tenantCapability.borrow()!
-		}
-
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation? {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-			}
-			let item=self.borrow(id)
-			let tenant=self.getTenant()
-			let info = self.checkSaleInformation(tenant: tenant, ids: [id], getGhost: false)
-			if info.items.length > 0 {
-				return info.items[0]
-			}
-			return nil
-		}
-
-		// todo: do we need this here?
-		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport {
-			let tenant=self.getTenant()
-			return self.checkSaleInformation(tenant: tenant, ids: self.getIds(), getGhost: true)
-		}
-
-		access(contract) fun checkSaleInformation(tenant: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
-			let ghost: [FindMarket.GhostListing] =[]
-			let info: [FindMarket.SaleItemInformation] =[]
-			let listingType = self.getListingType()
-			for id in ids {
-				let item=self.borrow(id)
-				if !item.pointer.valid() {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				//TODO: do we need to be smarter about this?
-				let stopped=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
-				var status="active"
-				if !stopped.allowed {
-					status="stopped"
-				}
-				let deprecated=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "delist item for sale"))
-
-				if !deprecated.allowed {
-					status="deprecated"
-				}
-
-				if let validTime = item.getValidUntil() {
-					if validTime >= getCurrentBlock().timestamp{
-						status="ended"
-					}
-				}
-				info.append(FindMarket.SaleItemInformation(item, status))
-			}
-
-			return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
 		}
 
 		pub fun getListingType() : Type {
@@ -290,6 +242,13 @@ pub contract FindMarketSale {
 
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			return &self.items[id] as &SaleItem
+		}
+
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
+			pre{
+				self.items.containsKey(id) : "This id does not exist : ".concat(id.toString())
+			}
+			return &self.items[id] as &SaleItem{FindMarket.SaleItem}
 		}
 
 		destroy() {

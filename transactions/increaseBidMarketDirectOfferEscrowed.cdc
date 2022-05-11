@@ -2,6 +2,7 @@ import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 transaction(id: UInt64, amount: UFix64) {
 
@@ -14,7 +15,8 @@ transaction(id: UInt64, amount: UFix64) {
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
-		let bidInfo = self.bidsReference.getBid(id)
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
+		let bidInfo = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
 		if bidInfo == nil {
 			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
 		}

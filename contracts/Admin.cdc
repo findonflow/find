@@ -12,6 +12,7 @@ import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
+import FindMarketOptions from "./FindMarketOptions.cdc"
 
 pub contract Admin {
 
@@ -187,6 +188,25 @@ pub contract Admin {
 		// Remove NonFungibleToken Information by alias
 		pub fun removeNFTInfoByAlias(_ alias: String) {
 			NFTRegistry.removeNFTInfoByAlias(alias)
+		}
+
+		/// ===================================================================================
+		// NonFungibleToken Registry 
+		/// ===================================================================================
+		pub fun addSaleItemCollectionType(_ type: Type) {
+			FindMarketOptions.addSaleItemCollectionType(type) 
+		}
+
+		pub fun addMarketBidCollectionType(_ type: Type) {
+			FindMarketOptions.addMarketBidCollectionType(type) 
+		}
+
+		pub fun removeSaleItemCollectionType(_ type: Type) {
+			FindMarketOptions.removeSaleItemCollectionType(type) 
+		}
+
+		pub fun removeMarketBidCollectionType(_ type: Type) {
+			FindMarketOptions.removeMarketBidCollectionType(type) 
 		}
 
 		init() {
