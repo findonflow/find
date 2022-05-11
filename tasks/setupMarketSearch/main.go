@@ -34,10 +34,6 @@ func main() {
 				Type: "string",
 			},
 			{
-				Name: "uuid",
-				Type: "int64",
-			},
-			{
 				Name: "tenant",
 				Type: "string",
 			},
@@ -48,19 +44,19 @@ func main() {
 			},
 			{
 				Name:     "seller_name",
-				Type:     "String",
+				Type:     "string",
 				Optional: pointer.True(),
 				Facet:    pointer.True(),
 			},
 			{
 				Name:     "buyer",
-				Type:     "String",
+				Type:     "string",
 				Optional: pointer.True(),
 				Facet:    pointer.True(),
 			},
 			{
 				Name:     "buyer_name",
-				Type:     "String",
+				Type:     "string",
 				Optional: pointer.True(),
 				Facet:    pointer.True(),
 			},
@@ -71,7 +67,7 @@ func main() {
 			},
 			{
 				Name:     "amount_type",
-				Type:     "String",
+				Type:     "string",
 				Optional: pointer.True(),
 			},
 			{
@@ -82,6 +78,12 @@ func main() {
 				Name:  "nft_type",
 				Type:  "string",
 				Facet: pointer.True(),
+			},
+			{
+				Name:     "nft_grouping",
+				Type:     "string",
+				Facet:    pointer.True(),
+				Optional: pointer.True(),
 			},
 			{
 				Name: "nft_name",
@@ -108,12 +110,7 @@ func main() {
 				Optional: pointer.True(),
 			},
 			{
-				Name:     "auction_start_price",
-				Type:     "float",
-				Optional: pointer.True(),
-			},
-			{
-				Name:  "listingType",
+				Name:  "listing_type",
 				Type:  "string",
 				Facet: pointer.True(),
 			},

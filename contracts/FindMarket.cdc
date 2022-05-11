@@ -48,6 +48,7 @@ pub contract FindMarket {
 		oldProfile.deposit(from: <- vault)
 	}
 
+	//TODO: uuid would be very nice here!
 	pub struct NFTInfo{
 		pub let name:String
 		pub let description:String
