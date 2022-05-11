@@ -34,11 +34,6 @@ func main() {
 				Type: "string",
 			},
 			{
-				Name: "status",
-				Type: "string",
-			},
-
-			{
 				Name:  "address",
 				Type:  "string",
 				Facet: pointer.True(),
