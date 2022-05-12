@@ -72,7 +72,7 @@ pub contract FindMarketDirectOfferSoft {
 			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
 		}
 
-		pub fun getAuction(): AnyStruct{FindMarket.AuctionItem}? {
+		pub fun getAuction(): FindMarket.AuctionItem? {
 			return nil
 		}
 
@@ -81,6 +81,14 @@ pub contract FindMarketDirectOfferSoft {
 				return "directoffer_soft_accepted"
 			}
 			return "directoffer_soft"
+		}
+
+		pub fun getListingType() : Type {
+			return Type<@SaleItem>()
+		}
+
+		pub fun getListingTypeIdentifier() : String {
+			return Type<@SaleItem>().identifier
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -108,7 +116,7 @@ pub contract FindMarketDirectOfferSoft {
 		}
 
 		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver())
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
 		}
 
 
@@ -125,37 +133,28 @@ pub contract FindMarketDirectOfferSoft {
 			self.offerCallback=callback
 		}
 
-		pub fun getPointer() : AnyStruct{FindViews.Pointer} {
-			return self.pointer as AnyStruct{FindViews.Pointer}
+		pub fun checkPointer() : Bool {
+			return self.pointer.valid()
 		}
 	}
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-		//fetch all names that are for sale
 
-		pub fun getItemsForSale(): [FindMarket.SaleItemInformation]
-
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation 
-
-		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation 
-
-		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] 
-
-		access(contract)fun cancelBid(_ id: UInt64) 
+		access(contract) fun cancelBid(_ id: UInt64) 
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>)
 
-		access(contract) fun isAcceptedDirectOffer(_ id:UInt64) :Bool
+		access(contract) fun isAcceptedDirectOffer(_ id:UInt64) : Bool
 
 		access(contract) fun fulfillDirectOfferNonEscrowed(id:UInt64, vault: @FungibleToken.Vault)
 
 		}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic {
+	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 
@@ -173,13 +172,6 @@ pub contract FindMarketDirectOfferSoft {
 			return self.tenantCapability.borrow()!
 		}
 
-		pub fun getItemForSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-			}
-			return FindMarket.SaleItemInformation(self.borrow(id))
-		}
-
 		pub fun isAcceptedDirectOffer(_ id:UInt64) : Bool{
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
@@ -189,30 +181,9 @@ pub contract FindMarketDirectOfferSoft {
 			return saleItem.directOfferAccepted
 		}
 
-		pub fun getItemForSaleInformationWithSaleInformationStruct(_ id:UInt64) : FindMarket.SaleInformation {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-			}
-			return FindMarket.SaleInformation(self.borrow(id))
-
+		pub fun getListingType() : Type {
+			return Type<@SaleItem>()
 		}
-
-		pub fun getItemsForSaleWithSaleInformationStruct(): [FindMarket.SaleInformation] {
-			let info: [FindMarket.SaleInformation] =[]
-			for id in self.getIds() {
-				info.append(FindMarket.SaleInformation(self.borrow(id)))
-			}
-			return info
-		}
-
-		pub fun getItemsForSale(): [FindMarket.SaleItemInformation] {
-			let info: [FindMarket.SaleItemInformation] =[]
-			for id in self.getIds() {
-				info.append(FindMarket.SaleItemInformation(self.borrow(id)))
-			}
-			return info
-		}
-
 
 		//this is called when a buyer cancel a direct offer
 		access(contract) fun cancelBid(_ id: UInt64) {
@@ -383,7 +354,17 @@ pub contract FindMarketDirectOfferSoft {
 		}
 
 		pub fun borrow(_ id: UInt64): &SaleItem {
+			pre{
+				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
 			return &self.items[id] as &SaleItem
+		}
+
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
+			pre{
+				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
+			return &self.items[id] as &SaleItem{FindMarket.SaleItem}
 		}
 
 		destroy() {
@@ -397,7 +378,7 @@ pub contract FindMarketDirectOfferSoft {
 	==========================================================================
 	*/
 
-	pub resource Bid {
+	pub resource Bid : FindMarket.Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
 		access(contract) let itemUUID: UInt64
@@ -423,10 +404,17 @@ pub contract FindMarketDirectOfferSoft {
 		access(contract) fun increaseBid(_ amount:UFix64) {
 			self.balance=self.balance+amount
 		}
+
+		pub fun getBalance() : UFix64 {
+			return self.balance
+		}
+
+		pub fun getSellerAddress() : Address {
+			return self.from.address
+		}
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getBids() : [FindMarket.BidInfo]
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
 		access(contract) fun acceptNonEscrowed(_ nft: @NonFungibleToken.NFT)
@@ -434,7 +422,7 @@ pub contract FindMarketDirectOfferSoft {
 	}
 
 	//A collection stored for bidders/buyers
-	pub resource MarketBidCollection: MarketBidCollectionPublic {
+	pub resource MarketBidCollection: MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic {
 
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
@@ -466,23 +454,12 @@ pub contract FindMarketDirectOfferSoft {
 			return self.borrowBid(id).vaultType
 		}
 
-		pub fun getBid(_ id: UInt64) : FindMarket.BidInfo {
-			let bid = self.borrowBid(id)
-
-			let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
-			return FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo)
-		
+		pub fun getIds() : [UInt64] {
+			return self.bids.keys
 		}
 
-		pub fun getBids() : [FindMarket.BidInfo] {
-			var bidInfo: [FindMarket.BidInfo] = []
-			for id in self.bids.keys {
-				let bid = self.borrowBid(id)
-
-				let saleInfo=bid.from.borrow()!.getItemForSaleInformation(id)
-				bidInfo.append(FindMarket.BidInfo(id: bid.itemUUID, amount: bid.balance, timestamp: bid.bidAt,item:saleInfo))
-			}
-			return bidInfo
+		pub fun getBidType() : Type {
+			return Type<@Bid>()
 		}
 
 
@@ -540,8 +517,19 @@ pub contract FindMarketDirectOfferSoft {
 		}
 
 		pub fun borrowBid(_ id: UInt64): &Bid {
+			pre{
+				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
 			return &self.bids[id] as &Bid
 		}
+
+		pub fun borrowBidItem(_ id: UInt64): &{FindMarket.Bid} {
+			pre{
+				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
+			return &self.bids[id] as &Bid{FindMarket.Bid}
+		}
+
 		pub fun getBalance(_ id: UInt64) : UFix64 {
 			let bid= self.borrowBid(id)
 			return bid.balance
@@ -563,30 +551,30 @@ pub contract FindMarketDirectOfferSoft {
 	}
 
 
-	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
+	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
 		return FindMarketDirectOfferSoft.getSaleItemCapability(marketplace: FindMarketDirectOfferSoft.account.address, user:user) 
 	}
 
-	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic}>? {
+	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
 		return FindMarketDirectOfferSoft.getBidCapability(marketplace:FindMarketDirectOfferSoft.account.address, user:user) 
 	}
 
-	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic}>? {
+	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
 		pre{
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 		}
 		return nil
 	}
 
-	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic}>? {
+	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
 		pre{
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
+			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 		}
 		return nil
 	}

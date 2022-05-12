@@ -2,13 +2,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
 import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-
-
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 pub struct FINDReport{
 	pub let profile:Profile.UserProfile?
@@ -16,10 +10,11 @@ pub struct FINDReport{
 	pub let relatedAccounts: { String: Address}
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
-	pub let itemsForSale: [FindMarket.SaleInformation]
-	pub let marketBids: [FindMarket.BidInfo]
+	pub let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
+	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
 
-	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: [FindMarket.SaleInformation], marketBids: [FindMarket.BidInfo]) {
+
+	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -30,50 +25,16 @@ pub struct FINDReport{
 	}
 }
 
+//TODO; name_status should reflect this one once they are done. And we should inline this into a contract to avoid duplication
 pub fun main(user: Address) : FINDReport {
 	let account=getAccount(user)
 	let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 	let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
-	let items : [FindMarket.SaleInformation] = []
-	if let sale =FindMarketSale.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(sale.getItemsForSaleWithSaleInformationStruct())
-	}
+	let items : {String : FindMarket.SaleItemCollectionReport} = FindMarketOptions.getFindSaleItemReport(address: user)
 
-	if let doe=FindMarketDirectOfferEscrow.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(doe.getItemsForSaleWithSaleInformationStruct())
-	}
-
-	if let ae = FindMarketAuctionEscrow.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(ae.getItemsForSaleWithSaleInformationStruct())
-	}
-
-	if let as = FindMarketAuctionSoft.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(as.getItemsForSaleWithSaleInformationStruct())
-	}
-
-	if let dos = FindMarketDirectOfferSoft.getFindSaleItemCapability(user)!.borrow() {
-		items.appendAll(dos.getItemsForSaleWithSaleInformationStruct())
-	}
-
-
-	let bids : [FindMarket.BidInfo] = []
-	if let bDoe= FindMarketDirectOfferEscrow.getFindBidCapability(user)!.borrow() {
-		bids.appendAll(bDoe.getBids())
-	}
-
-	if let bDos= FindMarketDirectOfferSoft.getFindBidCapability(user)!.borrow() {
-		bids.appendAll(bDos.getBids())
-	}
-
-	if let bAs= FindMarketAuctionSoft.getFindBidCapability(user)!.borrow() {
-		bids.appendAll(bAs.getBids())
-	}
-
-	if let bAe= FindMarketAuctionEscrow.getFindBidCapability(user)!.borrow() {
-		bids.appendAll(bAe.getBids())
-	}
+	let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarketOptions.getFindBidsReport(address: user)
 
 	return FINDReport(
 		profile: profile?.asProfile(),
@@ -82,6 +43,8 @@ pub fun main(user: Address) : FINDReport {
 		leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 		privateMode: profile?.isPrivateModeEnabled() ?? false,
 		itemsForSale: items,
-		marketBids: bids,
+		marketBids: marketBids,
 	)
 }
+
+

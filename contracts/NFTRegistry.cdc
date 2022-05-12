@@ -15,6 +15,8 @@ pub contract NFTRegistry {
     // Mapping of {Alias : Type Identifier}
     access(contract) var aliasMap : {String : String}
 
+		//TODO: name of init transactions
+		//TODO: name of check storage slot script
     /* Struct */
     pub struct NFTInfo {
         pub let alias : String

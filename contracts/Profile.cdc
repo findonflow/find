@@ -397,6 +397,15 @@ pub contract Profile {
 		}
 
 
+		pub fun hasWallet(_ name: String) : Bool {
+			for wallet in self.wallets {
+				if wallet.name == name {
+					return true
+				}
+			}
+			return false
+		}
+
 		pub fun getWallets() : [Wallet] { return self.wallets}
 		pub fun addWallet(_ val: Wallet) { self.wallets.append(val) }
 		pub fun removeWallet(_ val: String) {

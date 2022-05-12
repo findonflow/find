@@ -2,6 +2,7 @@ import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 transaction(id: UInt64, amount: UFix64) {
 
@@ -12,12 +13,15 @@ transaction(id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
-		let bidInfo = self.bidsReference.getBid(id)
-		let saleInformation = bidInfo.item
-		let ftIdentifier = bidInfo.item.ftTypeIdentifier
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
+		let bidInfo = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		if bidInfo == nil {
+			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
+		}
+		let saleInformation = bidInfo!.item
+		let ftIdentifier = bidInfo!.item.ftTypeIdentifier
 
 		//If this is nil, there must be something wrong with FIND setup
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!

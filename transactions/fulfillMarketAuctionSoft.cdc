@@ -2,6 +2,7 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 transaction(id: UInt64) {
 
@@ -16,7 +17,12 @@ transaction(id: UInt64) {
 
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 
-		let ftIdentifier = self.bidsReference.getBid(id).item.ftTypeIdentifier
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionSoft.MarketBidCollection>())
+		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		if bid==nil {
+			panic("Cannot fulfill market auction on ghost listing")
+		}
+		let ftIdentifier = bid!.item.ftTypeIdentifier
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
 
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

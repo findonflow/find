@@ -9,7 +9,7 @@ import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, to: Address) {
+transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, rarity: String, rarityNum:UFix64, to: Address) {
 	prepare(account: AuthAccount) {
 
 		let dancyReceiver =getAccount(to)
@@ -26,6 +26,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		//TODO: use Image/Video here.
 		let media=MetadataViews.HTTPFile(url:nftUrl)
 
+		let rarity = FindViews.Rarity(rarity: rarityNum, rarityName:rarity, parts: {})
+
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
 
@@ -35,7 +37,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let editioned= FindViews.SerialNumber(edition:i, maxEdition:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty]
+			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty, rarity]
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
