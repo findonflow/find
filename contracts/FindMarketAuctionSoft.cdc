@@ -156,12 +156,18 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback=callback
 		}
 
-		//TODO: what should the type be here, how to diff on soft vs not?
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
-				return "ongoing_auction"
-			}
-			return "ondemand_auction"
+				//TODO: fix when fixing hasAuctionEnded
+				if self.hasAuctionEnded()! {
+					if self.hasAuctionMetReservePrice() {
+						return "finished_completed"
+					} 
+					return "finished_failed"
+				}
+				return "active_ongoing"
+			} 
+			return "active_listed"
 		}
 
 		pub fun getListingType() : Type {
@@ -293,7 +299,7 @@ pub contract FindMarketAuctionSoft {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 
 		}
 
@@ -360,7 +366,7 @@ pub contract FindMarketAuctionSoft {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -370,13 +376,13 @@ pub contract FindMarketAuctionSoft {
 
 			let saleItem=self.borrow(id)
 
-			var status="cancelled"
+			var status="cancel"
 			if let auctionEnded = saleItem.hasAuctionEnded() {
 				if auctionEnded && saleItem.hasAuctionMetReservePrice() {
 					panic("Cannot cancel finished auction, fulfill it instead")
 				}
 				if auctionEnded && !saleItem.hasAuctionMetReservePrice() {
-					status="failed"
+					status="cancel_reserved_not_met"
 				}
 			}
 
@@ -457,7 +463,7 @@ pub contract FindMarketAuctionSoft {
 			saleItem.setMinBidIncrement(minimumBidIncrement)
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "listed")
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed")
 		}
 
 		pub fun getIds(): [UInt64] {

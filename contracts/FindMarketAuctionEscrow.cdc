@@ -146,12 +146,19 @@ pub contract FindMarketAuctionEscrow {
 			self.offerCallback=callback
 		}
 
-		//TODO: Should we have a different status if auction is ended can be finished?
+
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
-				return "ongoing_auction"
-			}
-			return "ondemand_auction"
+				//TODO: fix when fixing hasAuctionEnded
+				if self.hasAuctionEnded()! {
+					if self.hasAuctionMetReservePrice() {
+						return "finished_completed"
+					} 
+					return "finished_failed"
+				}
+				return "active_ongoing"
+			} 
+			return "active_listed"
 		}
 
 		pub fun getListingType() : Type {
@@ -285,7 +292,7 @@ pub contract FindMarketAuctionEscrow {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 
 		}
 
@@ -351,7 +358,7 @@ pub contract FindMarketAuctionEscrow {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -361,13 +368,13 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 
-			var status = "cancelled"
+			var status = "cancel_listing"
 			if let auctionEnded = saleItem.hasAuctionEnded() {
 				if auctionEnded && saleItem.hasAuctionMetReservePrice() {
 					panic("Cannot cancel finished auction, fulfill it instead")
 				}
 				if auctionEnded && !saleItem.hasAuctionMetReservePrice() {
-					status="failed"
+					status="cancel_reserved_not_met"
 				}
 			}
 
@@ -382,7 +389,7 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
-			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			self.emitEvent(saleItem: saleItem, status: status)
 			let id=saleItem.getId()
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
@@ -414,7 +421,7 @@ pub contract FindMarketAuctionEscrow {
 				let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 				if !saleItem.hasAuctionMetReservePrice() {
-					self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
+					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
 					return
 				}
 
@@ -447,8 +454,7 @@ pub contract FindMarketAuctionEscrow {
 
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "listed")
-
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed")
 
 		}
 
