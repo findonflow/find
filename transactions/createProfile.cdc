@@ -38,6 +38,7 @@ transaction(name: String) {
 
 		let profile <-Profile.createUser(name:name, createdAt: "find")
 
+		
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		if !fusdReceiver.check() {
@@ -80,6 +81,7 @@ transaction(name: String) {
 		acct.save(<-profile, to: Profile.storagePath)
 		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+		acct.borrow<&Profile.User>(from: Profile.storagePath)!.emitCreatedEvent()
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 

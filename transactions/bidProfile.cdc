@@ -39,6 +39,8 @@ transaction(name: String, amount: UFix64) {
 			account.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+
+			account.borrow<&Profile.User>(from: Profile.storagePath)!.emitCreatedEvent()
 		}
 
 		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
