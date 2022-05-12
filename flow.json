@@ -43,6 +43,13 @@
         "mainnet": "0x1654653399040a61"
       }
     },
+    "FiatToken": {
+      "source": "./contracts/standard/FiatToken.cdc",
+      "aliases": {
+        "testnet": "0xa983fecbed621163",
+        "mainnet": "0xb19436aae4d94622"
+      }
+    },
     "FIND": "./contracts/FIND.cdc",
     "Dandy": "./contracts/Dandy.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
@@ -137,7 +144,7 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
-				"FindMarketOptions",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
@@ -176,6 +183,7 @@
         "Profile",
         "Debug",
         "FUSD",
+        "FiatToken",
         "Admin",
         "CharityNFT",
         "FindViews",

@@ -99,6 +99,25 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	pub fun resolve(_ input:String) : Address? {
+		if FIND.validateFindName(input) {
+			return FIND.lookupAddress(input)
+		}
+
+		var address=input
+		if input.utf8[1] == 120 {
+			address = input.slice(from: 2, upTo: input.length)
+		}
+		var r:UInt64 = UInt64(0)
+		var bytes = address.decodeHex()
+
+		while bytes.length>0{
+			r = r  + (UInt64(bytes.removeFirst()) << UInt64(bytes.length * 8 ))
+		}
+
+		return Address(r)
+	}
+
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
 		pre {
@@ -1423,6 +1442,10 @@ pub contract FIND {
 			return false
 		}
 		if !FIND.validateAlphanumericLowerDash(value) {
+			return false
+		}
+
+		if value.length==16 && FIND.validateHex(value) {
 			return false
 		}
 
