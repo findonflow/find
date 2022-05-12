@@ -54,7 +54,7 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"nftId": "129",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType": "directSale",
+				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
 				"sellerName": "user1"
 			}]
@@ -89,7 +89,7 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"nftId": "129",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType": "ondemand_auction",
+				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
 				"sellerName": "user1"
 			}]
@@ -125,7 +125,7 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"nftId": "129",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType": "ondemand_auction",
+				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
 				"sellerName": "user1"
 			}]
@@ -153,7 +153,7 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"nftId": "128",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType": "directoffer",
+				"saleType": "active_ongoing",
 				"seller": "0x179b6b1cb6755e31",
 				"sellerName": "user1"
 			}]
@@ -181,7 +181,7 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"nftId": "128",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType": "directoffer_soft",
+				"saleType": "active_ongoing",
 				"seller": "0x179b6b1cb6755e31",
 				"sellerName": "user1"
 			}]
@@ -272,7 +272,7 @@ func TestNFTDetailScript(t *testing.T) {
 					},
 					"nftId": "129",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "directSale",
+					"saleType": "active_listed",
 					"seller": "0x179b6b1cb6755e31",
 					"sellerName": "user1"
 				}]
@@ -307,7 +307,7 @@ func TestNFTDetailScript(t *testing.T) {
 					},
 					"nftId": "129",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "ondemand_auction",
+					"saleType": "active_listed",
 					"seller": "0x179b6b1cb6755e31",
 					"sellerName": "user1"
 				}]
@@ -343,7 +343,7 @@ func TestNFTDetailScript(t *testing.T) {
 					},
 					"nftId": "129",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "ondemand_auction",
+					"saleType": "active_listed",
 					"seller": "0x179b6b1cb6755e31",
 					"sellerName": "user1"
 				}]

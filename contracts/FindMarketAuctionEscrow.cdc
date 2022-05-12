@@ -104,11 +104,18 @@ pub contract FindMarketAuctionEscrow {
 			self.auctionEndsAt=endsAt
 		}
 
-		pub fun hasAuctionEnded() : Bool? {       // Nil means that this auction is not live 
+		pub fun hasAuctionStarted() : Bool {
+			if let starts = self.auctionStartedAt {
+				return starts < Clock.time()
+			}
+			return false
+		}
+
+		pub fun hasAuctionEnded() : Bool {      
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
 			}
-			return nil
+			panic("Not a live auction")
 		}
 
 		pub fun hasAuctionMetReservePrice() : Bool {
@@ -324,8 +331,8 @@ pub contract FindMarketAuctionEscrow {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
-			if let auctionEnded = saleItem.hasAuctionEnded() {
-				if auctionEnded {
+			if saleItem.hasAuctionStarted() {
+				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
@@ -369,13 +376,11 @@ pub contract FindMarketAuctionEscrow {
 			let saleItem=self.borrow(id)
 
 			var status = "cancel_listing"
-			if let auctionEnded = saleItem.hasAuctionEnded() {
-				if auctionEnded && saleItem.hasAuctionMetReservePrice() {
+			if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+				if saleItem.hasAuctionMetReservePrice() {
 					panic("Cannot cancel finished auction, fulfill it instead")
 				}
-				if auctionEnded && !saleItem.hasAuctionMetReservePrice() {
-					status="cancel_reserved_not_met"
-				}
+				status="cancel_reserved_not_met"
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for auction"))
@@ -407,8 +412,8 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem = self.borrow(id)
 			
-			if let auctionEnded = saleItem.hasAuctionEnded() {
-				if !auctionEnded {
+			if saleItem.hasAuctionStarted() {
+				if !saleItem.hasAuctionEnded() {
 					panic("Auction has not ended yet")
 				}
 

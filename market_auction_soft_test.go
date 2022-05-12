@@ -17,11 +17,11 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price).
+			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(400.0).
 			//TODO: Should status be something else while time has not run out? I think so
-			saleItemListed("user1", "ongoing_auction", price+5.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionSoft("user2", id, price+5.0)
 	})
 
@@ -33,7 +33,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price)
+			saleItemListed("user1", "active_listed", price)
 
 		name := "user1"
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
@@ -46,7 +46,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"seller": otu.accountAddress(name),
 				"buyer":  "",
 				"amount": fmt.Sprintf("%.8f", 10.0),
-				"status": "cancelled",
+				"status": "cancel",
 			}))
 	})
 
@@ -58,11 +58,11 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price).
+			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(4000.0).
 			//TODO: Should status be something else while time has not run out? I think so
-			saleItemListed("user1", "ongoing_auction", price+5.0)
+			saleItemListed("user1", "finished_completed", price+5.0)
 
 		name := "user1"
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
@@ -80,7 +80,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price)
+			saleItemListed("user1", "active_listed", price)
 
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
@@ -89,6 +89,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
 
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
+
+		otu.tickClock(100.0)
 
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
@@ -105,10 +107,10 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price).
+			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+1.0).
 			tickClock(400.0).
-			saleItemListed("user1", "ongoing_auction", 11.0)
+			saleItemListed("user1", "finished_failed", 11.0)
 
 		buyer := "user2"
 		name := "user1"
@@ -122,7 +124,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"seller": otu.accountAddress(name),
 				"buyer":  otu.accountAddress(buyer),
 				"amount": fmt.Sprintf("%.8f", 11.0),
-				"status": "failed",
+				"status": "cancel_reserved_not_met",
 			}))
 	})
 
@@ -135,9 +137,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price).
+			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+preIncrement).
-			saleItemListed("user1", "ongoing_auction", price+preIncrement)
+			saleItemListed("user1", "active_ongoing", price+preIncrement)
 
 		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
