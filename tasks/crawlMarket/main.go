@@ -20,7 +20,7 @@ import (
 type MarketEvents []MarketEvent
 type GroupedEvents map[uint64]MarketEvents
 
-func (groupedEvents GroupedEvents) Partition(eventToIgnoreWhenIndexing string) (changed, removed, sold MarketEvents) {
+func (groupedEvents GroupedEvents) Partition() (changed, removed, sold MarketEvents) {
 	eventsToIndex := MarketEvents{}
 	eventsSold := MarketEvents{}
 	eventsToDelete := MarketEvents{}
@@ -35,12 +35,13 @@ func (groupedEvents GroupedEvents) Partition(eventToIgnoreWhenIndexing string) (
 		if status == "sold" {
 			eventsToDelete = append(eventsToDelete, events[0])
 			eventsSold = append(eventsSold, events[0])
+		} else if strings.HasSuffix(status, "failed") {
+
 		} else if status == "cancelled" || status == "failed" || status == "rejected" {
 			eventsToDelete = append(eventsToDelete, events[0])
 		} else {
 			for _, event := range events {
-				//we do not care about directOffers made here
-				if event.FlowEventID == eventToIgnoreWhenIndexing {
+				if strings.Contains(event.FlowEventID, "DirectOffer") {
 					continue
 				}
 				eventsToIndex = append(eventsToIndex, event)
@@ -111,7 +112,7 @@ func main() {
 		groupedEvents := events.GroupEvents()
 
 		//Ignore events sold for now
-		eventsToIndex, eventsToDelete, _ := groupedEvents.Partition(directOfferEvents)
+		eventsToIndex, eventsToDelete, _ := groupedEvents.Partition()
 		if len(eventsToIndex) == 0 && len(eventsToDelete) == 0 {
 			log.Println("No results found Writing progress to file")
 			writeProgressToFile(progressFile, now)
