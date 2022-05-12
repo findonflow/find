@@ -118,8 +118,8 @@ pub contract FindMarket {
 
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getIds(): [UInt64]
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
-		pub fun getSaleItemReport() : SaleItemCollectionReport
+		access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
+		pub fun getListingType() : Type 
 	}
 
 	pub struct SaleItemCollectionReport {
@@ -133,7 +133,9 @@ pub contract FindMarket {
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getBidsReport() : BidItemCollectionReport
+		pub fun getIds() : [UInt64] 
+		pub fun getBidType() : Type 
+		access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
 	}
 
 	pub struct BidItemCollectionReport {
@@ -144,6 +146,11 @@ pub contract FindMarket {
 			self.items=items
 			self.ghosts=ghosts
 		}
+	}
+
+	pub resource interface Bid {
+		pub fun getBalance() : UFix64
+		pub fun getSellerAddress() : Address 
 	}
 
 	pub resource interface SaleItem {
@@ -159,6 +166,8 @@ pub contract FindMarket {
 		pub fun getBuyerName() : String?
 
 		pub fun toNFTInfo() : FindMarket.NFTInfo
+		pub fun checkPointer() : Bool 
+		pub fun getListingType() : Type 
 
 		pub fun getFtAlias(): String 
 		//the Type of the item for sale

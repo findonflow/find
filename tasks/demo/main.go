@@ -27,6 +27,16 @@ func main() {
 		SignProposeAndPayAs("find").
 		RunPrintEventsFull()
 
+	o.TransactionFromFile("setup_find_market_1").
+		SignProposeAndPayAsService().
+		RunPrintEventsFull()
+
+	//link in the server in the versus client
+	o.TransactionFromFile("setup_find_market_2").
+		SignProposeAndPayAs("find").
+		Args(o.Arguments().Account("account")).
+		RunPrintEventsFull()
+
 	//we advance the clock
 	o.TransactionFromFile("clock").SignProposeAndPayAs("find").
 		Args(o.Arguments().UFix64(1.0)).
@@ -77,30 +87,33 @@ func main() {
 		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()
 
-		/*
-			o.TransactionFromFile("sendFT").
-				SignProposeAndPayAs("user2").
-				Args(o.Arguments().String("user2").UFix64(100.0).String("fusd")).
-				RunPrintEventsFull()
+	o.TransactionFromFile("sendFlowWithTagAndMessage").
+		SignProposeAndPayAs("user2").
+		Args(o.Arguments().
+			String("user1").
+			UFix64(100.0).
+			String("fusd").
+			String("find")).
+		RunPrintEventsFull()
+	/*
+		o.TransactionFromFile("renew").
+			SignProposeAndPayAs("user1").
+			Args(o.Arguments().String("user1").UFix64(5.0)).
+			RunPrintEventsFull()
 
-			o.TransactionFromFile("renew").
-				SignProposeAndPayAs("user1").
-				Args(o.Arguments().String("user1").UFix64(5.0)).
-				RunPrintEventsFull()
+		o.TransactionFromFile("listForSale").SignProposeAndPayAs("user1").
+			Args(o.Arguments().String("user1").UFix64(10.0)).
+			RunPrintEventsFull()
 
-			o.TransactionFromFile("listForSale").SignProposeAndPayAs("user1").
-				Args(o.Arguments().String("user1").UFix64(10.0)).
-				RunPrintEventsFull()
+		o.TransactionFromFile("bid").
+			SignProposeAndPayAs("user2").
+			Args(o.Arguments().String("user1").UFix64(10.0)).
+			RunPrintEventsFull()
 
-			o.TransactionFromFile("bid").
-				SignProposeAndPayAs("user2").
-				Args(o.Arguments().String("user1").UFix64(10.0)).
-				RunPrintEventsFull()
-
-			o.ScriptFromFile("address_status").
-				Args(o.Arguments().Account("user2")).
-				Run()
-		*/
+		o.ScriptFromFile("address_status").
+			Args(o.Arguments().Account("user2")).
+			Run()
+	*/
 
 	o.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").
 		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).

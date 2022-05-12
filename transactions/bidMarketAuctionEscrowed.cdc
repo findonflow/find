@@ -6,6 +6,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 transaction(address: Address, id: UInt64, amount: UFix64) {
 
@@ -19,7 +20,8 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		self.saleItemsCap= FindMarketAuctionEscrow.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
-		let saleInformation =self.saleItemsCap.borrow()!.getSaleInformation(id)
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.SaleItemCollection>())
+		let saleInformation = FindMarketOptions.getFindSaleInformation(address: address, marketOption: marketOption, id:id) 
 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")

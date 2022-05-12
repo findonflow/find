@@ -44,12 +44,12 @@
       }
     },
     "FiatToken": {
-			"source": "./contracts/standard/FiatToken.cdc",
-			"aliases": {
-				"testnet": "0xa983fecbed621163",
-				"mainnet" : "0xb19436aae4d94622"
-			}
-		},
+      "source": "./contracts/standard/FiatToken.cdc",
+      "aliases": {
+        "testnet": "0xa983fecbed621163",
+        "mainnet": "0xb19436aae4d94622"
+      }
+    },
     "FIND": "./contracts/FIND.cdc",
     "Dandy": "./contracts/Dandy.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
@@ -59,6 +59,7 @@
     "FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
     "FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
     "FindMarketSale": "./contracts/FindMarketSale.cdc",
+    "FindMarketOptions": "./contracts/FindMarketOptions.cdc",
     "FindViews": "./contracts/FindViews.cdc",
     "RelatedAccounts": "./contracts/RelatedAccounts.cdc",
     "Sender": "./contracts/Sender.cdc",
@@ -101,15 +102,15 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
-      "address": "4a2ad151970648cd",
+      "address": "8fcce1d764ef88dd",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
-      "address": "5c7eb4620e0242ac",
+      "address": "6bab580a75158802",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
-      "address": "b8190dbf1ff84273",
+      "address": "7dff3d39ec118263",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user2": {
@@ -143,6 +144,7 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
@@ -166,6 +168,7 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
@@ -193,6 +196,7 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",

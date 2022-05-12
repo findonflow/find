@@ -1,24 +1,21 @@
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 transaction() {
 	prepare(account: AuthAccount) {
 		// Get all the saleItems Id
 
-		let items = FindMarketSale.getFindSaleItemCapability(account.address)!.borrow()!.getSaleItemReport()
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketSale.SaleItem>())
+		let cap = FindMarketOptions.getFindSaleItemCollectionCapability(marketOption: marketOption, address: account.address)
+		let ref = cap.borrow() ?? panic("Cannot borrow reference to the capability.")
 
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let listingType=Type<@FindMarketSale.SaleItemCollection>()
 		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(listingType))!
-		let listingItems = items.items
-		for item in listingItems {
-			saleItems.delist(item.listingId)
+		let ids = ref.getIds()
+		for id in ids {
+			saleItems.delist(id)
 		}
-		let ghosts = items.ghosts
-		for ghost in ghosts {
-			saleItems.delist(ghost.id)
-		}	
-
-
 	}
 }

@@ -1,12 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 pub struct FINDNameReport{
 	pub let profile:Profile.UserProfile?
@@ -38,63 +33,10 @@ pub fun main(name: String) : FINDNameReport{
 		let account=getAccount(user)
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
+		let items : {String : FindMarket.SaleItemCollectionReport} =  FindMarketOptions.getFindSaleItemReport(address: user)
+	
+		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarketOptions.getFindBidsReport(address: user)
 
-	// Will refine this with a consolidating MarketOption Contract
-	let saleCaps : [Capability<&{FindMarket.SaleItemCollectionPublic}>] = [
-		FindMarketSale.getFindSaleItemCapability(user)!,
-		FindMarketDirectOfferEscrow.getFindSaleItemCapability(user)!,
-		FindMarketAuctionEscrow.getFindSaleItemCapability(user)!,
-		FindMarketAuctionSoft.getFindSaleItemCapability(user)!,
-		FindMarketDirectOfferSoft.getFindSaleItemCapability(user)!
-	]
-
-
-	let items : {String : FindMarket.SaleItemCollectionReport} = {}
-	for cap in saleCaps {
-		if let ref = cap.borrow() {
-			let report=ref.getSaleItemReport()
-			var listingTypeIdentifier: String = ""
-			if report.items.length > 0 {
-				listingTypeIdentifier = report.items[0].listingTypeIdentifier
-				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
-				items[identifier] = report 
-				continue
-			} 
-			if report.ghosts.length > 0 {
-				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
-				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-9)
-				items[identifier] = report 
-			}
-		}
-	}
-
-	// Will refine this with a consolidating MarketOption Contract
-	let bidsaps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = [
-		FindMarketDirectOfferEscrow.getFindBidCapability(user)!,
-		FindMarketDirectOfferSoft.getFindBidCapability(user)!,
-		FindMarketAuctionSoft.getFindBidCapability(user)!,
-		FindMarketAuctionEscrow.getFindBidCapability(user)!
-	]
-
-
-	let marketBids : {String : FindMarket.BidItemCollectionReport} = {}
-	for cap in bidsaps {
-		if let ref = cap.borrow() {
-			let report=ref.getBidsReport()
-			var listingTypeIdentifier: String = ""
-			if report.items.length > 0 {
-				listingTypeIdentifier = report.items[0].bidTypeIdentifier
-				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-4)
-				marketBids[identifier] = report 
-				continue
-			} 
-			if report.ghosts.length > 0 {
-				listingTypeIdentifier = report.ghosts[0].listingTypeIdentifier
-				let identifier=listingTypeIdentifier.slice(from: 19, upTo: listingTypeIdentifier.length-4)
-				marketBids[identifier] = report 
-			}
-		}
-	}
 		let profile= account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 		var lease:FIND.LeaseInformation?=nil
 		if leaseCap.check() {
@@ -126,3 +68,4 @@ pub fun main(name: String) : FINDNameReport{
 		marketBids: {}
 	)
 }
+ 

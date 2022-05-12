@@ -43,7 +43,6 @@ func TestFTRegistry(t *testing.T) {
 			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			"vaultPath":              "/storage/flowTokenVault",
 			"vaultPathIdentifier":    "flowTokenVault",
-
 		}
 		assert.Equal(t, expected, result)
 
@@ -74,7 +73,6 @@ func TestFTRegistry(t *testing.T) {
 			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			"vaultPath":              "/storage/flowTokenVault",
 			"vaultPathIdentifier":    "flowTokenVault",
-
 		}
 		assert.Equal(t, expected, result)
 
