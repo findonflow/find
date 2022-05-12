@@ -25,6 +25,78 @@ func TestMarketAuctionSoft(t *testing.T) {
 			fulfillMarketAuctionSoft("user2", id, price+5.0)
 	})
 
+	t.Run("Should be able to cancel an auction", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price)
+
+		name := "user1"
+		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				UInt64Array(id)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", id),
+				"seller": otu.accountAddress(name),
+				"buyer":  "",
+				"amount": fmt.Sprintf("%.8f", 10.0),
+				"status": "cancelled",
+			}))
+	})
+
+	t.Run("Should not be able to cancel an ended auction", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			tickClock(4000.0).
+			//TODO: Should status be something else while time has not run out? I think so
+			saleItemListed("user1", "ongoing_auction", price+5.0)
+
+		name := "user1"
+		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				UInt64Array(id)).
+			Test(otu.T).AssertFailure("Cannot cancel finished auction, fulfill it instead")
+	})
+
+	t.Run("Cannot fulfill a not yet ended auction", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price)
+
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id)).
+			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
+
+		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
+
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				UInt64(id)).
+			Test(otu.T).AssertFailure("Auction has not ended yet")
+	})
+
 	t.Run("Should allow seller to cancel auction if it failed to meet reserve price", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

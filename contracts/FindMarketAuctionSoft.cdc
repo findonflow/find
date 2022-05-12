@@ -113,11 +113,11 @@ pub contract FindMarketAuctionSoft {
 			self.auctionEndsAt=endsAt
 		}
 
-		pub fun hasAuctionEnded() : Bool {
+		pub fun hasAuctionEnded() : Bool? {     // nil means this auction is not live
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
 			}
-			panic("Not a live auction")
+			return nil
 		}
 
 		pub fun hasAuctionMetReservePrice() : Bool {
@@ -326,8 +326,8 @@ pub contract FindMarketAuctionSoft {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
-			if saleItem.auctionEndsAt != nil {
-				if saleItem.hasAuctionEnded() {
+			if let auctionEnded = saleItem.hasAuctionEnded() {
+				if auctionEnded {
 					panic("Auction has ended")
 				}
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
@@ -370,13 +370,14 @@ pub contract FindMarketAuctionSoft {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
-				panic("auction is not ongoing")
-			}
-
 			var status="cancelled"
-			if saleItem.hasAuctionEnded() && !saleItem.hasAuctionMetReservePrice() {
-				status="failed"
+			if let auctionEnded = saleItem.hasAuctionEnded() {
+				if auctionEnded && saleItem.hasAuctionMetReservePrice() {
+					panic("Cannot cancel finished auction, fulfill it instead")
+				}
+				if auctionEnded && !saleItem.hasAuctionMetReservePrice() {
+					status="failed"
+				}
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item from soft-auction"))
@@ -386,7 +387,11 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			self.emitEvent(saleItem: saleItem, status: status)
-			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+
+			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() { 
+				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			}
+			
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -398,36 +403,41 @@ pub contract FindMarketAuctionSoft {
 
 			let saleItem = self.borrow(id)
 
-			if !saleItem.hasAuctionEnded() {
-				panic("Auction has not ended yet")
+			if let auctionEnded = saleItem.hasAuctionEnded() {
+				if !auctionEnded {
+					panic("Auction has not ended yet")
+				}
+
+				if vault.getType() != saleItem.vaultType {
+					panic("The FT vault sent in to fulfill does not match the required type")
+				}
+
+				if vault.balance < saleItem.auctionReservePrice {
+					panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+				}
+
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "buy item for soft-auction"))
+
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
+
+				let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
+
+				let nftInfo=saleItem.toNFTInfo()
+				let royalty=saleItem.getRoyalty()
+
+				self.emitEvent(saleItem: saleItem, status: "sold")
+				saleItem.acceptNonEscrowedBid()
+
+				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
+
+				destroy <- self.items.remove(key: id)
+				return
 			}
 
-			if vault.getType() != saleItem.vaultType {
-				panic("The FT vault sent in to fulfill does not match the required type")
-			}
-
-			if vault.balance < saleItem.auctionReservePrice {
-				panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
-			}
-
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "buy item for soft-auction"))
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
-
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-
-
-			let nftInfo=saleItem.toNFTInfo()
-			let royalty=saleItem.getRoyalty()
-
-			self.emitEvent(saleItem: saleItem, status: "sold")
-			saleItem.acceptNonEscrowedBid()
-
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
-
-			destroy <- self.items.remove(key: id)
+			panic("This auction is not live")
 		}
 
 

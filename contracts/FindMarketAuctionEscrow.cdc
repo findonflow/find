@@ -104,11 +104,11 @@ pub contract FindMarketAuctionEscrow {
 			self.auctionEndsAt=endsAt
 		}
 
-		pub fun hasAuctionEnded() : Bool {
+		pub fun hasAuctionEnded() : Bool? {       // Nil means that this auction is not live 
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
 			}
-			panic("Not a live auction")
+			return nil
 		}
 
 		pub fun hasAuctionMetReservePrice() : Bool {
@@ -317,8 +317,8 @@ pub contract FindMarketAuctionEscrow {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
-			if saleItem.auctionEndsAt != nil {
-				if saleItem.hasAuctionEnded() {
+			if let auctionEnded = saleItem.hasAuctionEnded() {
+				if auctionEnded {
 					panic("Auction has ended")
 				}
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
@@ -361,12 +361,14 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
-				panic("auction is not ongoing")
-			}
-
-			if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
-				panic("Cannot cancel finished auction, fulfill it instead")
+			var status = "cancelled"
+			if let auctionEnded = saleItem.hasAuctionEnded() {
+				if auctionEnded && saleItem.hasAuctionMetReservePrice() {
+					panic("Cannot cancel finished auction, fulfill it instead")
+				}
+				if auctionEnded && !saleItem.hasAuctionMetReservePrice() {
+					status="failed"
+				}
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for auction"))
@@ -375,14 +377,16 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			self.internalCancelAuction(saleItem: saleItem, status: "cancelled")
+			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
 			self.emitEvent(saleItem: saleItem, status: "cancelled")
 			let id=saleItem.getId()
-			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
+				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			}
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -395,32 +399,37 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			let saleItem = self.borrow(id)
-			if !saleItem.hasAuctionEnded() {
-				panic("Auction has not ended yet")
+			
+			if let auctionEnded = saleItem.hasAuctionEnded() {
+				if !auctionEnded {
+					panic("Auction has not ended yet")
+				}
+
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
+
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
+
+				let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
+				if !saleItem.hasAuctionMetReservePrice() {
+					self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
+					return
+				}
+
+				let nftInfo= saleItem.toNFTInfo()
+				let royalty=saleItem.getRoyalty()
+
+				self.emitEvent(saleItem: saleItem, status: "sold")
+
+				let vault <- saleItem.acceptEscrowedBid()
+				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
+
+				destroy <- self.items.remove(key: id)
+				return 
 			}
-
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
-
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-
-			if !saleItem.hasAuctionMetReservePrice() {
-				self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
-				return
-			}
-
-			let nftInfo= saleItem.toNFTInfo()
-			let royalty=saleItem.getRoyalty()
-
-			self.emitEvent(saleItem: saleItem, status: "sold")
-
-			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
-
-			destroy <- self.items.remove(key: id)
+			panic("This auction is not live")
 
 		} 
 

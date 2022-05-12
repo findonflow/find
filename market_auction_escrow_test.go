@@ -75,6 +75,85 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to cancel the auction", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price)
+
+		name := "user1"
+
+		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				UInt64Array(id)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", id),
+				"seller": otu.accountAddress(name),
+				"buyer":  "",
+				"amount": fmt.Sprintf("%.8f", 10.0),
+				"status": "cancelled",
+			}))
+
+	})
+
+	t.Run("Should not be able to cancel the auction if it is ended", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			// //TODO: Should status be something else while time has not run out? I think so
+			saleItemListed("user1", "ongoing_auction", price+5.0)
+
+		name := "user1"
+
+		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				UInt64Array(id)).
+			Test(otu.T).AssertFailure("Cannot cancel finished auction, fulfill it instead")
+
+	})
+
+	t.Run("Should not be able to fulfill a not yet live / ended auction", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFlowFUSDDandyInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "ondemand_auction", price)
+
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("user1").
+				UInt64(id)).
+			Test(otu.T).AssertFailure("This auction is not live")
+
+		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("user1").
+				UInt64(id)).
+			Test(otu.T).AssertFailure("Auction has not ended yet")
+
+	})
+
 	t.Run("Should return funds if auction is cancelled", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
