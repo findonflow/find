@@ -35,7 +35,7 @@ func TestFTRegistry(t *testing.T) {
 			"alias":                  "Flow",
 			"balancePath":            "/public/flowTokenBalance",
 			"balancePathIdentifier":  "flowTokenBalance",
-			"icon":                   "",
+			"icon":                   "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
 			"receiverPath":           "/public/flowTokenReceiver",
 			"receiverPathIdentifier": "flowTokenReceiver",
 			"tag":                    []interface{}{"utility coin"},
@@ -43,6 +43,7 @@ func TestFTRegistry(t *testing.T) {
 			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			"vaultPath":              "/storage/flowTokenVault",
 			"vaultPathIdentifier":    "flowTokenVault",
+
 		}
 		assert.Equal(t, expected, result)
 
@@ -65,7 +66,7 @@ func TestFTRegistry(t *testing.T) {
 			"alias":                  "Flow",
 			"balancePath":            "/public/flowTokenBalance",
 			"balancePathIdentifier":  "flowTokenBalance",
-			"icon":                   "",
+			"icon":                   "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
 			"receiverPath":           "/public/flowTokenReceiver",
 			"receiverPathIdentifier": "flowTokenReceiver",
 			"tag":                    []interface{}{"utility coin"},
@@ -73,6 +74,7 @@ func TestFTRegistry(t *testing.T) {
 			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			"vaultPath":              "/storage/flowTokenVault",
 			"vaultPathIdentifier":    "flowTokenVault",
+
 		}
 		assert.Equal(t, expected, result)
 
@@ -84,24 +86,24 @@ func TestFTRegistry(t *testing.T) {
 		    "A.0ae53cb6e3f42a79.FlowToken.Vault": {
 		        "alias": "Flow",
 		        "balancePath": "/public/flowTokenBalance",
-				"balancePathIdentifier":"flowTokenBalance",
-		        "icon": "",
-				"tag" : ["utility coin"],
+				    "balancePathIdentifier":"flowTokenBalance",
+		        "icon": "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
+				    "tag" : ["utility coin"],
 		        "receiverPath": "/public/flowTokenReceiver",
-				"receiverPathIdentifier":"flowTokenReceiver",
+				    "receiverPathIdentifier":"flowTokenReceiver",
 		        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
 		        "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 		        "vaultPath": "/storage/flowTokenVault",
-				"vaultPathIdentifier":"flowTokenVault"
+				    "vaultPathIdentifier":"flowTokenVault"
 		    },
 			"A.f8d6e0586b0a20c7.FUSD.Vault": {
 		        "alias": "FUSD",
 		        "balancePath": "/public/fusdBalance",
-				"balancePathIdentifier":"fusdBalance",
-		        "icon": "",
-				"tag" : ["stablecoin"],
+				    "balancePathIdentifier":"fusdBalance",
+		        "icon": "https://static.flowscan.org/mainnet/icons/A.3c5959b568896393.FUSD.png",
+				    "tag" : ["stablecoin"],
 		        "receiverPath": "/public/fusdReceiver",
-				"receiverPathIdentifier":"fusdReceiver",
+				    "receiverPathIdentifier":"fusdReceiver",
 		        "type": "Type\u003cA.f8d6e0586b0a20c7.FUSD.Vault\u003e()",
 		        "typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
 		        "vaultPath": "/storage/fusdVault",
@@ -188,6 +190,39 @@ func TestFTRegistry(t *testing.T) {
 			Args(o.Arguments().String("Flow")).
 			RunReturnsInterface()
 		assert.Equal(t, "", infoResult)
+
+	})
+
+	t.Run("Should be able to registry usdc token and get it", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+				"alias":          "USDC",
+				"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+			})
+
+		o := otu.O
+		result := o.ScriptFromFile("getFTInfoByTypeIdentifier").
+			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FiatToken.Vault")).
+			RunReturnsInterface()
+
+		expected := map[string]interface{}{
+			"alias":          "USDC",
+			"balancePath":    "/public/USDCVaultBalance",
+      "balancePathIdentifier":  "USDCVaultBalance",
+			"icon":           "https://static.flowscan.org/mainnet/icons/A.b19436aae4d94622.FiatToken.png",
+			"receiverPath":   "/public/USDCVaultReceiver",
+      "receiverPathIdentifier": "USDCVaultReceiver",
+			"tag":            []interface{}{"stablecoin"},
+			"type":           "Type<A.f8d6e0586b0a20c7.FiatToken.Vault>()",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+			"vaultPath":      "/storage/USDCVault",
+      "vaultPathIdentifier":    "USDCVault",
+
+		}
+   
+    
+		assert.Equal(t, expected, result)
 
 	})
 }
