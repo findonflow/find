@@ -12,12 +12,14 @@ transaction(id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let bidInfo = self.bidsReference.getBid(id)
-		let saleInformation = bidInfo.item
-		let ftIdentifier = bidInfo.item.ftTypeIdentifier
+		if bidInfo == nil {
+			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
+		}
+		let saleInformation = bidInfo!.item
+		let ftIdentifier = bidInfo!.item.ftTypeIdentifier
 
 		//If this is nil, there must be something wrong with FIND setup
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!

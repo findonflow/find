@@ -48,147 +48,189 @@ pub contract FindMarket {
 		oldProfile.deposit(from: <- vault)
 	}
 
-	pub struct NFTInfo{
+	pub struct NFTInfo {
+		pub let id: UInt64 
 		pub let name:String
-		pub let description:String
 		pub let thumbnail:String
 		pub let type: String
-		//TODO: add more views here, like rarity
+		pub let grouping: String?
+		pub let rarity:String?
 
-		init(_ item: &{MetadataViews.Resolver}){
+		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
+
+			if let view = item.resolveView(Type<FindViews.Grouping>()) {
+				let grouping = view as! FindViews.Grouping
+				self.grouping=grouping.name
+			} else {
+				self.grouping=nil
+			}
+
+			if let view = item.resolveView(Type<FindViews.Rarity>()) {
+				let rarity = view as! FindViews.Rarity
+				self.rarity=rarity.rarityName
+			} else {
+				self.rarity=nil
+			}
+
 			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 			self.name=display.name
-			self.description=display.description
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
+			self.id=id
 		}
 	}
 
-	pub struct interface AuctionItem {
-		pub fun getStartPrice(): UFix64
-		pub fun getMinimumBidIncrement(): UFix64
-		pub fun getReservePrice(): UFix64
-		pub fun getExtentionOnLateBid(): UFix64
+	pub struct GhostListing{
+		pub let listingType: Type
+		pub let listingTypeIdentifier: String
+		pub let id: UInt64
+
+
+		init(listingType:Type, id:UInt64) {
+			self.listingType=listingType
+			self.listingTypeIdentifier=listingType.identifier
+			self.id=id
+		}
+	}
+
+	//BAM: make this a struct with fields
+	pub struct AuctionItem {
+		//end time
+		//current time
+		pub let startPrice: UFix64 
+		pub let currentPrice: UFix64
+		pub let minimumBidIncrement: UFix64 
+		pub let reservePrice: UFix64 
+		pub let extentionOnLateBid: UFix64 
+		pub let auctionEndsAt: UFix64? 
+		pub let timestamp: UFix64 
+
+		init(startPrice: UFix64, currentPrice: UFix64, minimumBidIncrement: UFix64, reservePrice: UFix64, extentionOnLateBid: UFix64, auctionEndsAt: UFix64? , timestamp: UFix64){
+			self.startPrice = startPrice 
+			self.currentPrice = currentPrice
+			self.minimumBidIncrement = minimumBidIncrement 
+			self.reservePrice = reservePrice
+			self.extentionOnLateBid = extentionOnLateBid
+			self.auctionEndsAt = auctionEndsAt 
+			self.timestamp = timestamp
+		}
+	}
+
+	pub resource interface SaleItemCollectionPublic {
+		pub fun getIds(): [UInt64]
+		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
+		pub fun getSaleItemReport() : SaleItemCollectionReport
+	}
+
+	pub struct SaleItemCollectionReport {
+		pub let items : [FindMarket.SaleItemInformation] 
+		pub let ghosts: [FindMarket.GhostListing]
+
+	  init(items: [SaleItemInformation], ghosts: [GhostListing]) {
+			self.items=items
+			self.ghosts=ghosts
+		}
+	}
+
+	pub resource interface MarketBidCollectionPublic {
+		pub fun getBidsReport() : BidItemCollectionReport
+	}
+
+	pub struct BidItemCollectionReport {
+		pub let items : [FindMarket.BidInfo] 
+		pub let ghosts: [FindMarket.GhostListing]
+
+	  init(items: [BidInfo], ghosts: [GhostListing]) {
+			self.items=items
+			self.ghosts=ghosts
+		}
 	}
 
 	pub resource interface SaleItem {
 
 		//this is the type of sale this is, auction, direct offer etc
 		pub fun getSaleType(): String
+		pub fun getListingTypeIdentifier(): String
 
 		pub fun getSeller(): Address
 		pub fun getBuyer(): Address?
 
 		pub fun getSellerName() : String?
 		pub fun getBuyerName() : String?
-		pub fun getPointer() : AnyStruct{FindViews.Pointer}
 
-		pub fun getItemCollectionAlias(): String
+		pub fun toNFTInfo() : FindMarket.NFTInfo
+
 		pub fun getFtAlias(): String 
 		//the Type of the item for sale
 		pub fun getItemType(): Type
-		//The id of the item for sale
+		//The id of the nft for sale
 		pub fun getItemID() : UInt64
-
-		//The id of this sale item
+		//The id of this sale item, ie the UUID of the item listed for sale
 		pub fun getId() : UInt64
 
 		pub fun getBalance(): UFix64
-
-		pub fun getAuction(): AnyStruct{AuctionItem}?
+		pub fun getAuction(): AuctionItem?
 		pub fun getFtType() : Type //The type of FT used for this sale item
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
+		
 	}
 
+	//BAM; this needs to know if an item is deprectaed or stopped in some way
 	pub struct SaleItemInformation {
 
-		//TODO: should we add typeIdentifier here?
-		//TODO: call this nftType?
-		pub let type:Type
-		pub let typeId: UInt64
-		pub let id:UInt64
-		pub let owner: Address
-		pub let amount: UFix64?
-		pub let bidder: Address?
-		pub let saleType:String
-		pub let ftType: Type
-		pub let ftTypeIdentifier: String
-		pub let auctionReservePrice: UFix64?
-		pub let extensionOnLateBid: UFix64?
-		pub let listingValidUntil: UFix64?
-
-
-		init(_ item: &{SaleItem}) {
-			self.type= item.getItemType()
-			self.typeId=item.getItemID()
-			self.saleType=item.getSaleType()
-			self.id= item.getId()
-			self.amount=item.getBalance()
-			self.bidder=item.getBuyer()
-			self.owner=item.getSeller()
-			self.auctionReservePrice=item.getAuction()?.getReservePrice()
-			self.extensionOnLateBid=item.getAuction()?.getExtentionOnLateBid()
-			self.ftType=item.getFtType()
-			self.ftTypeIdentifier=item.getFtType().identifier
-			self.listingValidUntil=item.getValidUntil()
-		}
-	}
-
-	pub struct SaleInformation {
-
-		//TODO: should we add typeIdentifier here?
-		//TODO: call this nftType?
-		pub let nftAlias: String 
+		pub let nftIdentifier: String 
 		pub let nftId: UInt64
 		pub let seller: Address
 		pub let sellerName: String?
 		pub let amount: UFix64?
 		pub let bidder: Address?
 		pub var bidderName: String?
-		pub let listingId:UInt64
-		pub let saleType:String
+		pub let listingId: UInt64
+
+		pub let saleType: String
+		pub let listingTypeIdentifier: String
 		pub let ftAlias: String 
-		pub let auctionReservePrice: UFix64?
-		pub let extensionOnLateBid: UFix64?
+		pub let ftTypeIdentifier: String
 		pub let listingValidUntil: UFix64?
-		pub let startPrice: UFix64?
-		pub let minimumBidIncrement: UFix64?
 
-		pub let nftName: String 
-		pub let nftDescription: String 
-		pub let nftThumbnail: String 
+		pub let nft: NFTInfo
+		pub let auction: AuctionItem?
+		pub let listingStatus:String
 
-		init(_ item: &{SaleItem}) {
-			self.nftAlias= item.getItemCollectionAlias()
+		init(item: &{SaleItem}, status:String) {
+			self.listingStatus=status
+			self.nftIdentifier= item.getItemType().identifier
 			self.nftId=item.getItemID()
 			self.saleType=item.getSaleType()
-			self.listingId= item.getId()
+			self.listingTypeIdentifier=item.getListingTypeIdentifier()
+			self.listingId=item.getId()
 			self.amount=item.getBalance()
 			self.bidder=item.getBuyer()
 			self.bidderName=item.getBuyerName()
 			self.seller=item.getSeller()
 			self.sellerName=item.getSellerName()
-			self.auctionReservePrice=item.getAuction()?.getReservePrice()
-			self.extensionOnLateBid=item.getAuction()?.getExtentionOnLateBid()
+
 			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
-			self.startPrice=item.getAuction()?.getStartPrice()
-			self.minimumBidIncrement=item.getAuction()?.getMinimumBidIncrement()
 
-			let view = item.getPointer().getViewResolver().resolveView(Type<MetadataViews.Display>()) as! MetadataViews.Display
-			self.nftName=view.name
-			self.nftDescription=view.description
-			self.nftThumbnail=view.thumbnail.uri()
+			self.ftTypeIdentifier=item.getFtType().identifier
+
+			self.nft=item.toNFTInfo()
+			self.auction=item.getAuction()
 		}
 	}
 
 	pub struct BidInfo{
 		pub let id: UInt64
+		pub let bidAmount: UFix64
+		pub let bidTypeIdentifier: String 
 		pub let timestamp: UFix64
 		pub let item: SaleItemInformation
 
-		init(id: UInt64, amount: UFix64, timestamp: UFix64, item:SaleItemInformation) {
+		init(id: UInt64, bidTypeIdentifier: String, bidAmount: UFix64, timestamp: UFix64, item:SaleItemInformation) {
 			self.id=id
+			self.bidAmount=bidAmount
+			self.bidTypeIdentifier=bidTypeIdentifier
 			self.timestamp=timestamp
 			self.item=item
 		}

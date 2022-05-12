@@ -35,6 +35,19 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	return id
 }
 
+func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
+	otu.setupFIND().
+		setupDandy("user1").
+		createUser(100.0, "user1").
+		createUser(100.0, "user2").
+		createUser(100.0, "user3").
+		registerUser("user2").
+		registerUser("user3")
+
+	ids := otu.mintThreeExampleDandies()
+	return ids
+}
+
 func (otu *OverflowTestUtils) assertLookupAddress(user, expected string) {
 	value := otu.O.Script(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {
@@ -564,6 +577,7 @@ func (otu *OverflowTestUtils) saleItemListed(name string, saleType string, price
 
 	t := otu.T
 	itemsForSale := otu.getItemsForSale(name)
+
 	assert.Equal(t, 1, len(itemsForSale))
 	assert.Equal(t, saleType, itemsForSale[0].SaleType)
 	assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
@@ -868,10 +882,16 @@ type Royalty struct {
 	} `json:"cutInfos"`
 }
 
-func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItem {
-	var saleItems []SaleItem
-	otu.O.ScriptFromFile("listSaleItems").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&saleItems)
-	return saleItems
+func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
+	var findReport FINDReport
+	otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&findReport)
+	var list []SaleItemInformation
+	for _, saleItemCollectionReport := range findReport.ItemsForSale {
+		for _, saleItemInformation := range saleItemCollectionReport.Items {
+			list = append(list, saleItemInformation)
+		}
+	}
+	return list
 
 }
 
@@ -1003,4 +1023,77 @@ type SaleItem struct {
 	SaleType            string `json:"saleType"`
 	Type                string `json:"type"`
 	TypeID              string `json:"typeId"`
+}
+
+type FINDReport struct {
+	Profile         string                               `json:"profile"`
+	Bids            string                               `json:"bids"`
+	RelatedAccounts string                               `json:"relatedAccounts"`
+	Leases          string                               `json:"leases"`
+	PrivateMode     string                               `json:"privateMode"`
+	ItemsForSale    map[string]SaleItemCollectionReport  `json:"itemsForSale"`
+	MarketBids      map[string]MarketBidCollectionPublic `json:"marketBids"`
+}
+
+type SaleItemCollectionReport struct {
+	Items  []SaleItemInformation `json:"items"`
+	Ghosts []GhostListing        `json:"ghosts"`
+}
+
+type MarketBidCollectionPublic struct {
+	Items  []BidInfo      `json:"items"`
+	Ghosts []GhostListing `json:"ghosts"`
+}
+
+type BidInfo struct {
+	Id                string `json:"id"`
+	BidAmount         string `json:"bidAmount"`
+	BidTypeIdentifier string `json:"bidTypeIdentifier"`
+	// Timestamp         string              `json:"timestamp"`
+	Item SaleItemInformation `json:"item"`
+}
+
+type SaleItemInformation struct {
+	NftIdentifier         string      `json:"nftIdentifier"`
+	NftId                 string      `json:"nftId"`
+	Seller                string      `json:"seller"`
+	SellerName            string      `json:"sellerName"`
+	Amount                string      `json:"amount"`
+	Bidder                string      `json:"bidder"`
+	BidderName            string      `json:"bidderName"`
+	ListingId             string      `json:"listingId"`
+	SaleType              string      `json:"saleType"`
+	ListingTypeIdentifier string      `json:"listingTypeIdentifier"`
+	FtAlias               string      `json:"ftAlias"`
+	FtTypeIdentifier      string      `json:"ftTypeIdentifier"`
+	ListingValidUntil     string      `json:"listingValidUntil"`
+	Nft                   NFTInfo     `json:"nft"`
+	Auction               AuctionItem `json:"auction"`
+	ListingStatus         string      `json:"listingStatus"`
+}
+
+type NFTInfo struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Thumbnail  string `json:"seller"`
+	SellerName string `json:"thumbnail"`
+	Nfttype    string `json:"type"`
+	Grouping   string `json:"grouping"`
+	Rarity     string `json:"rarity"`
+}
+
+type AuctionItem struct {
+	StartPrice          string `json:"startPrice"`
+	CurrentPrice        string `json:"currentPrice"`
+	MinimumBidIncrement string `json:"minimumBidIncrement"`
+	ReservePrice        string `json:"reservePrice"`
+	ExtentionOnLateBid  string `json:"extentionOnLateBid"`
+	AuctionEndsAt       string `json:"auctionEndsAt"`
+	// Timestamp           string `json:"timestamp"`
+}
+
+type GhostListing struct {
+	ListingType           string `json:"listingType"`
+	ListingTypeIdentifier string `json:"listingTypeIdentifier"`
+	Id                    string `json:"id"`
 }

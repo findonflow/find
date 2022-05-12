@@ -13,11 +13,14 @@ transaction(id: UInt64, amount: UFix64) {
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")
-
 		// get Bidding Fungible Token Vault
-	  let bid =self.bidsReference.getBid(id).item
-		self.oldAmount=bid.amount!
-		let ftIdentifier = bid.ftTypeIdentifier
+	  let bid =self.bidsReference.getBid(id)
+		if bid==nil {
+			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
+		}
+		let item= bid!.item
+		self.oldAmount=item.amount!
+		let ftIdentifier = item.ftTypeIdentifier
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
 
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
