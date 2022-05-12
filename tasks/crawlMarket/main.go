@@ -17,6 +17,57 @@ import (
 	"github.com/typesense/typesense-go/typesense"
 )
 
+type MarketEvents []MarketEvent
+type GroupedEvents map[uint64]MarketEvents
+
+func (groupedEvents GroupedEvents) Partition(eventToIgnoreWhenIndexing string) (changed, removed, sold MarketEvents) {
+	eventsToIndex := MarketEvents{}
+	eventsSold := MarketEvents{}
+	eventsToDelete := MarketEvents{}
+	for _, events := range groupedEvents {
+
+		sort.SliceStable(events, func(i, j int) bool {
+			return events[i].EventDate.UnixMilli() > events[j].EventDate.UnixMilli()
+		})
+
+		status := events[0].BlockEventData.Status
+		//Need to find delisted as well
+		if status == "sold" {
+			eventsToDelete = append(eventsToDelete, events[0])
+			eventsSold = append(eventsSold, events[0])
+		} else if status == "cancelled" || status == "failed" || status == "rejected" {
+			eventsToDelete = append(eventsToDelete, events[0])
+		} else {
+			for _, event := range events {
+				//we do not care about directOffers made here
+				if event.FlowEventID == eventToIgnoreWhenIndexing {
+					continue
+				}
+				eventsToIndex = append(eventsToIndex, event)
+				break
+			}
+		}
+	}
+	return eventsToDelete, eventsToDelete, eventsSold
+}
+
+func (me MarketEvents) GroupEvents() GroupedEvents {
+	groupedEvents := GroupedEvents{}
+	for _, event := range me {
+		//todo: replace with uuid
+		id := event.BlockEventData.ID //this is uuid of item
+		var group MarketEvents
+		group, ok := groupedEvents[id]
+		if !ok {
+			group = MarketEvents{}
+		}
+
+		group = append(group, event)
+		groupedEvents[id] = group
+	}
+	return groupedEvents
+}
+
 func main() {
 
 	forSaleEvents := "A.4a2ad151970648cd.FindMarketSale.ForSale"
@@ -25,63 +76,15 @@ func main() {
 
 	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}
 
-	progressFile := "market.progress"
-	lastIndex, err := readProgressFromFile(progressFile)
-	now := time.Now().Unix()
+	sleepVar := os.Getenv("CRAWLER_SLEEP")
+	sleep, err := time.ParseDuration(sleepVar)
 	if err != nil {
-		lastIndex = now
+		sleep = time.Second * 2
 	}
-
-	urlTemplate := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search?since=%d"
-
-	graffleUrl := fmt.Sprintf(urlTemplate, lastIndex)
-
-	events := getEventsFromGraffle(graffleUrl, marketEvents)
-	groupedEvents := map[uint64][]MarketEvent{}
-	for _, event := range events {
-		//todo: replace with uuid
-		id := event.BlockEventData.ID //this is uuid of item
-		var group []MarketEvent
-		group, ok := groupedEvents[id]
-		if !ok {
-			group = []MarketEvent{}
-		}
-
-		group = append(group, event)
-		groupedEvents[id] = group
-	}
-
-	eventsToIndex := []MarketEvent{}
-	eventsToDelete := []MarketEvent{}
-	for _, events := range groupedEvents {
-		sort.SliceStable(events, func(i, j int) bool {
-			return events[i].EventDate.UnixMilli() > events[j].EventDate.UnixMilli()
-		})
-
-		if events[0].BlockEventData.Status == "sold" {
-			eventsToDelete = append(eventsToDelete, events[0])
-		} else {
-			for _, event := range events {
-				//we do not care about directOffers made here
-				if event.FlowEventID == directOfferEvents {
-					continue
-				}
-				eventsToIndex = append(eventsToIndex, event)
-				break
-			}
-		}
-	}
-	if len(eventsToIndex) == 0 {
-		fmt.Println("No results found Writing progress to file")
-		writeProgressToFile(progressFile, now)
-		os.Exit(1)
-	}
-
-	fmt.Printf("Ignore %d number of events to delete for now since we are running new dump\n", len(eventsToDelete))
 
 	key := os.Getenv("TYPESENSE_FIND_ADMIN")
 	url := os.Getenv("TYPESENSE_FIND_URL")
-
+	progressFile := "market.progress"
 	client := typesense.NewClient(
 		typesense.WithServer(url),
 		typesense.WithAPIKey(key),
@@ -90,40 +93,85 @@ func main() {
 		typesense.WithCircuitBreakerInterval(2*time.Minute),
 		typesense.WithCircuitBreakerTimeout(1*time.Minute),
 	)
-	market := client.Collection("market").Documents()
 
-	for _, item := range eventsToIndex {
-		searchElement := SearchResult{
-			Id:                  fmt.Sprintf("%d", item.BlockEventData.ID),
-			Tenant:              item.BlockEventData.Tenant,
-			Seller:              item.BlockEventData.Seller,
-			SellerName:          item.SellerName(),
-			Buyer:               item.Buyer(),
-			BuyerName:           item.BuyerName(),
-			Amount:              item.BlockEventData.Amount,
-			AmountType:          item.BlockEventData.VaultType,
-			NFTID:               item.BlockEventData.Nft.ID,
-			NFTName:             item.BlockEventData.Nft.Name,
-			NFTType:             item.BlockEventData.Nft.Type,
-			NFTThumbnail:        item.BlockEventData.Nft.Thumbnail,
-			NFTGrouping:         item.Grouping(),
-			NFTRarity:           item.Rarity(),
-			AuctionEnds:         item.AuctionEnds(),
-			AuctionReservePrice: item.AuctionReservePrice(),
-			ListingType:         item.FlowEventID, //todo FIX?
-			Status:              item.BlockEventData.Status,
-			UpdatedAt:           time.Now().Unix(),
-		}
+	urlTemplate := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search?since=%d"
 
-		//TODO: can do this in paralell for initial import
-		_, err := market.Upsert(searchElement)
+	for {
+		lastIndex, err := readProgressFromFile(progressFile)
+		now := time.Now().Unix()
+		firstRun := true
 		if err != nil {
-			panic(err)
+			firstRun = false
+			lastIndex = now
 		}
-	}
+		graffleUrl := fmt.Sprintf(urlTemplate, lastIndex)
 
-	fmt.Println("Writing progress to file")
-	writeProgressToFile(progressFile, now)
+		events := getEventsFromGraffle(graffleUrl, marketEvents)
+
+		groupedEvents := events.GroupEvents()
+
+		//Ignore events sold for now
+		eventsToIndex, eventsToDelete, _ := groupedEvents.Partition(directOfferEvents)
+		if len(eventsToIndex) == 0 && len(eventsToDelete) == 0 {
+			log.Println("No results found Writing progress to file")
+			writeProgressToFile(progressFile, now)
+
+			time.Sleep(sleep)
+			continue
+		}
+
+		marketCollection := client.Collection("market")
+
+		if firstRun {
+			log.Printf("Ignore %d number of events to delete for now since we are running new dump\n", len(eventsToDelete))
+		} else {
+
+			for _, event := range eventsToDelete {
+				res, err := marketCollection.Document(fmt.Sprintf("%d", event.BlockEventData.ID)).Delete()
+				if err != nil {
+					log.Fatalf("Could not delete document with id %d, %v", event.BlockEventData.ID, err)
+				} else {
+					log.Printf("Delete document with result %v\n", res)
+				}
+			}
+		}
+
+		market := marketCollection.Documents()
+		for _, item := range eventsToIndex {
+			searchElement := SearchResult{
+				Id:                  fmt.Sprintf("%d", item.BlockEventData.ID),
+				Tenant:              item.BlockEventData.Tenant,
+				Seller:              item.BlockEventData.Seller,
+				SellerName:          item.SellerName(),
+				Buyer:               item.Buyer(),
+				BuyerName:           item.BuyerName(),
+				Amount:              item.BlockEventData.Amount,
+				AmountType:          item.BlockEventData.VaultType,
+				NFTID:               item.BlockEventData.Nft.ID,
+				NFTName:             item.BlockEventData.Nft.Name,
+				NFTType:             item.BlockEventData.Nft.Type,
+				NFTThumbnail:        item.BlockEventData.Nft.Thumbnail,
+				NFTGrouping:         item.Grouping(),
+				NFTRarity:           item.Rarity(),
+				AuctionEnds:         item.AuctionEnds(),
+				AuctionReservePrice: item.AuctionReservePrice(),
+				ListingType:         item.FlowEventID, //todo FIX?
+				Status:              item.BlockEventData.Status,
+				UpdatedAt:           time.Now().Unix(),
+			}
+
+			//TODO: can do this in paralell for initial import
+			log.Printf("Insert document %v\n", searchElement)
+			_, err := market.Upsert(searchElement)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		log.Println("Writing progress to file")
+		writeProgressToFile(progressFile, now)
+		//TODO: we do not sleep here
+	}
 }
 
 type SearchResult struct {
@@ -168,7 +216,7 @@ func readProgressFromFile(fileName string) (int64, error) {
 
 }
 
-func getEventsFromGraffle(url string, marketEvents []string) []MarketEvent {
+func getEventsFromGraffle(url string, marketEvents []string) MarketEvents {
 	graffleClient := http.Client{
 		Timeout: time.Second * 2, // Timeout after 2 seconds
 	}

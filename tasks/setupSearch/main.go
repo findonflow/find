@@ -71,11 +71,13 @@ func main() {
 				Name:     "latest_bid",
 				Type:     "float",
 				Optional: pointer.True(),
+				Facet:    pointer.True(),
 			},
 			{
 				Name:     "sale_price",
 				Type:     "float",
 				Optional: pointer.True(),
+				Facet:    pointer.True(),
 			},
 			{
 				Name:  "status",
@@ -86,6 +88,7 @@ func main() {
 				Name:     "auction_reserve_price",
 				Type:     "float",
 				Optional: pointer.True(),
+				Facet:    pointer.True(),
 			},
 		},
 		DefaultSortingField: pointer.String("valid_until"),
