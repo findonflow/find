@@ -96,16 +96,15 @@ func main() {
 	)
 
 	urlTemplate := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search?since=%d"
-
 	for {
 		lastIndex, err := readProgressFromFile(progressFile)
 		now := time.Now().Unix()
 		firstRun := true
-		if err != nil {
+		graffleUrl := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search"
+		if err == nil {
+			graffleUrl = fmt.Sprintf(urlTemplate, lastIndex)
 			firstRun = false
-			lastIndex = now
 		}
-		graffleUrl := fmt.Sprintf(urlTemplate, lastIndex)
 
 		events := getEventsFromGraffle(graffleUrl, marketEvents)
 

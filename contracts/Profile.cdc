@@ -18,6 +18,8 @@ pub contract Profile {
 	//and event emitted when a user verifies something
 	pub event Verification(account:Address, message:String)
 
+	pub event FindNameChanged(account:Address, name:String)
+
 	/* 
 	Represents a Fungible token wallet with a name and a supported type.
 	*/
@@ -441,7 +443,10 @@ pub contract Profile {
 		pub fun getFollowing(): [FriendStatus] { return self.following.values }
 
 		pub fun setName(_ val: String) { self.name = val }
-		pub fun setFindName(_ val: String) { self.findName = val }
+		pub fun setFindName(_ val: String) { 
+			emit FindNameChanged(account: self.owner!.address, name:val)
+			self.findName = val 
+		}
 		pub fun setGender(_ val: String) { self.gender = val }
 		pub fun setAvatar(_ val: String) { self.avatar = val }
 		pub fun setDescription(_ val: String) { self.description=val}
