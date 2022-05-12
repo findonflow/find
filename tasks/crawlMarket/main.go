@@ -48,7 +48,7 @@ func (groupedEvents GroupedEvents) Partition(eventToIgnoreWhenIndexing string) (
 			}
 		}
 	}
-	return eventsToDelete, eventsToDelete, eventsSold
+	return eventsToIndex, eventsToDelete, eventsSold
 }
 
 func (me MarketEvents) GroupEvents() GroupedEvents {
@@ -69,10 +69,10 @@ func (me MarketEvents) GroupEvents() GroupedEvents {
 }
 
 func main() {
-
-	forSaleEvents := "A.4a2ad151970648cd.FindMarketSale.ForSale"
-	forAuctionEvents := "A.4a2ad151970648cd.FindMarketAuctionEscrow.ForAuction"
-	directOfferEvents := "A.4a2ad151970648cd.FindMarketDirectOfferEscrow.DirectOffer"
+	address := "8fcce1d764ef88dd"
+	forSaleEvents := fmt.Sprintf("A.%s.FindMarketSale.ForSale", address)
+	forAuctionEvents := fmt.Sprintf("A.%s.FindMarketAuctionEscrow.ForAuction", address)
+	directOfferEvents := fmt.Sprintf("A.%s.FindMarketDirectOfferEscrow.DirectOffer", address)
 
 	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}
 
