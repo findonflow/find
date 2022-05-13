@@ -8,8 +8,10 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
+	//o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments())
+	o.SimpleTxArgs("setNFTInfo_neo", "find-admin", o.Arguments())
 	//o.ScriptFromFile("address_status").Args(o.Arguments().RawAccount("0x745fbb422764513b")).Run()
-	o.ScriptFromFile("address_status").Args(o.Arguments().RawAccount("0xb26a2c441eda9091")).Run()
+	//o.ScriptFromFile("address_status").Args(o.Arguments().RawAccount("0xb26a2c441eda9091")).Run()
 	/*
 
 		o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())

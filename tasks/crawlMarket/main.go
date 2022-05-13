@@ -35,9 +35,7 @@ func (groupedEvents GroupedEvents) Partition() (changed, removed, sold MarketEve
 		if status == "sold" {
 			eventsToDelete = append(eventsToDelete, events[0])
 			eventsSold = append(eventsSold, events[0])
-		} else if strings.HasSuffix(status, "failed") {
-
-		} else if status == "cancelled" || status == "failed" || status == "rejected" {
+		} else if strings.HasSuffix(status, "cancel") {
 			eventsToDelete = append(eventsToDelete, events[0])
 		} else {
 			for _, event := range events {
