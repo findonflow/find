@@ -35,7 +35,9 @@ func (groupedEvents GroupedEvents) Partition() (changed, removed, sold MarketEve
 		if status == "sold" {
 			eventsToDelete = append(eventsToDelete, events[0])
 			eventsSold = append(eventsSold, events[0])
-		} else if strings.HasSuffix(status, "cancel") {
+		} else if status == "cancelled" || status == "failed" || status == "rejected" {
+			eventsToDelete = append(eventsToDelete, events[0])
+		} else if strings.HasPrefix(status, "cancel") {
 			eventsToDelete = append(eventsToDelete, events[0])
 		} else {
 			for _, event := range events {
@@ -158,8 +160,7 @@ func main() {
 				UpdatedAt:           time.Now().Unix(),
 			}
 
-			//TODO: can do this in paralell for initial import
-			log.Printf("Insert document %v\n", searchElement)
+			log.Printf("Insert document %+v\n", searchElement)
 			_, err := market.Upsert(searchElement)
 			if err != nil {
 				panic(err)
