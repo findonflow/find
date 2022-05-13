@@ -17,7 +17,7 @@ func TestDandy(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry()
+			registerFtInRegistry()
 		dandyIds := otu.mintThreeExampleDandies()
 
 		id := dandyIds[0]

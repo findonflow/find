@@ -17,7 +17,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("Sale").
 			listNFTForSale("user1", id, price)
@@ -48,7 +48,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price)
@@ -78,7 +78,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
@@ -108,7 +108,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
@@ -140,7 +140,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price)
@@ -170,7 +170,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
@@ -200,7 +200,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
@@ -231,7 +231,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft")
 
@@ -259,7 +259,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketEscrowed("user2", "user1", id, price)
@@ -284,7 +284,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft")
 
@@ -312,7 +312,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price)
@@ -336,7 +336,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
@@ -361,7 +361,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", ids[0], price).
@@ -447,7 +447,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", ids[0], price).
