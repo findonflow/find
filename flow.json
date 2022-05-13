@@ -50,8 +50,30 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
+		"GrantedAccountAccess": {
+			"source": "./contracts/standard/GrantedAccountAccess.cdc",
+			"aliases": {
+				"mainnet": "0x2d4c3caffbeab845",
+				"testnet": "0x0afe396ebc8eee65"
+			}
+		},
+		"FLOAT": {
+			"source": "./contracts/standard/FLOAT.cdc",
+			"aliases": {
+				"mainnet": "0x2d4c3caffbeab845",
+				"testnet": "0x0afe396ebc8eee65"
+			}
+		},
+		"FLOATVerifiers": {
+			"source": "./contracts/standard/FLOATVerifiers.cdc",
+			"aliases": {
+				"mainnet": "0x2d4c3caffbeab845",
+				"testnet": "0x0afe396ebc8eee65"
+			}
+		},
     "FIND": "./contracts/FIND.cdc",
     "Dandy": "./contracts/Dandy.cdc",
+		"FindPack": "./contracts/FindPack.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
     "FindMarketTenant": "./contracts/FindMarketTenant.cdc",
     "FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
@@ -200,7 +222,12 @@
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
-        "NFTRegistry"
+        "NFTRegistry",
+				"FLOAT", 
+				"FLOATVerifiers", 
+				"GrantedAccountAccess",
+				"FindPack"
+
       ],
       "emulator-find": [],
       "emulator-user1": [],

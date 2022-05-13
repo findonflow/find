@@ -12,6 +12,7 @@ import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
+import FindPack from "./FindPack.cdc"
 import FindMarketOptions from "./FindMarketOptions.cdc"
 
 pub contract Admin {
@@ -57,6 +58,41 @@ pub contract Admin {
 
 		}
 		*/
+
+		pub fun registerPackMetadata(typeId:UInt64, metadata:FindPack.Metadata) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			FindPack.registerMetadata(typeId: typeId, metadata: metadata)
+		}
+
+		pub fun batchMintPacks(typeId: UInt64, hashes:[String]) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+
+			let recipient=Admin.account.getCapability<&{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath).borrow()!
+			for hash in  hashes {
+				FindPack.mintNFT(recipient:recipient, typeId: typeId, hash: hash)
+			}
+		}
+
+		pub fun requeue(packId:UInt64) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+
+			let cap= Admin.account.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+			cap.requeue(packId: packId)
+		}
+
+		pub fun fulfill(packId: UInt64, rewardIds:[UInt64], salt:String) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			FindPack.fulfill(packId: packId, rewardIds: rewardIds, salt: salt)
+		}
+
 
 		pub fun createFindMarketTenant(name: String, address:Address) : Capability<&FindMarketTenant.Tenant> {
 			pre {
