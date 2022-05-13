@@ -118,32 +118,6 @@ func TestFIND(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to send ft to another name", func(t *testing.T) {
-
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1")
-
-		otu.O.TransactionFromFile("sendFT").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("user1").
-				UFix64(5.0).
-				String("fusd")).
-			Test(t).AssertSuccess().
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
-				"to":     "0x179b6b1cb6755e31",
-			})).
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
-				"from":   "0xf3fcd2c1a78f5eee",
-			}))
-
-	})
-
 	t.Run("Admin should be able to register without paying FUSD", func(t *testing.T) {
 
 		otu := NewOverflowTest(t).
@@ -180,90 +154,6 @@ func TestFIND(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 				"name": "user1",
 			}))
-	})
-
-	t.Run("Should be able to send fusd with message", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2")
-
-		otu.O.TransactionFromFile("sendFusdWithMessage").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user2").UFix64(5.0).String("Happy to help")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Verification", map[string]interface{}{
-				"message": "user1 sent 5.00 FUSD with message:Happy to help",
-			}))
-
-	})
-
-	t.Run("Should be able to send fusd to another name with tag and message", func(t *testing.T) {
-
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2")
-
-		otu.O.TransactionFromFile("sendFusdWithTagAndMessage").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().String("user1").UFix64(5.0).String("This is a test").String("test")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
-				"from":      "0xf3fcd2c1a78f5eee",
-				"fromName":  "user2",
-				"toAddress": "0x179b6b1cb6755e31",
-				"amount":    "5.00000000",
-				"name":      "user1",
-				"tag":       "test",
-				"message":   "This is a test",
-			})).
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
-				"to":     "0x179b6b1cb6755e31",
-			})).
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
-				"from":   "0xf3fcd2c1a78f5eee",
-			}))
-
-	})
-
-	t.Run("Should be able to send flow to another name with tag and message", func(t *testing.T) {
-
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2")
-
-		otu.O.TransactionFromFile("sendFlowWithTagAndMessage").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().String("user1").UFix64(5.0).String("This is a test").String("test")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
-				"from":      "0xf3fcd2c1a78f5eee",
-				"fromName":  "user2",
-				"toAddress": "0x179b6b1cb6755e31",
-				"amount":    "5.00000000",
-				"name":      "user1",
-				"tag":       "test",
-				"message":   "This is a test",
-			})).
-			AssertEmitEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
-				"to":     "0x179b6b1cb6755e31",
-			})).
-			AssertEmitEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
-				"from":   "0xf3fcd2c1a78f5eee",
-			}))
-
 	})
 
 	t.Run("Should be able to register related account and remove it", func(t *testing.T) {

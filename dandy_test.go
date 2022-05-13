@@ -15,7 +15,9 @@ func TestDandy(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			setupDandy("user1").
-			registerFlowFUSDDandyInRegistry()
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry()
 		dandyIds := otu.mintThreeExampleDandies()
 
 		id := dandyIds[0]
@@ -51,7 +53,7 @@ func TestDandy(t *testing.T) {
 		assert.JSONEq(t, display, result)
 
 		externalUrl := `
-{ "url" : "https://find.xyz/collection/user1/dandy/83"}
+{ "url" : "https://find.xyz/collection/user1/dandy/110"}
 
 `
 		urlResult := otu.O.ScriptFromFile("view").Args(otu.O.Arguments().

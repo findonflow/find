@@ -16,7 +16,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -42,7 +42,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -78,7 +78,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -123,7 +123,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -181,7 +181,7 @@ func TestMarketOptions(t *testing.T) {
 	// 		setupDandy("user1").
 	// 		createUser(100.0, "user2").
 	// 		registerUser("user2").
-	// 		registerFlowFUSDDandyInRegistry().
+	// 		registerFtInRegistry().
 	// 		setFlowDandyMarketOption("Sale").
 	// 		setFlowDandyMarketOption("AuctionEscrow")
 

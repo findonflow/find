@@ -135,6 +135,15 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		AssertSuccess().
 		AssertEventCount(3)
 
+	otu.O.TransactionFromFile("mintUsdc").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			Account(name).
+			UFix64(fusd)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertEventCount(3)
+
 	return otu
 }
 
@@ -535,7 +544,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("buyItemForSaleFlowToken").
+	otu.O.TransactionFromFile("buyItemForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
@@ -963,7 +972,7 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 	return otu
 }
 
-func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUtils {
+func (otu *OverflowTestUtils) registerFtInRegistry() *OverflowTestUtils {
 	otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 		"alias":          "FUSD",
 		"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
@@ -971,6 +980,10 @@ func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUti
 		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 			"alias":          "Flow",
 			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		}).
+		registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "USDC",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
 		}).
 		registerDandyInNFTRegistry()
 	return otu

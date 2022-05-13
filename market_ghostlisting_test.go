@@ -17,7 +17,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("Sale").
 			listNFTForSale("user1", id, price)
@@ -48,7 +48,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price)
@@ -78,7 +78,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
@@ -108,7 +108,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
@@ -140,7 +140,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price)
@@ -170,7 +170,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
@@ -200,7 +200,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
@@ -231,7 +231,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("AuctionSoft")
 
@@ -259,7 +259,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketEscrowed("user2", "user1", id, price)
@@ -284,7 +284,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft")
 
@@ -312,7 +312,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price)
@@ -336,7 +336,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
@@ -361,7 +361,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", ids[0], price).
@@ -378,7 +378,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		expectedGhostJson := `
 			[{
-				"id": "125",
+				"id": "133",
 				"listingType": "Type\u003cA.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem\u003e()",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem"
 			}]
@@ -399,19 +399,19 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				"bidderName": "",
 				"ftAlias": "Flow",
 				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId": "126",
+				"listingId": "134",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
 					"grouping": "",
-					"id": "126",
+					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 				},
-				"nftId": "126",
+				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
@@ -447,7 +447,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", ids[0], price).
@@ -467,7 +467,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		expectedGhostDirectOfferJson := `[
 			{
-				"id": "125",
+				"id": "133",
 				"listingType": "Type\u003cA.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.Bid\u003e()",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.Bid"
 			}
@@ -475,7 +475,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		expectedGhostAuctionEscrowJson := `[
 			{
-				"id": "125",
+				"id": "133",
 				"listingType": "Type\u003cA.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid\u003e()",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid"
 			}
@@ -485,7 +485,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			{
 				"bidAmount": "15.00000000",
 				"bidTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid",
-				"id": "126",
+				"id": "134",
 				"item": {
 					"amount": "15.00000000",
 					"auction": {
@@ -500,19 +500,19 @@ func TestMarketGhostlistingTest(t *testing.T) {
 					"bidderName": "user2",
 					"ftAlias": "Flow",
 					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "126",
+					"listingId": "134",
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "301.00000000",
 					"nft": {
 						"grouping": "",
-						"id": "126",
+						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 					},
-					"nftId": "126",
+					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_ongoing",
 					"seller": "0x179b6b1cb6755e31",

@@ -14,7 +14,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price)
 
@@ -27,7 +27,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -40,7 +40,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -51,7 +51,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -65,7 +65,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
@@ -99,7 +99,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow")
 
 		otu.alterMarketOption("DirectOfferEscrow", "deprecate")
@@ -121,7 +121,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
@@ -144,7 +144,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -156,7 +156,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow")
 
 		otu.alterMarketOption("DirectOfferEscrow", "stop")
@@ -178,7 +178,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
@@ -207,7 +207,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -225,7 +225,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			alterMarketOption("DirectOfferEscrow", "deprecate").
 			alterMarketOption("DirectOfferEscrow", "enable").
@@ -240,7 +240,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			alterMarketOption("DirectOfferEscrow", "deprecate").
 			alterMarketOption("DirectOfferEscrow", "enable").
@@ -253,7 +253,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -288,7 +288,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).

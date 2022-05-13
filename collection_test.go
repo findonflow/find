@@ -15,48 +15,48 @@ func TestCollectionScripts(t *testing.T) {
 		{
 			"collections": {
 				"Dandy": [
-					"Dandy85",
-					"Dandy84",
-					"Dandy83"
+					"Dandy88",
+					"Dandy89",
+					"Dandy87"
 				]
 			},
 			"curatedCollections": {},
 			"items": {
-				"Dandy83": {
+				"Dandy87": {
 					"collection": "Dandy",
 					"contentType": "image",
-					"id": "83",
+					"id": "87",
 					"image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"metadata": {},
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"url": "find.xyz",
-					"uuid": "83"
+					"uuid": "87"
 				},
-				"Dandy84": {
+				"Dandy88": {
 					"collection": "Dandy",
 					"contentType": "image",
-					"id": "84",
+					"id": "88",
 					"image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"metadata": {},
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"url": "find.xyz",
-					"uuid": "84"
+					"uuid": "88"
 				},
-				"Dandy85": {
+				"Dandy89": {
 					"collection": "Dandy",
 					"contentType": "image",
-					"id": "85",
+					"id": "89",
 					"image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"metadata": {},
 					"name": "Neo Motorcycle 3 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"url": "find.xyz",
-					"uuid": "85"
+					"uuid": "89"
 				}
 			}
 		}
