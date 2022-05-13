@@ -14,9 +14,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			saleItemListed("user1", "directoffer_soft_accepted", price).
+			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoft("user2", id, price)
 	})
 
@@ -27,9 +27,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			increaseDirectOfferMarketSoft("user2", id, 5.0, 15.0).
-			saleItemListed("user1", "directoffer_soft", 15.0)
+			saleItemListed("user1", "active_ongoing", 15.0)
 	})
 
 	t.Run("Should be able to reject offer", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferSoft("user1", id, 10.0)
 	})
 
@@ -50,10 +50,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			retractOfferDirectOfferSoft("user2", "user1", id)
 	})
-
 
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 		otu := NewOverflowTest(t)
@@ -82,7 +81,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferSoft", "deprecate")
 
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
@@ -94,7 +93,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			AssertFailure("Tenant has deprected mutation options on this item")
 
 		otu.acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			saleItemListed("user1", "directoffer_soft_accepted", price).
+			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoft("user2", id, price)
 	})
 
@@ -105,7 +104,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferSoft", "deprecate").
 			rejectDirectOfferSoft("user1", id, 10.0)
 	})
@@ -137,7 +136,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferSoft", "stop")
 
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
@@ -163,9 +162,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			saleItemListed("user1", "directoffer_soft_accepted", price).
+			saleItemListed("user1", "active_finished", price).
 			alterMarketOption("DirectOfferSoft", "stop")
 
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
@@ -183,7 +182,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferSoft", "stop")
 
 		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
@@ -203,9 +202,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			alterMarketOption("DirectOfferSoft", "stop").
 			alterMarketOption("DirectOfferSoft", "enable").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			saleItemListed("user1", "directoffer_soft_accepted", price).
+			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoft("user2", id, price)
 	})
 
@@ -218,7 +217,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			alterMarketOption("DirectOfferSoft", "stop").
 			alterMarketOption("DirectOfferSoft", "enable").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferSoft("user1", id, 10.0)
 	})
 
@@ -229,7 +228,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferSoft", "deprecate")
 
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
@@ -264,7 +263,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer_soft", price)
+			saleItemListed("user1", "active_ongoing", price)
 
 		otu.alterMarketOption("DirectOfferSoft", "stop")
 

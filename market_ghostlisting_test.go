@@ -24,7 +24,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -55,7 +55,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ondemand_auction", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -86,7 +86,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_ongoing", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -117,7 +117,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
+		assert.Equal(t, "finished_completed", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -147,7 +147,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ondemand_auction", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -178,7 +178,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_ongoing", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -209,7 +209,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "ongoing_auction", itemsForSale[0].SaleType)
+		assert.Equal(t, "finished_completed", itemsForSale[0].SaleType)
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
 
@@ -239,7 +239,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_ongoing", itemsForSale[0].SaleType)
 
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
 
@@ -292,7 +292,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directoffer", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_ongoing", itemsForSale[0].SaleType)
 
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
 
@@ -413,7 +413,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				},
 				"nftId": "129",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType": "ondemand_auction",
+				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
 				"sellerName": "user1"
 			}]
@@ -514,7 +514,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 					},
 					"nftId": "129",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "ongoing_auction",
+					"saleType": "active_ongoing",
 					"seller": "0x179b6b1cb6755e31",
 					"sellerName": "user1"
 				}
