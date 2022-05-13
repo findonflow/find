@@ -1,7 +1,5 @@
 package main
 
-//TODO: send mail https://medium.com/vacatronics/how-to-use-gmail-with-go-c980295c23b8
-
 import (
 	"encoding/json"
 	"fmt"
@@ -18,7 +16,7 @@ import (
 )
 
 type MarketEvents []MarketEvent
-type GroupedEvents map[uint64]MarketEvents
+type GroupedEvents map[string]MarketEvents
 
 func (groupedEvents GroupedEvents) Partition() (changed, removed, sold MarketEvents) {
 	eventsToIndex := MarketEvents{}
@@ -55,8 +53,8 @@ func (groupedEvents GroupedEvents) Partition() (changed, removed, sold MarketEve
 func (me MarketEvents) GroupEvents() GroupedEvents {
 	groupedEvents := GroupedEvents{}
 	for _, event := range me {
-		//todo: replace with uuid
-		id := event.BlockEventData.ID //this is uuid of item
+		//TODO this needs to be <type>-uuid-tenant
+		id := event.SearchId()
 		var group MarketEvents
 		group, ok := groupedEvents[id]
 		if !ok {
@@ -104,10 +102,10 @@ func main() {
 		if err == nil {
 			graffleUrl = fmt.Sprintf(urlTemplate, lastIndex)
 			firstRun = false
+			fmt.Println("we are not first run")
 		}
 
 		events := getEventsFromGraffle(graffleUrl, marketEvents)
-
 		groupedEvents := events.GroupEvents()
 
 		//Ignore events sold for now
@@ -115,9 +113,7 @@ func main() {
 		if len(eventsToIndex) == 0 && len(eventsToDelete) == 0 {
 			log.Println("No results found Writing progress to file")
 			writeProgressToFile(progressFile, now)
-
 			time.Sleep(sleep)
-			continue
 		}
 
 		marketCollection := client.Collection("market")
@@ -125,7 +121,6 @@ func main() {
 		if firstRun {
 			log.Printf("Ignore %d number of events to delete for now since we are running new dump\n", len(eventsToDelete))
 		} else {
-
 			for _, event := range eventsToDelete {
 				res, err := marketCollection.Document(fmt.Sprintf("%d", event.BlockEventData.ID)).Delete()
 				if err != nil {
@@ -133,13 +128,15 @@ func main() {
 				} else {
 					log.Printf("Delete document with result %v\n", res)
 				}
+
 			}
 		}
 
 		market := marketCollection.Documents()
 		for _, item := range eventsToIndex {
 			searchElement := SearchResult{
-				Id:                  fmt.Sprintf("%d", item.BlockEventData.ID),
+				Id:                  item.SearchId(),
+				UUID:                item.BlockEventData.ID,
 				Tenant:              item.BlockEventData.Tenant,
 				Seller:              item.BlockEventData.Seller,
 				SellerName:          item.SellerName(),
@@ -160,7 +157,7 @@ func main() {
 				UpdatedAt:           time.Now().Unix(),
 			}
 
-			log.Printf("Insert document %+v\n", searchElement)
+			log.Printf("Inserted document %+v\n", searchElement)
 			_, err := market.Upsert(searchElement)
 			if err != nil {
 				panic(err)
@@ -169,12 +166,12 @@ func main() {
 
 		log.Println("Writing progress to file")
 		writeProgressToFile(progressFile, now)
-		//TODO: we do not sleep here
 	}
 }
 
 type SearchResult struct {
 	Id                  string   `json:"id"`
+	UUID                uint64   `json:"uuid"`
 	Tenant              string   `json:"tenant"`
 	Seller              string   `json:"seller"`
 	SellerName          *string  `json:"seller_name,omitempty"`
@@ -303,6 +300,10 @@ type MarketEvent struct {
 		Tenant     string `json:"tenant"`
 		VaultType  string `json:"vaultType"`
 	} `json:"blockEventData"`
+}
+
+func (event MarketEvent) SearchId() string {
+	return fmt.Sprintf("%s-%d-%s", event.FlowEventID, event.BlockEventData.ID, event.BlockEventData.Tenant) //this is uuid of item
 }
 
 func (me MarketEvent) SellerName() *string {

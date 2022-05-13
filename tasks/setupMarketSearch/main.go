@@ -22,10 +22,7 @@ func main() {
 		typesense.WithCircuitBreakerTimeout(1*time.Minute),
 	)
 
-	//pub event ForSale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
-	//nft: name, thumbnail, type
-	//auctions:
-
+	client.Collection("market").Delete()
 	schema := &api.CollectionSchema{
 		Name: "market",
 		Fields: []api.Field{
@@ -33,6 +30,11 @@ func main() {
 				Name: "id",
 				Type: "string",
 			},
+			{
+				Name: "uuid",
+				Type: "int64",
+			},
+
 			{
 				Name: "tenant",
 				Type: "string",
