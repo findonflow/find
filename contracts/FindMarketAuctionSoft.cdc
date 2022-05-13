@@ -441,6 +441,8 @@ pub contract FindMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
+			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
+
 			//TODO: inline these in contructor
 			saleItem.setAuctionDuration(auctionDuration)
 			saleItem.setExtentionOnLateBid(auctionExtensionOnLateBid)
