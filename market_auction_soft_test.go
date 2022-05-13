@@ -17,7 +17,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price)
+			saleItemListed("user1", "active_listed", price)
 
 		otu.O.TransactionFromFile("listNFTForAuctionSoft").
 			SignProposeAndPayAs("user1").

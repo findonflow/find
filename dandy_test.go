@@ -53,7 +53,7 @@ func TestDandy(t *testing.T) {
 		assert.JSONEq(t, display, result)
 
 		externalUrl := `
-{ "url" : "https://find.xyz/collection/user1/dandy/103"}
+{ "url" : "https://find.xyz/collection/user1/dandy/110"}
 
 `
 		urlResult := otu.O.ScriptFromFile("view").Args(otu.O.Arguments().

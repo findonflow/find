@@ -25,7 +25,7 @@ Taxonomy:
 pub contract FIND {
 
 	//event when FT is sent
-	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, type:Type)
+	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, ftType:Type)
 
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
@@ -192,7 +192,7 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
 			let fromAddress= from.owner!.address
-			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, type:vault.getType()) 
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType()) 
 			profile.deposit(from: <- vault)
 			return 
 		}

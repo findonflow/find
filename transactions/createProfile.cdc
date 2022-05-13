@@ -15,13 +15,42 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
-//really not sure on how to input links here.)
 transaction(name: String) {
 	prepare(acct: AuthAccount) {
 		//if we do not have a profile it might be stored under a different address so we will just remove it
-		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if profileCap.check() {
+		let profileCapFirst = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
+		if profileCapFirst.check() {
 			return 
+		}
+		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
+		//SYNC with register
+		//Add exising FUSD or create a new one and add it
+		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+		if !fusdReceiver.check() {
+			let fusd <- FUSD.createEmptyVault()
+			acct.save(<- fusd, to: /storage/fusdVault)
+			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
+			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+		}
+
+		let usdcCap = acct.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+		if !usdcCap.check() {
+				acct.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
+        acct.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
+        acct.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
+				acct.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+		}
+
+		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+		if !leaseCollection.check() {
+			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
+			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
+		}
+
+		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
+		if !bidCollection.check() {
+			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
+			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
 		let dandyCap= acct.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
@@ -37,62 +66,40 @@ transaction(name: String) {
 			)
 		}
 
-
-		let profile <-Profile.createUser(name:name, createdAt: "find")
-
-
-		let usdcCap = acct.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-		if !usdcCap.check() {
-				acct.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-        acct.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-        acct.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
-				acct.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+		var created=false
+		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
+		if !profileCap.check() {
+			let profile <-Profile.createUser(name:name, createdAt: "find")
+			acct.save(<-profile, to: Profile.storagePath)
+			acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
+			acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+			created=true
 		}
 
-		profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:acct.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
-
-		//Add exising FUSD or create a new one and add it
-		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
-			acct.save(<- fusd, to: /storage/fusdVault)
-			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+		let profile=acct.borrow<&Profile.User>(from: Profile.storagePath)!
+		if !profile.hasWallet("Flow") {
+			let flowWallet=Profile.Wallet( name:"Flow", receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
+	
+			profile.addWallet(flowWallet)
+		}
+		if !profile.hasWallet("FUSD") {
+			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"]))
 		}
 
-		let fusdWallet=Profile.Wallet(
-			name:"FUSD", 
-			receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
-			balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
-			accept: Type<@FUSD.Vault>(),
-			names: ["fusd", "stablecoin"]
-		)
-
-		profile.addWallet(fusdWallet)
-
-		let flowWallet=Profile.Wallet(
-			name:"Flow", 
-			receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
-			balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
-			accept: Type<@FlowToken.Vault>(),
-			names: ["flow"]
-		)
-		profile.addWallet(flowWallet)
-		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		if !leaseCollection.check() {
-			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
-			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
+		if !profile.hasWallet("USDC") {
+			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:acct.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
 		}
 
-		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
-		if !bidCollection.check() {
-			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
-			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
+ 		//If find name not set and we have a profile set it.
+		if profile.getFindName() == "" {
+			profile.setFindName(name)
 		}
 
-		acct.save(<-profile, to: Profile.storagePath)
-		acct.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
-		acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+		if created {
+			profile.emitCreatedEvent()
+		} else {
+			profile.emitUpdatedEvent()
+		}
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 
@@ -165,7 +172,6 @@ transaction(name: String) {
 			acct.link<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath, target: aeBidStoragePath)
 		}
 
-
 	 /// auctions that refers FT so 'soft' auction
 		let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
 		let asSalePublicPath= tenant.getPublicPath(asSaleType)
@@ -184,5 +190,8 @@ transaction(name: String) {
 			acct.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			acct.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
 		}
+		//SYNC with register
+
+
 	}
 }

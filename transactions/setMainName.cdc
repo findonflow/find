@@ -15,7 +15,6 @@ transaction(name: String) {
 			panic("You do not own this lease so you cannot set it as main name")
 		}
 
-
 		let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
 		profile.setFindName(name)
 	}

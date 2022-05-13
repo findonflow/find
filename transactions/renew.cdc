@@ -1,12 +1,9 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
-import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
-
-		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
 
 		let price=FIND.calculateCost(name)
 		if amount != price {

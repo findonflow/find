@@ -2,7 +2,6 @@ package test_main
 
 import (
 	"fmt"
-
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -18,7 +17,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
-			saleItemListed("user1", "ondemand_auction", price)
+			saleItemListed("user1", "active_listed", price)
 
 		otu.O.TransactionFromFile("listNFTForAuction").
 			SignProposeAndPayAs("user1").
