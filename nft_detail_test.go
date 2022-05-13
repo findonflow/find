@@ -16,7 +16,7 @@ func TestNFTDetailScript(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
@@ -234,7 +234,7 @@ func TestNFTDetailScript(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").

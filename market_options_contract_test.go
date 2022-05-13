@@ -16,7 +16,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", ids[0], price).
@@ -102,7 +102,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", ids[0], price).

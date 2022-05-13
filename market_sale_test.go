@@ -16,7 +16,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -39,7 +39,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -67,7 +67,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -92,7 +92,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -120,7 +120,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -149,7 +149,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -235,7 +235,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -289,7 +289,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -336,7 +336,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			alterMarketOption("Sale", "stop").
 			alterMarketOption("Sale", "enable")

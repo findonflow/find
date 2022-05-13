@@ -425,8 +425,6 @@ pub contract FindMarketDirectOfferEscrow {
 			destroy oldToken
 		}
 
-		//TODO: fix send in old balance like in auctionSoft
-		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
 			let bid =self.borrowBid(id)
 			bid.setBidAt(Clock.time())
