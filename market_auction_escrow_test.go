@@ -15,7 +15,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price)
@@ -39,7 +39,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -55,7 +55,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -72,7 +72,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -104,7 +104,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
@@ -131,7 +131,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -155,7 +155,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
@@ -185,7 +185,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -216,7 +216,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -246,7 +246,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		price := 10.0
 		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -270,7 +270,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		price := 10.0
 		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow")
 
 		otu.alterMarketOption("AuctionEscrow", "deprecate")
@@ -296,7 +296,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price)
 
@@ -343,7 +343,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionEscrow")
 
 		otu.alterMarketOption("AuctionEscrow", "stop")

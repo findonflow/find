@@ -14,7 +14,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "ondemand_auction", price)
@@ -38,7 +38,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -54,7 +54,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
@@ -79,7 +79,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -101,7 +101,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
@@ -128,7 +128,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -158,7 +158,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		price := 10.0
 		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -182,7 +182,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		price := 10.0
 		preIncrement := 5.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft")
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
@@ -208,7 +208,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price)
 
@@ -255,7 +255,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		price := 10.0
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("AuctionSoft")
 
 		otu.alterMarketOption("AuctionSoft", "stop")
