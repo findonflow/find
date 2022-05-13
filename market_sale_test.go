@@ -114,34 +114,6 @@ func TestMarketSale(t *testing.T) {
 			AssertFailure("Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
 	})
 
-	t.Run("Should not be able to buy if wrong type", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
-			setFlowDandyMarketOption("Sale")
-
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
-		otu.listNFTForSale("user1", id, price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
-
-		otu.O.TransactionFromFile("buyItemForSaleFUSD").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("user1").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("panic: This item can be baught using A.0ae53cb6e3f42a79.FlowToken.Vault you have sent in A.f8d6e0586b0a20c7.FUSD.Vault")
-	})
-
 	t.Run("Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().

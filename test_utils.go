@@ -525,7 +525,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("buyItemForSaleFlowToken").
+	otu.O.TransactionFromFile("buyItemForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account(seller).
