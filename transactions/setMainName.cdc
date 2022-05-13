@@ -17,7 +17,6 @@ transaction(name: String) {
 
 		let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
 		profile.setFindName(name)
-		profile.emitUpdatedEvent()
 	}
 }
 
