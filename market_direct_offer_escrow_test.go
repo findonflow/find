@@ -18,7 +18,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price)
 
-		otu.saleItemListed("user1", "directoffer", price)
+		otu.saleItemListed("user1", "active_ongoing", price)
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
 
 	})
@@ -30,9 +30,9 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
-			saleItemListed("user1", "directoffer", 15.0).
+			saleItemListed("user1", "active_ongoing", 15.0).
 			acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
 	})
 
@@ -43,7 +43,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferEscrowed("user1", id, 10.0)
 	})
 
@@ -54,7 +54,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			retractOfferDirectOfferEscrowed("user2", "user1", id)
 
 	})
@@ -68,7 +68,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price)
+			saleItemListed("user1", "active_ongoing", price)
 
 		newPrice := 11.0
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
@@ -124,7 +124,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price)
+			saleItemListed("user1", "active_ongoing", price)
 
 		otu.alterMarketOption("DirectOfferEscrow", "deprecate")
 
@@ -136,7 +136,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
-		otu.saleItemListed("user1", "directoffer", 10.0).
+		otu.saleItemListed("user1", "active_ongoing", 10.0).
 			acceptDirectOfferMarketEscrowed("user1", id, "user2", 10.0)
 	})
 
@@ -147,7 +147,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferEscrow", "deprecate").
 			rejectDirectOfferEscrowed("user1", id, 10.0)
 	})
@@ -181,7 +181,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price)
+			saleItemListed("user1", "active_ongoing", price)
 
 		otu.alterMarketOption("DirectOfferEscrow", "stop")
 
@@ -193,7 +193,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
-		otu.saleItemListed("user1", "directoffer", 10.0)
+		otu.saleItemListed("user1", "active_ongoing", 10.0)
 
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
@@ -210,7 +210,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferEscrow", "stop")
 
 		otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
@@ -230,9 +230,9 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			alterMarketOption("DirectOfferEscrow", "deprecate").
 			alterMarketOption("DirectOfferEscrow", "enable").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
-			saleItemListed("user1", "directoffer", 15.0).
+			saleItemListed("user1", "active_ongoing", 15.0).
 			acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
 	})
 
@@ -245,7 +245,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			alterMarketOption("DirectOfferEscrow", "deprecate").
 			alterMarketOption("DirectOfferEscrow", "enable").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferEscrowed("user1", id, 10.0)
 	})
 
@@ -256,7 +256,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferEscrow", "deprecate")
 
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
@@ -291,7 +291,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFlowFUSDDandyInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "directoffer", price).
+			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferEscrow", "stop")
 
 		otu.O.TransactionFromFile("retractOfferMarketDirectOfferEscrowed").

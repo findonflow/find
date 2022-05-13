@@ -78,9 +78,9 @@ pub contract FindMarketDirectOfferSoft {
 
 		pub fun getSaleType() : String {
 			if self.directOfferAccepted {
-				return "directoffer_soft_accepted"
+				return "active_finished"
 			}
-			return "directoffer_soft"
+			return "active_ongoing"
 		}
 
 		pub fun getListingType() : Type {
@@ -198,7 +198,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 			
-			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			self.emitEvent(saleItem: saleItem, status: "cancel")
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -226,7 +226,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "offered")
+			self.emitEvent(saleItem: saleItem, status: "active_offered")
 		}
 
 
@@ -272,7 +272,7 @@ pub contract FindMarketDirectOfferSoft {
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
 			saleItem.setCallback(callback)
 
-			self.emitEvent(saleItem: saleItem, status: "offered")
+			self.emitEvent(saleItem: saleItem, status: "active_offered")
 
 		}
 
@@ -291,7 +291,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "rejected")
+			self.emitEvent(saleItem: saleItem, status: "cancel_rejected")
 
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)
@@ -315,7 +315,7 @@ pub contract FindMarketDirectOfferSoft {
 			saleItem.setPointer(pointer)
 			saleItem.acceptDirectOffer()
 
-			self.emitEvent(saleItem: saleItem, status: "accepted")
+			self.emitEvent(saleItem: saleItem, status: "active_accepted")
 		}
 
 		/// this is called from a bid when a seller accepts

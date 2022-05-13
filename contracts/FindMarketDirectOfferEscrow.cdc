@@ -76,7 +76,7 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun getSaleType() : String {
-			return "directoffer"
+			return "active_ongoing"
 		}
 
 		pub fun getListingType() : Type {
@@ -177,7 +177,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			self.emitEvent(saleItem: saleItem, status: "cancel")
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -203,7 +203,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "offered")
+			self.emitEvent(saleItem: saleItem, status: "active_offered")
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
@@ -222,7 +222,7 @@ pub contract FindMarketDirectOfferEscrow {
 				
 				self.items[id] <-! saleItem
 				let item=self.borrow(id)
-				self.emitEvent(saleItem: item, status: "offered")
+				self.emitEvent(saleItem: item, status: "active_offered")
 				return 
 			}
 

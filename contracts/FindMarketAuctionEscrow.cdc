@@ -104,7 +104,14 @@ pub contract FindMarketAuctionEscrow {
 			self.auctionEndsAt=endsAt
 		}
 
-		pub fun hasAuctionEnded() : Bool {
+		pub fun hasAuctionStarted() : Bool {
+			if let starts = self.auctionStartedAt {
+				return starts < Clock.time()
+			}
+			return false
+		}
+
+		pub fun hasAuctionEnded() : Bool {      
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
 			}
@@ -146,12 +153,19 @@ pub contract FindMarketAuctionEscrow {
 			self.offerCallback=callback
 		}
 
-		//TODO: Should we have a different status if auction is ended can be finished?
+
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
-				return "ongoing_auction"
-			}
-			return "ondemand_auction"
+				//TODO: fix when fixing hasAuctionEnded
+				if self.hasAuctionEnded()! {
+					if self.hasAuctionMetReservePrice() {
+						return "finished_completed"
+					} 
+					return "finished_failed"
+				}
+				return "active_ongoing"
+			} 
+			return "active_listed"
 		}
 
 		pub fun getListingType() : Type {
@@ -285,7 +299,7 @@ pub contract FindMarketAuctionEscrow {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 
 		}
 
@@ -317,7 +331,7 @@ pub contract FindMarketAuctionEscrow {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
-			if saleItem.auctionEndsAt != nil {
+			if saleItem.hasAuctionStarted() {
 				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
@@ -351,7 +365,7 @@ pub contract FindMarketAuctionEscrow {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -361,12 +375,12 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
-				panic("auction is not ongoing")
-			}
-
-			if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
-				panic("Cannot cancel finished auction, fulfill it instead")
+			var status = "cancel_listing"
+			if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+				if saleItem.hasAuctionMetReservePrice() {
+					panic("Cannot cancel finished auction, fulfill it instead")
+				}
+				status="cancel_reserved_not_met"
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for auction"))
@@ -375,14 +389,16 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			self.internalCancelAuction(saleItem: saleItem, status: "cancelled")
+			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
-			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			self.emitEvent(saleItem: saleItem, status: status)
 			let id=saleItem.getId()
-			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
+				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			}
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -395,32 +411,37 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			let saleItem = self.borrow(id)
-			if !saleItem.hasAuctionEnded() {
-				panic("Auction has not ended yet")
+			
+			if saleItem.hasAuctionStarted() {
+				if !saleItem.hasAuctionEnded() {
+					panic("Auction has not ended yet")
+				}
+
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
+
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
+
+				let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
+				if !saleItem.hasAuctionMetReservePrice() {
+					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
+					return
+				}
+
+				let nftInfo= saleItem.toNFTInfo()
+				let royalty=saleItem.getRoyalty()
+
+				self.emitEvent(saleItem: saleItem, status: "sold")
+
+				let vault <- saleItem.acceptEscrowedBid()
+				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
+
+				destroy <- self.items.remove(key: id)
+				return 
 			}
-
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
-
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-
-			if !saleItem.hasAuctionMetReservePrice() {
-				self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
-				return
-			}
-
-			let nftInfo= saleItem.toNFTInfo()
-			let royalty=saleItem.getRoyalty()
-
-			self.emitEvent(saleItem: saleItem, status: "sold")
-
-			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
-
-			destroy <- self.items.remove(key: id)
+			panic("This auction is not live")
 
 		} 
 
@@ -438,8 +459,7 @@ pub contract FindMarketAuctionEscrow {
 
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "listed")
-
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed")
 
 		}
 

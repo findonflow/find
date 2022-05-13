@@ -425,7 +425,7 @@ func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *Overflow
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
-			"status": "cancelled",
+			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 		}))
@@ -443,7 +443,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
-			"status": "listed",
+			"status": "active_listed",
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
@@ -467,7 +467,7 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
-			"status":              "listed",
+			"status":              "active_listed",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
 			"id":                  fmt.Sprintf("%d", id),
@@ -491,7 +491,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
-			"status":              "listed",
+			"status":              "active_listed",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
 			"id":                  fmt.Sprintf("%d", id),
@@ -555,7 +555,7 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -572,7 +572,7 @@ func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint6
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -601,7 +601,7 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -619,7 +619,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -636,7 +636,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "offered",
+			"status": "active_offered",
 		}))
 	return otu
 }
@@ -653,7 +653,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "offered",
+			"status": "active_offered",
 		}))
 	return otu
 }
@@ -725,7 +725,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 			"seller": otu.accountAddress(name),
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
-			"status": "accepted",
+			"status": "active_accepted",
 		}))
 	return otu
 }
@@ -754,7 +754,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller stri
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
-			"status": "cancelled",
+			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 		}))
@@ -769,7 +769,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferSoft(name string, id uint64, pric
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"status": "rejected",
+			"status": "cancel_rejected",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
@@ -785,7 +785,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, 
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"status": "cancelled",
+			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 		}))
@@ -872,7 +872,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
-			"status": "cancelled",
+			"status": "cancel",
 		}))
 		//TODO: test better events
 	return otu
