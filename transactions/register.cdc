@@ -11,6 +11,9 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import Dandy from "../contracts/Dandy.cdc"
 
 transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
@@ -43,6 +46,19 @@ transaction(name: String, amount: UFix64) {
 		if !bidCollection.check() {
 			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
+		}
+
+		let dandyCap= acct.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		if !dandyCap.check() {
+			acct.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+			acct.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
+				Dandy.CollectionPublicPath,
+				target: Dandy.CollectionStoragePath
+			)
+			acct.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
+				Dandy.CollectionPrivatePath,
+				target: Dandy.CollectionStoragePath
+			)
 		}
 
 		var created=false

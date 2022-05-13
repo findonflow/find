@@ -53,6 +53,19 @@ transaction(name: String) {
 			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
+		let dandyCap= acct.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		if !dandyCap.check() {
+			acct.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+			acct.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
+				Dandy.CollectionPublicPath,
+				target: Dandy.CollectionStoragePath
+			)
+			acct.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
+				Dandy.CollectionPrivatePath,
+				target: Dandy.CollectionStoragePath
+			)
+		}
+
 		var created=false
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {

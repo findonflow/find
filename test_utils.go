@@ -25,7 +25,6 @@ const auctionDurationFloat = 86400.0
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
 		setupDandy("user1").
-		createUser(100.0, "user1").
 		createUser(100.0, "user2").
 		createUser(100.0, "user3").
 		registerUser("user2").
@@ -38,7 +37,6 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 	otu.setupFIND().
 		setupDandy("user1").
-		createUser(100.0, "user1").
 		createUser(100.0, "user2").
 		createUser(100.0, "user3").
 		registerUser("user2").
@@ -106,12 +104,15 @@ func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTestUtils {
 
+	nameAddress := otu.accountAddress(name)
+
 	otu.O.TransactionFromFile("createProfile").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().String(name)).
 		Test(otu.T).
 		AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Created", map[string]interface{}{
+			"account":   nameAddress,
 			"name":      name,
 			"createdAt": "find",
 		}))
@@ -224,7 +225,12 @@ pub fun main() :  UFix64 {
 }
 
 func (otu *OverflowTestUtils) accountAddress(name string) string {
-	return fmt.Sprintf("0x%s", otu.O.Account(name).Address().String())
+	address := otu.O.Account(name).Address().String()
+	for address[0:1] == "0" {
+		address = address[1:]
+	}
+
+	return fmt.Sprintf("0x%s", address)
 }
 
 func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {

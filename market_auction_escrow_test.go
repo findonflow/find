@@ -2,7 +2,6 @@ package test_main
 
 import (
 	"fmt"
-
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
