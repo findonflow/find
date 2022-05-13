@@ -72,6 +72,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 			}
 			profile.addLink(Profile.Link(title: link["title"]!, type: link["type"]!, url: link["url"]!))
 		}
+		acct.borrow<&Profile.User>(from: Profile.storagePath)!.emitUpdatedEvent()
 
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {

@@ -20,6 +20,7 @@ pub contract Profile {
 
 	pub event FindNameChanged(account:Address, name:String)
 	pub event Created(account:Address, name:String, createdAt:String)
+	pub event Updated(account:Address, name:String, thumbnail:String)
 
 	/* 
 	Represents a Fungible token wallet with a name and a supported type.
@@ -311,6 +312,10 @@ pub contract Profile {
 				private="false"
 			}
 			self.additionalProperties["privateMode"]  = private
+		}
+
+		pub fun emitUpdatedEvent() {
+			emit Updated(account: self.owner!.address, name: self.name, thumbnail: self.avatar)
 		}
 
 		pub fun emitCreatedEvent() {
