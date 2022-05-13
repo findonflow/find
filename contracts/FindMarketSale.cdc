@@ -41,7 +41,7 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getSaleType() : String {
-			return "directSale"
+			return "active_listed"
 		}
 
 		pub fun getListingType() : Type {
@@ -212,7 +212,7 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit ForSale(tenant: self.getTenant().name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver(), id: pointer.id), buyer: nil, buyerName:nil)
+			emit ForSale(tenant: self.getTenant().name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver(), id: pointer.id), buyer: nil, buyerName:nil)
 			let old <- self.items[pointer.getUUID()] <- saleItem
 			destroy old
 
@@ -232,7 +232,7 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancelled", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil)
+			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil)
 			destroy saleItem
 		}
 

@@ -113,6 +113,13 @@ pub contract FindMarketAuctionSoft {
 			self.auctionEndsAt=endsAt
 		}
 
+		pub fun hasAuctionStarted() : Bool {
+			if let starts = self.auctionStartedAt {
+				return starts < Clock.time()
+			}
+			return false
+		}
+
 		pub fun hasAuctionEnded() : Bool {
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
@@ -156,12 +163,18 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback=callback
 		}
 
-		//TODO: what should the type be here, how to diff on soft vs not?
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
-				return "ongoing_auction"
-			}
-			return "ondemand_auction"
+				//TODO: fix when fixing hasAuctionEnded
+				if self.hasAuctionEnded()! {
+					if self.hasAuctionMetReservePrice() {
+						return "finished_completed"
+					} 
+					return "finished_failed"
+				}
+				return "active_ongoing"
+			} 
+			return "active_listed"
 		}
 
 		pub fun getListingType() : Type {
@@ -293,7 +306,7 @@ pub contract FindMarketAuctionSoft {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 
 		}
 
@@ -326,8 +339,8 @@ pub contract FindMarketAuctionSoft {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
-			if saleItem.auctionEndsAt != nil {
-				if saleItem.hasAuctionEnded() {
+			if saleItem.hasAuctionStarted() {
+				if saleItem.hasAuctionStarted() {
 					panic("Auction has ended")
 				}
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
@@ -360,7 +373,7 @@ pub contract FindMarketAuctionSoft {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -370,13 +383,13 @@ pub contract FindMarketAuctionSoft {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
-				panic("auction is not ongoing")
-			}
+			var status="cancel"
+			if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+				if saleItem.hasAuctionMetReservePrice() {
+					panic("Cannot cancel finished auction, fulfill it instead")
+				}
+				status="cancel_reserved_not_met"
 
-			var status="cancelled"
-			if saleItem.hasAuctionEnded() && !saleItem.hasAuctionMetReservePrice() {
-				status="failed"
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item from soft-auction"))
@@ -386,7 +399,11 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			self.emitEvent(saleItem: saleItem, status: status)
-			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+
+			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() { 
+				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			}
+			
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -397,6 +414,10 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			let saleItem = self.borrow(id)
+
+			if !saleItem.hasAuctionStarted() {
+				panic("This auction is not live")
+			}
 
 			if !saleItem.hasAuctionEnded() {
 				panic("Auction has not ended yet")
@@ -428,6 +449,7 @@ pub contract FindMarketAuctionSoft {
 			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 
 			destroy <- self.items.remove(key: id)
+
 		}
 
 
@@ -447,7 +469,7 @@ pub contract FindMarketAuctionSoft {
 			saleItem.setMinBidIncrement(minimumBidIncrement)
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "listed")
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed")
 		}
 
 		pub fun getIds(): [UInt64] {

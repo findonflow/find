@@ -27,7 +27,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		otu.buyNFTForMarketSale("user2", "user1", id, price)
 	})
@@ -50,7 +50,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		newPrice := 15.0
@@ -78,7 +78,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.cancelNFTForSale("user1", id)
@@ -101,7 +101,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("buyItemForSale").
@@ -129,7 +129,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("buyItemForSaleFUSD").
@@ -157,7 +157,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("listNFTForSale").
@@ -189,7 +189,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 3, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		expected := []*overflow.FormatedEvent{
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
@@ -207,7 +207,7 @@ func TestMarketSale(t *testing.T) {
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"status":     "cancelled",
+				"status":     "cancel",
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
@@ -226,7 +226,7 @@ func TestMarketSale(t *testing.T) {
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"status":     "cancelled",
+				"status":     "cancel",
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
@@ -245,7 +245,7 @@ func TestMarketSale(t *testing.T) {
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"status":     "cancelled",
+				"status":     "cancel",
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
@@ -272,7 +272,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.alterMarketOption("Sale", "deprecate")
@@ -326,7 +326,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.alterMarketOption("Sale", "stop")
@@ -375,7 +375,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("listNFTForSale").
