@@ -18,9 +18,8 @@ pub contract Profile {
 	//and event emitted when a user verifies something
 	pub event Verification(account:Address, message:String)
 
-	pub event FindNameChanged(account:Address, name:String)
-	pub event Created(account:Address, name:String, createdAt:String)
-	pub event Updated(account:Address, name:String, thumbnail:String)
+	pub event Created(account:Address, userName:String, findName:String, createdAt:String)
+	pub event Updated(account:Address, userName:String, findName:String, thumbnail:String)
 
 	/* 
 	Represents a Fungible token wallet with a name and a supported type.
@@ -315,11 +314,11 @@ pub contract Profile {
 		}
 
 		pub fun emitUpdatedEvent() {
-			emit Updated(account: self.owner!.address, name: self.name, thumbnail: self.avatar)
+			emit Updated(account:self.owner!.address, userName:self.name, findName:self.findName, thumbnail:self.createdAt)
 		}
 
 		pub fun emitCreatedEvent() {
-			emit Created(account: self.owner!.address, name: self.name, createdAt: self.createdAt)
+			emit Created(account:self.owner!.address, userName:self.name, findName:self.findName, createdAt:self.createdAt)
 		}
 
 		pub fun isPrivateModeEnabled() : Bool {
@@ -453,7 +452,7 @@ pub contract Profile {
 
 		pub fun setName(_ val: String) { self.name = val }
 		pub fun setFindName(_ val: String) { 
-			emit FindNameChanged(account: self.owner!.address, name:val)
+			emit Updated(account:self.owner!.address, userName:self.name, findName:val, thumbnail:self.avatar)
 			self.findName = val 
 		}
 		pub fun setGender(_ val: String) { self.gender = val }
