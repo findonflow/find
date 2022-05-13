@@ -110,7 +110,11 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().String(name)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Created", map[string]interface{}{
+			"name":      name,
+			"createdAt": "find",
+		}))
 
 	otu.O.TransactionFromFile("mintFusd").
 		SignProposeAndPayAsService().
