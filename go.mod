@@ -1,10 +1,9 @@
-module github.com/findonflow/find
+module github.com/findonflow/find.git
 
 go 1.17
 
 require (
 	github.com/bjartek/overflow v0.0.0-20220407214147-f74f6ea0f10b
-	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.23.3
@@ -24,6 +23,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
 	github.com/dgraph-io/ristretto v0.0.3-0.20200630154024-f66de99634de // indirect
 	github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 // indirect
