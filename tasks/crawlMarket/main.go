@@ -21,7 +21,12 @@ func main() {
 	forAuctionEvents := fmt.Sprintf("A.%s.FindMarketAuctionEscrow.ForAuction", address)
 	directOfferEvents := fmt.Sprintf("A.%s.FindMarketDirectOfferEscrow.DirectOffer", address)
 
+	forSaleName := fmt.Sprintf("A.%s.FINF.ForSale", address)
+	forAuctionName := fmt.Sprintf("A.%s.FIND.ForAuction", address)
+	directOfferName := fmt.Sprintf("A.%s.FIND.DirectOffer", address)
 	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}
+
+	nameEvents := []string{forSaleName, forAuctionName, directOfferName}
 
 	sleepVar := os.Getenv("CRAWLER_SLEEP")
 	sleep, err := time.ParseDuration(sleepVar)
@@ -55,7 +60,7 @@ func main() {
 		}
 
 		fmt.Println(graffleUrl)
-		events := getEventsFromGraffle(graffleUrl, marketEvents)
+		events := getEventsFromGraffle(graffleUrl, marketEvents, nameEvents)
 
 		latestEventsForIdentity := events.DedupOldItems()
 
@@ -101,6 +106,25 @@ func main() {
 		writeProgressToFile(progressFile, now)
 	}
 }
+func writeProgressToFile(fileName string, blockHeight int64) error {
+	err := ioutil.WriteFile(fileName, []byte(fmt.Sprintf("%d", blockHeight)), 0644)
+	if err != nil {
+		return fmt.Errorf("Could not create initial progress file %v", err)
+	}
+	return nil
+}
+
+func readProgressFromFile(fileName string) (int64, error) {
+	dat, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return 0, fmt.Errorf("ProgressFile is not valid %v", err)
+	}
+
+	stringValue := strings.TrimSpace(string(dat))
+
+	return strconv.ParseInt(stringValue, 10, 64)
+
+}
 
 type MarketItem struct {
 	Id                  string   `json:"id"`
@@ -125,27 +149,7 @@ type MarketItem struct {
 	UpdatedAt           int64    `json:"updated_at"`
 }
 
-func writeProgressToFile(fileName string, blockHeight int64) error {
-	err := ioutil.WriteFile(fileName, []byte(fmt.Sprintf("%d", blockHeight)), 0644)
-	if err != nil {
-		return fmt.Errorf("Could not create initial progress file %v", err)
-	}
-	return nil
-}
-
-func readProgressFromFile(fileName string) (int64, error) {
-	dat, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		return 0, fmt.Errorf("ProgressFile is not valid %v", err)
-	}
-
-	stringValue := strings.TrimSpace(string(dat))
-
-	return strconv.ParseInt(stringValue, 10, 64)
-
-}
-
-func getEventsFromGraffle(url string, marketEvents []string) MarketEvents {
+func getEventsFromGraffle(url string, marketEvents []string, nameMarketEvents []string) MarketEvents {
 	graffleClient := http.Client{
 		Timeout: time.Second * 2, // Timeout after 2 seconds
 	}
@@ -177,8 +181,23 @@ func getEventsFromGraffle(url string, marketEvents []string) MarketEvents {
 		log.Fatal(jsonErr)
 	}
 
-	events := []MarketEvent{}
+	events := []FindEvent{}
 	for _, field := range results {
+
+		for _, candicate := range nameMarketEvents {
+			if candicate == field.FlowEventID {
+				var result NameEvent
+				obj, err := json.Marshal(field)
+				if err != nil {
+					panic(err)
+				}
+				jsonErr := json.Unmarshal(obj, &result)
+				if jsonErr != nil {
+					log.Fatal(jsonErr)
+				}
+				events = append(events, result)
+			}
+		}
 
 		for _, candicate := range marketEvents {
 			if candicate == field.FlowEventID {
@@ -196,7 +215,6 @@ func getEventsFromGraffle(url string, marketEvents []string) MarketEvents {
 		}
 	}
 	return events
-
 }
 
 type Event struct {
@@ -233,6 +251,113 @@ type MarketEvent struct {
 		Tenant     string `json:"tenant"`
 		VaultType  string `json:"vaultType"`
 	} `json:"blockEventData"`
+}
+
+type NameEvent struct {
+	EventDate         time.Time `json:"eventDate"`
+	FlowEventID       string    `json:"flowEventId"`
+	FlowTransactionID string    `json:"flowTransactionId"`
+	ID                string    `json:"id"`
+	BlockEventData    struct {
+		Name                string    `json:"name"`
+		UUID                uint64    `json:"uuid"`
+		Seller              string    `json:"seller"`
+		SellerName          string    `json:"sellerName,omitempty"`
+		Amount              float64   `json:"amount"`
+		VaultType           string    `json:"vaultType"`
+		Buyer               string    `json:"buyer,omitempty"`
+		BuyerName           string    `json:"buyerName,omitempty"`
+		ValidUntil          float64   `json:"validUntil,omitempty"`
+		LockedUntil         float64   `json:"lockedUntil,omitempty"`
+		AuctionReservePrice float64   `json:"auctionReservePrice,omitempty"`
+		EndsAt              time.Time `json:"endsAt,omitempty"`
+		Status              string    `json:"status"`
+	} `json:"blockEventData"`
+}
+
+func (event NameEvent) SearchId() string {
+	return fmt.Sprintf("%s-%d", event.FlowEventID, event.BlockEventData.UUID)
+}
+
+func (me NameEvent) SellerName() *string {
+	if me.BlockEventData.SellerName == "" {
+		return nil
+	}
+	return &me.BlockEventData.SellerName
+}
+
+func (me NameEvent) BuyerName() *string {
+	if me.BlockEventData.BuyerName == "" {
+		return nil
+	}
+	return &me.BlockEventData.BuyerName
+}
+
+func (me NameEvent) Buyer() *string {
+	if me.BlockEventData.Buyer == "" {
+		return nil
+	}
+	return &me.BlockEventData.Buyer
+}
+
+func (me NameEvent) AuctionEnds() *int64 {
+	if me.BlockEventData.EndsAt.IsZero() {
+		return nil
+	}
+	unix := me.BlockEventData.EndsAt.Unix()
+	return &unix
+}
+
+func (me NameEvent) AuctionReservePrice() *float64 {
+	if me.BlockEventData.AuctionReservePrice == 0 {
+		return nil
+	}
+	return &me.BlockEventData.AuctionReservePrice
+}
+
+func (me NameEvent) IsSold() bool {
+	return me.BlockEventData.Status == "sold"
+}
+
+func (me NameEvent) IsRemoved() bool {
+	status := me.BlockEventData.Status
+	if status == "cancelled" || status == "failed" || status == "rejected" {
+		return true
+	}
+	if strings.HasPrefix(status, "cancel") {
+		return true
+	}
+	return false
+}
+
+func (item NameEvent) ToMarketItem() interface{} {
+	return MarketItem{
+		Id:                  item.SearchId(),
+		UUID:                item.BlockEventData.UUID,
+		Tenant:              "find",
+		Seller:              item.BlockEventData.Seller,
+		SellerName:          item.SellerName(),
+		Buyer:               item.Buyer(),
+		BuyerName:           item.BuyerName(),
+		Amount:              item.BlockEventData.Amount,
+		AmountType:          item.BlockEventData.VaultType,
+		NFTID:               item.BlockEventData.UUID,
+		NFTName:             item.BlockEventData.Name,
+		NFTType:             "FindName",
+		NFTThumbnail:        "",
+		NFTGrouping:         nil,
+		NFTRarity:           nil,
+		EndsAt:              item.AuctionEnds(),
+		AuctionReservePrice: item.AuctionReservePrice(),
+		ListingType:         item.FlowEventID, //todo FIX?
+		Status:              item.BlockEventData.Status,
+		UpdatedAt:           time.Now().Unix(),
+	}
+}
+
+func (me NameEvent) CreateDeleteQuery() *string {
+	value := fmt.Sprintf("uuid:=%d", me.BlockEventData.UUID)
+	return &value
 }
 
 func (event MarketEvent) SearchId() string {
@@ -304,7 +429,7 @@ func (me MarketEvent) IsRemoved() bool {
 	return false
 }
 
-func (item MarketEvent) ToMarketItem() MarketItem {
+func (item MarketEvent) ToMarketItem() interface{} {
 	return MarketItem{
 		Id:                  item.SearchId(),
 		UUID:                item.BlockEventData.ID,
@@ -334,7 +459,15 @@ func (me MarketEvent) CreateDeleteQuery() *string {
 	return &value
 }
 
-type MarketEvents []MarketEvent
+type FindEvent interface {
+	CreateDeleteQuery() *string
+	IsRemoved() bool
+	IsSold() bool
+	SearchId() string
+	ToMarketItem() interface{}
+}
+
+type MarketEvents []FindEvent
 
 func (me MarketEvents) Reverse() MarketEvents {
 	for i, j := 0, len(me)-1; i < j; i, j = i+1, j-1 {
@@ -352,9 +485,6 @@ func (me MarketEvents) DedupOldItems() MarketEvents {
 		if !ok {
 			seen[id] = true
 			dedupedEvents = append(dedupedEvents, event)
-			fmt.Printf("added item %+v\n", event)
-		} else {
-			fmt.Printf("Skipped item %+v\n", event)
 		}
 	}
 	return dedupedEvents

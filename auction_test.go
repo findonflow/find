@@ -21,7 +21,7 @@ func TestAuction(t *testing.T) {
 
 	})
 
-	t.Run("Should be able list names for sale and delist them", func(t *testing.T) {
+	t.Run("Should be able list names for sale and delist some", func(t *testing.T) {
 
 		otu := NewOverflowTest(t).
 			setupFIND().
@@ -39,10 +39,11 @@ func TestAuction(t *testing.T) {
 				"buyer":       "",
 				"buyerName":   "",
 				"lockedUntil": "39312001.00000000",
-				"name":        "name1",
+				"name":        "user1",
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
+				"uuid":        "85",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -55,6 +56,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
+				"uuid":        "87",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -91,6 +93,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
+				"uuid":        "85",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -103,6 +106,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
+				"uuid":        "87",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -115,6 +119,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
+				"uuid":        "89",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
