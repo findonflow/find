@@ -920,7 +920,6 @@ pub contract FIND {
 		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
 			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil())
-			emit Register(name: name, owner:profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil())
 			token.move(profile: profile)
 			to.borrow()!.deposit(token: <- token)
 		}
