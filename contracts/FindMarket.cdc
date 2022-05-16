@@ -82,7 +82,8 @@ pub contract FindMarket {
 			self.NFTContractAddress = FindMarket.getContractAddress(item.getType())
 			self.NFTFindName = nil 
 			if getAccount(self.NFTContractAddress).getCapability<&{Profile.Public}>(Profile.publicPath).borrow != nil {
-				self.NFTFindName = Profile.find(self.NFTContractAddress).getFindName()
+				let profile = Profile.find(self.NFTContractAddress)
+				self.NFTFindName = profile.getName()
 			}
 		}
 	}
