@@ -21,7 +21,7 @@ func main() {
 	forAuctionEvents := fmt.Sprintf("A.%s.FindMarketAuctionEscrow.ForAuction", address)
 	directOfferEvents := fmt.Sprintf("A.%s.FindMarketDirectOfferEscrow.DirectOffer", address)
 
-	forSaleName := fmt.Sprintf("A.%s.FINF.ForSale", address)
+	forSaleName := fmt.Sprintf("A.%s.FIND.ForSale", address)
 	forAuctionName := fmt.Sprintf("A.%s.FIND.ForAuction", address)
 	directOfferName := fmt.Sprintf("A.%s.FIND.DirectOffer", address)
 	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}
