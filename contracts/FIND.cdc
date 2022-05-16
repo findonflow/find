@@ -24,6 +24,17 @@ Taxonomy:
 */
 pub contract FIND {
 
+
+	//Old events not in use anymore we cannot remove
+  pub event Sold()
+	pub event SoldAuction()
+  pub event DirectOfferRejected()
+	pub event DirectOfferCanceled()
+	pub event AuctionStarted()
+	pub event AuctionCanceled()
+	pub event AuctionBid()
+	pub event AuctionCanceledReservePrice()
+
 	//event when FT is sent
 	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, ftType:Type)
 
