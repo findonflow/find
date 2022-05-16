@@ -42,6 +42,7 @@ func main() {
 	)
 
 	marketCollection := client.Collection("market")
+	soldCollection := client.Collection("sold")
 	graffleUrl := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search"
 	urlTemplate := graffleUrl + "?since=%d"
 
@@ -59,8 +60,7 @@ func main() {
 		latestEventsForIdentity := events.DedupOldItems()
 
 		if len(latestEventsForIdentity) == 0 {
-			log.Println("No results found Writing progress to file")
-			writeProgressToFile(progressFile, now)
+			log.Println("No results found")
 			time.Sleep(sleep)
 			continue
 		}
@@ -76,7 +76,12 @@ func main() {
 					panic(err)
 				}
 				fmt.Printf("removed %d number of items after sold item\n", count)
-				//TODO: add to sold index
+				item, err := soldCollection.Documents().Upsert(item.ToMarketItem())
+				fmt.Printf("Insert  SOLD item %+v\n", item)
+				if err != nil {
+					panic(err)
+				}
+
 			} else if item.IsRemoved() {
 				item, err := marketCollection.Document(item.SearchId()).Delete()
 				fmt.Printf("Removing item %+v\n", item)
@@ -113,7 +118,7 @@ type MarketItem struct {
 	NFTThumbnail        string   `json:"nft_thumbnail"`
 	NFTGrouping         *string  `json:"nft_grouping"`
 	NFTRarity           *string  `json:"nft_rarity"`
-	AuctionEnds         *int64   `json:"auction_ends,omitempty"`
+	EndsAt              *int64   `json:"ends_at,omitempty"`
 	AuctionReservePrice *float64 `json:"auction_reserve_price,omitempty"`
 	ListingType         string   `json:"listing_type"`
 	Status              string   `json:"status"`
@@ -316,7 +321,7 @@ func (item MarketEvent) ToMarketItem() MarketItem {
 		NFTThumbnail:        item.BlockEventData.Nft.Thumbnail,
 		NFTGrouping:         item.Grouping(),
 		NFTRarity:           item.Rarity(),
-		AuctionEnds:         item.AuctionEnds(),
+		EndsAt:              item.AuctionEnds(),
 		AuctionReservePrice: item.AuctionReservePrice(),
 		ListingType:         item.FlowEventID, //todo FIX?
 		Status:              item.BlockEventData.Status,
