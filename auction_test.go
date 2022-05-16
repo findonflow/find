@@ -35,20 +35,28 @@ func TestAuction(t *testing.T) {
 
 		expected := []*overflow.FormatedEvent{
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":          "false",
-				"directSellPrice": "10.00000000",
-				"lockedUntil":     "39312001.00000000",
-				"name":            "user1",
-				"owner":           "0x179b6b1cb6755e31",
-				"validUntil":      "31536001.00000000",
+				"amount":      "10.00000000",
+				"buyer":       "",
+				"buyerName":   "",
+				"lockedUntil": "39312001.00000000",
+				"name":        "name1",
+				"seller":      "0x179b6b1cb6755e31",
+				"sellerName":  "user1",
+				"status":      "cancel",
+				"validUntil":  "31536001.00000000",
+				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":          "false",
-				"directSellPrice": "10.00000000",
-				"lockedUntil":     "39312001.00000000",
-				"name":            "name1",
-				"owner":           "0x179b6b1cb6755e31",
-				"validUntil":      "31536001.00000000",
+				"amount":      "10.00000000",
+				"buyer":       "",
+				"buyerName":   "",
+				"lockedUntil": "39312001.00000000",
+				"name":        "name1",
+				"seller":      "0x179b6b1cb6755e31",
+				"sellerName":  "user1",
+				"status":      "cancel",
+				"validUntil":  "31536001.00000000",
+				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
 		}
 
@@ -75,28 +83,40 @@ func TestAuction(t *testing.T) {
 
 		expected := []*overflow.FormatedEvent{
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":          "false",
-				"directSellPrice": "10.00000000",
-				"lockedUntil":     "39312001.00000000",
-				"name":            "user1",
-				"owner":           "0x179b6b1cb6755e31",
-				"validUntil":      "31536001.00000000",
+				"amount":      "10.00000000",
+				"buyer":       "",
+				"buyerName":   "",
+				"lockedUntil": "39312001.00000000",
+				"name":        "user1",
+				"seller":      "0x179b6b1cb6755e31",
+				"sellerName":  "user1",
+				"status":      "cancel",
+				"validUntil":  "31536001.00000000",
+				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":          "false",
-				"directSellPrice": "10.00000000",
-				"lockedUntil":     "39312001.00000000",
-				"name":            "name1",
-				"owner":           "0x179b6b1cb6755e31",
-				"validUntil":      "31536001.00000000",
+				"amount":      "10.00000000",
+				"buyer":       "",
+				"buyerName":   "",
+				"lockedUntil": "39312001.00000000",
+				"name":        "name1",
+				"seller":      "0x179b6b1cb6755e31",
+				"sellerName":  "user1",
+				"status":      "cancel",
+				"validUntil":  "31536001.00000000",
+				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-				"active":          "false",
-				"directSellPrice": "10.00000000",
-				"lockedUntil":     "39312001.00000000",
-				"name":            "name2",
-				"owner":           "0x179b6b1cb6755e31",
-				"validUntil":      "31536001.00000000",
+				"amount":      "10.00000000",
+				"buyer":       "",
+				"buyerName":   "",
+				"lockedUntil": "39312001.00000000",
+				"name":        "name2",
+				"seller":      "0x179b6b1cb6755e31",
+				"sellerName":  "user1",
+				"status":      "cancel",
+				"validUntil":  "31536001.00000000",
+				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
 		}
 
@@ -136,11 +156,14 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
-				"amount":        "4.00000000",
-				"newOwner":      "0xf3fcd2c1a78f5eee",
-				"previousOwner": "0x179b6b1cb6755e31",
-				"name":          "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"name":        "user1",
+				"seller":      otu.accountAddress("user1"),
+				"sellerName":  "user1",
+				"lockedUntil": "39312001.00000000",
+				"buyerName":   "user2",
+				"validUntil":  "31536001.00000000",
+				"status":      "sold",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "3.80000000",
@@ -164,7 +187,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user3").
 			listForAuction("user1").
 			bid("user2", "user1", 8.0).
-			auctionBid("user3", "user1", 20.0).
+			bid("user3", "user1", 20.0).
 			expireAuction()
 
 		otu.O.TransactionFromFile("fulfillAuction").
@@ -174,11 +197,14 @@ func TestAuction(t *testing.T) {
 				String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.SoldAuction", map[string]interface{}{
-				"amount":        "20.00000000",
-				"newOwner":      "0xe03daebed8ca0615",
-				"previousOwner": "0x179b6b1cb6755e31",
-				"name":          "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     otu.accountAddress("user1"),
+				"sellerName": "user1",
+				"amount":     "20.00000000",
+				"status":     "sold",
+				"buyer":      otu.accountAddress("user3"),
+				"buyerName":  "user3",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "19.00000000",
@@ -190,6 +216,7 @@ func TestAuction(t *testing.T) {
 			}))
 
 	})
+
 	t.Run("Should not allow auction bid lower then the current one", func(t *testing.T) {
 
 		otu := NewOverflowTest(t).
@@ -232,11 +259,14 @@ func TestAuction(t *testing.T) {
 				UFix64(amount)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sold", map[string]interface{}{
-				"amount":        "10.00000000",
-				"newOwner":      "0xf3fcd2c1a78f5eee",
-				"previousOwner": "0x179b6b1cb6755e31",
-				"name":          "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+				"name":       "user1",
+				"seller":     otu.accountAddress("user1"),
+				"sellerName": "user1",
+				"amount":     "10.00000000",
+				"status":     "sold",
+				"buyer":      otu.accountAddress(buyer),
+				"buyerName":  buyer,
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "9.50000000",
@@ -300,10 +330,12 @@ func TestAuction(t *testing.T) {
 				UFix64(4.0)).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount": "8.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":      "user1",
+				"seller":    otu.accountAddress("user1"),
+				"amount":    "8.00000000",
+				"status":    "active_ongoing",
+				"buyerName": "user2",
 			}))
 	})
 
@@ -346,11 +378,13 @@ func TestAuction(t *testing.T) {
 				UFix64(4.0)).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "8.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "8.00000000",
+				"status":     "active_ongoing",
+				"buyerName":  "user2",
 			}))
 	})
 
@@ -372,11 +406,13 @@ func TestAuction(t *testing.T) {
 				UFix64(3.0)).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
-				"amount":       "8.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "8.00000000",
+				"status":     "active_ongoing",
+				"buyerName":  "user2",
 			}))
 
 	})
@@ -398,11 +434,13 @@ func TestAuction(t *testing.T) {
 				String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "4.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xf3fcd2c1a78f5eee",
-				"name":         "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "4.00000000",
+				"status":     "active_ongoing",
+				"buyerName":  "user2",
 			}))
 
 	})
@@ -424,9 +462,13 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "4.00000000",
+				"status":     "cancel_rejected",
+				"buyerName":  "user2",
 			}))
 	})
 
@@ -449,9 +491,13 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferCanceled", map[string]interface{}{
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "4.00000000",
+				"status":     "cancel_rejected",
+				"buyerName":  "user2",
 			}))
 	})
 
@@ -495,11 +541,13 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
-				"amount":       "15.00000000",
-				"auctionEndAt": "86401.00000000",
-				"bidder":       "0xe03daebed8ca0615",
-				"name":         "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "15.00000000",
+				"status":     "active_ongoing",
+				"buyerName":  "user3",
 			}))
 
 	})
@@ -528,11 +576,13 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
-				"amount":       "15.00000000",
-				"auctionEndAt": "86681.00000000", //auction is extended
-				"bidder":       "0xe03daebed8ca0615",
-				"name":         "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "15.00000000",
+				"status":     "active_ongoing",
+				"buyerName":  "user3",
 			}))
 
 	})
@@ -559,10 +609,13 @@ func TestAuction(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
 				"amount": "5.00000000",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionCanceled", map[string]interface{}{
-				"amount": "5.00000000",
-				"bidder": "0xf3fcd2c1a78f5eee",
-				"name":   "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+				"name":       "user1",
+				"seller":     "0x179b6b1cb6755e31",
+				"sellerName": "user1",
+				"amount":     "5.00000000",
+				"status":     "cancel_listing",
+				"buyerName":  "user2",
 			}))
 
 	})
@@ -643,15 +696,21 @@ func TestAuction(t *testing.T) {
 				UFix64(300.0)). //extention on late bid
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
-				"auctionStartPrice":   "5.00000000",
-				"auctionReservePrice": "20.00000000",
-				"active":              "true",
-				"name":                name,
-				"owner":               otu.accountAddress(name),
+				"name":       name,
+				"seller":     otu.accountAddress(name),
+				"sellerName": name,
+				"amount":     "5.00000000",
+				"buyerName":  "",
+				"status":     "active_listed",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOfferRejected", map[string]interface{}{
-				"bidder": otu.accountAddress("user2"),
-				"name":   "user1",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+				"name":       name,
+				"seller":     otu.accountAddress(name),
+				"sellerName": name,
+				"amount":     "5.00000000",
+				"buyer":      "0xf3fcd2c1a78f5eee",
+				"buyerName":  "user2",
+				"status":     "rejected",
 			}))
 
 	})

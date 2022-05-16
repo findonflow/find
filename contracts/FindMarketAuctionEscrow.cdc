@@ -457,6 +457,8 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
+			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
+
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
 			self.emitEvent(saleItem: saleItemRef, status: "active_listed")

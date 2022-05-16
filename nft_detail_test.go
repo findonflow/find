@@ -16,7 +16,7 @@ func TestNFTDetailScript(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
@@ -40,19 +40,19 @@ func TestNFTDetailScript(t *testing.T) {
 				"bidderName": "",
 				"ftAlias": "Flow",
 				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId": "129",
+				"listingId": "134",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
 					"grouping": "",
-					"id": "129",
+					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 				},
-				"nftId": "129",
+				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
@@ -75,19 +75,19 @@ func TestNFTDetailScript(t *testing.T) {
 				"bidderName": "",
 				"ftAlias": "Flow",
 				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId": "129",
+				"listingId": "134",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
 					"grouping": "",
-					"id": "129",
+					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 				},
-				"nftId": "129",
+				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
@@ -111,19 +111,19 @@ func TestNFTDetailScript(t *testing.T) {
 				"bidderName": "",
 				"ftAlias": "Flow",
 				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId": "129",
+				"listingId": "134",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
 					"grouping": "",
-					"id": "129",
+					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 				},
-				"nftId": "129",
+				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_listed",
 				"seller": "0x179b6b1cb6755e31",
@@ -139,19 +139,19 @@ func TestNFTDetailScript(t *testing.T) {
 				"bidderName": "user2",
 				"ftAlias": "Flow",
 				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId": "128",
+				"listingId": "133",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
 					"grouping": "",
-					"id": "128",
+					"id": "133",
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 				},
-				"nftId": "128",
+				"nftId": "133",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_ongoing",
 				"seller": "0x179b6b1cb6755e31",
@@ -167,19 +167,19 @@ func TestNFTDetailScript(t *testing.T) {
 				"bidderName": "user2",
 				"ftAlias": "Flow",
 				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId": "128",
+				"listingId": "133",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
 					"grouping": "",
-					"id": "128",
+					"id": "133",
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 				},
-				"nftId": "128",
+				"nftId": "133",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_ongoing",
 				"seller": "0x179b6b1cb6755e31",
@@ -234,7 +234,7 @@ func TestNFTDetailScript(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
@@ -258,19 +258,19 @@ func TestNFTDetailScript(t *testing.T) {
 					"bidderName": "",
 					"ftAlias": "Flow",
 					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "129",
+					"listingId": "134",
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
 						"grouping": "",
-						"id": "129",
+						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 					},
-					"nftId": "129",
+					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_listed",
 					"seller": "0x179b6b1cb6755e31",
@@ -293,19 +293,19 @@ func TestNFTDetailScript(t *testing.T) {
 					"bidderName": "",
 					"ftAlias": "Flow",
 					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "129",
+					"listingId": "134",
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
 						"grouping": "",
-						"id": "129",
+						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 					},
-					"nftId": "129",
+					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_listed",
 					"seller": "0x179b6b1cb6755e31",
@@ -329,19 +329,19 @@ func TestNFTDetailScript(t *testing.T) {
 					"bidderName": "",
 					"ftAlias": "Flow",
 					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "129",
+					"listingId": "134",
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
 						"grouping": "",
-						"id": "129",
+						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
 					},
-					"nftId": "129",
+					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_listed",
 					"seller": "0x179b6b1cb6755e31",

@@ -11,7 +11,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -24,7 +24,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -36,7 +36,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -47,7 +47,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -58,7 +58,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			alterMarketOption("DirectOfferSoft", "deprecate")
 
@@ -78,7 +78,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -101,7 +101,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -113,7 +113,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			alterMarketOption("DirectOfferSoft", "stop")
 
@@ -133,7 +133,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -159,7 +159,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -179,7 +179,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -197,7 +197,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			alterMarketOption("DirectOfferSoft", "stop").
 			alterMarketOption("DirectOfferSoft", "enable").
@@ -212,7 +212,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			alterMarketOption("DirectOfferSoft", "stop").
 			alterMarketOption("DirectOfferSoft", "enable").
@@ -225,7 +225,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
@@ -260,7 +260,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		id := otu.setupMarketAndDandy()
-		otu.registerFlowFUSDDandyInRegistry().
+		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
