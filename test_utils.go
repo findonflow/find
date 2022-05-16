@@ -1108,13 +1108,15 @@ type SaleItemInformation struct {
 }
 
 type NFTInfo struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Thumbnail  string `json:"seller"`
-	SellerName string `json:"thumbnail"`
-	Nfttype    string `json:"type"`
-	Grouping   string `json:"grouping"`
-	Rarity     string `json:"rarity"`
+	Id             string `json:"id"`
+	Name           string `json:"name"`
+	Thumbnail      string `json:"seller"`
+	SellerName     string `json:"thumbnail"`
+	Nfttype        string `json:"type"`
+	Grouping       string `json:"grouping"`
+	Rarity         string `json:"rarity"`
+	EditionNumber  string `json:"editionNumber"`
+	TotalInEdition string `json:"totalInEdition"`
 }
 
 type AuctionItem struct {

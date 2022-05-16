@@ -29,8 +29,8 @@ func TestDandy(t *testing.T) {
 						        	            	    "String",
 						        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
 					        	            	      "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+																				"A.f8d6e0586b0a20c7.FindViews.Edition",
 																				"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-																				"A.f8d6e0586b0a20c7.FindViews.SerialNumber",
 																				"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
 																				"A.f8d6e0586b0a20c7.FindViews.CreativeWork"
 						        	            	]`, res)

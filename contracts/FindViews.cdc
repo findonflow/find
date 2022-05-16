@@ -95,12 +95,12 @@ pub contract FindViews {
 		}
 	}
 
-	pub struct SerialNumber {
-		pub let serialNumber: UInt64
+	pub struct Edition {
+		pub let editionNumber: UInt64
 		pub let totalInEdition: UInt64
 
 		init(serialNumber:UInt64, totalInEdition:UInt64){
-			self.serialNumber=serialNumber
+			self.editionNumber=serialNumber
 			self.totalInEdition=totalInEdition
 		}
 	}

@@ -2,7 +2,6 @@ package test_main
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,12 +44,14 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "",
+					"grouping": "user1",
 					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"editionNumber"	: "2",
+					"totalInEdition"	: "3"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -80,12 +81,14 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "",
+					"grouping": "user1",
 					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"editionNumber"	: "2",
+					"totalInEdition"	: "3"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -116,12 +119,14 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "",
+					"grouping": "user1",
 					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"editionNumber"	: "2",
+					"totalInEdition"	: "3"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -144,12 +149,14 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "",
+					"grouping": "user1",
 					"id": "133",
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"editionNumber"	: "1",
+					"totalInEdition"	: "3"
 				},
 				"nftId": "133",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -172,12 +179,14 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "",
+					"grouping": "user1",
 					"id": "133",
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"editionNumber"	: "1",
+					"totalInEdition"	: "3"
 				},
 				"nftId": "133",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -249,7 +258,6 @@ func TestNFTDetailScript(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 5, len(itemsForSale))
-		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@")
 		expectedSale := `
 		[		{
 					"amount": "10.00000000",
@@ -263,12 +271,14 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
-						"grouping": "",
+						"grouping": "user1",
 						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+						"editionNumber"	: "2",
+						"totalInEdition"	: "3"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -298,12 +308,14 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
-						"grouping": "",
+						"grouping": "user1",
 						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+						"editionNumber"	: "2",
+						"totalInEdition"	: "3"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -334,12 +346,14 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
-						"grouping": "",
+						"grouping": "user1",
 						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+						"editionNumber"	: "2",
+						"totalInEdition"	: "3"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -368,9 +382,8 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
 		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
 
-		result, err := otu.O.ScriptFromFile("resolveListingByAddress").Args(otu.O.Arguments().Account("user1").UInt64(ids[1])).RunReturns()
-		fmt.Println(result)
-		fmt.Println(err)
+		otu.O.ScriptFromFile("resolveListingByName").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+
 		FindMarketSale = itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow = itemForSaleStruct["FindMarketAuctionEscrow"].Items
 		FindMarketAuctionSoft = itemForSaleStruct["FindMarketAuctionSoft"].Items
