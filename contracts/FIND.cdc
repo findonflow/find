@@ -38,39 +38,22 @@ pub contract FIND {
 	/// Emitted when a name is moved to a new owner
 	pub event Moved(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64)
 
+
 	/// Emitted when a name is sold to a new owner
 	pub event Sold(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64, amount: UFix64)
-
 	pub event SoldAuction(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64, amount: UFix64)
-
-	/// Emitted when a name is explicistly put up for sale
-	pub event ForSale(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64, directSellPrice: UFix64, active: Bool)
-
-	/// Emitted when an name is put up for on-demand auction
-	pub event ForAuction(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
-
-	/// Emitted if a bid occurs at a name that is too low or not for sale
-	pub event DirectOffer(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
-
-	/// Emitted if a blind bid is canceled
-	pub event DirectOfferCanceled(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String)
-
-	/// Emitted if a blind bid is rejected
+  pub event DirectOfferCanceled(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String)
 	pub event DirectOfferRejected(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String,amount: UFix64)
-
-	/// Emitted if an auction is canceled
 	pub event AuctionCanceled(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
-
-	/// Emitted if an auction is canceled because it did not reach the reserved price
 	pub event AuctionCanceledReservePrice(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
-
-	/// Emitted when an auction starts. 
 	pub event AuctionStarted(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64, auctionEndAt: UFix64)
-
-	/// Emitted when there is a new bid in an auction
 	pub event AuctionBid(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64, auctionEndAt: UFix64)
 
-	//store bids made by a bidder to somebody elses leases
+	pub event ForSale(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64, directSellPrice: UFix64, active: Bool)
+	pub event ForAuction(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64,  auctionStartPrice: UFix64, auctionReservePrice: UFix64, active: Bool)
+	pub event DirectOffer(name: String, bidder: Address, bidderName: String?, owner:Address, ownerName:String, amount: UFix64)
+
+		//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
 	pub let BidStoragePath: StoragePath
 
@@ -837,6 +820,7 @@ pub contract FIND {
 				self.cancel(name)
 				return
 			}
+
 
 			let auction <- self.auctions.remove(key: name)!
 			let newProfile= getAccount(auction.latestBidCallback.address).getCapability<&{Profile.Public}>(Profile.publicPath)

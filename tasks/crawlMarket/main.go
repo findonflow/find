@@ -7,65 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/typesense/typesense-go/typesense"
+	"github.com/typesense/typesense-go/typesense/api"
 )
-
-type MarketEvents []MarketEvent
-type GroupedEvents map[string]MarketEvents
-
-func (groupedEvents GroupedEvents) Partition() (changed, removed, sold MarketEvents) {
-	eventsToIndex := MarketEvents{}
-	eventsSold := MarketEvents{}
-	eventsToDelete := MarketEvents{}
-	for _, events := range groupedEvents {
-
-		sort.SliceStable(events, func(i, j int) bool {
-			return events[i].EventDate.UnixMilli() > events[j].EventDate.UnixMilli()
-		})
-
-		status := events[0].BlockEventData.Status
-		//Need to find delisted as well
-		if status == "sold" {
-			eventsToDelete = append(eventsToDelete, events[0])
-			eventsSold = append(eventsSold, events[0])
-		} else if status == "cancelled" || status == "failed" || status == "rejected" {
-			eventsToDelete = append(eventsToDelete, events[0])
-		} else if strings.HasPrefix(status, "cancel") {
-			eventsToDelete = append(eventsToDelete, events[0])
-		} else {
-			for _, event := range events {
-				if strings.Contains(event.FlowEventID, "DirectOffer") {
-					continue
-				}
-				eventsToIndex = append(eventsToIndex, event)
-				break
-			}
-		}
-	}
-	return eventsToIndex, eventsToDelete, eventsSold
-}
-
-func (me MarketEvents) GroupEvents() GroupedEvents {
-	groupedEvents := GroupedEvents{}
-	for _, event := range me {
-		//TODO this needs to be <type>-uuid-tenant
-		id := event.SearchId()
-		var group MarketEvents
-		group, ok := groupedEvents[id]
-		if !ok {
-			group = MarketEvents{}
-		}
-
-		group = append(group, event)
-		groupedEvents[id] = group
-	}
-	return groupedEvents
-}
 
 func main() {
 	address := "8fcce1d764ef88dd"
@@ -81,9 +29,9 @@ func main() {
 		sleep = time.Second * 2
 	}
 
+	progressFile := "market.progress"
 	key := os.Getenv("TYPESENSE_FIND_ADMIN")
 	url := os.Getenv("TYPESENSE_FIND_URL")
-	progressFile := "market.progress"
 	client := typesense.NewClient(
 		typesense.WithServer(url),
 		typesense.WithAPIKey(key),
@@ -93,83 +41,63 @@ func main() {
 		typesense.WithCircuitBreakerTimeout(1*time.Minute),
 	)
 
-	urlTemplate := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search?since=%d"
+	marketCollection := client.Collection("market")
+	graffleUrl := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search"
+	urlTemplate := graffleUrl + "?since=%d"
+
 	for {
 		lastIndex, err := readProgressFromFile(progressFile)
 		now := time.Now().Unix()
-		firstRun := true
-		graffleUrl := "https://prod-test-net-dashboard-api.azurewebsites.net/api/company/04bd44ea-0ff1-44be-a5a0-e502802c56d8/search"
 		if err == nil {
 			graffleUrl = fmt.Sprintf(urlTemplate, lastIndex)
-			firstRun = false
 			fmt.Println("we are not first run")
 		}
 
+		fmt.Println(graffleUrl)
 		events := getEventsFromGraffle(graffleUrl, marketEvents)
-		groupedEvents := events.GroupEvents()
 
-		//Ignore events sold for now
-		eventsToIndex, eventsToDelete, _ := groupedEvents.Partition()
-		if len(eventsToIndex) == 0 && len(eventsToDelete) == 0 {
+		latestEventsForIdentity := events.DedupOldItems()
+
+		if len(latestEventsForIdentity) == 0 {
 			log.Println("No results found Writing progress to file")
 			writeProgressToFile(progressFile, now)
 			time.Sleep(sleep)
+			continue
 		}
 
-		marketCollection := client.Collection("market")
-
-		if firstRun {
-			log.Printf("Ignore %d number of events to delete for now since we are running new dump\n", len(eventsToDelete))
-		} else {
-			for _, event := range eventsToDelete {
-				res, err := marketCollection.Document(fmt.Sprintf("%d", event.BlockEventData.ID)).Delete()
+		//we need to apply the items in the reverse order
+		workQueue := latestEventsForIdentity.Reverse()
+		for _, item := range workQueue {
+			if item.IsSold() {
+				count, err := marketCollection.Documents().Delete(&api.DeleteDocumentsParams{
+					FilterBy: item.CreateDeleteQuery(),
+				})
 				if err != nil {
-					log.Fatalf("Could not delete document with id %d, %v", event.BlockEventData.ID, err)
-				} else {
-					log.Printf("Delete document with result %v\n", res)
+					panic(err)
 				}
-
+				fmt.Printf("removed %d number of items after sold item\n", count)
+				//TODO: add to sold index
+			} else if item.IsRemoved() {
+				item, err := marketCollection.Document(item.SearchId()).Delete()
+				fmt.Printf("Removing item %+v\n", item)
+				if err != nil {
+					fmt.Printf("removed document that can already be gone %v\n", err)
+				}
+			} else {
+				//we insert or update the item
+				item, err := marketCollection.Documents().Upsert(item.ToMarketItem())
+				fmt.Printf("Insert item %+v\n", item)
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
-
-		market := marketCollection.Documents()
-		for _, item := range eventsToIndex {
-			searchElement := SearchResult{
-				Id:                  item.SearchId(),
-				UUID:                item.BlockEventData.ID,
-				Tenant:              item.BlockEventData.Tenant,
-				Seller:              item.BlockEventData.Seller,
-				SellerName:          item.SellerName(),
-				Buyer:               item.Buyer(),
-				BuyerName:           item.BuyerName(),
-				Amount:              item.BlockEventData.Amount,
-				AmountType:          item.BlockEventData.VaultType,
-				NFTID:               item.BlockEventData.Nft.ID,
-				NFTName:             item.BlockEventData.Nft.Name,
-				NFTType:             item.BlockEventData.Nft.Type,
-				NFTThumbnail:        item.BlockEventData.Nft.Thumbnail,
-				NFTGrouping:         item.Grouping(),
-				NFTRarity:           item.Rarity(),
-				AuctionEnds:         item.AuctionEnds(),
-				AuctionReservePrice: item.AuctionReservePrice(),
-				ListingType:         item.FlowEventID, //todo FIX?
-				Status:              item.BlockEventData.Status,
-				UpdatedAt:           time.Now().Unix(),
-			}
-
-			log.Printf("Inserted document %+v\n", searchElement)
-			_, err := market.Upsert(searchElement)
-			if err != nil {
-				panic(err)
-			}
-		}
-
 		log.Println("Writing progress to file")
 		writeProgressToFile(progressFile, now)
 	}
 }
 
-type SearchResult struct {
+type MarketItem struct {
 	Id                  string   `json:"id"`
 	UUID                uint64   `json:"uuid"`
 	Tenant              string   `json:"tenant"`
@@ -303,7 +231,7 @@ type MarketEvent struct {
 }
 
 func (event MarketEvent) SearchId() string {
-	return fmt.Sprintf("%s-%d-%s", event.FlowEventID, event.BlockEventData.ID, event.BlockEventData.Tenant) //this is uuid of item
+	return fmt.Sprintf("%s-%d-%s", event.FlowEventID, event.BlockEventData.ID, event.BlockEventData.Tenant)
 }
 
 func (me MarketEvent) SellerName() *string {
@@ -354,4 +282,75 @@ func (me MarketEvent) AuctionReservePrice() *float64 {
 		return nil
 	}
 	return &me.BlockEventData.AuctionReservePrice
+}
+
+func (me MarketEvent) IsSold() bool {
+	return me.BlockEventData.Status == "sold"
+}
+
+func (me MarketEvent) IsRemoved() bool {
+	status := me.BlockEventData.Status
+	if status == "cancelled" || status == "failed" || status == "rejected" {
+		return true
+	}
+	if strings.HasPrefix(status, "cancel") {
+		return true
+	}
+	return false
+}
+
+func (item MarketEvent) ToMarketItem() MarketItem {
+	return MarketItem{
+		Id:                  item.SearchId(),
+		UUID:                item.BlockEventData.ID,
+		Tenant:              item.BlockEventData.Tenant,
+		Seller:              item.BlockEventData.Seller,
+		SellerName:          item.SellerName(),
+		Buyer:               item.Buyer(),
+		BuyerName:           item.BuyerName(),
+		Amount:              item.BlockEventData.Amount,
+		AmountType:          item.BlockEventData.VaultType,
+		NFTID:               item.BlockEventData.Nft.ID,
+		NFTName:             item.BlockEventData.Nft.Name,
+		NFTType:             item.BlockEventData.Nft.Type,
+		NFTThumbnail:        item.BlockEventData.Nft.Thumbnail,
+		NFTGrouping:         item.Grouping(),
+		NFTRarity:           item.Rarity(),
+		AuctionEnds:         item.AuctionEnds(),
+		AuctionReservePrice: item.AuctionReservePrice(),
+		ListingType:         item.FlowEventID, //todo FIX?
+		Status:              item.BlockEventData.Status,
+		UpdatedAt:           time.Now().Unix(),
+	}
+}
+
+func (me MarketEvent) CreateDeleteQuery() *string {
+	value := fmt.Sprintf("uuid:=%d", me.BlockEventData.ID)
+	return &value
+}
+
+type MarketEvents []MarketEvent
+
+func (me MarketEvents) Reverse() MarketEvents {
+	for i, j := 0, len(me)-1; i < j; i, j = i+1, j-1 {
+		me[i], me[j] = me[j], me[i]
+	}
+	return me
+}
+
+func (me MarketEvents) DedupOldItems() MarketEvents {
+	dedupedEvents := MarketEvents{}
+	seen := map[string]bool{}
+	for _, event := range me {
+		id := event.SearchId()
+		_, ok := seen[id]
+		if !ok {
+			seen[id] = true
+			dedupedEvents = append(dedupedEvents, event)
+			fmt.Printf("added item %+v\n", event)
+		} else {
+			fmt.Printf("Skipped item %+v\n", event)
+		}
+	}
+	return dedupedEvents
 }
