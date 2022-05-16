@@ -64,7 +64,9 @@ func TestMarketOptionsContract(t *testing.T) {
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"NFTContractAddress": "0xf8d6e0586b0a20c7",
+					"NFTFindName": "account"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -165,7 +167,9 @@ func TestMarketOptionsContract(t *testing.T) {
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-						"type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+						"NFTContractAddress": "0xf8d6e0586b0a20c7",
+						"NFTFindName": "account"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
