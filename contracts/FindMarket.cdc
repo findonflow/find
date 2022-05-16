@@ -55,8 +55,10 @@ pub contract FindMarket {
 		pub let type: String
 		pub let grouping: String?
 		pub let rarity:String?
+		pub let NFTContractAddress: Address 
+		pub var NFTFindName: String?
 
-		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
+		init(_ item: &{MetadataViews.Resolver}, id: UInt64 ){
 
 			if let view = item.resolveView(Type<FindViews.Grouping>()) {
 				let grouping = view as! FindViews.Grouping
@@ -77,6 +79,11 @@ pub contract FindMarket {
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
 			self.id=id
+			self.NFTContractAddress = FindMarket.getContractAddress(item.getType())
+			self.NFTFindName = nil 
+			if getAccount(self.NFTContractAddress).getCapability<&{Profile.Public}>(Profile.publicPath).borrow != nil {
+				self.NFTFindName = Profile.find(self.NFTContractAddress).getFindName()
+			}
 		}
 	}
 
@@ -244,4 +251,43 @@ pub contract FindMarket {
 			self.item=item
 		}
 	}
+
+	/* Helper Function */
+    pub fun getContractAddress(_ type: Type) : Address {
+        let identifier = type.identifier
+        var dots = 0
+        var start = 0 
+        var end = 0 
+        var counter = 0 
+        while counter < identifier.length {
+            if identifier[counter] == "." {
+                dots = dots + 1
+            }
+            if start == 0 && dots == 1 {
+                start = counter
+            }
+            if end == 0 && dots == 2 {
+                end = counter
+            }
+            counter = counter + 1
+        }
+        return self.resolve(identifier.slice(from: start + 1, upTo: end)) ?? panic("Cannot resolve the Contract Address")
+    }
+
+	pub fun resolve(_ input:String) : Address? {
+
+		var address=input
+		if input.utf8[1] == 120 {
+			address = input.slice(from: 2, upTo: input.length)
+		}
+		var r:UInt64 = UInt64(0)
+		var bytes = address.decodeHex()
+
+		while bytes.length>0{
+			r = r  + (UInt64(bytes.removeFirst()) << UInt64(bytes.length * 8 ))
+		}
+
+		return Address(r)
+	}
+
 }
