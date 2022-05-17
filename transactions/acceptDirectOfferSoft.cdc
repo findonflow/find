@@ -26,7 +26,7 @@ transaction(id: UInt64) {
 		//If this is nil, there must be something wrong with FIND setup
 		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftIdentifier)!
 		
-		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(nft.providerPath)
+		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
 		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 
 		market.acceptOffer(pointer)

@@ -206,11 +206,11 @@ pub contract FindViews {
 	}
 
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>
+		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
 		pub let nounce: UInt64
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>, id: UInt64) {
+		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 

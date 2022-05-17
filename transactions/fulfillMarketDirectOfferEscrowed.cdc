@@ -12,7 +12,7 @@ import FindViews from "../contracts/FindViews.cdc"
 transaction(id: UInt64) {
 	prepare(account: AuthAccount) {
 
-		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(Dandy.CollectionPrivatePath)
+		let dandyPrivateCap=	account.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(Dandy.CollectionPrivatePath)
 		let pointer= FindViews.AuthNFTPointer(cap: dandyPrivateCap, id: id)
 		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath =tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())!
