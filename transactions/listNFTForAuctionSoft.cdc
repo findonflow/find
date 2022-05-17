@@ -16,7 +16,7 @@ transaction(nftAlias:String, id: UInt64, ftAlias:String, price:UFix64, auctionRe
 		let nft = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")
 		let ft = FTRegistry.getFTInfoByAlias(ftAlias) ?? panic("This FT is not supported by the Find Market yet")
 
-		let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.Receiver}>(nft.providerPath)
+		let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
 
 		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
 		if !providerCap.check() {
