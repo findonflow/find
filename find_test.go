@@ -148,9 +148,6 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1").String("user2")).
 			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
-				"name": "user1",
-			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 				"name": "user1",
 			}))
