@@ -72,7 +72,7 @@ pub contract Dandy: NonFungibleToken {
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
 			views.append(Type<FindViews.Nounce>())
-			views.append(Type<FindViews.Grouping>())
+			views.append(Type<FindViews.NFTCollectionDisplay>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
 			views.append(Type<MetadataViews.Royalties>())
@@ -152,8 +152,11 @@ pub contract Dandy: NonFungibleToken {
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
 		pub fun resolveView(_ type: Type): AnyStruct {
 
-			if type == Type<FindViews.Grouping>() {
-				return FindViews.Grouping(self.minterPlatform.name)
+			if type == Type<FindViews.NFTCollectionDisplay>() {
+				let externalURL = MetadataViews.ExternalURL(self.minterPlatform.externalURL)
+				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.squareImage), mediaType: "image")
+				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.bannerImage), mediaType: "image")
+				return FindViews.NFTCollectionDisplay(name: self.minterPlatform.name, description: self.minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
 			}
 
 			if type == Type<MinterPlatform>() {
@@ -304,11 +307,19 @@ pub contract Dandy: NonFungibleToken {
 		pub let platform: Capability<&{FungibleToken.Receiver}>
 		pub let platformPercentCut: UFix64
 		pub let name: String
+		pub let description: String 
+		pub let externalURL: String 
+		pub let squareImage: String 
+		pub let bannerImage: String 
 
-		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64) {
+		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64, description: String, externalURL: String, squareImage: String, bannerImage: String) {
 			self.platform=platform
 			self.platformPercentCut=platformPercentCut
 			self.name=name
+			self.description=description 
+			self.externalURL=externalURL 
+			self.squareImage=squareImage 
+			self.bannerImage=bannerImage
 		}
 	}
 

@@ -25,7 +25,7 @@ func TestDandy(t *testing.T) {
 		assert.JSONEq(t, `[
 						        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
 			        	            	          "A.f8d6e0586b0a20c7.FindViews.Nounce",
-																				"A.f8d6e0586b0a20c7.FindViews.Grouping",
+																				"A.f8d6e0586b0a20c7.FindViews.NFTCollectionDisplay",
 						        	            	    "String",
 						        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
 					        	            	      "A.f8d6e0586b0a20c7.MetadataViews.Royalties",

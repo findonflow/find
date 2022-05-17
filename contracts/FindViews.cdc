@@ -6,14 +6,26 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
 
-	//This is added if you have a colletion with multiple groupings, like starly cards or rarible or mint store or dandy
-	pub struct Grouping {
-		pub let name: String
+    // A view to expose the information needed to showcase this NFT's collection
+    pub struct NFTCollectionDisplay {
+        pub let name: String
 
-		init(_ name:String) {
-			self.name =name
-		}
-	}
+        pub let description: String
+
+        pub let externalURL: MetadataViews.ExternalURL
+
+        pub let squareImage: MetadataViews.Media
+
+        pub let bannerImage: MetadataViews.Media
+
+        init(name: String, description: String, externalURL: MetadataViews.ExternalURL, squareImage: MetadataViews.Media, bannerImage: MetadataViews.Media) {
+            self.name = name
+            self.description = description
+            self.externalURL = externalURL
+            self.squareImage = squareImage
+            self.bannerImage = bannerImage
+        }
+    }
 
 	pub struct Identity{
 		pub let id:UInt64

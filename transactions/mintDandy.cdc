@@ -9,7 +9,7 @@ import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String) {
+transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
 	prepare(account: AuthAccount) {
 
 		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
@@ -47,7 +47,12 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
 				schemas: schemas, 
-				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"))
+				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"),
+				collectionDescription: collectionDescription,
+				collectionExternalURL: collectionExternalURL, 
+				collectionSquareImage: collectionSquareImage,
+				collectionBannerImage: collectionBannerImage
+				)
 
 			collection.deposit(token: <- token)
 			i=i+1

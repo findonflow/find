@@ -406,7 +406,11 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 			String("Neo").
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
-			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
+			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+			String("Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK").
+			String("https://neomotorcycles.co.uk/index.html").
+			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		Test(otu.T).
 		AssertSuccess().AssertEventCount(6).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
@@ -1108,15 +1112,18 @@ type SaleItemInformation struct {
 }
 
 type NFTInfo struct {
-	Id             string `json:"id"`
-	Name           string `json:"name"`
-	Thumbnail      string `json:"seller"`
-	SellerName     string `json:"thumbnail"`
-	Nfttype        string `json:"type"`
-	Grouping       string `json:"grouping"`
-	Rarity         string `json:"rarity"`
-	EditionNumber  string `json:"editionNumber"`
-	TotalInEdition string `json:"totalInEdition"`
+	Id                    string `json:"id"`
+	Name                  string `json:"name"`
+	Thumbnail             string `json:"seller"`
+	SellerName            string `json:"thumbnail"`
+	Nfttype               string `json:"type"`
+	Rarity                string `json:"rarity"`
+	EditionNumber         string `json:"editionNumber"`
+	TotalInEdition        string `json:"totalInEdition"`
+	CollectionName        string `json:"collectionName"`
+	CollectionExternalURL string `json:"collectionExternalURL"`
+	CollectionSquareImage string `json:"collectionSquareImage"`
+	CollectionBannerImage string `json:"collectionBannerImage"`
 }
 
 type AuctionItem struct {

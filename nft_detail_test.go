@@ -44,14 +44,17 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "user1",
 					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"editionNumber"	: "2",
-					"totalInEdition"	: "3"
+					"totalInEdition"	: "3",
+					"CollectionName" : "user1",
+					"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+					"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -81,14 +84,17 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "user1",
 					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"editionNumber"	: "2",
-					"totalInEdition"	: "3"
+					"totalInEdition"	: "3",
+					"CollectionName" : "user1",
+					"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+					"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -119,14 +125,17 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "user1",
 					"id": "134",
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"editionNumber"	: "2",
-					"totalInEdition"	: "3"
+					"totalInEdition"	: "3",
+					"CollectionName" : "user1",
+					"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+					"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -149,14 +158,17 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "user1",
 					"id": "133",
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"editionNumber"	: "1",
-					"totalInEdition"	: "3"
+					"totalInEdition"	: "3",
+					"CollectionName" : "user1",
+					"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+					"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 				},
 				"nftId": "133",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -179,14 +191,17 @@ func TestNFTDetailScript(t *testing.T) {
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				"listingValidUntil": "",
 				"nft": {
-					"grouping": "user1",
 					"id": "133",
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"editionNumber"	: "1",
-					"totalInEdition"	: "3"
+					"totalInEdition"	: "3",
+					"CollectionName" : "user1",
+					"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+					"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 				},
 				"nftId": "133",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -271,14 +286,17 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
-						"grouping": "user1",
 						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 						"editionNumber"	: "2",
-						"totalInEdition"	: "3"
+						"totalInEdition"	: "3",
+						"CollectionName" : "user1",
+						"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+						"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+						"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -308,14 +326,17 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
-						"grouping": "user1",
 						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 						"editionNumber"	: "2",
-						"totalInEdition"	: "3"
+						"totalInEdition"	: "3",
+						"CollectionName" : "user1",
+						"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+						"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+						"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -346,14 +367,17 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 					"listingValidUntil": "",
 					"nft": {
-						"grouping": "user1",
 						"id": "134",
 						"name": "Neo Motorcycle 2 of 3",
 						"rarity": "",
 						"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
 						"editionNumber"	: "2",
-						"totalInEdition"	: "3"
+						"totalInEdition"	: "3",
+						"CollectionName" : "user1",
+						"CollectionExternalURL": "https://neomotorcycles.co.uk/index.html",
+						"CollectionSquareImage": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+						"CollectionBannerImage": "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
