@@ -23,17 +23,18 @@ func TestDandy(t *testing.T) {
 		id := dandyIds[0]
 		res := otu.O.ScriptFromFile("dandyViews").Args(otu.O.Arguments().String("user1").UInt64(id)).RunReturnsJsonString()
 		assert.JSONEq(t, `[
-						        	            	    "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
-			        	            	          "A.f8d6e0586b0a20c7.FindViews.Nounce",
-																				"A.f8d6e0586b0a20c7.FindViews.Grouping",
-						        	            	    "String",
-						        	            	    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-					        	            	      "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-																				"A.f8d6e0586b0a20c7.FindViews.Edition",
-																				"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-																				"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
-																				"A.f8d6e0586b0a20c7.FindViews.CreativeWork"
-						        	            	]`, res)
+							"A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
+							"A.f8d6e0586b0a20c7.FindViews.Nounce",
+							"A.f8d6e0586b0a20c7.FindViews.Grouping",
+							"String",
+							"A.f8d6e0586b0a20c7.MetadataViews.Display",
+							"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+							"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
+							"A.f8d6e0586b0a20c7.FindViews.Edition",
+							"A.f8d6e0586b0a20c7.FindViews.Tag",
+							"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+							"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+							]`, res)
 
 		display := `
 						{

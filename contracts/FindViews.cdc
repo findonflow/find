@@ -15,6 +15,18 @@ pub contract FindViews {
 		}
 	}
 
+	pub struct Tag {
+		access(self) let tag : {String : String} 
+
+		init(tag: {String : String}) {
+			self.tag = tag 
+		}
+
+		pub fun getTag() : {String : String} {
+			return self.tag
+		}
+	}
+
 	pub struct Identity{
 		pub let id:UInt64
 		pub let uuid: UInt64

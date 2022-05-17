@@ -31,8 +31,11 @@ func TestCollectionScripts(t *testing.T) {
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"url": "find.xyz",
-					"uuid": "87"
+					"url": "https://find.xyz/collection/user1/dandy/87",
+					"uuid": "87",
+					"tag" : {
+						"NeoMotorCycleTag" : "Tag1"
+					}
 				},
 				"Dandy88": {
 					"collection": "Dandy",
@@ -43,8 +46,11 @@ func TestCollectionScripts(t *testing.T) {
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"url": "find.xyz",
-					"uuid": "88"
+					"url": "https://find.xyz/collection/user1/dandy/88",
+					"uuid": "88",
+					"tag" : {
+						"NeoMotorCycleTag" : "Tag1"
+					}
 				},
 				"Dandy89": {
 					"collection": "Dandy",
@@ -55,8 +61,11 @@ func TestCollectionScripts(t *testing.T) {
 					"name": "Neo Motorcycle 3 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"url": "find.xyz",
-					"uuid": "89"
+					"url": "https://find.xyz/collection/user1/dandy/89",
+					"uuid": "89",
+					"tag" : {
+						"NeoMotorCycleTag" : "Tag1"
+					}
 				}
 			}
 		}
