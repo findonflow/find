@@ -412,7 +412,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 					"EditionNumber" : "2",
 					"TotalInEdition" : "3",
 					"CollectionName": "user1",
-					"CollectionDescription": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK"
+					"CollectionDescription": "Neo Collectibles FIND"
 				},
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -516,7 +516,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 						"EditionNumber" : "2",
 						"TotalInEdition" : "3",
 						"CollectionName" : "user1",
-						"CollectionDescription": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK"
+					"CollectionDescription": "Neo Collectibles FIND"
 					},
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",

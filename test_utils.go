@@ -407,7 +407,7 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-			String("Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK").
+			String("Neo Collectibles FIND").
 			String("https://neomotorcycles.co.uk/index.html").
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
 			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
@@ -1114,8 +1114,7 @@ type SaleItemInformation struct {
 type NFTInfo struct {
 	Id                    string `json:"id"`
 	Name                  string `json:"name"`
-	Thumbnail             string `json:"seller"`
-	SellerName            string `json:"thumbnail"`
+	Thumbnail             string `json:"thumbnail"`
 	Nfttype               string `json:"type"`
 	Rarity                string `json:"rarity"`
 	EditionNumber         string `json:"editionNumber"`
