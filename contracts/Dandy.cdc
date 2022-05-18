@@ -72,6 +72,7 @@ pub contract Dandy: NonFungibleToken {
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
 			views.append(Type<FindViews.Nounce>())
+			views.append(Type<FindViews.NFTCollectionData>())
 			views.append(Type<FindViews.NFTCollectionDisplay>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
@@ -156,8 +157,18 @@ pub contract Dandy: NonFungibleToken {
 				let externalURL = MetadataViews.ExternalURL(self.minterPlatform.externalURL)
 				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.squareImage), mediaType: "image")
 				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.bannerImage), mediaType: "image")
-				return FindViews.NFTCollectionDisplay(name: self.minterPlatform.name, description: self.minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
+				return FindViews.NFTCollectionDisplay(name: self.minterPlatform.name, description: self.minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: {})
 			}
+
+			if type == Type<FindViews.NFTCollectionData>() {
+				return FindViews.NFTCollectionData(storagePath: Dandy.CollectionStoragePath,
+													publicPath: Dandy.CollectionPublicPath,
+													providerPath: Dandy.CollectionPrivatePath,
+													publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+													publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+													providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+													createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()})
+													}
 
 			if type == Type<MinterPlatform>() {
 				return self.minterPlatform

@@ -57,24 +57,18 @@ pub contract FindMarket {
 		pub var editionNumber: UInt64? 
 		pub var totalInEdition: UInt64?
 		pub var collectionName: String? 
-		pub var collectionExternalURL: String? 
-		pub var collectionSquareImage: String? 
-		pub var collectionBannerImage: String? 
+		pub var collectionDescription: String? 
 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
 
 			self.collectionName=nil
-			self.collectionExternalURL=nil
-			self.collectionSquareImage=nil
-			self.collectionBannerImage=nil
+			self.collectionDescription=nil
 			if item.resolveView(Type<FindViews.NFTCollectionDisplay>()) != nil {
 				let view = item.resolveView(Type<FindViews.NFTCollectionDisplay>())!
 				if view as? FindViews.NFTCollectionDisplay != nil {
 					let grouping = view as! FindViews.NFTCollectionDisplay
 					self.collectionName=grouping.name
-					self.collectionExternalURL=grouping.externalURL.url
-					self.collectionSquareImage=grouping.squareImage.file.uri()
-					self.collectionBannerImage=grouping.bannerImage.file.uri()
+					self.collectionDescription=grouping.description
 				}
 			} 
 				

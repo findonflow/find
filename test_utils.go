@@ -1121,9 +1121,7 @@ type NFTInfo struct {
 	EditionNumber         string `json:"editionNumber"`
 	TotalInEdition        string `json:"totalInEdition"`
 	CollectionName        string `json:"collectionName"`
-	CollectionExternalURL string `json:"collectionExternalURL"`
-	CollectionSquareImage string `json:"collectionSquareImage"`
-	CollectionBannerImage string `json:"collectionBannerImage"`
+	CollectionDescription string `json:"collectionDescription"`
 }
 
 type AuctionItem struct {
