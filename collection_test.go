@@ -35,6 +35,9 @@ func TestCollectionScripts(t *testing.T) {
 					"uuid": "87",
 					"tag" : {
 						"NeoMotorCycleTag" : "Tag1"
+					},
+					"scalar" : {
+						"Speed km/hr" : "100.00000000"
 					}
 				},
 				"Dandy88": {
@@ -50,6 +53,9 @@ func TestCollectionScripts(t *testing.T) {
 					"uuid": "88",
 					"tag" : {
 						"NeoMotorCycleTag" : "Tag1"
+					},
+					"scalar" : {
+						"Speed km/hr" : "100.00000000"
 					}
 				},
 				"Dandy89": {
@@ -65,6 +71,9 @@ func TestCollectionScripts(t *testing.T) {
 					"uuid": "89",
 					"tag" : {
 						"NeoMotorCycleTag" : "Tag1"
+					},
+					"scalar" : {
+						"Speed km/hr" : "100.00000000"
 					}
 				}
 			}

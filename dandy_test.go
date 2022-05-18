@@ -32,8 +32,9 @@ func TestDandy(t *testing.T) {
 							"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
 							"A.f8d6e0586b0a20c7.FindViews.Edition",
 							"A.f8d6e0586b0a20c7.FindViews.Tag",
-							"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-							"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+							"A.f8d6e0586b0a20c7.FindViews.Scalar",
+							"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+							"A.f8d6e0586b0a20c7.FindViews.CreativeWork"
 							]`, res)
 
 		display := `

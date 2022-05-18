@@ -57,8 +57,9 @@ pub struct MetadataCollectionItem {
 	pub let metadata: {String : String}
 	pub let collection: String // <- This will be Alias unless they want something else
 	pub let tag: {String : String}
+	pub let scalar: {String : UFix64}
 
-	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentType: String, rarity: String, collection: String, tag: {String : String}) {
+	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentType: String, rarity: String, collection: String, tag: {String : String}, scalar: {String : UFix64}) {
 		self.id=id
 		self.typeIdentifier = type.identifier
 		self.uuid = uuid
@@ -70,6 +71,7 @@ pub struct MetadataCollectionItem {
 		self.metadata={}
 		self.collection=collection
 		self.tag=tag
+		self.scalar=scalar
 	}
 }
 
@@ -110,7 +112,14 @@ pub fun main(address: Address) : MetadataCollections? {
 						let tagView = nft.resolveView(Type<FindViews.Tag>())!
 						let t= tagView as! FindViews.Tag
 						tag=t.getTag()
-					}					
+					}			
+
+					var scalar : {String : UFix64}={}
+					if nft.resolveView(Type<FindViews.Scalar>()) != nil {
+						let scalarView = nft.resolveView(Type<FindViews.Scalar>())!
+						let s= scalarView as! FindViews.Scalar
+						scalar=s.getScalar()
+					}				
 
 					let item = MetadataCollectionItem(
 						id: id,
@@ -122,7 +131,8 @@ pub fun main(address: Address) : MetadataCollections? {
 						contentType: "image",
 						rarity: rarity,
 						collection: nftInfo.alias,
-						tag: tag
+						tag: tag,
+						scalar: scalar
 					)
 					let itemId = nftInfo.alias.concat(item.id.toString())
 					items.append(itemId)

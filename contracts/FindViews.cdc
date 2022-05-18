@@ -27,6 +27,18 @@ pub contract FindViews {
 		}
 	}
 
+	pub struct Scalar {
+		access(self) let scalar : {String : UFix64} 
+
+		init(scalar: {String : UFix64}) {
+			self.scalar = scalar 
+		}
+
+		pub fun getScalar() : {String : UFix64} {
+			return self.scalar
+		}
+	}
+
 	pub struct Identity{
 		pub let id:UInt64
 		pub let uuid: UInt64
