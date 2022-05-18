@@ -35,6 +35,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
+		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
+		let scalar=FindViews.Scalar({"Speed km/hr" : 100.0})
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
@@ -42,7 +44,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let editioned= FindViews.Edition(edition:i, maxEdition:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty]
+			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty, tag, scalar ]
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
