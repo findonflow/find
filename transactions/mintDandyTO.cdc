@@ -36,6 +36,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
+
 		while i <= maxEdition {
 
 			let editioned= FindViews.Edition(edition:i, maxEdition:maxEdition)
@@ -45,7 +46,12 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
 				schemas: schemas, 
-				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"))
+				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"),
+				collectionDescription: "Neo Collectibles FIND",
+				collectionExternalURL: "https://neomotorcycles.co.uk/index.html",
+				collectionSquareImage: "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+				collectionBannerImage: "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1",
+			)
 
 			collection.deposit(token: <- token)
 			i=i+1

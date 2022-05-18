@@ -15,15 +15,15 @@ import (
 	"github.com/typesense/typesense-go/typesense/api"
 )
 
-const address = "8fcce1d764ef88dd"
+const address = "21e7b69ee6bb52cb"
 
 func main() {
-	forSaleEvents := fmt.Sprintf("A.%s.FindMarketSale.ForSale", address)
-	forAuctionEvents := fmt.Sprintf("A.%s.FindMarketAuctionEscrow.ForAuction", address)
+	forSaleEvents := fmt.Sprintf("A.%s.FindMarketSale.Sale", address)
+	forAuctionEvents := fmt.Sprintf("A.%s.FindMarketAuctionEscrow.EnglishAuction", address)
 	directOfferEvents := fmt.Sprintf("A.%s.FindMarketDirectOfferEscrow.DirectOffer", address)
 
-	forSaleName := fmt.Sprintf("A.%s.FIND.ForSale", address)
-	forAuctionName := fmt.Sprintf("A.%s.FIND.ForAuction", address)
+	forSaleName := fmt.Sprintf("A.%s.FIND.Sale", address)
+	forAuctionName := fmt.Sprintf("A.%s.FIND.EnglishAuction", address)
 	directOfferName := fmt.Sprintf("A.%s.FIND.DirectOffer", address)
 
 	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}

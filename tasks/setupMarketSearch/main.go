@@ -23,8 +23,7 @@ func main() {
 	)
 
 	client.Collection("market").Delete()
-	//	client.Collection("sold").Delete()
-	client.Collection("names").Delete()
+	client.Collection("sold").Delete()
 	fields := []api.Field{
 		{Name: "id", Type: "string"},
 		{Name: "uuid", Type: "int64", Facet: pointer.True()},
