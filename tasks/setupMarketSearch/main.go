@@ -25,113 +25,38 @@ func main() {
 	client.Collection("market").Delete()
 	//	client.Collection("sold").Delete()
 	client.Collection("names").Delete()
-
-	fields := 
+	fields := []api.Field{
+		{Name: "id", Type: "string"},
+		{Name: "uuid", Type: "int64"},
+		{Name: "tenant", Type: "string"},
+		{Name: "seller", Type: "string", Facet: pointer.True()},
+		{Name: "seller_name", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
+		{Name: "buyer", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
+		{Name: "buyer_name", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
+		{Name: "amount", Type: "float", Optional: pointer.True()},
+		{Name: "amount_type", Type: "string", Optional: pointer.True()},
+		{Name: "amount_alias", Type: "string", Optional: pointer.True()},
+		{Name: "nft_id", Type: "int64"},
+		{Name: "nft_type", Type: "string", Facet: pointer.True()},
+		{Name: "nft_alias", Type: "string", Facet: pointer.True()},
+		{Name: "collection_name", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
+		{Name: "collection_alias", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
+		{Name: "nft_name", Type: "string"},
+		{Name: "nft_thumbnail", Type: "string", Optional: pointer.True()},
+		{Name: "nft_rarity", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
+		{Name: "ends_at", Type: "int64", Optional: pointer.True()},
+		{Name: "auction_reserve_price", Type: "float", Optional: pointer.True()},
+		{Name: "listing_type", Type: "string", Facet: pointer.True()},
+		{Name: "listing_alias", Type: "string", Facet: pointer.True()},
+		{Name: "status", Type: "string", Facet: pointer.True()},
+		{Name: "string_*", Type: "string", Facet: pointer.True()},
+		{Name: "number_*", Type: "string", Facet: pointer.True()},
+		{Name: "updated_at", Type: "float"},
+	}
 
 	schema := &api.CollectionSchema{
 		Name:                "market",
-		Fields:              []api.Field{
-			{
-				Name: "id",
-				Type: "string",
-			},
-			{
-				Name: "uuid",
-				Type: "int64",
-			},
-
-			{
-				Name: "tenant",
-				Type: "string",
-			},
-			{
-				Name:  "seller",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name:     "seller_name",
-				Type:     "string",
-				Optional: pointer.True(),
-				Facet:    pointer.True(),
-			},
-			{
-				Name:     "buyer",
-				Type:     "string",
-				Optional: pointer.True(),
-				Facet:    pointer.True(),
-			},
-			{
-				Name:     "buyer_name",
-				Type:     "string",
-				Optional: pointer.True(),
-				Facet:    pointer.True(),
-			},
-			{
-				Name:     "amount",
-				Type:     "float",
-				Optional: pointer.True(),
-			},
-			{
-				Name:     "amount_type",
-				Type:     "string",
-				Optional: pointer.True(),
-			},
-			{
-				Name: "nft_id",
-				Type: "int64",
-			},
-			{
-				Name:  "nft_type",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name:     "nft_collection",
-				Type:     "string",
-				Facet:    pointer.True(),
-				Optional: pointer.True(),
-			},
-			{
-				Name: "nft_name",
-				Type: "string",
-			},
-			{
-				Name:     "nft_thumbnail",
-				Type:     "string",
-				Optional: pointer.True(),
-			},
-			{
-				Name:     "nft_rarity",
-				Type:     "string",
-				Facet:    pointer.True(),
-				Optional: pointer.True(),
-			},
-			{
-				Name:     "ends_at",
-				Type:     "int64",
-				Optional: pointer.True(),
-			},
-			{
-				Name:     "auction_reserve_price",
-				Type:     "float",
-				Optional: pointer.True(),
-			},
-			{
-				Name:  "listing_type",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name:  "status",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name: "updated_at",
-				Type: "float",
-			},
-		},
+		Fields:              fields,
 		DefaultSortingField: pointer.String("updated_at"),
 	}
 
@@ -142,92 +67,8 @@ func main() {
 
 	schema2 := &api.CollectionSchema{
 		Name:                "sold",
-		Fields:              []api.Field{
-			{
-				Name: "id",
-				Type: "string",
-			},
-			{
-				Name: "uuid",
-				Type: "int64",
-			},
-			{
-				Name: "tenant",
-				Type: "string",
-			},
-			{
-				Name:  "seller",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name:     "seller_name",
-				Type:     "string",
-				Optional: pointer.True(),
-				Facet:    pointer.True(),
-			},
-			{
-				Name:     "buyer",
-				Type:     "string",
-				Facet:    pointer.True(),
-			},
-			{
-				Name:     "buyer_name",
-				Type:     "string",
-				Optional: pointer.True(),
-				Facet:    pointer.True(),
-			},
-			{
-				Name:     "amount",
-				Type:     "float",
-				Optional: pointer.True(),
-			},
-			{
-				Name:     "amount_type",
-				Type:     "string",
-				Optional: pointer.True(),
-			},
-			{
-				Name: "nft_id",
-				Type: "int64",
-			},
-			{
-				Name:  "nft_type",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name:     "nft_collection",
-				Type:     "string",
-				Facet:    pointer.True(),
-				Optional: pointer.True(),
-			},
-			{
-				Name: "nft_name",
-				Type: "string",
-			},
-			{
-				Name:     "nft_thumbnail",
-				Type:     "string",
-				Optional: pointer.True(),
-			},
-			{
-				Name:     "nft_rarity",
-				Type:     "string",
-				Facet:    pointer.True(),
-				Optional: pointer.True(),
-			},
-			{
-				Name:  "listing_type",
-				Type:  "string",
-				Facet: pointer.True(),
-			},
-			{
-				Name: "sold_at",
-				Type: "float",
-			},
-		}
-		DefaultSortingField: pointer.String("sold_at"),
+		Fields:              fields,
+		DefaultSortingField: pointer.String("updated_at"),
 	}
 
 	_, err = client.Collections().Create(schema2)
