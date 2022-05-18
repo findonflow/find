@@ -25,8 +25,8 @@ func main() {
 	forSaleName := fmt.Sprintf("A.%s.FIND.ForSale", address)
 	forAuctionName := fmt.Sprintf("A.%s.FIND.ForAuction", address)
 	directOfferName := fmt.Sprintf("A.%s.FIND.DirectOffer", address)
-	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}
 
+	marketEvents := []string{forSaleEvents, forAuctionEvents, directOfferEvents}
 	nameEvents := []string{forSaleName, forAuctionName, directOfferName}
 
 	sleepVar := os.Getenv("CRAWLER_SLEEP")
@@ -73,6 +73,8 @@ func main() {
 
 		//we need to apply the items in the reverse order
 		workQueue := latestEventsForIdentity.Reverse()
+		//partition queue on UUID if this does not scale
+
 		for _, item := range workQueue {
 			if item.IsSold() {
 				count, err := marketCollection.Documents().Delete(&api.DeleteDocumentsParams{
@@ -87,7 +89,6 @@ func main() {
 				if err != nil {
 					panic(err)
 				}
-
 			} else if item.IsRemoved() {
 				item, err := marketCollection.Document(item.SearchId()).Delete()
 				fmt.Printf("Removing item %+v\n", item)
@@ -236,6 +237,99 @@ type MarketEvent struct {
 	} `json:"blockEventData"`
 }
 
+func (event MarketEvent) SearchId() string {
+	return fmt.Sprintf("%s-%d-%s", event.FlowEventID, event.BlockEventData.ID, event.BlockEventData.Tenant)
+}
+
+func (me MarketEvent) IsSold() bool {
+	return me.BlockEventData.Status == "sold"
+}
+
+func (me MarketEvent) IsRemoved() bool {
+	status := me.BlockEventData.Status
+	if status == "cancelled" || status == "failed" || status == "rejected" {
+		return true
+	}
+	if strings.HasPrefix(status, "cancel") {
+		return true
+	}
+	return false
+}
+
+func (item MarketEvent) ToSoldItem() map[string]interface{} {
+	market := item.ToMarketItem()
+	market["id"] = fmt.Sprintf("%s-%d", item.FlowEventID, item.BlockEventData.ID)
+	return market
+}
+
+func (item MarketEvent) ToMarketItem() map[string]interface{} {
+
+	amountParts := strings.Split(".", item.BlockEventData.VaultType)
+	amountAlias := amountParts[len(amountParts)-1]
+
+	nameParts := strings.Split(".", item.BlockEventData.Nft.Type)
+	nameAlias := amountParts[len(nameParts)-1]
+
+	listingParts := strings.Split(".", item.FlowEventID)
+	listingAlias := listingParts[len(listingParts)]
+	collection := StringPointer(item.BlockEventData.Nft.CollectionName)
+
+	var collectionAlias = StringPointer(item.BlockEventData.Nft.CollectionDescription)
+
+	if collection == nil {
+		collection = &nameAlias
+	}
+
+	if collectionAlias == nil {
+		collectionAlias = &nameAlias
+	}
+
+	standard := map[string]interface{}{
+		"id":                    item.SearchId(),
+		"uuid":                  item.BlockEventData.ID,
+		"tenant":                item.BlockEventData.Tenant,
+		"seller":                item.BlockEventData.Seller,
+		"seller_name":           StringPointer(item.BlockEventData.SellerName),
+		"buyer":                 StringPointer(item.BlockEventData.Buyer),
+		"buyer_name":            StringPointer(item.BlockEventData.BuyerName),
+		"amount":                item.BlockEventData.Amount,
+		"amount_type":           item.BlockEventData.VaultType,
+		"amount_alias":          amountAlias,
+		"nft_id":                item.BlockEventData.Nft.ID,
+		"nft_name":              item.BlockEventData.Nft.Name,
+		"nft_type":              item.BlockEventData.Nft.Type,
+		"nft_alias":             nameAlias,
+		"collection_name":       *collection,
+		"collection_alias":      *collectionAlias,
+		"nft_thumbnail":         StringPointer(item.BlockEventData.Nft.Thumbnail),
+		"nft_rarity":            StringPointer(item.BlockEventData.Nft.Rarity),
+		"nft_edition":           StringPointer(item.BlockEventData.Nft.Edition),
+		"nft_max_edition":       StringPointer(item.BlockEventData.Nft.MaxEdition),
+		"ends_at":               IntPointer(item.BlockEventData.EndsAt),
+		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
+		"listing_type":          item.FlowEventID,
+		"listing_alias":         listingAlias,
+		"transaction_hash":      item.FlowTransactionID,
+		"status":                item.BlockEventData.Status,
+		"updated_at":            item.EventDate,
+	}
+
+	for key, value := range item.BlockEventData.Nft.Scalars {
+		standard[fmt.Sprintf("number_%s", key)] = value
+	}
+
+	for key, value := range item.BlockEventData.Nft.Tags {
+		standard[fmt.Sprintf("string_%s", key)] = value
+	}
+
+	return standard
+}
+
+func (me MarketEvent) CreateDeleteQuery() *string {
+	value := fmt.Sprintf("uuid:=%d", me.BlockEventData.ID)
+	return &value
+}
+
 type NameEvent struct {
 	EventDate         time.Time `json:"eventDate"`
 	FlowEventID       string    `json:"flowEventId"`
@@ -358,99 +452,6 @@ func (item NameEvent) ToMarketItem() map[string]interface{} {
 
 func (me NameEvent) CreateDeleteQuery() *string {
 	value := fmt.Sprintf("uuid:=%d", me.BlockEventData.UUID)
-	return &value
-}
-
-func (event MarketEvent) SearchId() string {
-	return fmt.Sprintf("%s-%d-%s", event.FlowEventID, event.BlockEventData.ID, event.BlockEventData.Tenant)
-}
-
-func (me MarketEvent) IsSold() bool {
-	return me.BlockEventData.Status == "sold"
-}
-
-func (me MarketEvent) IsRemoved() bool {
-	status := me.BlockEventData.Status
-	if status == "cancelled" || status == "failed" || status == "rejected" {
-		return true
-	}
-	if strings.HasPrefix(status, "cancel") {
-		return true
-	}
-	return false
-}
-
-func (item MarketEvent) ToSoldItem() map[string]interface{} {
-	market := item.ToMarketItem()
-	market["id"] = fmt.Sprintf("%s-%d", item.FlowEventID, item.BlockEventData.ID)
-	return market
-}
-
-func (item MarketEvent) ToMarketItem() map[string]interface{} {
-
-	amountParts := strings.Split(".", item.BlockEventData.VaultType)
-	amountAlias := amountParts[len(amountParts)-1]
-
-	nameParts := strings.Split(".", item.BlockEventData.Nft.Type)
-	nameAlias := amountParts[len(nameParts)-1]
-
-	listingParts := strings.Split(".", item.FlowEventID)
-	listingAlias := listingParts[len(listingParts)]
-	collection := StringPointer(item.BlockEventData.Nft.CollectionName)
-
-	var collectionAlias = StringPointer(item.BlockEventData.Nft.CollectionDescription)
-
-	if collection == nil {
-		collection = &nameAlias
-	}
-
-	if collectionAlias == nil {
-		collectionAlias = &nameAlias
-	}
-
-	standard := map[string]interface{}{
-		"id":                    item.SearchId(),
-		"uuid":                  item.BlockEventData.ID,
-		"tenant":                item.BlockEventData.Tenant,
-		"seller":                item.BlockEventData.Seller,
-		"seller_name":           StringPointer(item.BlockEventData.SellerName),
-		"buyer":                 StringPointer(item.BlockEventData.Buyer),
-		"buyer_name":            StringPointer(item.BlockEventData.BuyerName),
-		"amount":                item.BlockEventData.Amount,
-		"amount_type":           item.BlockEventData.VaultType,
-		"amount_alias":          amountAlias,
-		"nft_id":                item.BlockEventData.Nft.ID,
-		"nft_name":              item.BlockEventData.Nft.Name,
-		"nft_type":              item.BlockEventData.Nft.Type,
-		"nft_alias":             nameAlias,
-		"collection_name":       *collection,
-		"collection_alias":      *collectionAlias,
-		"nft_thumbnail":         StringPointer(item.BlockEventData.Nft.Thumbnail),
-		"nft_rarity":            StringPointer(item.BlockEventData.Nft.Rarity),
-		"nft_edition":           StringPointer(item.BlockEventData.Nft.Edition),
-		"nft_max_edition":       StringPointer(item.BlockEventData.Nft.MaxEdition),
-		"ends_at":               IntPointer(item.BlockEventData.EndsAt),
-		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
-		"listing_type":          item.FlowEventID,
-		"listing_alias":         listingAlias,
-		"transaction_hash":      item.FlowTransactionID,
-		"status":                item.BlockEventData.Status,
-		"updated_at":            item.EventDate,
-	}
-
-	for key, value := range item.BlockEventData.Nft.Scalars {
-		standard[fmt.Sprintf("number_%s", key)] = value
-	}
-
-	for key, value := range item.BlockEventData.Nft.Tags {
-		standard[fmt.Sprintf("string_%s", key)] = value
-	}
-
-	return standard
-}
-
-func (me MarketEvent) CreateDeleteQuery() *string {
-	value := fmt.Sprintf("uuid:=%d", me.BlockEventData.ID)
 	return &value
 }
 

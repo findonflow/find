@@ -27,8 +27,8 @@ func main() {
 	client.Collection("names").Delete()
 	fields := []api.Field{
 		{Name: "id", Type: "string"},
-		{Name: "uuid", Type: "int64"},
-		{Name: "tenant", Type: "string"},
+		{Name: "uuid", Type: "int64", Facet: pointer.True()},
+		{Name: "tenant", Type: "string", Facet: pointer.True()},
 		{Name: "seller", Type: "string", Facet: pointer.True()},
 		{Name: "seller_name", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
 		{Name: "buyer", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
@@ -36,11 +36,11 @@ func main() {
 		{Name: "amount", Type: "float", Optional: pointer.True()},
 		{Name: "amount_type", Type: "string", Optional: pointer.True()},
 		{Name: "amount_alias", Type: "string", Optional: pointer.True()},
+		{Name: "collection_name", Type: "string", Facet: pointer.True()},
+		{Name: "collection_alias", Type: "string", Facet: pointer.True()},
 		{Name: "nft_id", Type: "int64"},
 		{Name: "nft_type", Type: "string", Facet: pointer.True()},
 		{Name: "nft_alias", Type: "string", Facet: pointer.True()},
-		{Name: "collection_name", Type: "string", Facet: pointer.True()},
-		{Name: "collection_alias", Type: "string", Facet: pointer.True()},
 		{Name: "nft_name", Type: "string"},
 		{Name: "nft_thumbnail", Type: "string", Optional: pointer.True()},
 		{Name: "nft_edition", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
@@ -53,7 +53,7 @@ func main() {
 		{Name: "transaction_hash", Type: "string", Facet: pointer.True()},
 		{Name: "status", Type: "string", Facet: pointer.True()},
 		{Name: "string_*", Type: "string", Facet: pointer.True()},
-		{Name: "number_*", Type: "string", Facet: pointer.True()},
+		{Name: "number_*", Type: "float", Facet: pointer.True()},
 		{Name: "updated_at", Type: "float"},
 	}
 	schema := &api.CollectionSchema{
