@@ -81,7 +81,7 @@ func main() {
 					panic(err)
 				}
 				fmt.Printf("removed %d number of items after sold item\n", count)
-				item, err := soldCollection.Documents().Upsert(item.ToMarketItem())
+				item, err := soldCollection.Documents().Upsert(item.ToSoldItem())
 				fmt.Printf("Insert  SOLD item %+v\n", item)
 				if err != nil {
 					panic(err)
@@ -124,29 +124,6 @@ func readProgressFromFile(fileName string) (int64, error) {
 
 	return strconv.ParseInt(stringValue, 10, 64)
 
-}
-
-type MarketItem struct {
-	Id                  string   `json:"id"`
-	UUID                uint64   `json:"uuid"`
-	Tenant              string   `json:"tenant"`
-	Seller              string   `json:"seller"`
-	SellerName          *string  `json:"seller_name,omitempty"`
-	Buyer               *string  `json:"buyer,omitempty"`
-	BuyerName           *string  `json:"buyer_name,omitempty"`
-	Amount              float64  `json:"amount"`
-	AmountType          string   `json:"amount_type"`
-	NFTID               uint64   `json:"nft_id"`
-	NFTType             string   `json:"nft_type"`
-	NFTName             string   `json:"nft_name"`
-	NFTThumbnail        string   `json:"nft_thumbnail"`
-	NFTGrouping         *string  `json:"nft_grouping"`
-	NFTRarity           *string  `json:"nft_rarity"`
-	EndsAt              *int64   `json:"ends_at,omitempty"`
-	AuctionReservePrice *float64 `json:"auction_reserve_price,omitempty"`
-	ListingType         string   `json:"listing_type"`
-	Status              string   `json:"status"`
-	UpdatedAt           int64    `json:"updated_at"`
 }
 
 func getEventsFromGraffle(url string, marketEvents []string, nameMarketEvents []string) MarketEvents {
@@ -279,43 +256,21 @@ func (event NameEvent) SearchId() string {
 	return fmt.Sprintf("%s-%d", event.FlowEventID, event.BlockEventData.UUID)
 }
 
-func (me NameEvent) SellerName() *string {
-	if me.BlockEventData.SellerName == "" {
-		return nil
-	}
-	return &me.BlockEventData.SellerName
-}
-
-func (me NameEvent) BuyerName() *string {
-	if me.BlockEventData.BuyerName == "" {
-		return nil
-	}
-	return &me.BlockEventData.BuyerName
-}
-
-func (me NameEvent) Buyer() *string {
-	if me.BlockEventData.Buyer == "" {
-		return nil
-	}
-	return &me.BlockEventData.Buyer
-}
-
-func (me NameEvent) AuctionEnds() *int64 {
-	if me.BlockEventData.EndsAt == 0 {
-		return nil
-	}
-	return &me.BlockEventData.EndsAt
-}
-
-func (me NameEvent) AuctionReservePrice() *float64 {
-	if me.BlockEventData.AuctionReservePrice == 0 {
-		return nil
-	}
-	return &me.BlockEventData.AuctionReservePrice
-}
-
 func (me NameEvent) IsSold() bool {
 	return me.BlockEventData.Status == "sold"
+}
+
+func (me NameEvent) Rarity() string {
+
+	nameLength := len(me.BlockEventData.Name)
+
+	var rarity string = "common"
+	if nameLength == 3 {
+		rarity = "epic"
+	} else if nameLength == 4 {
+		rarity = "rare"
+	}
+	return rarity
 }
 
 func (me NameEvent) IsRemoved() bool {
@@ -329,28 +284,66 @@ func (me NameEvent) IsRemoved() bool {
 	return false
 }
 
+func IntPointer(value int64) *int64 {
+	if value == 0 {
+		return nil
+	}
+	return &value
+}
+func StringPointer(value string) *string {
+	if value == "" {
+		return nil
+	}
+	return &value
+}
+
+func FloatPoitner(value float64) *float64 {
+	if value == 0 {
+		return nil
+	}
+	return &value
+}
+
+func (item NameEvent) ToSoldItem() interface{} {
+	return map[string]interface{}{
+		"id":             item.SearchId(),
+		"uuid":           item.BlockEventData.UUID,
+		"tenant":         "find",
+		"seller":         item.BlockEventData.Seller,
+		"seller_name":    StringPointer(item.BlockEventData.SellerName),
+		"buyer":          StringPointer(item.BlockEventData.Buyer),
+		"buyer_name":     StringPointer(item.BlockEventData.BuyerName),
+		"amount":         item.BlockEventData.Amount,
+		"amount_type":    item.BlockEventData.VaultType,
+		"nft_collection": "find",
+		"nft_id":         item.BlockEventData.UUID,
+		"nft_rarity":     item.Rarity(),
+		"nft_name":       item.BlockEventData.Name,
+		"listing_type":   item.FlowEventID, //todo FIX?
+		"sold_at":        time.Now().Unix(),
+	}
+}
+
 func (item NameEvent) ToMarketItem() interface{} {
-	return MarketItem{
-		Id:                  item.SearchId(),
-		UUID:                item.BlockEventData.UUID,
-		Tenant:              "find",
-		Seller:              item.BlockEventData.Seller,
-		SellerName:          item.SellerName(),
-		Buyer:               item.Buyer(),
-		BuyerName:           item.BuyerName(),
-		Amount:              item.BlockEventData.Amount,
-		AmountType:          item.BlockEventData.VaultType,
-		NFTID:               item.BlockEventData.UUID,
-		NFTName:             item.BlockEventData.Name,
-		NFTType:             "FindName",
-		NFTThumbnail:        "",
-		NFTGrouping:         nil,
-		NFTRarity:           nil,
-		EndsAt:              item.AuctionEnds(),
-		AuctionReservePrice: item.AuctionReservePrice(),
-		ListingType:         item.FlowEventID, //todo FIX?
-		Status:              item.BlockEventData.Status,
-		UpdatedAt:           time.Now().Unix(),
+	return map[string]interface{}{
+		"id":                    item.SearchId(),
+		"uuid":                  item.BlockEventData.UUID,
+		"tenant":                "find",
+		"seller":                item.BlockEventData.Seller,
+		"seller_name":           StringPointer(item.BlockEventData.SellerName),
+		"buyer":                 StringPointer(item.BlockEventData.Buyer),
+		"buyer_name":            StringPointer(item.BlockEventData.BuyerName),
+		"amount":                item.BlockEventData.Amount,
+		"amount_type":           item.BlockEventData.VaultType,
+		"nft_id":                item.BlockEventData.UUID,
+		"nft_collection":        "find",
+		"nft_rarity":            item.Rarity(),
+		"nft_name":              item.BlockEventData.Name,
+		"ends_at":               IntPointer(item.BlockEventData.EndsAt),
+		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
+		"listing_type":          item.FlowEventID, //todo FIX?
+		"status":                item.BlockEventData.Status,
+		"updated_at":            time.Now().Unix(),
 	}
 }
 
@@ -361,55 +354,6 @@ func (me NameEvent) CreateDeleteQuery() *string {
 
 func (event MarketEvent) SearchId() string {
 	return fmt.Sprintf("%s-%d-%s", event.FlowEventID, event.BlockEventData.ID, event.BlockEventData.Tenant)
-}
-
-func (me MarketEvent) SellerName() *string {
-	if me.BlockEventData.SellerName == "" {
-		return nil
-	}
-	return &me.BlockEventData.SellerName
-}
-
-func (me MarketEvent) BuyerName() *string {
-	if me.BlockEventData.BuyerName == "" {
-		return nil
-	}
-	return &me.BlockEventData.BuyerName
-}
-
-func (me MarketEvent) Buyer() *string {
-	if me.BlockEventData.Buyer == "" {
-		return nil
-	}
-	return &me.BlockEventData.Buyer
-}
-
-func (me MarketEvent) Grouping() *string {
-	if me.BlockEventData.Nft.Grouping == "" {
-		return nil
-	}
-	return &me.BlockEventData.Nft.Grouping
-}
-
-func (me MarketEvent) Rarity() *string {
-	if me.BlockEventData.Nft.Rarity == "" {
-		return nil
-	}
-	return &me.BlockEventData.Nft.Rarity
-}
-
-func (me MarketEvent) AuctionEnds() *int64 {
-	if me.BlockEventData.EndsAt == 0 {
-		return nil
-	}
-	return &me.BlockEventData.EndsAt
-}
-
-func (me MarketEvent) AuctionReservePrice() *float64 {
-	if me.BlockEventData.AuctionReservePrice == 0 {
-		return nil
-	}
-	return &me.BlockEventData.AuctionReservePrice
 }
 
 func (me MarketEvent) IsSold() bool {
@@ -427,29 +371,51 @@ func (me MarketEvent) IsRemoved() bool {
 	return false
 }
 
-func (item MarketEvent) ToMarketItem() interface{} {
-	return MarketItem{
-		Id:                  item.SearchId(),
-		UUID:                item.BlockEventData.ID,
-		Tenant:              item.BlockEventData.Tenant,
-		Seller:              item.BlockEventData.Seller,
-		SellerName:          item.SellerName(),
-		Buyer:               item.Buyer(),
-		BuyerName:           item.BuyerName(),
-		Amount:              item.BlockEventData.Amount,
-		AmountType:          item.BlockEventData.VaultType,
-		NFTID:               item.BlockEventData.Nft.ID,
-		NFTName:             item.BlockEventData.Nft.Name,
-		NFTType:             item.BlockEventData.Nft.Type,
-		NFTThumbnail:        item.BlockEventData.Nft.Thumbnail,
-		NFTGrouping:         item.Grouping(),
-		NFTRarity:           item.Rarity(),
-		EndsAt:              item.AuctionEnds(),
-		AuctionReservePrice: item.AuctionReservePrice(),
-		ListingType:         item.FlowEventID, //todo FIX?
-		Status:              item.BlockEventData.Status,
-		UpdatedAt:           time.Now().Unix(),
+func (item MarketEvent) ToSoldItem() interface{} {
+	return map[string]interface{}{
+		"id":             item.SearchId(),
+		"uuid":           item.BlockEventData.ID,
+		"tenant":         item.BlockEventData.Tenant,
+		"seller":         item.BlockEventData.Seller,
+		"seller_name":    StringPointer(item.BlockEventData.SellerName),
+		"buyer":          StringPointer(item.BlockEventData.Buyer),
+		"buyer_name":     StringPointer(item.BlockEventData.BuyerName),
+		"amount":         item.BlockEventData.Amount,
+		"amount_type":    item.BlockEventData.VaultType,
+		"nft_id":         item.BlockEventData.Nft.ID,
+		"nft_name":       item.BlockEventData.Nft.Name,
+		"nft_collection": StringPointer(item.BlockEventData.Nft.Grouping),
+		"nft_thumbnail":  StringPointer(item.BlockEventData.Nft.Thumbnail),
+		"nft_rarity":     StringPointer(item.BlockEventData.Nft.Rarity),
+		"listing_type":   item.FlowEventID, //todo FIX?
+		"sold_at":        time.Now().Unix(),
 	}
+
+}
+
+func (item MarketEvent) ToMarketItem() interface{} {
+	return map[string]interface{}{
+		"id":                    item.SearchId(),
+		"uuid":                  item.BlockEventData.ID,
+		"tenant":                item.BlockEventData.Tenant,
+		"seller":                item.BlockEventData.Seller,
+		"seller_name":           StringPointer(item.BlockEventData.SellerName),
+		"buyer":                 StringPointer(item.BlockEventData.Buyer),
+		"buyer_name":            StringPointer(item.BlockEventData.BuyerName),
+		"amount":                item.BlockEventData.Amount,
+		"amount_type":           item.BlockEventData.VaultType,
+		"nft_id":                item.BlockEventData.Nft.ID,
+		"nft_name":              item.BlockEventData.Nft.Name,
+		"nft_collection":        StringPointer(item.BlockEventData.Nft.Grouping),
+		"nft_thumbnail":         StringPointer(item.BlockEventData.Nft.Thumbnail),
+		"rarity":                StringPointer(item.BlockEventData.Nft.Rarity),
+		"ends_at":               IntPointer(item.BlockEventData.EndsAt),
+		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
+		"listing_type":          item.FlowEventID, //todo FIX?
+		"status":                item.BlockEventData.Status,
+		"updated_at":            time.Now().Unix(),
+	}
+
 }
 
 func (me MarketEvent) CreateDeleteQuery() *string {
@@ -463,6 +429,7 @@ type FindEvent interface {
 	IsSold() bool
 	SearchId() string
 	ToMarketItem() interface{}
+	ToSoldItem() interface{}
 }
 
 type MarketEvents []FindEvent
