@@ -231,12 +231,12 @@ type MarketEvent struct {
 	FlowTransactionID string    `json:"flowTransactionId"`
 	ID                string    `json:"id"`
 	BlockEventData    struct {
-		Amount              float64   `json:"amount"`
-		AuctionReservePrice float64   `json:"auctionReservePrice,omitempty"`
-		Buyer               string    `json:"buyer,omitempty"`
-		BuyerName           string    `json:"buyerName,omitempty"`
-		EndsAt              time.Time `json:"endsAt,omitempty"`
-		ID                  uint64    `json:"id"`
+		Amount              float64 `json:"amount"`
+		AuctionReservePrice float64 `json:"auctionReservePrice,omitempty"`
+		Buyer               string  `json:"buyer,omitempty"`
+		BuyerName           string  `json:"buyerName,omitempty"`
+		EndsAt              int64   `json:"endsAt,omitempty"`
+		ID                  uint64  `json:"id"`
 		Nft                 struct {
 			Grouping  string `json:"grouping,omitempty"`
 			ID        uint64 `json:"id"`
@@ -259,19 +259,19 @@ type NameEvent struct {
 	FlowTransactionID string    `json:"flowTransactionId"`
 	ID                string    `json:"id"`
 	BlockEventData    struct {
-		Name                string    `json:"name"`
-		UUID                uint64    `json:"uuid"`
-		Seller              string    `json:"seller"`
-		SellerName          string    `json:"sellerName,omitempty"`
-		Amount              float64   `json:"amount"`
-		VaultType           string    `json:"vaultType"`
-		Buyer               string    `json:"buyer,omitempty"`
-		BuyerName           string    `json:"buyerName,omitempty"`
-		ValidUntil          float64   `json:"validUntil,omitempty"`
-		LockedUntil         float64   `json:"lockedUntil,omitempty"`
-		AuctionReservePrice float64   `json:"auctionReservePrice,omitempty"`
-		EndsAt              time.Time `json:"endsAt,omitempty"`
-		Status              string    `json:"status"`
+		Name                string  `json:"name"`
+		UUID                uint64  `json:"uuid"`
+		Seller              string  `json:"seller"`
+		SellerName          string  `json:"sellerName,omitempty"`
+		Amount              float64 `json:"amount"`
+		VaultType           string  `json:"vaultType"`
+		Buyer               string  `json:"buyer,omitempty"`
+		BuyerName           string  `json:"buyerName,omitempty"`
+		ValidUntil          float64 `json:"validUntil,omitempty"`
+		LockedUntil         float64 `json:"lockedUntil,omitempty"`
+		AuctionReservePrice float64 `json:"auctionReservePrice,omitempty"`
+		EndsAt              int64   `json:"endsAt,omitempty"`
+		Status              string  `json:"status"`
 	} `json:"blockEventData"`
 }
 
@@ -301,11 +301,10 @@ func (me NameEvent) Buyer() *string {
 }
 
 func (me NameEvent) AuctionEnds() *int64 {
-	if me.BlockEventData.EndsAt.IsZero() {
+	if me.BlockEventData.EndsAt == 0 {
 		return nil
 	}
-	unix := me.BlockEventData.EndsAt.Unix()
-	return &unix
+	return &me.BlockEventData.EndsAt
 }
 
 func (me NameEvent) AuctionReservePrice() *float64 {
@@ -400,11 +399,10 @@ func (me MarketEvent) Rarity() *string {
 }
 
 func (me MarketEvent) AuctionEnds() *int64 {
-	if me.BlockEventData.EndsAt.IsZero() {
+	if me.BlockEventData.EndsAt == 0 {
 		return nil
 	}
-	unix := me.BlockEventData.EndsAt.Unix()
-	return &unix
+	return &me.BlockEventData.EndsAt
 }
 
 func (me MarketEvent) AuctionReservePrice() *float64 {
