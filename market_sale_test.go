@@ -174,7 +174,6 @@ func TestMarketSale(t *testing.T) {
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"id":        fmt.Sprintf("%d", ids[2]),
-					"grouping":  "user1",
 					"rarity":    "",
 					"scalars": map[string]interface{}{
 						"Speed": "100.00000000",
@@ -182,8 +181,10 @@ func TestMarketSale(t *testing.T) {
 					"tags": map[string]interface{}{
 						"NeoMotorCycleTag": "Tag1",
 					},
-					"editionNumber":  "3",
-					"totalInEdition": "3",
+					"editionNumber":         "3",
+					"totalInEdition":        "3",
+					"collectionName":        "user1",
+					"collectionDescription": "Neo Collectibles FIND",
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
@@ -201,7 +202,6 @@ func TestMarketSale(t *testing.T) {
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"id":        fmt.Sprintf("%d", ids[1]),
-					"grouping":  "user1",
 					"rarity":    "",
 					"scalars": map[string]interface{}{
 						"Speed": "100.00000000",
@@ -209,8 +209,10 @@ func TestMarketSale(t *testing.T) {
 					"tags": map[string]interface{}{
 						"NeoMotorCycleTag": "Tag1",
 					},
-					"editionNumber":  "2",
-					"totalInEdition": "3",
+					"editionNumber":         "2",
+					"totalInEdition":        "3",
+					"collectionName":        "user1",
+					"collectionDescription": "Neo Collectibles FIND",
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
@@ -228,7 +230,6 @@ func TestMarketSale(t *testing.T) {
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"id":        fmt.Sprintf("%d", ids[0]),
-					"grouping":  "user1",
 					"rarity":    "",
 					"scalars": map[string]interface{}{
 						"Speed": "100.00000000",
@@ -236,8 +237,10 @@ func TestMarketSale(t *testing.T) {
 					"tags": map[string]interface{}{
 						"NeoMotorCycleTag": "Tag1",
 					},
-					"editionNumber":  "1",
-					"totalInEdition": "3",
+					"editionNumber":         "1",
+					"totalInEdition":        "3",
+					"collectionName":        "user1",
+					"collectionDescription": "Neo Collectibles FIND",
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
