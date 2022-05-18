@@ -351,6 +351,7 @@ func (item NameEvent) ToMarketItem() map[string]interface{} {
 		"status":                item.BlockEventData.Status,
 		"number_valid_until":    item.BlockEventData.ValidUntil,
 		"number_locked_until":   item.BlockEventData.LockedUntil,
+		"transaction_hash":      item.FlowTransactionID,
 		"updated_at":            time.Now().Unix(),
 	}
 }
@@ -432,6 +433,7 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
 		"listing_type":          item.FlowEventID,
 		"listing_alias":         listingAlias,
+		"transaction_hash":      item.FlowTransactionID,
 		"status":                item.BlockEventData.Status,
 		"updated_at":            item.EventDate,
 	}

@@ -50,6 +50,7 @@ func main() {
 		{Name: "auction_reserve_price", Type: "float", Optional: pointer.True()},
 		{Name: "listing_type", Type: "string", Facet: pointer.True()},
 		{Name: "listing_alias", Type: "string", Facet: pointer.True()},
+		{Name: "transaction_hash", Type: "string", Facet: pointer.True()},
 		{Name: "status", Type: "string", Facet: pointer.True()},
 		{Name: "string_*", Type: "string", Facet: pointer.True()},
 		{Name: "number_*", Type: "string", Facet: pointer.True()},
