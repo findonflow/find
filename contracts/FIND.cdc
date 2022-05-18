@@ -131,6 +131,12 @@ pub contract FIND {
 	}
 
 
+	pub fun reverseLookupFN() : ((Address) : String?) {
+		return fun(address:Address): String? { 
+			return FIND.reverseLookup(address) 
+		}
+	}
+
 	/// lookup if an address has a .find name, if it does pick either the default one or the first registered
 	pub fun reverseLookup(_ address:Address): String? {
 		let account=getAccount(address)

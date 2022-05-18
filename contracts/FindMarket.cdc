@@ -12,7 +12,7 @@ pub contract FindMarket {
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarketTenant.TenantCuts) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarketTenant.TenantCuts, resolver: ((Address) : String?)) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -23,26 +23,23 @@ pub contract FindMarket {
 			for royaltyItem in royalty!.getRoyalties() {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
-				//let name=FIND.reverseLookup(royaltyItem.receiver.address)
-				let name=""
-				emit RoyaltyPaid(tenant:name, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				let name = resolver(royaltyItem.receiver.address)
+				emit RoyaltyPaid(tenant:tenant, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 		}
 
 		if let findCut =cuts.findCut {
 			let cutAmount= soldFor * findCut.cut
-			//let name =FIND.reverseLookup(findCut.receiver.address)
-			let name=""
-			emit RoyaltyPaid(tenant: name, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			let name = resolver(findCut.receiver.address)
+			emit RoyaltyPaid(tenant: tenant, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		if let tenantCut =cuts.tenantCut {
 			let cutAmount= soldFor * tenantCut.cut
-			//let name=FIND.reverseLookup(tenantCut.receiver.address)
-			let name=""
-			emit RoyaltyPaid(tenant: name, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			let name = resolver(tenantCut.receiver.address)
+			emit RoyaltyPaid(tenant: tenant, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 		oldProfile.deposit(from: <- vault)
