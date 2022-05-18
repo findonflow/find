@@ -15,6 +15,30 @@ pub contract FindViews {
 		}
 	}
 
+	pub struct Tag {
+		access(self) let tag : {String : String} 
+
+		init(tag: {String : String}) {
+			self.tag = tag 
+		}
+
+		pub fun getTag() : {String : String} {
+			return self.tag
+		}
+	}
+
+	pub struct Scalar {
+		access(self) let scalar : {String : UFix64} 
+
+		init(scalar: {String : UFix64}) {
+			self.scalar = scalar 
+		}
+
+		pub fun getScalar() : {String : UFix64} {
+			return self.scalar
+		}
+	}
+
 	pub struct Identity{
 		pub let id:UInt64
 		pub let uuid: UInt64
@@ -95,12 +119,12 @@ pub contract FindViews {
 		}
 	}
 
-	pub struct SerialNumber {
-		pub let serialNumber: UInt64
+	pub struct Edition {
+		pub let editionNumber: UInt64
 		pub let totalInEdition: UInt64
 
 		init(serialNumber:UInt64, totalInEdition:UInt64){
-			self.serialNumber=serialNumber
+			self.editionNumber=serialNumber
 			self.totalInEdition=totalInEdition
 		}
 	}
@@ -206,11 +230,11 @@ pub contract FindViews {
 	}
 
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>
+		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
 		pub let nounce: UInt64
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Receiver}>, id: UInt64) {
+		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 

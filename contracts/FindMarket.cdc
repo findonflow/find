@@ -53,30 +53,47 @@ pub contract FindMarket {
 		pub let name:String
 		pub let thumbnail:String
 		pub let type: String
-		pub let grouping: String?
-		pub let rarity:String?
+		pub var grouping: String?
+		pub var rarity:String?
+		pub var editionNumber: UInt64? 
+		pub var totalInEdition: UInt64?
 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
 
-			if let view = item.resolveView(Type<FindViews.Grouping>()) {
-				let grouping = view as! FindViews.Grouping
-				self.grouping=grouping.name
-			} else {
-				self.grouping=nil
-			}
-
-			if let view = item.resolveView(Type<FindViews.Rarity>()) {
-				let rarity = view as! FindViews.Rarity
-				self.rarity=rarity.rarityName
-			} else {
-				self.rarity=nil
-			}
-
+			self.grouping=nil
+			if item.resolveView(Type<FindViews.Grouping>()) != nil {
+				let view = item.resolveView(Type<FindViews.Grouping>())!
+				if view as? FindViews.Grouping != nil {
+					let grouping = view as! FindViews.Grouping
+					self.grouping=grouping.name
+				}
+			} 
+				
+			self.rarity=nil
+			if item.resolveView(Type<FindViews.Rarity>()) != nil {
+				let view = item.resolveView(Type<FindViews.Rarity>())!
+				if view as? FindViews.Rarity != nil {
+					let rarity = view as! FindViews.Rarity
+					self.rarity=rarity.rarityName
+				}
+			} 
+			
 			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
 			self.id=id
+
+			self.editionNumber=nil
+			self.totalInEdition=nil
+			if item.resolveView(Type<FindViews.Edition>()) != nil {
+				let view = item.resolveView(Type<FindViews.Edition>())!
+				if view as? FindViews.Edition != nil {
+					let edition = view as! FindViews.Edition
+					self.editionNumber=edition.editionNumber
+					self.totalInEdition=edition.totalInEdition
+				}
+			} 
 		}
 	}
 
