@@ -102,15 +102,15 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
-      "address": "8fcce1d764ef88dd",
+      "address": "21e7b69ee6bb52cb",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
-      "address": "6bab580a75158802",
+      "address": "3226cae199fe0a30",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
-      "address": "7dff3d39ec118263",
+      "address": "c015160f1100008e",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user2": {
