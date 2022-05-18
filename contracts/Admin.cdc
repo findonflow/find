@@ -76,6 +76,15 @@ pub contract Admin {
 			self.capability!.borrow()!.setWallet(wallet)
 		}
 
+		pub fun getFindMarketTenantClient():  &FindMarketTenant.TenantClient{
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+      let path = FindMarketTenant.TenantClientStoragePath
+      return Admin.account.borrow<&FindMarketTenant.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+		}
+
 		/// Enable or disable public registration 
 		pub fun setPublicEnabled(_ enabled: Bool) {
 			pre {

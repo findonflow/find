@@ -65,7 +65,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
 				"buyer":  "",
@@ -143,7 +143,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
 				"buyer":  otu.accountAddress(buyer),

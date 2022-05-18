@@ -164,7 +164,7 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		expected := []*overflow.FormatedEvent{
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
@@ -192,7 +192,7 @@ func TestMarketSale(t *testing.T) {
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
@@ -220,7 +220,7 @@ func TestMarketSale(t *testing.T) {
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
