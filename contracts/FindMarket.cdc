@@ -53,19 +53,22 @@ pub contract FindMarket {
 		pub let name:String
 		pub let thumbnail:String
 		pub let type: String
-		pub var grouping: String?
 		pub var rarity:String?
 		pub var editionNumber: UInt64? 
 		pub var totalInEdition: UInt64?
+		pub var collectionName: String? 
+		pub var collectionDescription: String? 
 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
 
-			self.grouping=nil
-			if item.resolveView(Type<FindViews.Grouping>()) != nil {
-				let view = item.resolveView(Type<FindViews.Grouping>())!
-				if view as? FindViews.Grouping != nil {
-					let grouping = view as! FindViews.Grouping
-					self.grouping=grouping.name
+			self.collectionName=nil
+			self.collectionDescription=nil
+			if item.resolveView(Type<FindViews.NFTCollectionDisplay>()) != nil {
+				let view = item.resolveView(Type<FindViews.NFTCollectionDisplay>())!
+				if view as? FindViews.NFTCollectionDisplay != nil {
+					let grouping = view as! FindViews.NFTCollectionDisplay
+					self.collectionName=grouping.name
+					self.collectionDescription=grouping.description
 				}
 			} 
 				

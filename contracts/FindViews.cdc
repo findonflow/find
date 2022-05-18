@@ -6,14 +6,58 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
 
-	//This is added if you have a colletion with multiple groupings, like starly cards or rarible or mint store or dandy
-	pub struct Grouping {
-		pub let name: String
+    // A view to expose the information needed to showcase this NFT's collection
+    pub struct NFTCollectionDisplay {
+        pub let name: String
+        pub let description: String
+        pub let externalURL: MetadataViews.ExternalURL
+        pub let squareImage: MetadataViews.Media
+        pub let bannerImage: MetadataViews.Media
+        // Social links to reach this collection's social homepages.
+        // Possible keys may be "instagram", "twitter", "discord", etc.
+        pub let socials: {String: MetadataViews.ExternalURL}
 
-		init(_ name:String) {
-			self.name =name
-		}
-	}
+        init(name: String, description: String, externalURL: MetadataViews.ExternalURL, squareImage: MetadataViews.Media, bannerImage: MetadataViews.Media, socials: {String: MetadataViews.ExternalURL}) {
+            self.name = name
+            self.description = description
+            self.externalURL = externalURL
+            self.squareImage = squareImage
+            self.bannerImage = bannerImage
+			self.socials = socials 
+        }
+    }
+
+    pub struct NFTCollectionData {
+        pub let storagePath: StoragePath
+        pub let publicPath: PublicPath
+        pub let providerPath: PrivatePath
+        pub let publicCollection: Type
+        pub let publicLinkedType: Type
+        pub let providerLinkedType: Type
+        pub let createEmptyCollection: ((): @NonFungibleToken.Collection)
+
+        init(
+            storagePath: StoragePath,
+            publicPath: PublicPath,
+            providerPath: PrivatePath,
+            publicCollection: Type,
+            publicLinkedType: Type,
+            providerLinkedType: Type,
+            createEmptyCollectionFunction: ((): @NonFungibleToken.Collection)
+        ) {
+            pre {
+                publicLinkedType.isSubtype(of: Type<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>()): "Public type must include NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, and MetadataViews.ResolverCollection interfaces."
+                providerLinkedType.isSubtype(of: Type<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>()): "Provider type must include NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, and MetadataViews.ResolverCollection interface."
+            }
+            self.storagePath=storagePath
+            self.publicPath=publicPath
+            self.providerPath = providerPath
+            self.publicCollection=publicCollection
+            self.publicLinkedType=publicLinkedType
+            self.providerLinkedType = providerLinkedType
+            self.createEmptyCollection=createEmptyCollectionFunction
+        }
+    }
 
 	pub struct Tag {
 		access(self) let tag : {String : String} 
