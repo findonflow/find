@@ -87,7 +87,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account(name).
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
 				"buyer":  otu.accountAddress(buyer),
@@ -115,7 +115,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
 				"buyer":  "",
@@ -200,7 +200,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
 				"buyer":  otu.accountAddress(buyer),

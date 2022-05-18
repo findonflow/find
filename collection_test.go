@@ -37,7 +37,7 @@ func TestCollectionScripts(t *testing.T) {
 						"NeoMotorCycleTag" : "Tag1"
 					},
 					"scalar" : {
-						"Speed km/hr" : "100.00000000"
+						"Speed" : "100.00000000"
 					}
 				},
 				"Dandy88": {
@@ -55,7 +55,7 @@ func TestCollectionScripts(t *testing.T) {
 						"NeoMotorCycleTag" : "Tag1"
 					},
 					"scalar" : {
-						"Speed km/hr" : "100.00000000"
+						"Speed" : "100.00000000"
 					}
 				},
 				"Dandy89": {
@@ -73,7 +73,7 @@ func TestCollectionScripts(t *testing.T) {
 						"NeoMotorCycleTag" : "Tag1"
 					},
 					"scalar" : {
-						"Speed km/hr" : "100.00000000"
+						"Speed" : "100.00000000"
 					}
 				}
 			}

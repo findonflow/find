@@ -53,11 +53,16 @@ pub contract FindMarket {
 		pub var rarity:String?
 		pub var editionNumber: UInt64? 
 		pub var totalInEdition: UInt64?
+		pub var scalars : {String: UFix64}
+		pub var tags : {String: String}
 		pub var collectionName: String? 
 		pub var collectionDescription: String? 
 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
 
+			self.scalars={}
+			self.tags={}
+		
 			self.collectionName=nil
 			self.collectionDescription=nil
 			if item.resolveView(Type<FindViews.NFTCollectionDisplay>()) != nil {
@@ -67,8 +72,8 @@ pub contract FindMarket {
 					self.collectionName=grouping.name
 					self.collectionDescription=grouping.description
 				}
-			} 
-				
+			}
+			
 			self.rarity=nil
 			if item.resolveView(Type<FindViews.Rarity>()) != nil {
 				let view = item.resolveView(Type<FindViews.Rarity>())!
@@ -77,6 +82,22 @@ pub contract FindMarket {
 					self.rarity=rarity.rarityName
 				}
 			} 
+
+			if item.resolveView(Type<FindViews.Tag>()) != nil {
+				let view = item.resolveView(Type<FindViews.Tag>())!
+				if view as? FindViews.Tag != nil {
+					let tags = view as! FindViews.Tag
+					self.tags=tags.getTag()
+				}
+			}
+
+			if item.resolveView(Type<FindViews.Scalar>()) != nil {
+				let view = item.resolveView(Type<FindViews.Scalar>())!
+				if view as? FindViews.Scalar != nil {
+					let scalar = view as! FindViews.Scalar
+					self.scalars=scalar.getScalar()
+				}
+			}
 			
 			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 			self.name=display.name

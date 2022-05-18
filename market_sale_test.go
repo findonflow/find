@@ -164,17 +164,23 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		expected := []*overflow.FormatedEvent{
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
 				"id":        fmt.Sprintf("%d", ids[2]),
 				"nft": map[string]interface{}{
-					"name":                  "Neo Motorcycle 3 of 3",
-					"thumbnail":             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type":                  "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"id":                    fmt.Sprintf("%d", ids[2]),
-					"rarity":                "",
+					"name":      "Neo Motorcycle 3 of 3",
+					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"id":        fmt.Sprintf("%d", ids[2]),
+					"rarity":    "",
+					"scalars": map[string]interface{}{
+						"Speed": "100.00000000",
+					},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+					},
 					"editionNumber":         "3",
 					"totalInEdition":        "3",
 					"collectionName":        "user1",
@@ -186,17 +192,23 @@ func TestMarketSale(t *testing.T) {
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
 				"id":        fmt.Sprintf("%d", ids[1]),
 				"nft": map[string]interface{}{
-					"name":                  "Neo Motorcycle 2 of 3",
-					"thumbnail":             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type":                  "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"id":                    fmt.Sprintf("%d", ids[1]),
-					"rarity":                "",
+					"name":      "Neo Motorcycle 2 of 3",
+					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"id":        fmt.Sprintf("%d", ids[1]),
+					"rarity":    "",
+					"scalars": map[string]interface{}{
+						"Speed": "100.00000000",
+					},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+					},
 					"editionNumber":         "2",
 					"totalInEdition":        "3",
 					"collectionName":        "user1",
@@ -208,17 +220,23 @@ func TestMarketSale(t *testing.T) {
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
 				"id":        fmt.Sprintf("%d", ids[0]),
 				"nft": map[string]interface{}{
-					"name":                  "Neo Motorcycle 1 of 3",
-					"thumbnail":             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type":                  "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"id":                    fmt.Sprintf("%d", ids[0]),
-					"rarity":                "",
+					"name":      "Neo Motorcycle 1 of 3",
+					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"id":        fmt.Sprintf("%d", ids[0]),
+					"rarity":    "",
+					"scalars": map[string]interface{}{
+						"Speed": "100.00000000",
+					},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+					},
 					"editionNumber":         "1",
 					"totalInEdition":        "3",
 					"collectionName":        "user1",

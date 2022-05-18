@@ -1,6 +1,6 @@
 module github.com/findonflow/find
 
-go 1.17
+go 1.18
 
 require (
 	github.com/bjartek/overflow v0.0.0-20220407214147-f74f6ea0f10b
@@ -9,6 +9,7 @@ require (
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.23.3
 	github.com/stretchr/testify v1.7.1
+	github.com/typesense/typesense-go v0.4.0
 )
 
 require (
@@ -24,6 +25,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
+	github.com/deepmap/oapi-codegen v1.9.0 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
 	github.com/dgraph-io/ristretto v0.0.3-0.20200630154024-f66de99634de // indirect
 	github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 // indirect
@@ -94,6 +96,7 @@ require (
 	github.com/rivo/uniseg v0.2.1-0.20211004051800-57c86be7915a // indirect
 	github.com/rs/zerolog v1.26.1 // indirect
 	github.com/sethvargo/go-retry v0.1.0 // indirect
+	github.com/sony/gobreaker v0.5.0 // indirect
 	github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect

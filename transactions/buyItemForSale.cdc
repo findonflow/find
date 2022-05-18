@@ -42,8 +42,4 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		let vault <- self.walletReference.withdraw(amount: amount) 
 		self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
 	}
-
-	post {
-		self.walletReference.balance == self.balanceBeforeBid - amount
-	}
 }
