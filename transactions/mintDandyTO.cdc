@@ -32,7 +32,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
 
 		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
-		let scalar=FindViews.Scalar({"Speed km/hr" : 100.0})
+		let scalar=FindViews.Scalar({"Speed" : 100.0})
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
