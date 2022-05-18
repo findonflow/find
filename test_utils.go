@@ -251,7 +251,7 @@ func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 			String(name).
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 			"amount":     "10.00000000",
 			"status":     "active_listed",
 			"name":       name,
@@ -269,7 +269,7 @@ func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTest
 			String(name).
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 			"amount":     "10.00000000",
 			"status":     "active_listed",
 			"name":       name,
@@ -307,7 +307,7 @@ func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
 			UFix64(auctionDurationFloat).
 			UFix64(300.0)). //extention on late bid
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"amount":              "5.00000000",
 			"auctionReservePrice": "20.00000000",
 			"status":              "active_listed",
@@ -327,7 +327,7 @@ func (otu *OverflowTestUtils) bid(buyer, name string, amount float64) *OverflowT
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"amount":    fmt.Sprintf("%.8f", amount),
 			"endsAt":    endTimeSting,
 			"buyer":     otu.accountAddress(buyer),
@@ -348,7 +348,7 @@ func (otu *OverflowTestUtils) auctionBid(buyer, name string, amount float64) *Ov
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"amount":    fmt.Sprintf("%.8f", amount),
 			"endsAt":    endTimeSting,
 			"buyer":     otu.accountAddress(buyer),
@@ -563,7 +563,7 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),

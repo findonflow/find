@@ -34,7 +34,7 @@ func TestAuction(t *testing.T) {
 			listNameForSale("user1", "name1")
 
 		expected := []*overflow.FormatedEvent{
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
 				"buyerName":   "",
@@ -47,7 +47,7 @@ func TestAuction(t *testing.T) {
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
 				"buyerName":   "",
@@ -84,7 +84,7 @@ func TestAuction(t *testing.T) {
 			listNameForSale("user1", "name2")
 
 		expected := []*overflow.FormatedEvent{
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
 				"buyerName":   "",
@@ -97,7 +97,7 @@ func TestAuction(t *testing.T) {
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
 				"buyerName":   "",
@@ -110,7 +110,7 @@ func TestAuction(t *testing.T) {
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
 				"buyerName":   "",
@@ -161,7 +161,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.accountAddress("user1"),
 				"sellerName":  "user1",
@@ -202,7 +202,7 @@ func TestAuction(t *testing.T) {
 				String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
@@ -264,7 +264,7 @@ func TestAuction(t *testing.T) {
 				UFix64(amount)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"name":       "user1",
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
@@ -335,7 +335,7 @@ func TestAuction(t *testing.T) {
 				UFix64(4.0)).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":      "user1",
 				"seller":    otu.accountAddress("user1"),
 				"amount":    "8.00000000",
@@ -383,7 +383,7 @@ func TestAuction(t *testing.T) {
 				UFix64(4.0)).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
@@ -411,7 +411,7 @@ func TestAuction(t *testing.T) {
 				UFix64(3.0)).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
@@ -439,7 +439,7 @@ func TestAuction(t *testing.T) {
 				String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
@@ -546,7 +546,7 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
@@ -581,7 +581,7 @@ func TestAuction(t *testing.T) {
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
@@ -614,7 +614,7 @@ func TestAuction(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
 				"amount": "5.00000000",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
@@ -700,7 +700,7 @@ func TestAuction(t *testing.T) {
 				UFix64(auctionDurationFloat).
 				UFix64(300.0)). //extention on late bid
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       name,
 				"seller":     otu.accountAddress(name),
 				"sellerName": name,
