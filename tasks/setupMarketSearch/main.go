@@ -39,10 +39,12 @@ func main() {
 		{Name: "nft_id", Type: "int64"},
 		{Name: "nft_type", Type: "string", Facet: pointer.True()},
 		{Name: "nft_alias", Type: "string", Facet: pointer.True()},
-		{Name: "collection_name", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
-		{Name: "collection_alias", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
+		{Name: "collection_name", Type: "string", Facet: pointer.True()},
+		{Name: "collection_alias", Type: "string", Facet: pointer.True()},
 		{Name: "nft_name", Type: "string"},
 		{Name: "nft_thumbnail", Type: "string", Optional: pointer.True()},
+		{Name: "nft_edition", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
+		{Name: "nft_max_edition", Type: "string", Optional: pointer.True(), Facet: pointer.True()},
 		{Name: "nft_rarity", Type: "string", Facet: pointer.True(), Optional: pointer.True()},
 		{Name: "ends_at", Type: "int64", Optional: pointer.True()},
 		{Name: "auction_reserve_price", Type: "float", Optional: pointer.True()},
@@ -53,7 +55,6 @@ func main() {
 		{Name: "number_*", Type: "string", Facet: pointer.True()},
 		{Name: "updated_at", Type: "float"},
 	}
-
 	schema := &api.CollectionSchema{
 		Name:                "market",
 		Fields:              fields,

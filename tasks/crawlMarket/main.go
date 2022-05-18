@@ -216,13 +216,15 @@ type MarketEvent struct {
 		EndsAt              int64   `json:"endsAt,omitempty"`
 		ID                  uint64  `json:"id"`
 		Nft                 struct {
-			//TODO; fix to add new formats
-			Grouping  string `json:"grouping,omitempty"`
-			ID        uint64 `json:"id"`
-			Name      string `json:"name"`
-			Rarity    string `json:"rarity,omitempty"`
-			Thumbnail string `json:"thumbnail"`
-			Type      string `json:"type"`
+			ID                    uint64 `json:"id"`
+			Name                  string `json:"name"`
+			Rarity                string `json:"rarity,omitempty"`
+			Thumbnail             string `json:"thumbnail"`
+			Type                  string `json:"type"`
+			Edition               string `json:"editionNumber"`
+			MaxEdition            string `json:"totalInEdition,omitempty"`
+			CollectionName        string `json:"collectionName,omnitempty"`
+			CollectionDescription string `json:"collectionDescription,omitempty"`
 		} `json:"nft"`
 		Seller     string `json:"seller"`
 		SellerName string `json:"sellerName,omitempty"`
@@ -391,6 +393,17 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 
 	listingParts := strings.Split(".", item.FlowEventID)
 	listingAlias := listingParts[len(listingParts)]
+	collection := StringPointer(item.BlockEventData.Nft.CollectionName)
+
+	var collectionAlias = StringPointer(item.BlockEventData.Nft.CollectionDescription)
+
+	if collection == nil {
+		collection = &nameAlias
+	}
+
+	if collectionAlias == nil {
+		collectionAlias = &nameAlias
+	}
 
 	return map[string]interface{}{
 		"id":                    item.SearchId(),
@@ -407,10 +420,12 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 		"nft_name":              item.BlockEventData.Nft.Name,
 		"nft_type":              item.BlockEventData.Nft.Type,
 		"nft_alias":             nameAlias,
-		"collection_name":       StringPointer(item.BlockEventData.Nft.Grouping),
-		"collection_alias":      StringPointer(item.BlockEventData.Nft.Grouping),
+		"collection_name":       *collection,
+		"collection_alias":      *collectionAlias,
 		"nft_thumbnail":         StringPointer(item.BlockEventData.Nft.Thumbnail),
 		"nft_rarity":            StringPointer(item.BlockEventData.Nft.Rarity),
+		"nft_edition":           StringPointer(item.BlockEventData.Nft.Edition),
+		"nft_max_edition":       StringPointer(item.BlockEventData.Nft.MaxEdition),
 		"ends_at":               IntPointer(item.BlockEventData.EndsAt),
 		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
 		"listing_type":          item.FlowEventID,
