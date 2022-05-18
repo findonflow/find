@@ -216,15 +216,17 @@ type MarketEvent struct {
 		EndsAt              int64   `json:"endsAt,omitempty"`
 		ID                  uint64  `json:"id"`
 		Nft                 struct {
-			ID                    uint64 `json:"id"`
-			Name                  string `json:"name"`
-			Rarity                string `json:"rarity,omitempty"`
-			Thumbnail             string `json:"thumbnail"`
-			Type                  string `json:"type"`
-			Edition               string `json:"editionNumber"`
-			MaxEdition            string `json:"totalInEdition,omitempty"`
-			CollectionName        string `json:"collectionName,omnitempty"`
-			CollectionDescription string `json:"collectionDescription,omitempty"`
+			ID                    uint64             `json:"id"`
+			Name                  string             `json:"name"`
+			Rarity                string             `json:"rarity,omitempty"`
+			Thumbnail             string             `json:"thumbnail"`
+			Type                  string             `json:"type"`
+			Edition               string             `json:"editionNumber"`
+			MaxEdition            string             `json:"totalInEdition,omitempty"`
+			Scalars               map[string]float64 `json:"scalars,omnitempty"`
+			Tags                  map[string]string  `json:"tags,omnitempty"`
+			CollectionName        string             `json:"collectionName,omnitempty"`
+			CollectionDescription string             `json:"collectionDescription,omitempty"`
 		} `json:"nft"`
 		Seller     string `json:"seller"`
 		SellerName string `json:"sellerName,omitempty"`
@@ -405,7 +407,7 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 		collectionAlias = &nameAlias
 	}
 
-	return map[string]interface{}{
+	standard := map[string]interface{}{
 		"id":                    item.SearchId(),
 		"uuid":                  item.BlockEventData.ID,
 		"tenant":                item.BlockEventData.Tenant,
@@ -434,6 +436,15 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 		"updated_at":            item.EventDate,
 	}
 
+	for key, value := range item.BlockEventData.Nft.Scalars {
+		standard[fmt.Sprintf("number_%s", key)] = value
+	}
+
+	for key, value := range item.BlockEventData.Nft.Tags {
+		standard[fmt.Sprintf("string_%s", key)] = value
+	}
+
+	return standard
 }
 
 func (me MarketEvent) CreateDeleteQuery() *string {
