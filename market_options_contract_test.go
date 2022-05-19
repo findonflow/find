@@ -95,7 +95,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		assert.Equal(otu.T, expectedGhost, ghost)
 		assert.Equal(otu.T, expectedListings, listings)
 
-		err = otu.O.ScriptFromFile("name_status").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&findReport)
+		err = otu.O.ScriptFromFile("name_status").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&findReport)
 		assert.NoError(otu.T, err)
 
 		ghost = findReport.ItemsForSale["FindMarketDirectOfferSoft"].Ghosts
@@ -212,7 +212,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		assert.Equal(otu.T, expectedGhostAuctionEscrow, ghostAuctionEscrow)
 		assert.Equal(otu.T, expectedBids, bids)
 
-		err = otu.O.ScriptFromFile("name_status").Args(otu.O.Arguments().Account("user2")).RunMarshalAs(&findReport)
+		err = otu.O.ScriptFromFile("name_status").Args(otu.O.Arguments().String("user2")).RunMarshalAs(&findReport)
 		assert.NoError(otu.T, err)
 
 		err = json.Unmarshal([]byte(expectedGhostDirectOfferJson), &expectedGhostDirectOffer)
