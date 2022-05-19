@@ -227,9 +227,9 @@ type MarketEvent struct {
 			Type                  string             `json:"type"`
 			Edition               int64              `json:"editionNumber"`
 			MaxEdition            int64              `json:"totalInEdition,omitempty"`
-			Scalars               map[string]float64 `json:"scalars,omnitempty"`
-			Tags                  map[string]string  `json:"tags,omnitempty"`
-			CollectionName        string             `json:"collectionName,omnitempty"`
+			Scalars               map[string]float64 `json:"scalars,omitempty"`
+			Tags                  map[string]string  `json:"tags,omitempty"`
+			CollectionName        string             `json:"collectionName,omitempty"`
 			CollectionDescription string             `json:"collectionDescription,omitempty"`
 		} `json:"nft"`
 		Seller     string `json:"seller"`
