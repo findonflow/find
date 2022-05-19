@@ -425,12 +425,9 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		var report Report
 		var expectedGhost []GhostListing
 		var expectedListings []SaleItemInformation
-<<<<<<< HEAD
-		err := otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&findReport)
+
+		err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&report)
 		assert.NoError(otu.T, err)
-=======
-		otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&report)
->>>>>>> v2
 
 		err = json.Unmarshal([]byte(expectedListingsJson), &expectedListings)
 		assert.NoError(otu.T, err)
@@ -438,22 +435,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		err = json.Unmarshal([]byte(expectedGhostJson), &expectedGhost)
 		assert.NoError(otu.T, err)
 
-<<<<<<< HEAD
-		ghost := findReport.ItemsForSale["FindMarketDirectOfferSoft"].Ghosts
-		listings := findReport.ItemsForSale["FindMarketAuctionEscrow"].Items
-
-		assert.Equal(otu.T, expectedGhost, ghost)
-		assert.Equal(otu.T, expectedListings, listings)
-
-		err = otu.O.ScriptFromFile("name_status").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&findReport)
-		assert.NoError(otu.T, err)
-
-		ghost = findReport.ItemsForSale["FindMarketDirectOfferSoft"].Ghosts
-		listings = findReport.ItemsForSale["FindMarketAuctionEscrow"].Items
-=======
 		ghost := report.FINDReport.ItemsForSale["FindMarketDirectOfferSoft"].Ghosts
 		listings := report.FINDReport.ItemsForSale["FindMarketAuctionEscrow"].Items
->>>>>>> v2
 
 		assert.Equal(otu.T, expectedGhost, ghost)
 		assert.Equal(otu.T, expectedListings, listings)
@@ -546,8 +529,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		var expectedGhostDirectOffer []GhostListing
 		var expectedGhostAuctionEscrow []GhostListing
 		var expectedBids []BidInfo
-		
-		err :=otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user2")).RunMarshalAs(&report)
+
+		err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user2")).RunMarshalAs(&report)
 		assert.NoError(otu.T, err)
 
 		err = json.Unmarshal([]byte(expectedGhostDirectOfferJson), &expectedGhostDirectOffer)
