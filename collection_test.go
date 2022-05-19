@@ -87,7 +87,7 @@ func TestCollectionScripts(t *testing.T) {
 			registerDandyInNFTRegistry().
 			mintThreeExampleDandies()
 
-		result := otu.O.ScriptFromFile("collections").
+		result := otu.O.ScriptFromFile("getCollections").
 			Args(otu.O.Arguments().String("user1")).
 			RunReturnsJsonString()
 		fmt.Println(result)

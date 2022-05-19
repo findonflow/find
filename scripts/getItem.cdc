@@ -1,6 +1,6 @@
-
-import NeoViews from 0xb25138dbf45e5801
-import MetadataViews from 0x1d7e57aa55817448
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FIND from "../contracts/FIND.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
@@ -30,10 +30,16 @@ pub struct MetadataCollectionItem {
 }
 
 
-pub fun main(address: Address, path:PublicPath, id:UInt64) : MetadataCollectionItem?{
+pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
 
+	let nftInfo = NFTRegistry.getNFTInfo(aliasOrIdentifier) 
+	if nftInfo == nil {panic("This NFT is not registered in registry. input: ".concat(aliasOrIdentifier))}
+
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return nil}
+	let address = resolveAddress!
 	let account=getAccount(address)
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo!.publicPath)
 	if !resolverCollectionCap.check() {
 		return nil
 	}
@@ -45,8 +51,8 @@ pub fun main(address: Address, path:PublicPath, id:UInt64) : MetadataCollectionI
 		let display = displayView as! MetadataViews.Display
 
 		var externalUrl=""
-		if let externalUrlView = nft.resolveView(Type<NeoViews.ExternalDomainViewUrl>()) {
-			let edvu= externalUrlView! as! NeoViews.ExternalDomainViewUrl
+		if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
+			let edvu= externalUrlView! as! MetadataViews.ExternalURL
 			externalUrl=edvu.url
 		}
 		let item = MetadataCollectionItem(

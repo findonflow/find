@@ -21,7 +21,7 @@ func TestDandy(t *testing.T) {
 		dandyIds := otu.mintThreeExampleDandies()
 
 		id := dandyIds[0]
-		res := otu.O.ScriptFromFile("NFTViews").Args(otu.O.Arguments().String("user1").String("Dandy").UInt64(id)).RunReturnsJsonString()
+		res := otu.O.ScriptFromFile("getNFTViews").Args(otu.O.Arguments().String("user1").String("Dandy").UInt64(id)).RunReturnsJsonString()
 		assert.JSONEq(t, `[
 									"A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
 									"A.f8d6e0586b0a20c7.FindViews.Nounce",
@@ -48,7 +48,7 @@ func TestDandy(t *testing.T) {
 							 }
 							`
 
-		result := otu.O.ScriptFromFile("NFTView").Args(otu.O.Arguments().
+		result := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
 			String("user1").
 			String("Dandy").
 			UInt64(id).
@@ -59,7 +59,7 @@ func TestDandy(t *testing.T) {
 		{ "url" : "https://find.xyz/collection/user1/dandy/110"}
 
 		`
-		urlResult := otu.O.ScriptFromFile("NFTView").Args(otu.O.Arguments().
+		urlResult := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
 			String("user1").
 			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).

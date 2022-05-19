@@ -113,7 +113,7 @@ func TestFIND(t *testing.T) {
 			expireLease().
 			tickClock(2.0)
 
-		value := otu.O.ScriptFromFile("status").Args(otu.O.Arguments().String("user1")).RunReturnsInterface()
+		value := otu.O.ScriptFromFile("getNameStatus").Args(otu.O.Arguments().String("user1")).RunReturnsInterface()
 		assert.Equal(t, "", value)
 
 	})

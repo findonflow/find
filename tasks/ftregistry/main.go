@@ -29,12 +29,12 @@ func main() {
 		RunPrintEventsFull()
 
 	// get Info by Alias
-	o.ScriptFromFile("getFTInfoByAlias").
+	o.ScriptFromFile("getFTInfo").
 		Args(o.Arguments().String("Flow")).
 		Run()
 
 	// get Info by TypeIdentifier
-	o.ScriptFromFile("getFTInfoByTypeIdentifier").
+	o.ScriptFromFile("getFTInfo").
 		Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
 		Run()
 
