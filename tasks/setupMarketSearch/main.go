@@ -51,8 +51,8 @@ func main() {
 		{Name: "listing_alias", Type: "string", Facet: pointer.True()},
 		{Name: "transaction_hash", Type: "string", Facet: pointer.True()},
 		{Name: "status", Type: "string", Facet: pointer.True()},
-		{Name: "string_*", Type: "string", Facet: pointer.True()},
-		{Name: "number_*", Type: "float", Facet: pointer.True()},
+		{Name: "string_.*", Type: "string", Facet: pointer.True()},
+		{Name: "number_.*", Type: "float", Facet: pointer.True()},
 		{Name: "updated_at", Type: "float"},
 	}
 	schema := &api.CollectionSchema{
