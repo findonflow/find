@@ -12,5 +12,5 @@ func main() {
 
 	account := os.Getenv("account")
 
-	o.ScriptFromFile("collections").Args(o.Arguments().RawAccount(account)).Run()
+	o.ScriptFromFile("getCollections").Args(o.Arguments().RawAccount(account)).Run()
 }

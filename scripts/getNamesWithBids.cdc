@@ -1,8 +1,11 @@
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: Address) : [FIND.LeaseInformation] {
+pub fun main(user: String) : [FIND.LeaseInformation] {
 
-	let account=getAccount(user)
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return []}
+	let address = resolveAddress!
+	let account=getAccount(address)
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 	let leases=leaseCap.borrow()?.getLeaseInformation() ?? []

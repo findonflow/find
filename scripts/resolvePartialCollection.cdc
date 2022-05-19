@@ -2,6 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 pub struct ViewCollectionPointer {
 	access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
@@ -113,8 +114,11 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address, aliases: [String], ids:[UInt64]) : [MetadataCollectionItem] {
+pub fun main(user: String, aliases: [String], ids:[UInt64]) : [MetadataCollectionItem] {
 
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return []}
+	let address = resolveAddress!
 	var pointerMap: {String : ViewCollectionPointer} = {}
 
 	var resultMap : [MetadataCollectionItem] = []

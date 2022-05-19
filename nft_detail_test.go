@@ -208,7 +208,7 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedAuctionSoftStruct []SaleItemInformation
 		var expectedDirectOfferEscrowStruct []SaleItemInformation
 		var expectedDirectOfferSoftStruct []SaleItemInformation
-		otu.O.ScriptFromFile("getListingsByAddress").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&itemForSaleStruct)
+		otu.O.ScriptFromFile("getListings").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&itemForSaleStruct)
 
 		json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
 		json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
@@ -221,20 +221,6 @@ func TestNFTDetailScript(t *testing.T) {
 		FindMarketAuctionSoft := itemForSaleStruct["FindMarketAuctionSoft"].Items
 		FindMarketDirectOfferEscrow := itemForSaleStruct["FindMarketDirectOfferEscrow"].Items
 		FindMarketDirectOfferSoft := itemForSaleStruct["FindMarketDirectOfferSoft"].Items
-
-		assert.Equal(otu.T, expectedSaleStruct, FindMarketSale)
-		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
-		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
-		assert.Equal(otu.T, expectedDirectOfferEscrowStruct, FindMarketDirectOfferEscrow)
-		assert.Equal(otu.T, expectedDirectOfferSoftStruct, FindMarketDirectOfferSoft)
-
-		otu.O.ScriptFromFile("getListingsByName").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&itemForSaleStruct)
-
-		FindMarketSale = itemForSaleStruct["FindMarketSale"].Items
-		FindMarketAuctionEscrow = itemForSaleStruct["FindMarketAuctionEscrow"].Items
-		FindMarketAuctionSoft = itemForSaleStruct["FindMarketAuctionSoft"].Items
-		FindMarketDirectOfferEscrow = itemForSaleStruct["FindMarketDirectOfferEscrow"].Items
-		FindMarketDirectOfferSoft = itemForSaleStruct["FindMarketDirectOfferSoft"].Items
 
 		assert.Equal(otu.T, expectedSaleStruct, FindMarketSale)
 		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
@@ -376,7 +362,7 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedSaleStruct []SaleItemInformation
 		var expectedAuctionEscrowStruct []SaleItemInformation
 		var expectedAuctionSoftStruct []SaleItemInformation
-		otu.O.ScriptFromFile("resolveListingByAddress").Args(otu.O.Arguments().Account("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
 
 		json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
 		json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
@@ -385,16 +371,6 @@ func TestNFTDetailScript(t *testing.T) {
 		FindMarketSale := itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow := itemForSaleStruct["FindMarketAuctionEscrow"].Items
 		FindMarketAuctionSoft := itemForSaleStruct["FindMarketAuctionSoft"].Items
-
-		assert.Equal(otu.T, expectedSaleStruct, FindMarketSale)
-		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
-		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
-
-		otu.O.ScriptFromFile("resolveListingByName").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
-
-		FindMarketSale = itemForSaleStruct["FindMarketSale"].Items
-		FindMarketAuctionEscrow = itemForSaleStruct["FindMarketAuctionEscrow"].Items
-		FindMarketAuctionSoft = itemForSaleStruct["FindMarketAuctionSoft"].Items
 
 		assert.Equal(otu.T, expectedSaleStruct, FindMarketSale)
 		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)

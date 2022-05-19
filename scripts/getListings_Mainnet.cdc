@@ -1,3 +1,5 @@
+import FIND from "../contracts/FIND.cdc"
+
 import NFTStorefront from 0x4eb8a10cb9f87357
 import Marketplace from 0xd796ff17107bbff6
 import Art from 0xd796ff17107bbff6
@@ -23,7 +25,11 @@ pub struct Listing {
 	}
 }
 
-pub fun main(address: Address): {UInt64 :[Listing]} {
+pub fun main(user: String): {UInt64 :[Listing]} {
+
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return {}}
+	let address = resolveAddress!
 	let account=getAccount(address)
 	let storefrontRef = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath).borrow()!
 

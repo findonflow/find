@@ -67,6 +67,16 @@ pub contract NFTRegistry {
 			return nil
     }
 
+    pub fun getNFTInfo(_ input: String) : NFTInfo? {
+        if let info = self.getNFTInfoByAlias(input) {
+            return info
+        }
+        if let info = self.getNFTInfoByTypeIdentifier(input) {
+            return info
+        }
+        return nil
+    }
+
     pub fun getTypeIdentifier(_ alias: String) : String? {
         return NFTRegistry.aliasMap[alias]
     }

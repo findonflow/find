@@ -20,7 +20,7 @@ func TestNFTRegistry(t *testing.T) {
 			registerDandyInNFTRegistry()
 
 		o := otu.O
-		result := o.ScriptFromFile("getNFTInfoByTypeIdentifier").
+		result := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 			RunReturnsInterface()
 
@@ -49,7 +49,7 @@ func TestNFTRegistry(t *testing.T) {
 			registerDandyInNFTRegistry()
 
 		o := otu.O
-		result := o.ScriptFromFile("getNFTInfoByAlias").
+		result := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
 
@@ -119,12 +119,12 @@ func TestNFTRegistry(t *testing.T) {
 			removeDandyInNFtRegistry("removeNFTInfoByAlias", "Dandy")
 
 		o := otu.O
-		aliasResult := o.ScriptFromFile("getNFTInfoByAlias").
+		aliasResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
 		assert.Equal(t, "", aliasResult)
 
-		infoResult := o.ScriptFromFile("getNFTInfoByAlias").
+		infoResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
 		assert.Equal(t, "", infoResult)
@@ -138,12 +138,12 @@ func TestNFTRegistry(t *testing.T) {
 			removeDandyInNFtRegistry("removeNFTInfoByTypeIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT")
 
 		o := otu.O
-		aliasResult := o.ScriptFromFile("getNFTInfoByTypeIdentifier").
+		aliasResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 			RunReturnsInterface()
 		assert.Equal(t, "", aliasResult)
 
-		infoResult := o.ScriptFromFile("getNFTInfoByAlias").
+		infoResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
 		assert.Equal(t, "", infoResult)
