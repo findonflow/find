@@ -22,7 +22,7 @@ dev:
 	gotestsum -f testname --watch
 
 client: 
-	go run overflow/main.go > lib/find.json
+	go run tasks/client/main.go > lib/find.json
 
 publish:
 	cd lib && npm publish && cd ..
