@@ -258,7 +258,7 @@ func (me MarketEvent) IsRemoved() bool {
 
 func (item MarketEvent) ToSoldItem() map[string]interface{} {
 	market := item.ToMarketItem()
-	market["id"] = fmt.Sprintf("%s-%d", item.FlowEventID, item.BlockEventData.ID)
+	market["id"] = fmt.Sprintf("%s-%d", item.ID, item.BlockEventData.ID)
 	return market
 }
 
@@ -405,9 +405,8 @@ func FloatPoitner(value float64) *float64 {
 }
 
 func (item NameEvent) ToSoldItem() map[string]interface{} {
-
 	market := item.ToMarketItem()
-	market["id"] = fmt.Sprintf("%s-%s", item.FlowEventID, item.BlockEventData.Name)
+	market["id"] = fmt.Sprintf("%s-%s", item.ID, item.BlockEventData.Name)
 	return market
 }
 
