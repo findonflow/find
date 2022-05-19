@@ -1,0 +1,65 @@
+on:
+  push:
+    branches:
+      - main
+
+name: ci
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          args: --timeout=3m
+
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.*'
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - uses: zencargo/github-action-go-mod-tidy@v1
+        with:
+          go-version: 1.18  
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TESTNET_ACCOUNT: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      MAINNET_FIND: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      MAINNET_FIND_ADMIN: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.*'
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: run tests
+        run: go test -json ./... > test.json
+      - name: Annotate tests
+        if: always()
+        uses: guyarb/golang-test-annotations@v0.5.0
+        with:
+          test-results: test.json
+
