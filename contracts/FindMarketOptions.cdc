@@ -1,5 +1,6 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import Clock from "../contracts/Clock.cdc"
 
 // Contract to store all helper functions. 
 pub contract FindMarketOptions {
@@ -134,7 +135,7 @@ pub contract FindMarketOptions {
                 }
 
                 if let validTime = item.getValidUntil() {
-                    if validTime >= getCurrentBlock().timestamp{
+                    if validTime >= Clock.time() {
                         status="ended"
                     }
                 }
@@ -229,7 +230,7 @@ pub contract FindMarketOptions {
                     }
                     continue
                 } 
-                let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: getCurrentBlock().timestamp, item:item!)
+                let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: Clock.time(), item:item!)
                 info.append(bidInfo)
             }
         }

@@ -205,7 +205,7 @@ pub contract FindMarketAuctionSoft {
 										  reservePrice: self.auctionReservePrice, 
 										  extentionOnLateBid: self.auctionExtensionOnLateBid ,
 										  auctionEndsAt: self.auctionEndsAt ,
-										  timestamp: getCurrentBlock().timestamp)
+										  timestamp: Clock.time())
 		}
 
 		pub fun getFtType() : Type {
