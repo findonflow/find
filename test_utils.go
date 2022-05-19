@@ -534,13 +534,14 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
-	otu.O.ScriptFromFile("getCheckRoyalty").
+	err := otu.O.ScriptFromFile("getCheckRoyalty").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
 			String(nftAlias).
 			String("A.f8d6e0586b0a20c7.MetadataViews.Royalties")).
 		RunMarshalAs(&royalty)
+	assert.NoError(otu.T, err)
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
@@ -918,8 +919,12 @@ type Royalty struct {
 }
 
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
+
 	var findReport Report
-	otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(name)).RunMarshalAs(&findReport)
+	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(name)).RunMarshalAs(&findReport)
+	if err != nil {
+		//TODO : Swallow the error.
+	}
 	var list []SaleItemInformation
 	for _, saleItemCollectionReport := range findReport.FINDReport.ItemsForSale {
 		list = append(list, saleItemCollectionReport.Items...)
@@ -1073,10 +1078,10 @@ type NameReport struct {
 }
 
 type FINDReport struct {
-	Profile         string                               `json:"profile"`
-	Bids            string                               `json:"bids"`
-	RelatedAccounts string                               `json:"relatedAccounts"`
-	Leases          string                               `json:"leases"`
+	Profile         interface{}                          `json:"profile"`
+	Bids            []interface{}                        `json:"bids"`
+	RelatedAccounts map[string]interface{}               `json:"relatedAccounts"`
+	Leases          []interface{}                        `json:"leases"`
 	PrivateMode     string                               `json:"privateMode"`
 	ItemsForSale    map[string]SaleItemCollectionReport  `json:"itemsForSale"`
 	MarketBids      map[string]MarketBidCollectionPublic `json:"marketBids"`
@@ -1101,22 +1106,22 @@ type BidInfo struct {
 }
 
 type SaleItemInformation struct {
-	NftIdentifier         string      `json:"nftIdentifier"`
-	NftId                 string      `json:"nftId"`
-	Seller                string      `json:"seller"`
-	SellerName            string      `json:"sellerName"`
-	Amount                string      `json:"amount"`
-	Bidder                string      `json:"bidder"`
-	BidderName            string      `json:"bidderName"`
-	ListingId             string      `json:"listingId"`
-	SaleType              string      `json:"saleType"`
-	ListingTypeIdentifier string      `json:"listingTypeIdentifier"`
-	FtAlias               string      `json:"ftAlias"`
-	FtTypeIdentifier      string      `json:"ftTypeIdentifier"`
-	ListingValidUntil     string      `json:"listingValidUntil"`
-	Nft                   NFTInfo     `json:"nft"`
-	Auction               AuctionItem `json:"auction"`
-	ListingStatus         string      `json:"listingStatus"`
+	NftIdentifier         string       `json:"nftIdentifier"`
+	NftId                 string       `json:"nftId"`
+	Seller                string       `json:"seller"`
+	SellerName            string       `json:"sellerName"`
+	Amount                string       `json:"amount"`
+	Bidder                string       `json:"bidder"`
+	BidderName            string       `json:"bidderName"`
+	ListingId             string       `json:"listingId"`
+	SaleType              string       `json:"saleType"`
+	ListingTypeIdentifier string       `json:"listingTypeIdentifier"`
+	FtAlias               string       `json:"ftAlias"`
+	FtTypeIdentifier      string       `json:"ftTypeIdentifier"`
+	ListingValidUntil     string       `json:"listingValidUntil"`
+	Nft                   NFTInfo      `json:"nft"`
+	Auction               *AuctionItem `json:"auction,omitempty"`
+	ListingStatus         string       `json:"listingStatus"`
 }
 
 type NFTInfo struct {

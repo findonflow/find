@@ -105,7 +105,10 @@ func main() {
 			}
 		}
 		log.Println("Writing progress to file")
-		writeProgressToFile(progressFile, now)
+		err = writeProgressToFile(progressFile, now)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 func writeProgressToFile(fileName string, blockHeight int64) error {
@@ -224,9 +227,9 @@ type MarketEvent struct {
 			Type                  string             `json:"type"`
 			Edition               int64              `json:"editionNumber"`
 			MaxEdition            int64              `json:"totalInEdition,omitempty"`
-			Scalars               map[string]float64 `json:"scalars,omnitempty"`
-			Tags                  map[string]string  `json:"tags,omnitempty"`
-			CollectionName        string             `json:"collectionName,omnitempty"`
+			Scalars               map[string]float64 `json:"scalars,omitempty"`
+			Tags                  map[string]string  `json:"tags,omitempty"`
+			CollectionName        string             `json:"collectionName,omitempty"`
 			CollectionDescription string             `json:"collectionDescription,omitempty"`
 		} `json:"nft"`
 		Seller     string `json:"seller"`
@@ -315,11 +318,11 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 	}
 
 	for key, value := range item.BlockEventData.Nft.Scalars {
-		standard[fmt.Sprintf("number_%s", key)] = value
+		standard[strings.ToLower(fmt.Sprintf("number.%s", key))] = value
 	}
 
 	for key, value := range item.BlockEventData.Nft.Tags {
-		standard[fmt.Sprintf("string_%s", key)] = value
+		standard[strings.ToLower(fmt.Sprintf("string.%s", key))] = value
 	}
 
 	return standard

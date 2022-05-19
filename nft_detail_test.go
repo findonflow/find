@@ -208,13 +208,19 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedAuctionSoftStruct []SaleItemInformation
 		var expectedDirectOfferEscrowStruct []SaleItemInformation
 		var expectedDirectOfferSoftStruct []SaleItemInformation
-		otu.O.ScriptFromFile("getListings").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&itemForSaleStruct)
+		err := otu.O.ScriptFromFile("getListings").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&itemForSaleStruct)
+		swallowErr(err)
 
-		json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
-		json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
-		json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
-		json.Unmarshal([]byte(expectedDirectOfferEscrow), &expectedDirectOfferEscrowStruct)
-		json.Unmarshal([]byte(expectedDirectOfferSoft), &expectedDirectOfferSoftStruct)
+		err = json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
+		swallowErr(err)
+		err = json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
+		swallowErr(err)
+		err = json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
+		swallowErr(err)
+		err = json.Unmarshal([]byte(expectedDirectOfferEscrow), &expectedDirectOfferEscrowStruct)
+		swallowErr(err)
+		err = json.Unmarshal([]byte(expectedDirectOfferSoft), &expectedDirectOfferSoftStruct)
+		swallowErr(err)
 
 		FindMarketSale := itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow := itemForSaleStruct["FindMarketAuctionEscrow"].Items
@@ -227,7 +233,6 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
 		assert.Equal(otu.T, expectedDirectOfferEscrowStruct, FindMarketDirectOfferEscrow)
 		assert.Equal(otu.T, expectedDirectOfferSoftStruct, FindMarketDirectOfferSoft)
-
 	})
 
 	t.Run("Should be able to get the nft and auction detail of an NFT by a script. ", func(t *testing.T) {
@@ -362,11 +367,15 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedSaleStruct []SaleItemInformation
 		var expectedAuctionEscrowStruct []SaleItemInformation
 		var expectedAuctionSoftStruct []SaleItemInformation
-		otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		err := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		swallowErr(err)
 
-		json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
-		json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
-		json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
+		err = json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
+		swallowErr(err)
+		err = json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
+		swallowErr(err)
+		err = json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
+		swallowErr(err)
 
 		FindMarketSale := itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow := itemForSaleStruct["FindMarketAuctionEscrow"].Items
@@ -375,7 +384,9 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.Equal(otu.T, expectedSaleStruct, FindMarketSale)
 		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
 		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
-
 	})
 
+}
+
+func swallowErr(err error) {
 }
