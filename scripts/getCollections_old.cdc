@@ -1,5 +1,6 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import CharityNFT from "../contracts/CharityNFT.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 //mainnet
 import Beam from 0x86b4a0010a71cfc3 
@@ -104,8 +105,13 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address) : MetadataCollections? {
+pub fun main(user: String) : MetadataCollections? {
 
+	let resolvingAddress = FIND.resolve(user)
+	if resolvingAddress == nil {
+		return nil
+	}
+	let address = resolvingAddress!
 	let resultMap : {String : MetadataCollectionItem} = {}
 	let account = getAccount(address)
 	let results : {String :  [String]}={}

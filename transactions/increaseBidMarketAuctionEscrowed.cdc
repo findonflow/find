@@ -39,8 +39,5 @@ transaction(id: UInt64, amount: UFix64) {
 		self.bidsReference!.increaseBid(id: id, vault: <- vault)
 	}
 
-	post {
-		self.walletReference.balance == self.balanceBeforeBid - amount
-	}
 }
 

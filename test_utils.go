@@ -534,7 +534,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
-	err := otu.O.ScriptFromFile("checkRoyalty").
+	err := otu.O.ScriptFromFile("getCheckRoyalty").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
@@ -919,15 +919,15 @@ type Royalty struct {
 }
 
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
-	var findReport FINDReport
-	err := otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&findReport)
+
+	var findReport Report
+	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(name)).RunMarshalAs(&findReport)
 	if err != nil {
 		//TODO : Swallow the error.
 	}
 	var list []SaleItemInformation
-	for _, saleItemCollectionReport := range findReport.ItemsForSale {
+	for _, saleItemCollectionReport := range findReport.FINDReport.ItemsForSale {
 		list = append(list, saleItemCollectionReport.Items...)
-
 	}
 	return list
 
@@ -1065,6 +1065,16 @@ type SaleItem struct {
 	SaleType            string `json:"saleType"`
 	Type                string `json:"type"`
 	TypeID              string `json:"typeId"`
+}
+
+type Report struct {
+	FINDReport FINDReport `json:"FINDReport"`
+	NameReport NameReport `json:"NameReport"`
+}
+
+type NameReport struct {
+	Status string `json:"status"`
+	Cost   string `json:"cost"`
 }
 
 type FINDReport struct {

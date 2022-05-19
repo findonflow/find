@@ -1,3 +1,5 @@
+import FIND from "../contracts/FIND.cdc"
+
 import StarlyCard from 0x5b82f21c0edf76e3
 import StarlyMetadataViews from 0x5b82f21c0edf76e3
 import MetadataViews from 0x1d7e57aa55817448
@@ -25,8 +27,11 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address) : [MetadataCollectionItem] {
+pub fun main(user: String) : [MetadataCollectionItem] {
 
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return []}
+	let address = resolveAddress!
 	let account=getAccount(address)
 	let items: [MetadataCollectionItem] = []
 	let resolverCollectionCap= account.getCapability<&{StarlyCard.StarlyCardCollectionPublic}>(StarlyCard.CollectionPublicPath)

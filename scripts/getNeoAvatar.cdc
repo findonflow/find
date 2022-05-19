@@ -1,3 +1,5 @@
+import FIND from "../contracts/FIND.cdc"
+
 import NeoAvatar from 0xb25138dbf45e5801
 import NeoViews from 0xb25138dbf45e5801
 import MetadataViews from 0x1d7e57aa55817448
@@ -25,8 +27,11 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address) : [MetadataCollectionItem] {
+pub fun main(user: String) : [MetadataCollectionItem] {
 
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return []}
+	let address = resolveAddress!
 	let account=getAccount(address)
 
 	return getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, account:account)

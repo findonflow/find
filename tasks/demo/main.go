@@ -96,8 +96,8 @@ func main() {
 		Args(o.Arguments().String("user1").UFix64(10.0)).
 		RunPrintEventsFull()
 
-	o.ScriptFromFile("address_status").
-		Args(o.Arguments().Account("user2")).
+	o.ScriptFromFile("getStatus").
+		Args(o.Arguments().String("user2")).
 		Run()
 
 	/*
