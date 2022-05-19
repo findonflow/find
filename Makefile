@@ -1,9 +1,12 @@
 all: dev
 
-.PHONY: setup deploy emulator test dev contract contract_publish client
+.PHONY: setup deploy emulator test dev contract contract_publish client lint
 
 setup: deploy
 	go run ./tasks/setup/main.go
+
+lint:
+	golangci-lint run 
 
 #this goal deployes all the contracts to emulator
 deploy:
