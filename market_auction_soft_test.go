@@ -217,7 +217,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertSuccess()
@@ -281,7 +281,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
@@ -330,7 +330,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(1.0)).
 			Test(otu.T).AssertFailure("You need to bid more then the starting price of 10.00000000")
@@ -351,7 +351,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(5.0)).
 			Test(otu.T).AssertFailure("bid 5.00000000 must be larger then previous bid+bidIncrement 16.00000000")

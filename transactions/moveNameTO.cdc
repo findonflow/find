@@ -5,19 +5,23 @@ import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 
-transaction(name: String, receiverAddress:Address) {
+transaction(name: String, receiver:String) {
 
 
-	let receiverAddress:Address
+	let receiverAddress:Address?
 	let sender : &FIND.LeaseCollection
 
 	prepare(acct: AuthAccount) {
 		self.sender= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		self.receiverAddress=receiverAddress
+		self.receiverAddress=FIND.resolve(receiver)
 	} 
 
+	pre{
+		self.receiverAddress != nil : "The input pass in is not a valid name or address. Input : ".concat(receiver)
+	}
+
 	execute {
-		let receiver=getAccount(self.receiverAddress)
+		let receiver=getAccount(self.receiverAddress!)
 		let receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let receiverProfile = receiver.getCapability<&{Profile.Public}>(Profile.publicPath)
 

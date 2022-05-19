@@ -132,7 +132,7 @@ func TestFTRegistry(t *testing.T) {
 			})
 
 		o := otu.O
-		o.TransactionFromFile("setFTInfo_flow").
+		o.TransactionFromFile("adminSetFTInfo_flow").
 			SignProposeAndPayAs("find").
 			Args(o.Arguments()).
 			Test(t).
@@ -146,7 +146,7 @@ func TestFTRegistry(t *testing.T) {
 				"alias":          "Flow",
 				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}).
-			removeFTInFtRegistry("removeFTInfoByAlias", "Flow",
+			removeFTInFtRegistry("adminRemoveFTInfoByAlias", "Flow",
 				"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
 					"alias":          "Flow",
 					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
@@ -172,7 +172,7 @@ func TestFTRegistry(t *testing.T) {
 				"alias":          "Flow",
 				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}).
-			removeFTInFtRegistry("removeFTInfoByTypeIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			removeFTInFtRegistry("adminRemoveFTInfoByTypeIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
 					"alias":          "Flow",
 					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",

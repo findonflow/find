@@ -6,8 +6,9 @@ import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FIND from "../contracts/FIND.cdc"
 
-transaction(address: Address, nftAlias: String, id: UInt64, ftAlias:String, amount: UFix64) {
+transaction(user: String, nftAlias: String, id: UInt64, ftAlias:String, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -18,6 +19,10 @@ transaction(address: Address, nftAlias: String, id: UInt64, ftAlias:String, amou
 
 	prepare(account: AuthAccount) {
 		
+		let resolveAddress = FIND.resolve(user)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let address = resolveAddress!
+
 		let nft = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")
 		let ft = FTRegistry.getFTInfoByAlias(ftAlias) ?? panic("This FT is not supported by the Find Market yet")
 

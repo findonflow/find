@@ -4,9 +4,12 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(name: String, amount: UFix64, recipient: Address) {
+transaction(name: String, amount: UFix64, recipient: String) {
 	prepare(acct: AuthAccount) {
 
+		let resolveAddress = FIND.resolve(recipient)
+		if resolveAddress == nil {panic("The input pass in is not a valid name or address. Input : ".concat(recipient))}
+		let address = resolveAddress!
 		let price=FIND.calculateCost(name)
 		if price != amount {
 			panic("Calculated cost does not match expected cost")
@@ -19,7 +22,7 @@ transaction(name: String, amount: UFix64, recipient: Address) {
 		let leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 		leases.register(name: name, vault: <- payVault)
 
-		let receiver = getAccount(recipient)
+		let receiver = getAccount(address)
 		let receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let receiverProfile = receiver.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !receiverLease.check() {
