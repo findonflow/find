@@ -425,10 +425,15 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		var report Report
 		var expectedGhost []GhostListing
 		var expectedListings []SaleItemInformation
-		otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&report)
 
-		json.Unmarshal([]byte(expectedListingsJson), &expectedListings)
-		json.Unmarshal([]byte(expectedGhostJson), &expectedGhost)
+		err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&report)
+		assert.NoError(otu.T, err)
+
+		err = json.Unmarshal([]byte(expectedListingsJson), &expectedListings)
+		assert.NoError(otu.T, err)
+
+		err = json.Unmarshal([]byte(expectedGhostJson), &expectedGhost)
+		assert.NoError(otu.T, err)
 
 		ghost := report.FINDReport.ItemsForSale["FindMarketDirectOfferSoft"].Ghosts
 		listings := report.FINDReport.ItemsForSale["FindMarketAuctionEscrow"].Items
@@ -524,11 +529,18 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		var expectedGhostDirectOffer []GhostListing
 		var expectedGhostAuctionEscrow []GhostListing
 		var expectedBids []BidInfo
-		otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user2")).RunMarshalAs(&report)
 
-		json.Unmarshal([]byte(expectedGhostDirectOfferJson), &expectedGhostDirectOffer)
-		json.Unmarshal([]byte(expectedGhostAuctionEscrowJson), &expectedGhostAuctionEscrow)
-		json.Unmarshal([]byte(expectedBidsJson), &expectedBids)
+		err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user2")).RunMarshalAs(&report)
+		assert.NoError(otu.T, err)
+
+		err = json.Unmarshal([]byte(expectedGhostDirectOfferJson), &expectedGhostDirectOffer)
+		assert.NoError(otu.T, err)
+
+		err = json.Unmarshal([]byte(expectedGhostAuctionEscrowJson), &expectedGhostAuctionEscrow)
+		assert.NoError(otu.T, err)
+
+		err = json.Unmarshal([]byte(expectedBidsJson), &expectedBids)
+		assert.NoError(otu.T, err)
 
 		ghostDirectOffer := report.FINDReport.MarketBids["FindMarketDirectOfferSoft"].Ghosts
 		ghostAuctionEscrow := report.FINDReport.MarketBids["FindMarketAuctionEscrow"].Ghosts
@@ -537,5 +549,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		assert.Equal(otu.T, expectedGhostDirectOffer, ghostDirectOffer)
 		assert.Equal(otu.T, expectedGhostAuctionEscrow, ghostAuctionEscrow)
 		assert.Equal(otu.T, expectedBids, bids)
+
 	})
 }
