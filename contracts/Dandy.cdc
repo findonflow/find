@@ -114,7 +114,7 @@ pub contract Dandy: NonFungibleToken {
 
 			let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
 			royalties.append(royalty)
-		
+
 			return MetadataViews.Royalties(cutInfos:royalties)
 		}
 
@@ -162,13 +162,13 @@ pub contract Dandy: NonFungibleToken {
 
 			if type == Type<FindViews.NFTCollectionData>() {
 				return FindViews.NFTCollectionData(storagePath: Dandy.CollectionStoragePath,
-													publicPath: Dandy.CollectionPublicPath,
-													providerPath: Dandy.CollectionPrivatePath,
-													publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-													publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-													providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-													createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()})
-													}
+				publicPath: Dandy.CollectionPublicPath,
+				providerPath: Dandy.CollectionPrivatePath,
+				publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+				publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+				providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()})
+			}
 
 			if type == Type<MinterPlatform>() {
 				return self.minterPlatform
@@ -300,7 +300,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun borrow(_ id: UInt64): &NFT {
-				pre {
+			pre {
 				self.ownedNFTs[id] != nil : "NFT does not exist"
 			}
 			let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT

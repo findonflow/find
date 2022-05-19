@@ -222,8 +222,8 @@ type MarketEvent struct {
 			Rarity                string             `json:"rarity,omitempty"`
 			Thumbnail             string             `json:"thumbnail"`
 			Type                  string             `json:"type"`
-			Edition               string             `json:"editionNumber"`
-			MaxEdition            string             `json:"totalInEdition,omitempty"`
+			Edition               int64              `json:"editionNumber"`
+			MaxEdition            int64              `json:"totalInEdition,omitempty"`
 			Scalars               map[string]float64 `json:"scalars,omnitempty"`
 			Tags                  map[string]string  `json:"tags,omnitempty"`
 			CollectionName        string             `json:"collectionName,omnitempty"`
@@ -258,20 +258,20 @@ func (me MarketEvent) IsRemoved() bool {
 
 func (item MarketEvent) ToSoldItem() map[string]interface{} {
 	market := item.ToMarketItem()
-	market["id"] = fmt.Sprintf("%s-%d", item.FlowEventID, item.BlockEventData.ID)
+	market["id"] = fmt.Sprintf("%s-%d", item.ID, item.BlockEventData.ID)
 	return market
 }
 
 func (item MarketEvent) ToMarketItem() map[string]interface{} {
 
-	amountParts := strings.Split(".", item.BlockEventData.VaultType)
-	amountAlias := amountParts[len(amountParts)-1]
+	amountParts := strings.Split(item.BlockEventData.VaultType, ".")
+	amountAlias := amountParts[len(amountParts)-2]
 
-	nameParts := strings.Split(".", item.BlockEventData.Nft.Type)
-	nameAlias := amountParts[len(nameParts)-1]
+	nameParts := strings.Split(item.BlockEventData.Nft.Type, ".")
+	nameAlias := amountParts[len(nameParts)-2]
 
-	listingParts := strings.Split(".", item.FlowEventID)
-	listingAlias := listingParts[len(listingParts)]
+	listingParts := strings.Split(item.FlowEventID, ".")
+	listingAlias := listingParts[len(listingParts)-1]
 	collection := StringPointer(item.BlockEventData.Nft.CollectionName)
 
 	var collectionAlias = StringPointer(item.BlockEventData.Nft.CollectionDescription)
@@ -303,15 +303,15 @@ func (item MarketEvent) ToMarketItem() map[string]interface{} {
 		"collection_alias":      *collectionAlias,
 		"nft_thumbnail":         StringPointer(item.BlockEventData.Nft.Thumbnail),
 		"nft_rarity":            StringPointer(item.BlockEventData.Nft.Rarity),
-		"nft_edition":           StringPointer(item.BlockEventData.Nft.Edition),
-		"nft_max_edition":       StringPointer(item.BlockEventData.Nft.MaxEdition),
+		"nft_edition":           IntPointer(item.BlockEventData.Nft.Edition),
+		"nft_max_edition":       IntPointer(item.BlockEventData.Nft.MaxEdition),
 		"ends_at":               IntPointer(item.BlockEventData.EndsAt),
 		"auction_reserve_price": FloatPoitner(item.BlockEventData.AuctionReservePrice),
 		"listing_type":          item.FlowEventID,
 		"listing_alias":         listingAlias,
 		"transaction_hash":      item.FlowTransactionID,
 		"status":                item.BlockEventData.Status,
-		"updated_at":            item.EventDate,
+		"updated_at":            item.EventDate.Unix(),
 	}
 
 	for key, value := range item.BlockEventData.Nft.Scalars {
@@ -405,20 +405,19 @@ func FloatPoitner(value float64) *float64 {
 }
 
 func (item NameEvent) ToSoldItem() map[string]interface{} {
-
 	market := item.ToMarketItem()
-	market["id"] = fmt.Sprintf("%s-%s", item.FlowEventID, item.BlockEventData.Name)
+	market["id"] = fmt.Sprintf("%s-%s", item.ID, item.BlockEventData.Name)
 	return market
 }
 
 func (item NameEvent) ToMarketItem() map[string]interface{} {
 
-	amountParts := strings.Split(".", item.BlockEventData.VaultType)
-	amountAlias := amountParts[len(amountParts)-1]
+	amountParts := strings.Split(item.BlockEventData.VaultType, ".")
+	amountAlias := amountParts[len(amountParts)-2]
 
 	nameType := fmt.Sprintf("A.%s.FIND.Lease", address)
-	listingParts := strings.Split(".", item.FlowEventID)
-	listingAlias := listingParts[len(listingParts)]
+	listingParts := strings.Split(item.FlowEventID, ".")
+	listingAlias := listingParts[len(listingParts)-1]
 
 	return map[string]interface{}{
 		"id":                    item.SearchId(),

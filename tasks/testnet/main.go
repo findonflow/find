@@ -49,9 +49,9 @@ func main() {
 	o.SimpleTxArgs("setFTInfo_flow", "find-admin", o.Arguments())
 	o.SimpleTxArgs("setFTInfo_usdc", "find-admin", o.Arguments())
 	o.SimpleTxArgs("setFTInfo_fusd", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
 	o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments())
-	//TODO: add Bl0x
 	o.SimpleTxArgs("setupMarketOptionsTypes", "find-admin", o.Arguments())
 
 	createProfileAndGiftName(o, "find")
