@@ -318,7 +318,46 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	})
 
+	t.Run("Should not be able to bid below listing price", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price)
+
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("user1").
+				UInt64(id).
+				UFix64(1.0)).
+			Test(otu.T).AssertFailure("You need to bid more then the starting price of 10.00000000")
+
+	})
+
+	t.Run("Should not be able to bid less the previous bidder", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0)
+
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").
+			SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
+				Account("user1").
+				UInt64(id).
+				UFix64(5.0)).
+			Test(otu.T).AssertFailure("bid 5.00000000 must be larger then previous bid+bidIncrement 16.00000000")
+
+	})
+
 }
 
-//TODO: add bid when there is a higher bid by another user
 //TODO: add bid should return money from another user that has bid before
