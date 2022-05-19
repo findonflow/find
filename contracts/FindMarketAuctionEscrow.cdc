@@ -106,7 +106,7 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun hasAuctionStarted() : Bool {
 			if let starts = self.auctionStartedAt {
-				return starts < Clock.time()
+				return starts <= Clock.time()
 			}
 			return false
 		}
@@ -282,7 +282,10 @@ pub contract FindMarketAuctionEscrow {
 
 			let previousOffer = saleItem.offerCallback!
 
-			let minBid=oldBalance + saleItem.auctionMinBidIncrement
+			var minBid=oldBalance + saleItem.auctionMinBidIncrement
+			if newOffer.address != previousOffer.address {
+				minBid = previousOffer.borrow()!.getBalance(id) + saleItem.auctionMinBidIncrement
+			}
 
 			if newOfferBalance < minBid {
 				panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement ").concat(minBid.toString()))
@@ -310,13 +313,11 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
+			if !saleItem.hasAuctionStarted() {
 				panic("Auction is not started")
 			}
 
-
-			let timestamp=Clock.time()
-			if saleItem.auctionEndsAt! < timestamp {
+			if saleItem.hasAuctionEnded() {
 				panic("Auction has ended")
 			}
 
@@ -331,10 +332,18 @@ pub contract FindMarketAuctionEscrow {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
+
 			if saleItem.hasAuctionStarted() {
 				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
+
+				if let cb = saleItem.offerCallback {
+					if cb.address == callback.address {
+						panic("You already have the latest bid on this item, use the incraseBid transaction")
+					}
+				}
+
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
 				return
 			}
@@ -347,18 +356,10 @@ pub contract FindMarketAuctionEscrow {
 
 			let balance=callback.borrow()!.getBalance(id)
 
-			if let cb= saleItem.offerCallback {
-				if cb.address == callback.address {
-					panic("You already have the latest bid on this item, use the incraseBid transaction")
-				}
-
-				let currentBalance=saleItem.getBalance()
-				Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
-				if currentBalance >= balance {
-					panic("There is already a higher bid on this item")
-				}
-				cb.borrow()!.cancelBidFromSaleItem(id)
+			if saleItem.auctionStartPrice >  balance {
+				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
 			}
+
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
 			let endsAt=timestamp + duration
