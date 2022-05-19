@@ -22,8 +22,14 @@ func main() {
 		typesense.WithCircuitBreakerTimeout(1*time.Minute),
 	)
 
-	client.Collection("market").Delete()
-	client.Collection("sold").Delete()
+	_, err := client.Collection("market").Delete()
+	if err != nil {
+		panic(err)
+	}
+	_, err = client.Collection("sold").Delete()
+	if err != nil {
+		panic(err)
+	}
 	fields := []api.Field{
 		{Name: "id", Type: "string"},
 		{Name: "uuid", Type: "int64", Facet: pointer.True()},
@@ -51,8 +57,8 @@ func main() {
 		{Name: "listing_alias", Type: "string", Facet: pointer.True()},
 		{Name: "transaction_hash", Type: "string", Facet: pointer.True()},
 		{Name: "status", Type: "string", Facet: pointer.True()},
-		{Name: "string_.*", Type: "string", Facet: pointer.True()},
-		{Name: "number_.*", Type: "float", Facet: pointer.True()},
+		{Name: "string\\..*", Type: "string", Facet: pointer.True()},
+		{Name: "number\\..*", Type: "float", Facet: pointer.True()},
 		{Name: "updated_at", Type: "float"},
 	}
 	schema := &api.CollectionSchema{
@@ -61,7 +67,7 @@ func main() {
 		DefaultSortingField: pointer.String("updated_at"),
 	}
 
-	_, err := client.Collections().Create(schema)
+	_, err = client.Collections().Create(schema)
 	if err != nil {
 		panic(err)
 	}

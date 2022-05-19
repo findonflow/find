@@ -534,13 +534,14 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
-	otu.O.ScriptFromFile("checkRoyalty").
+	err := otu.O.ScriptFromFile("checkRoyalty").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
 			String(nftAlias).
 			String("A.f8d6e0586b0a20c7.MetadataViews.Royalties")).
 		RunMarshalAs(&royalty)
+	assert.NoError(otu.T, err)
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
@@ -919,7 +920,8 @@ type Royalty struct {
 
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
 	var findReport FINDReport
-	otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&findReport)
+	err := otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&findReport)
+	assert.NoError(otu.T, err)
 	var list []SaleItemInformation
 	for _, saleItemCollectionReport := range findReport.ItemsForSale {
 		for _, saleItemInformation := range saleItemCollectionReport.Items {

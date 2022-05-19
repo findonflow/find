@@ -208,13 +208,19 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedAuctionSoftStruct []SaleItemInformation
 		var expectedDirectOfferEscrowStruct []SaleItemInformation
 		var expectedDirectOfferSoftStruct []SaleItemInformation
-		otu.O.ScriptFromFile("getListingsByAddress").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&itemForSaleStruct)
+		err := otu.O.ScriptFromFile("getListingsByAddress").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&itemForSaleStruct)
+		assert.NoError(otu.T, err)
 
-		json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
-		json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
-		json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
-		json.Unmarshal([]byte(expectedDirectOfferEscrow), &expectedDirectOfferEscrowStruct)
-		json.Unmarshal([]byte(expectedDirectOfferSoft), &expectedDirectOfferSoftStruct)
+		err = json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
+		assert.NoError(otu.T, err)
+		err = json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
+		assert.NoError(otu.T, err)
+		err = json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
+		assert.NoError(otu.T, err)
+		err = json.Unmarshal([]byte(expectedDirectOfferEscrow), &expectedDirectOfferEscrowStruct)
+		assert.NoError(otu.T, err)
+		err = json.Unmarshal([]byte(expectedDirectOfferSoft), &expectedDirectOfferSoftStruct)
+		assert.NoError(otu.T, err)
 
 		FindMarketSale := itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow := itemForSaleStruct["FindMarketAuctionEscrow"].Items
@@ -228,7 +234,8 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.Equal(otu.T, expectedDirectOfferEscrowStruct, FindMarketDirectOfferEscrow)
 		assert.Equal(otu.T, expectedDirectOfferSoftStruct, FindMarketDirectOfferSoft)
 
-		otu.O.ScriptFromFile("getListingsByName").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&itemForSaleStruct)
+		err = otu.O.ScriptFromFile("getListingsByName").Args(otu.O.Arguments().Account("user1")).RunMarshalAs(&itemForSaleStruct)
+		assert.NoError(otu.T, err)
 
 		FindMarketSale = itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow = itemForSaleStruct["FindMarketAuctionEscrow"].Items
@@ -376,11 +383,15 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedSaleStruct []SaleItemInformation
 		var expectedAuctionEscrowStruct []SaleItemInformation
 		var expectedAuctionSoftStruct []SaleItemInformation
-		otu.O.ScriptFromFile("resolveListingByAddress").Args(otu.O.Arguments().Account("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		err := otu.O.ScriptFromFile("resolveListingByAddress").Args(otu.O.Arguments().Account("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		assert.NoError(otu.T, err)
 
-		json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
-		json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
-		json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
+		err = json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
+		assert.NoError(otu.T, err)
+		err = json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
+		assert.NoError(otu.T, err)
+		err = json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
+		assert.NoError(otu.T, err)
 
 		FindMarketSale := itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow := itemForSaleStruct["FindMarketAuctionEscrow"].Items
@@ -390,7 +401,8 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
 		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
 
-		otu.O.ScriptFromFile("resolveListingByName").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		err = otu.O.ScriptFromFile("resolveListingByName").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunMarshalAs(&itemForSaleStruct)
+		assert.NoError(otu.T, err)
 
 		FindMarketSale = itemForSaleStruct["FindMarketSale"].Items
 		FindMarketAuctionEscrow = itemForSaleStruct["FindMarketAuctionEscrow"].Items
