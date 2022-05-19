@@ -88,7 +88,7 @@ func TestCollectionScripts(t *testing.T) {
 			mintThreeExampleDandies()
 
 		result := otu.O.ScriptFromFile("collections").
-			Args(otu.O.Arguments().Address("user1")).
+			Args(otu.O.Arguments().String("user1")).
 			RunReturnsJsonString()
 		fmt.Println(result)
 		assert.JSONEq(otu.T, expected, result)

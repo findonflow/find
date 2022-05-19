@@ -170,7 +170,7 @@ func TestFIND(t *testing.T) {
 				"related": "0xf3fcd2c1a78f5eee",
 			}))
 
-		value := otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		assert.Contains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
 
 		otu.O.TransactionFromFile("removeRelatedAccount").
@@ -183,7 +183,7 @@ func TestFIND(t *testing.T) {
 				"related": "0xf3fcd2c1a78f5eee",
 			}))
 
-		value = otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		value = otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		assert.NotContains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
 
 	})
@@ -200,7 +200,7 @@ func TestFIND(t *testing.T) {
 			Args(otu.O.Arguments().Boolean(true)).
 			Test(t).AssertSuccess()
 
-		value := otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		assert.Contains(t, value, `"privateMode": "true"`)
 
 		otu.O.TransactionFromFile("setPrivateMode").
@@ -208,7 +208,7 @@ func TestFIND(t *testing.T) {
 			Args(otu.O.Arguments().Boolean(false)).
 			Test(t).AssertSuccess()
 
-		value = otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		value = otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		assert.Contains(t, value, `"privateMode": "false"`)
 
 	})

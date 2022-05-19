@@ -27,7 +27,7 @@ func TestFTRegistry(t *testing.T) {
 			})
 
 		o := otu.O
-		result := o.ScriptFromFile("getFTInfoByTypeIdentifier").
+		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
 			RunReturnsInterface()
 
@@ -57,7 +57,7 @@ func TestFTRegistry(t *testing.T) {
 			})
 
 		o := otu.O
-		result := o.ScriptFromFile("getFTInfoByAlias").
+		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsInterface()
 
@@ -153,12 +153,12 @@ func TestFTRegistry(t *testing.T) {
 				})
 
 		o := otu.O
-		aliasResult := o.ScriptFromFile("getFTInfoByAlias").
+		aliasResult := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsInterface()
 		assert.Equal(t, "", aliasResult)
 
-		infoResult := o.ScriptFromFile("getFTInfoByAlias").
+		infoResult := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsInterface()
 		assert.Equal(t, "", infoResult)
@@ -179,12 +179,12 @@ func TestFTRegistry(t *testing.T) {
 				})
 
 		o := otu.O
-		aliasResult := o.ScriptFromFile("getFTInfoByTypeIdentifier").
+		aliasResult := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
 			RunReturnsInterface()
 		assert.Equal(t, "", aliasResult)
 
-		infoResult := o.ScriptFromFile("getFTInfoByAlias").
+		infoResult := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsInterface()
 		assert.Equal(t, "", infoResult)
@@ -200,7 +200,7 @@ func TestFTRegistry(t *testing.T) {
 			})
 
 		o := otu.O
-		result := o.ScriptFromFile("getFTInfoByTypeIdentifier").
+		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FiatToken.Vault")).
 			RunReturnsInterface()
 
