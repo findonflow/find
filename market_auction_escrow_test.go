@@ -405,8 +405,45 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	})
 
-}
+	t.Run("Should not be able to bid below listing price", func(t *testing.T) {
+		otu := NewOverflowTest(t)
 
-//TODO: list item twice for auction
-//TODO: add bid when there is a higher bid by another user
-//TODO: add bid should return money from another user that has bid before
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price)
+
+		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("user1").
+				UInt64(id).
+				UFix64(1.0)).
+			Test(otu.T).AssertFailure("You need to bid more then the starting price of 10.00000000")
+
+	})
+
+	t.Run("Should not be able to bid less the previous bidder", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+
+		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
+				Account("user1").
+				UInt64(id).
+				UFix64(5.0)).
+			Test(otu.T).AssertFailure("bid 5.00000000 must be larger then previous bid+bidIncrement 16.00000000")
+
+	})
+
+}
