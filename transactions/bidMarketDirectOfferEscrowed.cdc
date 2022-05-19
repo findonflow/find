@@ -42,7 +42,4 @@ transaction(address: Address, nftAlias: String, id: UInt64, ftAlias:String, amou
 		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability)
 	}
 
-	post {
-		self.walletReference.balance == self.balanceBeforeBid - amount
-	}
 }

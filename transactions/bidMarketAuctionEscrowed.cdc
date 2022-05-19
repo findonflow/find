@@ -52,7 +52,4 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability)
 	}
 
-	post {
-		self.walletReference.balance == self.balanceBeforeBid - amount
-	}
 }
