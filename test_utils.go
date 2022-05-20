@@ -892,24 +892,6 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 	return otu
 }
 
-func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
-
-	otu.O.TransactionFromFile("fulfillMarketAuction").
-		SignProposeAndPayAs(name).
-		Args(otu.O.Arguments().
-			Account(name).
-			UInt64(id)).
-		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.EnglishAuction", map[string]interface{}{
-			"id":     fmt.Sprintf("%d", id),
-			"buyer":  otu.accountAddress(buyer),
-			"amount": fmt.Sprintf("%.8f", price),
-			"status": "cancel",
-		}))
-		//TODO: test better events
-	return otu
-}
-
 type Royalty struct {
 	Items []struct {
 		Cut         string `json:"cut"`
