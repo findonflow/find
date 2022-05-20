@@ -49,6 +49,23 @@ func TestMarketAuctionSoft(t *testing.T) {
 			fulfillMarketAuctionSoft("user2", id, price+5.0)
 	})
 
+	t.Run("Should be able to add bid at auction", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			increaseAuctionBidMarketSoft("user2", id, 5.0, price+10.0).
+			tickClock(400.0).
+			//TODO: Should status be something else while time has not run out? I think so
+			saleItemListed("user1", "finished_completed", price+10.0).
+			fulfillMarketAuctionSoft("user2", id, price+10.0)
+	})
+
 	t.Run("Should be able to cancel an auction", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
