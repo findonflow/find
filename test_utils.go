@@ -905,7 +905,7 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 	var findReport Report
 	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(name)).RunMarshalAs(&findReport)
 	if err != nil {
-		//TODO : Swallow the error.
+		swallowErr(err)
 	}
 	var list []SaleItemInformation
 	for _, saleItemCollectionReport := range findReport.FINDReport.ItemsForSale {
