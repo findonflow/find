@@ -154,7 +154,7 @@ func TestMarketOptionsContract(t *testing.T) {
 					"ftAlias": "Flow",
 					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 					"listingId": "134",
-					"listingStatus": "active",
+					"listingStatus": "ended",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "301.00000000",
 					"nft": {
