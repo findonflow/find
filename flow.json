@@ -27,6 +27,13 @@
         "mainnet": "0x3c5959b568896393"
       }
     },
+		"NFTStorefront" : {
+			"source": "./contracts/standard/NFTStorefront.cdc",
+			"aliases" : {
+				"testnet": "0x94b06cfca1d8a476",
+				"mainnet": "0x4eb8a10cb9f87357"
+			}
+		},
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -200,7 +207,8 @@
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
-        "NFTRegistry"
+        "NFTRegistry",
+				"NFTStorefront"
       ],
       "emulator-find": [],
       "emulator-user1": [],
