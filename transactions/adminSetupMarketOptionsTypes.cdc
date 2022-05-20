@@ -14,6 +14,19 @@ transaction() {
     }
 
     execute{
+        let saleItemTypes: [Type] =         [Type<@FindMarketSale.SaleItem>(), 
+                                               Type<@FindMarketAuctionSoft.SaleItem>(),
+                                               Type<@FindMarketAuctionEscrow.SaleItem>(),
+                                               Type<@FindMarketDirectOfferSoft.SaleItem>(),
+                                               Type<@FindMarketDirectOfferEscrow.SaleItem>()
+                                               ]
+
+        let marketBidTypes: [Type] =        [Type<@FindMarketAuctionSoft.Bid>(),
+                                               Type<@FindMarketAuctionEscrow.Bid>(),
+                                               Type<@FindMarketDirectOfferSoft.Bid>(),
+                                               Type<@FindMarketDirectOfferEscrow.Bid>()
+                                               ]  
+
         let saleItemCollectionTypes: [Type] = [Type<@FindMarketSale.SaleItemCollection>(), 
                                                Type<@FindMarketAuctionSoft.SaleItemCollection>(),
                                                Type<@FindMarketAuctionEscrow.SaleItemCollection>(),
@@ -26,6 +39,14 @@ transaction() {
                                                Type<@FindMarketDirectOfferSoft.MarketBidCollection>(),
                                                Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
                                                ]          
+        for type in saleItemTypes {
+            self.adminRef.addSaleItemType(type)
+        }
+
+        for type in marketBidTypes {
+            self.adminRef.addMarketBidType(type)
+        }
+
         for type in saleItemCollectionTypes {
             self.adminRef.addSaleItemCollectionType(type)
         }

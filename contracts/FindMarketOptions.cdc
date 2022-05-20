@@ -5,7 +5,9 @@ import Clock from "../contracts/Clock.cdc"
 // Contract to store all helper functions. 
 pub contract FindMarketOptions {
 
+    access(contract) var saleItemTypes : [Type]
     access(contract) var saleItemCollectionTypes : [Type]
+    access(contract) var marketBidTypes : [Type]
     access(contract) var marketBidCollectionTypes : [Type]
 
     /* Get Tenant */
@@ -15,6 +17,10 @@ pub contract FindMarketOptions {
             FindMarketTenant.getTenantCapability(tenant)!.check() : "The capability to tenant is not valid." 
         }
         return FindMarketTenant.getTenantCapability(tenant)!.borrow()!
+    }
+
+    pub fun getSaleItemTypes() : [Type] {
+        return self.saleItemTypes
     }
 
     /* Get SaleItemCollections */
@@ -88,6 +94,19 @@ pub contract FindMarketOptions {
         }
         return report
     }
+
+    pub fun getNFTListing(tenant:Address, address: Address, id: UInt64) : {String : FindMarket.SaleItemInformation} {
+        let tenantRef = self.getTenant(tenant)
+        var report : {String : FindMarket.SaleItemInformation} = {}
+        for type in self.getSaleItemCollectionTypes() {
+            let marketOption = self.getMarketOptionFromType(type)
+            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true)
+            if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+                report[marketOption] = returnedReport.items[0]
+            }
+        }
+        return report
+    }
     
     // A function to 
     // Return a list of all options 
@@ -101,6 +120,10 @@ pub contract FindMarketOptions {
 
     pub fun getFindSaleItems(address: Address, id: UInt64) : {String : FindMarket.SaleItemCollectionReport} {
         return self.getSaleItems(tenant:FindMarketOptions.account.address, address: address, id: id)
+    }
+
+    pub fun getNFTFindListing(address: Address, id: UInt64) : {String : FindMarket.SaleItemInformation} {
+        return self.getNFTListing(tenant:FindMarketOptions.account.address, address: address, id: id)
     }
 
     access(contract) fun checkSaleInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
@@ -147,6 +170,10 @@ pub contract FindMarketOptions {
     }
 
     /* Get Bid Collections */
+    pub fun getMarketBidTypes() : [Type] {
+        return self.marketBidTypes
+    }
+
     pub fun getMarketBidCollectionTypes() : [Type] {
         return self.marketBidCollectionTypes
     }
@@ -260,12 +287,40 @@ pub contract FindMarketOptions {
     }
 
     /* Admin Function */
+    access(account) fun addSaleItemType(_ type: Type) {
+        self.saleItemTypes.append(type)
+    }
+
+    access(account) fun addMarketBidType(_ type: Type) {
+        self.marketBidTypes.append(type)
+    }
+
     access(account) fun addSaleItemCollectionType(_ type: Type) {
         self.saleItemCollectionTypes.append(type)
     }
 
     access(account) fun addMarketBidCollectionType(_ type: Type) {
         self.marketBidCollectionTypes.append(type)
+    }
+
+    access(account) fun removeSaleItemType(_ type: Type) {
+        var counter = 0 
+        while counter < self.saleItemTypes.length {
+            if type == self.saleItemTypes[counter] {
+                self.saleItemTypes.remove(at: counter)
+            }
+            counter = counter + 1   
+        }
+    }
+
+    access(account) fun removeMarketBidType(_ type: Type) {
+        var counter = 0 
+        while counter < self.marketBidTypes.length {
+            if type == self.marketBidTypes[counter] {
+                self.marketBidTypes.remove(at: counter)
+            }
+            counter = counter + 1   
+        }
     }
 
     access(account) fun removeSaleItemCollectionType(_ type: Type) {
@@ -289,7 +344,9 @@ pub contract FindMarketOptions {
     }
 
     init(){
+        self.saleItemTypes = []
         self.saleItemCollectionTypes = []
+        self.marketBidTypes = []
         self.marketBidCollectionTypes = []
     }
 

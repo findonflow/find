@@ -52,7 +52,7 @@ func main() {
 	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
 	o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments())
-	o.SimpleTxArgs("setupMarketOptionsTypes", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminSetupMarketOptionsTypes", "find-admin", o.Arguments())
 
 	createProfileAndGiftName(o, "find")
 	createProfileAndGiftName(o, "find-admin")

@@ -224,7 +224,6 @@ pub contract FindMarket {
 
 	//BAM; this needs to know if an item is deprectaed or stopped in some way
 	pub struct SaleItemInformation {
-
 		pub let nftIdentifier: String 
 		pub let nftId: UInt64
 		pub let seller: Address
@@ -240,14 +239,13 @@ pub contract FindMarket {
 		pub let ftTypeIdentifier: String
 		pub let listingValidUntil: UFix64?
 
-		pub let nft: NFTInfo
 		pub let auction: AuctionItem?
 		pub let listingStatus:String
 
 		init(item: &{SaleItem}, status:String) {
-			self.listingStatus=status
 			self.nftIdentifier= item.getItemType().identifier
 			self.nftId=item.getItemID()
+			self.listingStatus=status
 			self.saleType=item.getSaleType()
 			self.listingTypeIdentifier=item.getListingTypeIdentifier()
 			self.listingId=item.getId()
@@ -262,7 +260,6 @@ pub contract FindMarket {
 
 			self.ftTypeIdentifier=item.getFtType().identifier
 
-			self.nft=item.toNFTInfo()
 			self.auction=item.getAuction()
 		}
 	}
