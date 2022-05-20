@@ -11,7 +11,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 	price := 10.00
 
-	t.Run("Should be able to get all listings of a person by a script. ", func(t *testing.T) {
+	t.Run("Should be able to get all listings of a person by a script", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
@@ -235,7 +235,7 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.Equal(otu.T, expectedDirectOfferSoftStruct, FindMarketDirectOfferSoft)
 	})
 
-	t.Run("Should be able to get the nft and auction detail of an NFT by a script. ", func(t *testing.T) {
+	t.Run("Should be able to get the nft and auction detail of an NFT by a script", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
@@ -391,8 +391,97 @@ func TestNFTDetailScript(t *testing.T) {
         	            	                }
         	            	            ]
         	            	        }
-        	            	    }
+        	            	    },
+														"storefront" : ""
         	            	}`
+
+		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunReturnsJsonString()
+
+		assert.JSONEq(otu.T, expectedJson, json)
+	})
+
+	t.Run("Should be able to get storefront listings of an NFT by a script", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			setFlowDandyMarketOption("DirectOfferSoft").
+			setFlowDandyMarketOption("Sale").
+			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSale("user1", ids[1], price)
+
+		otu.O.TransactionFromFile("testListStorefront").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().UInt64(ids[1]).UFix64(10.0)).
+			Test(otu.T).AssertSuccess()
+
+		expectedJson := `
+{
+	"findMarket": {
+        "FindMarketSale": {
+            "ghosts": null,
+            "items": [
+                {
+                    "amount": "10.00000000",
+                    "auction": "",
+                    "bidder": "",
+                    "bidderName": "",
+                    "ftAlias": "Flow",
+                    "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "listingId": "134",
+                    "listingStatus": "active",
+                    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
+                    "listingValidUntil": "",
+                    "nft": {
+                        "collectionDescription": "Neo Collectibles FIND",
+                        "collectionName": "user1",
+                        "editionNumber": "2",
+                        "id": "134",
+                        "name": "Neo Motorcycle 2 of 3",
+                        "rarity": "",
+                        "scalars": {
+                            "Speed": "100.00000000"
+                        },
+                        "tags": {
+                            "NeoMotorCycleTag": "Tag1"
+                        },
+                        "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+                        "totalInEdition": "3",
+                        "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+                    },
+                    "nftId": "134",
+                    "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                    "saleType": "active_listed",
+                    "seller": "0x179b6b1cb6755e31",
+                    "sellerName": "user1"
+                }
+            ]
+        }
+    },
+    "storefront": {
+        "ghosts": null,
+        "items": [
+            {
+                "amount": "10.00000000",
+                "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                "listingID": "138",
+                "nftID": "134",
+                "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                "saleCut": [
+                    {
+                        "address": "0x179b6b1cb6755e31",
+                        "amount": "10.00000000",
+                        "findName": "user1"
+                    }
+                ],
+                "storefront": "137"
+            }
+        ]
+    }
+}
+`
 
 		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunReturnsJsonString()
 
