@@ -158,13 +158,13 @@ func TestFIND(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			createUser(100.0, "user1").
-			registerUser("user1")
-
-		user2Address := otu.accountAddress("user2")
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2")
 
 		otu.O.TransactionFromFile("setRelatedAccount").
 			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("dapper").String(user2Address)).
+			Args(otu.O.Arguments().String("dapper").String("user2")).
 			Test(t).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
 				"name":    "dapper",
