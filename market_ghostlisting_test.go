@@ -33,10 +33,10 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", 15.0)
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertFailure("This listing is a ghost listing")
@@ -67,7 +67,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(bidPrice)).
 			Test(otu.T).AssertFailure("This listing is a ghost listing")
@@ -129,7 +129,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Address("user1").
+				String("user1").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("NFT does not exist")
 
@@ -159,7 +159,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(bidPrice)).
 			Test(otu.T).AssertFailure("This listing is a ghost listing")
@@ -246,7 +246,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -276,7 +276,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				UInt64(id)).
-			Test(otu.T).AssertFailure("NFT does not exist")
+			Test(otu.T).AssertFailure("Cannot fulfill market offer on ghost listing")
 
 	})
 
@@ -299,7 +299,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").

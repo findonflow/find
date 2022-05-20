@@ -74,7 +74,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -107,7 +107,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -164,7 +164,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -262,7 +262,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -275,7 +275,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").

@@ -84,7 +84,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
-				Account(name).
+				String(name).
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
@@ -162,7 +162,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("This auction is not live")
 
@@ -173,7 +173,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Auction has not ended yet")
 
@@ -304,7 +304,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertSuccess()
@@ -368,7 +368,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
@@ -418,7 +418,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(1.0)).
 			Test(otu.T).AssertFailure("You need to bid more then the starting price of 10.00000000")
@@ -439,7 +439,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(5.0)).
 			Test(otu.T).AssertFailure("bid 5.00000000 must be larger then previous bid+bidIncrement 16.00000000")

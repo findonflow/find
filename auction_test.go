@@ -62,7 +62,7 @@ func TestAuction(t *testing.T) {
 			}),
 		}
 
-		otu.O.TransactionFromFile("delistSale").
+		otu.O.TransactionFromFile("delistNameSale").
 			SignProposeAndPayAs("user1"). //the buy
 			Args(otu.O.Arguments().StringArray("user1", "name1")).
 			Test(t).
@@ -125,7 +125,7 @@ func TestAuction(t *testing.T) {
 			}),
 		}
 
-		otu.O.TransactionFromFile("delistAllSale").
+		otu.O.TransactionFromFile("delistAllNameSale").
 			SignProposeAndPayAs("user1"). //the buy
 			Test(t).
 			AssertSuccess().
@@ -156,7 +156,7 @@ func TestAuction(t *testing.T) {
 			listForSale("user1").
 			directOffer("user2", "user1", 4.0)
 
-		otu.O.TransactionFromFile("fulfill").
+		otu.O.TransactionFromFile("fulfillName").
 			SignProposeAndPayAs("user1"). //the buy
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
@@ -195,7 +195,7 @@ func TestAuction(t *testing.T) {
 			bid("user3", "user1", 20.0).
 			expireAuction()
 
-		otu.O.TransactionFromFile("fulfillAuction").
+		otu.O.TransactionFromFile("fulfillNameAuction").
 			SignProposeAndPayAs("user3"). //the buy
 			Args(otu.O.Arguments().
 				Account("user1").
@@ -236,7 +236,7 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 8.0).
 			auctionBid("user3", "user1", 20.0)
 
-		otu.O.TransactionFromFile("bid").SignProposeAndPayAs("user2").
+		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
 				UFix64(10.0)).
@@ -258,7 +258,7 @@ func TestAuction(t *testing.T) {
 		name := "user1"
 		amount := 10.0
 
-		otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 			Args(otu.O.Arguments().
 				String(name).
 				UFix64(amount)).
@@ -308,7 +308,7 @@ func TestAuction(t *testing.T) {
 			registerUser("user3").
 			directOffer("user2", "user1", 10.0)
 
-		otu.O.TransactionFromFile("bid").SignProposeAndPayAs("user3").
+		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
 				String("user1").
 				UFix64(5.0)).
@@ -328,7 +328,7 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
 
-		otu.O.TransactionFromFile("increaseBid").
+		otu.O.TransactionFromFile("increaseNameBid").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -356,7 +356,7 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			bid("user2", "user1", 10.0)
 
-		otu.O.TransactionFromFile("bid").SignProposeAndPayAs("user2").
+		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
 				UFix64(15.0)).
@@ -376,7 +376,7 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
 
-		otu.O.TransactionFromFile("increaseBid").
+		otu.O.TransactionFromFile("increaseNameBid").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -404,7 +404,7 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
-		otu.O.TransactionFromFile("increaseBid").
+		otu.O.TransactionFromFile("increaseNameBid").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -433,7 +433,7 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
 
-		otu.O.TransactionFromFile("startAuction").
+		otu.O.TransactionFromFile("startNameAuction").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				String("user1")).
@@ -462,9 +462,9 @@ func TestAuction(t *testing.T) {
 			listForSale("user1").
 			directOffer("user2", "user1", 4.0)
 
-		otu.O.TransactionFromFile("cancelBid").
+		otu.O.TransactionFromFile("cancelNameBid").
 			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().String("user1")).
+			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
@@ -491,9 +491,9 @@ func TestAuction(t *testing.T) {
 
 		otu.assertLookupAddress("user2", "")
 
-		otu.O.TransactionFromFile("cancelBid").
+		otu.O.TransactionFromFile("cancelNameBid").
 			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().String("user1")).
+			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
@@ -517,9 +517,9 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
-		otu.O.TransactionFromFile("cancelBid").
+		otu.O.TransactionFromFile("cancelNameBid").
 			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().String("user1")).
+			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertFailure("Cannot cancel a bid that is in an auction")
 	})
@@ -537,7 +537,7 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
-		otu.O.TransactionFromFile("bid").
+		otu.O.TransactionFromFile("bidName").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().String("user1").UFix64(15.0)).
 			Test(t).
@@ -572,7 +572,7 @@ func TestAuction(t *testing.T) {
 
 		otu.tickClock(86380.0)
 
-		otu.O.TransactionFromFile("bid").
+		otu.O.TransactionFromFile("bidName").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().String("user1").UFix64(15.0)).
 			Test(t).
@@ -603,9 +603,9 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
-		otu.O.TransactionFromFile("cancelAuction").
+		otu.O.TransactionFromFile("cancelNameAuction").
 			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1")).
+			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
@@ -638,7 +638,7 @@ func TestAuction(t *testing.T) {
 		otu.expireLease().tickClock(2.0)
 		otu.expireLock().tickClock(2.0)
 
-		otu.O.TransactionFromFile("bid").
+		otu.O.TransactionFromFile("bidName").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().String("user1").UFix64(10.0)).
 			Test(t).
@@ -658,9 +658,9 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 25.0).
 			expireAuction().tickClock(2.0)
 
-		otu.O.TransactionFromFile("cancelAuction").
+		otu.O.TransactionFromFile("cancelNameAuction").
 			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1")).
+			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertFailure("Cannot cancel finished auction")
 
@@ -673,7 +673,7 @@ func TestAuction(t *testing.T) {
 			createUser(100.0, "user1").
 			registerUser("user1")
 
-		otu.O.TransactionFromFile("bid").SignProposeAndPayAs("user1").
+		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1").UFix64(5.0)).
 			Test(otu.T).
 			AssertFailure("cannot bid on your own name")
@@ -691,7 +691,7 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 5.0)
 
 		name := "user1"
-		otu.O.TransactionFromFile("listForAuction").
+		otu.O.TransactionFromFile("listNameForAuction").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
 				String(name).

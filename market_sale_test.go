@@ -104,10 +104,10 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(id).
 				UFix64(5.0)).
 			Test(otu.T).
@@ -250,7 +250,7 @@ func TestMarketSale(t *testing.T) {
 			}),
 		}
 
-		otu.O.TransactionFromFile("cancelAllNFTForSale").
+		otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Test(otu.T).AssertSuccess().
 			AssertEmitEvent(expected...)
@@ -286,10 +286,10 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
@@ -301,7 +301,7 @@ func TestMarketSale(t *testing.T) {
 
 		otu.alterMarketOption("Sale", "deprecate")
 
-		otu.O.TransactionFromFile("cancelNFTForSale").
+		otu.O.TransactionFromFile("delistNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				UInt64Array(ids[1])).
@@ -340,16 +340,16 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("cancelNFTForSale").
+		otu.O.TransactionFromFile("delistNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				UInt64Array(ids[0])).
@@ -387,10 +387,10 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess()
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).

@@ -95,7 +95,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 }
 
 func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
-	otu.O.TransactionFromFile("clock").SignProposeAndPayAs("find").
+	otu.O.TransactionFromFile("testClock").SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			UFix64(time)).
 		Test(otu.T).AssertSuccess()
@@ -118,7 +118,7 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 			"createdAt": "find",
 		}))
 
-	otu.O.TransactionFromFile("mintFusd").
+	otu.O.TransactionFromFile("testMintFusd").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().
 			Account(name).
@@ -127,7 +127,7 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		AssertSuccess().
 		AssertEventCount(3)
 
-	otu.O.TransactionFromFile("mintFlow").
+	otu.O.TransactionFromFile("testMintFlow").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().
 			Account(name).
@@ -136,7 +136,7 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		AssertSuccess().
 		AssertEventCount(3)
 
-	otu.O.TransactionFromFile("mintUsdc").
+	otu.O.TransactionFromFile("testMintUsdc").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().
 			Account(name).
@@ -245,7 +245,7 @@ func (otu *OverflowTestUtils) accountAddress(name string) string {
 
 func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listForSale").
+	otu.O.TransactionFromFile("listNameForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			String(name).
@@ -263,7 +263,7 @@ func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listForSale").
+	otu.O.TransactionFromFile("listNameForSale").
 		SignProposeAndPayAs(seller).
 		Args(otu.O.Arguments().
 			String(name).
@@ -280,7 +280,7 @@ func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTest
 }
 
 func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *OverflowTestUtils {
-	otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(amount)).
@@ -298,7 +298,7 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 
 func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listForAuction").
+	otu.O.TransactionFromFile("listNameForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			String(name).
@@ -321,7 +321,7 @@ func (otu *OverflowTestUtils) bid(buyer, name string, amount float64) *OverflowT
 
 	endTime := otu.currentTime() + auctionDurationFloat
 	endTimeSting := fmt.Sprintf("%f00", endTime)
-	otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(amount)).
@@ -342,7 +342,7 @@ func (otu *OverflowTestUtils) auctionBid(buyer, name string, amount float64) *Ov
 
 	endTime := otu.currentTime() + auctionDurationFloat
 	endTimeSting := fmt.Sprintf("%f00", endTime)
-	otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(amount)).
@@ -380,7 +380,7 @@ func (otu *OverflowTestUtils) setupCharity(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) mintCharity(name, image, thumbnail, originUrl, description, user string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("mintCharity").SignProposeAndPayAs("find").
+	otu.O.TransactionFromFile("adminMintCharity").SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			String(name).
 			String(image).
@@ -450,7 +450,7 @@ func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("cancelNFTForSale").
+	otu.O.TransactionFromFile("delistNFTSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			UInt64Array(id)).
@@ -557,10 +557,10 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("buyItemForSale").
+	otu.O.TransactionFromFile("buyNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			String(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
@@ -625,7 +625,7 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 	otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			String(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
@@ -643,7 +643,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 	otu.O.TransactionFromFile("bidMarketAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			String(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
@@ -695,7 +695,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 	otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			String(seller).
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
@@ -714,7 +714,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 	otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			String(seller).
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
@@ -845,7 +845,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 	otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(name).
+			String(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
@@ -892,24 +892,6 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 	return otu
 }
 
-func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
-
-	otu.O.TransactionFromFile("fulfillMarketAuction").
-		SignProposeAndPayAs(name).
-		Args(otu.O.Arguments().
-			Account(name).
-			UInt64(id)).
-		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.EnglishAuction", map[string]interface{}{
-			"id":     fmt.Sprintf("%d", id),
-			"buyer":  otu.accountAddress(buyer),
-			"amount": fmt.Sprintf("%.8f", price),
-			"status": "cancel",
-		}))
-		//TODO: test better events
-	return otu
-}
-
 type Royalty struct {
 	Items []struct {
 		Cut         string `json:"cut"`
@@ -923,7 +905,7 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 	var findReport Report
 	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(name)).RunMarshalAs(&findReport)
 	if err != nil {
-		//TODO : Swallow the error.
+		swallowErr(err)
 	}
 	var list []SaleItemInformation
 	for _, saleItemCollectionReport := range findReport.FINDReport.ItemsForSale {
@@ -940,7 +922,7 @@ func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected stri
 }
 
 func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
-	otu.O.TransactionFromFile("setFTInfo_" + alias).
+	otu.O.TransactionFromFile("adminSetFTInfo_" + alias).
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
@@ -961,7 +943,7 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 }
 
 func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
-	otu.O.TransactionFromFile("setNFTInfo_Dandy").
+	otu.O.TransactionFromFile("adminSetNFTInfo_Dandy").
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
@@ -1005,7 +987,7 @@ func (otu *OverflowTestUtils) registerFtInRegistry() *OverflowTestUtils {
 }
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
-	otu.O.TransactionFromFile("setSellDandyForFlow").
+	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().String(marketType)).
 		Test(otu.T).
@@ -1014,7 +996,7 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *Overf
 }
 
 func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *OverflowTestUtils {
-	otu.O.TransactionFromFile("alterMarketOption").
+	otu.O.TransactionFromFile("testAlterMarketOption").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().String(marketType).String(ruleName)).
 		Test(otu.T).

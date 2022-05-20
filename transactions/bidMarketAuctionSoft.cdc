@@ -7,8 +7,9 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FIND from "../contracts/FIND.cdc"
 
-transaction(address: Address, id: UInt64, amount: UFix64) {
+transaction(user: String, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}> 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
@@ -19,6 +20,10 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 	let ftVaultType: Type
 
 	prepare(account: AuthAccount) {
+
+		let resolveAddress = FIND.resolve(user)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let address = resolveAddress!
 
 		self.saleItemsCap= FindMarketAuctionSoft.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionSoft.SaleItemCollection>())

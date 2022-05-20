@@ -124,7 +124,7 @@ func TestFIND(t *testing.T) {
 			setupFIND().
 			createUser(10.0, "find")
 
-		otu.O.TransactionFromFile("registerAdmin").
+		otu.O.TransactionFromFile("adminRegisterName").
 			SignProposeAndPayAs("find").
 			Args(otu.O.Arguments().StringArray("find-admin").Account("find")).
 			Test(otu.T).
@@ -144,7 +144,7 @@ func TestFIND(t *testing.T) {
 			registerUser("user1").
 			registerUser("user2")
 
-		otu.O.TransactionFromFile("moveNameToName").
+		otu.O.TransactionFromFile("moveNameTO").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1").String("user2")).
 			Test(t).AssertSuccess().
@@ -158,11 +158,13 @@ func TestFIND(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			createUser(100.0, "user1").
-			registerUser("user1")
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2")
 
 		otu.O.TransactionFromFile("setRelatedAccount").
 			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("dapper").Account("user2")).
+			Args(otu.O.Arguments().String("dapper").String("user2")).
 			Test(t).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
 				"name":    "dapper",
