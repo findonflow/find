@@ -219,7 +219,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 		}
 	}
 
-	return NFTDetailReport(findMarket:findMarket, storefront: listings, nftDetail: nftDetail, AllowedListingActions: report)
+	return NFTDetailReport(findMarket:findMarket, storefront: listings, nftDetail: nftDetail, allowedListingActions: report)
 
 }
 

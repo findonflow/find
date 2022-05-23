@@ -201,7 +201,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		expectedJson := `
 		{
-			"AllowedListingActions": {
+			"allowedListingActions": {
 				"FindMarketAuctionEscrow": {
 					"ftAlias": [
 						"Flow"
