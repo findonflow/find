@@ -24,7 +24,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let address = resolveAddress!
 		self.saleItemsCap= FindMarketAuctionEscrow.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.SaleItemCollection>())
-		let saleInformation = FindMarketOptions.getSaleInformation(tenant:marketplace, address: address, marketOption: marketOption, id:id) 
+		let saleInformation = FindMarketOptions.getSaleInformation(tenant:marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")

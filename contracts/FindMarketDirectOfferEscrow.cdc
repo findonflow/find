@@ -42,6 +42,14 @@ pub contract FindMarketDirectOfferEscrow {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
 			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				return MetadataViews.Royalties([royalty])
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				return MetadataViews.Royalties(royalty)
+			}
 
 			return  nil
 		}

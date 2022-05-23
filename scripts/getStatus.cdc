@@ -56,9 +56,9 @@ pub fun main(user: String) : Report {
 		let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
 		let find= FindMarketOptions.getFindTenantAddress()
-		let items : {String : FindMarket.SaleItemCollectionReport} = FindMarketOptions.getSaleItemReport(tenant:find, address: address)
+		let items : {String : FindMarket.SaleItemCollectionReport} = FindMarketOptions.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
-		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarketOptions.getBidsReport(tenant:find, address: address)
+		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarketOptions.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
 		findReport = FINDReport(
 			profile: profile?.asProfile(),

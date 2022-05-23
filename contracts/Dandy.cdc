@@ -72,8 +72,8 @@ pub contract Dandy: NonFungibleToken {
 			var views : [Type]=[]
 			views.append(Type<MinterPlatform>())
 			views.append(Type<FindViews.Nounce>())
-			views.append(Type<FindViews.NFTCollectionData>())
-			views.append(Type<FindViews.NFTCollectionDisplay>())
+			views.append(Type<MetadataViews.NFTCollectionData>())
+			views.append(Type<MetadataViews.NFTCollectionDisplay>())
 			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
 			views.append(Type<MetadataViews.Royalties>())
@@ -153,21 +153,22 @@ pub contract Dandy: NonFungibleToken {
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
 		pub fun resolveView(_ type: Type): AnyStruct {
 
-			if type == Type<FindViews.NFTCollectionDisplay>() {
+			if type == Type<MetadataViews.NFTCollectionDisplay>() {
 				let externalURL = MetadataViews.ExternalURL(self.minterPlatform.externalURL)
 				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.squareImage), mediaType: "image")
 				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.bannerImage), mediaType: "image")
-				return FindViews.NFTCollectionDisplay(name: self.minterPlatform.name, description: self.minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: {})
+				return MetadataViews.NFTCollectionDisplay(name: self.minterPlatform.name, description: self.minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: {})
 			}
 
-			if type == Type<FindViews.NFTCollectionData>() {
-				return FindViews.NFTCollectionData(storagePath: Dandy.CollectionStoragePath,
+			if type == Type<MetadataViews.NFTCollectionData>() {
+				return MetadataViews.NFTCollectionData(storagePath: Dandy.CollectionStoragePath,
 				publicPath: Dandy.CollectionPublicPath,
 				providerPath: Dandy.CollectionPrivatePath,
 				publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
 				publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
 				providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()})
+				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()}
+				)
 			}
 
 			if type == Type<MinterPlatform>() {
