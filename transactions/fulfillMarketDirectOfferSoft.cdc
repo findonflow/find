@@ -18,13 +18,12 @@ transaction(marketplace:Address, id: UInt64) {
 		let bid = FindMarketOptions.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id)
 		if bid==nil {
 			panic("Cannot fulfill market offer on ghost listing")
-
 		}
 
 		let ftIdentifier= bid!.item.ftTypeIdentifier
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
 
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+	self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.balanceBeforeFulfill=self.walletReference.balance
 
 	}

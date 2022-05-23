@@ -2,8 +2,6 @@ package test_main
 
 import (
 	"testing"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func TestMarketDirectOfferSoft(t *testing.T) {
@@ -18,11 +16,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			saleItemListed("user1", "active_finished", price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		spew.Dump(itemsForSale)
-		otu.fulfillMarketDirectOfferSoft("user2", id, price)
+			saleItemListed("user1", "active_finished", price).
+			fulfillMarketDirectOfferSoft("user2", id, price)
 	})
 
 	t.Run("Should be able to increase offer", func(t *testing.T) {

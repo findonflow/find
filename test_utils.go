@@ -910,7 +910,6 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
 		}))
-		//TODO: test that funds leave the account here
 	return otu
 }
 

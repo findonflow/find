@@ -14,10 +14,6 @@ pub contract FindMarketOptions {
 
     /* Get Tenant */
     pub fun getTenant(_ tenant: Address) : &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic} {
-        pre{
-            FindMarketTenant.getTenantCapability(tenant) != nil : "This tenant does not exist." 
-            FindMarketTenant.getTenantCapability(tenant)!.check() : "The capability to tenant is not valid." 
-        }
         return FindMarketTenant.getTenantCapability(tenant)!.borrow()!
     }
 

@@ -11,7 +11,6 @@ transaction(marketplace:Address, id: UInt64) {
 
 		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
-
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
 		let saleItem = FindMarketOptions.getSaleInformation(tenant:marketplace, address: account.address, marketOption: marketOption, id:id)
 		if saleItem==nil {
