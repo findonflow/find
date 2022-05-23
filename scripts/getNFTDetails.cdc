@@ -12,7 +12,7 @@ pub struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
 	pub let storefront: StorefrontListing?
     pub let nftDetail: NFTDetail?
-	pub let AllowedListingActions: {String : ListingTypeReport}
+	pub let allowedListingActions: {String : ListingTypeReport}
 
 	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, AllowedListingActions: {String : ListingTypeReport}) {
 		self.findMarket=findMarket
