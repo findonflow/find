@@ -85,7 +85,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess().AssertNoEvents()
 
-	otu.O.TransactionFromFile("setupMarketOptionsTypes").
+	otu.O.TransactionFromFile("adminSetupMarketOptionsTypes").
 		SignProposeAndPayAs("find").
 		Test(otu.T).AssertSuccess().AssertNoEvents()
 
@@ -1101,7 +1101,6 @@ type SaleItemInformation struct {
 	FtAlias               string       `json:"ftAlias"`
 	FtTypeIdentifier      string       `json:"ftTypeIdentifier"`
 	ListingValidUntil     string       `json:"listingValidUntil"`
-	Nft                   NFTInfo      `json:"nft"`
 	Auction               *AuctionItem `json:"auction,omitempty"`
 	ListingStatus         string       `json:"listingStatus"`
 }

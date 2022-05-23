@@ -6,5 +6,5 @@ pub fun main(user: String) : {String : FindMarket.SaleItemCollectionReport} {
     let resolveAddress = FIND.resolve(user)
     if resolveAddress == nil { return {}}
     let address = resolveAddress!
-    return FindMarketOptions.getFindSaleItemReport(address: address)
+    return FindMarketOptions.getFindSaleItemReport(address: address, getNFTInfo: false)
 }

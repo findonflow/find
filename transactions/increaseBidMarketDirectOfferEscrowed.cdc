@@ -16,7 +16,7 @@ transaction(id: UInt64, amount: UFix64) {
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
-		let bidInfo = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		let bidInfo = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id, getNFTInfo: false)
 		if bidInfo == nil {
 			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
 		}

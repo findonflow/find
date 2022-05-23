@@ -200,14 +200,30 @@ pub contract Admin {
 		}
 
 		/// ===================================================================================
-		// NonFungibleToken Registry 
+		// Find Market Options 
 		/// ===================================================================================
+		pub fun addSaleItemType(_ type: Type) {
+			FindMarketOptions.addSaleItemType(type) 
+		}
+
+		pub fun addMarketBidType(_ type: Type) {
+			FindMarketOptions.addMarketBidType(type) 
+		}
+
 		pub fun addSaleItemCollectionType(_ type: Type) {
 			FindMarketOptions.addSaleItemCollectionType(type) 
 		}
 
 		pub fun addMarketBidCollectionType(_ type: Type) {
 			FindMarketOptions.addMarketBidCollectionType(type) 
+		}
+
+		pub fun removeSaleItemType(_ type: Type) {
+			FindMarketOptions.removeSaleItemType(type) 
+		}
+
+		pub fun removeMarketBidType(_ type: Type) {
+			FindMarketOptions.removeMarketBidType(type) 
 		}
 
 		pub fun removeSaleItemCollectionType(_ type: Type) {
