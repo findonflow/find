@@ -344,179 +344,127 @@ func TestNFTDetailScript(t *testing.T) {
 
 		expectedJson := `
 		{
-			"allowedListingActions": {
-				"FindMarketAuctionEscrow": {
-					"ftAlias": [
-						"Flow"
-					],
-					"ftIdentifiers": [
-						"A.0ae53cb6e3f42a79.FlowToken.Vault"
-					],
-					"listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-					"status": "active"
-				},
-				"FindMarketAuctionSoft": {
-					"ftAlias": [
-						"Flow"
-					],
-					"ftIdentifiers": [
-						"A.0ae53cb6e3f42a79.FlowToken.Vault"
-					],
-					"listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-					"status": "active"
-				},
-				"FindMarketDirectOfferEscrow": {
-					"ftAlias": [
-						"Flow"
-					],
-					"ftIdentifiers": [
-						"A.0ae53cb6e3f42a79.FlowToken.Vault"
-					],
-					"listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-					"status": "active"
-				},
-				"FindMarketDirectOfferSoft": {
-					"ftAlias": [
-						"Flow"
-					],
-					"ftIdentifiers": [
-						"A.0ae53cb6e3f42a79.FlowToken.Vault"
-					],
-					"listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-					"status": "active"
-				},
-				"FindMarketSale": {
-					"ftAlias": [
-						"Flow"
-					],
-					"ftIdentifiers": [
-						"A.0ae53cb6e3f42a79.FlowToken.Vault"
-					],
-					"listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-					"status": "active"
-				}
-			},
-			"findMarket": {
-				"FindMarketAuctionEscrow": {
-					"amount": "10.00000000",
-					"auction": {
-						"auctionEndsAt": "",
-						"currentPrice": "10.00000000",
-						"extentionOnLateBid": "60.00000000",
-						"minimumBidIncrement": "1.00000000",
-						"reservePrice": "15.00000000",
-						"startPrice": "10.00000000",
-						"timestamp": "1.00000000"
-					},
-					"bidder": "",
-					"bidderName": "",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "134",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-					"listingValidUntil": "",
-					"nft": "",
-					"nftId": "134",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_listed",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				},
-				"FindMarketAuctionSoft": {
-					"amount": "10.00000000",
-					"auction": {
-						"auctionEndsAt": "",
-						"currentPrice": "10.00000000",
-						"extentionOnLateBid": "60.00000000",
-						"minimumBidIncrement": "1.00000000",
-						"reservePrice": "15.00000000",
-						"startPrice": "10.00000000",
-						"timestamp": "1.00000000"
-					},
-					"bidder": "",
-					"bidderName": "",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "134",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-					"listingValidUntil": "",
-					"nft": "",
-					"nftId": "134",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_listed",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				},
-				"FindMarketSale": {
-					"amount": "10.00000000",
-					"auction": "",
-					"bidder": "",
-					"bidderName": "",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "134",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-					"listingValidUntil": "",
-					"nft": "",
-					"nftId": "134",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_listed",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				}
-			},
-			"nftDetail": {
-				"collectionDescription": "Neo Collectibles FIND",
-				"collectionName": "user1",
-				"editionNumber": "2",
-				"id": "134",
-				"name": "Neo Motorcycle 2 of 3",
-				"rarity": "",
-				"royalties": [
-					{
-						"address": "0x179b6b1cb6755e31",
-						"cut": "0.05000000",
-						"findName": "user1",
-						"royaltyName": "artist"
-					},
-					{
-						"address": "0xf8d6e0586b0a20c7",
-						"cut": "0.15000000",
-						"findName": "",
-						"royaltyName": "platform"
-					}
-				],
-				"scalars": {
-					"Speed": "100.00000000"
-				},
-				"tags": {
-					"NeoMotorCycleTag": "Tag1"
-				},
-				"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-				"totalInEdition": "3",
-				"type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"uuid": "134",
-				"views": {}
-			},
-			"storefront": {
-				"amount": "10.00000000",
-				"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingID": "140",
-				"nftID": "134",
-				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleCut": [
-					{
-						"address": "0x179b6b1cb6755e31",
-						"amount": "10.00000000",
-						"findName": "user1"
-					}
-				],
-				"storefront": "139"
-			}
-		}
+	    "allowedListingActions": {
+	        "FindMarketAuctionEscrow": {
+	            "ftAlias": [
+	                "Flow"
+	            ],
+	            "ftIdentifiers": [
+	                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+	            ],
+	            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
+	            "status": "active"
+	        },
+	        "FindMarketAuctionSoft": {
+	            "ftAlias": [
+	                "Flow"
+	            ],
+	            "ftIdentifiers": [
+	                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+	            ],
+	            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
+	            "status": "active"
+	        },
+	        "FindMarketDirectOfferEscrow": {
+	            "ftAlias": [
+	                "Flow"
+	            ],
+	            "ftIdentifiers": [
+	                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+	            ],
+	            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
+	            "status": "active"
+	        },
+	        "FindMarketDirectOfferSoft": {
+	            "ftAlias": [
+	                "Flow"
+	            ],
+	            "ftIdentifiers": [
+	                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+	            ],
+	            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
+	            "status": "active"
+	        },
+	        "FindMarketSale": {
+	            "ftAlias": [
+	                "Flow"
+	            ],
+	            "ftIdentifiers": [
+	                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+	            ],
+	            "listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
+	            "status": "active"
+	        }
+	    },
+	    "findMarket": {
+	        "FindMarketSale": {
+	            "amount": "10.00000000",
+	            "auction": "",
+	            "bidder": "",
+	            "bidderName": "",
+	            "ftAlias": "Flow",
+	            "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	            "listingId": "134",
+	            "listingStatus": "active",
+	            "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
+	            "listingValidUntil": "",
+	            "nft": "",
+	            "nftId": "134",
+	            "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	            "saleType": "active_listed",
+	            "seller": "0x179b6b1cb6755e31",
+	            "sellerName": "user1"
+	        }
+	    },
+	    "nftDetail": {
+	        "collectionDescription": "Neo Collectibles FIND",
+	        "collectionName": "user1",
+	        "editionNumber": "2",
+	        "id": "134",
+	        "name": "Neo Motorcycle 2 of 3",
+	        "rarity": "",
+	        "royalties": [
+	            {
+	                "address": "0x179b6b1cb6755e31",
+	                "cut": "0.05000000",
+	                "findName": "user1",
+	                "royaltyName": "artist"
+	            },
+	            {
+	                "address": "0xf8d6e0586b0a20c7",
+	                "cut": "0.15000000",
+	                "findName": "",
+	                "royaltyName": "platform"
+	            }
+	        ],
+	        "scalars": {
+	            "Speed": "100.00000000"
+	        },
+	        "tags": {
+	            "NeoMotorCycleTag": "Tag1"
+	        },
+	        "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+	        "totalInEdition": "3",
+	        "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	        "uuid": "134",
+	        "views": {}
+	    },
+	    "storefront": {
+	        "amount": "10.00000000",
+	        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	        "listingID": "138",
+	        "nftID": "134",
+	        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	        "saleCut": [
+	            {
+	                "address": "0x179b6b1cb6755e31",
+	                "amount": "10.00000000",
+	                "findName": "user1"
+	            }
+	        ],
+	        "storefront": "137"
+	    }
+	}
 			`
 
 		json := otu.O.ScriptFromFile("getNFTDetails").
@@ -529,80 +477,4 @@ func TestNFTDetailScript(t *testing.T) {
 		assert.JSONEq(otu.T, expectedJson, json)
 	})
 
-	t.Run("Should be able to get listing methods from a script", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		otu.setupMarketAndMintDandys()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft")
-
-		expectedJson := `
-		{
-			"FindMarketAuctionEscrow": {
-				"ftAlias": [
-					"Flow"
-				],
-				"ftIdentifiers": [
-					"A.0ae53cb6e3f42a79.FlowToken.Vault"
-				],
-				"listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-				"status": "active"
-			},
-			"FindMarketAuctionSoft": {
-				"ftAlias": [
-					"Flow"
-				],
-				"ftIdentifiers": [
-					"A.0ae53cb6e3f42a79.FlowToken.Vault"
-				],
-				"listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-				"status": "active"
-			},
-			"FindMarketDirectOfferEscrow": {
-				"ftAlias": [
-					"Flow"
-				],
-				"ftIdentifiers": [
-					"A.0ae53cb6e3f42a79.FlowToken.Vault"
-				],
-				"listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-				"status": "active"
-			},
-			"FindMarketDirectOfferSoft": {
-				"ftAlias": [
-					"Flow"
-				],
-				"ftIdentifiers": [
-					"A.0ae53cb6e3f42a79.FlowToken.Vault"
-				],
-				"listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-				"status": "active"
-			},
-			"FindMarketSale": {
-				"ftAlias": [
-					"Flow"
-				],
-				"ftIdentifiers": [
-					"A.0ae53cb6e3f42a79.FlowToken.Vault"
-				],
-				"listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-				"status": "active"
-			}
-		}
-		`
-		json := otu.O.ScriptFromFile("resolveListing").
-			Args(otu.O.Arguments().
-				String("Dandy")).
-			RunReturnsJsonString()
-
-		assert.JSONEq(otu.T, expectedJson, json)
-	})
-
-}
-
-func swallowErr(err error) {
 }

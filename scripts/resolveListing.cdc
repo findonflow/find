@@ -4,16 +4,6 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(aliasOrIdentifier: String) : {String : ListingTypeReport} {
-	let tenantCap = FindMarketTenant.getFindTenantCapability()
-	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up.")
-
-	init(findMarket:{String : FindMarket.SaleItemCollectionReport}, storefront: StorefrontReport?) {
-		self.findMarket=findMarket
-		self.storefront=storefront
-	}
-}
-
 pub struct StoreFrontCut {
 
 	pub let amount:UFix64
