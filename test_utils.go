@@ -1009,6 +1009,15 @@ func (otu *OverflowTestUtils) registerFtInRegistry() *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setProfile").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().String("https://find.xyz/assets/img/avatars/avatar14.png")).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
 		SignProposeAndPayAsService().

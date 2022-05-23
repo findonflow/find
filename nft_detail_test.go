@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +15,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		ids := otu.setupMarketAndMintDandys()
 		otu.registerFtInRegistry().
+			setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
@@ -28,320 +28,301 @@ func TestNFTDetailScript(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 5, len(itemsForSale))
+		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 
-		expectedSale := `
-		[		{
-					"amount": "10.00000000",
-					"auction": "",
-					"bidder": "",
-					"bidderName": "",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "134",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-					"listingValidUntil": "",
-					"nftId": "134",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_listed",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				}]
-			`
-		expectedAuctionEscrow := `
-		[		{
-					"amount": "10.00000000",
-					"auction": {
-						"auctionEndsAt": "",
-						"currentPrice": "10.00000000",
-						"extentionOnLateBid": "60.00000000",
-						"minimumBidIncrement": "1.00000000",
-						"reservePrice": "15.00000000",
-						"startPrice": "10.00000000",
-						"timestamp": "1652277195.00000000"
-					},
-					"bidder": "",
-					"bidderName": "",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "134",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-					"listingValidUntil": "",
-					"nftId": "134",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_listed",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				}]
-				`
-
-		expectedAuctionSoft := `
-		[		{
-					"amount": "10.00000000",
-					"auction": {
-						"auctionEndsAt": "",
-						"currentPrice": "10.00000000",
-						"extentionOnLateBid": "60.00000000",
-						"minimumBidIncrement": "1.00000000",
-						"reservePrice": "15.00000000",
-						"startPrice": "10.00000000",
-						"timestamp": "1652277195.00000000"
-					},
-					"bidder": "",
-					"bidderName": "",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "134",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-					"listingValidUntil": "",
-					"nftId": "134",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_listed",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				}]
-				`
-
-		expectedDirectOfferEscrow := `
-		[		{
-					"amount": "10.00000000",
-					"auction": "",
-					"bidder": "0xf3fcd2c1a78f5eee",
-					"bidderName": "user2",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "133",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-					"listingValidUntil": "",
-					"nftId": "133",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_ongoing",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				}]
-				`
-
-		expectedDirectOfferSoft := `
-		[		{
-					"amount": "10.00000000",
-					"auction": "",
-					"bidder": "0xf3fcd2c1a78f5eee",
-					"bidderName": "user2",
-					"ftAlias": "Flow",
-					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId": "133",
-					"listingStatus": "active",
-					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-					"listingValidUntil": "",
-					"nftId": "133",
-					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"saleType": "active_ongoing",
-					"seller": "0x179b6b1cb6755e31",
-					"sellerName": "user1"
-				}]
-				`
-
-		var itemForSaleStruct map[string]SaleItemCollectionReport
-
-		var expectedSaleStruct []SaleItemInformation
-		var expectedAuctionEscrowStruct []SaleItemInformation
-		var expectedAuctionSoftStruct []SaleItemInformation
-		var expectedDirectOfferEscrowStruct []SaleItemInformation
-		var expectedDirectOfferSoftStruct []SaleItemInformation
-		err := otu.O.ScriptFromFile("getListings").Args(otu.O.Arguments().Account("account").String("user1")).RunMarshalAs(&itemForSaleStruct)
-		swallowErr(err)
-
-		err = json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
-		swallowErr(err)
-		err = json.Unmarshal([]byte(expectedAuctionEscrow), &expectedAuctionEscrowStruct)
-		swallowErr(err)
-		err = json.Unmarshal([]byte(expectedAuctionSoft), &expectedAuctionSoftStruct)
-		swallowErr(err)
-		err = json.Unmarshal([]byte(expectedDirectOfferEscrow), &expectedDirectOfferEscrowStruct)
-		swallowErr(err)
-		err = json.Unmarshal([]byte(expectedDirectOfferSoft), &expectedDirectOfferSoftStruct)
-		swallowErr(err)
-
-		FindMarketSale := itemForSaleStruct["FindMarketSale"].Items
-		FindMarketAuctionEscrow := itemForSaleStruct["FindMarketAuctionEscrow"].Items
-		FindMarketAuctionSoft := itemForSaleStruct["FindMarketAuctionSoft"].Items
-		FindMarketDirectOfferEscrow := itemForSaleStruct["FindMarketDirectOfferEscrow"].Items
-		FindMarketDirectOfferSoft := itemForSaleStruct["FindMarketDirectOfferSoft"].Items
-
-		assert.Equal(otu.T, expectedSaleStruct, FindMarketSale)
-		assert.Equal(otu.T, expectedAuctionEscrowStruct, FindMarketAuctionEscrow)
-		assert.Equal(otu.T, expectedAuctionSoftStruct, FindMarketAuctionSoft)
-		assert.Equal(otu.T, expectedDirectOfferEscrowStruct, FindMarketDirectOfferEscrow)
-		assert.Equal(otu.T, expectedDirectOfferSoftStruct, FindMarketDirectOfferSoft)
-	})
-
-	t.Run("Should be able to get NFT and listing details by a script", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		ids := otu.setupMarketAndMintDandys()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSale("user1", ids[1], price).
-			listNFTForEscrowedAuction("user1", ids[1], price).
-			listNFTForSoftAuction("user1", ids[1], price)
-
-		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 5, len(itemsForSale))
-
-		expectedJson := `
+		expected := `
 {
-        	            	    "findMarket": {
-        	            	        "FindMarketAuctionEscrow": {
-        	            	            "ghosts": null,
-        	            	            "items": [
-        	            	                {
-        	            	                    "amount": "10.00000000",
-        	            	                    "auction": {
-        	            	                        "auctionEndsAt": "",
-        	            	                        "currentPrice": "10.00000000",
-        	            	                        "extentionOnLateBid": "60.00000000",
-        	            	                        "minimumBidIncrement": "1.00000000",
-        	            	                        "reservePrice": "15.00000000",
-        	            	                        "startPrice": "10.00000000",
-        	            	                        "timestamp": "1.00000000"
-        	            	                    },
-        	            	                    "bidder": "",
-        	            	                    "bidderName": "",
-        	            	                    "ftAlias": "Flow",
-        	            	                    "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        	            	                    "listingId": "134",
-        	            	                    "listingStatus": "active",
-        	            	                    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-        	            	                    "listingValidUntil": "",
-        	            	                    "nft": {
-        	            	                        "collectionDescription": "Neo Collectibles FIND",
-        	            	                        "collectionName": "user1",
-        	            	                        "editionNumber": "2",
-        	            	                        "id": "134",
-        	            	                        "name": "Neo Motorcycle 2 of 3",
-        	            	                        "rarity": "",
-        	            	                        "scalars": {
-        	            	                            "Speed": "100.00000000"
-        	            	                        },
-        	            	                        "tags": {
-        	            	                            "NeoMotorCycleTag": "Tag1"
-        	            	                        },
-        	            	                        "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        	            	                        "totalInEdition": "3",
-        	            	                        "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
-        	            	                    },
-        	            	                    "nftId": "134",
-        	            	                    "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        	            	                    "saleType": "active_listed",
-        	            	                    "seller": "0x179b6b1cb6755e31",
-        	            	                    "sellerName": "user1"
-        	            	                }
-        	            	            ]
-        	            	        },
-        	            	        "FindMarketAuctionSoft": {
-        	            	            "ghosts": null,
-        	            	            "items": [
-        	            	                {
-        	            	                    "amount": "10.00000000",
-        	            	                    "auction": {
-        	            	                        "auctionEndsAt": "",
-        	            	                        "currentPrice": "10.00000000",
-        	            	                        "extentionOnLateBid": "60.00000000",
-        	            	                        "minimumBidIncrement": "1.00000000",
-        	            	                        "reservePrice": "15.00000000",
-        	            	                        "startPrice": "10.00000000",
-        	            	                        "timestamp": "1.00000000"
-        	            	                    },
-        	            	                    "bidder": "",
-        	            	                    "bidderName": "",
-        	            	                    "ftAlias": "Flow",
-        	            	                    "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        	            	                    "listingId": "134",
-        	            	                    "listingStatus": "active",
-        	            	                    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-        	            	                    "listingValidUntil": "",
-        	            	                    "nft": {
-        	            	                        "collectionDescription": "Neo Collectibles FIND",
-        	            	                        "collectionName": "user1",
-        	            	                        "editionNumber": "2",
-        	            	                        "id": "134",
-        	            	                        "name": "Neo Motorcycle 2 of 3",
-        	            	                        "rarity": "",
-        	            	                        "scalars": {
-        	            	                            "Speed": "100.00000000"
-        	            	                        },
-        	            	                        "tags": {
-        	            	                            "NeoMotorCycleTag": "Tag1"
-        	            	                        },
-        	            	                        "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        	            	                        "totalInEdition": "3",
-        	            	                        "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
-        	            	                    },
-        	            	                    "nftId": "134",
-        	            	                    "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        	            	                    "saleType": "active_listed",
-        	            	                    "seller": "0x179b6b1cb6755e31",
-        	            	                    "sellerName": "user1"
-        	            	                }
-        	            	            ]
-        	            	        },
-        	            	        "FindMarketSale": {
-        	            	            "ghosts": null,
-        	            	            "items": [
-        	            	                {
-        	            	                    "amount": "10.00000000",
-        	            	                    "auction": "",
-        	            	                    "bidder": "",
-        	            	                    "bidderName": "",
-        	            	                    "ftAlias": "Flow",
-        	            	                    "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        	            	                    "listingId": "134",
-        	            	                    "listingStatus": "active",
-        	            	                    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-        	            	                    "listingValidUntil": "",
-        	            	                    "nft": {
-        	            	                        "collectionDescription": "Neo Collectibles FIND",
-        	            	                        "collectionName": "user1",
-        	            	                        "editionNumber": "2",
-        	            	                        "id": "134",
-        	            	                        "name": "Neo Motorcycle 2 of 3",
-        	            	                        "rarity": "",
-        	            	                        "scalars": {
-        	            	                            "Speed": "100.00000000"
-        	            	                        },
-        	            	                        "tags": {
-        	            	                            "NeoMotorCycleTag": "Tag1"
-        	            	                        },
-        	            	                        "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        	            	                        "totalInEdition": "3",
-        	            	                        "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
-        	            	                    },
-        	            	                    "nftId": "134",
-        	            	                    "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        	            	                    "saleType": "active_listed",
-        	            	                    "seller": "0x179b6b1cb6755e31",
-        	            	                    "sellerName": "user1"
-        	            	                }
-        	            	            ]
-        	            	        }
-        	            	    },
-														"storefront" : ""
-        	            	}`
+	    "FINDReport": {
+	        "bids": null,
+	        "itemsForSale": {
+	            "FindMarketAuctionEscrow": {
+	                "ghosts": null,
+	                "items": [
+	                    {
+	                        "amount": "10.00000000",
+	                        "auction": {
+	                            "auctionEndsAt": "",
+	                            "currentPrice": "10.00000000",
+	                            "extentionOnLateBid": "60.00000000",
+	                            "minimumBidIncrement": "1.00000000",
+	                            "reservePrice": "15.00000000",
+	                            "startPrice": "10.00000000",
+	                            "timestamp": "1.00000000"
+	                        },
+	                        "bidder": "",
+	                        "bidderName": "",
+	                        "ftAlias": "Flow",
+	                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	                        "listingId": "134",
+	                        "listingStatus": "active",
+	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
+	                        "listingValidUntil": "",
+	                        "nft": {
+	                            "collectionDescription": "Neo Collectibles FIND",
+	                            "collectionName": "user1",
+	                            "editionNumber": "2",
+	                            "id": "134",
+	                            "name": "Neo Motorcycle 2 of 3",
+	                            "rarity": "",
+	                            "scalars": {
+	                                "Speed": "100.00000000"
+	                            },
+	                            "tags": {
+	                                "NeoMotorCycleTag": "Tag1"
+	                            },
+	                            "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+	                            "totalInEdition": "3",
+	                            "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+	                        },
+	                        "nftId": "134",
+	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	                        "saleType": "active_listed",
+	                        "seller": "0x179b6b1cb6755e31",
+	                        "sellerName": "user1"
+	                    }
+	                ]
+	            },
+	            "FindMarketAuctionSoft": {
+	                "ghosts": null,
+	                "items": [
+	                    {
+	                        "amount": "10.00000000",
+	                        "auction": {
+	                            "auctionEndsAt": "",
+	                            "currentPrice": "10.00000000",
+	                            "extentionOnLateBid": "60.00000000",
+	                            "minimumBidIncrement": "1.00000000",
+	                            "reservePrice": "15.00000000",
+	                            "startPrice": "10.00000000",
+	                            "timestamp": "1.00000000"
+	                        },
+	                        "bidder": "",
+	                        "bidderName": "",
+	                        "ftAlias": "Flow",
+	                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	                        "listingId": "134",
+	                        "listingStatus": "active",
+	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
+	                        "listingValidUntil": "",
+	                        "nft": {
+	                            "collectionDescription": "Neo Collectibles FIND",
+	                            "collectionName": "user1",
+	                            "editionNumber": "2",
+	                            "id": "134",
+	                            "name": "Neo Motorcycle 2 of 3",
+	                            "rarity": "",
+	                            "scalars": {
+	                                "Speed": "100.00000000"
+	                            },
+	                            "tags": {
+	                                "NeoMotorCycleTag": "Tag1"
+	                            },
+	                            "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+	                            "totalInEdition": "3",
+	                            "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+	                        },
+	                        "nftId": "134",
+	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	                        "saleType": "active_listed",
+	                        "seller": "0x179b6b1cb6755e31",
+	                        "sellerName": "user1"
+	                    }
+	                ]
+	            },
+	            "FindMarketDirectOfferEscrow": {
+	                "ghosts": null,
+	                "items": [
+	                    {
+	                        "amount": "10.00000000",
+	                        "auction": "",
+	                        "bidder": "0xf3fcd2c1a78f5eee",
+	                        "bidderName": "user2",
+	                        "ftAlias": "Flow",
+	                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	                        "listingId": "133",
+	                        "listingStatus": "active",
+	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
+	                        "listingValidUntil": "",
+	                        "nft": {
+	                            "collectionDescription": "Neo Collectibles FIND",
+	                            "collectionName": "user1",
+	                            "editionNumber": "1",
+	                            "id": "133",
+	                            "name": "Neo Motorcycle 1 of 3",
+	                            "rarity": "",
+	                            "scalars": {
+	                                "Speed": "100.00000000"
+	                            },
+	                            "tags": {
+	                                "NeoMotorCycleTag": "Tag1"
+	                            },
+	                            "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+	                            "totalInEdition": "3",
+	                            "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+	                        },
+	                        "nftId": "133",
+	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	                        "saleType": "active_ongoing",
+	                        "seller": "0x179b6b1cb6755e31",
+	                        "sellerName": "user1"
+	                    }
+	                ]
+	            },
+	            "FindMarketDirectOfferSoft": {
+	                "ghosts": null,
+	                "items": [
+	                    {
+	                        "amount": "10.00000000",
+	                        "auction": "",
+	                        "bidder": "0xf3fcd2c1a78f5eee",
+	                        "bidderName": "user2",
+	                        "ftAlias": "Flow",
+	                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	                        "listingId": "133",
+	                        "listingStatus": "active",
+	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
+	                        "listingValidUntil": "",
+	                        "nft": {
+	                            "collectionDescription": "Neo Collectibles FIND",
+	                            "collectionName": "user1",
+	                            "editionNumber": "1",
+	                            "id": "133",
+	                            "name": "Neo Motorcycle 1 of 3",
+	                            "rarity": "",
+	                            "scalars": {
+	                                "Speed": "100.00000000"
+	                            },
+	                            "tags": {
+	                                "NeoMotorCycleTag": "Tag1"
+	                            },
+	                            "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+	                            "totalInEdition": "3",
+	                            "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+	                        },
+	                        "nftId": "133",
+	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	                        "saleType": "active_ongoing",
+	                        "seller": "0x179b6b1cb6755e31",
+	                        "sellerName": "user1"
+	                    }
+	                ]
+	            },
+	            "FindMarketSale": {
+	                "ghosts": null,
+	                "items": [
+	                    {
+	                        "amount": "10.00000000",
+	                        "auction": "",
+	                        "bidder": "",
+	                        "bidderName": "",
+	                        "ftAlias": "Flow",
+	                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	                        "listingId": "134",
+	                        "listingStatus": "active",
+	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
+	                        "listingValidUntil": "",
+	                        "nft": {
+	                            "collectionDescription": "Neo Collectibles FIND",
+	                            "collectionName": "user1",
+	                            "editionNumber": "2",
+	                            "id": "134",
+	                            "name": "Neo Motorcycle 2 of 3",
+	                            "rarity": "",
+	                            "scalars": {
+	                                "Speed": "100.00000000"
+	                            },
+	                            "tags": {
+	                                "NeoMotorCycleTag": "Tag1"
+	                            },
+	                            "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+	                            "totalInEdition": "3",
+	                            "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+	                        },
+	                        "nftId": "134",
+	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+	                        "saleType": "active_listed",
+	                        "seller": "0x179b6b1cb6755e31",
+	                        "sellerName": "user1"
+	                    }
+	                ]
+	            }
+	        },
+	        "leases": [
+	            {
+	                "addons": [
+	                    "forge"
+	                ],
+	                "address": "0x179b6b1cb6755e31",
+	                "auctionEnds": "",
+	                "auctionReservePrice": "",
+	                "auctionStartPrice": "",
+	                "cost": "5.00000000",
+	                "currentTime": "1.00000000",
+	                "extensionOnLateBid": "300.00000000",
+	                "latestBid": "",
+	                "latestBidBy": "",
+	                "lockedUntil": "39312001.00000000",
+	                "name": "user1",
+	                "salePrice": "",
+	                "status": "TAKEN",
+	                "validUntil": "31536001.00000000"
+	            }
+	        ],
+	        "marketBids": {},
+	        "privateMode": "false",
+	        "profile": {
+	            "address": "0x179b6b1cb6755e31",
+	            "allowStoringFollowers": "true",
+	            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+	            "collections": null,
+	            "createdAt": "find",
+	            "description": "",
+	            "findName": "user1",
+	            "followers": null,
+	            "following": null,
+	            "gender": "",
+	            "links": null,
+	            "name": "user1",
+	            "tags": null,
+	            "wallets": [
+	                {
+	                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+	                    "balance": "100.00100000",
+	                    "name": "Flow",
+	                    "tags": [
+	                        "flow"
+	                    ]
+	                },
+	                {
+	                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+	                    "balance": "45.00000000",
+	                    "name": "FUSD",
+	                    "tags": [
+	                        "fusd",
+	                        "stablecoin"
+	                    ]
+	                },
+	                {
+	                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+	                    "balance": "100.00000000",
+	                    "name": "USDC",
+	                    "tags": [
+	                        "usdc",
+	                        "stablecoin"
+	                    ]
+	                }
+	            ]
+	        },
+	        "relatedAccounts": {}
+	    },
+	    "NameReport": {
+	        "cost": "5.00000000",
+	        "status": "TAKEN"
+	    }
+	}
+		`
+		assert.JSONEq(otu.T, expected, actual)
 
-		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().Account("account").String("user1").UInt64(ids[1])).RunReturnsJsonString()
-
-		assert.JSONEq(otu.T, expectedJson, json)
 	})
 
 	t.Run("Should be able to get storefront listings of an NFT by a script", func(t *testing.T) {
