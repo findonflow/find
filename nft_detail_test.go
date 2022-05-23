@@ -194,7 +194,6 @@ func TestNFTDetailScript(t *testing.T) {
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			listNFTForSoftAuction("user1", ids[1], price)
 
-<<<<<<< HEAD
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
 		itemsForSale := otu.getItemsForSale("user1")
@@ -539,9 +538,6 @@ func TestNFTDetailScript(t *testing.T) {
 		}
 			`
 
-<<<<<<< HEAD
-		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().Account("account").String("user1").UInt64(ids[1])).RunReturnsJsonString()
-=======
 		json := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").

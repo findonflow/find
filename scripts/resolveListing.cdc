@@ -8,7 +8,6 @@ pub fun main(aliasOrIdentifier: String) : {String : ListingTypeReport} {
 	let tenantCap = FindMarketTenant.getFindTenantCapability()
 	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up.")
 
-<<<<<<< HEAD
 	init(findMarket:{String : FindMarket.SaleItemCollectionReport}, storefront: StorefrontReport?) {
 		self.findMarket=findMarket
 		self.storefront=storefront
