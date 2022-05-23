@@ -65,10 +65,10 @@ pub contract FindMarket {
 		
 			self.collectionName=nil
 			self.collectionDescription=nil
-			if item.resolveView(Type<FindViews.NFTCollectionDisplay>()) != nil {
-				let view = item.resolveView(Type<FindViews.NFTCollectionDisplay>())!
-				if view as? FindViews.NFTCollectionDisplay != nil {
-					let grouping = view as! FindViews.NFTCollectionDisplay
+			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
+				let view = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())!
+				if view as? MetadataViews.NFTCollectionDisplay != nil {
+					let grouping = view as! MetadataViews.NFTCollectionDisplay
 					self.collectionName=grouping.name
 					self.collectionDescription=grouping.description
 				}
@@ -239,10 +239,11 @@ pub contract FindMarket {
 		pub let ftTypeIdentifier: String
 		pub let listingValidUntil: UFix64?
 
+		pub var nft: NFTInfo?
 		pub let auction: AuctionItem?
 		pub let listingStatus:String
 
-		init(item: &{SaleItem}, status:String) {
+		init(item: &{SaleItem}, status:String, nftInfo: Bool) {
 			self.nftIdentifier= item.getItemType().identifier
 			self.nftId=item.getItemID()
 			self.listingStatus=status
@@ -257,7 +258,8 @@ pub contract FindMarket {
 
 			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
-
+			self.nft=nil
+			if nftInfo {self.nft=item.toNFTInfo()}
 			self.ftTypeIdentifier=item.getFtType().identifier
 
 			self.auction=item.getAuction()

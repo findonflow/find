@@ -2,7 +2,6 @@ package test_main
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -202,6 +201,58 @@ func TestNFTDetailScript(t *testing.T) {
 
 		expectedJson := `
 		{
+			"AllowedListingActions": {
+				"FindMarketAuctionEscrow": {
+					"ftAlias": [
+						"Flow"
+					],
+					"ftIdentifiers": [
+						"A.0ae53cb6e3f42a79.FlowToken.Vault"
+					],
+					"listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
+					"status": "active"
+				},
+				"FindMarketAuctionSoft": {
+					"ftAlias": [
+						"Flow"
+					],
+					"ftIdentifiers": [
+						"A.0ae53cb6e3f42a79.FlowToken.Vault"
+					],
+					"listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
+					"status": "active"
+				},
+				"FindMarketDirectOfferEscrow": {
+					"ftAlias": [
+						"Flow"
+					],
+					"ftIdentifiers": [
+						"A.0ae53cb6e3f42a79.FlowToken.Vault"
+					],
+					"listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
+					"status": "active"
+				},
+				"FindMarketDirectOfferSoft": {
+					"ftAlias": [
+						"Flow"
+					],
+					"ftIdentifiers": [
+						"A.0ae53cb6e3f42a79.FlowToken.Vault"
+					],
+					"listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
+					"status": "active"
+				},
+				"FindMarketSale": {
+					"ftAlias": [
+						"Flow"
+					],
+					"ftIdentifiers": [
+						"A.0ae53cb6e3f42a79.FlowToken.Vault"
+					],
+					"listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
+					"status": "active"
+				}
+			},
 			"findMarket": {
 				"FindMarketAuctionEscrow": {
 					"amount": "10.00000000",
@@ -222,6 +273,7 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "",
+					"nft": "",
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_listed",
@@ -247,6 +299,7 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
 					"listingValidUntil": "",
+					"nft": "",
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_listed",
@@ -264,6 +317,7 @@ func TestNFTDetailScript(t *testing.T) {
 					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
 					"listingValidUntil": "",
+					"nft": "",
 					"nftId": "134",
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType": "active_listed",
@@ -278,6 +332,20 @@ func TestNFTDetailScript(t *testing.T) {
 				"id": "134",
 				"name": "Neo Motorcycle 2 of 3",
 				"rarity": "",
+				"royalties": [
+					{
+						"address": "0x179b6b1cb6755e31",
+						"cut": "0.05000000",
+						"findName": "user1",
+						"royaltyName": "artist"
+					},
+					{
+						"address": "0xf8d6e0586b0a20c7",
+						"cut": "0.15000000",
+						"findName": "",
+						"royaltyName": "platform"
+					}
+				],
 				"scalars": {
 					"Speed": "100.00000000"
 				},
@@ -315,9 +383,6 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(ids[1]).
 				StringArray()).
 			RunReturnsJsonString()
-		fmt.Println("@@@@@@@@@@@@@@@@@")
-		fmt.Println(json)
-		fmt.Println("@@@@@@@@@@@@@@@@@@")
 		assert.JSONEq(otu.T, expectedJson, json)
 	})
 

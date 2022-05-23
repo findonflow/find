@@ -60,21 +60,21 @@ pub contract FindMarketOptions {
     }
 
     /* Get Sale Reports and Sale Item */
-    pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64) : FindMarket.SaleItemInformation? {
+    pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
         let tenantRef=self.getTenant(tenant)
-        let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: false)
+        let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
         if info.items.length > 0 {
             return info.items[0]
         }
         return nil
     }
 
-    pub fun getSaleItemReport(tenant:Address, address: Address) : {String : FindMarket.SaleItemCollectionReport} {
+    pub fun getSaleItemReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
         let tenantRef = self.getTenant(tenant)
         var report : {String : FindMarket.SaleItemCollectionReport} = {}
         for type in self.getSaleItemCollectionTypes() {
             let marketOption = self.getMarketOptionFromType(type)
-            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [], getGhost: true)
+            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
             if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
                 report[marketOption] = returnedReport
             }
@@ -82,12 +82,12 @@ pub contract FindMarketOptions {
         return report
     }
 
-    pub fun getSaleItems(tenant:Address, address: Address, id: UInt64) : {String : FindMarket.SaleItemCollectionReport} {
+    pub fun getSaleItems(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
         let tenantRef = self.getTenant(tenant)
         var report : {String : FindMarket.SaleItemCollectionReport} = {}
         for type in self.getSaleItemCollectionTypes() {
             let marketOption = self.getMarketOptionFromType(type)
-            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true)
+            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true, getNFTInfo: getNFTInfo)
             if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
                 report[marketOption] = returnedReport
             }
@@ -95,12 +95,12 @@ pub contract FindMarketOptions {
         return report
     }
 
-    pub fun getNFTListing(tenant:Address, address: Address, id: UInt64) : {String : FindMarket.SaleItemInformation} {
+    pub fun getNFTListing(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemInformation} {
         let tenantRef = self.getTenant(tenant)
         var report : {String : FindMarket.SaleItemInformation} = {}
         for type in self.getSaleItemCollectionTypes() {
             let marketOption = self.getMarketOptionFromType(type)
-            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true)
+            let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true, getNFTInfo: getNFTInfo)
             if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
                 report[marketOption] = returnedReport.items[0]
             }
@@ -110,23 +110,23 @@ pub contract FindMarketOptions {
     
     // A function to 
     // Return a list of all options 
-    pub fun getFindSaleInformation(address: Address, marketOption: String, id:UInt64) : FindMarket.SaleItemInformation? {
-        return self.getSaleInformation(tenant: FindMarketOptions.account.address, address: address, marketOption: marketOption, id: id)
+    pub fun getFindSaleInformation(address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
+        return self.getSaleInformation(tenant: FindMarketOptions.account.address, address: address, marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
     }
 
-    pub fun getFindSaleItemReport(address: Address) : {String : FindMarket.SaleItemCollectionReport} {
-        return self.getSaleItemReport(tenant: FindMarketOptions.account.address, address: address)
+    pub fun getFindSaleItemReport(address: Address, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
+        return self.getSaleItemReport(tenant: FindMarketOptions.account.address, address: address, getNFTInfo: getNFTInfo)
     }
 
-    pub fun getFindSaleItems(address: Address, id: UInt64) : {String : FindMarket.SaleItemCollectionReport} {
-        return self.getSaleItems(tenant:FindMarketOptions.account.address, address: address, id: id)
+    pub fun getFindSaleItems(address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
+        return self.getSaleItems(tenant:FindMarketOptions.account.address, address: address, id: id, getNFTInfo: getNFTInfo)
     }
 
-    pub fun getNFTFindListing(address: Address, id: UInt64) : {String : FindMarket.SaleItemInformation} {
-        return self.getNFTListing(tenant:FindMarketOptions.account.address, address: address, id: id)
+    pub fun getNFTFindListing(address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemInformation} {
+        return self.getNFTListing(tenant:FindMarketOptions.account.address, address: address, id: id, getNFTInfo: getNFTInfo)
     }
 
-    access(contract) fun checkSaleInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
+    access(contract) fun checkSaleInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost: Bool, getNFTInfo: Bool) : FindMarket.SaleItemCollectionReport {
         let ghost: [FindMarket.GhostListing] =[]
         let info: [FindMarket.SaleItemInformation] =[]
         let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -162,7 +162,7 @@ pub contract FindMarketOptions {
                         status="ended"
                     }
                 }
-                info.append(FindMarket.SaleItemInformation(item, status))
+                info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
             }
         }
 
@@ -207,21 +207,21 @@ pub contract FindMarketOptions {
         return self.getMarketBidCollectionCapability(tenantRef: self.getTenant(FindMarketOptions.account.address), marketOption: marketOption, address: address)
     }
 
-    pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64) : FindMarket.BidInfo? {
+    pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
         let tenantRef=self.getTenant(tenant)
-        let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [id], getGhost: false)
+        let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
         if bidInfo.items.length > 0 {
             return bidInfo.items[0]
         }
         return nil
     }
 
-    pub fun getBidsReport(tenant:Address, address: Address) : {String : FindMarket.BidItemCollectionReport} {
+    pub fun getBidsReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.BidItemCollectionReport} {
         let tenantRef = self.getTenant(tenant)
         var report : {String : FindMarket.BidItemCollectionReport} = {}
         for type in self.getMarketBidCollectionTypes() {
             let marketOption = self.getMarketOptionFromType(type!)
-            let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [], getGhost: true)
+            let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
             if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
                 report[marketOption] = returnedReport
             }
@@ -229,15 +229,15 @@ pub contract FindMarketOptions {
         return report
     }
 
-    pub fun getFindBid(address: Address, marketOption: String, id:UInt64) : FindMarket.BidInfo? {
-        return self.getBid(tenant: FindMarketOptions.account.address, address: address, marketOption: marketOption, id: id)
+    pub fun getFindBid(address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
+        return self.getBid(tenant: FindMarketOptions.account.address, address: address, marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
     }
 
-    pub fun getFindBidsReport(address: Address) : {String : FindMarket.BidItemCollectionReport} {
-        return self.getBidsReport(tenant: FindMarketOptions.account.address, address: address)
+    pub fun getFindBidsReport(address: Address, getNFTInfo: Bool) : {String : FindMarket.BidItemCollectionReport} {
+        return self.getBidsReport(tenant: FindMarketOptions.account.address, address: address, getNFTInfo: getNFTInfo)
     }
 
-    access(contract) fun checkBidInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool) : FindMarket.BidItemCollectionReport {
+    access(contract) fun checkBidInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool, getNFTInfo: Bool) : FindMarket.BidItemCollectionReport {
         let ghost: [FindMarket.GhostListing] =[]
         let info: [FindMarket.BidInfo] =[]
         let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -250,7 +250,7 @@ pub contract FindMarketOptions {
         for id in listID {
             if ref.getIds().contains(id) {
                 let bid=ref.borrowBidItem(id)
-                let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id)
+                let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
                 if item == nil {
                     if getGhost {
                         ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))

@@ -18,7 +18,7 @@ transaction(id: UInt64) {
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionSoft.MarketBidCollection>())
-		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id, getNFTInfo: false)
 		if bid==nil {
 			panic("Cannot fulfill market auction on ghost listing")
 		}

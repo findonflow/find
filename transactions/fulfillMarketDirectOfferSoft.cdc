@@ -17,7 +17,7 @@ transaction(id: UInt64) {
 
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id, getNFTInfo: false)
 		if bid==nil {
 			panic("Cannot fulfill market offer on ghost listing")
 
