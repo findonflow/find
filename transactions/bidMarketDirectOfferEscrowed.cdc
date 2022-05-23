@@ -1,4 +1,4 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -8,7 +8,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64) {
+transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -28,7 +28,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)

@@ -22,6 +22,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForAuctionSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -80,6 +81,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
@@ -109,6 +111,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertFailure("Cannot cancel finished auction, fulfill it instead")
 	})
@@ -126,6 +129,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
 
@@ -136,6 +140,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Auction has not ended yet")
 	})
@@ -158,6 +163,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
@@ -185,6 +191,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(0.1)).
 			Test(otu.T).
@@ -207,6 +214,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForAuctionSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -234,6 +242,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
@@ -242,6 +251,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price + 10.0)).
 			Test(otu.T).AssertSuccess()
@@ -251,6 +261,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertSuccess()
 
@@ -262,6 +273,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess()
 
@@ -280,6 +292,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForAuctionSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -298,6 +311,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
@@ -311,6 +325,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price + 10.0)).
 			Test(otu.T).
@@ -320,6 +335,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -329,6 +345,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -347,6 +364,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(1.0)).
@@ -368,6 +386,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(5.0)).

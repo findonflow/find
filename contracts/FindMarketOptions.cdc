@@ -8,6 +8,10 @@ pub contract FindMarketOptions {
     access(contract) var saleItemCollectionTypes : [Type]
     access(contract) var marketBidCollectionTypes : [Type]
 
+		pub fun getFindTenantAddress() : Address {
+			return FindMarketOptions.account.address
+		}
+
     /* Get Tenant */
     pub fun getTenant(_ tenant: Address) : &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic} {
         pre{
@@ -35,11 +39,7 @@ pub contract FindMarketOptions {
         return caps
     }
 
-    pub fun getFindSaleItemCollectionCapabilitiies(address: Address) : [Capability<&{FindMarket.SaleItemCollectionPublic}>] {
-        return self.getSaleItemCollectionCapabilities(tenantRef: self.getTenant(FindMarketOptions.account.address), address: address)
-    }
-
-    pub fun getSaleItemCollectionCapability(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
+     pub fun getSaleItemCollectionCapability(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
         for type in self.getSaleItemCollectionTypes() {
             if self.getMarketOptionFromType(type) == marketOption{
                 let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type!))
@@ -49,11 +49,7 @@ pub contract FindMarketOptions {
         panic("Cannot find market option : ".concat(marketOption))
     }
 
-    pub fun getFindSaleItemCollectionCapability(marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
-        return self.getSaleItemCollectionCapability(tenantRef: self.getTenant(FindMarketOptions.account.address), marketOption: marketOption, address: address)
-    }
-
-    /* Get Sale Reports and Sale Item */
+     /* Get Sale Reports and Sale Item */
     pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64) : FindMarket.SaleItemInformation? {
         let tenantRef=self.getTenant(tenant)
         let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: false)
@@ -89,20 +85,6 @@ pub contract FindMarketOptions {
         return report
     }
     
-    // A function to 
-    // Return a list of all options 
-    pub fun getFindSaleInformation(address: Address, marketOption: String, id:UInt64) : FindMarket.SaleItemInformation? {
-        return self.getSaleInformation(tenant: FindMarketOptions.account.address, address: address, marketOption: marketOption, id: id)
-    }
-
-    pub fun getFindSaleItemReport(address: Address) : {String : FindMarket.SaleItemCollectionReport} {
-        return self.getSaleItemReport(tenant: FindMarketOptions.account.address, address: address)
-    }
-
-    pub fun getFindSaleItems(address: Address, id: UInt64) : {String : FindMarket.SaleItemCollectionReport} {
-        return self.getSaleItems(tenant:FindMarketOptions.account.address, address: address, id: id)
-    }
-
     access(contract) fun checkSaleInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
         let ghost: [FindMarket.GhostListing] =[]
         let info: [FindMarket.SaleItemInformation] =[]
@@ -162,10 +144,6 @@ pub contract FindMarketOptions {
         return caps
     }
 
-    pub fun getFindMarketBidCollectionCapabilities(address: Address) : [Capability<&{FindMarket.MarketBidCollectionPublic}>] {    
-        return self.getMarketBidCollectionCapabilities(tenantRef: self.getTenant(FindMarketOptions.account.address), address: address)
-    }
-
     pub fun getMarketBidCollectionCapability(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
         for type in self.getMarketBidCollectionTypes() {
             if self.getMarketOptionFromType(type!) == marketOption{
@@ -175,11 +153,6 @@ pub contract FindMarketOptions {
         }
         panic("Cannot find market option : ".concat(marketOption))
     }
-
-    pub fun getFindMarketBidCollectionCapability(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
-        return self.getMarketBidCollectionCapability(tenantRef: self.getTenant(FindMarketOptions.account.address), marketOption: marketOption, address: address)
-    }
-
     pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64) : FindMarket.BidInfo? {
         let tenantRef=self.getTenant(tenant)
         let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [id], getGhost: false)
@@ -202,13 +175,6 @@ pub contract FindMarketOptions {
         return report
     }
 
-    pub fun getFindBid(address: Address, marketOption: String, id:UInt64) : FindMarket.BidInfo? {
-        return self.getBid(tenant: FindMarketOptions.account.address, address: address, marketOption: marketOption, id: id)
-    }
-
-    pub fun getFindBidsReport(address: Address) : {String : FindMarket.BidItemCollectionReport} {
-        return self.getBidsReport(tenant: FindMarketOptions.account.address, address: address)
-    }
 
     access(contract) fun checkBidInformation(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool) : FindMarket.BidItemCollectionReport {
         let ghost: [FindMarket.GhostListing] =[]

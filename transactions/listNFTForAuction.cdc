@@ -1,4 +1,4 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -6,11 +6,11 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
+transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 	prepare(account: AuthAccount) {
 		// get saleItemsRef from tenant
 
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>()))!
 
 		// Get supported NFT and FT Information from Registries from input alias

@@ -263,12 +263,6 @@ pub contract FindMarketSale {
 		return <- create SaleItemCollection(tenantCapability)
 	}
 
-	//BAM: will this work?
-	//pub fun getFindSaleItemCapability(_ user: Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollection}>? {
-	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		return FindMarketSale.getSaleItemCapability(marketplace: FindMarketSale.account.address, user:user) 
-	}
-
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
 		pre{
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"

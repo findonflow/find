@@ -1,23 +1,21 @@
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 //TODO: should these include the amount for safety reason, i belive they should
-transaction(id: UInt64) {
+transaction(marketplace:Address, id: UInt64) {
 
 	let walletReference : &FungibleToken.Vault
 	let balanceBeforeFulfill: UFix64
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 
 	prepare(account: AuthAccount) {
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		let bid = FindMarketOptions.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id)
 		if bid==nil {
 			panic("Cannot fulfill market offer on ghost listing")
 

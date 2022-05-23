@@ -1,4 +1,3 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -7,14 +6,14 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
 //TODO: use execute and post
-transaction(id: UInt64) {
+transaction(marketplace:Address, id: UInt64) {
 	prepare(account: AuthAccount) {
 
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
 
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
-		let saleItem = FindMarketOptions.getFindSaleInformation(address: account.address, marketOption: marketOption, id:id)
+		let saleItem = FindMarketOptions.getSaleInformation(tenant:marketplace, address: account.address, marketOption: marketOption, id:id)
 		if saleItem==nil {
 			panic("Cannot fulfill market offer on ghost listing")
 

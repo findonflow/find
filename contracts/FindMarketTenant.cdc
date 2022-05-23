@@ -467,10 +467,6 @@ pub contract FindMarketTenant {
 			PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
 	}
 
-	pub fun getFindTenantCapability() : Capability<&Tenant{TenantPublic}> {
-		return FindMarketTenant.getTenantCapability(FindMarketTenant.account.address) ?? panic("Find market tenant not set up correctly")
-	}
-
 	init() {
 		self.tenantAddressName={}
 		self.tenantNameAddress={}

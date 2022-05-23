@@ -208,7 +208,7 @@ func TestNFTDetailScript(t *testing.T) {
 		var expectedAuctionSoftStruct []SaleItemInformation
 		var expectedDirectOfferEscrowStruct []SaleItemInformation
 		var expectedDirectOfferSoftStruct []SaleItemInformation
-		err := otu.O.ScriptFromFile("getListings").Args(otu.O.Arguments().String("user1")).RunMarshalAs(&itemForSaleStruct)
+		err := otu.O.ScriptFromFile("getListings").Args(otu.O.Arguments().Account("account").String("user1")).RunMarshalAs(&itemForSaleStruct)
 		swallowErr(err)
 
 		err = json.Unmarshal([]byte(expectedSale), &expectedSaleStruct)
@@ -395,7 +395,7 @@ func TestNFTDetailScript(t *testing.T) {
 														"storefront" : ""
         	            	}`
 
-		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunReturnsJsonString()
+		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().Account("account").String("user1").UInt64(ids[1])).RunReturnsJsonString()
 
 		assert.JSONEq(otu.T, expectedJson, json)
 	})
@@ -483,7 +483,7 @@ func TestNFTDetailScript(t *testing.T) {
 }
 `
 
-		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().String("user1").UInt64(ids[1])).RunReturnsJsonString()
+		json := otu.O.ScriptFromFile("resolveListing").Args(otu.O.Arguments().Account("account").String("user1").UInt64(ids[1])).RunReturnsJsonString()
 
 		assert.JSONEq(otu.T, expectedJson, json)
 	})

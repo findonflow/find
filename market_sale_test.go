@@ -107,6 +107,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(5.0)).
@@ -135,6 +136,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
@@ -252,6 +254,7 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().Account("account")).
 			Test(otu.T).AssertSuccess().
 			AssertEmitEvent(expected...)
 	})
@@ -279,6 +282,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -289,6 +293,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
@@ -304,6 +309,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("delistNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(ids[1])).
 			Test(otu.T).
 			AssertSuccess()
@@ -333,6 +339,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -343,6 +350,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
@@ -352,6 +360,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("delistNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(ids[0])).
 			Test(otu.T).AssertFailure("Tenant has stopped this item")
 
@@ -380,6 +389,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -390,6 +400,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
@@ -399,6 +410,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[0]).
 				String("Flow").

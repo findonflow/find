@@ -2,6 +2,8 @@ package test_main
 
 import (
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestMarketDirectOfferSoft(t *testing.T) {
@@ -16,8 +18,11 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			saleItemListed("user1", "active_finished", price).
-			fulfillMarketDirectOfferSoft("user2", id, price)
+			saleItemListed("user1", "active_finished", price)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		spew.Dump(itemsForSale)
+		otu.fulfillMarketDirectOfferSoft("user2", id, price)
 	})
 
 	t.Run("Should be able to increase offer", func(t *testing.T) {
@@ -65,6 +70,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -87,6 +93,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
@@ -120,6 +127,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -142,6 +150,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
@@ -150,6 +159,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("acceptDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -170,6 +180,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -188,6 +199,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -234,6 +246,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -247,6 +260,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -270,6 +284,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Tenant has stopped this item")
 

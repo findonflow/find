@@ -7,6 +7,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
@@ -104,7 +105,7 @@ transaction(name: String) {
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let tenantCapability= FindMarketTenant.getFindTenantCapability()
+		let tenantCapability= FindMarketTenant.getTenantCapability(FindMarketOptions.getFindTenantAddress())!
 		let tenant = tenantCapability.borrow()!
 
 		let publicPath= tenant.getPublicPath(saleItemType) 

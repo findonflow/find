@@ -74,6 +74,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -90,7 +91,6 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				"amount": fmt.Sprintf("%.8f", price),
 				"to":     otu.accountAddress("user2"),
 			}))
-		//TODO: should there be an event emitted that you get your money back?
 
 	})
 
@@ -107,6 +107,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -131,6 +132,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(5)).
 			Test(otu.T).
@@ -164,6 +166,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -188,6 +191,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(5)).
 			Test(otu.T).
@@ -198,6 +202,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -216,6 +221,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -262,6 +268,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -275,6 +282,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -297,6 +305,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("retractOfferMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")

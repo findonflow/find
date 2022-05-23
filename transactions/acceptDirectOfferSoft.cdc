@@ -1,4 +1,3 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -8,15 +7,15 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
-transaction(id: UInt64) {
+transaction(marketplace:Address, id: UInt64) {
 
 	
 	prepare(account: AuthAccount) {
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())!
+		let tenant=FindMarketOptions.getTenant(marketplace)
+		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
 		let market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
-		let saleInformation = FindMarketOptions.getFindSaleInformation(address: account.address, marketOption: marketOption, id:id) 
+		let saleInformation = FindMarketOptions.getSaleInformation(tenant:marketplace, address: account.address, marketOption: marketOption, id:id) 
 		if saleInformation==nil {
 			panic("This offer is made on a ghost listing")
 

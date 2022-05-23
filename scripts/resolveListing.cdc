@@ -80,13 +80,13 @@ pub struct StorefrontReport {
 	}
 }
 
-pub fun main(user: String, id: UInt64) : NFTDetailReport?{
+pub fun main(marketplace:Address, user: String, id: UInt64) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {
 		return nil
 	}
 	let address = resolveAddress!
-	let findMarket=FindMarketOptions.getFindSaleItems(address: address, id: id)
+	let findMarket=FindMarketOptions.getSaleItems(tenant: marketplace, address: address, id: id)
 
 	let account=getAccount(address)
 	let listings : {UInt64 : NFTStorefront.ListingDetails} = {}

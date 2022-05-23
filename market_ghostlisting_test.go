@@ -36,6 +36,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
@@ -67,6 +68,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(bidPrice)).
@@ -98,6 +100,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(bidPrice + 1.0)).
 			Test(otu.T).AssertFailure("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
@@ -129,6 +132,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("NFT does not exist")
@@ -159,6 +163,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(bidPrice)).
@@ -190,6 +195,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(bidPrice + 1.0)).
 			Test(otu.T).AssertFailure("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
@@ -221,6 +227,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
 
@@ -246,6 +253,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -275,6 +283,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Cannot fulfill market offer on ghost listing")
 
@@ -299,6 +308,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -327,6 +337,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("acceptDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("This offer is made on a ghost listing")
 
@@ -352,6 +363,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Cannot fulfill market offer on ghost listing")
 

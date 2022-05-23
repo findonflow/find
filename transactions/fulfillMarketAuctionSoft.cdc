@@ -1,10 +1,9 @@
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
-transaction(id: UInt64) {
+transaction(marketplace:Address, id: UInt64) {
 
 	let walletReference : &FungibleToken.Vault
 	let balanceBeforeFulfill: UFix64
@@ -12,13 +11,13 @@ transaction(id: UInt64) {
 	let amount: UFix64
 
 	prepare(account: AuthAccount) {
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())!
+		let tenant=FindMarketOptions.getTenant(marketplace)
+		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())
 
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionSoft.MarketBidCollection>())
-		let bid = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id)
+		let bid = FindMarketOptions.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id)
 		if bid==nil {
 			panic("Cannot fulfill market auction on ghost listing")
 		}
