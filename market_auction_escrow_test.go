@@ -22,6 +22,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForAuction").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -84,6 +85,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				String(name).
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
@@ -113,6 +115,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
@@ -144,6 +147,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertFailure("Cannot cancel finished auction, fulfill it instead")
 
@@ -162,6 +166,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("This auction is not live")
@@ -173,6 +178,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Auction has not ended yet")
@@ -198,6 +204,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
@@ -225,20 +232,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", 20.0)
 
 	})
-
-	/*
-		//TODO: does not work
-		t.Run("Relist", func(t *testing.T) {
-			otu := NewOverflowTest(t)
-
-			price := 10.0
-			id := otu.setupMarketAndDandy()
-			otu.listNFTForEscrowedAuction("user1", id, price)
-			otu.saleItemListed("user1", "ondemand_auction", price)
-			otu.listNFTForEscrowedAuction("user1", id, 20.0)
-		})
-	*/
-
 	t.Run("Should not be able to add bid that is not above minimumBidIncrement", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
@@ -255,6 +248,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(0.1)).
 			Test(otu.T).
@@ -277,6 +271,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForAuction").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -304,6 +299,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
@@ -312,6 +308,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price + 10.0)).
 			Test(otu.T).AssertSuccess()
@@ -321,6 +318,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertSuccess()
 
@@ -332,6 +330,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess()
 
@@ -350,6 +349,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForAuction").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
@@ -368,6 +368,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
@@ -381,6 +382,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price + 10.0)).
 			Test(otu.T).
@@ -390,6 +392,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -399,6 +402,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -418,6 +422,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(1.0)).
@@ -439,6 +444,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				UInt64(id).
 				UFix64(5.0)).

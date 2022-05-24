@@ -9,7 +9,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(user: String, id: UInt64, amount: UFix64) {
+transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -23,9 +23,9 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
 
-		self.saleItemsCap= FindMarketSale.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
+		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
-		let saleInformation = FindMarketOptions.getFindSaleInformation(address: address, marketOption: marketOption, id:id, getNFTInfo: false) 
+		let saleInformation = FindMarketOptions.getSaleInformation(tenant: marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")
 		}

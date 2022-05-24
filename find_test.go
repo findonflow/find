@@ -72,21 +72,21 @@ func TestFIND(t *testing.T) {
 		otu.expireLease().tickClock(2.0)
 
 		otu.O.Transaction(`
-		import FIND from "../contracts/FIND.cdc"
+			import FIND from "../contracts/FIND.cdc"
 
-		transaction(name: String) {
+			transaction(name: String) {
 
-		    prepare(account: AuthAccount) {
-		        let status=FIND.status(name)
-						if status.status == FIND.LeaseStatus.LOCKED {
-							panic("locked")
-						}
-						if status.status == FIND.LeaseStatus.FREE {
-							panic("free")
-						}
-		    }
-		}
-		`).
+			    prepare(account: AuthAccount) {
+			        let status=FIND.status(name)
+							if status.status == FIND.LeaseStatus.LOCKED {
+								panic("locked")
+							}
+							if status.status == FIND.LeaseStatus.FREE {
+								panic("free")
+							}
+			    }
+			}
+			`).
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).AssertFailure("locked")

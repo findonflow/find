@@ -558,15 +558,6 @@ pub contract FindMarketDirectOfferSoft {
 		return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
 	}
 
-
-	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		return FindMarketDirectOfferSoft.getSaleItemCapability(marketplace: FindMarketDirectOfferSoft.account.address, user:user) 
-	}
-
-	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
-		return FindMarketDirectOfferSoft.getBidCapability(marketplace:FindMarketDirectOfferSoft.account.address, user:user) 
-	}
-
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
 		pre{
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"

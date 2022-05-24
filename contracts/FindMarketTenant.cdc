@@ -15,6 +15,11 @@ pub contract FindMarketTenant {
 	access(contract) let tenantNameAddress : {String:Address}
 	access(contract) let tenantAddressName : {Address:String}
 
+	/* Get Tenant */
+	pub fun getTenant(_ tenant: Address) : &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic} {
+		return FindMarketTenant.getTenantCapability(tenant)!.borrow()!
+	}
+
 	/// A struct to return what action an NFT can execute 
 	pub struct AllowedListing {
 		pub let listingType: Type 
@@ -258,7 +263,7 @@ pub contract FindMarketTenant {
 				if !valid {
 					continue
 				}
-				
+
 				if item.status=="stopped" {
 					return ActionResult(allowed:false, message: "Tenant has stopped this item", name:item.name)
 				}
@@ -394,7 +399,7 @@ pub contract FindMarketTenant {
 				cut: cut, 
 				rules: rules, 
 				status:"active"
-				), type: "tenant")
+			), type: "tenant")
 			//Emit Event here
 		}
 
@@ -441,7 +446,7 @@ pub contract FindMarketTenant {
 
 			return self.capability!.borrow()!
 		}
-		
+
 	}
 
 	access(account) fun createFindMarketTenant(name: String, address:Address) : Capability<&Tenant> {
@@ -512,17 +517,13 @@ pub contract FindMarketTenant {
 
 		return FindMarketTenant.account.getCapability<&Tenant{TenantPublic}>(
 			PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
-	}
+		}
 
-	pub fun getFindTenantCapability() : Capability<&Tenant{TenantPublic}> {
-		return FindMarketTenant.getTenantCapability(FindMarketTenant.account.address) ?? panic("Find market tenant not set up correctly")
-	}
+		init() {
+			self.tenantAddressName={}
+			self.tenantNameAddress={}
 
-	init() {
-		self.tenantAddressName={}
-		self.tenantNameAddress={}
-
-		self.TenantClientPublicPath=/public/findMarketClient
-		self.TenantClientStoragePath=/storage/findMarketClient
+			self.TenantClientPublicPath=/public/findMarketClient
+			self.TenantClientStoragePath=/storage/findMarketClient
+		}
 	}
-}

@@ -1,10 +1,9 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 
-transaction(id: UInt64, amount: UFix64) {
+transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 
 	let walletReference : &FungibleToken.Vault
 	let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection
@@ -13,11 +12,11 @@ transaction(id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		// Get the accepted vault type from BidInfo
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
-		let bidInfo = FindMarketOptions.getFindBid(address: account.address, marketOption: marketOption, id:id, getNFTInfo: false)
+		let bidInfo = FindMarketOptions.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id, getNFTInfo:false)
 		if bidInfo==nil {
 			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
 		}
@@ -36,7 +35,7 @@ transaction(id: UInt64, amount: UFix64) {
 
 	execute {
 		let vault <- self.walletReference.withdraw(amount: amount) 
-		self.bidsReference!.increaseBid(id: id, vault: <- vault)
+		self.bidsReference.increaseBid(id: id, vault: <- vault)
 	}
 
 }

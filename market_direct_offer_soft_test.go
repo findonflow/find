@@ -65,6 +65,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -87,6 +88,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
@@ -120,6 +122,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -142,6 +145,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
@@ -150,6 +154,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("acceptDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -170,6 +175,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -188,6 +194,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
@@ -234,6 +241,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -247,6 +255,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("user1").
 				String("Dandy").
 				UInt64(id).
@@ -270,6 +279,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertFailure("Tenant has stopped this item")
 

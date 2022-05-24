@@ -6,12 +6,12 @@ import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
-
 
 transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
@@ -82,9 +82,8 @@ transaction(name: String, amount: UFix64) {
 		}
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let tenantCapability= FindMarketTenant.getFindTenantCapability()
+		let tenantCapability= FindMarketTenant.getTenantCapability(FindMarketOptions.getFindTenantAddress())!
 		let tenant = tenantCapability.borrow()!
 
 		let publicPath= tenant.getPublicPath(saleItemType) 

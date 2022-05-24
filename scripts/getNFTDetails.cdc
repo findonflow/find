@@ -192,7 +192,8 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	}
 
 
-	let findMarket=FindMarketOptions.getNFTFindListing(address: address, id: nftDetail!.uuid, getNFTInfo:false)
+	let findAddress=FindMarketOptions.getFindTenantAddress()
+	let findMarket=FindMarketOptions.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
 	var listings : StorefrontListing? = nil
 	let storefrontCap = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
@@ -208,7 +209,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 		}
 	}
 
-	let tenantCap = FindMarketTenant.getFindTenantCapability()
+	let tenantCap = FindMarketTenant.getTenantCapability(findAddress)!
 	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up.")
 
 	let marketTypes = FindMarketOptions.getSaleItemTypes()
