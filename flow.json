@@ -27,13 +27,13 @@
         "mainnet": "0x3c5959b568896393"
       }
     },
-		"NFTStorefront" : {
-			"source": "./contracts/standard/NFTStorefront.cdc",
-			"aliases" : {
-				"testnet": "0x94b06cfca1d8a476",
-				"mainnet": "0x4eb8a10cb9f87357"
-			}
-		},
+    "NFTStorefront": {
+      "source": "./contracts/standard/NFTStorefront.cdc",
+      "aliases": {
+        "testnet": "0x94b06cfca1d8a476",
+        "mainnet": "0x4eb8a10cb9f87357"
+      }
+    },
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -107,15 +107,15 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
-      "address": "21e7b69ee6bb52cb",
+      "address": "a4085e3df7d2ddfb",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
-      "address": "3226cae199fe0a30",
+      "address": "498f59df598967a1",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
-      "address": "c015160f1100008e",
+      "address": "bbbc8531d1776d1f",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user2": {
@@ -200,7 +200,7 @@
         "RelatedAccounts",
         "FTRegistry",
         "NFTRegistry",
-				"NFTStorefront"
+        "NFTStorefront"
       ],
       "emulator-find": [],
       "emulator-user1": [],
