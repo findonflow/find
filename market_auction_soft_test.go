@@ -265,7 +265,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64(id).
-				UFix64(price + 10.0)).
+				UFix64(30.0)).
 			Test(otu.T).AssertSuccess()
 
 		otu.alterMarketOption("AuctionSoft", "enable").
@@ -350,7 +350,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64(id).
-				UFix64(price + 10.0)).
+				UFix64(price + 5.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 

@@ -903,7 +903,8 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			UInt64(id)).
+			UInt64(id).
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),

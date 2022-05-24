@@ -228,7 +228,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(15.0)).
 			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
 
 	})
@@ -364,7 +365,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price)).
 			Test(otu.T).AssertFailure("Cannot fulfill market offer on ghost listing")
 
 	})

@@ -176,7 +176,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 	})
