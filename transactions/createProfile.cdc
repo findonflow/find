@@ -103,16 +103,12 @@ transaction(name: String) {
 		}
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		//198
-
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenantCapability= FindMarketTenant.getTenantCapability(FindMarketOptions.getFindTenantAddress())!
-		//219 (521)
 
 		let tenant = tenantCapability.borrow()!
 		let publicPath=FindMarketOptions.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarketOptions.getStoragePath(saleItemType, name:tenant.name)
-		//237 (977)
 
 		let saleItemCap= acct.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
 		if !saleItemCap.check() {
