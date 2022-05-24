@@ -19,7 +19,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -268,7 +268,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.alterMarketOption("AuctionEscrow", "deprecate")
 
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -346,7 +346,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.alterMarketOption("AuctionEscrow", "stop")
 
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").

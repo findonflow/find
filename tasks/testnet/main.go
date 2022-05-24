@@ -44,15 +44,18 @@ func main() {
 		Args(o.Arguments().Account("find")).
 		RunPrintEventsFull()
 
-	o.SimpleTxArgs("setNFTInfo_Dandy", "find-admin", o.Arguments())
-	o.SimpleTxArgs("setNFTInfo_Neo", "find-admin", o.Arguments())
-	o.SimpleTxArgs("setFTInfo_flow", "find-admin", o.Arguments())
-	o.SimpleTxArgs("setFTInfo_usdc", "find-admin", o.Arguments())
-	o.SimpleTxArgs("setFTInfo_fusd", "find-admin", o.Arguments())
-	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments())
-	o.SimpleTxArgs("adminSellDandy", "find", o.Arguments())
-	o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetupMarketOptionsTypes", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminSetFTInfo_flow", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
+
+	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments())
+
+	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
+	o.SimpleTxArgs("testSetSellNeoTestnetRules", "find", o.Arguments())
+
+	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments())
 
 	createProfileAndGiftName(o, "find")
 	createProfileAndGiftName(o, "find-admin")

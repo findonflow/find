@@ -92,7 +92,6 @@ pub contract FindViews {
 			}
 			return (media as! OnChainFile).uri()
 		}
-
 	}
 
 	// This is an example taken from Versus

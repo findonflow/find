@@ -486,7 +486,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listNFTForAuction").
+	otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").

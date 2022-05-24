@@ -11,6 +11,9 @@ pub contract FindMarketTenant {
 	pub let TenantClientPublicPath: PublicPath
 	pub let TenantClientStoragePath: StoragePath
 
+
+	access(contract) let tenantPathPrefix :String
+
 	//TODO: remove a tenant
 	access(contract) let tenantNameAddress : {String:Address}
 	access(contract) let tenantAddressName : {Address:String}
@@ -293,7 +296,6 @@ pub contract FindMarketTenant {
 
 			return StoragePath(identifier: path) ?? panic("Cannot find storage path for type ".concat(type.identifier))
 		}
-
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
 
 			var containsNFTType = false 
@@ -335,7 +337,6 @@ pub contract FindMarketTenant {
 			}
 			return nil
 		}
-
 	}
 
 	// Tenant admin stuff
@@ -472,15 +473,6 @@ pub contract FindMarketTenant {
 			status:"active"
 		), type: "cut")
 
-		//TODO: put this in another transaction
-		/* 
-		tenant.addSaleItem(TenantSaleItem(
-			name:"AnyNFTFlow", 
-			cut:nil, 
-			rules:[ TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
-			status:"active"
-		), type: "tenant")
-		*/
 		let tenantPath=self.getTenantPathForName(name)
 		let sp=StoragePath(identifier: tenantPath)!
 		let pp=PrivatePath(identifier: tenantPath)!
@@ -497,9 +489,7 @@ pub contract FindMarketTenant {
 			self.tenantNameAddress.containsKey(name) : "tenant is not registered in registry"
 		}
 
-		let path= FindViews.typeToPathIdentifier(Type<@Tenant>())
-
-		return path.concat("_").concat(name)
+		return self.tenantPathPrefix.concat("_").concat(name)
 	}
 
 	pub fun getTenantPathForAddress(_ address:Address) : String {
@@ -515,15 +505,16 @@ pub contract FindMarketTenant {
 			self.tenantAddressName.containsKey(marketplace) : "tenant is not registered in registry"
 		}
 
-		return FindMarketTenant.account.getCapability<&Tenant{TenantPublic}>(
-			PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
-		}
-
-		init() {
-			self.tenantAddressName={}
-			self.tenantNameAddress={}
-
-			self.TenantClientPublicPath=/public/findMarketClient
-			self.TenantClientStoragePath=/storage/findMarketClient
-		}
+		return FindMarketTenant.account.getCapability<&Tenant{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
 	}
+
+	init() {
+		self.tenantAddressName={}
+		self.tenantNameAddress={}
+
+		self.TenantClientPublicPath=/public/findMarketClient
+		self.TenantClientStoragePath=/storage/findMarketClient
+
+		self.tenantPathPrefix=  FindViews.typeToPathIdentifier(Type<@Tenant>())
+	}
+}
