@@ -15,12 +15,8 @@ transaction(marketplace:Address, id: UInt64) {
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
 		let market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
-		let saleInformation = FindMarket.getSaleInformation(tenant:marketplace, address: account.address, marketOption: marketOption, id:id, getNFTInfo:false) 
-		if saleInformation==nil {
-			panic("This offer is made on a ghost listing")
-
-		}
-		let nftIdentifier = saleInformation!.nftIdentifier
+		let item = FindMarket.assertOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
+		let nftIdentifier = item.getItemType().identifier
 
 		//If this is nil, there must be something wrong with FIND setup
 		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftIdentifier)!

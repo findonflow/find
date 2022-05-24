@@ -12,13 +12,11 @@ transaction(marketplace:Address, id: UInt64) {
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
-		let saleItem = FindMarket.getSaleInformation(tenant:marketplace, address: account.address, marketOption: marketOption, id:id, getNFTInfo:false)
-		if saleItem==nil {
-			panic("Cannot fulfill market offer on ghost listing")
 
-		}
-		let nftTypeIdentifier = saleItem!.nftIdentifier
-		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftTypeIdentifier) ?? panic("This NFT is not supported by the Find Market yet")
+		let item = FindMarket.assertOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
+
+		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(item.getItemType().identifier) ?? panic("This NFT is not supported by the Find Market yet ")
+	
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
 
 		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */

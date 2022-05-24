@@ -13,11 +13,8 @@ transaction(marketplace: Address, id: UInt64, amount: UFix64) {
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")
 		// get Bidding Fungible Token Vault
-  	let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		let bid = FindMarket.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id, getNFTInfo:false)
-		if bid==nil {
-			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
-		}
+  		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
+		let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
 	}
 
 	execute {
