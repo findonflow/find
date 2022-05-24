@@ -14,6 +14,10 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferSoft {
 
+
+	access(self) let salePathPrefix : String
+	access(self) let bidPathPrefix : String
+
 	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
 
 	pub resource SaleItem : FindMarket.SaleItem{
@@ -546,6 +550,11 @@ pub contract FindMarketDirectOfferSoft {
 		destroy() {
 			destroy self.bids
 		}
+	}
+
+	init() {
+		self.salePathPrefix=FindViews.typeToPathIdentifier(Type<@SaleItemCollection>())
+		self.bidPathPrefix=FindViews.typeToPathIdentifier(Type<@MarketBidCollection>())
 	}
 
 	//Create an empty lease collection that store your leases to a name

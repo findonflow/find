@@ -18,6 +18,8 @@ A Find Market for direct sales
 */
 pub contract FindMarketSale {
 
+	access(self) let salePathPrefix : String
+
 	pub event Sale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
 
 	//A sale item for a direct sale
@@ -265,6 +267,10 @@ pub contract FindMarketSale {
 	}
 
 
+	init() {
+		self.salePathPrefix=FindViews.typeToPathIdentifier(Type<@SaleItemCollection>())
+	}
+
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}>): @SaleItemCollection {
 		let wallet=FindMarketSale.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
@@ -276,7 +282,7 @@ pub contract FindMarketSale {
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@FindMarketSale.SaleItemCollection>()))
+			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(self.salePathPrefix))
 		}
 		return nil
 	}

@@ -138,8 +138,8 @@ pub contract FindMarketTenant {
 	}
 
 	pub resource interface TenantPublic {
-		pub fun getStoragePath(_ type: Type) : StoragePath 
-		pub fun getPublicPath(_ type: Type) : PublicPath
+		pub fun getStoragePath(_ prefix: String) : StoragePath 
+		pub fun getPublicPath(_ prefix: String) : PublicPath
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
@@ -280,22 +280,16 @@ pub contract FindMarketTenant {
 			return ActionResult(allowed:false, message:"Nothing matches", name:"")
 		}
 
-		pub fun getPublicPath(_ type: Type) : PublicPath {
-			//TODO: pre that this is a market?
-
-			let pathPrefix=FindViews.typeToPathIdentifier(type)
-			let path=pathPrefix.concat("_").concat(self.name)
-
-			return PublicPath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
+		pub fun getPublicPath(_ prefix: String) : PublicPath {
+			let path=prefix.concat("_").concat(self.name)
+			return PublicPath(identifier: path) ?? panic("Cannot find public path for ".concat(path))
 		}
 
-		pub fun getStoragePath(_ type: Type) : StoragePath {
-
-			let pathPrefix=FindViews.typeToPathIdentifier(type)
-			let path=pathPrefix.concat("_").concat(self.name)
-
-			return StoragePath(identifier: path) ?? panic("Cannot find storage path for type ".concat(type.identifier))
+		pub fun getStoragePath(_ prefix: String) : StoragePath {
+			let path=prefix.concat("_").concat(self.name)
+			return StoragePath(identifier: path) ?? panic("Cannot find storage path for  ".concat(path))
 		}
+
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
 
 			var containsNFTType = false 
