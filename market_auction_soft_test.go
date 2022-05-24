@@ -47,7 +47,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			//TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionSoft("user2", id, price+5.0)
+			fulfillMarketAuctionSoft("user2", id, 15.0)
 	})
 
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
@@ -130,7 +130,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price)).
 			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
 
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
@@ -141,7 +142,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price + 5.0)).
 			Test(otu.T).AssertFailure("Auction has not ended yet")
 	})
 
@@ -262,7 +264,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price + 10.0)).
 			Test(otu.T).AssertSuccess()
 
 		otu.alterMarketOption("AuctionSoft", "enable").
@@ -346,7 +349,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price + 10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 

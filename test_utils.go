@@ -884,7 +884,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			UInt64(id)).
+			UInt64(id).
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),

@@ -1,4 +1,4 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -6,7 +6,6 @@ import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
@@ -25,8 +24,8 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 
-		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
-		let saleInformation = FindMarketOptions.getSaleInformation(tenant: marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
+		let saleInformation = FindMarket.getSaleInformation(tenant: marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")
 		}

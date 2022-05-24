@@ -5,7 +5,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
@@ -25,9 +25,9 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let address = resolveAddress!
 
 		self.saleItemsCap= FindMarketAuctionSoft.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
-		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionSoft.SaleItemCollection>())
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionSoft.SaleItemCollection>())
 
-		let saleInformation = FindMarketOptions.getSaleInformation(tenant:marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
+		let saleInformation = FindMarket.getSaleInformation(tenant:marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")
@@ -39,7 +39,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No FUSD wallet linked for this account")
 		self.ftVaultType = ft.type
 
-		let tenant=FindMarketOptions.getTenant(marketplace)
+		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())
 
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath)

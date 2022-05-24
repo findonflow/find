@@ -15,9 +15,9 @@ func TestCollectionScripts(t *testing.T) {
 		{
 			"collections": {
 				"Dandy": [
-				  "Dandy87",
 					"Dandy89",
-					"Dandy88"
+					"Dandy88",
+					"Dandy87"
 				]
 			},
 			"curatedCollections": {},

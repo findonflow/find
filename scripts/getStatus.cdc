@@ -1,8 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
 import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
 pub struct FINDReport{
 	pub let profile:Profile.UserProfile?
@@ -55,10 +54,10 @@ pub fun main(user: String) : Report {
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
-		let find= FindMarketOptions.getFindTenantAddress()
-		let items : {String : FindMarket.SaleItemCollectionReport} = FindMarketOptions.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
+		let find= FindMarket.getFindTenantAddress()
+		let items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
-		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarketOptions.getBidsReport(tenant:find, address: address, getNFTInfo:true)
+		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
 		findReport = FINDReport(
 			profile: profile?.asProfile(),

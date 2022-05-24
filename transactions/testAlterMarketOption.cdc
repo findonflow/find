@@ -1,9 +1,9 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(market: String , action: String ){
     prepare(account: AuthAccount){
-        let path = FindMarketTenant.TenantClientStoragePath
-        let tenantRef = account.borrow<&FindMarketTenant.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+        let path = FindMarket.TenantClientStoragePath
+        let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 
 
         switch action {

@@ -1,7 +1,7 @@
 import Admin from "../contracts/Admin.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import Bl0x from 0xe8124d8428980aa6
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 
@@ -25,10 +25,10 @@ transaction() {
 					allowedFTTypes: nil, 
 					address:0xe8124d8428980aa6, externalFixedUrl: "bl0x-5ccsb92pb-findonflow.vercel.app")
 
-				self.adminRef.getFindMarketTenantClient().setMarketOption(
+				self.adminRef.getFindMarketClient().setMarketOption(
 					name:"FlowBl0x", cut: nil, rules:[
-            FindMarketTenant.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
-            FindMarketTenant.TenantRule(name:"Neo", types:[ Type<@Bl0x.NFT>()], ruleType: "nft", allow: true)
+            FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
+            FindMarket.TenantRule(name:"Neo", types:[ Type<@Bl0x.NFT>()], ruleType: "nft", allow: true)
             ]
         )
     }
