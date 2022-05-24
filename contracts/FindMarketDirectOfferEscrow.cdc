@@ -14,6 +14,10 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferEscrow {
 
+
+	access(self) let salePathPrefix : String
+	access(self) let bidPathPrefix : String
+
 	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
 
 
@@ -480,6 +484,11 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 	}
 
+	init() {
+		self.salePathPrefix=FindViews.typeToPathIdentifier(Type<@SaleItemCollection>())
+		self.bidPathPrefix=FindViews.typeToPathIdentifier(Type<@MarketBidCollection>())
+	}
+
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}>): @SaleItemCollection {
 		let wallet=FindMarketDirectOfferEscrow.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
@@ -495,7 +504,7 @@ pub contract FindMarketDirectOfferEscrow {
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(self.salePathPrefix))
 		}
 		return nil
 	}
@@ -505,7 +514,7 @@ pub contract FindMarketDirectOfferEscrow {
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
+			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(self.bidPathPrefix))
 		}
 		return nil
 	}

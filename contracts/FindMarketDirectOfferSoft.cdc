@@ -14,7 +14,6 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferSoft {
 
-
 	access(self) let salePathPrefix : String
 	access(self) let bidPathPrefix : String
 
@@ -572,7 +571,7 @@ pub contract FindMarketDirectOfferSoft {
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(self.salePathPrefix))
 		}
 		return nil
 	}
@@ -582,7 +581,7 @@ pub contract FindMarketDirectOfferSoft {
 			FindMarketTenant.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
 		if let tenant=FindMarketTenant.getTenantCapability(marketplace)!.borrow() {
-			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
+			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(self.bidPathPrefix))
 		}
 		return nil
 	}
