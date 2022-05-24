@@ -44,10 +44,12 @@ func main() {
 
 	o.SimpleTxArgs("adminSetupMarketOptionsTypes", "find", o.Arguments())
 
-	o.TransactionFromFile("createProfile").
-		SignProposeAndPayAsService().
-		Args(o.Arguments().String("find")).
-		RunPrintEventsFull()
+	/*
+		o.TransactionFromFile("createProfile").
+			SignProposeAndPayAsService().
+			Args(o.Arguments().String("find")).
+			RunPrintEventsFull()
+	*/
 
 	/*
 		o.TransactionFromFile("createProfile").
