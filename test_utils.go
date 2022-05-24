@@ -84,11 +84,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess().AssertNoEvents()
-
-	otu.O.TransactionFromFile("adminSetupMarketOptionsTypes").
-		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
-
 	otu.createUser(100.0, "account")
 
 	return otu.tickClock(1.0)

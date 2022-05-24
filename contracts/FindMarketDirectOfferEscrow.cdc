@@ -507,4 +507,11 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 		return nil
 	}
+
+	init() {
+		FindMarket.addSaleItemType(Type<@SaleItem>())
+		FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+		FindMarket.addMarketBidType(Type<@Bid>())
+		FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
+	}
 }

@@ -11,6 +11,7 @@ import Debug from "./Debug.cdc"
 pub contract FindMarket {
 	//TODO: figure out if these can be let
 	access(contract) var pathMap : {String: String}
+	access(contract) var listingName : {String: String}
 	access(contract) var saleItemTypes : [Type]
 	access(contract) var saleItemCollectionTypes : [Type]
 	access(contract) var marketBidTypes : [Type]
@@ -86,8 +87,33 @@ pub contract FindMarket {
 		panic("Cannot find market option : ".concat(marketOption))
 	}
 
+
+
+	/* Get Sale Reports and Sale Item */
+	pub fun assertOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
+
+		let tenantRef=self.getTenant(tenant)
+		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+    let optRef = collectionCap.borrow() 
+		if optRef == nil {
+			panic("Account not properly set up, cannot borrow sale item collection")
+		}
+		let ref=optRef!
+  	let item=ref.borrowSaleItem(id)
+		if !item.checkPointer() {
+			panic("this is a ghost listing")
+		} 
+		if let validTime = item.getValidUntil() {
+			if validTime >= Clock.time() {
+				panic("This listing is expired")
+			}
+		}
+		return item
+	}
+
 	/* Get Sale Reports and Sale Item */
 	pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
+
 		let tenantRef=self.getTenant(tenant)
 		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
 		if info.items.length > 0 {
@@ -149,7 +175,9 @@ pub contract FindMarket {
 		if ids.length == 0 {
 			listID = ref.getIds()
 		}
+
 		for id in listID {
+			//TODO: do we need to call this here?
 			if ref.getIds().contains(id) {
 				let item=ref.borrowSaleItem(id)
 				if !item.checkPointer() {
@@ -158,18 +186,22 @@ pub contract FindMarket {
 					}
 					continue
 				} 
+				//361
 				//TODO: do we need to be smarter about this?
 				let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
 				var status="active"
 				if !stopped.allowed {
 					status="stopped"
 				}
+				//418
+
 				let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
 
 				if !deprecated.allowed {
 					status="deprecated"
 				}
 
+				//474
 				if let validTime = item.getValidUntil() {
 					if validTime >= Clock.time() {
 						status="ended"
@@ -269,8 +301,11 @@ pub contract FindMarket {
 	}
 
 	/* Helper Function */
-	//TODO: helper dictionary
-	pub fun getMarketOptionFromType(_ type: Type) : String {
+	pub fun getMarketOptionFromType(_ type:Type) : String {
+		return self.listingName[type.identifier]!
+	}
+
+	pub fun typeToListingName(_ type: Type) : String {
 		let identifier = type.identifier
 		var dots = 0
 		var start = 0 
@@ -295,21 +330,25 @@ pub contract FindMarket {
 	access(account) fun addSaleItemType(_ type: Type) {
 		self.saleItemTypes.append(type)
 		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
 	}
 
 	access(account) fun addMarketBidType(_ type: Type) {
 		self.marketBidTypes.append(type)
 		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
 	}
 
 	access(account) fun addSaleItemCollectionType(_ type: Type) {
 		self.saleItemCollectionTypes.append(type)
 		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
 	}
 
 	access(account) fun addMarketBidCollectionType(_ type: Type) {
 		self.marketBidCollectionTypes.append(type)
 		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
 	}
 
 	access(account) fun removeSaleItemType(_ type: Type) {
@@ -1098,7 +1137,9 @@ pub contract FindMarket {
 			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
 			self.nft=nil
-			if nftInfo {self.nft=item.toNFTInfo()}
+			if nftInfo {
+				self.nft=item.toNFTInfo()
+			}
 			self.ftTypeIdentifier=item.getFtType().identifier
 
 			self.auction=item.getAuction()
@@ -1128,11 +1169,12 @@ pub contract FindMarket {
 		self.TenantClientPublicPath=/public/findMarketClient
 		self.TenantClientStoragePath=/storage/findMarketClient
 
-		self.tenantPathPrefix=  FindViews.typeToPathIdentifier(Type<@Tenant>())
+		self.tenantPathPrefix=  FindMarket.typeToPathIdentifier(Type<@Tenant>())
 
 	  self.saleItemTypes = []
 		self.saleItemCollectionTypes = []
 		self.pathMap = {}
+		self.listingName={}
 		self.marketBidTypes = []
 		self.marketBidCollectionTypes = []
 

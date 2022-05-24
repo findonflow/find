@@ -14,28 +14,24 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 	let walletReference : &FungibleToken.Vault
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> 
-	let balanceBeforeBid: UFix64
 
 	prepare(account: AuthAccount) {
 
 		let resolveAddress = FIND.resolve(user)
-		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
-		let address = resolveAddress!
-
-		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
-
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
-		let saleInformation = FindMarket.getSaleInformation(tenant: marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
-		if saleInformation==nil {
-			panic("This listing is a ghost listing")
+		if resolveAddress == nil {
+			panic("The address input is not a valid name nor address. Input : ".concat(user))
 		}
+		let address = resolveAddress!
+		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
 
-		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(saleInformation!.nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet ")
-		let ft = FTRegistry.getFTInfoByTypeIdentifier(saleInformation!.ftTypeIdentifier) ?? panic("This FT is not supported by the Find Market yet")
+		let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
+
+		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(item.getItemType().identifier) ?? panic("This NFT is not supported by the Find Market yet ")
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet")
 	
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
-		self.balanceBeforeBid=self.walletReference.balance
 	}
 
 	pre {

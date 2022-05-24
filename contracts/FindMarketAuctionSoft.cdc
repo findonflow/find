@@ -195,12 +195,12 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getAuction(): FindMarket.AuctionItem? {
 			return FindMarket.AuctionItem(startPrice: self.auctionStartPrice, 
-										  currentPrice: self.getBalance(),
-										  minimumBidIncrement: self.auctionMinBidIncrement ,
-										  reservePrice: self.auctionReservePrice, 
-										  extentionOnLateBid: self.auctionExtensionOnLateBid ,
-										  auctionEndsAt: self.auctionEndsAt ,
-										  timestamp: Clock.time())
+			currentPrice: self.getBalance(),
+			minimumBidIncrement: self.auctionMinBidIncrement ,
+			reservePrice: self.auctionReservePrice, 
+			extentionOnLateBid: self.auctionExtensionOnLateBid ,
+			auctionEndsAt: self.auctionEndsAt ,
+			timestamp: Clock.time())
 		}
 
 		pub fun getFtType() : Type {
@@ -399,7 +399,7 @@ pub contract FindMarketAuctionSoft {
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() { 
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
 			}
-			
+
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -681,4 +681,12 @@ pub contract FindMarketAuctionSoft {
 		}
 		return nil
 	}
+
+	init() {
+		FindMarket.addSaleItemType(Type<@SaleItem>())
+		FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+		FindMarket.addMarketBidType(Type<@Bid>())
+		FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
+	}
+
 }

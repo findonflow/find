@@ -196,12 +196,12 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getAuction(): FindMarket.AuctionItem? {
 			return FindMarket.AuctionItem(startPrice: self.auctionStartPrice, 
-										  currentPrice: self.getBalance(),
-										  minimumBidIncrement: self.auctionMinBidIncrement ,
-										  reservePrice: self.auctionReservePrice, 
-										  extentionOnLateBid: self.auctionExtensionOnLateBid ,
-										  auctionEndsAt: self.auctionEndsAt , 
-										  timestamp: Clock.time())
+			currentPrice: self.getBalance(),
+			minimumBidIncrement: self.auctionMinBidIncrement ,
+			reservePrice: self.auctionReservePrice, 
+			extentionOnLateBid: self.auctionExtensionOnLateBid ,
+			auctionEndsAt: self.auctionEndsAt , 
+			timestamp: Clock.time())
 		}
 
 		pub fun getFtType() : Type {
@@ -226,7 +226,7 @@ pub contract FindMarketAuctionEscrow {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-		
+
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) 
 
 		//place a bid on a token
@@ -417,7 +417,7 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			let saleItem = self.borrow(id)
-			
+
 			if saleItem.hasAuctionStarted() {
 				if !saleItem.hasAuctionEnded() {
 					panic("Auction has not ended yet")
@@ -456,7 +456,7 @@ pub contract FindMarketAuctionEscrow {
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement)
-			
+
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "list item for auction"))
 
 			if !actionResult.allowed {
@@ -680,5 +680,12 @@ pub contract FindMarketAuctionEscrow {
 			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 		}
 		return nil
+	}
+
+	init() {
+		FindMarket.addSaleItemType(Type<@SaleItem>())
+		FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+		FindMarket.addMarketBidType(Type<@Bid>())
+		FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
 	}
 }

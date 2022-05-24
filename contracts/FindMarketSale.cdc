@@ -190,14 +190,17 @@ pub contract FindMarketSale {
 
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
+
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
 			let nftInfo= saleItem.toNFTInfo()
 
 			let royalty=saleItem.getRoyalty()
+
 			let soldFor=saleItem.getBalance()
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
+
 
 			emit Sale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 
@@ -277,5 +280,11 @@ pub contract FindMarketSale {
 			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 		}
 		return nil
+	}
+
+
+	init() {
+		FindMarket.addSaleItemType(Type<@SaleItem>())
+		FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
 	}
 }
