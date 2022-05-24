@@ -103,11 +103,7 @@ pub contract FindMarket {
 		if !item.checkPointer() {
 			panic("this is a ghost listing")
 		} 
-		if let validTime = item.getValidUntil() {
-			if validTime >= Clock.time() {
-				panic("This listing is expired")
-			}
-		}
+
 		return item
 	}
 
@@ -274,9 +270,9 @@ pub contract FindMarket {
 		let optRef = collectionCap.borrow()
 		if optRef==nil {
 		  return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
-	  }
+	  	}
 
-	  let ref=optRef!
+	  	let ref=optRef!
 
 		let listingType = ref.getBidType()
 		var listID = ids 
@@ -298,6 +294,31 @@ pub contract FindMarket {
 			}
 		}
 		return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+	}
+
+	pub fun assertBidOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
+
+		let tenantRef=self.getTenant(tenant)
+		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+    	let optRef = collectionCap.borrow() 
+		if optRef == nil {
+			panic("Account not properly set up, cannot borrow bid item collection")
+		}
+		let ref=optRef!
+  		let bidItem=ref.borrowBidItem(id)
+
+		let saleItemCollectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: bidItem.getSellerAddress())
+    	let saleRef = saleItemCollectionCap.borrow() 
+		if saleRef == nil {
+			panic("Seller account is not properly set up, cannot borrow sale item collection")
+		}
+		let sale=saleRef!
+		let item=sale.borrowSaleItem(id)
+		if !item.checkPointer() {
+			panic("this is a ghost listing")
+		} 
+
+		return item
 	}
 
 	/* Helper Function */

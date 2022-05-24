@@ -14,15 +14,8 @@ transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
-		let bidInfo = FindMarket.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id, getNFTInfo:false)
-		if bidInfo == nil {
-			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
-		}
-		let saleInformation = bidInfo!.item
-		let ftIdentifier = bidInfo!.item.ftTypeIdentifier
-
-		//If this is nil, there must be something wrong with FIND setup
-		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
+		let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet")
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.balanceBeforeBid=self.walletReference.balance
 	}

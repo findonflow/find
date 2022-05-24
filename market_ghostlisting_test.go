@@ -40,7 +40,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
-			Test(otu.T).AssertFailure("This listing is a ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -72,7 +72,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(bidPrice)).
-			Test(otu.T).AssertFailure("This listing is a ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -103,7 +103,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(bidPrice + 1.0)).
-			Test(otu.T).AssertFailure("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -167,7 +167,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(bidPrice)).
-			Test(otu.T).AssertFailure("This listing is a ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -198,7 +198,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(bidPrice + 1.0)).
-			Test(otu.T).AssertFailure("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -230,7 +230,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(15.0)).
-			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -286,7 +286,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64(id)).
-			Test(otu.T).AssertFailure("Cannot fulfill market offer on ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -340,7 +340,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64(id)).
-			Test(otu.T).AssertFailure("This offer is made on a ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 
@@ -367,7 +367,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(price)).
-			Test(otu.T).AssertFailure("Cannot fulfill market offer on ghost listing")
+			Test(otu.T).AssertFailure("this is a ghost listing")
 
 	})
 

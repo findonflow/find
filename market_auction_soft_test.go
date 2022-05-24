@@ -126,14 +126,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
-
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
 
 		otu.tickClock(100.0)
