@@ -30,21 +30,6 @@ pub contract FindViews {
 		}
 	}
 
-	pub struct Identity{
-		pub let id:UInt64
-		pub let uuid: UInt64
-		pub let type:Type
-		pub let typeIdentifier:String
-		pub let discriminator: String
-
-		init(id:UInt64, uuid:UInt64, type:Type, discriminator:String) {
-			self.id=id
-			self.uuid=uuid
-			self.type=type
-			self.typeIdentifier=type.identifier
-			self.discriminator=discriminator
-		}
-	}
 
 	pub struct Files {
 		pub let media : {String: &{MetadataViews.File}}
@@ -299,25 +284,6 @@ pub contract FindViews {
 		init(_ nounce: UInt64) {
 			self.nounce=nounce
 		}
-	}
-
-
-	pub fun typeToPathIdentifier(_ type:Type) : String {
-		let identifier=type.identifier
-
-		var i=0
-		var newIdentifier=""
-		while i < identifier.length {
-
-			let item= identifier.slice(from: i, upTo: i+1) 
-			if item=="." {
-				newIdentifier=newIdentifier.concat("_")
-			} else {
-				newIdentifier=newIdentifier.concat(item)
-			}
-			i=i+1
-		}
-		return newIdentifier
 	}
 
 }
