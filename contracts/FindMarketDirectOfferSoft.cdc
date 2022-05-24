@@ -481,11 +481,11 @@ pub contract FindMarketDirectOfferSoft {
 			}
 
 			let uuid=item.getUUID()
-			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
+			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(FindMarketDirectOfferSoft.salePathPrefix))
 
 			let bid <- create Bid(from: from, itemUUID:item.getUUID(), nftCap: nftCap, vaultType: vaultType, nonEscrowedBalance:amount)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
-			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(FindMarketDirectOfferSoft.bidPathPrefix))
 			let oldToken <- self.bids[uuid] <- bid
 			saleItemCollection.registerBid(item: item, callback: callbackCapability)
 			destroy oldToken

@@ -14,7 +14,7 @@ pub contract FindMarketOptions {
 
 	pub fun getPublicPath(_ type: Type, name:String) : PublicPath {
 
-	  let pathPrefix=self.pathMap[type.identifier]!
+		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
 		return PublicPath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
@@ -22,12 +22,11 @@ pub contract FindMarketOptions {
 
 	pub fun getStoragePath(_ type: Type, name:String) : StoragePath {
 
-	  let pathPrefix=self.pathMap[type.identifier]!
+		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
 		return StoragePath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
 	}
-
 	pub fun getFindTenantAddress() : Address {
 		return FindMarketOptions.account.address
 	}
@@ -50,7 +49,8 @@ pub contract FindMarketOptions {
 		var caps : [Capability<&{FindMarket.SaleItemCollectionPublic}>] = []
 		for type in self.getSaleItemCollectionTypes() {
 			if type != nil {
-				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type!))
+				let pathPrefix=self.pathMap[type.identifier]!
+				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(pathPrefix))
 				if cap.check() {
 					caps.append(cap)
 				}
@@ -62,7 +62,8 @@ pub contract FindMarketOptions {
 	pub fun getSaleItemCollectionCapability(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
 		for type in self.getSaleItemCollectionTypes() {
 			if self.getMarketOptionFromType(type) == marketOption{
-				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type!))
+				let pathPrefix=self.pathMap[type.identifier]!
+				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(pathPrefix))
 				return cap
 			}
 		}
@@ -173,7 +174,8 @@ pub contract FindMarketOptions {
 	pub fun getMarketBidCollectionCapabilities(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, address: Address) : [Capability<&{FindMarket.MarketBidCollectionPublic}>] {
 		var caps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = []
 		for type in self.getMarketBidCollectionTypes() {
-			let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type!))
+			let pathPrefix=self.pathMap[type.identifier]!
+			let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(pathPrefix))
 			if cap.check() {
 				caps.append(cap)
 			}
@@ -183,8 +185,9 @@ pub contract FindMarketOptions {
 
 	pub fun getMarketBidCollectionCapability(tenantRef: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
 		for type in self.getMarketBidCollectionTypes() {
-			if self.getMarketOptionFromType(type!) == marketOption{
-				let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type!))
+			if self.getMarketOptionFromType(type) == marketOption{
+				let pathPrefix=self.pathMap[type.identifier]!
+				let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(pathPrefix))
 				return cap
 			}
 		}

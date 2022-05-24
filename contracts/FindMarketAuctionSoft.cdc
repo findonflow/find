@@ -22,7 +22,6 @@ pub contract FindMarketAuctionSoft {
 
 	pub resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer
-
 		access(contract) var vaultType: Type
 		access(contract) var auctionStartPrice: UFix64
 		access(contract) var auctionReservePrice: UFix64
@@ -166,8 +165,7 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
-				//TODO: fix when fixing hasAuctionEnded
-				if self.hasAuctionEnded()! {
+				if self.hasAuctionEnded() {
 					if self.hasAuctionMetReservePrice() {
 						return "finished_completed"
 					} 
