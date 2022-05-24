@@ -15,7 +15,7 @@ import (
 	"github.com/typesense/typesense-go/typesense/api"
 )
 
-const address = "21e7b69ee6bb52cb"
+const address = "a4085e3df7d2ddfb"
 
 func main() {
 	forSaleEvents := fmt.Sprintf("A.%s.FindMarketSale.Sale", address)
