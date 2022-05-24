@@ -104,7 +104,13 @@ pub contract FindMarketOptions {
         let ghost: [FindMarket.GhostListing] =[]
         let info: [FindMarket.SaleItemInformation] =[]
         let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-        let ref = collectionCap.borrow() ?? panic("Cannot borrow reference to the paased in capability.")
+        let optRef = collectionCap.borrow() 
+				if optRef == nil {
+					return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
+				}
+
+				let ref = optRef!
+
         let listingType = ref.getListingType()
         var listID = ids 
         if ids.length == 0 {
@@ -199,7 +205,14 @@ pub contract FindMarketOptions {
         let ghost: [FindMarket.GhostListing] =[]
         let info: [FindMarket.BidInfo] =[]
         let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-        let ref = collectionCap.borrow() ?? panic("Cannot borrow reference to the paased in capability.")
+        let optRef = collectionCap.borrow() 
+				if optRef==nil {
+					return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+				}
+
+				let ref=optRef!
+
+
         let listingType = ref.getBidType()
         var listID = ids 
         if ids.length == 0 {

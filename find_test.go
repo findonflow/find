@@ -215,4 +215,30 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND()
+
+		nameAddress := otu.accountAddress("user1")
+		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(nameAddress)).RunReturnsJsonString()
+
+		expected := `
+{
+    "FINDReport": {
+        "bids": null,
+        "itemsForSale": {},
+        "leases": null,
+        "marketBids": {},
+        "privateMode": "false",
+        "profile": "",
+        "relatedAccounts": {}
+    },
+    "NameReport": ""
+}
+`
+		assert.JSONEq(otu.T, expected, value)
+
+	})
+
 }
