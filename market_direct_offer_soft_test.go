@@ -1,7 +1,10 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/bjartek/overflow/overflow"
 )
 
 func TestMarketDirectOfferSoft(t *testing.T) {
@@ -305,6 +308,55 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterMarketOption("DirectOfferSoft", "deprecate").
 			retractOfferDirectOfferSoft("user2", "user1", id)
+	})
+
+	/* Testing on Royalties */
+
+	// platform 0.15
+	// artist 0.05
+	// find 0.025
+	// tenant nil
+	t.Run("Royalties should be sent to correspondence upon accept offer action", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price).
+			acceptDirectOfferMarketSoft("user1", id, "user2", price)
+
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"findName":    "",
+				"id":          fmt.Sprintf("%d", id),
+				"royaltyName": "find",
+				"tenant":      "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("user1"),
+				"amount":      "0.50000000",
+				"findName":    "user1",
+				"id":          fmt.Sprintf("%d", id),
+				"royaltyName": "artist",
+				"tenant":      "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"findName":    "",
+				"id":          fmt.Sprintf("%d", id),
+				"royaltyName": "platform",
+				"tenant":      "find",
+			}))
+
 	})
 
 }
