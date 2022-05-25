@@ -432,7 +432,7 @@ func TestNFTDetailScript(t *testing.T) {
 	            },
 	            {
 	                "address": "0xf8d6e0586b0a20c7",
-	                "cut": "0.15000000",
+	                "cut": "0.02500000",
 	                "findName": "",
 	                "royaltyName": "platform"
 	            }

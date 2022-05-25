@@ -37,7 +37,6 @@ func main() {
 
 	o.SimpleTxArgs("adminSetFTInfo_flow", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find", o.Arguments())
-	//o.SimpleTxArgs("adminSetupMarketOptionsTypes", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetSellDandyRules", "account", o.Arguments())
 
 	//we advance the clock
