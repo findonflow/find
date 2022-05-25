@@ -67,6 +67,26 @@ func TestMarketAuctionSoft(t *testing.T) {
 			fulfillMarketAuctionSoft("user2", id, price+10.0)
 	})
 
+	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price)
+
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+	})
+
 	t.Run("Should be able to cancel an auction", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

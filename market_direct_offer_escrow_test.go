@@ -59,6 +59,26 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	})
 
+	t.Run("Should not be able to offer your own NFT", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(price)).
+			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+
+	})
+
 	//return money when outbid
 
 	t.Run("Should return money when outbid", func(t *testing.T) {

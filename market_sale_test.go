@@ -60,8 +60,31 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%.8f", newPrice), itemsForSale[0].Amount)
 	})
 
-	// //TODO: Should there be a seperate status?
-	t.Run("Should be able to canel sale", func(t *testing.T) {
+	t.Run("Should not be able to buy your own listing", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+		otu.listNFTForSale("user1", id, price)
+
+		otu.O.TransactionFromFile("buyNFTForSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("You cannot buy your own listing")
+	})
+
+	t.Run("Should be able to cancel sale", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			setupDandy("user1").
