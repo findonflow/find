@@ -67,6 +67,26 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.fulfillMarketAuctionEscrowFromBidder("user2", id, price+5.0)
 	})
 
+	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price)
+
+		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+	})
+
 	t.Run("Should return funds if auction does not meet reserve price", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

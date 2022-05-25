@@ -170,6 +170,7 @@ pub contract FindMarketSale {
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+				self.owner!.address != nftCap.address : "You cannot buy your own listing"
 			}
 
 			//TODO: check valid until

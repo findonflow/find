@@ -54,6 +54,26 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			retractOfferDirectOfferSoft("user2", "user1", id)
 	})
 
+	t.Run("Should not be able to offer your own NFT", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(price)).
+			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+
+	})
+
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
