@@ -1,7 +1,13 @@
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
+import FIND from "../contracts/FIND.cdc"
 
-transaction(owner: Address, id: UInt64) {
+transaction(marketplace:Address, owner: String, id: UInt64) {
 	prepare(account: AuthAccount) {
-		FindMarketAuctionEscrow.getFindSaleItemCapability(owner)!.borrow()!.fulfillAuction(id)
+		let resolveAddress = FIND.resolve(owner)
+		if resolveAddress == nil { 
+			panic("The address input is not a valid name nor address. Input : ".concat(owner))
+		}
+		let address = resolveAddress!
+		FindMarketAuctionEscrow.getSaleItemCapability(marketplace:marketplace, user:address)!.borrow()!.fulfillAuction(id)
 	}
 }

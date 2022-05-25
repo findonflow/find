@@ -5,9 +5,10 @@ import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FIND from "../contracts/FIND.cdc"
 
-transaction(address: Address, id: UInt64, amount: UFix64) {
+transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}> 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
@@ -18,8 +19,12 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
-		self.saleItemsCap= FindMarketAuctionEscrow.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
-		let saleInformation =self.saleItemsCap.borrow()!.getSaleInformation(id)
+		let resolveAddress = FIND.resolve(user)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let address = resolveAddress!
+		self.saleItemsCap= FindMarketAuctionEscrow.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.SaleItemCollection>())
+		let saleInformation = FindMarketOptions.getSaleInformation(tenant:marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")
@@ -31,7 +36,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())!
 
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
@@ -50,7 +55,4 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability)
 	}
 
-	post {
-		self.walletReference.balance == self.balanceBeforeBid - amount
-	}
 }

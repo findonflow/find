@@ -15,7 +15,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionEscrow {
 
-	pub event ForAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
+	pub event EnglishAuction(tenant: String, id: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
 
 
 	pub resource SaleItem : FindMarket.SaleItem {
@@ -57,6 +57,14 @@ pub contract FindMarketAuctionEscrow {
 		pub fun getRoyalty() : MetadataViews.Royalties? {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				return MetadataViews.Royalties([royalty])
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				return MetadataViews.Royalties(royalty)
 			}
 
 			return  nil
@@ -104,7 +112,14 @@ pub contract FindMarketAuctionEscrow {
 			self.auctionEndsAt=endsAt
 		}
 
-		pub fun hasAuctionEnded() : Bool {
+		pub fun hasAuctionStarted() : Bool {
+			if let starts = self.auctionStartedAt {
+				return starts <= Clock.time()
+			}
+			return false
+		}
+
+		pub fun hasAuctionEnded() : Bool {      
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
 			}
@@ -146,12 +161,27 @@ pub contract FindMarketAuctionEscrow {
 			self.offerCallback=callback
 		}
 
-		//TODO: Should we have a different status if auction is ended can be finished?
+
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
-				return "ongoing_auction"
-			}
-			return "ondemand_auction"
+				//TODO: fix when fixing hasAuctionEnded
+				if self.hasAuctionEnded()! {
+					if self.hasAuctionMetReservePrice() {
+						return "finished_completed"
+					} 
+					return "finished_failed"
+				}
+				return "active_ongoing"
+			} 
+			return "active_listed"
+		}
+
+		pub fun getListingType() : Type {
+			return Type<@SaleItem>()
+		}
+
+		pub fun getListingTypeIdentifier(): String {
+			return Type<@SaleItem>().identifier
 		}
 
 		pub fun getListingTypeIdentifier(): String {
@@ -178,7 +208,7 @@ pub contract FindMarketAuctionEscrow {
 										  reservePrice: self.auctionReservePrice, 
 										  extentionOnLateBid: self.auctionExtensionOnLateBid ,
 										  auctionEndsAt: self.auctionEndsAt , 
-										  timestamp: getCurrentBlock().timestamp)
+										  timestamp: Clock.time())
 		}
 
 		pub fun getFtType() : Type {
@@ -193,14 +223,16 @@ pub contract FindMarketAuctionEscrow {
 			return self.auctionEndsAt
 
 		}
+
+		pub fun checkPointer() : Bool {
+			return self.pointer.valid()
+		}
 	}
 
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
-		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport
 		
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) 
 
@@ -241,60 +273,7 @@ pub contract FindMarketAuctionEscrow {
 			let id=saleItem.getId()
 
 
-			emit ForAuction(tenant:self.getTenant().name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, endsAt: saleItem.auctionEndsAt)
-		}
-
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation? {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-			}
-			let item=self.borrow(id)
-			let tenant=self.getTenant()
-			let info = self.checkSaleInformation(tenant: tenant, ids: [id], getGhost: false)
-			if info.items.length > 0 {
-				return info.items[0]
-			}
-			return nil
-		}
-
-		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport {
-			let tenant=self.getTenant()
-			return self.checkSaleInformation(tenant: tenant, ids: self.getIds(), getGhost: true)
-		}
-
-		access(contract) fun checkSaleInformation(tenant: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
-			let ghost: [FindMarket.GhostListing] =[]
-			let info: [FindMarket.SaleItemInformation] =[]
-			let listingType = self.getListingType()
-			for id in ids {
-				let item=self.borrow(id)
-				if !item.pointer.valid() {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				//TODO: do we need to be smarter about this?
-				let stopped=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
-				var status="active"
-				if !stopped.allowed {
-					status="stopped"
-				}
-				let deprecated=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "delist item for sale"))
-
-				if !deprecated.allowed {
-					status="deprecated"
-				}
-
-				if let validTime = item.getValidUntil() {
-					if validTime >= getCurrentBlock().timestamp{
-						status="ended"
-					}
-				}
-				info.append(FindMarket.SaleItemInformation(item, status))
-			}
-
-			return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
+			emit EnglishAuction(tenant:self.getTenant().name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, endsAt: saleItem.auctionEndsAt)
 		}
 
 		pub fun getListingType() : Type {
@@ -315,7 +294,10 @@ pub contract FindMarketAuctionEscrow {
 
 			let previousOffer = saleItem.offerCallback!
 
-			let minBid=oldBalance + saleItem.auctionMinBidIncrement
+			var minBid=oldBalance + saleItem.auctionMinBidIncrement
+			if newOffer.address != previousOffer.address {
+				minBid = previousOffer.borrow()!.getBalance(id) + saleItem.auctionMinBidIncrement
+			}
 
 			if newOfferBalance < minBid {
 				panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement ").concat(minBid.toString()))
@@ -332,7 +314,7 @@ pub contract FindMarketAuctionEscrow {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 
 		}
 
@@ -343,13 +325,11 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
+			if !saleItem.hasAuctionStarted() {
 				panic("Auction is not started")
 			}
 
-
-			let timestamp=Clock.time()
-			if saleItem.auctionEndsAt! < timestamp {
+			if saleItem.hasAuctionEnded() {
 				panic("Auction has ended")
 			}
 
@@ -364,10 +344,18 @@ pub contract FindMarketAuctionEscrow {
 			let id = item.getUUID()
 
 			let saleItem=self.borrow(id)
-			if saleItem.auctionEndsAt != nil {
+
+			if saleItem.hasAuctionStarted() {
 				if saleItem.hasAuctionEnded() {
 					panic("Auction has ended")
 				}
+
+				if let cb = saleItem.offerCallback {
+					if cb.address == callback.address {
+						panic("You already have the latest bid on this item, use the incraseBid transaction")
+					}
+				}
+
 				self.addBid(id: id, newOffer: callback, oldBalance: 0.0)
 				return
 			}
@@ -380,25 +368,17 @@ pub contract FindMarketAuctionEscrow {
 
 			let balance=callback.borrow()!.getBalance(id)
 
-			if let cb= saleItem.offerCallback {
-				if cb.address == callback.address {
-					panic("You already have the latest bid on this item, use the incraseBid transaction")
-				}
-
-				let currentBalance=saleItem.getBalance()
-				Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
-				if currentBalance >= balance {
-					panic("There is already a higher bid on this item")
-				}
-				cb.borrow()!.cancelBidFromSaleItem(id)
+			if saleItem.auctionStartPrice >  balance {
+				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
 			}
+
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
 			let endsAt=timestamp + duration
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -408,12 +388,12 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem=self.borrow(id)
 
-			if saleItem.auctionEndsAt == nil {
-				panic("auction is not ongoing")
-			}
-
-			if saleItem.hasAuctionEnded() && saleItem.hasAuctionMetReservePrice() {
-				panic("Cannot cancel finished auction, fulfill it instead")
+			var status = "cancel_listing"
+			if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+				if saleItem.hasAuctionMetReservePrice() {
+					panic("Cannot cancel finished auction, fulfill it instead")
+				}
+				status="cancel_reserved_not_met"
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for auction"))
@@ -422,14 +402,16 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			self.internalCancelAuction(saleItem: saleItem, status: "cancelled")
+			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
-			self.emitEvent(saleItem: saleItem, status: "cancelled")
+			self.emitEvent(saleItem: saleItem, status: status)
 			let id=saleItem.getId()
-			saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
+				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
+			}
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -442,32 +424,37 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			let saleItem = self.borrow(id)
-			if !saleItem.hasAuctionEnded() {
-				panic("Auction has not ended yet")
+			
+			if saleItem.hasAuctionStarted() {
+				if !saleItem.hasAuctionEnded() {
+					panic("Auction has not ended yet")
+				}
+
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
+
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
+
+				let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+
+				if !saleItem.hasAuctionMetReservePrice() {
+					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
+					return
+				}
+
+				let nftInfo= saleItem.toNFTInfo()
+				let royalty=saleItem.getRoyalty()
+
+				self.emitEvent(saleItem: saleItem, status: "sold")
+
+				let vault <- saleItem.acceptEscrowedBid()
+				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
+
+				destroy <- self.items.remove(key: id)
+				return 
 			}
-
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "fulfill auction"))
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
-
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-
-			if !saleItem.hasAuctionMetReservePrice() {
-				self.internalCancelAuction(saleItem: saleItem, status: "cancelled_reserved_not_met")
-				return
-			}
-
-			let nftInfo= saleItem.toNFTInfo()
-			let royalty=saleItem.getRoyalty()
-
-			self.emitEvent(saleItem: saleItem, status: "sold")
-
-			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
-
-			destroy <- self.items.remove(key: id)
+			panic("This auction is not live")
 
 		} 
 
@@ -483,10 +470,11 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
+			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
+
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "listed")
-
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed")
 
 		}
 
@@ -495,7 +483,17 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun borrow(_ id: UInt64): &SaleItem {
+			pre{
+				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
 			return &self.items[id] as &SaleItem
+		}
+
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
+			pre{
+				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
+			return &self.items[id] as &SaleItem{FindMarket.SaleItem}
 		}
 
 		destroy() {
@@ -503,7 +501,7 @@ pub contract FindMarketAuctionEscrow {
 		}
 	}
 
-	pub resource Bid {
+	pub resource Bid : FindMarket.Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
 		access(contract) let itemUUID: UInt64
@@ -521,8 +519,17 @@ pub contract FindMarketAuctionEscrow {
 			self.bidAt=Clock.time()
 			self.nftCap=nftCap
 		}
+
 		access(contract) fun setBidAt(_ time: UFix64) {
 			self.bidAt=time
+		}
+
+		pub fun getBalance() : UFix64 {
+			return self.vault.balance
+		}
+
+		pub fun getSellerAddress() : Address {
+			return self.from.address
 		}
 
 		destroy() {
@@ -531,8 +538,6 @@ pub contract FindMarketAuctionEscrow {
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getBid(_ id:UInt64) : FindMarket.BidInfo? 
-		pub fun getBidsReport() : FindMarket.BidItemCollectionReport 
 		pub fun getBalance(_ id: UInt64) : UFix64
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
@@ -570,39 +575,8 @@ pub contract FindMarketAuctionEscrow {
 			return <- vault
 		}
 
-
-		pub fun getBid(_ id:UInt64) : FindMarket.BidInfo? {
-			pre{
-				self.bids[id] != nil : "This bid does not exist"
-			}
-			let bidInfo = self.checkBidInformation(ids: [id], getGhost: false)
-			if bidInfo.items.length > 0 {
-				return bidInfo.items[0]
-			}
-			return nil
-		}
-
-		pub fun getBidsReport() : FindMarket.BidItemCollectionReport {
-			return self.checkBidInformation(ids: self.bids.keys, getGhost: true)
-		}
-
-		access(contract) fun checkBidInformation(ids: [UInt64], getGhost:Bool) : FindMarket.BidItemCollectionReport {
-			let ghost: [FindMarket.GhostListing] =[]
-			let info: [FindMarket.BidInfo] =[]
-			let listingType = self.getBidType()
-			for id in ids {
-				let bid=self.borrowBid(id)
-				let item=bid.from.borrow()!.getSaleInformation(id)
-				if item == nil {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.vault.balance, timestamp: getCurrentBlock().timestamp, item:item!)
-				info.append(bidInfo)
-			}
-			return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+		pub fun getIds() : [UInt64] {
+			return self.bids.keys
 		}
 
 		pub fun getBidType() : Type {
@@ -662,7 +636,17 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun borrowBid(_ id: UInt64): &Bid {
+			pre{
+				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
 			return &self.bids[id] as &Bid
+		}
+
+		pub fun borrowBidItem(_ id: UInt64): &{FindMarket.Bid} {
+			pre{
+				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			}
+			return &self.bids[id] as &Bid{FindMarket.Bid}
 		}
 
 		pub fun getBalance(_ id: UInt64) : UFix64 {
@@ -683,14 +667,6 @@ pub contract FindMarketAuctionEscrow {
 
 	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}>) : @MarketBidCollection {
 		return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
-	}
-
-	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		return FindMarketAuctionEscrow.getSaleItemCapability(marketplace: FindMarketAuctionEscrow.account.address, user:user) 
-	}
-
-	pub fun getFindBidCapability(_ user: Address) :Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
-		return FindMarketAuctionEscrow.getBidCapability(marketplace:FindMarketAuctionEscrow.account.address, user:user) 
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {

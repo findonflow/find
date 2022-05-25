@@ -1,6 +1,6 @@
 import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 
-transaction(market: String , action: String ){
+transaction(marketRule: String , action: String ){
     prepare(account: AuthAccount){
         let path = FindMarketTenant.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarketTenant.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
@@ -8,13 +8,13 @@ transaction(market: String , action: String ){
 
         switch action {
             case "enable" :
-                tenantRef.enableMarketOption("FlowDandy".concat(market))
+                tenantRef.enableMarketOption(marketRule)
 
             case "deprecate" :
-                tenantRef.deprecateMarketOption("FlowDandy".concat(market))
+                tenantRef.deprecateMarketOption(marketRule)
 
             case "stop" :
-                tenantRef.stopMarketOption("FlowDandy".concat(market))
+                tenantRef.stopMarketOption(marketRule)
         }
     }
 }

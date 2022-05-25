@@ -1,13 +1,14 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FIND from "../contracts/FIND.cdc"
 
-transaction(address: Address, nftAlias: String, id: UInt64, ftAlias:String, amount: UFix64) {
+transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -18,15 +19,19 @@ transaction(address: Address, nftAlias: String, id: UInt64, ftAlias:String, amou
 
 	prepare(account: AuthAccount) {
 		
-		let nft = NFTRegistry.getNFTInfoByAlias(nftAlias) ?? panic("This NFT is not supported by the Find Market yet")
-		let ft = FTRegistry.getFTInfoByAlias(ftAlias) ?? panic("This FT is not supported by the Find Market yet")
+		let resolveAddress = FIND.resolve(user)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let address = resolveAddress!
+
+		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet")
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet")
 
 		self.ftVaultType = ft.type
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
+		let tenant=FindMarketOptions.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())!
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath)
 		self.balanceBeforeBid=self.walletReference.balance

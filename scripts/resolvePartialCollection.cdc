@@ -2,14 +2,15 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 pub struct ViewCollectionPointer {
 	access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
 	pub let nftInfo: NFTRegistry.NFTInfo
 
-	init(cap: Capability<&{MetadataViews.ResolverCollection}>, alias: String) {
+	init(cap: Capability<&{MetadataViews.ResolverCollection}>, aliasOrIdentifier: String) {
 		self.cap=cap
-		self.nftInfo=NFTRegistry.getNFTInfoByAlias(alias)!
+		self.nftInfo=NFTRegistry.getNFTInfo(aliasOrIdentifier)!
 	}
 
 	pub fun resolveView(_ type: Type, id: UInt64) : AnyStruct? {
@@ -79,10 +80,10 @@ pub struct ViewCollectionPointer {
 
 }
 
-pub fun createViewReadPointer(address:Address, alias:String) : ViewCollectionPointer {
-	let path= NFTRegistry.getNFTInfoByAlias(alias)!.publicPath
+pub fun createViewReadPointer(address:Address, aliasOrIdentifier:String) : ViewCollectionPointer {
+	let path= NFTRegistry.getNFTInfo(aliasOrIdentifier)!.publicPath
 	let cap= getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
-	let pointer= ViewCollectionPointer(cap: cap, alias: alias)
+	let pointer= ViewCollectionPointer(cap: cap, aliasOrIdentifier: aliasOrIdentifier)
 	return pointer
 }
 
@@ -113,19 +114,22 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-pub fun main(address: Address, aliases: [String], ids:[UInt64]) : [MetadataCollectionItem] {
+pub fun main(user: String, aliasOrIdentifier: [String], ids:[UInt64]) : [MetadataCollectionItem] {
 
+	let resolveAddress = FIND.resolve(user) 
+	if resolveAddress == nil {return []}
+	let address = resolveAddress!
 	var pointerMap: {String : ViewCollectionPointer} = {}
 
 	var resultMap : [MetadataCollectionItem] = []
 
-	assert(aliases.length == ids.length, message: "The length of alias passed in does not match with that of the IDs.")
+	assert(aliasOrIdentifier.length == ids.length, message: "The length of alias passed in does not match with that of the IDs.")
 	var i = 0
-	while i < aliases.length {
-		let alias = aliases[i]
+	while i < aliasOrIdentifier.length {
+		let alias = aliasOrIdentifier[i]
 		let id = ids[i]
 		if pointerMap[alias] == nil {
-			pointerMap[alias] = createViewReadPointer(address: address, alias: alias)
+			pointerMap[alias] = createViewReadPointer(address: address, aliasOrIdentifier: alias)
 		}
 		let pointer = pointerMap[alias]!
 		resultMap.append(MetadataCollectionItem(id: id, 

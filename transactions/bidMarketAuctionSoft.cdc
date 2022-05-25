@@ -1,4 +1,3 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -6,8 +5,10 @@ import FindViews from "../contracts/FindViews.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FIND from "../contracts/FIND.cdc"
 
-transaction(address: Address, id: UInt64, amount: UFix64) {
+transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}> 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
@@ -19,8 +20,14 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
-		self.saleItemsCap= FindMarketAuctionSoft.getFindSaleItemCapability(address) ?? panic("cannot find sale item cap")
-		let saleInformation =self.saleItemsCap.borrow()!.getSaleInformation(id)
+		let resolveAddress = FIND.resolve(user)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let address = resolveAddress!
+
+		self.saleItemsCap= FindMarketAuctionSoft.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
+		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionSoft.SaleItemCollection>())
+
+		let saleInformation = FindMarketOptions.getSaleInformation(tenant:marketplace, address: address, marketOption: marketOption, id:id, getNFTInfo:false) 
 
 		if saleInformation==nil {
 			panic("This listing is a ghost listing")
@@ -32,8 +39,8 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No FUSD wallet linked for this account")
 		self.ftVaultType = ft.type
 
-		let tenant=FindMarketTenant.getFindTenantCapability().borrow() ?? panic("Cannot borrow reference to tenant")
-		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())!
+		let tenant=FindMarketOptions.getTenant(marketplace)
+		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())
 
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: storagePath)
 		self.balanceBeforeBid=self.walletReference.balance

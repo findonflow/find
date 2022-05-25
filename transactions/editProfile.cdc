@@ -70,6 +70,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
 			profile.addLinkWithName(name:titleName, link: Profile.Link(title: title, type: type, url: type))
 		}
+		profile.emitUpdatedEvent()
 
 		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {

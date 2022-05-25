@@ -15,48 +15,66 @@ func TestCollectionScripts(t *testing.T) {
 		{
 			"collections": {
 				"Dandy": [
-					"Dandy81",
-					"Dandy80",
-					"Dandy82"
+				  "Dandy87",
+					"Dandy89",
+					"Dandy88"
 				]
 			},
 			"curatedCollections": {},
 			"items": {
-				"Dandy80": {
+				"Dandy87": {
 					"collection": "Dandy",
 					"contentType": "image",
-					"id": "80",
+					"id": "87",
 					"image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"metadata": {},
 					"name": "Neo Motorcycle 1 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"url": "find.xyz",
-					"uuid": "80"
+					"url": "https://find.xyz/collection/user1/dandy/87",
+					"uuid": "87",
+					"tag" : {
+						"NeoMotorCycleTag" : "Tag1"
+					},
+					"scalar" : {
+						"Speed" : "100.00000000"
+					}
 				},
-				"Dandy81": {
+				"Dandy88": {
 					"collection": "Dandy",
 					"contentType": "image",
-					"id": "81",
+					"id": "88",
 					"image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"metadata": {},
 					"name": "Neo Motorcycle 2 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"url": "find.xyz",
-					"uuid": "81"
+					"url": "https://find.xyz/collection/user1/dandy/88",
+					"uuid": "88",
+					"tag" : {
+						"NeoMotorCycleTag" : "Tag1"
+					},
+					"scalar" : {
+						"Speed" : "100.00000000"
+					}
 				},
-				"Dandy82": {
+				"Dandy89": {
 					"collection": "Dandy",
 					"contentType": "image",
-					"id": "82",
+					"id": "89",
 					"image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"metadata": {},
 					"name": "Neo Motorcycle 3 of 3",
 					"rarity": "",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"url": "find.xyz",
-					"uuid": "82"
+					"url": "https://find.xyz/collection/user1/dandy/89",
+					"uuid": "89",
+					"tag" : {
+						"NeoMotorCycleTag" : "Tag1"
+					},
+					"scalar" : {
+						"Speed" : "100.00000000"
+					}
 				}
 			}
 		}
@@ -69,8 +87,8 @@ func TestCollectionScripts(t *testing.T) {
 			registerDandyInNFTRegistry().
 			mintThreeExampleDandies()
 
-		result := otu.O.ScriptFromFile("collections").
-			Args(otu.O.Arguments().Address("user1")).
+		result := otu.O.ScriptFromFile("getCollections").
+			Args(otu.O.Arguments().String("user1")).
 			RunReturnsJsonString()
 		fmt.Println(result)
 		assert.JSONEq(otu.T, expected, result)

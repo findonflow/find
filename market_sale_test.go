@@ -16,18 +16,18 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
 		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.15)
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.025)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		otu.buyNFTForMarketSale("user2", "user1", id, price)
 	})
@@ -39,18 +39,18 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
 		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.15)
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.025)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		newPrice := 15.0
@@ -60,25 +60,48 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("%.8f", newPrice), itemsForSale[0].Amount)
 	})
 
-	// //TODO: Should there be a seperate status?
-	t.Run("Should be able to canel sale", func(t *testing.T) {
+	t.Run("Should not be able to buy your own listing", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
 		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.15)
+		otu.O.TransactionFromFile("buyNFTForSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("You cannot buy your own listing")
+	})
+
+	t.Run("Should be able to cancel sale", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+		otu.listNFTForSale("user1", id, price)
+
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.025)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.cancelNFTForSale("user1", id)
@@ -92,7 +115,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -101,45 +124,18 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				Account("account").
+				String("user1").
 				UInt64(id).
 				UFix64(5.0)).
 			Test(otu.T).
 			AssertFailure("Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
-	})
-
-	t.Run("Should not be able to buy if wrong type", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
-			setFlowDandyMarketOption("Sale")
-
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
-		otu.listNFTForSale("user1", id, price)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
-
-		otu.O.TransactionFromFile("buyItemForSaleFUSD").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("user1").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("panic: This item can be baught using A.0ae53cb6e3f42a79.FlowToken.Vault you have sent in A.f8d6e0586b0a20c7.FUSD.Vault")
 	})
 
 	t.Run("Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
@@ -148,7 +144,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -157,12 +153,13 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
@@ -177,7 +174,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -189,10 +186,10 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 3, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		expected := []*overflow.FormatedEvent{
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
@@ -202,16 +199,25 @@ func TestMarketSale(t *testing.T) {
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"id":        fmt.Sprintf("%d", ids[2]),
-					"grouping":  "",
 					"rarity":    "",
+					"scalars": map[string]interface{}{
+						"Speed": "100.00000000",
+					},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+					},
+					"editionNumber":         "3",
+					"totalInEdition":        "3",
+					"collectionName":        "user1",
+					"collectionDescription": "Neo Collectibles FIND",
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"status":     "cancelled",
+				"status":     "cancel",
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
@@ -221,16 +227,25 @@ func TestMarketSale(t *testing.T) {
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"id":        fmt.Sprintf("%d", ids[1]),
-					"grouping":  "",
 					"rarity":    "",
+					"scalars": map[string]interface{}{
+						"Speed": "100.00000000",
+					},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+					},
+					"editionNumber":         "2",
+					"totalInEdition":        "3",
+					"collectionName":        "user1",
+					"collectionDescription": "Neo Collectibles FIND",
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"status":     "cancelled",
+				"status":     "cancel",
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
@@ -240,19 +255,29 @@ func TestMarketSale(t *testing.T) {
 					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"id":        fmt.Sprintf("%d", ids[0]),
-					"grouping":  "",
 					"rarity":    "",
+					"scalars": map[string]interface{}{
+						"Speed": "100.00000000",
+					},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+					},
+					"editionNumber":         "1",
+					"totalInEdition":        "3",
+					"collectionName":        "user1",
+					"collectionDescription": "Neo Collectibles FIND",
 				},
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"status":     "cancelled",
+				"status":     "cancel",
 				"tenant":     "find",
 				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}),
 		}
 
-		otu.O.TransactionFromFile("cancelAllNFTForSale").
+		otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().Account("account")).
 			Test(otu.T).AssertSuccess().
 			AssertEmitEvent(expected...)
 	})
@@ -263,7 +288,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -272,7 +297,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.alterMarketOption("Sale", "deprecate")
@@ -280,6 +305,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -287,10 +313,11 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				Account("account").
+				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
@@ -302,9 +329,10 @@ func TestMarketSale(t *testing.T) {
 
 		otu.alterMarketOption("Sale", "deprecate")
 
-		otu.O.TransactionFromFile("cancelNFTForSale").
+		otu.O.TransactionFromFile("delistNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(ids[1])).
 			Test(otu.T).
 			AssertSuccess()
@@ -317,7 +345,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -326,7 +354,7 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.alterMarketOption("Sale", "stop")
@@ -334,6 +362,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -341,18 +370,20 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				Account("account").
+				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("cancelNFTForSale").
+		otu.O.TransactionFromFile("delistNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				UInt64Array(ids[0])).
 			Test(otu.T).AssertFailure("Tenant has stopped this item")
 
@@ -364,7 +395,7 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			alterMarketOption("Sale", "stop").
 			alterMarketOption("Sale", "enable")
@@ -375,12 +406,13 @@ func TestMarketSale(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "directSale", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -388,10 +420,11 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess()
 
-		otu.O.TransactionFromFile("buyItemForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				Account("user1").
+				Account("account").
+				String("user1").
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
@@ -400,6 +433,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[0]).
 				String("Flow").
@@ -410,6 +444,66 @@ func TestMarketSale(t *testing.T) {
 		otu.cancelNFTForSale("user2", ids[0])
 		itemsForSale = otu.getItemsForSale("user2")
 		assert.Equal(t, 0, len(itemsForSale))
+	})
+
+	/* Testing on Royalties */
+
+	// platform 0.15
+	// artist 0.05
+	// find 0.025
+	// tenant nil
+	t.Run("Royalties should be sent to correspondence upon buy action", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		ids := otu.mintThreeExampleDandies()
+		otu.listNFTForSale("user1", ids[0], price)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+
+		otu.O.TransactionFromFile("buyNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[0]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"findName":    "",
+				"id":          fmt.Sprintf("%d", ids[0]),
+				"royaltyName": "find",
+				"tenant":      "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("user1"),
+				"amount":      "0.50000000",
+				"findName":    "user1",
+				"id":          fmt.Sprintf("%d", ids[0]),
+				"royaltyName": "artist",
+				"tenant":      "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"findName":    "",
+				"id":          fmt.Sprintf("%d", ids[0]),
+				"royaltyName": "platform",
+				"tenant":      "find",
+			}))
+
 	})
 
 }

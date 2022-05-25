@@ -25,7 +25,6 @@ const auctionDurationFloat = 86400.0
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
 		setupDandy("user1").
-		createUser(100.0, "user1").
 		createUser(100.0, "user2").
 		createUser(100.0, "user3").
 		registerUser("user2").
@@ -38,7 +37,6 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 	otu.setupFIND().
 		setupDandy("user1").
-		createUser(100.0, "user1").
 		createUser(100.0, "user2").
 		createUser(100.0, "user3").
 		registerUser("user2").
@@ -87,13 +85,17 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess().AssertNoEvents()
 
+	otu.O.TransactionFromFile("adminSetupMarketOptionsTypes").
+		SignProposeAndPayAs("find").
+		Test(otu.T).AssertSuccess().AssertNoEvents()
+
 	otu.createUser(100.0, "account")
 
 	return otu.tickClock(1.0)
 }
 
 func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
-	otu.O.TransactionFromFile("clock").SignProposeAndPayAs("find").
+	otu.O.TransactionFromFile("testClock").SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			UFix64(time)).
 		Test(otu.T).AssertSuccess()
@@ -102,13 +104,21 @@ func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTestUtils {
 
+	nameAddress := otu.accountAddress(name)
+
 	otu.O.TransactionFromFile("createProfile").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().String(name)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Created", map[string]interface{}{
+			"account":   nameAddress,
+			"userName":  name,
+			"findName":  name,
+			"createdAt": "find",
+		}))
 
-	otu.O.TransactionFromFile("mintFusd").
+	otu.O.TransactionFromFile("testMintFusd").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().
 			Account(name).
@@ -117,7 +127,16 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		AssertSuccess().
 		AssertEventCount(3)
 
-	otu.O.TransactionFromFile("mintFlow").
+	otu.O.TransactionFromFile("testMintFlow").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			Account(name).
+			UFix64(fusd)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertEventCount(3)
+
+	otu.O.TransactionFromFile("testMintUsdc").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().
 			Account(name).
@@ -216,45 +235,52 @@ pub fun main() :  UFix64 {
 }
 
 func (otu *OverflowTestUtils) accountAddress(name string) string {
-	return fmt.Sprintf("0x%s", otu.O.Account(name).Address().String())
+	address := otu.O.Account(name).Address().String()
+	for address[0:1] == "0" {
+		address = address[1:]
+	}
+
+	return fmt.Sprintf("0x%s", address)
 }
 
 func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listForSale").
+	otu.O.TransactionFromFile("listNameForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-			"directSellPrice": "10.00000000",
-			"active":          "true",
-			"name":            name,
-			"owner":           otu.accountAddress(name),
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			"amount":     "10.00000000",
+			"status":     "active_listed",
+			"name":       name,
+			"seller":     otu.accountAddress(name),
+			"sellerName": name,
 		}))
 	return otu
 }
 
 func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listForSale").
+	otu.O.TransactionFromFile("listNameForSale").
 		SignProposeAndPayAs(seller).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForSale", map[string]interface{}{
-			"directSellPrice": "10.00000000",
-			"active":          "true",
-			"name":            name,
-			"owner":           otu.accountAddress(seller),
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			"amount":     "10.00000000",
+			"status":     "active_listed",
+			"name":       name,
+			"seller":     otu.accountAddress(seller),
+			"sellerName": seller,
 		}))
 	return otu
 }
 
 func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *OverflowTestUtils {
-	otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(amount)).
@@ -262,8 +288,9 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 		AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", amount),
-			"bidder": otu.accountAddress(buyer),
+			"buyer":  otu.accountAddress(buyer),
 			"name":   name,
+			"status": "offered",
 		}))
 
 	return otu
@@ -271,7 +298,7 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 
 func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listForAuction").
+	otu.O.TransactionFromFile("listNameForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			String(name).
@@ -280,12 +307,12 @@ func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
 			UFix64(auctionDurationFloat).
 			UFix64(300.0)). //extention on late bid
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.ForAuction", map[string]interface{}{
-			"auctionStartPrice":   "5.00000000",
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			"amount":              "5.00000000",
 			"auctionReservePrice": "20.00000000",
-			"active":              "true",
+			"status":              "active_listed",
 			"name":                name,
-			"owner":               otu.accountAddress(name),
+			"seller":              otu.accountAddress(name),
 		}))
 	return otu
 }
@@ -294,17 +321,19 @@ func (otu *OverflowTestUtils) bid(buyer, name string, amount float64) *OverflowT
 
 	endTime := otu.currentTime() + auctionDurationFloat
 	endTimeSting := fmt.Sprintf("%f00", endTime)
-	otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-			"amount":       fmt.Sprintf("%.8f", amount),
-			"auctionEndAt": endTimeSting,
-			"bidder":       otu.accountAddress(buyer),
-			"name":         name,
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", amount),
+			"endsAt":    endTimeSting,
+			"buyer":     otu.accountAddress(buyer),
+			"buyerName": buyer,
+			"name":      name,
+			"status":    "active_ongoing",
 		}))
 	return otu
 }
@@ -313,17 +342,19 @@ func (otu *OverflowTestUtils) auctionBid(buyer, name string, amount float64) *Ov
 
 	endTime := otu.currentTime() + auctionDurationFloat
 	endTimeSting := fmt.Sprintf("%f00", endTime)
-	otu.O.TransactionFromFile("bid").SignProposeAndPayAs(buyer).
+	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
 			String(name).
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
-			"amount":       fmt.Sprintf("%.8f", amount),
-			"auctionEndAt": endTimeSting,
-			"bidder":       otu.accountAddress(buyer),
-			"name":         name,
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", amount),
+			"endsAt":    endTimeSting,
+			"buyer":     otu.accountAddress(buyer),
+			"buyerName": buyer,
+			"name":      name,
+			"status":    "active_ongoing",
 		}))
 	return otu
 }
@@ -349,7 +380,7 @@ func (otu *OverflowTestUtils) setupCharity(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) mintCharity(name, image, thumbnail, originUrl, description, user string) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("mintCharity").SignProposeAndPayAs("find").
+	otu.O.TransactionFromFile("adminMintCharity").SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			String(name).
 			String(image).
@@ -375,7 +406,11 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 			String("Neo").
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
-			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp")).
+			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+			String("Neo Collectibles FIND").
+			String("https://neomotorcycles.co.uk/index.html").
+			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		Test(otu.T).
 		AssertSuccess().AssertEventCount(6).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
@@ -415,13 +450,14 @@ func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("cancelNFTForSale").
+	otu.O.TransactionFromFile("delistNFTSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
-			"status": "cancelled",
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 		}))
@@ -433,13 +469,14 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 	otu.O.TransactionFromFile("listNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
-			"status": "listed",
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			"status": "active_listed",
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
@@ -449,10 +486,10 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	//TODO: rename to listNFTForAuctionEscrow
 	otu.O.TransactionFromFile("listNFTForAuction").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
@@ -462,8 +499,8 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			UFix64(60.0).
 			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
-			"status":              "listed",
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			"status":              "active_listed",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
 			"id":                  fmt.Sprintf("%d", id),
@@ -477,6 +514,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 	otu.O.TransactionFromFile("listNFTForAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
@@ -486,8 +524,8 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			UFix64(60.0).
 			UFix64(1.0)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
-			"status":              "listed",
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"status":              "active_listed",
 			"amount":              fmt.Sprintf("%.8f", price),
 			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
 			"id":                  fmt.Sprintf("%d", id),
@@ -499,13 +537,14 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 	royalty := Royalty{}
-	otu.O.ScriptFromFile("checkRoyalty").
+	err := otu.O.ScriptFromFile("getCheckRoyalty").
 		Args(otu.O.Arguments().
 			String(name).
 			UInt64(id).
 			String(nftAlias).
 			String("A.f8d6e0586b0a20c7.MetadataViews.Royalties")).
 		RunMarshalAs(&royalty)
+	assert.NoError(otu.T, err)
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
@@ -521,14 +560,15 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("buyItemForSaleFlowToken").
+	otu.O.TransactionFromFile("buyNFTForSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			Account("account").
+			String(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
@@ -544,14 +584,15 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 	otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -561,14 +602,15 @@ func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint6
 	otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -589,15 +631,16 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 	otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			Account("account").
+			String(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -607,15 +650,16 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 	otu.O.TransactionFromFile("bidMarketAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			Account("account").
+			String(seller).
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "active",
+			"status": "active_ongoing",
 		}))
 	return otu
 }
@@ -625,6 +669,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 	otu.O.TransactionFromFile("increaseBidMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
@@ -632,7 +677,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "offered",
+			"status": "active_offered",
 		}))
 	return otu
 }
@@ -642,6 +687,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 	otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
@@ -649,7 +695,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
-			"status": "offered",
+			"status": "active_offered",
 		}))
 	return otu
 }
@@ -659,7 +705,8 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 	otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			Account("account").
+			String(seller).
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
@@ -678,7 +725,8 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 	otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(seller).
+			Account("account").
+			String(seller).
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
@@ -697,6 +745,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 	otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
@@ -714,6 +763,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 	otu.O.TransactionFromFile("acceptDirectOfferSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
@@ -721,7 +771,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 			"seller": otu.accountAddress(name),
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
-			"status": "accepted",
+			"status": "active_accepted",
 		}))
 	return otu
 }
@@ -731,6 +781,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 	otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
@@ -747,10 +798,11 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller stri
 	otu.O.TransactionFromFile("retractOfferMarketDirectOfferEscrowed").
 		SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
-			"status": "cancelled",
+			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 		}))
@@ -762,10 +814,11 @@ func (otu *OverflowTestUtils) rejectDirectOfferSoft(name string, id uint64, pric
 	otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"status": "rejected",
+			"status": "cancel_rejected",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
@@ -778,10 +831,11 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, 
 	otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
 		SignProposeAndPayAs(buyer).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"status": "cancelled",
+			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 		}))
@@ -793,9 +847,10 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrowFromBidder(name string, 
 	otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
@@ -809,10 +864,11 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 	otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
-			Account(name).
+			Account("account").
+			String(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
 			"buyer":  otu.accountAddress(buyer),
@@ -827,9 +883,10 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 	otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.ForAuction", map[string]interface{}{
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
@@ -844,6 +901,7 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 	otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
+			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
@@ -852,25 +910,6 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
 		}))
-		//TODO: test that funds leave the account here
-	return otu
-}
-
-func (otu *OverflowTestUtils) fulfillMarketAuctionCancelled(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
-
-	otu.O.TransactionFromFile("fulfillMarketAuction").
-		SignProposeAndPayAs(name).
-		Args(otu.O.Arguments().
-			Account(name).
-			UInt64(id)).
-		Test(otu.T).AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.ForAuction", map[string]interface{}{
-			"id":     fmt.Sprintf("%d", id),
-			"buyer":  otu.accountAddress(buyer),
-			"amount": fmt.Sprintf("%.8f", price),
-			"status": "cancelled",
-		}))
-		//TODO: test better events
 	return otu
 }
 
@@ -883,16 +922,23 @@ type Royalty struct {
 }
 
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
-	var findReport FINDReport
-	otu.O.ScriptFromFile("address_status").Args(otu.O.Arguments().Account(name)).RunMarshalAs(&findReport)
+
+	var findReport Report
+	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
+		String(name)).
+		RunMarshalAs(&findReport)
+	if err != nil {
+		swallowErr(err)
+	}
 	var list []SaleItemInformation
-	for _, saleItemCollectionReport := range findReport.ItemsForSale {
-		for _, saleItemInformation := range saleItemCollectionReport.Items {
-			list = append(list, saleItemInformation)
-		}
+	for _, saleItemCollectionReport := range findReport.FINDReport.ItemsForSale {
+		list = append(list, saleItemCollectionReport.Items...)
 	}
 	return list
 
+}
+
+func swallowErr(err error) {
 }
 
 func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected string) *OverflowTestUtils {
@@ -902,7 +948,7 @@ func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected stri
 }
 
 func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
-	otu.O.TransactionFromFile("setFTInfo_" + alias).
+	otu.O.TransactionFromFile("adminSetFTInfo_" + alias).
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
@@ -923,7 +969,7 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 }
 
 func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
-	otu.O.TransactionFromFile("setNFTInfo_Dandy").
+	otu.O.TransactionFromFile("adminSetNFTInfo_Dandy").
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
@@ -949,7 +995,7 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 	return otu
 }
 
-func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUtils {
+func (otu *OverflowTestUtils) registerFtInRegistry() *OverflowTestUtils {
 	otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 		"alias":          "FUSD",
 		"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
@@ -958,12 +1004,25 @@ func (otu *OverflowTestUtils) registerFlowFUSDDandyInRegistry() *OverflowTestUti
 			"alias":          "Flow",
 			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 		}).
+		registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "USDC",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+		}).
 		registerDandyInNFTRegistry()
 	return otu
 }
 
+func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setProfile").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().String("https://find.xyz/assets/img/avatars/avatar14.png")).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
-	otu.O.TransactionFromFile("setSellDandyForFlow").
+	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().String(marketType)).
 		Test(otu.T).
@@ -972,7 +1031,7 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *Overf
 }
 
 func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *OverflowTestUtils {
-	otu.O.TransactionFromFile("alterMarketOption").
+	otu.O.TransactionFromFile("testAlterMarketOption").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().String(marketType).String(ruleName)).
 		Test(otu.T).
@@ -1025,11 +1084,21 @@ type SaleItem struct {
 	TypeID              string `json:"typeId"`
 }
 
+type Report struct {
+	FINDReport FINDReport `json:"FINDReport"`
+	NameReport NameReport `json:"NameReport"`
+}
+
+type NameReport struct {
+	Status string `json:"status"`
+	Cost   string `json:"cost"`
+}
+
 type FINDReport struct {
-	Profile         string                               `json:"profile"`
-	Bids            string                               `json:"bids"`
-	RelatedAccounts string                               `json:"relatedAccounts"`
-	Leases          string                               `json:"leases"`
+	Profile         interface{}                          `json:"profile"`
+	Bids            []interface{}                        `json:"bids"`
+	RelatedAccounts map[string]interface{}               `json:"relatedAccounts"`
+	Leases          []interface{}                        `json:"leases"`
 	PrivateMode     string                               `json:"privateMode"`
 	ItemsForSale    map[string]SaleItemCollectionReport  `json:"itemsForSale"`
 	MarketBids      map[string]MarketBidCollectionPublic `json:"marketBids"`
@@ -1054,32 +1123,33 @@ type BidInfo struct {
 }
 
 type SaleItemInformation struct {
-	NftIdentifier         string      `json:"nftIdentifier"`
-	NftId                 string      `json:"nftId"`
-	Seller                string      `json:"seller"`
-	SellerName            string      `json:"sellerName"`
-	Amount                string      `json:"amount"`
-	Bidder                string      `json:"bidder"`
-	BidderName            string      `json:"bidderName"`
-	ListingId             string      `json:"listingId"`
-	SaleType              string      `json:"saleType"`
-	ListingTypeIdentifier string      `json:"listingTypeIdentifier"`
-	FtAlias               string      `json:"ftAlias"`
-	FtTypeIdentifier      string      `json:"ftTypeIdentifier"`
-	ListingValidUntil     string      `json:"listingValidUntil"`
-	Nft                   NFTInfo     `json:"nft"`
-	Auction               AuctionItem `json:"auction"`
-	ListingStatus         string      `json:"listingStatus"`
+	NftIdentifier         string       `json:"nftIdentifier"`
+	NftId                 string       `json:"nftId"`
+	Seller                string       `json:"seller"`
+	SellerName            string       `json:"sellerName"`
+	Amount                string       `json:"amount"`
+	Bidder                string       `json:"bidder"`
+	BidderName            string       `json:"bidderName"`
+	ListingId             string       `json:"listingId"`
+	SaleType              string       `json:"saleType"`
+	ListingTypeIdentifier string       `json:"listingTypeIdentifier"`
+	FtAlias               string       `json:"ftAlias"`
+	FtTypeIdentifier      string       `json:"ftTypeIdentifier"`
+	ListingValidUntil     string       `json:"listingValidUntil"`
+	Auction               *AuctionItem `json:"auction,omitempty"`
+	ListingStatus         string       `json:"listingStatus"`
 }
 
 type NFTInfo struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Thumbnail  string `json:"seller"`
-	SellerName string `json:"thumbnail"`
-	Nfttype    string `json:"type"`
-	Grouping   string `json:"grouping"`
-	Rarity     string `json:"rarity"`
+	Id                    string `json:"id"`
+	Name                  string `json:"name"`
+	Thumbnail             string `json:"thumbnail"`
+	Nfttype               string `json:"type"`
+	Rarity                string `json:"rarity"`
+	EditionNumber         string `json:"editionNumber"`
+	TotalInEdition        string `json:"totalInEdition"`
+	CollectionName        string `json:"collectionName"`
+	CollectionDescription string `json:"collectionDescription"`
 }
 
 type AuctionItem struct {

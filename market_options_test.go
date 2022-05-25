@@ -16,7 +16,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -26,6 +26,7 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -42,7 +43,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -59,6 +60,7 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
@@ -78,7 +80,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -89,6 +91,7 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
@@ -102,13 +105,14 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
-				"status": "listed",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+				"status": "active_listed",
 				"amount": fmt.Sprintf("%.8f", price),
 				"id":     fmt.Sprintf("%d", ids[1]),
 				"seller": otu.accountAddress("user1"),
@@ -123,7 +127,7 @@ func TestMarketOptions(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFlowFUSDDandyInRegistry().
+			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow")
 
@@ -134,6 +138,7 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
@@ -147,6 +152,7 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
@@ -160,13 +166,14 @@ func TestMarketOptions(t *testing.T) {
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
+				Account("account").
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.ForSale", map[string]interface{}{
-				"status": "listed",
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+				"status": "active_listed",
 				"amount": fmt.Sprintf("%.8f", price),
 				"id":     fmt.Sprintf("%d", ids[1]),
 				"seller": otu.accountAddress("user1"),
@@ -181,7 +188,7 @@ func TestMarketOptions(t *testing.T) {
 	// 		setupDandy("user1").
 	// 		createUser(100.0, "user2").
 	// 		registerUser("user2").
-	// 		registerFlowFUSDDandyInRegistry().
+	// 		registerFtInRegistry().
 	// 		setFlowDandyMarketOption("Sale").
 	// 		setFlowDandyMarketOption("AuctionEscrow")
 

@@ -27,6 +27,13 @@
         "mainnet": "0x3c5959b568896393"
       }
     },
+    "NFTStorefront": {
+      "source": "./contracts/standard/NFTStorefront.cdc",
+      "aliases": {
+        "testnet": "0x94b06cfca1d8a476",
+        "mainnet": "0x4eb8a10cb9f87357"
+      }
+    },
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -43,6 +50,13 @@
         "mainnet": "0x1654653399040a61"
       }
     },
+    "FiatToken": {
+      "source": "./contracts/standard/FiatToken.cdc",
+      "aliases": {
+        "testnet": "0xa983fecbed621163",
+        "mainnet": "0xb19436aae4d94622"
+      }
+    },
     "FIND": "./contracts/FIND.cdc",
     "Dandy": "./contracts/Dandy.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
@@ -52,6 +66,7 @@
     "FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
     "FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
     "FindMarketSale": "./contracts/FindMarketSale.cdc",
+    "FindMarketOptions": "./contracts/FindMarketOptions.cdc",
     "FindViews": "./contracts/FindViews.cdc",
     "RelatedAccounts": "./contracts/RelatedAccounts.cdc",
     "Sender": "./contracts/Sender.cdc",
@@ -94,15 +109,15 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
-      "address": "4a2ad151970648cd",
+      "address": "a4085e3df7d2ddfb",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
-      "address": "5c7eb4620e0242ac",
+      "address": "498f59df598967a1",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
-      "address": "b8190dbf1ff84273",
+      "address": "bbbc8531d1776d1f",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user2": {
@@ -136,6 +151,7 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
@@ -159,6 +175,7 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
@@ -173,6 +190,7 @@
         "Profile",
         "Debug",
         "FUSD",
+        "FiatToken",
         "Admin",
         "CharityNFT",
         "FindViews",
@@ -185,10 +203,12 @@
         "FindMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindMarketOptions",
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
-        "NFTRegistry"
+        "NFTRegistry",
+        "NFTStorefront"
       ],
       "emulator-find": [],
       "emulator-user1": [],

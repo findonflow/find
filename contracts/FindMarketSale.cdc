@@ -18,7 +18,7 @@ A Find Market for direct sales
 */
 pub contract FindMarketSale {
 
-	pub event ForSale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
+	pub event Sale(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
 
 	//A sale item for a direct sale
 	pub resource SaleItem : FindMarket.SaleItem{
@@ -41,7 +41,15 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getSaleType() : String {
-			return "directSale"
+			return "active_listed"
+		}
+
+		pub fun getListingType() : Type {
+			return Type<@SaleItem>()
+		}
+
+		pub fun getListingTypeIdentifier(): String {
+			return Type<@SaleItem>().identifier
 		}
 
 		pub fun getListingTypeIdentifier(): String {
@@ -83,6 +91,14 @@ pub contract FindMarketSale {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
 			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				return MetadataViews.Royalties([royalty])
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				return MetadataViews.Royalties(royalty)
+			}
 
 			return  nil
 		}
@@ -120,13 +136,15 @@ pub contract FindMarketSale {
 			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
 		}
 
+		pub fun checkPointer() : Bool {
+			return self.pointer.valid()
+		}
+
 	}
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
-		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
@@ -149,60 +167,6 @@ pub contract FindMarketSale {
 			return self.tenantCapability.borrow()!
 		}
 
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation? {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-			}
-			let item=self.borrow(id)
-			let tenant=self.getTenant()
-			let info = self.checkSaleInformation(tenant: tenant, ids: [id], getGhost: false)
-			if info.items.length > 0 {
-				return info.items[0]
-			}
-			return nil
-		}
-
-		// todo: do we need this here?
-		pub fun getSaleItemReport() : FindMarket.SaleItemCollectionReport {
-			let tenant=self.getTenant()
-			return self.checkSaleInformation(tenant: tenant, ids: self.getIds(), getGhost: true)
-		}
-
-		access(contract) fun checkSaleInformation(tenant: &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}, ids: [UInt64], getGhost:Bool) : FindMarket.SaleItemCollectionReport {
-			let ghost: [FindMarket.GhostListing] =[]
-			let info: [FindMarket.SaleItemInformation] =[]
-			let listingType = self.getListingType()
-			for id in ids {
-				let item=self.borrow(id)
-				if !item.pointer.valid() {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				//TODO: do we need to be smarter about this?
-				let stopped=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "delist item for sale"))
-				var status="active"
-				if !stopped.allowed {
-					status="stopped"
-				}
-				let deprecated=tenant.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "delist item for sale"))
-
-				if !deprecated.allowed {
-					status="deprecated"
-				}
-
-				if let validTime = item.getValidUntil() {
-					if validTime >= getCurrentBlock().timestamp{
-						status="ended"
-					}
-				}
-				info.append(FindMarket.SaleItemInformation(item, status))
-			}
-
-			return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
-		}
-
 		pub fun getListingType() : Type {
 			return Type<@SaleItem>()
 		}
@@ -210,6 +174,7 @@ pub contract FindMarketSale {
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+				self.owner!.address != nftCap.address : "You cannot buy your own listing"
 			}
 
 			//TODO: check valid until
@@ -240,9 +205,9 @@ pub contract FindMarketSale {
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
 
-			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
+			emit Sale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
 
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
+			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 
 			destroy <- self.items.remove(key: id)
@@ -260,7 +225,7 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit ForSale(tenant: self.getTenant().name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver(), id: pointer.id), buyer: nil, buyerName:nil)
+			emit Sale(tenant: self.getTenant().name, id: pointer.getUUID(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver(), id: pointer.id), buyer: nil, buyerName:nil)
 			let old <- self.items[pointer.getUUID()] <- saleItem
 			destroy old
 
@@ -280,7 +245,7 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit ForSale(tenant:self.getTenant().name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancelled", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil)
+			emit Sale(tenant:self.getTenant().name, id: id, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil)
 			destroy saleItem
 		}
 
@@ -290,6 +255,13 @@ pub contract FindMarketSale {
 
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			return &self.items[id] as &SaleItem
+		}
+
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
+			pre{
+				self.items.containsKey(id) : "This id does not exist : ".concat(id.toString())
+			}
+			return &self.items[id] as &SaleItem{FindMarket.SaleItem}
 		}
 
 		destroy() {
@@ -302,12 +274,6 @@ pub contract FindMarketSale {
 	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarketTenant.Tenant{FindMarketTenant.TenantPublic}>): @SaleItemCollection {
 		let wallet=FindMarketSale.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		return <- create SaleItemCollection(tenantCapability)
-	}
-
-	//BAM: will this work?
-	//pub fun getFindSaleItemCapability(_ user: Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollection}>? {
-	pub fun getFindSaleItemCapability(_ user: Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		return FindMarketSale.getSaleItemCapability(marketplace: FindMarketSale.account.address, user:user) 
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {

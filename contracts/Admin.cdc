@@ -12,6 +12,7 @@ import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
+import FindMarketOptions from "./FindMarketOptions.cdc"
 
 pub contract Admin {
 
@@ -73,6 +74,15 @@ pub contract Admin {
 			}
 
 			self.capability!.borrow()!.setWallet(wallet)
+		}
+
+		pub fun getFindMarketTenantClient():  &FindMarketTenant.TenantClient{
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+      let path = FindMarketTenant.TenantClientStoragePath
+      return Admin.account.borrow<&FindMarketTenant.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 		}
 
 		/// Enable or disable public registration 
@@ -187,6 +197,41 @@ pub contract Admin {
 		// Remove NonFungibleToken Information by alias
 		pub fun removeNFTInfoByAlias(_ alias: String) {
 			NFTRegistry.removeNFTInfoByAlias(alias)
+		}
+
+		/// ===================================================================================
+		// Find Market Options 
+		/// ===================================================================================
+		pub fun addSaleItemType(_ type: Type) {
+			FindMarketOptions.addSaleItemType(type) 
+		}
+
+		pub fun addMarketBidType(_ type: Type) {
+			FindMarketOptions.addMarketBidType(type) 
+		}
+
+		pub fun addSaleItemCollectionType(_ type: Type) {
+			FindMarketOptions.addSaleItemCollectionType(type) 
+		}
+
+		pub fun addMarketBidCollectionType(_ type: Type) {
+			FindMarketOptions.addMarketBidCollectionType(type) 
+		}
+
+		pub fun removeSaleItemType(_ type: Type) {
+			FindMarketOptions.removeSaleItemType(type) 
+		}
+
+		pub fun removeMarketBidType(_ type: Type) {
+			FindMarketOptions.removeMarketBidType(type) 
+		}
+
+		pub fun removeSaleItemCollectionType(_ type: Type) {
+			FindMarketOptions.removeSaleItemCollectionType(type) 
+		}
+
+		pub fun removeMarketBidCollectionType(_ type: Type) {
+			FindMarketOptions.removeMarketBidCollectionType(type) 
 		}
 
 		init() {

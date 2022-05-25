@@ -12,7 +12,7 @@ pub contract FindMarket {
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarketTenant.TenantCuts) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarketTenant.TenantCuts, resolver: ((Address) : String?)) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -23,26 +23,23 @@ pub contract FindMarket {
 			for royaltyItem in royalty!.getRoyalties() {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
-				//let name=FIND.reverseLookup(royaltyItem.receiver.address)
-				let name=""
-				emit RoyaltyPaid(tenant:name, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				let name = resolver(royaltyItem.receiver.address)
+				emit RoyaltyPaid(tenant:tenant, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 		}
 
 		if let findCut =cuts.findCut {
 			let cutAmount= soldFor * findCut.cut
-			//let name =FIND.reverseLookup(findCut.receiver.address)
-			let name=""
-			emit RoyaltyPaid(tenant: name, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			let name = resolver(findCut.receiver.address)
+			emit RoyaltyPaid(tenant: tenant, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		if let tenantCut =cuts.tenantCut {
 			let cutAmount= soldFor * tenantCut.cut
-			//let name=FIND.reverseLookup(tenantCut.receiver.address)
-			let name=""
-			emit RoyaltyPaid(tenant: name, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			let name = resolver(tenantCut.receiver.address)
+			emit RoyaltyPaid(tenant: tenant, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 		oldProfile.deposit(from: <- vault)
@@ -53,30 +50,71 @@ pub contract FindMarket {
 		pub let name:String
 		pub let thumbnail:String
 		pub let type: String
-		pub let grouping: String?
-		pub let rarity:String?
+		pub var rarity:String?
+		pub var editionNumber: UInt64? 
+		pub var totalInEdition: UInt64?
+		pub var scalars : {String: UFix64}
+		pub var tags : {String: String}
+		pub var collectionName: String? 
+		pub var collectionDescription: String? 
 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
 
-			if let view = item.resolveView(Type<FindViews.Grouping>()) {
-				let grouping = view as! FindViews.Grouping
-				self.grouping=grouping.name
-			} else {
-				self.grouping=nil
+			self.scalars={}
+			self.tags={}
+		
+			self.collectionName=nil
+			self.collectionDescription=nil
+			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
+				let view = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())!
+				if view as? MetadataViews.NFTCollectionDisplay != nil {
+					let grouping = view as! MetadataViews.NFTCollectionDisplay
+					self.collectionName=grouping.name
+					self.collectionDescription=grouping.description
+				}
+			}
+			
+			self.rarity=nil
+			if item.resolveView(Type<FindViews.Rarity>()) != nil {
+				let view = item.resolveView(Type<FindViews.Rarity>())!
+				if view as? FindViews.Rarity != nil {
+					let rarity = view as! FindViews.Rarity
+					self.rarity=rarity.rarityName
+				}
+			} 
+
+			if item.resolveView(Type<FindViews.Tag>()) != nil {
+				let view = item.resolveView(Type<FindViews.Tag>())!
+				if view as? FindViews.Tag != nil {
+					let tags = view as! FindViews.Tag
+					self.tags=tags.getTag()
+				}
 			}
 
-			if let view = item.resolveView(Type<FindViews.Rarity>()) {
-				let rarity = view as! FindViews.Rarity
-				self.rarity=rarity.rarityName
-			} else {
-				self.rarity=nil
+			if item.resolveView(Type<FindViews.Scalar>()) != nil {
+				let view = item.resolveView(Type<FindViews.Scalar>())!
+				if view as? FindViews.Scalar != nil {
+					let scalar = view as! FindViews.Scalar
+					self.scalars=scalar.getScalar()
+				}
 			}
-
+			
 			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
 			self.id=id
+
+			self.editionNumber=nil
+			self.totalInEdition=nil
+			if item.resolveView(Type<FindViews.Edition>()) != nil {
+				let view = item.resolveView(Type<FindViews.Edition>())!
+				if view as? FindViews.Edition != nil {
+					let edition = view as! FindViews.Edition
+					self.editionNumber=edition.editionNumber
+					self.totalInEdition=edition.totalInEdition
+				}
+			} 
 		}
 	}
 
@@ -118,8 +156,8 @@ pub contract FindMarket {
 
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getIds(): [UInt64]
-		pub fun getSaleInformation(_ id:UInt64) : FindMarket.SaleItemInformation?
-		pub fun getSaleItemReport() : SaleItemCollectionReport
+		access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
+		pub fun getListingType() : Type 
 	}
 
 	pub struct SaleItemCollectionReport {
@@ -133,7 +171,9 @@ pub contract FindMarket {
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getBidsReport() : BidItemCollectionReport
+		pub fun getIds() : [UInt64] 
+		pub fun getBidType() : Type 
+		access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
 	}
 
 	pub struct BidItemCollectionReport {
@@ -144,6 +184,11 @@ pub contract FindMarket {
 			self.items=items
 			self.ghosts=ghosts
 		}
+	}
+
+	pub resource interface Bid {
+		pub fun getBalance() : UFix64
+		pub fun getSellerAddress() : Address 
 	}
 
 	pub resource interface SaleItem {
@@ -159,6 +204,8 @@ pub contract FindMarket {
 		pub fun getBuyerName() : String?
 
 		pub fun toNFTInfo() : FindMarket.NFTInfo
+		pub fun checkPointer() : Bool 
+		pub fun getListingType() : Type 
 
 		pub fun getFtAlias(): String 
 		//the Type of the item for sale
@@ -177,7 +224,6 @@ pub contract FindMarket {
 
 	//BAM; this needs to know if an item is deprectaed or stopped in some way
 	pub struct SaleItemInformation {
-
 		pub let nftIdentifier: String 
 		pub let nftId: UInt64
 		pub let seller: Address
@@ -193,14 +239,14 @@ pub contract FindMarket {
 		pub let ftTypeIdentifier: String
 		pub let listingValidUntil: UFix64?
 
-		pub let nft: NFTInfo
+		pub var nft: NFTInfo?
 		pub let auction: AuctionItem?
 		pub let listingStatus:String
 
-		init(item: &{SaleItem}, status:String) {
-			self.listingStatus=status
+		init(item: &{SaleItem}, status:String, nftInfo: Bool) {
 			self.nftIdentifier= item.getItemType().identifier
 			self.nftId=item.getItemID()
+			self.listingStatus=status
 			self.saleType=item.getSaleType()
 			self.listingTypeIdentifier=item.getListingTypeIdentifier()
 			self.listingId=item.getId()
@@ -212,10 +258,10 @@ pub contract FindMarket {
 
 			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
-
+			self.nft=nil
+			if nftInfo {self.nft=item.toNFTInfo()}
 			self.ftTypeIdentifier=item.getFtType().identifier
 
-			self.nft=item.toNFTInfo()
 			self.auction=item.getAuction()
 		}
 	}

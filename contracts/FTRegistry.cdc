@@ -56,6 +56,16 @@ pub contract FTRegistry {
 			return nil
     }
 
+    pub fun getFTInfo(_ input: String) : FTInfo? {
+        if let info = self.getFTInfoByAlias(input) {
+            return info
+        }
+        if let info = self.getFTInfoByTypeIdentifier(input) {
+            return info
+        }
+        return nil 
+    }
+
     pub fun getTypeIdentifier(_ alias: String) : String? {
         return FTRegistry.aliasMap[alias]
     }

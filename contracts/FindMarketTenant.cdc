@@ -15,6 +15,24 @@ pub contract FindMarketTenant {
 	access(contract) let tenantNameAddress : {String:Address}
 	access(contract) let tenantAddressName : {Address:String}
 
+	/* Get Tenant */
+	pub fun getTenant(_ tenant: Address) : &FindMarketTenant.Tenant{FindMarketTenant.TenantPublic} {
+		return FindMarketTenant.getTenantCapability(tenant)!.borrow()!
+	}
+
+	/// A struct to return what action an NFT can execute 
+	pub struct AllowedListing {
+		pub let listingType: Type 
+		pub let ftTypes: [Type]
+		pub let status: String 
+
+		init(listingType: Type, ftTypes: [Type], status: String) {
+			self.listingType=listingType
+			self.ftTypes=ftTypes 
+			self.status=status 
+		} 
+	}
+
 	/// If this is a listing action it will not be allowed if deprecated
 	pub struct MarketAction{
 		pub let listing:Bool
@@ -121,7 +139,7 @@ pub contract FindMarketTenant {
 		pub fun getPublicPath(_ type: Type) : PublicPath
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
-		pub fun getSaleItems() : {String: {String: TenantSaleItem}} 
+		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
 		pub let name:String
 	}
 
@@ -245,7 +263,7 @@ pub contract FindMarketTenant {
 				if !valid {
 					continue
 				}
-				
+
 				if item.status=="stopped" {
 					return ActionResult(allowed:false, message: "Tenant has stopped this item", name:item.name)
 				}
@@ -276,14 +294,48 @@ pub contract FindMarketTenant {
 			return StoragePath(identifier: path) ?? panic("Cannot find storage path for type ".concat(type.identifier))
 		}
 
-		pub fun getSaleItems() : {String: {String: TenantSaleItem}} {
-			var saleItems : {String: {String: TenantSaleItem} } = {}
-			saleItems["findSaleItems"] = self.findSaleItems
-			saleItems["tenantSaleItems"] = self.tenantSaleItems
-			saleItems["findCuts"] = self.findCuts
+		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
 
-			return saleItems
+			var containsNFTType = false 
+			var containsListingType = false
+			for item in self.findSaleItems.values {
+				for rule in item.rules {
+					if rule.types.contains(nftType){
+						containsNFTType = true
+					} 
+					if rule.types.contains(marketType) {
+						containsListingType = true
+					} 
+
+					if containsListingType && containsNFTType {
+						return nil
+					}
+				}
+				containsNFTType = false 
+				containsListingType = false
+			}
+			for item in self.tenantSaleItems.values {
+				var allowedFTTypes : [Type] = []
+				for rule in item.rules {
+					if rule.ruleType == "ft"{
+						allowedFTTypes = rule.types
+					}
+					if rule.types.contains(nftType) && rule.allow {
+						containsNFTType = true
+					} 
+					if rule.types.contains(marketType) && rule.allow {
+						containsListingType = true
+					} 				
+					if containsListingType && containsNFTType {
+						return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
+					}
+				}
+				containsNFTType = false 
+				containsListingType = false
+			}
+			return nil
 		}
+
 	}
 
 	// Tenant admin stuff
@@ -347,7 +399,7 @@ pub contract FindMarketTenant {
 				cut: cut, 
 				rules: rules, 
 				status:"active"
-				), type: "tenant")
+			), type: "tenant")
 			//Emit Event here
 		}
 
@@ -394,7 +446,7 @@ pub contract FindMarketTenant {
 
 			return self.capability!.borrow()!
 		}
-		
+
 	}
 
 	access(account) fun createFindMarketTenant(name: String, address:Address) : Capability<&Tenant> {
@@ -465,17 +517,13 @@ pub contract FindMarketTenant {
 
 		return FindMarketTenant.account.getCapability<&Tenant{TenantPublic}>(
 			PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
-	}
+		}
 
-	pub fun getFindTenantCapability() : Capability<&Tenant{TenantPublic}> {
-		return FindMarketTenant.getTenantCapability(FindMarketTenant.account.address) ?? panic("Find market tenant not set up correctly")
-	}
+		init() {
+			self.tenantAddressName={}
+			self.tenantNameAddress={}
 
-	init() {
-		self.tenantAddressName={}
-		self.tenantNameAddress={}
-
-		self.TenantClientPublicPath=/public/findMarketClient
-		self.TenantClientStoragePath=/storage/findMarketClient
+			self.TenantClientPublicPath=/public/findMarketClient
+			self.TenantClientStoragePath=/storage/findMarketClient
+		}
 	}
-}
