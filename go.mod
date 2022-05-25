@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220407214147-f74f6ea0f10b
+	github.com/bjartek/overflow v0.0.0-20220525083727-07ab2e21653c
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
@@ -79,12 +79,12 @@ require (
 	github.com/multiformats/go-multihash v0.1.0 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/onflow/atree v0.2.0 // indirect
-	github.com/onflow/flow-cli v0.33.0 // indirect
+	github.com/onflow/flow-cli v0.34.0 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v0.11.0 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.11.0 // indirect
-	github.com/onflow/flow-emulator v0.31.0 // indirect
+	github.com/onflow/flow-emulator v0.31.1 // indirect
 	github.com/onflow/flow-ft/lib/go/contracts v0.5.0 // indirect
-	github.com/onflow/flow-go v0.25.5-0.20220330212458-32bda868ae65 // indirect
+	github.com/onflow/flow-go v0.25.6 // indirect
 	github.com/onflow/flow-go-sdk v0.24.0 // indirect
 	github.com/onflow/flow-go/crypto v0.24.3 // indirect
 	github.com/onflow/flow/protobuf/go/flow v0.2.4 // indirect
@@ -96,6 +96,7 @@ require (
 	github.com/rivo/uniseg v0.2.1-0.20211004051800-57c86be7915a // indirect
 	github.com/rs/zerolog v1.26.1 // indirect
 	github.com/sethvargo/go-retry v0.1.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/sony/gobreaker v0.5.0 // indirect
 	github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect

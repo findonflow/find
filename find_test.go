@@ -89,7 +89,9 @@ func TestFIND(t *testing.T) {
 			`).
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1")).
-			Test(t).AssertFailure("locked")
+			Test(t).
+			AssertFailure("locked").
+			AssertComputationLessThenOrEqual(70)
 
 		otu.expireLease()
 		otu.registerUser("user1")
