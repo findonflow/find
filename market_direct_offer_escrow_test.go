@@ -59,6 +59,26 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	})
 
+	t.Run("Should not be able to offer your own NFT", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(price)).
+			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+
+	})
+
 	//return money when outbid
 
 	t.Run("Should return money when outbid", func(t *testing.T) {
@@ -312,6 +332,53 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.alterMarketOption("DirectOfferEscrow", "deprecate").
 			retractOfferDirectOfferEscrowed("user2", "user1", id)
+	})
+
+	/* Testing on Royalties */
+
+	// platform 0.15
+	// artist 0.05
+	// find 0.025
+	// tenant nil
+	t.Run("Royalties should be sent to correspondence upon accept offer action", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price)
+
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"findName":    "",
+				"id":          fmt.Sprintf("%d", id),
+				"royaltyName": "find",
+				"tenant":      "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("user1"),
+				"amount":      "0.50000000",
+				"findName":    "user1",
+				"id":          fmt.Sprintf("%d", id),
+				"royaltyName": "artist",
+				"tenant":      "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"findName":    "",
+				"id":          fmt.Sprintf("%d", id),
+				"royaltyName": "platform",
+				"tenant":      "find",
+			}))
 	})
 
 }
