@@ -62,6 +62,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		for link in removeLinks {
 			profile.removeLink(link)
 		}
+		profile.emitUpdatedEvent()
 
 		for titleName in linkTitles.keys {
 			let title=linkTitles[titleName]!

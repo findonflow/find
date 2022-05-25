@@ -52,10 +52,6 @@ pub contract FindMarketSale {
 			return Type<@SaleItem>().identifier
 		}
 
-		pub fun getListingTypeIdentifier(): String {
-			return Type<@SaleItem>().identifier
-		}
-
 		pub fun setBuyer(_ address:Address) {
 			self.buyer=address
 		}

@@ -99,10 +99,6 @@ pub contract FindMarketDirectOfferSoft {
 			return Type<@SaleItem>().identifier
 		}
 
-		pub fun getListingTypeIdentifier() : String {
-			return Type<@SaleItem>().identifier
-		}
-
 		pub fun getBalance() : UFix64 {
 			return self.offerCallback.borrow()!.getBalance(self.getId())
 		}

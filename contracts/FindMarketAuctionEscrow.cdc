@@ -184,10 +184,6 @@ pub contract FindMarketAuctionEscrow {
 			return Type<@SaleItem>().identifier
 		}
 
-		pub fun getListingTypeIdentifier(): String {
-			return Type<@SaleItem>().identifier
-		}
-
 
 		pub fun getItemID() : UInt64 {
 			return self.pointer.id

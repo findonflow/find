@@ -95,10 +95,6 @@ pub contract FindMarketDirectOfferEscrow {
 			return Type<@SaleItem>().identifier
 		}
 
-		pub fun getListingTypeIdentifier() : String {
-			return Type<@SaleItem>().identifier
-		}
-
 		pub fun setPointer(_ pointer: FindViews.AuthNFTPointer) {
 			self.pointer=pointer
 		}
