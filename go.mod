@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/bjartek/overflow v0.0.0-20220525083727-07ab2e21653c
 	github.com/davecgh/go-spew v1.1.1
+	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.23.3
@@ -50,7 +51,6 @@ require (
 	github.com/gosuri/uilive v0.0.4 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hexops/autogold v1.3.0 // indirect
 	github.com/hexops/valast v1.4.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/ipfs/go-block-format v0.0.3 // indirect
