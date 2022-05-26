@@ -1,0 +1,32 @@
+`{
+    "A.0ae53cb6e3f42a79.FlowToken.Vault": {
+        "alias": "Flow",
+        "balancePath": "/public/flowTokenBalance",
+        "balancePathIdentifier": "flowTokenBalance",
+        "icon": "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
+        "receiverPath": "/public/flowTokenReceiver",
+        "receiverPathIdentifier": "flowTokenReceiver",
+        "tag": [
+            "utility coin"
+        ],
+        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
+        "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+        "vaultPath": "/storage/flowTokenVault",
+        "vaultPathIdentifier": "flowTokenVault"
+    },
+    "A.f8d6e0586b0a20c7.FUSD.Vault": {
+        "alias": "FUSD",
+        "balancePath": "/public/fusdBalance",
+        "balancePathIdentifier": "fusdBalance",
+        "icon": "https://static.flowscan.org/mainnet/icons/A.3c5959b568896393.FUSD.png",
+        "receiverPath": "/public/fusdReceiver",
+        "receiverPathIdentifier": "fusdReceiver",
+        "tag": [
+            "stablecoin"
+        ],
+        "type": "Type\u003cA.f8d6e0586b0a20c7.FUSD.Vault\u003e()",
+        "typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+        "vaultPath": "/storage/fusdVault",
+        "vaultPathIdentifier": "fusdVault"
+    }
+}`

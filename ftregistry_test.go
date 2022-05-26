@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,22 +30,9 @@ func TestFTRegistry(t *testing.T) {
 		o := otu.O
 		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
-			RunReturnsInterface()
+			RunReturnsJsonString()
 
-		expected := map[string]interface{}{
-			"alias":                  "Flow",
-			"balancePath":            "/public/flowTokenBalance",
-			"balancePathIdentifier":  "flowTokenBalance",
-			"icon":                   "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
-			"receiverPath":           "/public/flowTokenReceiver",
-			"receiverPathIdentifier": "flowTokenReceiver",
-			"tag":                    []interface{}{"utility coin"},
-			"type":                   "Type<A.0ae53cb6e3f42a79.FlowToken.Vault>()",
-			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			"vaultPath":              "/storage/flowTokenVault",
-			"vaultPathIdentifier":    "flowTokenVault",
-		}
-		assert.Equal(t, expected, result)
+		autogold.Equal(t, result)
 
 	})
 
@@ -59,57 +47,14 @@ func TestFTRegistry(t *testing.T) {
 		o := otu.O
 		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
-			RunReturnsInterface()
+			RunReturnsJsonString()
 
-		expected := map[string]interface{}{
-			"alias":                  "Flow",
-			"balancePath":            "/public/flowTokenBalance",
-			"balancePathIdentifier":  "flowTokenBalance",
-			"icon":                   "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
-			"receiverPath":           "/public/flowTokenReceiver",
-			"receiverPathIdentifier": "flowTokenReceiver",
-			"tag":                    []interface{}{"utility coin"},
-			"type":                   "Type<A.0ae53cb6e3f42a79.FlowToken.Vault>()",
-			"typeIdentifier":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			"vaultPath":              "/storage/flowTokenVault",
-			"vaultPathIdentifier":    "flowTokenVault",
-		}
-		assert.Equal(t, expected, result)
-
+		autogold.Equal(t, result)
 	})
 
 	t.Run("Should be able to registry flow token, fusd token and get list from it", func(t *testing.T) {
-		expected := `
-			{
-			    "A.0ae53cb6e3f42a79.FlowToken.Vault": {
-			        "alias": "Flow",
-			        "balancePath": "/public/flowTokenBalance",
-					"balancePathIdentifier":"flowTokenBalance",
-			        "icon": "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
-					"tag" : ["utility coin"],
-			        "receiverPath": "/public/flowTokenReceiver",
-					"receiverPathIdentifier":"flowTokenReceiver",
-			        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
-			        "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			        "vaultPath": "/storage/flowTokenVault",
-					"vaultPathIdentifier":"flowTokenVault"
-			    },
-				"A.f8d6e0586b0a20c7.FUSD.Vault": {
-			        "alias": "FUSD",
-			        "balancePath": "/public/fusdBalance",
-					"balancePathIdentifier":"fusdBalance",
-			        "icon": "https://static.flowscan.org/mainnet/icons/A.3c5959b568896393.FUSD.png",
-					"tag" : ["stablecoin"],
-			        "receiverPath": "/public/fusdReceiver",
-					"receiverPathIdentifier":"fusdReceiver",
-			        "type": "Type\u003cA.f8d6e0586b0a20c7.FUSD.Vault\u003e()",
-			        "typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			        "vaultPath": "/storage/fusdVault",
-					"vaultPathIdentifier":"fusdVault"
-			    }
-			}
-			`
-		NewOverflowTest(t).
+		
+		otu := NewOverflowTest(t).
 			setupFIND().
 			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 				"alias":          "Flow",
@@ -118,8 +63,10 @@ func TestFTRegistry(t *testing.T) {
 			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 				"alias":          "FUSD",
 				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			}).
-			scriptEqualToJson("getFTInfoAll", expected)
+			})
+
+		result := otu.O.ScriptFromFile("getFTInfoAll").RunReturnsJsonString()
+		autogold.Equal(t, result)
 
 	})
 
@@ -202,23 +149,9 @@ func TestFTRegistry(t *testing.T) {
 		o := otu.O
 		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FiatToken.Vault")).
-			RunReturnsInterface()
+			RunReturnsJsonString()
 
-		expected := map[string]interface{}{
-			"alias":                  "USDC",
-			"balancePath":            "/public/USDCVaultBalance",
-			"balancePathIdentifier":  "USDCVaultBalance",
-			"icon":                   "https://static.flowscan.org/mainnet/icons/A.b19436aae4d94622.FiatToken.png",
-			"receiverPath":           "/public/USDCVaultReceiver",
-			"receiverPathIdentifier": "USDCVaultReceiver",
-			"tag":                    []interface{}{"stablecoin"},
-			"type":                   "Type<A.f8d6e0586b0a20c7.FiatToken.Vault>()",
-			"typeIdentifier":         "A.f8d6e0586b0a20c7.FiatToken.Vault",
-			"vaultPath":              "/storage/USDCVault",
-			"vaultPathIdentifier":    "USDCVault",
-		}
-
-		assert.Equal(t, expected, result)
+		autogold.Equal(t, result)
 
 	})
 

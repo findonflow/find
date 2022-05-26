@@ -3,6 +3,7 @@ package test_main
 import (
 	"testing"
 
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,30 +74,13 @@ func TestNFTRegistry(t *testing.T) {
 	})
 
 	t.Run("Should be able to registry Dandy token and list it", func(t *testing.T) {
-		expected := `
-			{
-				"A.f8d6e0586b0a20c7.Dandy.NFT": {
-					"address":"0xf8d6e0586b0a20c7",
-					"allowedFTTypes":"",
-					"icon":"",
-					"externalFixedUrl" : "find.xyz",
-					"alias":"Dandy",
-					"providerPath":     "/private/findDandy",
-					"providerPathIdentifier":"findDandy",
-					"publicPath":       "/public/findDandy",
-					"publicPathIdentifier":"findDandy",
-					"storagePath":      "/storage/findDandy",
-					"storagePathIdentifier":"findDandy",
-					"type": "Type\u003cA.f8d6e0586b0a20c7.Dandy.NFT\u003e()",
-					"typeIdentifier":"A.f8d6e0586b0a20c7.Dandy.NFT"}
-			}
-			`
 
-		NewOverflowTest(t).
+		otu := NewOverflowTest(t).
 			setupFIND().
-			registerDandyInNFTRegistry().
-			scriptEqualToJson("getNFTInfoAll", expected)
+			registerDandyInNFTRegistry()
 
+		result := otu.O.ScriptFromFile("getNFTInfoAll").RunReturnsJsonString()
+		autogold.Equal(t, result)
 	})
 
 	t.Run("Should not be able to overrride an nft without removing it first", func(t *testing.T) {
