@@ -938,6 +938,9 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 
 }
 
+func swallowErr(err error) {
+}
+
 func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetFTInfo_" + alias).
 		SignProposeAndPayAs("find").
