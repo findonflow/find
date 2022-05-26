@@ -1167,3 +1167,30 @@ type GhostListing struct {
 	ListingTypeIdentifier string `json:"listingTypeIdentifier"`
 	Id                    string `json:"id"`
 }
+
+type Profile struct {
+	Address               string      `json:"address"`
+	AllowStoringFollowers string      `json:"allowStoringFollowers"`
+	Avatar                string      `json:"avatar"`
+	Collections           interface{} `json:"collections"`
+	CreatedAt             string      `json:"createdAt"`
+	Description           string      `json:"description"`
+	FindName              string      `json:"findName"`
+	Followers             interface{} `json:"followers"`
+	Following             interface{} `json:"following"`
+	Gender                string      `json:"gender"`
+	Links                 []struct {
+		TitleName string `json:"titleName"`
+		Title     string `json:"title"`
+		Type      string `json:"type"`
+		URL       string `json:"url"`
+	} `json:"links"`
+	Name    string   `json:"name"`
+	Tags    []string `json:"tags"`
+	Wallets []struct {
+		Accept  string   `json:"accept"`
+		Balance string   `json:"balance"`
+		Name    string   `json:"name"`
+		Tags    []string `json:"tags"`
+	} `json:"wallets"`
+}

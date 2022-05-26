@@ -82,11 +82,13 @@ pub contract Profile {
 	A link that you could add to your profile
 	*/
 	pub struct Link {
+		pub let titleName: String
 		pub let url: String
 		pub let title: String
 		pub let type: String
 
-		init(title: String, type: String, url: String) {
+		init(titleName:String, title: String, type: String, url: String) {
+			self.titleName=titleName
 			self.url=url
 			self.title=title
 			self.type=type
@@ -244,6 +246,8 @@ pub contract Profile {
 		pub fun setWallets(_ val: [Wallet])
 
 		pub fun addLink(_ val: Link)
+		pub fun addLinkWithName(name:String, link:Link)
+		
 		pub fun removeLink(_ val: String)
 
 		//Verify that this user has signed something.
@@ -373,6 +377,10 @@ pub contract Profile {
 
 		pub fun getLinks() : [Link] {
 			return self.links.values
+		}
+
+		pub fun addLinkWithName(name:String, link:Link) {
+			self.links[name]=link
 		}
 
 		pub fun addLink(_ val: Link) {

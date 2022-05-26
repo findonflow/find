@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -241,4 +242,91 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(30.0, "user1").
+			registerUser("user1")
+
+		otu.O.TransactionFromFile("editProfile").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("This is description").
+				String("This is avatar").
+				StringArray("This is tag").
+				Boolean(true).
+				StringMap(map[string]string{"CryptoTwitter": "0xBjartek", "FindTwitter": "find"}).
+				StringMap(map[string]string{"CryptoTwitter": "Twitter", "FindTwitter": "Twitter"}).
+				StringMap(map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}).
+				StringArray()).
+			Test(t).
+			AssertSuccess()
+
+		var profile Profile
+		err := otu.O.ScriptFromFile("getProfile").
+			Args(otu.O.Arguments().
+				String("user1")).
+			RunMarshalAs(&profile)
+		assert.NoError(otu.T, err)
+
+		var links Profile
+		linksJson := `
+		{"links": [
+			{
+				"title": "find",
+				"titleName": "FindTwitter",
+				"type": "Twitter",
+				"url": "https://twitter.com/findonflow"
+			},
+			{
+				"title": "0xBjartek",
+				"titleName": "CryptoTwitter",
+				"type": "Twitter",
+				"url": "https://twitter.com/0xBjartek"
+			}
+		]}
+		`
+		err = json.Unmarshal([]byte(linksJson), &links)
+		if err != nil {
+		}
+		assert.Equal(otu.T, links.Links, profile.Links)
+
+		// Remove find links
+		otu.O.TransactionFromFile("editProfile").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("This is description").
+				String("This is avatar").
+				StringArray("This is tag").
+				Boolean(true).
+				StringMap(map[string]string{}).
+				StringMap(map[string]string{}).
+				StringMap(map[string]string{}).
+				StringArray("FindTwitter")).
+			Test(t).
+			AssertSuccess()
+		err = otu.O.ScriptFromFile("getProfile").
+			Args(otu.O.Arguments().
+				String("user1")).
+			RunMarshalAs(&profile)
+		assert.NoError(otu.T, err)
+
+		linksJson = `
+		{"links": [
+			{
+				"title": "0xBjartek",
+				"titleName": "CryptoTwitter",
+				"type": "Twitter",
+				"url": "https://twitter.com/0xBjartek"
+			}
+		]}
+		`
+		err = json.Unmarshal([]byte(linksJson), &links)
+		if err != nil {
+		}
+		assert.Equal(otu.T, links.Links, profile.Links)
+	})
 }
