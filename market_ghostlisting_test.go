@@ -122,7 +122,17 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "finished_completed", itemsForSale[0].SaleType)
 
-		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
+		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(15.0).
+				UFix64(800.0)).
+			Test(otu.T).AssertSuccess()
 
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))
@@ -217,7 +227,17 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "finished_completed", itemsForSale[0].SaleType)
 
-		otu.directOfferMarketEscrowed("user2", "user1", id, 15.0)
+		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(15.0).
+				UFix64(800.0)).
+			Test(otu.T).AssertSuccess()
 
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))
@@ -258,7 +278,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).AssertFailure("NFT does not exist")
 
 	})
@@ -313,7 +334,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).AssertFailure("NFT does not exist")
 
 	})
@@ -502,7 +524,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 					"ftAlias": "Flow",
 					"ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 					"listingId": "134",
-					"listingStatus": "ended",
+					"listingStatus": "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil": "301.00000000",
 					"nftId": "134",

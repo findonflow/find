@@ -473,7 +473,8 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"status": "active_listed",
@@ -710,7 +711,8 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
@@ -730,7 +732,8 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),

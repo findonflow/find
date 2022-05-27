@@ -84,6 +84,31 @@ func TestMarketSale(t *testing.T) {
 			AssertFailure("You cannot buy your own listing")
 	})
 
+	t.Run("Should not be able to buy expired listing", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+		otu.listNFTForSale("user1", id, price).
+			tickClock(200.0)
+
+		otu.O.TransactionFromFile("buyNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("This sale item listing is already expired")
+	})
+
 	t.Run("Should be able to cancel sale", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
@@ -163,7 +188,8 @@ func TestMarketSale(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 	})
@@ -193,6 +219,7 @@ func TestMarketSale(t *testing.T) {
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
+				"endsAt":    "100.00000000",
 				"id":        fmt.Sprintf("%d", ids[2]),
 				"nft": map[string]interface{}{
 					"name":      "Neo Motorcycle 3 of 3",
@@ -221,6 +248,7 @@ func TestMarketSale(t *testing.T) {
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
+				"endsAt":    "100.00000000",
 				"id":        fmt.Sprintf("%d", ids[1]),
 				"nft": map[string]interface{}{
 					"name":      "Neo Motorcycle 2 of 3",
@@ -249,6 +277,7 @@ func TestMarketSale(t *testing.T) {
 				"amount":    "10.00000000",
 				"buyer":     "",
 				"buyerName": "",
+				"endsAt":    "100.00000000",
 				"id":        fmt.Sprintf("%d", ids[0]),
 				"nft": map[string]interface{}{
 					"name":      "Neo Motorcycle 1 of 3",
@@ -309,7 +338,8 @@ func TestMarketSale(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -366,7 +396,8 @@ func TestMarketSale(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -416,7 +447,8 @@ func TestMarketSale(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertSuccess()
 
@@ -437,7 +469,8 @@ func TestMarketSale(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[0]).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertSuccess()
 

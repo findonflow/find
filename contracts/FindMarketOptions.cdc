@@ -138,7 +138,7 @@ pub contract FindMarketOptions {
                 }
 
                 if let validTime = item.getValidUntil() {
-                    if validTime >= Clock.time() {
+                    if validTime <= Clock.time() {
                         status="ended"
                     }
                 }

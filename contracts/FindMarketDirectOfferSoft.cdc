@@ -14,7 +14,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferSoft {
 
-	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?)
+	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
 
 	pub resource SaleItem : FindMarket.SaleItem{
 
@@ -22,11 +22,13 @@ pub contract FindMarketDirectOfferSoft {
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
 		access(contract) var directOfferAccepted:Bool
+		access(contract) var validUntil: UFix64?
 
-		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?) {
 			self.pointer=pointer
 			self.offerCallback=callback
 			self.directOfferAccepted=false
+			self.validUntil=validUntil
 		}
 
 
@@ -127,11 +129,13 @@ pub contract FindMarketDirectOfferSoft {
 			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
 		}
 
-
-		pub fun getValidUntil() : UFix64? {
-			return nil 
+		pub fun setValidUntil(_ time: UFix64?) {
+			self.validUntil=time
 		}
 
+		pub fun getValidUntil() : UFix64? {
+			return self.validUntil 
+		}
 
 		pub fun setPointer(_ pointer: FindViews.AuthNFTPointer) {
 			self.pointer=pointer
@@ -154,7 +158,7 @@ pub contract FindMarketDirectOfferSoft {
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
 
 		//place a bid on a token
-		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>)
+		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?)
 
 		access(contract) fun isAcceptedDirectOffer(_ id:UInt64) : Bool
 
@@ -217,7 +221,7 @@ pub contract FindMarketDirectOfferSoft {
 			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
-			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer))
+			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), endsAt: saleItem.validUntil)
 		}
 
 
@@ -239,13 +243,13 @@ pub contract FindMarketDirectOfferSoft {
 
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
-		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?) {
 
 			let id = item.getUUID()
 
 			//If there are no bids from anybody else before we need to make the item
 			if !self.items.containsKey(id) {
-				let saleItem <- create SaleItem(pointer: item, callback: callback)
+				let saleItem <- create SaleItem(pointer: item, callback: callback, validUntil: validUntil)
 				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in direct offer soft"))
 
 				if !actionResult.allowed {
@@ -278,6 +282,7 @@ pub contract FindMarketDirectOfferSoft {
 			}
 			//somebody else has the highest item so we cancel it
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
+			saleItem.setValidUntil(validUntil)
 			saleItem.setCallback(callback)
 
 			self.emitEvent(saleItem: saleItem, status: "active_offered")
@@ -312,6 +317,10 @@ pub contract FindMarketDirectOfferSoft {
 
 			let id = pointer.getUUID()
 			let saleItem = self.borrow(id)
+
+			if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {
+				panic("This direct offer is already expired")
+			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:false, "accept offer in direct offer soft"))
 
@@ -471,7 +480,7 @@ pub contract FindMarketDirectOfferSoft {
 		}
 
 
-		pub fun bid(item: FindViews.ViewReadPointer, amount:UFix64, vaultType:Type, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		pub fun bid(item: FindViews.ViewReadPointer, amount:UFix64, vaultType:Type, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?) {
 			pre {
 				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
 				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
@@ -484,7 +493,7 @@ pub contract FindMarketDirectOfferSoft {
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[uuid] <- bid
-			saleItemCollection.registerBid(item: item, callback: callbackCapability)
+			saleItemCollection.registerBid(item: item, callback: callbackCapability, validUntil: validUntil)
 			destroy oldToken
 		}
 

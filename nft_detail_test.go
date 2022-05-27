@@ -142,7 +142,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        "listingId": "133",
 	                        "listingStatus": "active",
 	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-	                        "listingValidUntil": "",
+	                        "listingValidUntil": "100.00000000",
 	                        "nft": {
 	                            "collectionDescription": "Neo Collectibles FIND",
 	                            "collectionName": "user1",
@@ -181,7 +181,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        "listingId": "133",
 	                        "listingStatus": "active",
 	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-	                        "listingValidUntil": "",
+	                        "listingValidUntil": "100.00000000",
 	                        "nft": {
 	                            "collectionDescription": "Neo Collectibles FIND",
 	                            "collectionName": "user1",
@@ -220,7 +220,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        "listingId": "134",
 	                        "listingStatus": "active",
 	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-	                        "listingValidUntil": "",
+	                        "listingValidUntil": "100.00000000",
 	                        "nft": {
 	                            "collectionDescription": "Neo Collectibles FIND",
 	                            "collectionName": "user1",
@@ -407,7 +407,7 @@ func TestNFTDetailScript(t *testing.T) {
 	            "listingId": "134",
 	            "listingStatus": "active",
 	            "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-	            "listingValidUntil": "",
+	            "listingValidUntil": "100.00000000",
 	            "nft": "",
 	            "nftId": "134",
 	            "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",

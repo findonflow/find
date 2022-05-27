@@ -6,7 +6,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64) {
+transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 	prepare(account: AuthAccount) {
 		// Get the salesItemRef from tenant
 		let tenant=FindMarketOptions.getTenant(marketplace)
@@ -27,7 +27,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 		}
 
 		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice)
+		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice, validUntil: validUntil)
 	}
 }
 

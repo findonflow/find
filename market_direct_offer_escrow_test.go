@@ -74,8 +74,30 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+
+	})
+
+	t.Run("Should not be able to accept expired offers", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price).
+			increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
+			saleItemListed("user1", "active_ongoing", 15.0).
+			tickClock(200.0)
+
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id)).
+			Test(otu.T).AssertFailure("This direct offer is already expired")
 
 	})
 
@@ -99,7 +121,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(newPrice)).
+				UFix64(newPrice).
+				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"amount": fmt.Sprintf("%.8f", newPrice),
@@ -132,7 +155,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -191,7 +215,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -293,7 +318,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price + 10.0)).
+				UFix64(price + 10.0).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -307,7 +333,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price + 10.0)).
+				UFix64(price + 10.0).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 	})
