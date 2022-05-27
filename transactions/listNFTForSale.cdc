@@ -27,7 +27,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 		}
 
 		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice, validUntil: validUntil)
+		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
 	}
 }
 

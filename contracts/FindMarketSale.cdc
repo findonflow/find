@@ -32,14 +32,16 @@ pub contract FindMarketSale {
 		//this field is set if this is a saleItem
 		access(contract) var salePrice: UFix64
 		access(contract) var validUntil: UFix64? 
+		access(contract) let saleItemExtraField: {String : AnyStruct}
 
 		//TODO: add valid until?
-		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, price:UFix64, validUntil: UFix64?) {
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, price:UFix64, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.salePrice=price
 			self.buyer=nil
 			self.validUntil=validUntil
+			self.saleItemExtraField=saleItemExtraField
 		}
 
 		pub fun getSaleType() : String {
@@ -142,6 +144,10 @@ pub contract FindMarketSale {
 			return self.pointer.valid()
 		}
 
+		pub fun getSaleItemExtraField() : {String : AnyStruct} {
+			return self.saleItemExtraField
+		}
+
 	}
 
 	pub resource interface SaleItemCollectionPublic {
@@ -219,10 +225,10 @@ pub contract FindMarketSale {
 			destroy <- self.items.remove(key: id)
 		}
 
-		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?) {
+		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
 
 			// What happends if we relist  
-			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil)
+			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for sale"))
 

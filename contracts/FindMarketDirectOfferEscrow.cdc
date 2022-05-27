@@ -23,11 +23,13 @@ pub contract FindMarketDirectOfferEscrow {
 
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 		access(contract) var validUntil: UFix64? 
+		access(contract) var saleItemExtraField: {String : AnyStruct}
 
-		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?) {
+		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.pointer=pointer
 			self.offerCallback=callback
 			self.validUntil=validUntil
+			self.saleItemExtraField=saleItemExtraField
 		}
 
 		pub fun getId() : UInt64{
@@ -140,6 +142,14 @@ pub contract FindMarketDirectOfferEscrow {
 		pub fun checkPointer() : Bool {
 			return self.pointer.valid()
 		}
+
+		pub fun getSaleItemExtraField() : {String : AnyStruct} {
+			return self.saleItemExtraField
+		}
+
+		access(contract) fun setSaleItemExtraField(_ field: {String : AnyStruct}) {
+			self.saleItemExtraField = field
+		}
 	}
 
 
@@ -152,7 +162,7 @@ pub contract FindMarketDirectOfferEscrow {
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
 
 		//place a bid on a token
-		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?)
+		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct})
 
 	}
 
@@ -221,13 +231,13 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
-		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?) {
+		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
 			let id = item.getUUID()
 
 			//If there are no bids from anybody else before we need to make the item
 			if !self.items.containsKey(id) {
-				let saleItem <- create SaleItem(pointer: item, callback: callback, validUntil: validUntil)
+				let saleItem <- create SaleItem(pointer: item, callback: callback, validUntil: validUntil, saleItemExtraField: saleItemExtraField)
 				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "bid in direct offer"))
 
 				if !actionResult.allowed {
@@ -351,14 +361,16 @@ pub contract FindMarketDirectOfferEscrow {
 		access(contract) let vault: @FungibleToken.Vault
 		access(contract) let vaultType: Type
 		access(contract) var bidAt: UFix64
+		access(contract) let bidExtraField: {String : AnyStruct}
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
 			self.vaultType=vault.getType()
 			self.vault <- vault
 			self.itemUUID=itemUUID
 			self.from=from
 			self.bidAt=Clock.time()
 			self.nftCap=nftCap
+			self.bidExtraField=bidExtraField
 		}
 
 		access(contract) fun setBidAt(_ time: UFix64) {
@@ -371,6 +383,10 @@ pub contract FindMarketDirectOfferEscrow {
 
 		pub fun getSellerAddress() : Address {
 			return self.from.address
+		}
+
+		pub fun getBidExtraField() : {String : AnyStruct} {
+			return self.bidExtraField
 		}
 
 		destroy() {
@@ -428,7 +444,7 @@ pub contract FindMarketDirectOfferEscrow {
 			return Type<@Bid>()
 		}
 
-		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?) {
+		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
 			pre {
 				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
 				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
@@ -437,11 +453,11 @@ pub contract FindMarketDirectOfferEscrow {
 			let uuid=item.getUUID()
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
-			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap)
+			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[uuid] <- bid
-			saleItemCollection.registerBid(item: item, callback: callbackCapability, validUntil:validUntil)
+			saleItemCollection.registerBid(item: item, callback: callbackCapability, validUntil:validUntil, saleItemExtraField: saleItemExtraField)
 			destroy oldToken
 		}
 

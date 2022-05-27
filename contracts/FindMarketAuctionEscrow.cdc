@@ -30,9 +30,9 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) var auctionStartedAt: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
+		access(contract) let saleItemExtraField: {String : AnyStruct}
 
-
-		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64) {
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.auctionStartPrice=auctionStartPrice
@@ -43,6 +43,7 @@ pub contract FindMarketAuctionEscrow {
 			self.offerCallback=nil
 			self.auctionStartedAt=nil
 			self.auctionEndsAt=nil
+			self.saleItemExtraField=saleItemExtraField
 		}
 
 		pub fun getId() : UInt64{
@@ -222,6 +223,10 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun checkPointer() : Bool {
 			return self.pointer.valid()
+		}
+
+		pub fun getSaleItemExtraField() : {String : AnyStruct} {
+			return self.saleItemExtraField
 		}
 	}
 
@@ -456,9 +461,9 @@ pub contract FindMarketAuctionEscrow {
 
 		//TODO: right now changing options does not work
 		//TODO: what parameters should be able to be changed after auction has started and before?
-		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
+		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, saleItemExtraField: {String : AnyStruct}) {
 
-			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement)
+			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, saleItemExtraField: saleItemExtraField)
 			
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for auction"))
 
@@ -506,14 +511,16 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) let vault: @FungibleToken.Vault
 		access(contract) let vaultType: Type
 		access(contract) var bidAt: UFix64
+		access(contract) let bidExtraField: {String : AnyStruct}
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}> , bidExtraField: {String : AnyStruct}) {
 			self.vaultType= vault.getType()
 			self.vault <- vault
 			self.itemUUID=itemUUID
 			self.from=from
 			self.bidAt=Clock.time()
 			self.nftCap=nftCap
+			self.bidExtraField=bidExtraField
 		}
 
 		access(contract) fun setBidAt(_ time: UFix64) {
@@ -526,6 +533,10 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getSellerAddress() : Address {
 			return self.from.address
+		}
+
+		pub fun getBidExtraField() : {String : AnyStruct} {
+			return self.bidExtraField 
 		}
 
 		destroy() {
@@ -579,7 +590,7 @@ pub contract FindMarketAuctionEscrow {
 			return Type<@Bid>()
 		}
 
-		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
 			pre {
 				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
 				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
@@ -590,7 +601,7 @@ pub contract FindMarketAuctionEscrow {
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 			let vaultType=vault.getType()
 
-			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap)
+			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))

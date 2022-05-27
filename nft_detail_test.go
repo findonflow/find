@@ -76,7 +76,8 @@ func TestNFTDetailScript(t *testing.T) {
 	                        },
 	                        "nftId": "134",
 	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-	                        "saleType": "active_listed",
+							"saleItemExtraField" : {} ,
+							"saleType": "active_listed",
 	                        "seller": "0x179b6b1cb6755e31",
 	                        "sellerName": "user1"
 	                    }
@@ -123,7 +124,8 @@ func TestNFTDetailScript(t *testing.T) {
 	                        },
 	                        "nftId": "134",
 	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-	                        "saleType": "active_listed",
+							"saleItemExtraField" : {} ,
+							"saleType": "active_listed",
 	                        "seller": "0x179b6b1cb6755e31",
 	                        "sellerName": "user1"
 	                    }
@@ -162,6 +164,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        },
 	                        "nftId": "133",
 	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+							"saleItemExtraField" : {} ,
 	                        "saleType": "active_ongoing",
 	                        "seller": "0x179b6b1cb6755e31",
 	                        "sellerName": "user1"
@@ -201,6 +204,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        },
 	                        "nftId": "133",
 	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+							"saleItemExtraField" : {} ,
 	                        "saleType": "active_ongoing",
 	                        "seller": "0x179b6b1cb6755e31",
 	                        "sellerName": "user1"
@@ -240,6 +244,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        },
 	                        "nftId": "134",
 	                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+							"saleItemExtraField" : {} ,
 	                        "saleType": "active_listed",
 	                        "seller": "0x179b6b1cb6755e31",
 	                        "sellerName": "user1"
@@ -411,7 +416,8 @@ func TestNFTDetailScript(t *testing.T) {
 	            "nft": "",
 	            "nftId": "134",
 	            "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-	            "saleType": "active_listed",
+				"saleItemExtraField" : {} ,
+				"saleType": "active_listed",
 	            "seller": "0x179b6b1cb6755e31",
 	            "sellerName": "user1"
 	        }
@@ -455,7 +461,7 @@ func TestNFTDetailScript(t *testing.T) {
 	        "listingID": "138",
 	        "nftID": "134",
 	        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-	        "saleCut": [
+			"saleCut": [
 	            {
 	                "address": "0x179b6b1cb6755e31",
 	                "amount": "10.00000000",

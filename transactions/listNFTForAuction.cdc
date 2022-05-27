@@ -34,7 +34,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 		assert(auctionDuration > 0.0, message: "Auction Duration should be greater than 0.")
 		assert(auctionExtensionOnLateBid > 0.0, message: "Auction Duration should be greater than 0.")
 		
-		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement)
+		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, saleItemExtraField: {})
 
 	}
 }

@@ -44,7 +44,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 
 	execute {
 		let vault <- self.walletReference.withdraw(amount: amount) 
-		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, validUntil: validUntil)
+		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
 	}
 
 }
