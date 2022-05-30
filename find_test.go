@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -89,7 +90,9 @@ func TestFIND(t *testing.T) {
 			`).
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1")).
-			Test(t).AssertFailure("locked")
+			Test(t).
+			AssertFailure("locked").
+			AssertComputationLessThenOrEqual(70)
 
 		otu.expireLease()
 		otu.registerUser("user1")
@@ -222,22 +225,7 @@ func TestFIND(t *testing.T) {
 
 		nameAddress := otu.accountAddress("user1")
 		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(nameAddress)).RunReturnsJsonString()
-
-		expected := `
-{
-    "FINDReport": {
-        "bids": null,
-        "itemsForSale": {},
-        "leases": null,
-        "marketBids": {},
-        "privateMode": "false",
-        "profile": "",
-        "relatedAccounts": {}
-    },
-    "NameReport": ""
-}
-`
-		assert.JSONEq(otu.T, expected, value)
+		autogold.Equal(t, value)
 
 	})
 

@@ -1,7 +1,7 @@
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 
@@ -12,19 +12,13 @@ transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		// Get the accepted vault type from BidInfo
-		let tenant=FindMarketOptions.getTenant(marketplace)
+		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
-		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
-		let bidInfo = FindMarketOptions.getBid(tenant:marketplace, address: account.address, marketOption: marketOption, id:id, getNFTInfo:false)
-		if bidInfo==nil {
-			panic("This bid is on a ghostlisting, so you should cancel the original bid and get your funds back")
-		}
-		let saleInformation = bidInfo!.item
-		let ftIdentifier = saleInformation.ftTypeIdentifier
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
+		let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
 
-		//If this is nil, there must be something wrong with FIND setup
-		let ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)!
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet")
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.balanceBeforeBid = self.walletReference.balance
 	}

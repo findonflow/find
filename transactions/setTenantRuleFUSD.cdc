@@ -1,13 +1,13 @@
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
 transaction(optionName: String){
     prepare(account: AuthAccount){
-        let path = FindMarketTenant.TenantClientStoragePath
-        let tenantRef = account.borrow<&FindMarketTenant.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+        let path = FindMarket.TenantClientStoragePath
+        let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 
         tenantRef.setTenantRule(optionName: optionName, tenantRule:
-            FindMarketTenant.TenantRule(name:"FUSD", types:[Type<@FUSD.Vault>()], ruleType: "ft", allow: true)
+            FindMarket.TenantRule(name:"FUSD", types:[Type<@FUSD.Vault>()], ruleType: "ft", allow: true)
         )
     }
 }

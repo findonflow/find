@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +22,11 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
+
+func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
+	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
+	return otu
+}
 
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
@@ -84,11 +90,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess().AssertNoEvents()
-
-	otu.O.TransactionFromFile("adminSetupMarketOptionsTypes").
-		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
-
 	otu.createUser(100.0, "account")
 
 	return otu.tickClock(1.0)
@@ -473,7 +474,8 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"status": "active_listed",
@@ -486,7 +488,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listNFTForAuction").
+	otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
@@ -497,7 +499,8 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			UFix64(price + 5.0).
 			UFix64(300.0).
 			UFix64(60.0).
-			UFix64(1.0)).
+			UFix64(1.0).
+			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
@@ -522,7 +525,8 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			UFix64(price + 5.0).
 			UFix64(300.0).
 			UFix64(60.0).
-			UFix64(1.0)).
+			UFix64(1.0).
+			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
@@ -710,7 +714,8 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
@@ -730,7 +735,8 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
@@ -884,7 +890,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			UInt64(id)).
+			UInt64(id).
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
@@ -902,7 +909,8 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			UInt64(id)).
+			UInt64(id).
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
@@ -939,12 +947,6 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 }
 
 func swallowErr(err error) {
-}
-
-func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected string) *OverflowTestUtils {
-	result := otu.O.ScriptFromFile(scriptFile).RunReturnsJsonString()
-	assert.JSONEq(otu.T, expected, result)
-	return otu
 }
 
 func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
@@ -1023,8 +1025,10 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().String(marketType)).
+		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			//			Account("account").
+			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()
 	return otu

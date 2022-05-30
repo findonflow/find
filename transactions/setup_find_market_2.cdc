@@ -1,5 +1,5 @@
 import Admin from "../contracts/Admin.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
 //signed by admin to link tenantClient to a new tenant
 transaction(tenantAddress: Address) {
@@ -7,10 +7,10 @@ transaction(tenantAddress: Address) {
 	prepare(account: AuthAccount) {
 		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 		//We create a tenant that has both auctions and direct offers
-		let tenantCap= adminClient.createFindMarketTenant(name: "find", address: tenantAddress)
+		let tenantCap= adminClient.createFindMarket(name: "find", address: tenantAddress)
 
 		let tenantAccount=getAccount(tenantAddress)
-		let tenantClient=tenantAccount.getCapability<&{FindMarketTenant.TenantClientPublic}>(FindMarketTenant.TenantClientPublicPath).borrow()!
+		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!
 		tenantClient.addCapability(tenantCap)
 	}
 }

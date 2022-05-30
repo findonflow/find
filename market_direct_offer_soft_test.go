@@ -72,8 +72,28 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+
+	})
+
+	t.Run("Should not be able to accept expired offer", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price).
+			tickClock(200.0)
+
+		otu.O.TransactionFromFile("acceptDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id)).
+			Test(otu.T).AssertFailure("This direct offer is already expired")
 
 	})
 
@@ -93,7 +113,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 	})
@@ -150,7 +171,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 	})
@@ -199,7 +221,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 	})
@@ -269,7 +292,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price + 10.0)).
+				UFix64(price + 10.0).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -283,7 +307,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				String("Dandy").
 				UInt64(id).
 				String("Flow").
-				UFix64(price + 10.0)).
+				UFix64(price + 10.0).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 	})
@@ -330,7 +355,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),

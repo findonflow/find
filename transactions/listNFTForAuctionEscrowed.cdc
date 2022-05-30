@@ -1,4 +1,4 @@
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -6,12 +6,14 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64) {
+transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 	prepare(account: AuthAccount) {
 		// get saleItemsRef from tenant
+		let tenant=FindMarket.getTenant(marketplace)
 
-		let tenant=FindMarketOptions.getTenant(marketplace)
-		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>()))!
+		let path=FindMarket.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>(), name: tenant.name)
+
+		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: path)!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet")
@@ -34,7 +36,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 		assert(auctionDuration > 0.0, message: "Auction Duration should be greater than 0.")
 		assert(auctionExtensionOnLateBid > 0.0, message: "Auction Duration should be greater than 0.")
 		
-		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement)
+		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil:auctionValidUntil, saleItemExtraField: {})
 
 	}
 }

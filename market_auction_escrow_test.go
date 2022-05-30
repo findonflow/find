@@ -19,7 +19,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -30,7 +30,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(price + 5.0).
 				UFix64(300.0).
 				UFix64(60.0).
-				UFix64(1.0)).
+				UFix64(1.0).
+				UFix64(10.0)).
 			Test(otu.T).AssertFailure("Auction listing for this item is already created.")
 	})
 
@@ -65,6 +66,27 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.saleItemListed("user1", "finished_completed", price+5.0)
 		otu.fulfillMarketAuctionEscrowFromBidder("user2", id, price+5.0)
+	})
+
+	t.Run("Should not be able to bid expired auction listing", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			tickClock(100.0)
+
+		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).AssertFailure("This auction listing is already expired")
 	})
 
 	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
@@ -288,7 +310,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.alterMarketOption("AuctionEscrow", "deprecate")
 
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -299,7 +321,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(price + preIncrement).
 				UFix64(300.0).
 				UFix64(60.0).
-				UFix64(1.0)).
+				UFix64(1.0).
+				UFix64(10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -342,9 +365,22 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UInt64(id)).
 			Test(otu.T).AssertSuccess()
 
-		otu.alterMarketOption("AuctionEscrow", "enable").
-			listNFTForEscrowedAuction("user2", id, price).
-			auctionBidMarketEscrow("user1", "user2", id, price+5.0)
+		otu.alterMarketOption("AuctionEscrow", "enable")
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(price).
+				UFix64(price + 5.0).
+				UFix64(300.0).
+				UFix64(60.0).
+				UFix64(1.0).
+				UFix64(510.0)).
+			Test(otu.T).AssertSuccess()
+		otu.auctionBidMarketEscrow("user1", "user2", id, price+5.0)
 
 		otu.alterMarketOption("AuctionEscrow", "deprecate")
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
@@ -366,7 +402,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.alterMarketOption("AuctionEscrow", "stop")
 
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -377,7 +413,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(price + 5.0).
 				UFix64(300.0).
 				UFix64(60.0).
-				UFix64(1.0)).
+				UFix64(1.0).
+				UFix64(10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
