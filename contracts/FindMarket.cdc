@@ -197,6 +197,7 @@ pub contract FindMarket {
 	pub resource interface Bid {
 		pub fun getBalance() : UFix64
 		pub fun getSellerAddress() : Address 
+		pub fun getBidExtraField() : {String : AnyStruct}
 	}
 
 	pub resource interface SaleItem {
@@ -227,6 +228,8 @@ pub contract FindMarket {
 		pub fun getAuction(): AuctionItem?
 		pub fun getFtType() : Type //The type of FT used for this sale item
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
+
+		pub fun getSaleItemExtraField() : {String : AnyStruct}
 		
 		pub fun getTotalRoyalties() : UFix64 
 	}
@@ -251,6 +254,7 @@ pub contract FindMarket {
 		pub var nft: NFTInfo?
 		pub let auction: AuctionItem?
 		pub let listingStatus:String
+		pub let saleItemExtraField: {String : AnyStruct}
 
 		init(item: &{SaleItem}, status:String, nftInfo: Bool) {
 			self.nftIdentifier= item.getItemType().identifier
@@ -272,6 +276,7 @@ pub contract FindMarket {
 			self.ftTypeIdentifier=item.getFtType().identifier
 
 			self.auction=item.getAuction()
+			self.saleItemExtraField=item.getSaleItemExtraField()
 		}
 	}
 

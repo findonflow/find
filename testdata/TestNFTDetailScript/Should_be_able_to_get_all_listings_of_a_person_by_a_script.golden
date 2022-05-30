@@ -23,7 +23,7 @@
                         "listingId": "134",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-                        "listingValidUntil": "",
+                        "listingValidUntil": "10.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -43,6 +43,7 @@
                         },
                         "nftId": "134",
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                        "saleItemExtraField": {},
                         "saleType": "active_listed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -70,7 +71,7 @@
                         "listingId": "134",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-                        "listingValidUntil": "",
+                        "listingValidUntil": "10.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -90,6 +91,7 @@
                         },
                         "nftId": "134",
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                        "saleItemExtraField": {},
                         "saleType": "active_listed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -109,7 +111,7 @@
                         "listingId": "133",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-                        "listingValidUntil": "",
+                        "listingValidUntil": "100.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -129,6 +131,7 @@
                         },
                         "nftId": "133",
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                        "saleItemExtraField": {},
                         "saleType": "active_ongoing",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -148,7 +151,7 @@
                         "listingId": "133",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-                        "listingValidUntil": "",
+                        "listingValidUntil": "100.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -168,6 +171,7 @@
                         },
                         "nftId": "133",
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                        "saleItemExtraField": {},
                         "saleType": "active_ongoing",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -187,7 +191,7 @@
                         "listingId": "134",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-                        "listingValidUntil": "",
+                        "listingValidUntil": "100.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -207,6 +211,7 @@
                         },
                         "nftId": "134",
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                        "saleItemExtraField": {},
                         "saleType": "active_listed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"

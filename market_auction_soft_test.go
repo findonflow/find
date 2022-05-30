@@ -30,7 +30,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(price + 5.0).
 				UFix64(300.0).
 				UFix64(60.0).
-				UFix64(1.0)).
+				UFix64(1.0).
+				UFix64(10.0)).
 			Test(otu.T).AssertFailure("Auction listing for this item is already created.")
 	})
 
@@ -65,6 +66,27 @@ func TestMarketAuctionSoft(t *testing.T) {
 			//TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+10.0).
 			fulfillMarketAuctionSoft("user2", id, price+10.0)
+	})
+
+	t.Run("Should not be able to bid expired auction listing", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			tickClock(100.0)
+
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(price)).
+			Test(otu.T).AssertFailure("This auction listing is already expired")
 	})
 
 	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
@@ -242,7 +264,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(price + preIncrement).
 				UFix64(300.0).
 				UFix64(60.0).
-				UFix64(1.0)).
+				UFix64(1.0).
+				UFix64(10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -285,9 +308,22 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id)).
 			Test(otu.T).AssertSuccess()
 
-		otu.alterMarketOption("AuctionSoft", "enable").
-			listNFTForSoftAuction("user2", id, price).
-			auctionBidMarketSoft("user1", "user2", id, price+5.0)
+		otu.alterMarketOption("AuctionSoft", "enable")
+		otu.O.TransactionFromFile("listNFTForAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(price).
+				UFix64(price + 5.0).
+				UFix64(300.0).
+				UFix64(60.0).
+				UFix64(1.0).
+				UFix64(510.0)).
+			Test(otu.T).AssertSuccess()
+		otu.auctionBidMarketSoft("user1", "user2", id, price+5.0)
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
@@ -320,7 +356,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(price + 5.0).
 				UFix64(300.0).
 				UFix64(60.0).
-				UFix64(1.0)).
+				UFix64(1.0).
+				UFix64(10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 

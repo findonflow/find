@@ -8,7 +8,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64) {
+transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -45,6 +45,6 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 	}
 
 	execute {
-		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability)
+		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
 	}
 }

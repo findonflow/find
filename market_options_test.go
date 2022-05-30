@@ -30,7 +30,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertSuccess()
 
@@ -64,7 +65,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("Flow").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 
@@ -95,7 +97,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 
@@ -109,7 +112,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
@@ -142,7 +146,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 
@@ -156,7 +161,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 
@@ -170,7 +176,8 @@ func TestMarketOptions(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				String("FUSD").
-				UFix64(price)).
+				UFix64(price).
+				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
