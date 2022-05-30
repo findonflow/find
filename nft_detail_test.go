@@ -56,7 +56,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        "listingId": "134",
 	                        "listingStatus": "active",
 	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-	                        "listingValidUntil": "",
+	                        "listingValidUntil": "10.00000000",
 	                        "nft": {
 	                            "collectionDescription": "Neo Collectibles FIND",
 	                            "collectionName": "user1",
@@ -104,7 +104,7 @@ func TestNFTDetailScript(t *testing.T) {
 	                        "listingId": "134",
 	                        "listingStatus": "active",
 	                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-	                        "listingValidUntil": "",
+	                        "listingValidUntil": "10.00000000",
 	                        "nft": {
 	                            "collectionDescription": "Neo Collectibles FIND",
 	                            "collectionName": "user1",

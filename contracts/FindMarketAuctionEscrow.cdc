@@ -28,11 +28,12 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) var auctionMinBidIncrement: UFix64
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var auctionStartedAt: UFix64?
+		access(contract) var auctionValidUntil: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
 		access(contract) let saleItemExtraField: {String : AnyStruct}
 
-		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64, saleItemExtraField: {String : AnyStruct}) {
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.auctionStartPrice=auctionStartPrice
@@ -43,6 +44,7 @@ pub contract FindMarketAuctionEscrow {
 			self.offerCallback=nil
 			self.auctionStartedAt=nil
 			self.auctionEndsAt=nil
+			self.auctionValidUntil=auctionValidUntil
 			self.saleItemExtraField=saleItemExtraField
 		}
 
@@ -216,9 +218,15 @@ pub contract FindMarketAuctionEscrow {
 			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
 		}
 
-		pub fun getValidUntil() : UFix64? {
-			return self.auctionEndsAt
+		pub fun setValidUntil(_ time: UFix64?) {
+			self.auctionValidUntil=time
+		}
 
+		pub fun getValidUntil() : UFix64? {
+			if self.hasAuctionStarted() {
+				return self.auctionEndsAt
+			}
+			return self.auctionValidUntil
 		}
 
 		pub fun checkPointer() : Bool {
@@ -373,6 +381,10 @@ pub contract FindMarketAuctionEscrow {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
 			}
 
+			if let valid = saleItem.getValidUntil() {
+				assert( valid >= Clock.time(), message: "This auction listing is already expired")
+			}
+
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
 			let endsAt=timestamp + duration
@@ -461,9 +473,9 @@ pub contract FindMarketAuctionEscrow {
 
 		//TODO: right now changing options does not work
 		//TODO: what parameters should be able to be changed after auction has started and before?
-		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, saleItemExtraField: {String : AnyStruct}) {
+		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
-			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, saleItemExtraField: saleItemExtraField)
+			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 			
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for auction"))
 

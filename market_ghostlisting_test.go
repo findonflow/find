@@ -436,7 +436,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				"listingId": "134",
 				"listingStatus": "active",
 				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-				"listingValidUntil": "",
+				"listingValidUntil": "10.00000000",
 				"nftId": "134",
 				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 				"saleType": "active_listed",

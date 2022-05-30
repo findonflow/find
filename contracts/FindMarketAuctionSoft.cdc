@@ -27,11 +27,12 @@ pub contract FindMarketAuctionSoft {
 		access(contract) var auctionMinBidIncrement: UFix64
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var auctionStartedAt: UFix64?
+		access(contract) var auctionValidUntil: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
 		access(contract) var saleItemExtraField: {String : AnyStruct}
 
-		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, saleItemExtraField: {String : AnyStruct}) {
+		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.auctionStartPrice=auctionStartPrice
@@ -41,6 +42,7 @@ pub contract FindMarketAuctionSoft {
 			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
 			self.auctionStartedAt=nil
+			self.auctionValidUntil=auctionValidUntil
 			self.auctionEndsAt=nil
 			self.saleItemExtraField=saleItemExtraField
 		}
@@ -216,9 +218,15 @@ pub contract FindMarketAuctionSoft {
 			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
 		}
 
-		pub fun getValidUntil() : UFix64? {
-			return self.auctionEndsAt
+		pub fun setValidUntil(_ time: UFix64?) {
+			self.auctionValidUntil=time
+		}
 
+		pub fun getValidUntil() : UFix64? {
+			if self.hasAuctionStarted() {
+				return self.auctionEndsAt
+			}
+			return self.auctionValidUntil
 		}
 
 		pub fun checkPointer() : Bool {
@@ -372,6 +380,10 @@ pub contract FindMarketAuctionSoft {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
 			}
 
+			if let valid = saleItem.getValidUntil() {
+				assert( valid >= Clock.time(), message: "This auction listing is already expired")
+			}
+
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
 			let endsAt=timestamp + duration
@@ -458,9 +470,9 @@ pub contract FindMarketAuctionSoft {
 		}
 
 
-		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, saleItemExtraField: {String : AnyStruct}) {
+		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
-			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, saleItemExtraField: saleItemExtraField)
+			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarketTenant.MarketAction(listing:true, "list item for soft-auction"))
 
