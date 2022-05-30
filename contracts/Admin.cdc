@@ -8,11 +8,9 @@ import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FindViews from "./FindViews.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
-import FindMarket from "./FindMarket.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
-import FindMarketOptions from "./FindMarketOptions.cdc"
+import FindMarket from "./FindMarket.cdc"
 
 pub contract Admin {
 
@@ -48,7 +46,7 @@ pub contract Admin {
 		}
 
 		/*
-		pub fun addTenantItem(_ item: FindMarketTenant.TenantSaleItem) {
+		pub fun addTenantItem(_ item: FindMarket.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -58,12 +56,12 @@ pub contract Admin {
 		}
 		*/
 
-		pub fun createFindMarketTenant(name: String, address:Address) : Capability<&FindMarketTenant.Tenant> {
+		pub fun createFindMarket(name: String, address:Address) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			return  FindMarketTenant.createFindMarketTenant(name:name, address:address)
+			return  FindMarket.createFindMarket(name:name, address:address)
 		}
 
 		/// Set the wallet used for the network
@@ -76,13 +74,13 @@ pub contract Admin {
 			self.capability!.borrow()!.setWallet(wallet)
 		}
 
-		pub fun getFindMarketTenantClient():  &FindMarketTenant.TenantClient{
+		pub fun getFindMarketClient():  &FindMarket.TenantClient{
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-      let path = FindMarketTenant.TenantClientStoragePath
-      return Admin.account.borrow<&FindMarketTenant.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+      let path = FindMarket.TenantClientStoragePath
+      return Admin.account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 		}
 
 		/// Enable or disable public registration 
@@ -203,49 +201,49 @@ pub contract Admin {
 		// Find Market Options 
 		/// ===================================================================================
 		pub fun addSaleItemType(_ type: Type) {
-			FindMarketOptions.addSaleItemType(type) 
+			FindMarket.addSaleItemType(type) 
 		}
 
 		pub fun addMarketBidType(_ type: Type) {
-			FindMarketOptions.addMarketBidType(type) 
+			FindMarket.addMarketBidType(type) 
 		}
 
 		pub fun addSaleItemCollectionType(_ type: Type) {
-			FindMarketOptions.addSaleItemCollectionType(type) 
+			FindMarket.addSaleItemCollectionType(type) 
 		}
 
 		pub fun addMarketBidCollectionType(_ type: Type) {
-			FindMarketOptions.addMarketBidCollectionType(type) 
+			FindMarket.addMarketBidCollectionType(type) 
 		}
 
 		pub fun removeSaleItemType(_ type: Type) {
-			FindMarketOptions.removeSaleItemType(type) 
+			FindMarket.removeSaleItemType(type) 
 		}
 
 		pub fun removeMarketBidType(_ type: Type) {
-			FindMarketOptions.removeMarketBidType(type) 
+			FindMarket.removeMarketBidType(type) 
 		}
 
 		pub fun removeSaleItemCollectionType(_ type: Type) {
-			FindMarketOptions.removeSaleItemCollectionType(type) 
+			FindMarket.removeSaleItemCollectionType(type) 
 		}
 
 		pub fun removeMarketBidCollectionType(_ type: Type) {
-			FindMarketOptions.removeMarketBidCollectionType(type) 
+			FindMarket.removeMarketBidCollectionType(type) 
 		}
 
 		/// ===================================================================================
 		// Tenant Rules Management
 		/// ===================================================================================
-		pub fun getTenantRef(_ tenant: Address) : &FindMarketTenant.Tenant {
-			let string = FindMarketTenant.getTenantPathForAddress(tenant)
+		pub fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
+			let string = FindMarket.getTenantPathForAddress(tenant)
 			let sp = StoragePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
-			return Admin.account.borrow<&FindMarketTenant.Tenant>(from: sp) ?? panic("Cannot borrow tenant reference.")
+			return Admin.account.borrow<&FindMarket.Tenant>(from: sp) ?? panic("Cannot borrow tenant reference.")
 		}
 
-		pub fun setMarketOption(tenant: Address, name: String, cut: MetadataViews.Royalty?, rules: [FindMarketTenant.TenantRule]) {
+		pub fun setMarketOption(tenant: Address, name: String, cut: MetadataViews.Royalty?, rules: [FindMarket.TenantRule]) {
 			let tenant = self.getTenantRef(tenant) 
-			tenant.addSaleItem(FindMarketTenant.TenantSaleItem(
+			tenant.addSaleItem(FindMarket.TenantSaleItem(
 				name: name, 
 				cut: cut, 
 				rules: rules, 
@@ -274,7 +272,7 @@ pub contract Admin {
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
-		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarketTenant.TenantRule) {
+		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarket.TenantRule) {
 			let tenantRef = self.getTenantRef(tenant)
 			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
 		}

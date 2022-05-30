@@ -6,7 +6,7 @@ import (
 
 func main() {
 
-	o := overflow.NewOverflowInMemoryEmulator().Start()
+	o := overflow.NewOverflowEmulator().Start()
 	/*
 		o := overflow.NewOverflowMainnet().Start()
 	*/
@@ -38,9 +38,11 @@ func main() {
 		RunPrintEventsFull()
 
 	//we advance the clock
-	o.TransactionFromFile("clock").SignProposeAndPayAs("find").
+	o.TransactionFromFile("testClock").SignProposeAndPayAs("find").
 		Args(o.Arguments().UFix64(1.0)).
 		RunPrintEventsFull()
+
+	o.SimpleTxArgs("adminSetupMarketOptionsTypes", "find", o.Arguments())
 
 	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAsService().
@@ -67,7 +69,7 @@ func main() {
 		Args(o.Arguments().String("Find")).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("mintFusd").
+	o.TransactionFromFile("testMintFusd").
 		SignProposeAndPayAsService().
 		Args(o.Arguments().Account("user1").UFix64(100.0)).
 		RunPrintEventsFull()
@@ -77,12 +79,12 @@ func main() {
 		Args(o.Arguments().String("user1").UFix64(5.0)).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("mintFusd").
+	o.TransactionFromFile("testMintFusd").
 		SignProposeAndPayAsService().
 		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("mintFlow").
+	o.TransactionFromFile("testMintFlow").
 		SignProposeAndPayAsService().
 		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()

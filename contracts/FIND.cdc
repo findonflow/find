@@ -1506,11 +1506,11 @@ pub contract FIND {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
 
-		self.LeasePublicPath=/public/findLeases2
-		self.LeaseStoragePath=/storage/findLeases2
+		self.LeasePublicPath=/public/findLeases
+		self.LeaseStoragePath=/storage/findLeases
 
-		self.BidPublicPath=/public/findBids2
-		self.BidStoragePath=/storage/findBids2
+		self.BidPublicPath=/public/findBids
+		self.BidStoragePath=/storage/findBids
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 

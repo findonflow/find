@@ -1,13 +1,13 @@
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(marketplace:Address) {
 	prepare(account: AuthAccount) {
 		// Get all the saleItems Id
 
-		let tenant = FindMarketOptions.getTenant(marketplace)
-		let marketOption = FindMarketOptions.getMarketOptionFromType(Type<@FindMarketSale.SaleItem>())
-		let cap = FindMarketOptions.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)
+		let tenant = FindMarket.getTenant(marketplace)
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItem>())
+		let cap = FindMarket.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)
 		let ref = cap.borrow() ?? panic("Cannot borrow reference to the capability.")
 
 		let listingType=Type<@FindMarketSale.SaleItemCollection>()

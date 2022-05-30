@@ -1,7 +1,5 @@
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc" 
-import FindViews from "../contracts/FindViews.cdc" 
 import FindMarket from "../contracts/FindMarket.cdc" 
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc" 
+import FindViews from "../contracts/FindViews.cdc" 
 import FIND from "../contracts/FIND.cdc" 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
@@ -192,8 +190,8 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	}
 
 
-	let findAddress=FindMarketOptions.getFindTenantAddress()
-	let findMarket=FindMarketOptions.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
+	let findAddress=FindMarket.getFindTenantAddress()
+	let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
 	var listings : StorefrontListing? = nil
 	let storefrontCap = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
@@ -209,14 +207,14 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 		}
 	}
 
-	let tenantCap = FindMarketTenant.getTenantCapability(findAddress)!
+	let tenantCap = FindMarket.getTenantCapability(findAddress)!
 	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up.")
 
-	let marketTypes = FindMarketOptions.getSaleItemTypes()
+	let marketTypes = FindMarket.getSaleItemTypes()
 	var report : {String : ListingTypeReport} = {}
 	for marketType in marketTypes {
 		if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-			report[FindMarketOptions.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing)
+			report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing)
 		}
 	}
 
@@ -289,7 +287,7 @@ pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	return []
 }
 
-pub fun createListingTypeReport(_ allowedListing: FindMarketTenant.AllowedListing) : ListingTypeReport {
+pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : ListingTypeReport {
 	let listingType = allowedListing.listingType.identifier
 	var ftAlias : [String] = []
 	var ftIdentifier : [String] = []

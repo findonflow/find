@@ -3,16 +3,915 @@ import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FUSD from "./standard/FUSD.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
 
 pub contract FindMarket {
+	//TODO: figure out if these can be let
+	access(contract) var pathMap : {String: String}
+	access(contract) var listingName : {String: String}
+	access(contract) var saleItemTypes : [Type]
+	access(contract) var saleItemCollectionTypes : [Type]
+	access(contract) var marketBidTypes : [Type]
+	access(contract) var marketBidCollectionTypes : [Type]
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarketTenant.TenantCuts, resolver: ((Address) : String?)) {
+	// Tenant information
+	pub let TenantClientPublicPath: PublicPath
+	pub let TenantClientStoragePath: StoragePath
+
+	access(contract) let tenantPathPrefix :String
+
+	access(contract) let tenantNameAddress : {String:Address}
+	access(contract) let tenantAddressName : {Address:String}
+
+
+
+	// ========================================
+	pub fun getPublicPath(_ type: Type, name:String) : PublicPath {
+
+		let pathPrefix=self.pathMap[type.identifier]!
+		let path=pathPrefix.concat("_").concat(name)
+
+		return PublicPath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
+	}
+
+	pub fun getStoragePath(_ type: Type, name:String) : StoragePath {
+
+		let pathPrefix=self.pathMap[type.identifier]!
+		let path=pathPrefix.concat("_").concat(name)
+
+		return StoragePath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
+	}
+	pub fun getFindTenantAddress() : Address {
+		return FindMarket.account.address
+	}
+
+	/* Get Tenant */
+	pub fun getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic} {
+		return FindMarket.getTenantCapability(tenant)!.borrow()!
+	}
+
+	pub fun getSaleItemTypes() : [Type] {
+		return self.saleItemTypes
+	}
+
+	/* Get SaleItemCollections */
+	pub fun getSaleItemCollectionTypes() : [Type] {
+		return self.saleItemCollectionTypes
+	}
+
+	pub fun getSaleItemCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.SaleItemCollectionPublic}>] {
+		var caps : [Capability<&{FindMarket.SaleItemCollectionPublic}>] = []
+		for type in self.getSaleItemCollectionTypes() {
+			if type != nil {
+				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))
+				if cap.check() {
+					caps.append(cap)
+				}
+			}
+		}
+		return caps
+	}
+
+	pub fun getSaleItemCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
+		for type in self.getSaleItemCollectionTypes() {
+			if self.getMarketOptionFromType(type) == marketOption{
+				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))
+				return cap
+			}
+		}
+		panic("Cannot find market option : ".concat(marketOption))
+	}
+
+
+
+	/* Get Sale Reports and Sale Item */
+	pub fun assertOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
+
+		let tenantRef=self.getTenant(tenant)
+		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+    let optRef = collectionCap.borrow() 
+		if optRef == nil {
+			panic("Account not properly set up, cannot borrow sale item collection")
+		}
+		let ref=optRef!
+  	let item=ref.borrowSaleItem(id)
+		if !item.checkPointer() {
+			panic("this is a ghost listing")
+		} 
+
+		return item
+	}
+
+	/* Get Sale Reports and Sale Item */
+	pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
+
+		let tenantRef=self.getTenant(tenant)
+		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
+		if info.items.length > 0 {
+			return info.items[0]
+		}
+		return nil
+	}
+
+	pub fun getSaleItemReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
+		let tenantRef = self.getTenant(tenant)
+		var report : {String : FindMarket.SaleItemCollectionReport} = {}
+		for type in self.getSaleItemCollectionTypes() {
+			let marketOption = self.getMarketOptionFromType(type)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
+			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+				report[marketOption] = returnedReport
+			}
+		}
+		return report
+	}
+
+	pub fun getSaleItems(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
+		let tenantRef = self.getTenant(tenant)
+		var report : {String : FindMarket.SaleItemCollectionReport} = {}
+		for type in self.getSaleItemCollectionTypes() {
+			let marketOption = self.getMarketOptionFromType(type)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true, getNFTInfo: getNFTInfo)
+			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+				report[marketOption] = returnedReport
+			}
+		}
+		return report
+	}
+
+	pub fun getNFTListing(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemInformation} {
+		let tenantRef = self.getTenant(tenant)
+		var report : {String : FindMarket.SaleItemInformation} = {}
+		for type in self.getSaleItemCollectionTypes() {
+			let marketOption = self.getMarketOptionFromType(type)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true, getNFTInfo: getNFTInfo)
+			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+				report[marketOption] = returnedReport.items[0]
+			}
+		}
+		return report
+	}
+
+	access(contract) fun checkSaleInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost: Bool, getNFTInfo: Bool) : FindMarket.SaleItemCollectionReport {
+		let ghost: [FindMarket.GhostListing] =[]
+		let info: [FindMarket.SaleItemInformation] =[]
+		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+    let optRef = collectionCap.borrow() 
+		if optRef == nil {
+			return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
+		}
+		let ref=optRef!
+		let listingType = ref.getListingType()
+		var listID = ids 
+		if ids.length == 0 {
+			listID = ref.getIds()
+		}
+
+		for id in listID {
+			//TODO: do we need to call this here?
+			if ref.getIds().contains(id) {
+				let item=ref.borrowSaleItem(id)
+				if !item.checkPointer() {
+					if getGhost {
+						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
+					}
+					continue
+				} 
+				//361
+				//TODO: do we need to be smarter about this?
+				let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
+				var status="active"
+				if !stopped.allowed {
+					status="stopped"
+				}
+				//418
+
+				let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
+
+				if !deprecated.allowed {
+					status="deprecated"
+				}
+
+				//474
+				if let validTime = item.getValidUntil() {
+					if validTime <= Clock.time() {
+						status="ended"
+					}
+				}
+				info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
+			}
+		}
+
+		return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
+	}
+
+	/* Get Bid Collections */
+	pub fun getMarketBidTypes() : [Type] {
+		return self.marketBidTypes
+	}
+
+	pub fun getMarketBidCollectionTypes() : [Type] {
+		return self.marketBidCollectionTypes
+	}
+
+	pub fun getMarketBidCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.MarketBidCollectionPublic}>] {
+		var caps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = []
+		for type in self.getMarketBidCollectionTypes() {
+			let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
+			if cap.check() {
+				caps.append(cap)
+			}
+		}
+		return caps
+	}
+
+	pub fun getMarketBidCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
+		for type in self.getMarketBidCollectionTypes() {
+			if self.getMarketOptionFromType(type) == marketOption{
+				let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
+				return cap
+			}
+		}
+		panic("Cannot find market option : ".concat(marketOption))
+	}
+
+	pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
+		let tenantRef=self.getTenant(tenant)
+		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
+		if bidInfo.items.length > 0 {
+			return bidInfo.items[0]
+		}
+		return nil
+	}
+
+	pub fun getBidsReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.BidItemCollectionReport} {
+		let tenantRef = self.getTenant(tenant)
+		var report : {String : FindMarket.BidItemCollectionReport} = {}
+		for type in self.getMarketBidCollectionTypes() {
+			let marketOption = self.getMarketOptionFromType(type)
+			let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
+			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+				report[marketOption] = returnedReport
+			}
+		}
+		return report
+	}
+
+	access(contract) fun checkBidInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool, getNFTInfo: Bool) : FindMarket.BidItemCollectionReport {
+		let ghost: [FindMarket.GhostListing] =[]
+		let info: [FindMarket.BidInfo] =[]
+		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+
+		let optRef = collectionCap.borrow()
+		if optRef==nil {
+		  return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+	  	}
+
+	  	let ref=optRef!
+
+		let listingType = ref.getBidType()
+		var listID = ids 
+		if ids.length == 0 {
+			listID = ref.getIds()
+		}
+		for id in listID {
+			if ref.getIds().contains(id) {
+				let bid=ref.borrowBidItem(id)
+				let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
+				if item == nil {
+					if getGhost {
+						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
+					}
+					continue
+				} 
+				let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: Clock.time(), item:item!)
+				info.append(bidInfo)
+			}
+		}
+		return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+	}
+
+	pub fun assertBidOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
+
+		let tenantRef=self.getTenant(tenant)
+		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+    	let optRef = collectionCap.borrow() 
+		if optRef == nil {
+			panic("Account not properly set up, cannot borrow bid item collection")
+		}
+		let ref=optRef!
+  		let bidItem=ref.borrowBidItem(id)
+
+		let saleItemCollectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: bidItem.getSellerAddress())
+    	let saleRef = saleItemCollectionCap.borrow() 
+		if saleRef == nil {
+			panic("Seller account is not properly set up, cannot borrow sale item collection")
+		}
+		let sale=saleRef!
+		let item=sale.borrowSaleItem(id)
+		if !item.checkPointer() {
+			panic("this is a ghost listing")
+		} 
+
+		return item
+	}
+
+	/* Helper Function */
+	pub fun getMarketOptionFromType(_ type:Type) : String {
+		return self.listingName[type.identifier]!
+	}
+
+	pub fun typeToListingName(_ type: Type) : String {
+		let identifier = type.identifier
+		var dots = 0
+		var start = 0 
+		var end = 0 
+		var counter = 0 
+		while counter < identifier.length {
+			if identifier[counter] == "." {
+				dots = dots + 1
+			}
+			if start == 0 && dots == 2 {
+				start = counter
+			}
+			if end == 0 && dots == 3 {
+				end = counter
+			}
+			counter = counter + 1
+		}
+		return identifier.slice(from: start + 1, upTo: end)
+	}
+
+	/* Admin Function */
+	access(account) fun addSaleItemType(_ type: Type) {
+		self.saleItemTypes.append(type)
+		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
+	}
+
+	access(account) fun addMarketBidType(_ type: Type) {
+		self.marketBidTypes.append(type)
+		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
+	}
+
+	access(account) fun addSaleItemCollectionType(_ type: Type) {
+		self.saleItemCollectionTypes.append(type)
+		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
+	}
+
+	access(account) fun addMarketBidCollectionType(_ type: Type) {
+		self.marketBidCollectionTypes.append(type)
+		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+		self.listingName[type.identifier] =self.typeToListingName(type)
+	}
+
+	access(account) fun removeSaleItemType(_ type: Type) {
+		var counter = 0 
+		while counter < self.saleItemTypes.length {
+			if type == self.saleItemTypes[counter] {
+				self.saleItemTypes.remove(at: counter)
+			}
+			counter = counter + 1   
+		}
+	}
+
+	access(account) fun removeMarketBidType(_ type: Type) {
+		var counter = 0 
+		while counter < self.marketBidTypes.length {
+			if type == self.marketBidTypes[counter] {
+				self.marketBidTypes.remove(at: counter)
+			}
+			counter = counter + 1   
+		}
+	}
+
+	access(account) fun removeSaleItemCollectionType(_ type: Type) {
+		var counter = 0 
+		while counter < self.saleItemCollectionTypes.length {
+			if type == self.saleItemCollectionTypes[counter] {
+				self.saleItemCollectionTypes.remove(at: counter)
+			}
+			counter = counter + 1   
+		}
+	}
+
+	access(account) fun removeMarketBidCollectionType(_ type: Type) {
+		var counter = 0 
+		while counter < self.marketBidCollectionTypes.length {
+			if type == self.marketBidCollectionTypes[counter] {
+				self.marketBidCollectionTypes.remove(at: counter)
+			}
+			counter = counter + 1   
+		}
+	}
+
+	pub fun typeToPathIdentifier(_ type:Type) : String {
+		let identifier=type.identifier
+
+		var i=0
+		var newIdentifier=""
+		while i < identifier.length {
+
+			let item= identifier.slice(from: i, upTo: i+1) 
+			if item=="." {
+				newIdentifier=newIdentifier.concat("_")
+			} else {
+				newIdentifier=newIdentifier.concat(item)
+			}
+			i=i+1
+		}
+		return newIdentifier
+	}
+	// ========================================
+
+	/// A struct to return what action an NFT can execute 
+	pub struct AllowedListing {
+		pub let listingType: Type 
+		pub let ftTypes: [Type]
+		pub let status: String 
+
+		init(listingType: Type, ftTypes: [Type], status: String) {
+			self.listingType=listingType
+			self.ftTypes=ftTypes 
+			self.status=status 
+		} 
+	}
+
+	/// If this is a listing action it will not be allowed if deprecated
+	pub struct MarketAction{
+		pub let listing:Bool
+		pub let name:String
+
+		init(listing:Bool, name:String){
+			self.listing=listing
+			self.name=name
+		}
+	}
+
+	pub struct ActionResult {
+		pub let allowed:Bool
+		pub let message:String
+		pub let name:String
+
+		init(allowed:Bool, message:String, name:String) {
+			self.allowed=allowed
+			self.message=message
+			self.name =name
+		}
+	}
+
+	pub struct TenantRule{
+		pub let name:String
+		pub let types:[Type]
+		pub let ruleType:String
+		pub let allow:Bool
+
+		init(name:String, types:[Type], ruleType:String, allow:Bool){
+
+			pre {
+				ruleType == "nft" || ruleType == "ft" || ruleType == "listing" : "Must be nft/ft/listing"
+			}
+			self.name=name
+			self.types=types
+			self.ruleType=ruleType
+			self.allow=allow
+		}
+
+
+		pub fun accept(_ relevantType: Type): Bool {
+			let contains=self.types.contains(relevantType)
+
+			if self.allow && contains{
+				return true
+			}
+
+			if !self.allow && !contains {
+				return true
+			}
+			return false
+		}
+	}
+
+	pub struct TenantSaleItem {
+		pub let name:String
+		pub let cut:MetadataViews.Royalty?
+		pub let rules:[TenantRule]
+		pub var status:String
+
+		//TODO : pre all the names that are unique
+		init(name:String, cut:MetadataViews.Royalty?, rules:[TenantRule], status:String){
+			self.name=name
+			self.cut=cut
+			self.rules=rules
+			self.status=status
+		}
+
+		access(contract) fun alterStatus(_ status : String) {
+			self.status = status
+		}
+
+		access(contract) fun isValid(nftType: Type, ftType: Type, listingType: Type) : Bool {
+			for rule in self.rules {
+
+				var relevantType=nftType
+				if rule.ruleType == "listing" {
+					relevantType=listingType
+				} else if rule.ruleType=="ft" {
+					relevantType=ftType 
+				} 
+
+				if !rule.accept(relevantType) {
+					return false
+				}
+			}		
+			return true	
+		}
+	}
+
+	pub struct TenantCuts {
+		pub let findCut:MetadataViews.Royalty?
+		pub let tenantCut:MetadataViews.Royalty?
+
+		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
+			self.findCut=findCut
+			self.tenantCut=tenantCut
+		}
+	}
+
+	pub resource interface TenantPublic {
+		pub fun getStoragePath(_ type: Type) : StoragePath 
+		pub fun getPublicPath(_ type: Type) : PublicPath
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
+		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
+		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
+		pub let name:String
+	}
+
+	//this needs to be a resource so that nobody else can make it.
+	pub resource Tenant : TenantPublic{
+
+		access(self) let findSaleItems : {String : TenantSaleItem}
+		access(self) let tenantSaleItems : {String : TenantSaleItem}
+		access(self) let findCuts : {String : TenantSaleItem}
+
+		pub let name: String
+
+		init(_ name:String) {
+			self.name=name
+			self.tenantSaleItems={}
+			self.findSaleItems={}
+			self.findCuts= {}
+		}
+
+		access(account) fun alterMarketOption(name: String, status: String) {
+			pre{
+				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
+			}
+			self.tenantSaleItems[name]!.alterStatus(status)
+		}
+
+		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
+			pre{
+				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
+			}
+			/* 
+			let rules = self.tenantSaleItems[optionName]!.rules
+			for rule in rules {
+				assert(rule.name == tenantRule.name, message: "Rule with same name already exist. Name: ".concat(rule.name))
+			}
+			*/
+			self.tenantSaleItems[optionName]!.rules.append(tenantRule)
+		}
+
+		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
+			pre{
+				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
+			}
+			let rules : [TenantRule] = self.tenantSaleItems[optionName]!.rules
+			var counter = 0
+			while counter < rules.length {
+				if rules[counter]!.name == tenantRuleName {
+					break
+				}
+				counter = counter + 1
+				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
+			}
+			self.tenantSaleItems[optionName]!.rules.remove(at: counter)
+		}
+
+		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts {
+
+			let item = self.tenantSaleItems[name]!
+
+			for findCut in self.findCuts.values {
+				let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
+				if valid{
+					return TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
+				}
+			}
+			return TenantCuts(findCut:nil, tenantCut: item.cut)
+		}
+
+		access(account) fun addSaleItem(_ item: TenantSaleItem, type:String) {
+			if type=="find" {
+				self.findSaleItems[item.name]=item
+			} else if type=="tenant" {
+				self.tenantSaleItems[item.name]=item
+			} else if type=="cut" {
+				self.findCuts[item.name]=item
+			} else{
+				panic("Not valid type to add sale item for")
+			}
+		}
+
+		access(account) fun removeSaleItem(_ name:String, type:String) {
+			if type=="find" {
+				self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
+			} else if type=="tenant" {
+				self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
+			} else if type=="cut" {
+				self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
+			} else{
+				panic("Not valid type to add sale item for")
+			}
+		}
+
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{
+
+			for item in self.findSaleItems.values {
+				for rule in item.rules {
+					var relevantType=nftType
+					if rule.ruleType == "listing" {
+						relevantType=listingType
+					} else if rule.ruleType=="ft" {
+						relevantType=ftType 
+					} 
+
+					if rule.accept(relevantType) {
+						continue
+					}
+					return ActionResult(allowed:false, message: rule.name, name: item.name)
+				}
+				if item.status=="stopped" {
+					return ActionResult(allowed:false, message: "Find has stopped this item", name:item.name)
+				}
+
+				if item.status=="deprecated" && action.listing{
+					return ActionResult(allowed:false, message: "Find has deprected mutation options on this item", name:item.name)
+				}
+			}
+
+			for item in self.tenantSaleItems.values {
+				let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
+
+				if !valid {
+					continue
+				}
+
+				if item.status=="stopped" {
+					return ActionResult(allowed:false, message: "Tenant has stopped this item", name:item.name)
+				}
+
+				if item.status=="deprecated" && action.listing{
+					return ActionResult(allowed:false, message: "Tenant has deprected mutation options on this item", name:item.name)
+				}
+				return ActionResult(allowed:true, message:"OK!", name:item.name)
+			}
+
+			return ActionResult(allowed:false, message:"Nothing matches", name:"")
+		}
+
+		pub fun getPublicPath(_ type: Type) : PublicPath {
+			return FindMarket.getPublicPath(type, name: self.name)
+		}
+
+		pub fun getStoragePath(_ type: Type) : StoragePath {
+			return FindMarket.getStoragePath(type, name: self.name)
+		}
+
+		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
+
+			var containsNFTType = false 
+			var containsListingType = false
+			for item in self.findSaleItems.values {
+				for rule in item.rules {
+					if rule.types.contains(nftType){
+						containsNFTType = true
+					} 
+					if rule.types.contains(marketType) {
+						containsListingType = true
+					} 
+
+					if containsListingType && containsNFTType {
+						return nil
+					}
+				}
+				containsNFTType = false 
+				containsListingType = false
+			}
+			for item in self.tenantSaleItems.values {
+				var allowedFTTypes : [Type] = []
+				for rule in item.rules {
+					if rule.ruleType == "ft"{
+						allowedFTTypes = rule.types
+					}
+					if rule.types.contains(nftType) && rule.allow {
+						containsNFTType = true
+					} 
+					if rule.types.contains(marketType) && rule.allow {
+						containsListingType = true
+					} 				
+					if containsListingType && containsNFTType {
+						return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
+					}
+				}
+				containsNFTType = false 
+				containsListingType = false
+			}
+			return nil
+		}
+	}
+
+	// Tenant admin stuff
+	//Admin client to use for capability receiver pattern
+	pub fun createTenantClient() : @TenantClient {
+		return <- create TenantClient()
+	}
+
+
+	//interface to use for capability receiver pattern
+	pub resource interface TenantClientPublic  {
+		pub fun addCapability(_ cap: Capability<&Tenant>)
+	}
+
+	/*
+
+	A tenantClient should be able to:
+	- deprecte a certain market type: No new listings can be made
+
+	*/
+	//admin proxy with capability receiver 
+	pub resource TenantClient: TenantClientPublic {
+
+		access(self) var capability: Capability<&Tenant>?
+
+		pub fun addCapability(_ cap: Capability<&Tenant>) {
+			pre {
+				cap.check() : "Invalid tenant"
+				self.capability == nil : "Server already set"
+			}
+			self.capability = cap
+		}
+
+		init() {
+			self.capability = nil
+		}
+
+
+		/*
+		//Add that i can list Dandy for Flow
+		//list it
+		//deprecte it
+		//list another
+
+		Add a new tenant rule, remove it from the above market tenant
+		test that a tenant can then turn deprecate  a rule
+		//TODO: creat a method to add these
+		//TODO: put this in another transaction
+		tenant.addSaleItem(TenantSaleItem(
+			name:"AnyNFTFlow", 
+			cut:nil, 
+			rules:[ TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
+			status:"active"
+		), type: "tenant")
+		*/
+
+		pub fun setMarketOption(name: String, cut: MetadataViews.Royalty?, rules: [TenantRule]) {
+			let tenant = self.getTenantRef() 
+			tenant.addSaleItem(TenantSaleItem(
+				name: name, 
+				cut: cut, 
+				rules: rules, 
+				status:"active"
+			), type: "tenant")
+			//Emit Event here
+		}
+
+		pub fun removeMarketOption(name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.removeSaleItem(name, type: "tenant")
+		}
+
+		pub fun enableMarketOption(_ name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.alterMarketOption(name: name, status: "active")
+		}
+
+		pub fun deprecateMarketOption(_ name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.alterMarketOption(name: name, status: "deprecated")
+		}
+
+		pub fun stopMarketOption(_ name: String) {
+			let tenant = self.getTenantRef() 
+			tenant.alterMarketOption(name: name, status: "stopped")
+		}
+
+		pub fun setTenantRule(optionName: String, tenantRule: TenantRule) {
+			let tenantRef = self.getTenantRef()
+			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
+		}
+
+		pub fun removeTenantRule(optionName: String, tenantRuleName: String) {
+			let tenantRef = self.getTenantRef()
+			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
+		}
+
+		//BAM: do admin operations on a tenant
+		/*
+		- not allow a certain market type
+		*/
+		// This is a function only for private use. Not exposed through public interface
+		pub fun getTenantRef() : &Tenant {
+			pre {
+				self.capability != nil: "TenantClient is not present"
+				self.capability!.check()  : "Tenant client is not linked anymore"
+			}
+
+			return self.capability!.borrow()!
+		}
+
+	}
+
+	access(account) fun createFindMarket(name: String, address:Address) : Capability<&Tenant> {
+		let account=FindMarket.account
+
+		let receiver=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
+
+		let tenant <- create Tenant(name)
+		//fetch the TenentRegistry from our storage path and add the new tenant with the given name and address
+
+		//add to registry
+		self.tenantAddressName[address]=name
+		self.tenantNameAddress[name]=address
+
+		//TODO: do not do this here, do it on the outside
+		let flowType=Type<@FlowToken.Vault>()
+		let fusdType=Type<@FUSD.Vault>()
+
+		tenant.addSaleItem(TenantSaleItem(
+			name:"FlowFusdCut", 
+			cut:findRoyalty, 
+			rules:[TenantRule( name:"standard ft", types:[flowType, fusdType], ruleType:"ft", allow:true)], 
+			status:"active"
+		), type: "cut")
+		//end do on outside
+
+		let tenantPath=self.getTenantPathForName(name)
+		let sp=StoragePath(identifier: tenantPath)!
+		let pp=PrivatePath(identifier: tenantPath)!
+		let pubp=PublicPath(identifier:tenantPath)!
+
+		account.save(<- tenant, to: sp)
+		account.link<&Tenant>(pp, target:sp)
+		account.link<&Tenant{TenantPublic}>(pubp, target:sp)
+		return account.getCapability<&Tenant>(pp)
+	}
+
+	pub fun getTenantPathForName(_ name:String) : String {
+		pre {
+			self.tenantNameAddress.containsKey(name) : "tenant is not registered in registry"
+		}
+
+		return self.tenantPathPrefix.concat("_").concat(name)
+	}
+
+	pub fun getTenantPathForAddress(_ address:Address) : String {
+		pre {
+			self.tenantAddressName.containsKey(address) : "tenant is not registered in registry"
+		}
+
+		return self.getTenantPathForName(self.tenantAddressName[address]!)
+	}
+
+	pub fun getTenantCapability(_ marketplace:Address) : Capability<&Tenant{TenantPublic}>? {
+		pre {
+			self.tenantAddressName.containsKey(marketplace) : "tenant is not registered in registry"
+		}
+
+		return FindMarket.account.getCapability<&Tenant{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
+	}
+
+
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?)) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -272,7 +1171,9 @@ pub contract FindMarket {
 			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
 			self.nft=nil
-			if nftInfo {self.nft=item.toNFTInfo()}
+			if nftInfo {
+				self.nft=item.toNFTInfo()
+			}
 			self.ftTypeIdentifier=item.getFtType().identifier
 
 			self.auction=item.getAuction()
@@ -295,4 +1196,23 @@ pub contract FindMarket {
 			self.item=item
 		}
 	}
+
+	init() {
+		self.tenantAddressName={}
+		self.tenantNameAddress={}
+
+		self.TenantClientPublicPath=/public/findMarketClient
+		self.TenantClientStoragePath=/storage/findMarketClient
+
+		self.tenantPathPrefix=  FindMarket.typeToPathIdentifier(Type<@Tenant>())
+
+	  self.saleItemTypes = []
+		self.saleItemCollectionTypes = []
+		self.pathMap = {}
+		self.listingName={}
+		self.marketBidTypes = []
+		self.marketBidCollectionTypes = []
+
+	}
+
 }

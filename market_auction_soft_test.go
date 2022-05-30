@@ -48,7 +48,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			//TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionSoft("user2", id, price+5.0)
+			fulfillMarketAuctionSoft("user2", id, 15.0)
 	})
 
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
@@ -168,13 +168,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64(id)).
-			Test(otu.T).AssertFailure("Cannot fulfill market auction on ghost listing")
-
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
 
 		otu.tickClock(100.0)
@@ -183,7 +176,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price + 5.0)).
 			Test(otu.T).AssertFailure("Auction has not ended yet")
 	})
 
@@ -305,7 +299,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(30.0)).
 			Test(otu.T).AssertSuccess()
 
 		otu.alterMarketOption("AuctionSoft", "enable")
@@ -403,7 +398,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(price + 5.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -466,40 +462,38 @@ func TestMarketAuctionSoft(t *testing.T) {
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
-			auctionBidMarketSoft("user2", "user1", id, price+5.0)
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			setProfile("user1")
 
 		otu.tickClock(500.0)
 
-		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		otu.AutoGold("status", status)
+
+		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				UInt64(id)).
+				UInt64(id).
+				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", id),
 				"royaltyName": "find",
-				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      "0.50000000",
-				"findName":    "user1",
-				"id":          fmt.Sprintf("%d", id),
 				"royaltyName": "artist",
-				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", id),
 				"royaltyName": "platform",
-				"tenant":      "find",
 			}))
+
+		otu.AutoGold("events", res.Events)
 	})
 
 }

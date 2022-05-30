@@ -6,8 +6,6 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FindMarketTenant from "../contracts/FindMarketTenant.cdc"
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
@@ -103,13 +101,12 @@ transaction(name: String) {
 		}
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let tenantCapability= FindMarketTenant.getTenantCapability(FindMarketOptions.getFindTenantAddress())!
-		let tenant = tenantCapability.borrow()!
+		let tenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
 
-		let publicPath= tenant.getPublicPath(saleItemType) 
-		let storagePath= tenant.getStoragePath(saleItemType) 
+		let tenant = tenantCapability.borrow()!
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
 		let saleItemCap= acct.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
 		if !saleItemCap.check() {
@@ -119,8 +116,8 @@ transaction(name: String) {
 		}
 
 		let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
-		let doeSalePublicPath= tenant.getPublicPath(doeSaleType) 
-		let doeSaleStoragePath= tenant.getStoragePath(doeSaleType)
+		let doeSalePublicPath=FindMarket.getPublicPath(doeSaleType, name: tenant.name)
+		let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
 		let doeSaleCap= acct.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath) 
 		if !doeSaleCap.check() {
 			acct.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
@@ -128,8 +125,8 @@ transaction(name: String) {
 		}
 
 		let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
-		let doeBidPublicPath= tenant.getPublicPath(doeBidType) 
-		let doeBidStoragePath= tenant.getStoragePath(doeBidType)
+		let doeBidPublicPath=FindMarket.getPublicPath(doeBidType, name: tenant.name)
+		let doeBidStoragePath= FindMarket.getStoragePath(doeBidType, name:tenant.name)
 		let doeBidCap= acct.getCapability<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath) 
 		if !doeBidCap.check() {
 			acct.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: doeBidStoragePath)
@@ -138,8 +135,8 @@ transaction(name: String) {
 
 		/// auctions that escrow ft
 		let aeSaleType= Type<@FindMarketAuctionEscrow.SaleItemCollection>()
-		let aeSalePublicPath= tenant.getPublicPath(aeSaleType) 
-		let aeSaleStoragePath= tenant.getStoragePath(aeSaleType)
+		let aeSalePublicPath=FindMarket.getPublicPath(aeSaleType, name: tenant.name)
+		let aeSaleStoragePath= FindMarket.getStoragePath(aeSaleType, name:tenant.name)
 		let aeSaleCap= acct.getCapability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeSalePublicPath) 
 		if !aeSaleCap.check() {
 			acct.save<@FindMarketAuctionEscrow.SaleItemCollection>(<- FindMarketAuctionEscrow.createEmptySaleItemCollection(tenantCapability), to: aeSaleStoragePath)
@@ -147,8 +144,10 @@ transaction(name: String) {
 		}
 
 		let dosSaleType= Type<@FindMarketDirectOfferSoft.SaleItemCollection>()
-		let dosSalePublicPath= tenant.getPublicPath(dosSaleType)
-		let dosSaleStoragePath= tenant.getStoragePath(dosSaleType)
+
+		let dosSalePublicPath=FindMarket.getPublicPath(dosSaleType, name: tenant.name)
+		let dosSaleStoragePath= FindMarket.getStoragePath(dosSaleType, name:tenant.name)
+
 		let dosSaleCap= acct.getCapability<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(dosSalePublicPath) 
 		if !dosSaleCap.check() {
 			acct.save<@FindMarketDirectOfferSoft.SaleItemCollection>(<- FindMarketDirectOfferSoft.createEmptySaleItemCollection(tenantCapability), to: dosSaleStoragePath)
@@ -156,8 +155,8 @@ transaction(name: String) {
 		}
 
 		let dosBidType= Type<@FindMarketDirectOfferSoft.MarketBidCollection>()
-		let dosBidPublicPath= tenant.getPublicPath(dosBidType) 
-		let dosBidStoragePath= tenant.getStoragePath(dosBidType) 
+		let dosBidPublicPath=FindMarket.getPublicPath(dosBidType, name: tenant.name)
+		let dosBidStoragePath= FindMarket.getStoragePath(dosBidType, name:tenant.name)
 		let dosBidCap= acct.getCapability<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath) 
 		if !dosBidCap.check() {
 			acct.save<@FindMarketDirectOfferSoft.MarketBidCollection>(<- FindMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: dosBidStoragePath)
@@ -165,8 +164,9 @@ transaction(name: String) {
 		}
 
 		let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
-		let aeBidPublicPath= tenant.getPublicPath(aeBidType) 
-		let aeBidStoragePath= tenant.getStoragePath(aeBidType) 
+
+		let aeBidPublicPath=FindMarket.getPublicPath(aeBidType, name: tenant.name)
+		let aeBidStoragePath= FindMarket.getStoragePath(aeBidType, name:tenant.name)
 		let aeBidCap= acct.getCapability<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath) 
 		if !aeBidCap.check() {
 			acct.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: aeBidStoragePath)
@@ -175,8 +175,8 @@ transaction(name: String) {
 
 	 /// auctions that refers FT so 'soft' auction
 		let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
-		let asSalePublicPath= tenant.getPublicPath(asSaleType)
-		let asSaleStoragePath= tenant.getStoragePath(asSaleType) 
+		let asSalePublicPath=FindMarket.getPublicPath(asSaleType, name: tenant.name)
+		let asSaleStoragePath= FindMarket.getStoragePath(asSaleType, name:tenant.name)
 		let asSaleCap= acct.getCapability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(asSalePublicPath) 
 		if !asSaleCap.check() {
 			acct.save<@FindMarketAuctionSoft.SaleItemCollection>(<- FindMarketAuctionSoft.createEmptySaleItemCollection(tenantCapability), to: asSaleStoragePath)
@@ -184,15 +184,14 @@ transaction(name: String) {
 		}
 
 		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
-		let asBidPublicPath= tenant.getPublicPath(asBidType) 
-		let asBidStoragePath= tenant.getStoragePath(asBidType)
+		let asBidPublicPath=FindMarket.getPublicPath(asBidType, name: tenant.name)
+		let asBidStoragePath= FindMarket.getStoragePath(asBidType, name:tenant.name)
 		let asBidCap= acct.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath) 
 		if !asBidCap.check() {
 			acct.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			acct.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
 		}
 		//SYNC with register
-
 
 	}
 }

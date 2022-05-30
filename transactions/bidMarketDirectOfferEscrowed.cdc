@@ -1,4 +1,4 @@
-import FindMarketOptions from "../contracts/FindMarketOptions.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -28,7 +28,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
-		let tenant=FindMarketOptions.getTenant(marketplace)
+		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
 
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)

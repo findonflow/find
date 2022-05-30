@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +22,11 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
+
+func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
+	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
+	return otu
+}
 
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
@@ -84,11 +90,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess().AssertNoEvents()
-
-	otu.O.TransactionFromFile("adminSetupMarketOptionsTypes").
-		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
-
 	otu.createUser(100.0, "account")
 
 	return otu.tickClock(1.0)
@@ -487,7 +488,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.TransactionFromFile("listNFTForAuction").
+	otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
@@ -889,7 +890,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			UInt64(id)).
+			UInt64(id).
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
@@ -907,7 +909,8 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			UInt64(id)).
+			UInt64(id).
+			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
@@ -1022,9 +1025,9 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
-		SignProposeAndPayAs("find").
+		SignProposeAndPayAs("account").
 		Args(otu.O.Arguments().
-			Account("account").
+			//			Account("account").
 			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()
