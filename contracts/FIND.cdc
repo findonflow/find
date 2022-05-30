@@ -149,7 +149,7 @@ pub contract FIND {
 			return nil
 		}
 
-		let profile= Profile.find(address).asReport()
+		let profileFindName= Profile.find(address).getFindName()
 		let leases = leaseCap.borrow()!.getLeaseInformation() 
 		var time : UFix64?= nil
 		var name :String?= nil
@@ -161,14 +161,14 @@ pub contract FIND {
 			}
 
 			//if we have not set a 
-			if profile.findName == "" {
+			if profileFindName == "" {
 				if time == nil || lease.validUntil < time! {
 					time=lease.validUntil
 					name=lease.name
 				}
 			}
 
-			if profile.findName == lease.name {
+			if profileFindName == lease.name {
 				return lease.name
 			}
 		}
