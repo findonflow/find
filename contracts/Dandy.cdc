@@ -1,7 +1,6 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import Profile from "../contracts/Profile.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
 //TODO: review all permissions and events

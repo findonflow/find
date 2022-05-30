@@ -1,7 +1,5 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
@@ -94,17 +92,6 @@ pub contract FindViews {
 		}
 	}
 
-	pub struct Edition {
-		pub let editionNumber: UInt64
-		pub let totalInEdition: UInt64
-
-		init(serialNumber:UInt64, totalInEdition:UInt64){
-			self.editionNumber=serialNumber
-			self.totalInEdition=totalInEdition
-		}
-	}
-
-
 	// Would this work for rarity? Hoodlums, flovatar, Basicbeasts? comments?
 	pub struct Rarity{
 		pub let rarity: UFix64
@@ -131,17 +118,6 @@ pub contract FindViews {
 			self.name=name
 		}
 
-	}
-
-	//Could this work to mark that something is for sale?
-	pub struct ForSale{
-		pub let types: [Type] //these are the types of FT that this token can be sold as
-		pub let price: UFix64
-
-		init(types: [Type], price: UFix64) {
-			self.types=types
-			self.price=price
-		}
 	}
 
 	/// A basic pointer that can resolve data and get owner/id/uuid and gype
@@ -285,5 +261,4 @@ pub contract FindViews {
 			self.nounce=nounce
 		}
 	}
-
 }

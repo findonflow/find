@@ -8,7 +8,6 @@ import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferEscrow {
@@ -128,10 +127,6 @@ pub contract FindMarketDirectOfferEscrow {
 
 		pub fun getItemType() : Type {
 			return self.pointer.getItemType()
-		}
-
-		pub fun getItemCollectionAlias() : String {
-			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
 		}
 
 		pub fun getAuction(): FindMarket.AuctionItem? {

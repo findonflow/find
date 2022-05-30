@@ -1,5 +1,4 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "./FindViews.cdc"
@@ -8,7 +7,6 @@ import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
-import NFTRegistry from "./NFTRegistry.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
@@ -211,10 +209,6 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getItemType() : Type {
 			return self.pointer.getItemType()
-		}
-
-		pub fun getItemCollectionAlias() : String {
-			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
 		}
 
 		pub fun getAuction(): FindMarket.AuctionItem? {

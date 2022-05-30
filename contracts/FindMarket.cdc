@@ -1,6 +1,5 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FlowToken from "./standard/FlowToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FUSD from "./standard/FUSD.cdc"
@@ -1167,7 +1166,6 @@ pub contract FindMarket {
 			self.bidderName=item.getBuyerName()
 			self.seller=item.getSeller()
 			self.sellerName=item.getSellerName()
-
 			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
 			self.nft=nil
