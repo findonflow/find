@@ -1,15 +1,11 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferEscrow {
 
@@ -130,20 +126,12 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.pointer.getItemType()
 		}
 
-		pub fun getItemCollectionAlias() : String {
-			return NFTRegistry.getNFTInfoByTypeIdentifier(self.getItemType().identifier)!.alias
-		}
-
 		pub fun getAuction(): FindMarket.AuctionItem? {
 			return nil
 		}
 
 		pub fun getFtType() : Type  {
 			return self.offerCallback.borrow()!.getVaultType(self.getId())
-		}
-
-		pub fun getFtAlias() : String {
-			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
 		}
 
 		pub fun setValidUntil(_ time: UFix64?) {
@@ -532,7 +520,6 @@ pub contract FindMarketDirectOfferEscrow {
 	}
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
-		let wallet=FindMarketDirectOfferEscrow.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		return <- create SaleItemCollection(tenantCapability)
 	}
 

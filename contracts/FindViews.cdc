@@ -1,7 +1,4 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {

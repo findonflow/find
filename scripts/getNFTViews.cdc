@@ -1,4 +1,3 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"

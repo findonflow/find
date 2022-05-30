@@ -1,5 +1,4 @@
 import Admin from "../contracts/Admin.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
 transaction(alias: String) {
 

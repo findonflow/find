@@ -1,5 +1,4 @@
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
 //TODO: this needs work for DUC
