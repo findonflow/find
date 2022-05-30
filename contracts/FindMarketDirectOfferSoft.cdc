@@ -22,11 +22,31 @@ pub contract FindMarketDirectOfferSoft {
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 
 		access(contract) var directOfferAccepted:Bool
+		access(contract) let totalRoyalties: UFix64 
 
 		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
 			self.pointer=pointer
 			self.offerCallback=callback
 			self.directOfferAccepted=false
+
+			var royalties : UFix64 = 0.0
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
+				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+				for royalty in v.getRoyalties() {
+					royalties = royalties + royalty.cut
+				}
+			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				royalties = royalties + royalty.cut
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				for royalty in r {
+					royalties = royalties + royalty.cut
+				}
+			}
+			self.totalRoyalties=royalties
 		}
 
 
@@ -143,6 +163,10 @@ pub contract FindMarketDirectOfferSoft {
 
 		pub fun checkPointer() : Bool {
 			return self.pointer.valid()
+		}
+
+		pub fun getTotalRoyalties() : UFix64 {
+			return self.totalRoyalties
 		}
 	}
 

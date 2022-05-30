@@ -31,13 +31,31 @@ pub contract FindMarketSale {
 
 		//this field is set if this is a saleItem
 		access(contract) var salePrice: UFix64
-
+		access(contract) let totalRoyalties: UFix64 
 		//TODO: add valid until?
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, price:UFix64) {
 			self.vaultType=vaultType
 			self.pointer=pointer
 			self.salePrice=price
 			self.buyer=nil
+			var royalties : UFix64 = 0.0
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
+				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+				for royalty in v.getRoyalties() {
+					royalties = royalties + royalty.cut
+				}
+			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				royalties = royalties + royalty.cut
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				for royalty in r {
+					royalties = royalties + royalty.cut
+				}
+			}
+			self.totalRoyalties=royalties
 		}
 
 		pub fun getSaleType() : String {
@@ -134,6 +152,10 @@ pub contract FindMarketSale {
 
 		pub fun checkPointer() : Bool {
 			return self.pointer.valid()
+		}
+
+		pub fun getTotalRoyalties() : UFix64 {
+			return self.totalRoyalties
 		}
 
 	}
