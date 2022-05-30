@@ -11,3 +11,4 @@ address=$(flow accounts create --network testnet --signer testnet-account --key 
 
 yq -iP ".accounts.\"testnet-user1\".address=\"$address\"" flow.json -o json
 
+git add . 

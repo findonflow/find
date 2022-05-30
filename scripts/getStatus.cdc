@@ -4,7 +4,7 @@ import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
 pub struct FINDReport{
-	pub let profile:Profile.UserProfile?
+	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
 	pub let relatedAccounts: { String: Address}
 	pub let leases: [FIND.LeaseInformation]
@@ -13,7 +13,7 @@ pub struct FINDReport{
 	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
 
 
-	init(profile: Profile.UserProfile?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}) {
+	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -60,7 +60,7 @@ pub fun main(user: String) : Report? {
 		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
 		findReport = FINDReport(
-			profile: profile?.asProfile(),
+			profile: profile?.asReport(),
 			relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
 			bids: bidCap.borrow()?.getBids() ?? [],
 			leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
