@@ -21,7 +21,7 @@
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                         "listingId": "133",
-                        "listingStatus": "active",
+                        "listingStatus": "ended",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
                         "listingValidUntil": "301.00000000",
                         "nft": {
@@ -43,6 +43,7 @@
                         },
                         "nftId": "133",
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+                        "saleItemExtraField": {},
                         "saleType": "finished_completed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"

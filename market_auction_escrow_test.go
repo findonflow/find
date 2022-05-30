@@ -366,7 +366,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Test(otu.T).AssertSuccess()
 
 		otu.alterMarketOption("AuctionEscrow", "enable")
-		otu.O.TransactionFromFile("listNFTForAuction").
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
