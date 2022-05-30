@@ -1023,8 +1023,10 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().String(marketType)).
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("account").
+			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()
 	return otu
