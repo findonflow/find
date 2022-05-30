@@ -24,12 +24,32 @@ pub contract FindMarketDirectOfferEscrow {
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
 		access(contract) var validUntil: UFix64? 
 		access(contract) var saleItemExtraField: {String : AnyStruct}
+		access(contract) let totalRoyalties: UFix64 
 
 		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.pointer=pointer
 			self.offerCallback=callback
 			self.validUntil=validUntil
 			self.saleItemExtraField=saleItemExtraField
+
+			var royalties : UFix64 = 0.0
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
+				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+				for royalty in v.getRoyalties() {
+					royalties = royalties + royalty.cut
+				}
+			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				royalties = royalties + royalty.cut
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				for royalty in r {
+					royalties = royalties + royalty.cut
+				}
+			}
+			self.totalRoyalties=royalties
 		}
 
 		pub fun getId() : UInt64{
@@ -149,6 +169,10 @@ pub contract FindMarketDirectOfferEscrow {
 
 		access(contract) fun setSaleItemExtraField(_ field: {String : AnyStruct}) {
 			self.saleItemExtraField = field
+		}
+		
+		pub fun getTotalRoyalties() : UFix64 {
+			return self.totalRoyalties
 		}
 	}
 

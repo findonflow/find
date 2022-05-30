@@ -234,6 +234,57 @@ pub contract Admin {
 			FindMarketOptions.removeMarketBidCollectionType(type) 
 		}
 
+		/// ===================================================================================
+		// Tenant Rules Management
+		/// ===================================================================================
+		pub fun getTenantRef(_ tenant: Address) : &FindMarketTenant.Tenant {
+			let string = FindMarketTenant.getTenantPathForAddress(tenant)
+			let sp = StoragePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
+			return Admin.account.borrow<&FindMarketTenant.Tenant>(from: sp) ?? panic("Cannot borrow tenant reference.")
+		}
+
+		pub fun setMarketOption(tenant: Address, name: String, cut: MetadataViews.Royalty?, rules: [FindMarketTenant.TenantRule]) {
+			let tenant = self.getTenantRef(tenant) 
+			tenant.addSaleItem(FindMarketTenant.TenantSaleItem(
+				name: name, 
+				cut: cut, 
+				rules: rules, 
+				status:"active"
+			), type: "tenant")
+			//Emit Event here
+		}
+
+		pub fun removeMarketOption(tenant: Address, name: String) {
+			let tenant = self.getTenantRef(tenant) 
+			tenant.removeSaleItem(name, type: "tenant")
+		}
+
+		pub fun enableMarketOption(tenant: Address, name: String) {
+			let tenant = self.getTenantRef(tenant) 
+			tenant.alterMarketOption(name: name, status: "active")
+		}
+
+		pub fun deprecateMarketOption(tenant: Address, name: String) {
+			let tenant = self.getTenantRef(tenant) 
+			tenant.alterMarketOption(name: name, status: "deprecated")
+		}
+
+		pub fun stopMarketOption(tenant: Address, name: String) {
+			let tenant = self.getTenantRef(tenant) 
+			tenant.alterMarketOption(name: name, status: "stopped")
+		}
+
+		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarketTenant.TenantRule) {
+			let tenantRef = self.getTenantRef(tenant)
+			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
+		}
+
+		pub fun removeTenantRule(tenant: Address, optionName: String, tenantRuleName: String) {
+			let tenantRef = self.getTenantRef(tenant)
+			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
+		}
+
+
 		init() {
 			self.capability = nil
 		}

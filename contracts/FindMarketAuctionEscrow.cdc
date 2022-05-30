@@ -31,6 +31,7 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) var auctionValidUntil: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
+		access(contract) let totalRoyalties: UFix64 
 		access(contract) let saleItemExtraField: {String : AnyStruct}
 
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
@@ -46,6 +47,25 @@ pub contract FindMarketAuctionEscrow {
 			self.auctionEndsAt=nil
 			self.auctionValidUntil=auctionValidUntil
 			self.saleItemExtraField=saleItemExtraField
+
+			var royalties : UFix64 = 0.0
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
+				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+				for royalty in v.getRoyalties() {
+					royalties = royalties + royalty.cut
+				}
+			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				royalties = royalties + royalty.cut
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				for royalty in r {
+					royalties = royalties + royalty.cut
+				}
+			}
+			self.totalRoyalties=royalties
 		}
 
 		pub fun getId() : UInt64{
@@ -235,6 +255,10 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
+		}
+		
+		pub fun getTotalRoyalties() : UFix64 {
+			return self.totalRoyalties
 		}
 	}
 

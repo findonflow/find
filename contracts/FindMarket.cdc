@@ -20,6 +20,14 @@ pub contract FindMarket {
 		let ftType=vault.getType()
 
 		if royalty != nil {
+			/* Check the total royalty to prevent changing of royalties */
+			let royalties = royalty!.getRoyalties()
+			var totalRoyalties : UFix64 = 0.0
+			for royaltyItem in royalties {
+				totalRoyalties = totalRoyalties + royaltyItem.cut
+			}
+			assert(totalRoyalties == saleItem.getTotalRoyalties(), message: "The total Royalties to be paid is changed after listing.")
+
 			for royaltyItem in royalty!.getRoyalties() {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
@@ -223,6 +231,7 @@ pub contract FindMarket {
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 		
+		pub fun getTotalRoyalties() : UFix64 
 	}
 
 	//BAM; this needs to know if an item is deprectaed or stopped in some way

@@ -1,0 +1,12 @@
+`{
+    "FINDReport": {
+        "bids": null,
+        "itemsForSale": {},
+        "leases": null,
+        "marketBids": {},
+        "privateMode": "false",
+        "profile": "",
+        "relatedAccounts": {}
+    },
+    "NameReport": ""
+}`

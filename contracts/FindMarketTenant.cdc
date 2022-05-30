@@ -159,14 +159,14 @@ pub contract FindMarketTenant {
 			self.findCuts= {}
 		}
 
-		access(contract) fun alterMarketOption(name: String, status: String) {
+		access(account) fun alterMarketOption(name: String, status: String) {
 			pre{
 				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
 		}
 
-		access(contract) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
+		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
 			pre{
 				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
 			}
@@ -179,7 +179,7 @@ pub contract FindMarketTenant {
 			self.tenantSaleItems[optionName]!.rules.append(tenantRule)
 		}
 
-		access(contract) fun removeTenantRule(optionName: String, tenantRuleName: String) {
+		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
 			pre{
 				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
 			}
