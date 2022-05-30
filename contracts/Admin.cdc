@@ -6,8 +6,6 @@ import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
-import FindViews from "./FindViews.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import NFTRegistry from "./NFTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
@@ -237,18 +235,14 @@ pub contract Admin {
 		/// ===================================================================================
 		pub fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
 			let string = FindMarket.getTenantPathForAddress(tenant)
-			let sp = StoragePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
-			return Admin.account.borrow<&FindMarket.Tenant>(from: sp) ?? panic("Cannot borrow tenant reference.")
+			let pp = PrivatePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
+			let cap = Admin.account.getCapability<&FindMarket.Tenant>(pp)
+			return cap.borrow() ?? panic("Cannot borrow tenant reference.")
 		}
 
-		pub fun setMarketOption(tenant: Address, name: String, cut: MetadataViews.Royalty?, rules: [FindMarket.TenantRule]) {
+		pub fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
 			let tenant = self.getTenantRef(tenant) 
-			tenant.addSaleItem(FindMarket.TenantSaleItem(
-				name: name, 
-				cut: cut, 
-				rules: rules, 
-				status:"active"
-			), type: "tenant")
+			tenant.addSaleItem(saleItem, type: "tenant")
 			//Emit Event here
 		}
 

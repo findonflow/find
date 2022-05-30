@@ -52,13 +52,13 @@ func main() {
 	o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
 
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
-	o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments())
+	// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
 
 	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
-	o.SimpleTxArgs("testSetSellNeoTestnetRules", "find", o.Arguments())
+	o.SimpleTxArgs("testSetSellNeoTestnetRules", "find-admin", o.Arguments().Account("find"))
 
-	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments())
-	o.SimpleTxArgs("setSellDandyRules", "find", o.Arguments())
+	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminSetSellDandyRules", "find", o.Arguments())
 
 	createProfileAndGiftName(o, "find")
 	createProfileAndGiftName(o, "find-admin")
