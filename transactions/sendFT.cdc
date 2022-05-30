@@ -1,9 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import Profile from "../contracts/Profile.cdc"
 import Sender from "../contracts/Sender.cdc"
 import FIND from "../contracts/FIND.cdc"
-import CharityNFT from "../contracts/CharityNFT.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 

@@ -1,7 +1,5 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 pub fun main(user: String) : {String : [UInt64]} {

@@ -1,5 +1,6 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
+import MetadataViews from "./standard/MetadataViews.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
@@ -54,12 +55,12 @@ pub contract Admin {
 		}
 		*/
 
-		pub fun createFindMarket(name: String, address:Address) : Capability<&FindMarket.Tenant> {
+		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule]) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			return  FindMarket.createFindMarket(name:name, address:address)
+			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules)
 		}
 
 		/// Set the wallet used for the network
@@ -240,6 +241,37 @@ pub contract Admin {
 			return cap.borrow() ?? panic("Cannot borrow tenant reference.")
 		}
 
+		pub fun setFindCut(tenant: Address, cut: UFix64?, rules: [FindMarket.TenantRule]?, status: String) {
+			let tenant = self.getTenantRef(tenant)
+			let oldCut = tenant.removeSaleItem("findRoyalty", type: "cut") 
+
+			var newCut = oldCut.cut! 
+			if cut != nil {
+				newCut = MetadataViews.Royalty(receiver: oldCut.cut!.receiver, cut: cut!, description: oldCut.cut!.description)
+			}
+
+			var newRules = oldCut.rules 
+			if rules != nil {
+				newRules = rules!
+			}
+
+			let newSaleItem = FindMarket.TenantSaleItem(
+				name: oldCut.name, 
+				cut: newCut ,
+				rules: newRules, 
+				status: status
+			)
+			tenant.addSaleItem(newSaleItem, type: "cut")
+		}
+
+		/* 
+		tenant.addSaleItem(TenantSaleItem(
+			name:"findRoyalty", 
+			cut:findRoyalty, 
+			rules: defaultCutRules, 
+			status:"active"
+		), type: "cut")
+		 */
 		pub fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
 			let tenant = self.getTenantRef(tenant) 
 			tenant.addSaleItem(saleItem, type: "tenant")

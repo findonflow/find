@@ -1,5 +1,4 @@
 import Admin from "../contracts/Admin.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import NeoVoucher from 0xd6b39e5b5b367aad
 
 transaction() {

@@ -1073,6 +1073,17 @@ func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTest
 	return otu
 }
 
+func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetFindCut").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("account").
+			UFix64(cut)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 type SaleItem struct {
 	Amount              string `json:"amount"`
 	AuctionReservePrice string `json:"auctionReservePrice"`

@@ -1,5 +1,4 @@
 import Admin from "../contracts/Admin.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 
 transaction() {
