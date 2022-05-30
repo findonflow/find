@@ -1,0 +1,66 @@
+`{
+    "collections": {
+        "Dandy": [
+            "Dandy87",
+            "Dandy89",
+            "Dandy88"
+        ]
+    },
+    "curatedCollections": {},
+    "items": {
+        "Dandy87": {
+            "collection": "Dandy",
+            "contentType": "image",
+            "id": "87",
+            "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+            "metadata": {},
+            "name": "Neo Motorcycle 1 of 3",
+            "rarity": "",
+            "scalar": {
+                "Speed": "100.00000000"
+            },
+            "tag": {
+                "NeoMotorCycleTag": "Tag1"
+            },
+            "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+            "url": "https://find.xyz/collection/user1/dandy/87",
+            "uuid": "87"
+        },
+        "Dandy88": {
+            "collection": "Dandy",
+            "contentType": "image",
+            "id": "88",
+            "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+            "metadata": {},
+            "name": "Neo Motorcycle 2 of 3",
+            "rarity": "",
+            "scalar": {
+                "Speed": "100.00000000"
+            },
+            "tag": {
+                "NeoMotorCycleTag": "Tag1"
+            },
+            "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+            "url": "https://find.xyz/collection/user1/dandy/88",
+            "uuid": "88"
+        },
+        "Dandy89": {
+            "collection": "Dandy",
+            "contentType": "image",
+            "id": "89",
+            "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+            "metadata": {},
+            "name": "Neo Motorcycle 3 of 3",
+            "rarity": "",
+            "scalar": {
+                "Speed": "100.00000000"
+            },
+            "tag": {
+                "NeoMotorCycleTag": "Tag1"
+            },
+            "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+            "url": "https://find.xyz/collection/user1/dandy/89",
+            "uuid": "89"
+        }
+    }
+}`

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -222,22 +223,7 @@ func TestFIND(t *testing.T) {
 
 		nameAddress := otu.accountAddress("user1")
 		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(nameAddress)).RunReturnsJsonString()
-
-		expected := `
-{
-    "FINDReport": {
-        "bids": null,
-        "itemsForSale": {},
-        "leases": null,
-        "marketBids": {},
-        "privateMode": "false",
-        "profile": "",
-        "relatedAccounts": {}
-    },
-    "NameReport": ""
-}
-`
-		assert.JSONEq(otu.T, expected, value)
+		autogold.Equal(t, value)
 
 	})
 

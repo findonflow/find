@@ -181,30 +181,4 @@ func TestMarketOptions(t *testing.T) {
 
 	})
 
-	// It works but need a better way to do the assert
-	// t.Run("Should be able to get all the tenant rules.", func(t *testing.T) {
-	// 	otu := NewOverflowTest(t).
-	// 		setupFIND().
-	// 		setupDandy("user1").
-	// 		createUser(100.0, "user2").
-	// 		registerUser("user2").
-	// 		registerFtInRegistry().
-	// 		setFlowDandyMarketOption("Sale").
-	// 		setFlowDandyMarketOption("AuctionEscrow")
-
-	// value, err := otu.O.ScriptFromFile("getTenantSaleItem").
-	// 	Args(otu.O.Arguments().
-	// 		Address("account")).
-	// 	RunReturns()
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// expected := "AuctionEscrow"
-
-	// assert.Contains(otu.T, value, expected)
-
-	// })
-
 }

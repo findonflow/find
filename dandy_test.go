@@ -1,9 +1,10 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/hexops/autogold"
 )
 
 /*
@@ -22,49 +23,21 @@ func TestDandy(t *testing.T) {
 
 		id := dandyIds[0]
 		res := otu.O.ScriptFromFile("getNFTViews").Args(otu.O.Arguments().String("user1").String("Dandy").UInt64(id)).RunReturnsJsonString()
-		assert.JSONEq(t, `[
-									"A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
-									"A.f8d6e0586b0a20c7.FindViews.Nounce",
-									"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-									"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
-									"String",
-									"A.f8d6e0586b0a20c7.MetadataViews.Display",
-									"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-									"A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
-									"A.f8d6e0586b0a20c7.FindViews.Edition",
-									"A.f8d6e0586b0a20c7.FindViews.Tag",
-									"A.f8d6e0586b0a20c7.FindViews.Scalar",
-									"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-									"A.f8d6e0586b0a20c7.FindViews.CreativeWork"
-									]`, res)
-
-		display := `
-								{
-							     "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
-							     "name": "Neo Motorcycle 1 of 3",
-							     "thumbnail": {
-							         "url": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"
-							     }
-							 }
-							`
 
 		result := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
 			String("user1").
 			String("Dandy").
 			UInt64(id).
 			String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
-		assert.JSONEq(t, display, result)
 
-		externalUrl := `
-		{ "url" : "https://find.xyz/collection/user1/dandy/110"}
-
-		`
 		urlResult := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
 			String("user1").
 			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("A.f8d6e0586b0a20c7.MetadataViews.ExternalURL")).RunReturnsJsonString()
-		assert.JSONEq(t, externalUrl, urlResult)
+
+		overallResult := fmt.Sprintf("%s%s%s", res, result, urlResult)
+		autogold.Equal(t, overallResult)
 
 	})
 }

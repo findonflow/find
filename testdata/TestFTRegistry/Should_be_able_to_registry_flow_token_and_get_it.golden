@@ -1,0 +1,15 @@
+`{
+    "alias": "Flow",
+    "balancePath": "/public/flowTokenBalance",
+    "balancePathIdentifier": "flowTokenBalance",
+    "icon": "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
+    "receiverPath": "/public/flowTokenReceiver",
+    "receiverPathIdentifier": "flowTokenReceiver",
+    "tag": [
+        "utility coin"
+    ],
+    "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
+    "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+    "vaultPath": "/storage/flowTokenVault",
+    "vaultPathIdentifier": "flowTokenVault"
+}`
