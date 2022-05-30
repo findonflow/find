@@ -1,4 +1,4 @@
-m import FungibleToken from "./standard/FungibleToken.cdc"
+import FungibleToken from "./standard/FungibleToken.cdc"
 
 pub contract FTRegistry {
 

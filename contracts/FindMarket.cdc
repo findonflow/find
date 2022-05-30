@@ -971,6 +971,7 @@ pub contract FindMarket {
 		
 			self.collectionName=nil
 			self.collectionDescription=nil
+			//TODO:cannot resolveView twice here, could be expenseive
 			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
 				let view = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())!
 				if view as? MetadataViews.NFTCollectionDisplay != nil {
@@ -1013,12 +1014,33 @@ pub contract FindMarket {
 
 			self.editionNumber=nil
 			self.totalInEdition=nil
-			if item.resolveView(Type<FindViews.Edition>()) != nil {
-				let view = item.resolveView(Type<FindViews.Edition>())!
-				if view as? FindViews.Edition != nil {
-					let edition = view as! FindViews.Edition
-					self.editionNumber=edition.editionNumber
-					self.totalInEdition=edition.totalInEdition
+
+			if item.resolveView(Type<MetadataViews.Edition>()) != nil {
+				let view = item.resolveView(Type<MetadataViews.Edition>())!
+				if view as? MetadataViews.Edition != nil {
+					let edition = view as! MetadataViews.Edition
+					self.editionNumber=edition.number
+					self.totalInEdition=edition.max
+				}
+			} 
+
+			let editionsViews = item.resolveView(Type<MetadataViews.Editions>())
+			if editionsViews!= nil {
+				let view = editionsViews!
+				if view as? MetadataViews.Editions != nil {
+					let editions = view as! MetadataViews.Editions
+					for edition in editions.infoList {
+						if edition.name == nil {
+							self.editionNumber=edition.number
+							self.totalInEdition=edition.max
+						} else {
+							self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
+
+							if edition.max != nil {
+								self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
+							}
+						}
+					}
 				}
 			} 
 		}

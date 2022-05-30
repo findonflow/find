@@ -38,8 +38,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		var i:UInt64=1
 
 		while i <= maxEdition {
-
-			let editioned= FindViews.Edition(edition:i, maxEdition:maxEdition)
+			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let schemas: [AnyStruct] = [ editioned, creativeWork, media, minterRoyalty, rarity, tag, scalar]
 			let token <- finLeases.mintDandy(minter: name, 

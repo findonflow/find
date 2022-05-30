@@ -99,7 +99,7 @@ pub contract FIND {
 		if input.utf8[1] == 120 {
 			address = input.slice(from: 2, upTo: input.length)
 		}
-		var r:UInt64 = UInt64(0)
+		var r:UInt64 = (0 as UInt64)
 		var bytes = address.decodeHex()
 
 		while bytes.length>0{
@@ -512,6 +512,7 @@ pub contract FIND {
 
 			lease.addAddon(addon)
 
+			//put something in your storage
 			emit AddonActivated(name: name, addon: addon)
 			self.networkWallet.borrow()!.deposit(from: <- vault)
 		}

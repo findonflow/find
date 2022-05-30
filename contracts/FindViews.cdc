@@ -1,4 +1,3 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
@@ -27,7 +26,6 @@ pub contract FindViews {
 			return self.scalar
 		}
 	}
-
 
 	pub struct Files {
 		pub let media : {String: &{MetadataViews.File}}
@@ -161,7 +159,6 @@ pub contract FindViews {
 		pub fun owner() : Address {
 			return self.cap.address
 		}
-
 
 		pub fun valid() : Bool {
 			if !self.cap.borrow()!.getIDs().contains(self.id) {
