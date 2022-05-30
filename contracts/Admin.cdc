@@ -235,15 +235,15 @@ pub contract Admin {
 		/// ===================================================================================
 		// Tenant Rules Management
 		/// ===================================================================================
-		pub fun getTenantRef(_ tenant: Address) : &FindMarketTenant.Tenant {
-			let string = FindMarketTenant.getTenantPathForAddress(tenant)
+		pub fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
+			let string = FindMarket.getTenantPathForAddress(tenant)
 			let sp = StoragePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
-			return Admin.account.borrow<&FindMarketTenant.Tenant>(from: sp) ?? panic("Cannot borrow tenant reference.")
+			return Admin.account.borrow<&FindMarket.Tenant>(from: sp) ?? panic("Cannot borrow tenant reference.")
 		}
 
-		pub fun setMarketOption(tenant: Address, name: String, cut: MetadataViews.Royalty?, rules: [FindMarketTenant.TenantRule]) {
+		pub fun setMarketOption(tenant: Address, name: String, cut: MetadataViews.Royalty?, rules: [FindMarket.TenantRule]) {
 			let tenant = self.getTenantRef(tenant) 
-			tenant.addSaleItem(FindMarketTenant.TenantSaleItem(
+			tenant.addSaleItem(FindMarket.TenantSaleItem(
 				name: name, 
 				cut: cut, 
 				rules: rules, 
@@ -272,7 +272,7 @@ pub contract Admin {
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
-		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarketTenant.TenantRule) {
+		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarket.TenantRule) {
 			let tenantRef = self.getTenantRef(tenant)
 			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
 		}

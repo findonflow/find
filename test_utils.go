@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +22,11 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
+
+func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
+	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
+	return otu
+}
 
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
@@ -1014,9 +1020,9 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
-		SignProposeAndPayAs("find").
+		SignProposeAndPayAs("account").
 		Args(otu.O.Arguments().
-			Account("account").
+			//			Account("account").
 			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()

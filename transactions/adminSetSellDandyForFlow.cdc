@@ -6,9 +6,9 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import Admin from "../contracts/Admin.cdc"
 
-transaction(tenant: Address, market: String){
+
+transaction(market: String){
     prepare(account: AuthAccount){
         let path = FindMarket.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
@@ -37,3 +37,4 @@ transaction(tenant: Address, market: String){
         )
     }
 }
+
