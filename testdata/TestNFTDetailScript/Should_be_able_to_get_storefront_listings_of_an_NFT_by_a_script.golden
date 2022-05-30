@@ -62,10 +62,11 @@
             "listingId": "134",
             "listingStatus": "active",
             "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-            "listingValidUntil": "",
+            "listingValidUntil": "100.00000000",
             "nft": "",
             "nftId": "134",
             "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+            "saleItemExtraField": {},
             "saleType": "active_listed",
             "seller": "0x179b6b1cb6755e31",
             "sellerName": "user1"

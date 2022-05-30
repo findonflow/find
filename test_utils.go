@@ -474,7 +474,8 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"status": "active_listed",
@@ -498,7 +499,8 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			UFix64(price + 5.0).
 			UFix64(300.0).
 			UFix64(60.0).
-			UFix64(1.0)).
+			UFix64(1.0).
+			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
@@ -523,7 +525,8 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			UFix64(price + 5.0).
 			UFix64(300.0).
 			UFix64(60.0).
-			UFix64(1.0)).
+			UFix64(1.0).
+			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
@@ -711,7 +714,8 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
@@ -731,7 +735,8 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			String("Dandy").
 			UInt64(id).
 			String("Flow").
-			UFix64(price)).
+			UFix64(price).
+			UFix64(100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),

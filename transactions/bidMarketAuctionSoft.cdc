@@ -51,6 +51,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 	}
 
 	execute {
-		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability)
+		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability, bidExtraField: {})
 	}
 }
