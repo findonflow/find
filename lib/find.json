@@ -823,14 +823,20 @@
                      "avatar",
                      "tags",
                      "allowStoringFollowers",
-                     "links"
+                     "linkTitles",
+                     "linkTypes",
+                     "linkUrls",
+                     "removeLinks"
                   ],
                   "parameters": {
                      "allowStoringFollowers": "Bool",
                      "avatar": "String",
                      "description": "String",
-                     "links": "[{String: String}]",
+                     "linkTitles": "{String: String}",
+                     "linkTypes": "{String: String}",
+                     "linkUrls": "{String: String}",
                      "name": "String",
+                     "removeLinks": "[String]",
                      "tags": "[String]"
                   }
                }
@@ -2327,14 +2333,20 @@
                      "avatar",
                      "tags",
                      "allowStoringFollowers",
-                     "links"
+                     "linkTitles",
+                     "linkTypes",
+                     "linkUrls",
+                     "removeLinks"
                   ],
                   "parameters": {
                      "allowStoringFollowers": "Bool",
                      "avatar": "String",
                      "description": "String",
-                     "links": "[{String: String}]",
+                     "linkTitles": "{String: String}",
+                     "linkTypes": "{String: String}",
+                     "linkUrls": "{String: String}",
                      "name": "String",
+                     "removeLinks": "[String]",
                      "tags": "[String]"
                   }
                }
@@ -3831,14 +3843,20 @@
                      "avatar",
                      "tags",
                      "allowStoringFollowers",
-                     "links"
+                     "linkTitles",
+                     "linkTypes",
+                     "linkUrls",
+                     "removeLinks"
                   ],
                   "parameters": {
                      "allowStoringFollowers": "Bool",
                      "avatar": "String",
                      "description": "String",
-                     "links": "[{String: String}]",
+                     "linkTitles": "{String: String}",
+                     "linkTypes": "{String: String}",
+                     "linkUrls": "{String: String}",
                      "name": "String",
+                     "removeLinks": "[String]",
                      "tags": "[String]"
                   }
                }

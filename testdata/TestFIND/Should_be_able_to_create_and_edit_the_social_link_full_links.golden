@@ -1,0 +1,55 @@
+`{
+    "address": "0x179b6b1cb6755e31",
+    "allowStoringFollowers": "true",
+    "avatar": "This is avatar",
+    "createdAt": "find",
+    "description": "This is description",
+    "findName": "user1",
+    "followers": null,
+    "following": null,
+    "gender": "",
+    "links": {
+        "CryptoTwitter": {
+            "title": "0xBjartek",
+            "type": "Twitter",
+            "url": "Twitter"
+        },
+        "FindTwitter": {
+            "title": "find",
+            "type": "Twitter",
+            "url": "Twitter"
+        }
+    },
+    "name": "user1",
+    "tags": [
+        "This is tag"
+    ],
+    "wallets": [
+        {
+            "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+            "balance": "30.00100000",
+            "name": "Flow",
+            "tags": [
+                "flow"
+            ]
+        },
+        {
+            "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+            "balance": "25.00000000",
+            "name": "FUSD",
+            "tags": [
+                "fusd",
+                "stablecoin"
+            ]
+        },
+        {
+            "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+            "balance": "30.00000000",
+            "name": "USDC",
+            "tags": [
+                "usdc",
+                "stablecoin"
+            ]
+        }
+    ]
+}`
