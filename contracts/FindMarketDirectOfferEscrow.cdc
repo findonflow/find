@@ -420,7 +420,6 @@ pub contract FindMarketDirectOfferEscrow {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
-		pub fun getBidsReport() : FindMarket.BidItemCollectionReport
 		pub fun getVaultType(_ id: UInt64) : Type
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)

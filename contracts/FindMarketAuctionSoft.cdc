@@ -579,7 +579,6 @@ pub contract FindMarketAuctionSoft {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
-		pub fun getBidsReport() : FindMarket.BidItemCollectionReport 
 
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT)
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)

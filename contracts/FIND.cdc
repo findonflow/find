@@ -149,7 +149,7 @@ pub contract FIND {
 			return nil
 		}
 
-		let profile= Profile.find(address).asProfile()
+		let profile= Profile.find(address).asReport()
 		let leases = leaseCap.borrow()!.getLeaseInformation() 
 		var time : UFix64?= nil
 		var name :String?= nil
@@ -189,7 +189,7 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
 			let fromAddress= from.owner!.address
-			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType()) 
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType()) 
 			profile.deposit(from: <- vault)
 			return 
 		}

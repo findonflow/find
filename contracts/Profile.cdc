@@ -222,6 +222,7 @@ pub contract Profile {
 	}
 
 	pub resource interface Public{
+		pub fun getAddress() : Address
 		pub fun getName(): String
 		pub fun getFindName(): String
 		pub fun getCreatedAt(): String
@@ -417,6 +418,10 @@ pub contract Profile {
 				allowStoringFollowers: self.allowStoringFollowers,
 				createdAt:self.getCreatedAt()
 			)
+		}
+
+		pub fun getAddress() : Address {
+			return self.owner!.address
 		}
 
 		pub fun asProfile() : UserProfile {
