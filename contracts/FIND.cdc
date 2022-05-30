@@ -1,6 +1,5 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
@@ -149,7 +148,7 @@ pub contract FIND {
 			return nil
 		}
 
-		let profile= Profile.find(address).asProfile()
+		let profileFindName= Profile.find(address).getFindName()
 		let leases = leaseCap.borrow()!.getLeaseInformation() 
 		var time : UFix64?= nil
 		var name :String?= nil
@@ -161,14 +160,14 @@ pub contract FIND {
 			}
 
 			//if we have not set a 
-			if profile.findName == "" {
+			if profileFindName == "" {
 				if time == nil || lease.validUntil < time! {
 					time=lease.validUntil
 					name=lease.name
 				}
 			}
 
-			if profile.findName == lease.name {
+			if profileFindName == lease.name {
 				return lease.name
 			}
 		}
@@ -189,7 +188,7 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
 			let fromAddress= from.owner!.address
-			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.asProfile().address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType()) 
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType()) 
 			profile.deposit(from: <- vault)
 			return 
 		}

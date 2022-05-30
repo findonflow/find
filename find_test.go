@@ -228,5 +228,59 @@ func TestFIND(t *testing.T) {
 		autogold.Equal(t, value)
 
 	})
+	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(30.0, "user1").
+			setProfile("user1").
+			registerUser("user1")
+
+		result := otu.O.TransactionFromFile("editProfile").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("This is description").
+				String("This is avatar").
+				StringArray("This is tag").
+				Boolean(true).
+				StringMap(map[string]string{"CryptoTwitter": "0xBjartek", "FindTwitter": "find"}).
+				StringMap(map[string]string{"CryptoTwitter": "Twitter", "FindTwitter": "Twitter"}).
+				StringMap(map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}).
+				StringArray()).
+			Test(t).
+			AssertSuccess()
+
+		otu.AutoGold("first_edit", result.Events)
+
+		profile := otu.O.ScriptFromFile("getProfile").
+			Args(otu.O.Arguments().
+				String("user1")).
+			RunReturnsJsonString()
+
+		otu.AutoGold("full_links", profile)
+
+		// Remove find links
+		result2 := otu.O.TransactionFromFile("editProfile").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("This is description").
+				String("This is avatar").
+				StringArray("This is tag").
+				Boolean(true).
+				StringMap(map[string]string{}).
+				StringMap(map[string]string{}).
+				StringMap(map[string]string{}).
+				StringArray("FindTwitter")).
+			Test(t).
+			AssertSuccess()
+
+		otu.AutoGold("second_edit", result2.Events)
+
+		profile = otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+
+		otu.AutoGold("link_removed", profile)
+	})
 
 }

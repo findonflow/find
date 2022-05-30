@@ -1025,9 +1025,9 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
-		SignProposeAndPayAs("account").
+		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
-			//			Account("account").
+			Account("account").
 			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()
@@ -1068,6 +1068,17 @@ func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTest
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().
 			String(optionName)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetFindCut").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("account").
+			UFix64(cut)).
 		Test(otu.T).
 		AssertSuccess()
 	return otu

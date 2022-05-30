@@ -1,5 +1,3 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-
 pub contract NFTRegistry {
 
     /* Event */

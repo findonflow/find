@@ -1,5 +1,3 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-
 pub contract FTRegistry {
 
     /* Event */

@@ -1,11 +1,9 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import FUSD from "./standard/FUSD.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
-import Debug from "./Debug.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarket {
 	//TODO: figure out if these can be let
@@ -630,16 +628,16 @@ pub contract FindMarket {
 			}
 		}
 
-		access(account) fun removeSaleItem(_ name:String, type:String) {
+		access(account) fun removeSaleItem(_ name:String, type:String) : TenantSaleItem {
 			if type=="find" {
-				self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
+				return self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
 			} else if type=="tenant" {
-				self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
+				return self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
 			} else if type=="cut" {
-				self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
-			} else{
-				panic("Not valid type to add sale item for")
+				return self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
 			}
+			panic("Not valid type to add sale item for")
+			
 		}
 
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{
@@ -849,7 +847,7 @@ pub contract FindMarket {
 
 	}
 
-	access(account) fun createFindMarket(name: String, address:Address) : Capability<&Tenant> {
+	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule]) : Capability<&Tenant> {
 		let account=FindMarket.account
 
 		let receiver=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
@@ -862,14 +860,10 @@ pub contract FindMarket {
 		self.tenantAddressName[address]=name
 		self.tenantNameAddress[name]=address
 
-		//TODO: do not do this here, do it on the outside
-		let flowType=Type<@FlowToken.Vault>()
-		let fusdType=Type<@FUSD.Vault>()
-
 		tenant.addSaleItem(TenantSaleItem(
-			name:"FlowFusdCut", 
+			name:"findRoyalty", 
 			cut:findRoyalty, 
-			rules:[TenantRule( name:"standard ft", types:[flowType, fusdType], ruleType:"ft", allow:true)], 
+			rules: defaultCutRules, 
 			status:"active"
 		), type: "cut")
 		//end do on outside
@@ -1136,7 +1130,7 @@ pub contract FindMarket {
 		pub fun checkPointer() : Bool 
 		pub fun getListingType() : Type 
 
-		pub fun getFtAlias(): String 
+		// pub fun getFtAlias(): String 
 		//the Type of the item for sale
 		pub fun getItemType(): Type
 		//The id of the nft for sale
@@ -1188,13 +1182,15 @@ pub contract FindMarket {
 			self.bidderName=item.getBuyerName()
 			self.seller=item.getSeller()
 			self.sellerName=item.getSellerName()
-			self.ftAlias=item.getFtAlias()
 			self.listingValidUntil=item.getValidUntil()
 			self.nft=nil
 			if nftInfo {
 				self.nft=item.toNFTInfo()
 			}
-			self.ftTypeIdentifier=item.getFtType().identifier
+			let ftIdentifier=item.getFtType().identifier
+			self.ftTypeIdentifier=ftIdentifier
+			let ftInfo=FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier)
+			self.ftAlias=ftInfo?.alias ?? ""
 
 			self.auction=item.getAuction()
 			self.saleItemExtraField=item.getSaleItemExtraField()

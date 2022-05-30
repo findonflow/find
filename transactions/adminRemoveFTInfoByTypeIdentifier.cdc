@@ -1,6 +1,4 @@
 import Admin from "../contracts/Admin.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 transaction(typeIdentifier: String) {
 

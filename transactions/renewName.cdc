@@ -1,4 +1,3 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FIND from "../contracts/FIND.cdc"
 

@@ -496,6 +496,49 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.AutoGold("events", res.Events)
 	})
 
+	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 5.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			setProfile("user1"). 
+			setFindCut(0.035)
+
+		otu.tickClock(500.0)
+
+		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		otu.AutoGold("status", status)
+
+		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id).
+				UFix64(10.0)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.35000000",
+				"royaltyName": "find",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("user1"),
+				"amount":      "0.50000000",
+				"royaltyName": "artist",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+				"address":     otu.accountAddress("account"),
+				"amount":      "0.25000000",
+				"royaltyName": "platform",
+			}))
+
+		otu.AutoGold("events", res.Events)
+	})
 }
 
 //TODO: add bid should return money from another user that has bid before

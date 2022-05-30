@@ -1,5 +1,4 @@
 import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
 
 transaction(mode: Bool) {
 	prepare(acct: AuthAccount) {

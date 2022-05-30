@@ -1,7 +1,6 @@
 import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-
 transaction(name: String, target: String) {
 	prepare(account: AuthAccount) {
 

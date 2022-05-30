@@ -3,12 +3,10 @@ import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarketDirectOfferSoft {
 
@@ -84,10 +82,6 @@ pub contract FindMarketDirectOfferSoft {
 
 		pub fun getFtType() : Type {
 			return self.offerCallback.borrow()!.getVaultType(self.getId())
-		}
-
-		pub fun getFtAlias() : String {
-			return FTRegistry.getFTInfoByTypeIdentifier(self.getFtType().identifier)!.alias
 		}
 
 		pub fun getItemID() : UInt64 {
@@ -595,7 +589,6 @@ pub contract FindMarketDirectOfferSoft {
 
 	//Create an empty lease collection that store your leases to a name
 	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
-		let wallet=FindMarketDirectOfferSoft.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		return <- create SaleItemCollection(tenantCapability)
 	}
 
