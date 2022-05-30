@@ -938,12 +938,6 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 func swallowErr(err error) {
 }
 
-func (otu *OverflowTestUtils) scriptEqualToJson(scriptFile string, expected string) *OverflowTestUtils {
-	result := otu.O.ScriptFromFile(scriptFile).RunReturnsJsonString()
-	assert.JSONEq(otu.T, expected, result)
-	return otu
-}
-
 func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetFTInfo_" + alias).
 		SignProposeAndPayAs("find").
@@ -1020,8 +1014,10 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellDandyForFlow").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().String(marketType)).
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("account").
+			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()
 	return otu

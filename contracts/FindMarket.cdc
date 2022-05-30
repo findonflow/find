@@ -570,14 +570,14 @@ pub contract FindMarket {
 			self.findCuts= {}
 		}
 
-		access(contract) fun alterMarketOption(name: String, status: String) {
+		access(account) fun alterMarketOption(name: String, status: String) {
 			pre{
 				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
 		}
 
-		access(contract) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
+		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
 			pre{
 				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
 			}
@@ -590,7 +590,7 @@ pub contract FindMarket {
 			self.tenantSaleItems[optionName]!.rules.append(tenantRule)
 		}
 
-		access(contract) fun removeTenantRule(optionName: String, tenantRuleName: String) {
+		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
 			pre{
 				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
 			}
@@ -919,6 +919,14 @@ pub contract FindMarket {
 		let ftType=vault.getType()
 
 		if royalty != nil {
+			/* Check the total royalty to prevent changing of royalties */
+			let royalties = royalty!.getRoyalties()
+			var totalRoyalties : UFix64 = 0.0
+			for royaltyItem in royalties {
+				totalRoyalties = totalRoyalties + royaltyItem.cut
+			}
+			assert(totalRoyalties == saleItem.getTotalRoyalties(), message: "The total Royalties to be paid is changed after listing.")
+
 			for royaltyItem in royalty!.getRoyalties() {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
@@ -1119,6 +1127,7 @@ pub contract FindMarket {
 		pub fun getFtType() : Type //The type of FT used for this sale item
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 		
+		pub fun getTotalRoyalties() : UFix64 
 	}
 
 	//BAM; this needs to know if an item is deprectaed or stopped in some way

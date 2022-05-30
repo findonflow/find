@@ -27,6 +27,7 @@ pub contract FindMarketAuctionSoft {
 		access(contract) var auctionStartedAt: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
+		access(contract) let totalRoyalties: UFix64 
 
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64) {
 			self.vaultType=vaultType
@@ -39,6 +40,25 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback=nil
 			self.auctionStartedAt=nil
 			self.auctionEndsAt=nil
+
+			var royalties : UFix64 = 0.0
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
+				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+				for royalty in v.getRoyalties() {
+					royalties = royalties + royalty.cut
+				}
+			}
+			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
+				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
+				royalties = royalties + royalty.cut
+			}
+			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
+				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
+				for royalty in r {
+					royalties = royalties + royalty.cut
+				}
+			}
+			self.totalRoyalties=royalties
 		}
 
 		//TODO: Should we rename this?
@@ -218,6 +238,10 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun checkPointer() : Bool {
 			return self.pointer.valid()
+		}
+
+		pub fun getTotalRoyalties() : UFix64 {
+			return self.totalRoyalties
 		}
 	}
 
