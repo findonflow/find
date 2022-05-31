@@ -167,7 +167,7 @@ pub contract FindMarketDirectOfferEscrow {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract)fun cancelBid(_ id: UInt64) 
 
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
@@ -348,6 +348,10 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.items.keys
 		}
 
+		pub fun containsId(_ id: UInt64): Bool {
+			return self.items.containsKey(id)
+		}
+
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			return &self.items[id] as &SaleItem
 		}
@@ -409,6 +413,7 @@ pub contract FindMarketDirectOfferEscrow {
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
@@ -450,6 +455,10 @@ pub contract FindMarketDirectOfferEscrow {
 
 		pub fun getIds() : [UInt64] {
 			return self.bids.keys
+		}
+
+		pub fun containsId(_ id: UInt64) : Bool {
+			return self.bids.containsKey(id)
 		}
 
 		pub fun getBidType() : Type {

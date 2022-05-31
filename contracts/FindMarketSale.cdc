@@ -162,7 +162,7 @@ pub contract FindMarketSale {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-
+		pub fun containsId(_ id: UInt64): Bool
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
 
@@ -276,6 +276,10 @@ pub contract FindMarketSale {
 			return self.items.keys
 		}
 
+		pub fun containsId(_ id: UInt64): Bool {
+			return self.items.containsKey(id)
+		}
+		
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			return &self.items[id] as &SaleItem
 		}
