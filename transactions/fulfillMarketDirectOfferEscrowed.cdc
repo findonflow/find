@@ -5,7 +5,6 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-//TODO: use execute and post
 transaction(marketplace:Address, id: UInt64) {
 	prepare(account: AuthAccount) {
 

@@ -191,7 +191,7 @@ pub contract FUSD: FungibleToken {
 
     }
 
-    //TODO: Modified from source
+    //Modified from source, to make it easier to work with locally
     init() {
         let adminAccount =self.account
         self.AdminStoragePath = /storage/fusdAdmin

@@ -579,7 +579,6 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 			"buyer":  otu.accountAddress(name),
 			"status": "sold",
 		}))
-		//TODO: test better events
 	return otu
 }
 
@@ -899,7 +898,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
 		}))
-		//TODO: test that funds leave the account here
 	return otu
 }
 

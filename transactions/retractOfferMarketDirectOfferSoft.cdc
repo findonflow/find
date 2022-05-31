@@ -1,7 +1,6 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 
-//TODO: this needs work for DUC
 transaction(marketplace:Address, id: UInt64) {
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 

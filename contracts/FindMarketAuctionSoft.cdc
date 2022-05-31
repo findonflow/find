@@ -60,7 +60,6 @@ pub contract FindMarketAuctionSoft {
 			self.totalRoyalties=royalties
 		}
 
-		//TODO: Should we rename this?
 		pub fun getId() : UInt64{
 			return self.pointer.getUUID()
 		}
@@ -70,7 +69,6 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 		}
 
-		//BAM: copy this to the other options
 		pub fun getRoyalty() : MetadataViews.Royalties? {
 			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
 				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
@@ -490,7 +488,6 @@ pub contract FindMarketAuctionSoft {
 
 			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
 
-			//TODO: inline these in contructor
 			saleItem.setAuctionDuration(auctionDuration)
 			saleItem.setExtentionOnLateBid(auctionExtensionOnLateBid)
 			saleItem.setMinBidIncrement(minimumBidIncrement)

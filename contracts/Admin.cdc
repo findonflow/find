@@ -308,12 +308,12 @@ pub contract Admin {
 			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
 		}
 
-
 		init() {
 			self.capability = nil
 		}
 
 	}
+
 
 	init() {
 

@@ -7,7 +7,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 
 
-//TODO: this has to be called after we have listed it somewhere else because of cap
+//this has to be called after we have listed it somewhere else because of cap
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
     let flowReceiver: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
     let exampleNFTProvider: Capability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>
