@@ -141,7 +141,6 @@ pub contract FIND {
 		}
 
 		let account = getAccount(Address(r))
-		// panic(account.address.toString())
 		let cap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if cap.check() {
 			return cap.borrow()!
