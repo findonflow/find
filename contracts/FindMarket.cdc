@@ -90,12 +90,12 @@ pub contract FindMarket {
 
 		let tenantRef=self.getTenant(tenant)
 		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-    let optRef = collectionCap.borrow() 
+		let optRef = collectionCap.borrow() 
 		if optRef == nil {
 			panic("Account not properly set up, cannot borrow sale item collection")
 		}
 		let ref=optRef!
-  	let item=ref.borrowSaleItem(id)
+		let item=ref.borrowSaleItem(id)
 		if !item.checkPointer() {
 			panic("this is a ghost listing")
 		} 
@@ -107,7 +107,7 @@ pub contract FindMarket {
 	pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
 
 		let tenantRef=self.getTenant(tenant)
-		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
+		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo)
 		if info.items.length > 0 {
 			return info.items[0]
 		}
@@ -119,7 +119,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: nil, getGhost: true, getNFTInfo: getNFTInfo)
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport
 			}
@@ -132,7 +132,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo)
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport
 			}
@@ -145,7 +145,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemInformation} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, ids: [id], getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo)
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport.items[0]
 			}
@@ -153,49 +153,56 @@ pub contract FindMarket {
 		return report
 	}
 
-	access(contract) fun checkSaleInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost: Bool, getNFTInfo: Bool) : FindMarket.SaleItemCollectionReport {
+	access(contract) fun checkSaleInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, itemId: UInt64?, getGhost: Bool, getNFTInfo: Bool) : FindMarket.SaleItemCollectionReport {
 		let ghost: [FindMarket.GhostListing] =[]
 		let info: [FindMarket.SaleItemInformation] =[]
 		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-    let optRef = collectionCap.borrow() 
+		let optRef = collectionCap.borrow() 
 		if optRef == nil {
 			return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
 		}
 		let ref=optRef!
-		let listingType = ref.getListingType()
-		var listID = ids 
-		if ids.length == 0 {
+
+		var listID : [UInt64]= []
+		if let id = itemId{
+			if !ref.getIds().contains(id) {
+				return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
+			}
+			listID=[id]
+		} else {
 			listID = ref.getIds()
 		}
 
+		let listingType = ref.getListingType()
+
 		for id in listID {
-			if ref.getIds().contains(id) {
-				let item=ref.borrowSaleItem(id)
-				if !item.checkPointer() {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
-				var status="active"
-				if !stopped.allowed {
-					status="stopped"
+			//if this id is not present in this Market option then we just skip it
+			let item=ref.borrowSaleItem(id)
+			if !item.checkPointer() {
+				if getGhost {
+					ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
 				}
-				//418
-
-				let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
-
-				if !deprecated.allowed {
-					status="deprecated"
-				}
-				if let validTime = item.getValidUntil() {
-					if validTime <= Clock.time() {
-						status="ended"
-					}
-				}
-				info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
+				continue
+			} 
+			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
+			var status="active"
+			if !stopped.allowed {
+				status="stopped"
 			}
+			//418
+
+			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
+
+			if !deprecated.allowed {
+				status="deprecated"
+			}
+			if let validTime = item.getValidUntil() {
+				if validTime <= Clock.time() {
+					status="ended"
+				}
+			}
+			info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
+
 		}
 
 		return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
@@ -260,10 +267,10 @@ pub contract FindMarket {
 
 		let optRef = collectionCap.borrow()
 		if optRef==nil {
-		  return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
-	  	}
+			return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+		}
 
-	  	let ref=optRef!
+		let ref=optRef!
 
 		let listingType = ref.getBidType()
 		var listID = ids 
@@ -291,15 +298,15 @@ pub contract FindMarket {
 
 		let tenantRef=self.getTenant(tenant)
 		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-    	let optRef = collectionCap.borrow() 
+		let optRef = collectionCap.borrow() 
 		if optRef == nil {
 			panic("Account not properly set up, cannot borrow bid item collection")
 		}
 		let ref=optRef!
-  		let bidItem=ref.borrowBidItem(id)
+		let bidItem=ref.borrowBidItem(id)
 
 		let saleItemCollectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: bidItem.getSellerAddress())
-    	let saleRef = saleItemCollectionCap.borrow() 
+		let saleRef = saleItemCollectionCap.borrow() 
 		if saleRef == nil {
 			panic("Seller account is not properly set up, cannot borrow sale item collection")
 		}
@@ -630,7 +637,7 @@ pub contract FindMarket {
 				return self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
 			}
 			panic("Not valid type to add sale item for")
-			
+
 		}
 
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{
@@ -930,7 +937,7 @@ pub contract FindMarket {
 
 			self.scalars={}
 			self.tags={}
-		
+
 			self.collectionName=nil
 			self.collectionDescription=nil
 			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
@@ -941,7 +948,7 @@ pub contract FindMarket {
 					self.collectionDescription=grouping.description
 				}
 			}
-			
+
 			self.rarity=nil
 			if item.resolveView(Type<FindViews.Rarity>()) != nil {
 				let view = item.resolveView(Type<FindViews.Rarity>())!
@@ -966,7 +973,7 @@ pub contract FindMarket {
 					self.scalars=scalar.getScalar()
 				}
 			}
-			
+
 			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
@@ -1052,7 +1059,7 @@ pub contract FindMarket {
 		pub let items : [FindMarket.SaleItemInformation] 
 		pub let ghosts: [FindMarket.GhostListing]
 
-	  init(items: [SaleItemInformation], ghosts: [GhostListing]) {
+		init(items: [SaleItemInformation], ghosts: [GhostListing]) {
 			self.items=items
 			self.ghosts=ghosts
 		}
@@ -1068,7 +1075,7 @@ pub contract FindMarket {
 		pub let items : [FindMarket.BidInfo] 
 		pub let ghosts: [FindMarket.GhostListing]
 
-	  init(items: [BidInfo], ghosts: [GhostListing]) {
+		init(items: [BidInfo], ghosts: [GhostListing]) {
 			self.items=items
 			self.ghosts=ghosts
 		}
@@ -1110,7 +1117,7 @@ pub contract FindMarket {
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
-		
+
 		pub fun getTotalRoyalties() : UFix64 
 	}
 
@@ -1187,7 +1194,7 @@ pub contract FindMarket {
 
 		self.tenantPathPrefix=  FindMarket.typeToPathIdentifier(Type<@Tenant>())
 
-	  self.saleItemTypes = []
+		self.saleItemTypes = []
 		self.saleItemCollectionTypes = []
 		self.pathMap = {}
 		self.listingName={}
