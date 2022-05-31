@@ -8,9 +8,9 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
-	user := "0xfbd6c52b7e6fe7be"
+	user := "0x1302ac340c4f445b"
 
-	o.SimpleTxArgs("testSendFlow", "account", o.Arguments().RawAccount(user).UFix64(1000.0))
+	// o.SimpleTxArgs("testSendFlow", "account", o.Arguments().RawAccount(user).UFix64(1000.0))
 
 	o.TransactionFromFile("testMintDandyTO").
 		SignProposeAndPayAs("user1").
