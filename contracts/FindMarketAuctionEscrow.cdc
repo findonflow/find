@@ -284,17 +284,16 @@ pub contract FindMarketAuctionEscrow {
 			let ftType=saleItem.getFtType()
 			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
-			let buyer=saleItem.getBuyer()
-			let buyerName=saleItem.getBuyerName()
-			var buyerAvatar:String?=nil
-			if buyerName != nil {
-				buyerAvatar=FIND.lookup(buyerName!)?.getAvatar()
-			}
 			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
 
-
-			emit EnglishAuction(tenant:self.getTenant().name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar:buyerAvatar, endsAt: saleItem.auctionEndsAt)
+			let buyer=saleItem.getBuyer()
+			if buyer != nil {
+				let profile = FIND.lookup(buyer!.toString())
+				emit EnglishAuction(tenant:self.getTenant().name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: profile?.getName(), buyerAvatar: profile?.getAvatar(), endsAt: saleItem.auctionEndsAt)
+			} else {
+				emit EnglishAuction(tenant:self.getTenant().name, id: id, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, endsAt: saleItem.auctionEndsAt)
+			}
 		}
 
 		pub fun getListingType() : Type {

@@ -225,13 +225,9 @@ pub contract FindMarketSale {
 			let soldFor=saleItem.getBalance()
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
-			let buyerName=FIND.reverseLookup(buyer)
-			var buyerAvatar : String? = nil
-			if buyerName != nil {
-				buyerAvatar = FIND.lookup(buyerName!)?.getAvatar()
-			}
+			let profile = FIND.lookup(buyer.toString())
 
-			emit Sale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: buyerAvatar ,endsAt:saleItem.validUntil)
+			emit Sale(tenant:self.getTenant().name, id: id, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: profile?.getName(), buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
 
 			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())

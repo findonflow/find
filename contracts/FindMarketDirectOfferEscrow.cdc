@@ -222,12 +222,9 @@ pub contract FindMarketDirectOfferEscrow {
 			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
-			let buyerName=FIND.reverseLookup(buyer)
-			var buyerAvatar:String?=nil
-			if buyerName != nil {
-				buyerAvatar=FIND.lookup(buyerName!)?.getAvatar()
-			}
-			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: buyerAvatar, endsAt: saleItem.validUntil)
+			let profile = FIND.lookup(buyer.toString())
+
+			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: profile?.getName(), buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil)
 		}
 
 		//The only thing we do here is basically register an event
