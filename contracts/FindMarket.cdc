@@ -188,6 +188,8 @@ pub contract FindMarket {
 			var status="active"
 			if !stopped.allowed {
 				status="stopped"
+				info.append(FindMarket.SaleItemInformation(item, status, false))
+				continue
 			}
 			//418
 
