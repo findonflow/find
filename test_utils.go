@@ -89,7 +89,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	otu.O.TransactionFromFile("setup_find_market_2").
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("account")).
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+		Test(otu.T).AssertSuccess()
 	otu.createUser(100.0, "account")
 
 	return otu.tickClock(1.0)

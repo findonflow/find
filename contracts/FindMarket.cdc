@@ -14,6 +14,9 @@ pub contract FindMarket {
 	access(contract) let  marketBidCollectionTypes : [Type]
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
+	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 
 	// Tenant information
 	pub let TenantClientPublicPath: PublicPath
@@ -574,6 +577,7 @@ pub contract FindMarket {
 				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
+			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
 		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
@@ -587,6 +591,7 @@ pub contract FindMarket {
 			}
 			*/
 			self.tenantSaleItems[optionName]!.rules.append(tenantRule)
+			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
 		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
@@ -603,6 +608,7 @@ pub contract FindMarket {
 				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
 			}
 			self.tenantSaleItems[optionName]!.rules.remove(at: counter)
+			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts {
@@ -621,22 +627,69 @@ pub contract FindMarket {
 		access(account) fun addSaleItem(_ item: TenantSaleItem, type:String) {
 			if type=="find" {
 				self.findSaleItems[item.name]=item
+				self.emitRulesEvent(item: item, type: "find", status: nil)
 			} else if type=="tenant" {
 				self.tenantSaleItems[item.name]=item
+				self.emitRulesEvent(item: item, type: "tenant", status: nil)
 			} else if type=="cut" {
 				self.findCuts[item.name]=item
+				self.emitRulesEvent(item: item, type: "cut", status: nil)
 			} else{
 				panic("Not valid type to add sale item for")
 			}
 		}
+	
+		// if status is nil, will fetch the original rule status (use for removal of rules)
+		access(contract) fun emitRulesEvent(item: TenantSaleItem, type: String, status: String?) {
+		let tenant = self.name 
+		let ruleName = item.name 
+		var ftTypes : [String] = [] 
+		var nftTypes : [String] = [] 
+		var listingTypes : [String] = [] 
+		var ruleStatus = status
+		for rule in item.rules {
+			var array : [String] = [] 
+			for t in rule.types {
+				array.append(t.identifier)
+			}
+			if rule.ruleType == "ft" {
+				ftTypes = array
+			} else if rule.ruleType == "nft" {
+				nftTypes = array
+			} else if rule.ruleType == "listing" {
+				listingTypes = array 
+			}
+		}
+		if ruleStatus == nil {
+			ruleStatus = item.status
+		}
+
+		if type == "find" {
+			emit FindBlockRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+			return
+		} else if type == "tenant" {
+			emit TenantAllowRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+			return
+		} else if type == "cut" {
+			emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut!.cut, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+			return
+		}
+		panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
+	}
 
 		access(account) fun removeSaleItem(_ name:String, type:String) : TenantSaleItem {
 			if type=="find" {
-				return self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
+				let item = self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
+				self.emitRulesEvent(item: item, type: "find", status: "remove")
+				return item
 			} else if type=="tenant" {
-				return self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
+				let item = self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
+				self.emitRulesEvent(item: item, type: "tenant", status: "remove")
+				return item
 			} else if type=="cut" {
-				return self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
+				let item = self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
+				self.emitRulesEvent(item: item, type: "cut", status: "remove")
+				return item
 			}
 			panic("Not valid type to add sale item for")
 
