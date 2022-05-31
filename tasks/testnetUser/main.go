@@ -8,15 +8,15 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
-	user := "0x22652d7499c1cf00"
+	user := "0x1302ac340c4f445b"
 
-	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(100.0))
+	// o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(100.0))
 
 	o.TransactionFromFile("testMintDandyTO").
 		SignProposeAndPayAs("user1").
 		Args(o.Arguments().
 			String("user1").
-			UInt64(5).
+			UInt64(1).
 			String("Neo").
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
