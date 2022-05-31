@@ -9,7 +9,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 pub struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
 	pub let storefront: StorefrontListing?
-    pub let nftDetail: NFTDetail?
+	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
 
 	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}) {
@@ -35,88 +35,117 @@ pub struct ListingTypeReport {
 }
 
 pub struct NFTDetail {
-    pub let id: UInt64 
-    pub let uuid: UInt64 
-    pub let name:String
-    pub let thumbnail:String
-    pub let type: String
-    pub var rarity:String?
+	pub let id: UInt64 
+	pub let uuid: UInt64 
+	pub let name:String
+	pub let thumbnail:String
+	pub let type: String
+	pub var rarity:String?
 	pub var royalties: [Royalties]
-    pub var editionNumber: UInt64? 
-    pub var totalInEdition: UInt64?
-    pub var scalars : {String: UFix64}
-    pub var tags : {String: String}
-    pub var collectionName: String? 
-    pub var collectionDescription: String? 
-    pub var views: {String : AnyStruct?}
+	pub var editionNumber: UInt64? 
+	pub var totalInEdition: UInt64?
+	pub var scalars : {String: UFix64}
+	pub var tags : {String: String}
+	pub var collectionName: String? 
+	pub var collectionDescription: String? 
+	pub var data: {String : AnyStruct?}
+	pub var views :[String]
 
-init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}){
+	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}){
 
-            let item = pointer.getViewResolver()
+		let item = pointer.getViewResolver()
 
-			self.scalars={}
-			self.tags={}
-			/* Scalar */
-			self.collectionName=nil
-			self.collectionDescription=nil
-			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
-				let view = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())!
-				if view as? MetadataViews.NFTCollectionDisplay != nil {
-					let grouping = view as! MetadataViews.NFTCollectionDisplay
-					self.collectionName=grouping.name
-					self.collectionDescription=grouping.description
-				}
+		self.scalars={}
+		self.tags={}
+		self.collectionName=nil
+		self.collectionDescription=nil
+
+		/* NFT Collection Display */
+		let collectionDisplay =item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())
+		if collectionDisplay!= nil {
+			let view = collectionDisplay!
+			if view as? MetadataViews.NFTCollectionDisplay != nil {
+				let grouping = view as! MetadataViews.NFTCollectionDisplay
+				self.collectionName=grouping.name
+				self.collectionDescription=grouping.description
 			}
-			/* Rarity */
-			self.rarity=nil
-			if item.resolveView(Type<FindViews.Rarity>()) != nil {
-				let view = item.resolveView(Type<FindViews.Rarity>())!
-				if view as? FindViews.Rarity != nil {
-					let rarity = view as! FindViews.Rarity
-					self.rarity=rarity.rarityName
-				}
-			} 
-			/* Tag */
-			if item.resolveView(Type<FindViews.Tag>()) != nil {
-				let view = item.resolveView(Type<FindViews.Tag>())!
-				if view as? FindViews.Tag != nil {
-					let tags = view as! FindViews.Tag
-					self.tags=tags.getTag()
-				}
-			}
-			/* Scalar */
-			if item.resolveView(Type<FindViews.Scalar>()) != nil {
-				let view = item.resolveView(Type<FindViews.Scalar>())!
-				if view as? FindViews.Scalar != nil {
-					let scalar = view as! FindViews.Scalar
-					self.scalars=scalar.getScalar()
-				}
-			}
-			
-			/* NFT Collection Display */
-			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
-			self.name=display.name
-			self.thumbnail=display.thumbnail.uri()
-			self.type=item.getType().identifier
-			self.id=pointer.id
-            self.uuid=pointer.getUUID()
-
-			/* Edition */
-			self.editionNumber=nil
-			self.totalInEdition=nil
-			if item.resolveView(Type<FindViews.Edition>()) != nil {
-				let view = item.resolveView(Type<FindViews.Edition>())!
-				if view as? FindViews.Edition != nil {
-					let edition = view as! FindViews.Edition
-					self.editionNumber=edition.editionNumber
-					self.totalInEdition=edition.totalInEdition
-				}
-			} 
-			/* Royalties */
-			self.royalties=resolveRoyalties(pointer)
-
-			self.views=views
 		}
+		/* Rarity */
+		self.rarity=nil
+		let rarityView=item.resolveView(Type<FindViews.Rarity>()) 
+		if rarityView != nil {
+			let view = rarityView!
+			if view as? FindViews.Rarity != nil {
+				let rarity = view as! FindViews.Rarity
+				self.rarity=rarity.rarityName
+			}
+		} 
+		/* Tag */
+		let tagView=item.resolveView(Type<FindViews.Tag>())
+		if tagView != nil {
+			let view = tagView!
+			if view as? FindViews.Tag != nil {
+				let tags = view as! FindViews.Tag
+				self.tags=tags.getTag()
+			}
+		}
+		/* Scalar */
+		let scalarView=item.resolveView(Type<FindViews.Scalar>())
+		if scalarView != nil {
+			let view = scalarView!
+			if view as? FindViews.Scalar != nil {
+				let scalar = view as! FindViews.Scalar
+				self.scalars=scalar.getScalar()
+			}
+		}
+	
+		let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+		self.name=display.name
+		self.thumbnail=display.thumbnail.uri()
+		self.type=item.getType().identifier
+		self.id=pointer.id
+		self.uuid=pointer.getUUID()
+
+		/* Edition */
+		self.editionNumber=nil
+		self.totalInEdition=nil
+		let editionView=item.resolveView(Type<MetadataViews.Edition>())
+		if  editionView!= nil {
+			let view = editionView!
+			if view as? MetadataViews.Edition != nil {
+				let edition = view as! MetadataViews.Edition
+				self.editionNumber=edition.number
+				self.totalInEdition=edition.max
+			}
+		} 
+		let editionsView=item.resolveView(Type<MetadataViews.Editions>())
+		if  editionsView!= nil {
+			let view = editionsView!
+			if view as? MetadataViews.Editions != nil {
+				let editions = view as! MetadataViews.Editions
+				for edition in editions.infoList {
+					if edition.name== nil {
+						self.editionNumber=edition.number
+						self.totalInEdition=edition.max
+					} else {
+						self.scalars["edition_".concat(edition.name!).concat("_number")]= UFix64(edition.number)
+
+						if let max=edition.max {
+							self.scalars["edition_".concat(edition.name!).concat("_max")]= UFix64(max)
+						}
+					}
+				}
+			}
+		}
+		/* Royalties */
+		self.royalties=resolveRoyalties(pointer)
+		self.data=views
+
+		self.views=[]
+		for view in item.getViews() {
+			self.views.append(view.identifier)
+		}
+	}
 
 }
 
@@ -181,7 +210,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 
 	let account = getAccount(address) 
 	let publicPath = NFTRegistry.getNFTInfo(nftAliasOrIdentifier)?.publicPath ?? panic("This NFT is not supported by NFT Registry")
- 	let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+	let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
 	let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
 
 	let nftDetail = getNFTDetail(pointer:pointer, views: views)
@@ -238,7 +267,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 		}
 	}
 	return NFTDetail(pointer, views: nftViews)
-	
+
 
 }
 
@@ -265,6 +294,7 @@ pub fun getType(_ type: Type) : String {
 	return identifier.slice(from: counter + 1, upTo: identifier.length)
 }
 
+//TODO: fix this so that we do not use gas
 pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	let viewTypes = pointer.getViews() 
 	var resolveType = Type<MetadataViews.Royalty>()

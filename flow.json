@@ -16,7 +16,6 @@
     "MetadataViews": {
       "source": "./contracts/standard/MetadataViews.cdc",
       "aliases": {
-        "testnet": "0x631e88ae7f1d7c20",
         "mainnet": "0x1d7e57aa55817448"
       }
     },
@@ -107,15 +106,15 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
-      "address": "a4085e3df7d2ddfb",
+      "address": "e4a4699662f01c7f",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
-      "address": "498f59df598967a1",
+      "address": "f76515e91db54484",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
-      "address": "bbbc8531d1776d1f",
+      "address": "1302ac340c4f445b",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user2": {
@@ -173,7 +172,8 @@
         "Sender",
         "RelatedAccounts",
         "FTRegistry",
-        "NFTRegistry"
+        "NFTRegistry",
+				"MetadataViews"
       ]
     },
     "emulator": {

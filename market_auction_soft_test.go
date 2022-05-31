@@ -46,7 +46,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(400.0).
-			//TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionSoft("user2", id, 15.0)
 	})
@@ -63,7 +62,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			increaseAuctionBidMarketSoft("user2", id, 5.0, price+10.0).
 			tickClock(400.0).
-			//TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+10.0).
 			fulfillMarketAuctionSoft("user2", id, price+10.0)
 	})
@@ -146,7 +144,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(4000.0).
-			//TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+5.0)
 
 		name := "user1"
@@ -542,5 +539,3 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.AutoGold("events", res.Events)
 	})
 }
-
-//TODO: add bid should return money from another user that has bid before

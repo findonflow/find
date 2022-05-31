@@ -32,7 +32,6 @@ func TestMarketSale(t *testing.T) {
 		otu.buyNFTForMarketSale("user2", "user1", id, price)
 	})
 
-	//TODO: Should there be a seperate status?
 	t.Run("Should be able to change price of dandy", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
@@ -214,12 +213,12 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 3, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		res := otu.O.TransactionFromFile("delistAllNFTSale").
+		result := otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Account("account")).
 			Test(otu.T).AssertSuccess()
 
-		otu.AutoGold("events", res.Events)
+		otu.AutoGold("events", result.Events)
 	})
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {

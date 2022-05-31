@@ -125,7 +125,7 @@ pub struct MetadataCollections {
 					externalUrl=edvu.url
 				}
 
-				//TODO: add check for rarity and minter here
+				//: add check for rarity and minter here
 
 				let item = MetadataCollectionItem(
 					id: id,
@@ -177,7 +177,7 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-//TODO change bacak to address later
+// change bacak to address later
 //pub fun main(address: Address) : MetadataCollections? {
 pub fun main(name: String) : MetadataCollections? {
 	let address=FIND.lookupAddress(name)!
@@ -656,7 +656,7 @@ pub fun main(name: String) : MetadataCollections? {
 	}
 
 	
-	//TODO:matrixworld
+	//:matrixworld
 
   let sturdyCollectionCap = account.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
 	if sturdyCollectionCap.check() {
@@ -746,7 +746,7 @@ pub fun main(name: String) : MetadataCollections? {
 		}
 	}
 
-	/* //TODO fix
+	/* // fix
   let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if geniaceCap.check() {
 		let geniace=geniaceCap.borrow()!
@@ -834,10 +834,10 @@ pub fun main(name: String) : MetadataCollections? {
 		}
 	}
 
-	//TODO: xtingles
+	//: xtingles
 
 	/*
-	TODO: goats
+	: goats
 	let goatsCap = account.getCapability<&{GoatedGoatsVouchers.GoatsVoucherCollectionPublic}>(GoatedGoatsVouchers.CollectionPublicPath)
 	if goatsCap.check() {
 		let goatsImageUrl= GoatedGoatsVouchers.getCollectionMetadata()["mediaURL"]!
@@ -882,7 +882,7 @@ pub fun main(name: String) : MetadataCollections? {
 	*/
 
 
-	/* //TODO fix
+	/* // fix
   let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
 	if bitkuCap.check() {
 		let nfts = bitkuCap.borrow()!
@@ -971,7 +971,7 @@ pub fun main(name: String) : MetadataCollections? {
 	}
 
 	/*
-	TODO: add when url fixed
+	: add when url fixed
 	let beamCap = account.getCapability<&{Beam.BeamCollectionPublic}>(Beam.CollectionPublicPath)
 		if beamCap.check() {
 		let nfts = beamCap.borrow()!

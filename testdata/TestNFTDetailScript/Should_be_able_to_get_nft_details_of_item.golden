@@ -1,45 +1,5 @@
 `{
     "allowedListingActions": {
-        "FindMarketAuctionEscrow": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-            "status": "active"
-        },
-        "FindMarketAuctionSoft": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-            "status": "active"
-        },
-        "FindMarketDirectOfferEscrow": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-            "status": "active"
-        },
-        "FindMarketDirectOfferSoft": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-            "status": "active"
-        },
         "FindMarketSale": {
             "ftAlias": [
                 "Flow"
@@ -122,19 +82,5 @@
             "A.f8d6e0586b0a20c7.FindViews.Scalar"
         ]
     },
-    "storefront": {
-        "amount": "10.00000000",
-        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        "listingID": "138",
-        "nftID": "134",
-        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "saleCut": [
-            {
-                "address": "0x179b6b1cb6755e31",
-                "amount": "10.00000000",
-                "findName": "user1"
-            }
-        ],
-        "storefront": "137"
-    }
+    "storefront": ""
 }`

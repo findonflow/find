@@ -46,7 +46,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
 			tickClock(400.0).
-			// //TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
@@ -138,7 +137,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": fmt.Sprintf("%.8f", 11.0),
 				"status": "cancel_reserved_not_met",
 			}))
-		//TODO: should this be cancelled or should it be something else?
 
 	})
 
@@ -181,7 +179,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
 			tickClock(400.0).
-			// //TODO: Should status be something else while time has not run out? I think so
 			saleItemListed("user1", "finished_completed", price+5.0)
 
 		name := "user1"

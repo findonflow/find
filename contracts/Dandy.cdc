@@ -3,7 +3,6 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-//TODO: review all permissions and events
 pub contract Dandy: NonFungibleToken {
 
 	pub let CollectionStoragePath: StoragePath
@@ -38,7 +37,6 @@ pub contract Dandy: NonFungibleToken {
 		pub let id: UInt64
 		access(self) var nounce: UInt64
 
-		//TODO: remove this before mainnet
 		access(self) var primaryCutPaid: Bool
 		access(contract) let schemas: {String : ViewInfo}
 		access(contract) let name: String
@@ -117,8 +115,6 @@ pub contract Dandy: NonFungibleToken {
 			return MetadataViews.Royalties(cutInfos:royalties)
 		}
 
-		//TODO: This should honor Media if it is an image aswell.
-		//TODO: it should also exit out the first time it finds and thumbnail image
 		pub fun resolveDisplay() : MetadataViews.Display {
 			var thumbnail : AnyStruct{MetadataViews.File}? = nil
 			if self.schemas.containsKey(Type<FindViews.Files>().identifier) {
@@ -312,8 +308,6 @@ pub contract Dandy: NonFungibleToken {
 		}
 	}
 
-	//TODO: this needs some sort of url information to determine the sourceURI of nfts minted with it
-	//TODO: can these fields really be public? Not sure that is wise
 	pub struct MinterPlatform {
 		pub let platform: Capability<&{FungibleToken.Receiver}>
 		pub let platformPercentCut: UFix64

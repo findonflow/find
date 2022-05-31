@@ -62,7 +62,9 @@
                                 "name": "Neo Motorcycle 2 of 3",
                                 "rarity": "",
                                 "scalars": {
-                                    "Speed": "100.00000000"
+                                    "Speed": "100.00000000",
+                                    "edition_set_max": "3.00000000",
+                                    "edition_set_number": "2.00000000"
                                 },
                                 "tags": {
                                     "NeoMotorCycleTag": "Tag1"

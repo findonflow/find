@@ -721,7 +721,3 @@ func TestAuction(t *testing.T) {
 	})
 
 }
-
-//TODO: Fullfillment of auction that had a name that was locked
-//TODO: cancel an auction that did not meets its price as the bidder
-//TODO: test new lease information
