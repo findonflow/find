@@ -30,7 +30,6 @@ pub contract FindMarketSale {
 		access(contract) let saleItemExtraField: {String : AnyStruct}
 
 		access(contract) let totalRoyalties: UFix64 
-		//TODO: add valid until?
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, price:UFix64, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
 			self.pointer=pointer
@@ -195,7 +194,6 @@ pub contract FindMarketSale {
 				self.owner!.address != nftCap.address : "You cannot buy your own listing"
 			}
 
-			//TODO: check valid until
 			let saleItem=self.borrow(id)
 
 			if saleItem.salePrice != vault.balance {

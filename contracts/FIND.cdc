@@ -98,7 +98,7 @@ pub contract FIND {
 		if input.utf8[1] == 120 {
 			address = input.slice(from: 2, upTo: input.length)
 		}
-		var r:UInt64 = (0 as UInt64)
+		var r:UInt64 = 0 
 		var bytes = address.decodeHex()
 
 		while bytes.length>0{
@@ -504,7 +504,6 @@ pub contract FIND {
 				panic("You already have this addon")
 			}
 
-			//TODO: get from Network addonPrices
 			if addon=="forge" && vault.balance != 50.0 {
 				panic("Expect 50 FUSD for forge addon")
 			}

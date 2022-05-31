@@ -32,7 +32,6 @@ func TestMarketSale(t *testing.T) {
 		otu.buyNFTForMarketSale("user2", "user1", id, price)
 	})
 
-	//TODO: Should there be a seperate status?
 	t.Run("Should be able to change price of dandy", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
@@ -492,7 +491,7 @@ func TestMarketSale(t *testing.T) {
 			createUser(100.0, "user2").
 			registerUser("user2").
 			registerFtInRegistry().
-			setProfile("user1"). 
+			setProfile("user1").
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -534,8 +533,8 @@ func TestMarketSale(t *testing.T) {
 				"id":          fmt.Sprintf("%d", ids[0]),
 				"royaltyName": "platform",
 				"tenant":      "find",
-		}))
-			otu.AutoGold("events", res.Events)
+			}))
+		otu.AutoGold("events", res.Events)
 
 	})
 
@@ -547,7 +546,7 @@ func TestMarketSale(t *testing.T) {
 			registerUser("user2").
 			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
-			setProfile("user1"). 
+			setProfile("user1").
 			setFindCut(0.035)
 
 		price := 10.0

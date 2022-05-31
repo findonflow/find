@@ -1,8 +1,6 @@
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-//TODO: this needs work for DUC
-//TODO: this will not work for DUC, we need totally seperate TX for them or we need to just not check bid balance.
 transaction(marketplace: Address, id: UInt64, amount: UFix64) {
 
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection

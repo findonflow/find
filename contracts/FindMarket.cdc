@@ -6,13 +6,12 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub contract FindMarket {
-	//TODO: figure out if these can be let
-	access(contract) var pathMap : {String: String}
-	access(contract) var listingName : {String: String}
-	access(contract) var saleItemTypes : [Type]
-	access(contract) var saleItemCollectionTypes : [Type]
-	access(contract) var marketBidTypes : [Type]
-	access(contract) var marketBidCollectionTypes : [Type]
+	access(contract) let  pathMap : {String: String}
+	access(contract) let  listingName : {String: String}
+	access(contract) let  saleItemTypes : [Type]
+	access(contract) let  saleItemCollectionTypes : [Type]
+	access(contract) let  marketBidTypes : [Type]
+	access(contract) let  marketBidCollectionTypes : [Type]
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
 
@@ -170,7 +169,6 @@ pub contract FindMarket {
 		}
 
 		for id in listID {
-			//TODO: do we need to call this here?
 			if ref.getIds().contains(id) {
 				let item=ref.borrowSaleItem(id)
 				if !item.checkPointer() {
@@ -179,8 +177,6 @@ pub contract FindMarket {
 					}
 					continue
 				} 
-				//361
-				//TODO: do we need to be smarter about this?
 				let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
 				var status="active"
 				if !stopped.allowed {
@@ -193,8 +189,6 @@ pub contract FindMarket {
 				if !deprecated.allowed {
 					status="deprecated"
 				}
-
-				//474
 				if let validTime = item.getValidUntil() {
 					if validTime <= Clock.time() {
 						status="ended"
@@ -502,7 +496,6 @@ pub contract FindMarket {
 		pub let rules:[TenantRule]
 		pub var status:String
 
-		//TODO : pre all the names that are unique
 		init(name:String, cut:MetadataViews.Royalty?, rules:[TenantRule], status:String){
 			self.name=name
 			self.cut=cut
@@ -771,25 +764,6 @@ pub contract FindMarket {
 			self.capability = nil
 		}
 
-
-		/*
-		//Add that i can list Dandy for Flow
-		//list it
-		//deprecte it
-		//list another
-
-		Add a new tenant rule, remove it from the above market tenant
-		test that a tenant can then turn deprecate  a rule
-		//TODO: creat a method to add these
-		//TODO: put this in another transaction
-		tenant.addSaleItem(TenantSaleItem(
-			name:"AnyNFTFlow", 
-			cut:nil, 
-			rules:[ TenantRule( name:"flow", types:[flowType, fusdType], ruleType:"ft", allow:true) ], 
-			status:"active"
-		), type: "tenant")
-		*/
-
 		pub fun setMarketOption(name: String, cut: MetadataViews.Royalty?, rules: [TenantRule]) {
 			let tenant = self.getTenantRef() 
 			tenant.addSaleItem(TenantSaleItem(
@@ -798,7 +772,6 @@ pub contract FindMarket {
 				rules: rules, 
 				status:"active"
 			), type: "tenant")
-			//Emit Event here
 		}
 
 		pub fun removeMarketOption(name: String) {
@@ -831,11 +804,6 @@ pub contract FindMarket {
 			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
 		}
 
-		//BAM: do admin operations on a tenant
-		/*
-		- not allow a certain market type
-		*/
-		// This is a function only for private use. Not exposed through public interface
 		pub fun getTenantRef() : &Tenant {
 			pre {
 				self.capability != nil: "TenantClient is not present"
@@ -965,7 +933,6 @@ pub contract FindMarket {
 		
 			self.collectionName=nil
 			self.collectionDescription=nil
-			//TODO:cannot resolveView twice here, could be expenseive
 			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
 				let view = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())!
 				if view as? MetadataViews.NFTCollectionDisplay != nil {
@@ -1053,7 +1020,6 @@ pub contract FindMarket {
 		}
 	}
 
-	//BAM: make this a struct with fields
 	pub struct AuctionItem {
 		//end time
 		//current time
@@ -1148,7 +1114,6 @@ pub contract FindMarket {
 		pub fun getTotalRoyalties() : UFix64 
 	}
 
-	//BAM; this needs to know if an item is deprectaed or stopped in some way
 	pub struct SaleItemInformation {
 		pub let nftIdentifier: String 
 		pub let nftId: UInt64

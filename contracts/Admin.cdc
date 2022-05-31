@@ -314,6 +314,7 @@ pub contract Admin {
 
 	}
 
+
 	init() {
 
 		self.AdminProxyPublicPath= /public/findAdminProxy

@@ -28,7 +28,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let creativeWork=
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
-		//TODO: use Image/Video here.
 		let media=MetadataViews.HTTPFile(url:nftUrl)
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)

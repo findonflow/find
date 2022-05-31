@@ -242,7 +242,6 @@ pub contract Profile {
 		pub fun asReport() : UserReport
 		pub fun isBanned(_ val: Address): Bool
 		pub fun isPrivateModeEnabled() : Bool
-		//TODO: getBanned
 
 		access(contract) fun internal_addFollower(_ val: FriendStatus)
 		access(contract) fun internal_removeFollower(_ address: Address) 
@@ -491,7 +490,7 @@ pub contract Profile {
 				}
 			} 
 			let identifier=from.getType().identifier
-			//TODO: I need to destroy here for this to compile, but WHY?
+			//I need to destroy here for this to compile, but WHY?
 			destroy from
 			panic("could not find a supported wallet for:".concat(identifier))
 		}

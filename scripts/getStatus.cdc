@@ -44,7 +44,6 @@ pub struct Report {
 	}
 }
 
-//TODO; name_status should reflect this one once they are done. And we should inline this into a contract to avoid duplication
 pub fun main(user: String) : Report? {
 
 	var findReport: FINDReport? = nil

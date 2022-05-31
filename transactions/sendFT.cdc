@@ -8,8 +8,6 @@ transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: Stri
 
 	prepare(account: AuthAccount) {
 
-		//TODO: copy from Register from FIND-114
-
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet")
 		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 

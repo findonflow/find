@@ -213,7 +213,6 @@ pub contract FindViews {
 			return self.getViewResolver().getViews()
 		}
 
-		//TODO: Should require to expose display to be valid
 		pub fun valid() : Bool {
 			if !self.cap.borrow()!.getIDs().contains(self.id) {
 				return false
