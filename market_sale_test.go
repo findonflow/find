@@ -214,101 +214,12 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 3, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		expected := []*overflow.FormatedEvent{
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount":    "10.00000000",
-				"buyer":     "",
-				"buyerName": "",
-				"endsAt":    "100.00000000",
-				"id":        fmt.Sprintf("%d", ids[2]),
-				"nft": map[string]interface{}{
-					"name":      "Neo Motorcycle 3 of 3",
-					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"id":        fmt.Sprintf("%d", ids[2]),
-					"rarity":    "",
-					"scalars": map[string]interface{}{
-						"Speed": "100.00000000",
-					},
-					"tags": map[string]interface{}{
-						"NeoMotorCycleTag": "Tag1",
-					},
-					"editionNumber":         "3",
-					"totalInEdition":        "3",
-					"collectionName":        "user1",
-					"collectionDescription": "Neo Collectibles FIND",
-				},
-				"seller":     otu.accountAddress("user1"),
-				"sellerName": "user1",
-				"status":     "cancel",
-				"tenant":     "find",
-				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount":    "10.00000000",
-				"buyer":     "",
-				"buyerName": "",
-				"endsAt":    "100.00000000",
-				"id":        fmt.Sprintf("%d", ids[1]),
-				"nft": map[string]interface{}{
-					"name":      "Neo Motorcycle 2 of 3",
-					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"id":        fmt.Sprintf("%d", ids[1]),
-					"rarity":    "",
-					"scalars": map[string]interface{}{
-						"Speed": "100.00000000",
-					},
-					"tags": map[string]interface{}{
-						"NeoMotorCycleTag": "Tag1",
-					},
-					"editionNumber":         "2",
-					"totalInEdition":        "3",
-					"collectionName":        "user1",
-					"collectionDescription": "Neo Collectibles FIND",
-				},
-				"seller":     otu.accountAddress("user1"),
-				"sellerName": "user1",
-				"status":     "cancel",
-				"tenant":     "find",
-				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}),
-			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount":    "10.00000000",
-				"buyer":     "",
-				"buyerName": "",
-				"endsAt":    "100.00000000",
-				"id":        fmt.Sprintf("%d", ids[0]),
-				"nft": map[string]interface{}{
-					"name":      "Neo Motorcycle 1 of 3",
-					"thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-					"type":      "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"id":        fmt.Sprintf("%d", ids[0]),
-					"rarity":    "",
-					"scalars": map[string]interface{}{
-						"Speed": "100.00000000",
-					},
-					"tags": map[string]interface{}{
-						"NeoMotorCycleTag": "Tag1",
-					},
-					"editionNumber":         "1",
-					"totalInEdition":        "3",
-					"collectionName":        "user1",
-					"collectionDescription": "Neo Collectibles FIND",
-				},
-				"seller":     otu.accountAddress("user1"),
-				"sellerName": "user1",
-				"status":     "cancel",
-				"tenant":     "find",
-				"vaultType":  "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}),
-		}
-
-		otu.O.TransactionFromFile("delistAllNFTSale").
+		res := otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Account("account")).
-			Test(otu.T).AssertSuccess().
-			AssertEmitEvent(expected...)
+			Test(otu.T).AssertSuccess()
+
+		otu.AutoGold("events", res.Events)
 	})
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {
@@ -492,7 +403,8 @@ func TestMarketSale(t *testing.T) {
 			createUser(100.0, "user2").
 			registerUser("user2").
 			registerFtInRegistry().
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -534,8 +446,8 @@ func TestMarketSale(t *testing.T) {
 				"id":          fmt.Sprintf("%d", ids[0]),
 				"royaltyName": "platform",
 				"tenant":      "find",
-		}))
-			otu.AutoGold("events", res.Events)
+			}))
+		otu.AutoGold("events", res.Events)
 
 	})
 
@@ -547,7 +459,8 @@ func TestMarketSale(t *testing.T) {
 			registerUser("user2").
 			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			setFindCut(0.035)
 
 		price := 10.0

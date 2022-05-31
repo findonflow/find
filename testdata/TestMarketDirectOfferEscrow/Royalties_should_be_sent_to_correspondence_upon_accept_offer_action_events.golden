@@ -8,11 +8,12 @@
 			},
 		},
 		Fields: map[string]interface{}{
-			"amount":    "10.00000000",
-			"buyer":     "0xf3fcd2c1a78f5eee",
-			"buyerName": "user2",
-			"endsAt":    "100.00000000",
-			"id":        "133",
+			"amount":      "10.00000000",
+			"buyer":       "0xf3fcd2c1a78f5eee",
+			"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+			"buyerName":   "user2",
+			"endsAt":      "100.00000000",
+			"id":          "133",
 			"nft": map[string]interface{}{
 				"collectionDescription": "Neo Collectibles FIND",
 				"collectionName":        "user1",

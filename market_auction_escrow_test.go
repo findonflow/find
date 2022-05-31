@@ -524,7 +524,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
 		otu.tickClock(500.0)
@@ -576,7 +577,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			setFindCut(0.035)
 
 		otu.tickClock(500.0)

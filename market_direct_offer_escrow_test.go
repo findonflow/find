@@ -374,7 +374,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			saleItemListed("user1", "active_ongoing", price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
@@ -422,7 +423,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			setFindCut(0.035)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
