@@ -9,6 +9,104 @@ This repo is the backend code, there are two other repos in this solutions namel
  - [find-web](https://github.com/findonflow/find-web) the frontend code
  
 
+## Transactions
+There are a lot of transactions in the transactions folder in .find. These can be grouped as follows:
+
+### Direct sales of NFT
+
+- buyNFTForSale
+- delistAllNFTSale
+- delistNFTSale
+- listNFTForSale
+
+### Direct Offers of NFTs 
+
+This direct offer variant will escrow funds in the owners account so that we know they have enough and can pay
+
+- bidMarketDirectOfferEscrowed
+- cancelMarketDirectOfferEscrowed
+- fulfillMarketDirectOfferEscrowed
+- retractOfferMarketDirectOfferEscrowed
+- increaseBidMarketDirectOfferEscrowed
+
+
+### Auctions of NFTs 
+
+This auction variant will escrow funds in the owners account so that we know they have enough and can pay
+
+- cancelMarketAuctionEscrowed
+- bidMarketAuctionEscrowed
+- fulfillMarketAuctionEscrowed
+- fulfillMarketAuctionEscrowedFromBidder
+- increaseBidMarketAuctionEscrowed
+- listNFTForAuctionEscrowed
+
+### Auctions of NFTs for Dapper Utility Coin
+A specialized version of auctions that can work with the struct rules for dapper utlity coin.
+
+- increaseBidMarketAuctionSoft
+- fulfillMarketAuctionSoft
+- cancelMarketAuctionSoft
+- bidMarketAuctionSoft
+- listNFTForAuctionSoft
+
+
+### Direct Offers on NFTs for Dapper Utility Coin
+
+A specialized version of directOffers that can work with the struct rules for dapper utlity coin.
+
+- bidMarketDirectOfferSoft
+- acceptDirectOfferSoft
+- cancelMarketDirectOfferSoft
+- fulfillMarketDirectOfferSoft
+- retractOfferMarketDirectOfferSoft
+- increaseBidMarketDirectOfferSoft
+
+
+### Listing and Auctions for .find names
+
+These will seldom be used in other places then .find
+
+- bidName
+- startNameAuction
+- cancelNameAuction
+- cancelNameBid
+- delistAllNameSale
+- delistNameSale
+- fulfillName
+- fulfillNameAuction
+- fulfillNameAuctionBidder
+- increaseNameBid
+- listNameForAuction
+- listNameForSale
+- rejectNameDirectOffer
+
+
+### Misc transactions mainly used in .find
+
+- buyAddon
+- mintDandy
+- moveNameTO
+- register
+- registerGift
+- removeCurratedCollection
+- removeMarketOption
+- removeRelatedAccount
+- removeTenantRule
+- renewName
+- createCharity
+- createProfile
+- editProfile
+- sendCharity
+- sendFT
+- setMainName
+- setPrivateMode
+- setProfile
+- setRelatedAccount
+- storeCuratedCollections
+- addCuratedCollection
+- alterMarketOption
+
 ## Tests
 In order to run the tests for .find we recommend using (gotestsum)[https://github.com/gotestyourself/gotestsum] with the following invocation
 
