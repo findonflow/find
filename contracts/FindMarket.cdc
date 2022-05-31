@@ -165,7 +165,7 @@ pub contract FindMarket {
 
 		var listID : [UInt64]= []
 		if let id = itemId{
-			if !ref.getIds().contains(id) {
+			if !ref.containsId(id) {
 				return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
 			}
 			listID=[id]
@@ -240,7 +240,7 @@ pub contract FindMarket {
 
 	pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
 		let tenantRef=self.getTenant(tenant)
-		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
+		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo)
 		if bidInfo.items.length > 0 {
 			return bidInfo.items[0]
 		}
@@ -252,7 +252,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.BidItemCollectionReport} = {}
 		for type in self.getMarketBidCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, itemId: nil, getGhost: true, getNFTInfo: getNFTInfo)
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport
 			}
@@ -260,7 +260,7 @@ pub contract FindMarket {
 		return report
 	}
 
-	access(contract) fun checkBidInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool, getNFTInfo: Bool) : FindMarket.BidItemCollectionReport {
+	access(contract) fun checkBidInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, itemId: UInt64?, getGhost:Bool, getNFTInfo: Bool) : FindMarket.BidItemCollectionReport {
 		let ghost: [FindMarket.GhostListing] =[]
 		let info: [FindMarket.BidInfo] =[]
 		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -273,23 +273,29 @@ pub contract FindMarket {
 		let ref=optRef!
 
 		let listingType = ref.getBidType()
-		var listID = ids 
-		if ids.length == 0 {
+		var listID : [UInt64]= []
+		if let id = itemId{
+			if !ref.containsId(id) {
+				return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+			}
+			listID=[id]
+		} else {
 			listID = ref.getIds()
 		}
+
 		for id in listID {
-			if ref.getIds().contains(id) {
-				let bid=ref.borrowBidItem(id)
-				let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
-				if item == nil {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: Clock.time(), item:item!)
-				info.append(bidInfo)
-			}
+
+			let bid=ref.borrowBidItem(id)
+			let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
+			if item == nil {
+				if getGhost {
+					ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
+				}
+				continue
+			} 
+			let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: Clock.time(), item:item!)
+			info.append(bidInfo)
+
 		}
 		return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
 	}
@@ -1051,6 +1057,7 @@ pub contract FindMarket {
 
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getIds(): [UInt64]
+		pub fun containsId(_ id: UInt64): Bool
 		access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
 		pub fun getListingType() : Type 
 	}
@@ -1067,6 +1074,7 @@ pub contract FindMarket {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getIds() : [UInt64] 
+		pub fun containsId(_ id: UInt64): Bool
 		pub fun getBidType() : Type 
 		access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
 	}

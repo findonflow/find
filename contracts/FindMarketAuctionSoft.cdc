@@ -247,7 +247,7 @@ pub contract FindMarketAuctionSoft {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance: UFix64) 
 
 		//place a bid on a token
@@ -500,6 +500,10 @@ pub contract FindMarketAuctionSoft {
 			return self.items.keys
 		}
 
+		pub fun containsId(_ id: UInt64): Bool {
+			return self.items.containsKey(id)
+		}
+
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			pre{
 				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
@@ -562,7 +566,7 @@ pub contract FindMarketAuctionSoft {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
-
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT)
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
@@ -601,6 +605,10 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getIds() : [UInt64] {
 			return self.bids.keys
+		}
+
+		pub fun containsId(_ id: UInt64) : Bool {
+			return self.bids.containsKey(id)
 		}
 
 		pub fun getBidType() : Type {
