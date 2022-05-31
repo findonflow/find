@@ -10,6 +10,25 @@ func TestNFTDetailScript(t *testing.T) {
 
 	price := 10.00
 
+	t.Run("Should be able to get nft details of item", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("Sale").
+			listNFTForSale("user1", ids[1], price)
+
+		actual := otu.O.ScriptFromFile("getNFTDetails").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("Dandy").
+				UInt64(ids[1]).
+				StringArray()).
+			RunReturnsJsonString()
+
+		autogold.Equal(t, actual)
+	})
+
 	t.Run("Should be able to get all listings of a person by a script", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

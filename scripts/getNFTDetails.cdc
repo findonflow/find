@@ -48,7 +48,8 @@ pub struct NFTDetail {
 	pub var tags : {String: String}
 	pub var collectionName: String? 
 	pub var collectionDescription: String? 
-	pub var views: {String : AnyStruct?}
+	pub var data: {String : AnyStruct?}
+	pub var views :[String]
 
 	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}){
 
@@ -117,13 +118,33 @@ pub struct NFTDetail {
 				self.totalInEdition=edition.max
 			}
 		} 
-		//TODO: can we just add it as scalars for editions?
-		//TODO: what if there are more then one royalty?
+		let editionsView=item.resolveView(Type<MetadataViews.Editions>())
+		if  editionsView!= nil {
+			let view = editionsView!
+			if view as? MetadataViews.Editions != nil {
+				let editions = view as! MetadataViews.Editions
+				for edition in editions.infoList {
+					if edition.name== nil {
+						self.editionNumber=edition.number
+						self.totalInEdition=edition.max
+					} else {
+						self.scalars["edition_".concat(edition.name!).concat("_number")]= UFix64(edition.number)
 
+						if let max=edition.max {
+							self.scalars["edition_".concat(edition.name!).concat("_max")]= UFix64(max)
+						}
+					}
+				}
+			}
+		}
 		/* Royalties */
 		self.royalties=resolveRoyalties(pointer)
+		self.data=views
 
-		self.views=views
+		self.views=[]
+		for view in item.getViews() {
+			self.views.append(view.identifier)
+		}
 	}
 
 }
