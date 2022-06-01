@@ -39,7 +39,7 @@ func main() {
 
 	o.SimpleTxArgs("adminSetFTInfo_flow", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find", o.Arguments())
-	//	o.SimpleTxArgs("adminSetSellDandyRules", "account", o.Arguments())
+	o.SimpleTxArgs("adminSetSellDandyRules", "find", o.Arguments().Account("account"))
 
 	//we advance the clock
 	o.TransactionFromFile("testClock").SignProposeAndPayAs("find").

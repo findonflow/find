@@ -35,6 +35,18 @@ pub contract FindViews {
 		}
 	}
 
+	/// Medias is an optional view for collections that issue objects with multiple Media sources in it
+    ///
+    pub struct Medias {
+
+        /// An arbitrary-sized list for any number of Media items
+        pub let items: [MetadataViews.Media]
+
+        init(_ items: [MetadataViews.Media]) {
+            self.items = items
+        }
+    }
+
 	pub struct OnChainFile : MetadataViews.File{
 		pub let content: String
 		pub let mediaType: String

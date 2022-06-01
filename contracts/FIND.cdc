@@ -1,3 +1,4 @@
+import MetadataViews from "./standard/MetadataViews.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
 import Profile from "./Profile.cdc"
@@ -500,14 +501,14 @@ pub contract FIND {
 			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
 		}
 
-		pub fun mintDandy(minter: String, nftName: String, description: String, schemas: [AnyStruct], externalUrlPrefix: String?, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) : @Dandy.NFT {
+		pub fun mintDandy(minter: String, nftName: String, description: String, thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix: String?, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) : @Dandy.NFT {
 
 			let lease = self.borrow(minter)
 			if !lease.addons.containsKey("forge") {
 				panic("You do not have the forge addon, buy it first")
 			}
 
-			return <- Dandy.mintNFT(name:nftName, description:description, platform: self.createPlatform(name: minter, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage), schemas: schemas, externalUrlPrefix:externalUrlPrefix)
+			return <- Dandy.mintNFT(name:nftName, description:description, thumbnail: thumbnail, platform: self.createPlatform(name: minter, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage), schemas: schemas, externalUrlPrefix:externalUrlPrefix)
 		}
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {

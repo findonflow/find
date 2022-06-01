@@ -46,6 +46,7 @@ pub struct NFTDetail {
 	pub var totalInEdition: UInt64?
 	pub var scalars : {String: UFix64}
 	pub var tags : {String: String}
+	pub var media: [MetadataViews.Media]
 	pub var collectionName: String? 
 	pub var collectionDescription: String? 
 	pub var data: {String : AnyStruct?}
@@ -57,6 +58,7 @@ pub struct NFTDetail {
 
 		self.scalars={}
 		self.tags={}
+		self.media=[]
 		self.collectionName=nil
 		self.collectionDescription=nil
 
@@ -78,6 +80,15 @@ pub struct NFTDetail {
 
 		if let scalar=FindViews.getScalar(item){
 				self.scalars=scalar.getScalar()
+		}
+		/* Medias */
+		let mediaView=item.resolveView(Type<FindViews.Medias>())
+		if mediaView != nil {
+			let view = mediaView!
+			if view as? FindViews.Medias != nil {
+				let media = view as! FindViews.Medias
+				self.media=media.items
+			}
 		}
 	
 
@@ -111,6 +122,9 @@ pub struct NFTDetail {
 
 		self.views=[]
 		for view in item.getViews() {
+			if ignoreViews().contains(view) {
+				continue
+			}
 			self.views.append(view.identifier)
 		}
 	}
@@ -283,4 +297,17 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : L
 		}
 	}
 	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status )
+}
+
+pub fun ignoreViews() : [Type] {
+	return [
+		Type<MetadataViews.NFTCollectionDisplay>() , 
+		Type<FindViews.Rarity>() ,
+		Type<FindViews.Tag>() , 
+		Type<FindViews.Scalar>() ,
+		Type<FindViews.Medias>() ,
+		Type<MetadataViews.Display>() ,
+		Type<MetadataViews.Edition>() ,
+		Type<MetadataViews.Editions>() 
+	]
 }
