@@ -46,7 +46,7 @@ pub struct NFTDetail {
 	pub var totalInEdition: UInt64?
 	pub var scalars : {String: UFix64}
 	pub var tags : {String: String}
-	pub var files: {String: &{MetadataViews.File}}
+	pub var media: [MetadataViews.Media]
 	pub var collectionName: String? 
 	pub var collectionDescription: String? 
 	pub var data: {String : AnyStruct?}
@@ -58,7 +58,7 @@ pub struct NFTDetail {
 
 		self.scalars={}
 		self.tags={}
-		self.files={}
+		self.media=[]
 		self.collectionName=nil
 		self.collectionDescription=nil
 
@@ -100,13 +100,13 @@ pub struct NFTDetail {
 				self.scalars=scalar.getScalar()
 			}
 		}
-		/* File */
-		let fileView=item.resolveView(Type<FindViews.Files>())
-		if fileView != nil {
-			let view = fileView!
-			if view as? FindViews.Files != nil {
-				let files = view as! FindViews.Files
-				self.files=files.media
+		/* Medias */
+		let mediaView=item.resolveView(Type<FindViews.Medias>())
+		if mediaView != nil {
+			let view = mediaView!
+			if view as? FindViews.Medias != nil {
+				let media = view as! FindViews.Medias
+				self.media=media.items
 			}
 		}
 	
@@ -350,7 +350,7 @@ pub fun ignoreViews() : [Type] {
 		Type<FindViews.Rarity>() ,
 		Type<FindViews.Tag>() , 
 		Type<FindViews.Scalar>() ,
-		Type<FindViews.Files>() ,
+		Type<FindViews.Medias>() ,
 		Type<MetadataViews.Display>() ,
 		Type<MetadataViews.Edition>() ,
 		Type<MetadataViews.Editions>() 

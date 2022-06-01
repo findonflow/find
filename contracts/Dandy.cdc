@@ -136,6 +136,22 @@ pub contract Dandy: NonFungibleToken {
 				thumbnail=self.schemas[Type<FindViews.SharedMedia>().identifier]!.result as! AnyStruct{MetadataViews.File}
 			}
 
+			if self.schemas.containsKey(Type<MetadataViews.Media>().identifier) {
+				let media=self.schemas[Type<MetadataViews.Media>().identifier]!.result as! MetadataViews.Media
+				if media.mediaType == "image" {
+					thumbnail=media.file
+				}
+			}
+
+			if self.schemas.containsKey(Type<FindViews.Medias>().identifier) {
+				let medias=self.schemas[Type<FindViews.Medias>().identifier]!.result as! FindViews.Medias 
+				for media in medias.items {
+					if media.mediaType == "thumbnail" {
+						thumbnail=media.file
+					}
+				}
+			}
+
 			return MetadataViews.Display(
 				name: self.name,
 				description: self.description,
