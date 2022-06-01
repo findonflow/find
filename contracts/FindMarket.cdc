@@ -165,7 +165,7 @@ pub contract FindMarket {
 
 		var listID : [UInt64]= []
 		if let id = itemId{
-			if !ref.getIds().contains(id) {
+			if !ref.containsId(id) {
 				return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
 			}
 			listID=[id]
@@ -189,20 +189,19 @@ pub contract FindMarket {
 			if !stopped.allowed {
 				status="stopped"
 			}
-			//418
 
 			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
 
 			if !deprecated.allowed {
 				status="deprecated"
 			}
+
 			if let validTime = item.getValidUntil() {
 				if validTime <= Clock.time() {
 					status="ended"
 				}
 			}
 			info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
-
 		}
 
 		return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
@@ -240,7 +239,7 @@ pub contract FindMarket {
 
 	pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
 		let tenantRef=self.getTenant(tenant)
-		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [id], getGhost: false, getNFTInfo: getNFTInfo)
+		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo)
 		if bidInfo.items.length > 0 {
 			return bidInfo.items[0]
 		}
@@ -252,7 +251,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.BidItemCollectionReport} = {}
 		for type in self.getMarketBidCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, ids: [], getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, itemId: nil, getGhost: true, getNFTInfo: getNFTInfo)
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport
 			}
@@ -260,7 +259,7 @@ pub contract FindMarket {
 		return report
 	}
 
-	access(contract) fun checkBidInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, ids: [UInt64], getGhost:Bool, getNFTInfo: Bool) : FindMarket.BidItemCollectionReport {
+	access(contract) fun checkBidInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, itemId: UInt64?, getGhost:Bool, getNFTInfo: Bool) : FindMarket.BidItemCollectionReport {
 		let ghost: [FindMarket.GhostListing] =[]
 		let info: [FindMarket.BidInfo] =[]
 		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -273,23 +272,29 @@ pub contract FindMarket {
 		let ref=optRef!
 
 		let listingType = ref.getBidType()
-		var listID = ids 
-		if ids.length == 0 {
+		var listID : [UInt64]= []
+		if let id = itemId{
+			if !ref.containsId(id) {
+				return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
+			}
+			listID=[id]
+		} else {
 			listID = ref.getIds()
 		}
+
 		for id in listID {
-			if ref.getIds().contains(id) {
-				let bid=ref.borrowBidItem(id)
-				let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
-				if item == nil {
-					if getGhost {
-						ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
-					}
-					continue
-				} 
-				let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: Clock.time(), item:item!)
-				info.append(bidInfo)
-			}
+
+			let bid=ref.borrowBidItem(id)
+			let item=self.getSaleInformation(tenant: tenantRef.owner!.address, address: bid.getSellerAddress(), marketOption: marketOption, id: id, getNFTInfo: getNFTInfo)
+			if item == nil {
+				if getGhost {
+					ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
+				}
+				continue
+			} 
+			let bidInfo = FindMarket.BidInfo(id: id, bidTypeIdentifier: listingType.identifier,  bidAmount: bid.getBalance(), timestamp: Clock.time(), item:item!)
+			info.append(bidInfo)
+
 		}
 		return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
 	}
@@ -879,23 +884,25 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties?, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?)) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?)) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 		let soldFor=vault.balance
 		let ftType=vault.getType()
 
-		if royalty != nil {
-			/* Check the total royalty to prevent changing of royalties */
-			let royalties = royalty!.getRoyalties()
+		/* Check the total royalty to prevent changing of royalties */
+
+
+		let royalties = royalty.getRoyalties()
+		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
 			for royaltyItem in royalties {
 				totalRoyalties = totalRoyalties + royaltyItem.cut
 			}
 			assert(totalRoyalties == saleItem.getTotalRoyalties(), message: "The total Royalties to be paid is changed after listing.")
 
-			for royaltyItem in royalty!.getRoyalties() {
+			for royaltyItem in royalties {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
 				let name = resolver(royaltyItem.receiver.address)
@@ -940,41 +947,26 @@ pub contract FindMarket {
 
 			self.collectionName=nil
 			self.collectionDescription=nil
-			if item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) != nil {
-				let view = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())!
-				if view as? MetadataViews.NFTCollectionDisplay != nil {
-					let grouping = view as! MetadataViews.NFTCollectionDisplay
-					self.collectionName=grouping.name
-					self.collectionDescription=grouping.description
-				}
+
+			if let ncd = FindViews.getNFTCollectionDisplay(item) {
+				self.collectionName=ncd.name
+				self.collectionDescription=ncd.description
 			}
 
 			self.rarity=nil
-			if item.resolveView(Type<FindViews.Rarity>()) != nil {
-				let view = item.resolveView(Type<FindViews.Rarity>())!
-				if view as? FindViews.Rarity != nil {
-					let rarity = view as! FindViews.Rarity
-					self.rarity=rarity.rarityName
-				}
-			} 
-
-			if item.resolveView(Type<FindViews.Tag>()) != nil {
-				let view = item.resolveView(Type<FindViews.Tag>())!
-				if view as? FindViews.Tag != nil {
-					let tags = view as! FindViews.Tag
-					self.tags=tags.getTag()
-				}
+			if let rarity = FindViews.getRarity(item) {
+				self.rarity=rarity.rarityName
 			}
 
-			if item.resolveView(Type<FindViews.Scalar>()) != nil {
-				let view = item.resolveView(Type<FindViews.Scalar>())!
-				if view as? FindViews.Scalar != nil {
-					let scalar = view as! FindViews.Scalar
-					self.scalars=scalar.getScalar()
-				}
+			if let tags = FindViews.getTags(item) {
+				self.tags=tags.getTag()
 			}
 
-			let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+			if let scalar = FindViews.getScalar(item) {
+				self.scalars=scalar.getScalar()
+			}
+
+			let display = FindViews.getDisplay(item) ?? panic("cannot find display!")
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
@@ -983,34 +975,19 @@ pub contract FindMarket {
 			self.editionNumber=nil
 			self.totalInEdition=nil
 
-			if item.resolveView(Type<MetadataViews.Edition>()) != nil {
-				let view = item.resolveView(Type<MetadataViews.Edition>())!
-				if view as? MetadataViews.Edition != nil {
-					let edition = view as! MetadataViews.Edition
-					self.editionNumber=edition.number
-					self.totalInEdition=edition.max
-				}
-			} 
-
-			let editionsViews = item.resolveView(Type<MetadataViews.Editions>())
-			if editionsViews!= nil {
-				let view = editionsViews!
-				if view as? MetadataViews.Editions != nil {
-					let editions = view as! MetadataViews.Editions
-					for edition in editions.infoList {
-						if edition.name == nil {
-							self.editionNumber=edition.number
-							self.totalInEdition=edition.max
-						} else {
-							self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
-
-							if edition.max != nil {
-								self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
-							}
+			if let editions = FindViews.getEditions(item) {
+				for edition in editions.infoList {
+					if edition.name == nil {
+						self.editionNumber=edition.number
+						self.totalInEdition=edition.max
+					} else {
+						self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
+						if edition.max != nil {
+							self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
 						}
 					}
 				}
-			} 
+			}
 		}
 	}
 
@@ -1051,6 +1028,7 @@ pub contract FindMarket {
 
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getIds(): [UInt64]
+		pub fun containsId(_ id: UInt64): Bool
 		access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
 		pub fun getListingType() : Type 
 	}
@@ -1067,6 +1045,7 @@ pub contract FindMarket {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getIds() : [UInt64] 
+		pub fun containsId(_ id: UInt64): Bool
 		pub fun getBidType() : Type 
 		access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
 	}

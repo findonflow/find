@@ -94,35 +94,25 @@ pub fun main(user: String) : MetadataCollections? {
 			for id in collection.getIDs() {
 				let nft = collection.borrowViewResolver(id: id) 
 				
-				if nft.resolveView(Type<MetadataViews.Display>()) != nil {
-					let displayView = nft.resolveView(Type<MetadataViews.Display>())!
-					let display = displayView as! MetadataViews.Display
-
+				if let display= FindViews.getDisplay(nft) {
 					var externalUrl=nftInfo.externalFixedUrl
-					if nft.resolveView(Type<MetadataViews.ExternalURL>()) != nil {
-						let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>())!
-						let url= externalUrlView as! MetadataViews.ExternalURL
-						externalUrl=url.url
+
+					if let externalUrlViw=FindViews.getExternalURL(nft) { 
+						externalUrl=externalUrlViw.url
 					}
 
 					var rarity=""
-					if nft.resolveView(Type<FindViews.Rarity>()) != nil {
-						let rarityView = nft.resolveView(Type<FindViews.Rarity>())!
-						let r= rarityView as! FindViews.Rarity
+					if let r = FindViews.getRarity(nft) {
 						rarity=r.rarityName
 					}
 
 					var tag : {String : String}={}
-					if nft.resolveView(Type<FindViews.Tag>()) != nil {
-						let tagView = nft.resolveView(Type<FindViews.Tag>())!
-						let t= tagView as! FindViews.Tag
+					if let t= FindViews.getTags(nft) {
 						tag=t.getTag()
 					}			
 
 					var scalar : {String : UFix64}={}
-					if nft.resolveView(Type<FindViews.Scalar>()) != nil {
-						let scalarView = nft.resolveView(Type<FindViews.Scalar>())!
-						let s= scalarView as! FindViews.Scalar
+					if let s= FindViews.getScalar(nft) {
 						scalar=s.getScalar()
 					}				
 
@@ -161,42 +151,3 @@ pub fun main(user: String) : MetadataCollections? {
 	return MetadataCollections(items: resultMap, collections:results, curatedCollections: curatedCollections)
 }
 
-/*
-//This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-pub fun getItemForMetadataStandard(alias:String, path: PublicPath, account:PublicAccount, externalFixedUrl: String) : {String : MetadataCollectionItem} {
-	let items: {String : MetadataCollectionItem} = {}
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
-	if resolverCollectionCap.check() {
-		let collection = resolverCollectionCap.borrow()!
-		for id in collection.getIDs() {
-			let nft = collection.borrowViewResolver(id: id) 
-
-			if nft.resolveView(Type<MetadataViews.Display>()) != nil {
-				let displayView = nft.resolveView(Type<MetadataViews.Display>())!
-				let display = displayView as! MetadataViews.Display
-
-
-				var externalUrl=externalFixedUrl
-				if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
-					let url= externalUrlView as! MetadataViews.ExternalURL
-					externalUrl=url.url
-				}
-				let item = MetadataCollectionItem(
-					id: id,
-					name: display.name,
-					image: display.thumbnail.uri(),
-					url: externalUrl,
-					listPrice: nil,
-					listToken: nil,
-					contentType: "image",
-					rarity: ""
-				)
-				let itemId = alias.concat(item.id.toString())
-				items[itemId] = item
-			}
-		}
-	}
-	return items
-
-}
-*/

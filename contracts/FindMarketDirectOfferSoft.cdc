@@ -28,16 +28,7 @@ pub contract FindMarketDirectOfferSoft {
 			self.directOfferAccepted=false
 			self.validUntil=validUntil
 			self.saleItemExtraField=saleItemExtraField
-
-			var royalties : UFix64 = 0.0
-			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = view as? MetadataViews.Royalties {
-					for royalty in v.getRoyalties() {
-						royalties = royalties + royalty.cut
-					}
-				}
-			}
-			self.totalRoyalties=royalties
+			self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
 		}
 
 
@@ -55,13 +46,8 @@ pub contract FindMarketDirectOfferSoft {
 			self.offerCallback.borrow()!.acceptNonEscrowed(<- pointer.withdraw())
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties? {
-			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = view as? MetadataViews.Royalties {
-					return v
-				}
-			}
-			return  nil
+		pub fun getRoyalty() : MetadataViews.Royalties {
+			return self.pointer.getRoyalty()
 		}
 
 		pub fun getFtType() : Type {
@@ -159,7 +145,7 @@ pub contract FindMarketDirectOfferSoft {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun cancelBid(_ id: UInt64) 
 		access(contract) fun registerIncreasedBid(_ id: UInt64) 
 
@@ -377,6 +363,10 @@ pub contract FindMarketDirectOfferSoft {
 			return self.items.keys
 		}
 
+		pub fun containsId(_ id: UInt64): Bool {
+			return self.items.containsKey(id)
+		}
+
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			pre{
 				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
@@ -447,6 +437,7 @@ pub contract FindMarketDirectOfferSoft {
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun getVaultType(_ id: UInt64) : Type
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun acceptNonEscrowed(_ nft: @NonFungibleToken.NFT)
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
@@ -486,6 +477,10 @@ pub contract FindMarketDirectOfferSoft {
 
 		pub fun getIds() : [UInt64] {
 			return self.bids.keys
+		}
+
+		pub fun containsId(_ id: UInt64) : Bool {
+			return self.bids.containsKey(id)
 		}
 
 		pub fun getBidType() : Type {

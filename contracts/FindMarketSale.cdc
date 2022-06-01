@@ -38,14 +38,7 @@ pub contract FindMarketSale {
 			self.validUntil=validUntil
 			self.saleItemExtraField=saleItemExtraField
 			var royalties : UFix64 = 0.0
-			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = view as? MetadataViews.Royalties {
-					for royalty in v.getRoyalties() {
-						royalties = royalties + royalty.cut
-					}
-				}
-			}
-			self.totalRoyalties=royalties
+			self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
 		}
 
 		pub fun getSaleType() : String {
@@ -87,13 +80,8 @@ pub contract FindMarketSale {
 			return self.pointer.getItemType()
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties? {
-			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = view as? MetadataViews.Royalties {
-					return v
-				}
-			}
-			return  nil
+		pub fun getRoyalty() : MetadataViews.Royalties {
+			return self.pointer.getRoyalty()
 		}
 
 		pub fun getSeller() : Address {
@@ -146,7 +134,7 @@ pub contract FindMarketSale {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-
+		pub fun containsId(_ id: UInt64): Bool
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
 
@@ -260,6 +248,10 @@ pub contract FindMarketSale {
 			return self.items.keys
 		}
 
+		pub fun containsId(_ id: UInt64): Bool {
+			return self.items.containsKey(id)
+		}
+		
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			return &self.items[id] as &SaleItem
 		}

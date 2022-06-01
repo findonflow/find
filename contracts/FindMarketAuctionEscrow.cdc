@@ -40,16 +40,7 @@ pub contract FindMarketAuctionEscrow {
 			self.auctionEndsAt=nil
 			self.auctionValidUntil=auctionValidUntil
 			self.saleItemExtraField=saleItemExtraField
-
-			var royalties : UFix64 = 0.0
-			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = view as? MetadataViews.Royalties {
-					for royalty in v.getRoyalties() {
-						royalties = royalties + royalty.cut
-					}
-				}
-			}
-			self.totalRoyalties=royalties
+			self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
 		}
 
 		pub fun getId() : UInt64{
@@ -61,13 +52,8 @@ pub contract FindMarketAuctionEscrow {
 			return <- vault
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties? {
-			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = view as? MetadataViews.Royalties {
-					return v
-				}
-			}
-			return  nil
+		pub fun getRoyalty() : MetadataViews.Royalties {
+			return self.pointer.getRoyalty()
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -234,7 +220,7 @@ pub contract FindMarketAuctionEscrow {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
-
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) 
 
 		//place a bid on a token
@@ -485,6 +471,10 @@ pub contract FindMarketAuctionEscrow {
 			return self.items.keys
 		}
 
+		pub fun containsId(_ id: UInt64): Bool {
+			return self.items.containsKey(id)
+		}
+
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			pre{
 				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
@@ -548,6 +538,7 @@ pub contract FindMarketAuctionEscrow {
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
+		pub fun containsId(_ id: UInt64): Bool
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
@@ -586,6 +577,10 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getIds() : [UInt64] {
 			return self.bids.keys
+		}
+
+		pub fun containsId(_ id: UInt64) : Bool {
+			return self.bids.containsKey(id)
 		}
 
 		pub fun getBidType() : Type {

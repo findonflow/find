@@ -117,11 +117,10 @@ pub contract Dandy: NonFungibleToken {
 				description: self.description,
 				thumbnail: self.thumbnail.file
 			)
-
-
 		}
 
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
+		//NB! This will _not_ error out if it does not return Optional!
 		pub fun resolveView(_ type: Type): AnyStruct? {
 
 			if type == Type<MetadataViews.NFTCollectionDisplay>() {
