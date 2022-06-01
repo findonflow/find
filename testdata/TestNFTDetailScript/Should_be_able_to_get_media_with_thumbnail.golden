@@ -56,7 +56,7 @@
         "collectionDescription": "Arlequin FIND",
         "collectionName": "user1",
         "data": {},
-        "editionNumber": "1",
+        "editionNumber": "",
         "id": "141",
         "media": [
             {
@@ -89,13 +89,15 @@
             }
         ],
         "scalars": {
+            "edition_nft_max": "1.00000000",
+            "edition_nft_number": "1.00000000",
             "mint #": "3.00000000"
         },
         "tags": {
             "arlequin Tag": "Tag1"
         },
         "thumbnail": "https://bafybeidljddi5awmjxqitiyx7pqpjywup44hi5vee7fgjyaj6wohucrxje.ipfs.nftstorage.link/thumbnail.jpeg",
-        "totalInEdition": "1",
+        "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "141",
         "views": [

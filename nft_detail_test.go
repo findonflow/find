@@ -113,15 +113,45 @@ func TestNFTDetailScript(t *testing.T) {
 			}
 		}
 
-		actual := otu.O.ScriptFromFile("getNFTDetails").
+		actual1 := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("Dandy").
-				UInt64(dandyIds[4]).
+				UInt64(dandyIds[0]).
 				StringArray()).
 			RunReturnsJsonString()
 
-		autogold.Equal(t, actual)
+		otu.AutoGold("actual1", actual1)
+
+		actual2 := otu.O.ScriptFromFile("getNFTDetails").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("Dandy").
+				UInt64(dandyIds[1]).
+				StringArray()).
+			RunReturnsJsonString()
+
+		otu.AutoGold("actual2", actual2)
+
+		actual3 := otu.O.ScriptFromFile("getNFTDetails").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("Dandy").
+				UInt64(dandyIds[2]).
+				StringArray()).
+			RunReturnsJsonString()
+
+		otu.AutoGold("actual3", actual3)
+
+		actual4 := otu.O.ScriptFromFile("getNFTDetails").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("Dandy").
+				UInt64(dandyIds[3]).
+				StringArray()).
+			RunReturnsJsonString()
+
+		otu.AutoGold("actual", actual4)
 	})
 
 }
