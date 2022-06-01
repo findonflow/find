@@ -10,7 +10,7 @@ import FindMarket from "./FindMarket.cdc"
 
 pub contract FindMarketDirectOfferSoft {
 
-	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, endsAt: UFix64?)
+	pub event DirectOffer(tenant: String, id: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?)
 
 	pub resource SaleItem : FindMarket.SaleItem{
 
@@ -213,7 +213,10 @@ pub contract FindMarketDirectOfferSoft {
 			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
-			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: FIND.reverseLookup(buyer), endsAt: saleItem.validUntil)
+			let buyerName=FIND.reverseLookup(buyer)
+			let profile = FIND.lookup(buyer.toString())
+			
+			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil)
 		}
 
 

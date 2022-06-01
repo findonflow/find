@@ -403,6 +403,7 @@ func TestMarketSale(t *testing.T) {
 			registerUser("user2").
 			registerFtInRegistry().
 			setProfile("user1").
+			setProfile("user2").
 			setFlowDandyMarketOption("Sale")
 
 		price := 10.0
@@ -458,6 +459,7 @@ func TestMarketSale(t *testing.T) {
 			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
 			setProfile("user1").
+			setProfile("user2").
 			setFindCut(0.035)
 
 		price := 10.0

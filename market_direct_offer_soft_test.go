@@ -349,7 +349,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			acceptDirectOfferMarketSoft("user1", id, "user2", price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
@@ -399,7 +400,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			setProfile("user1"). 
+			setProfile("user1").
+			setProfile("user2").
 			setFindCut(0.035)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()

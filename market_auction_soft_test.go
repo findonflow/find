@@ -460,7 +460,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			setProfile("user1")
+			setProfile("user1").
+			setProfile("user2")
 
 		otu.tickClock(500.0)
 
@@ -504,6 +505,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			setProfile("user1").
+			setProfile("user2").
 			setFindCut(0.035)
 
 		otu.tickClock(500.0)

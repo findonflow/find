@@ -121,14 +121,31 @@ pub contract FIND {
 	}
 
 	/// Lookup the profile registered for a name
-	pub fun lookup(_ name:String): &{Profile.Public}? {
-		pre {
-			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+	pub fun lookup(_ input:String): &{Profile.Public}? {
+
+		if FIND.validateFindName(input) {
+			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+				return network.lookup(input)
+			}
 		}
 
-		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-			return network.lookup(name)
+		var address=input
+		if input.utf8[1] == 120 {
+			address = input.slice(from: 2, upTo: input.length)
 		}
+		var r:UInt64 = 0 
+		var bytes = address.decodeHex()
+
+		while bytes.length>0{
+			r = r  + (UInt64(bytes.removeFirst()) << UInt64(bytes.length * 8 ))
+		}
+
+		let account = getAccount(Address(r))
+		let cap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
+		if cap.check() {
+			return cap.borrow()!
+		}
+
 		panic("Network is not set up")
 	}
 
