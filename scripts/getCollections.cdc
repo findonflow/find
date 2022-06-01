@@ -99,10 +99,10 @@ pub fun main(user: String) : MetadataCollections? {
 					let display = displayView as! MetadataViews.Display
 
 					var externalUrl=nftInfo.externalFixedUrl
-					if nft.resolveView(Type<MetadataViews.ExternalURL>()) != nil {
-						let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>())!
-						let url= externalUrlView as! MetadataViews.ExternalURL
-						externalUrl=url.url
+					if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
+						if let view = externalUrlView as? MetadataViews.ExternalURL {
+							externalUrl=view.url
+						}
 					}
 
 					var rarity=""
@@ -111,7 +111,6 @@ pub fun main(user: String) : MetadataCollections? {
 						let r= rarityView as! FindViews.Rarity
 						rarity=r.rarityName
 					}
-
 					var tag : {String : String}={}
 					if nft.resolveView(Type<FindViews.Tag>()) != nil {
 						let tagView = nft.resolveView(Type<FindViews.Tag>())!

@@ -52,7 +52,7 @@ pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataColle
 
 		var externalUrl=""
 		if let externalUrlView = nft.resolveView(Type<MetadataViews.ExternalURL>()) {
-			let edvu= externalUrlView! as! MetadataViews.ExternalURL
+			let edvu= externalUrlView as! MetadataViews.ExternalURL
 			externalUrl=edvu.url
 		}
 		let item = MetadataCollectionItem(

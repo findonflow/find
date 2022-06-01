@@ -38,23 +38,7 @@ pub contract FindMarketSale {
 			self.validUntil=validUntil
 			self.saleItemExtraField=saleItemExtraField
 			var royalties : UFix64 = 0.0
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
-				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
-				for royalty in v.getRoyalties() {
-					royalties = royalties + royalty.cut
-				}
-			}
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
-				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
-				royalties = royalties + royalty.cut
-			}
-			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
-				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
-				for royalty in r {
-					royalties = royalties + royalty.cut
-				}
-			}
-			self.totalRoyalties=royalties
+			self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
 		}
 
 		pub fun getSaleType() : String {
@@ -97,19 +81,7 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getRoyalty() : MetadataViews.Royalties? {
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
-				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
-			}
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
-				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
-				return MetadataViews.Royalties([royalty])
-			}
-			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
-				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
-				return MetadataViews.Royalties(royalty)
-			}
-
-			return  nil
+			return self.pointer.getRoyalty()
 		}
 
 		pub fun getSeller() : Address {
