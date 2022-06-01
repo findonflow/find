@@ -191,10 +191,7 @@ pub contract FindMarket {
 			var status="active"
 			if !stopped.allowed {
 				status="stopped"
-				info.append(FindMarket.SaleItemInformation(item, status, false))
-				continue
 			}
-			//418
 
 			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
 
@@ -553,6 +550,7 @@ pub contract FindMarket {
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
+		pub fun getBlockedNFT(marketType: Type) : [Type] 
 		pub let name:String
 	}
 
@@ -750,24 +748,27 @@ pub contract FindMarket {
 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
 
-			var containsNFTType = false 
-			var containsListingType = false
+			// Find Rules have to be deny rules
+			var containsNFTType = false
+			var containsListingType = true
 			for item in self.findSaleItems.values {
 				for rule in item.rules {
 					if rule.types.contains(nftType){
 						containsNFTType = true
 					} 
-					if rule.types.contains(marketType) {
-						containsListingType = true
-					} 
-
-					if containsListingType && containsNFTType {
-						return nil
+					if rule.ruleType == "listing" && !rule.types.contains(marketType) {
+						containsListingType = false
 					}
 				}
+				if containsListingType && containsNFTType {
+						return nil
+				}
 				containsNFTType = false 
-				containsListingType = false
+				containsListingType = true
 			}
+
+			// Tenant Rules have to be allow rules
+			containsListingType = false
 			for item in self.tenantSaleItems.values {
 				var allowedFTTypes : [Type] = []
 				for rule in item.rules {
@@ -788,6 +789,61 @@ pub contract FindMarket {
 				containsListingType = false
 			}
 			return nil
+		}
+
+		pub fun getBlockedNFT(marketType: Type) : [Type] {
+			// Find Rules have to be deny rules
+			let list : [Type] = []
+			var containsListingType = true
+			var l : [Type] = []
+			for item in self.findSaleItems.values {
+				for rule in item.rules {
+					if rule.ruleType == "listing" && !rule.types.contains(marketType){
+						containsListingType = false
+					}
+					if rule.ruleType == "nft" {
+						l.appendAll(rule.types)
+					}
+				}
+				if containsListingType { 
+					for type in l {
+						if list.contains(type) {
+							continue
+						}
+						list.append(type)
+					}
+				}
+				l = []
+				containsListingType = true
+			}
+
+			containsListingType = false
+			// Tenant Rules have to be allow rules
+			for item in self.tenantSaleItems.values {
+				for rule in item.rules {
+					if item.status != "stopped" {
+						continue
+					}
+					if rule.ruleType == "nft"{
+						l.appendAll(rule.types)
+					}
+					if rule.types.contains(marketType) && rule.allow {
+						containsListingType = true
+					} 				
+
+				}
+				if containsListingType { 
+					for type in l {
+						if list.contains(type) {
+							continue
+						}
+						list.append(type)
+					}
+				}
+				l = []
+				containsListingType = false
+			}
+			return list
 		}
 	}
 
@@ -1212,7 +1268,9 @@ pub contract FindMarket {
 			self.listingValidUntil=item.getValidUntil()
 			self.nft=nil
 			if nftInfo {
-				self.nft=item.toNFTInfo()
+				if status != "stopped" {
+					self.nft=item.toNFTInfo()
+				}
 			}
 			let ftIdentifier=item.getFtType().identifier
 			self.ftTypeIdentifier=ftIdentifier
