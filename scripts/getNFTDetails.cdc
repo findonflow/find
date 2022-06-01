@@ -60,46 +60,28 @@ pub struct NFTDetail {
 		self.collectionName=nil
 		self.collectionDescription=nil
 
-		/* NFT Collection Display */
-		let collectionDisplay =item.resolveView(Type<MetadataViews.NFTCollectionDisplay>())
-		if collectionDisplay!= nil {
-			let view = collectionDisplay!
-			if view as? MetadataViews.NFTCollectionDisplay != nil {
-				let grouping = view as! MetadataViews.NFTCollectionDisplay
-				self.collectionName=grouping.name
-				self.collectionDescription=grouping.description
-			}
+		if let grouping=FindViews.getNFTCollectionDisplay(item) {
+			self.collectionName=grouping.name
+			self.collectionDescription=grouping.description
 		}
+
 		/* Rarity */
 		self.rarity=nil
-		let rarityView=item.resolveView(Type<FindViews.Rarity>()) 
-		if rarityView != nil {
-			let view = rarityView!
-			if view as? FindViews.Rarity != nil {
-				let rarity = view as! FindViews.Rarity
-				self.rarity=rarity.rarityName
-			}
-		} 
-		/* Tag */
-		let tagView=item.resolveView(Type<FindViews.Tag>())
-		if tagView != nil {
-			let view = tagView!
-			if view as? FindViews.Tag != nil {
-				let tags = view as! FindViews.Tag
-				self.tags=tags.getTag()
-			}
+		if let r = FindViews.getRarity(item) {
+		  self.rarity=r.rarityName
 		}
-		/* Scalar */
-		let scalarView=item.resolveView(Type<FindViews.Scalar>())
-		if scalarView != nil {
-			let view = scalarView!
-			if view as? FindViews.Scalar != nil {
-				let scalar = view as! FindViews.Scalar
+
+
+		if let t= FindViews.getTags(item) {
+			self.tags=t.getTag()
+		}			
+
+		if let scalar=FindViews.getScalar(item){
 				self.scalars=scalar.getScalar()
-			}
 		}
 	
-		let display = item.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+
+		let display = FindViews.getDisplay(item) ?? panic("Could not find display")
 		self.name=display.name
 		self.thumbnail=display.thumbnail.uri()
 		self.type=item.getType().identifier
@@ -109,34 +91,20 @@ pub struct NFTDetail {
 		/* Edition */
 		self.editionNumber=nil
 		self.totalInEdition=nil
-		let editionView=item.resolveView(Type<MetadataViews.Edition>())
-		if  editionView!= nil {
-			let view = editionView!
-			if view as? MetadataViews.Edition != nil {
-				let edition = view as! MetadataViews.Edition
-				self.editionNumber=edition.number
-				self.totalInEdition=edition.max
-			}
-		} 
-		let editionsView=item.resolveView(Type<MetadataViews.Editions>())
-		if  editionsView!= nil {
-			let view = editionsView!
-			if view as? MetadataViews.Editions != nil {
-				let editions = view as! MetadataViews.Editions
+			if let editions = FindViews.getEditions(item) {
 				for edition in editions.infoList {
-					if edition.name== nil {
+					if edition.name == nil {
 						self.editionNumber=edition.number
 						self.totalInEdition=edition.max
 					} else {
-						self.scalars["edition_".concat(edition.name!).concat("_number")]= UFix64(edition.number)
-
-						if let max=edition.max {
-							self.scalars["edition_".concat(edition.name!).concat("_max")]= UFix64(max)
+						self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
+						if edition.max != nil {
+							self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
 						}
 					}
 				}
 			}
-		}
+
 		/* Royalties */
 		self.royalties=resolveRoyalties(pointer)
 		self.data=views
@@ -294,27 +262,14 @@ pub fun getType(_ type: Type) : String {
 	return identifier.slice(from: counter + 1, upTo: identifier.length)
 }
 
-//TODO: fix this so that we do not use gas
 pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
-	let viewTypes = pointer.getViews() 
-	var resolveType = Type<MetadataViews.Royalty>()
-	if viewTypes.contains(resolveType) {
-		let royalty = pointer.resolveView(resolveType)! as! MetadataViews.Royalty
+	let array : [Royalties] = []
+	for royalty in pointer.getRoyalty().getRoyalties() {
 		let address = royalty.receiver.address
-		return [Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut)]
-	}
-	resolveType = Type<MetadataViews.Royalties>()
-	if viewTypes.contains(resolveType) {
-		let royalties = pointer.resolveView(resolveType)! as! MetadataViews.Royalties
-		let array : [Royalties] = []
-		for royalty in royalties.getRoyalties() {
-			let address = royalty.receiver.address
-			array.append(Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut))
-		}
-		return array
+		array.append(Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut))
 	}
 
-	return []
+	return array
 }
 
 pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : ListingTypeReport {
