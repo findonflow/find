@@ -9,12 +9,10 @@ func main() {
 	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
 	o := overflow.NewOverflowTestnet().Start()
 
-	/*
-		o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find").UFix64(1.0))
+	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find").UFix64(1.0))
 
-		//Deploy contracts to testnet
-		o.InitializeContracts()
-	*/
+	//Deploy contracts to testnet
+	o.InitializeContracts()
 
 	//send flow to admin and user account
 	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find-admin").UFix64(1000.0))
