@@ -264,6 +264,14 @@ pub contract FindViews {
 		return nil
 	}
 
+	pub fun getExternalURL(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.ExternalURL? {
+		if let view = viewResolver.resolveView(Type<MetadataViews.ExternalURL>()) {
+			if let v = view as? MetadataViews.ExternalURL {
+				return v
+			}
+		}
+		return nil
+	}
 
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
