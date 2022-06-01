@@ -303,18 +303,14 @@ pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 		let address = royalty.receiver.address
 		return [Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut)]
 	}
-	resolveType = Type<MetadataViews.Royalties>()
-	if viewTypes.contains(resolveType) {
-		let royalties = pointer.resolveView(resolveType)! as! MetadataViews.Royalties
-		let array : [Royalties] = []
-		for royalty in royalties.getRoyalties() {
-			let address = royalty.receiver.address
-			array.append(Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut))
-		}
-		return array
+
+	let array : [Royalties] = []
+	for royalty in pointer.getRoyalty().getRoyalties() {
+		let address = royalty.receiver.address
+		array.append(Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut))
 	}
 
-	return []
+	return array
 }
 
 pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : ListingTypeReport {

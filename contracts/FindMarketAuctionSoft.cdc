@@ -51,7 +51,7 @@ pub contract FindMarketAuctionSoft {
 			self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties? {
+		pub fun getRoyalty() : MetadataViews.Royalties {
 			return self.pointer.getRoyalty()
 		}
 

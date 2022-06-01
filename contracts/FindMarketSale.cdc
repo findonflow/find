@@ -80,7 +80,7 @@ pub contract FindMarketSale {
 			return self.pointer.getItemType()
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties? {
+		pub fun getRoyalty() : MetadataViews.Royalties {
 			return self.pointer.getRoyalty()
 		}
 
