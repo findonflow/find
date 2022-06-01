@@ -191,12 +191,16 @@ pub contract FindMarket {
 			var status="active"
 			if !stopped.allowed {
 				status="stopped"
+				info.append(FindMarket.SaleItemInformation(item, status, false))
+				continue
 			}
 
 			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
 
 			if !deprecated.allowed {
 				status="deprecated"
+				info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
+				continue
 			}
 
 			if let validTime = item.getValidUntil() {
@@ -642,44 +646,6 @@ pub contract FindMarket {
 				panic("Not valid type to add sale item for")
 			}
 		}
-	
-		// if status is nil, will fetch the original rule status (use for removal of rules)
-		access(contract) fun emitRulesEvent(item: TenantSaleItem, type: String, status: String?) {
-		let tenant = self.name 
-		let ruleName = item.name 
-		var ftTypes : [String] = [] 
-		var nftTypes : [String] = [] 
-		var listingTypes : [String] = [] 
-		var ruleStatus = status
-		for rule in item.rules {
-			var array : [String] = [] 
-			for t in rule.types {
-				array.append(t.identifier)
-			}
-			if rule.ruleType == "ft" {
-				ftTypes = array
-			} else if rule.ruleType == "nft" {
-				nftTypes = array
-			} else if rule.ruleType == "listing" {
-				listingTypes = array 
-			}
-		}
-		if ruleStatus == nil {
-			ruleStatus = item.status
-		}
-
-		if type == "find" {
-			emit FindBlockRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
-			return
-		} else if type == "tenant" {
-			emit TenantAllowRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
-			return
-		} else if type == "cut" {
-			emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut!.cut, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
-			return
-		}
-		panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
-	}
 
 		access(account) fun removeSaleItem(_ name:String, type:String) : TenantSaleItem {
 			if type=="find" {
@@ -697,6 +663,44 @@ pub contract FindMarket {
 			}
 			panic("Not valid type to add sale item for")
 
+		}
+
+		// if status is nil, will fetch the original rule status (use for removal of rules)
+		access(contract) fun emitRulesEvent(item: TenantSaleItem, type: String, status: String?) {
+			let tenant = self.name 
+			let ruleName = item.name 
+			var ftTypes : [String] = [] 
+			var nftTypes : [String] = [] 
+			var listingTypes : [String] = [] 
+			var ruleStatus = status
+			for rule in item.rules {
+				var array : [String] = [] 
+				for t in rule.types {
+					array.append(t.identifier)
+				}
+				if rule.ruleType == "ft" {
+					ftTypes = array
+				} else if rule.ruleType == "nft" {
+					nftTypes = array
+				} else if rule.ruleType == "listing" {
+					listingTypes = array 
+				}
+			}
+			if ruleStatus == nil {
+				ruleStatus = item.status
+			}
+
+			if type == "find" {
+				emit FindBlockRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+				return
+			} else if type == "tenant" {
+				emit TenantAllowRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+				return
+			} else if type == "cut" {
+				emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut!.cut, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+				return
+			}
+			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
 		}
 
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{

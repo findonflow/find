@@ -1082,6 +1082,16 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
+	otu.O.TransactionFromFile(script).
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 type SaleItem struct {
 	Amount              string `json:"amount"`
 	AuctionReservePrice string `json:"auctionReservePrice"`
