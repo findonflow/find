@@ -243,9 +243,10 @@ pub contract FindMarketDirectOfferSoft {
 			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
+			let buyerName=FIND.reverseLookup(buyer)
 			let profile = FIND.lookup(buyer.toString())
 			
-			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: profile?.getName(), buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil)
+			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil)
 		}
 
 
