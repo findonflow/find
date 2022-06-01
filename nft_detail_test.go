@@ -154,4 +154,112 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.AutoGold("actual", actual4)
 	})
 
+	t.Run("Should not be fetching NFTInfo when item is stopped", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setProfile("user1").
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			setFlowDandyMarketOption("DirectOfferSoft").
+			setFlowDandyMarketOption("Sale").
+			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSale("user1", ids[1], price).
+			directOfferMarketSoft("user2", "user1", ids[0], price).
+			listNFTForEscrowedAuction("user1", ids[1], price).
+			listNFTForSoftAuction("user1", ids[1], price).
+			directOfferMarketEscrowed("user2", "user1", ids[0], price).
+			alterMarketOption("Sale", "stop").
+			alterMarketOption("AuctionSoft", "stop").
+			alterMarketOption("AuctionEscrow", "stop").
+			alterMarketOption("DirectOfferSoft", "stop").
+			alterMarketOption("DirectOfferEscrow", "stop")
+
+		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+
+		autogold.Equal(t, actual)
+	})
+
+	t.Run("Should return all blocked NFTs by type", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setProfile("user1").
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			setFlowDandyMarketOption("DirectOfferSoft").
+			setFlowDandyMarketOption("Sale").
+			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSale("user1", ids[1], price).
+			directOfferMarketSoft("user2", "user1", ids[0], price).
+			listNFTForEscrowedAuction("user1", ids[1], price).
+			listNFTForSoftAuction("user1", ids[1], price).
+			directOfferMarketEscrowed("user2", "user1", ids[0], price).
+			alterMarketOption("Sale", "stop").
+			alterMarketOption("AuctionSoft", "stop").
+			alterMarketOption("AuctionEscrow", "stop")
+
+		actual := otu.O.ScriptFromFile("getMarketBlockedNFT").RunReturnsJsonString()
+
+		autogold.Equal(t, actual)
+	})
+
+	t.Run("Should not fetch NFTInfo if blocked by find", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setProfile("user1").
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			setFlowDandyMarketOption("DirectOfferSoft").
+			setFlowDandyMarketOption("Sale").
+			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSale("user1", ids[1], price).
+			directOfferMarketSoft("user2", "user1", ids[0], price).
+			listNFTForEscrowedAuction("user1", ids[1], price).
+			listNFTForSoftAuction("user1", ids[1], price).
+			blockDandy("testBlockItem")
+
+		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		autogold.Equal(t, actual)
+	})
+
+	t.Run("Should return all blocked NFTs if blocked by find.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setProfile("user1").
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			setFlowDandyMarketOption("DirectOfferSoft").
+			setFlowDandyMarketOption("Sale").
+			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption("AuctionSoft").
+			blockDandy("testBlockItem")
+
+		actual := otu.O.ScriptFromFile("getMarketBlockedNFT").RunReturnsJsonString()
+
+		autogold.Equal(t, actual)
+	})
+
+	t.Run("Should return all blocked NFTs if blocked by find by listing type.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setProfile("user1").
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			setFlowDandyMarketOption("DirectOfferSoft").
+			setFlowDandyMarketOption("Sale").
+			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption("AuctionSoft").
+			blockDandy("testBlockItemByListingType")
+
+		actual := otu.O.ScriptFromFile("getMarketBlockedNFT").RunReturnsJsonString()
+
+		autogold.Equal(t, actual)
+	})
 }
