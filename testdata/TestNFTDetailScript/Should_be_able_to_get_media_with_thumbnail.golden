@@ -69,7 +69,7 @@
                 "file": {
                     "url": "https://bafybeidljddi5awmjxqitiyx7pqpjywup44hi5vee7fgjyaj6wohucrxje.ipfs.nftstorage.link/thumbnail.jpeg"
                 },
-                "mediaType": "thumbnail"
+                "mediaType": "image/thumbnail"
             }
         ],
         "name": "Arlequin 1 of 1",
@@ -99,14 +99,12 @@
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "141",
         "views": [
-            "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "String",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media",
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "A.f8d6e0586b0a20c7.MetadataViews.Media"
         ]
     },
     "storefront": ""

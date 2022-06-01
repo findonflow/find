@@ -41,13 +41,15 @@ pub contract Dandy: NonFungibleToken {
 		access(contract) let schemas: {String : ViewInfo}
 		access(contract) let name: String
 		access(contract) let description: String
+		access(contract) let thumbnail: MetadataViews.Media
 		access(contract) let minterPlatform: MinterPlatform
 
 
-		init(name: String, description: String, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform, externalUrlPrefix: String?) {
+		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform, externalUrlPrefix: String?) {
 
 			self.id = self.uuid
 			self.schemas=schemas
+			self.thumbnail=thumbnail
 			self.minterPlatform=minterPlatform
 			self.name=name
 			self.description=description
@@ -67,11 +69,9 @@ pub contract Dandy: NonFungibleToken {
 		pub fun getViews() : [Type] {
 
 			var views : [Type]=[]
-			views.append(Type<MinterPlatform>())
 			views.append(Type<FindViews.Nounce>())
 			views.append(Type<MetadataViews.NFTCollectionData>())
 			views.append(Type<MetadataViews.NFTCollectionDisplay>())
-			views.append(Type<String>())
 			views.append(Type<MetadataViews.Display>())
 			views.append(Type<MetadataViews.Royalties>())
 
@@ -83,26 +83,22 @@ pub contract Dandy: NonFungibleToken {
 			}
 
 			//ViewConverter: If there are any viewconverters that add new types that can be resolved add them
-			for v in views {
-				if Dandy.viewConverters.containsKey(v.identifier) {
-					for converter in Dandy.viewConverters[v.identifier]! {
-						//I wants sets in cadence...
-						if !views.contains(converter.to){ 
-							views.append(converter.to)
-						}
-					}
-				}
-			}
+			// for v in views {
+			// 	if Dandy.viewConverters.containsKey(v.identifier) {
+			// 		for converter in Dandy.viewConverters[v.identifier]! {
+			// 			//I wants sets in cadence...
+			// 			if !views.contains(converter.to){ 
+			// 				views.append(converter.to)
+			// 			}
+			// 		}
+			// 	}
+			// }
 
 			return views
 		}
 
 		access(self) fun resolveRoyalties() : MetadataViews.Royalties {
 			let royalties : [MetadataViews.Royalty] = []
-
-			if self.schemas.containsKey(Type<MetadataViews.Royalty>().identifier) {
-				royalties.append(self.schemas[Type<MetadataViews.Royalty>().identifier]!.result as! MetadataViews.Royalty)
-			}
 
 			if self.schemas.containsKey(Type<MetadataViews.Royalties>().identifier) {
 				let multipleRoylaties=self.schemas[Type<MetadataViews.Royalties>().identifier]!.result as! MetadataViews.Royalties
@@ -116,53 +112,17 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun resolveDisplay() : MetadataViews.Display {
-			var thumbnail : AnyStruct{MetadataViews.File}? = nil
-			if self.schemas.containsKey(Type<FindViews.Files>().identifier) {
-				let medias=self.schemas[Type<FindViews.Files>().identifier]!.result as! FindViews.Files
-				if medias.media.containsKey("thumbnail") {
-					thumbnail=medias.media["thumbnail"] as! AnyStruct{MetadataViews.File}
-				}
-			}
-
-			if self.schemas.containsKey(Type<MetadataViews.HTTPFile>().identifier) {
-				thumbnail=self.schemas[Type<MetadataViews.HTTPFile>().identifier]!.result as! MetadataViews.HTTPFile
-			}
-
-			if self.schemas.containsKey(Type<MetadataViews.IPFSFile>().identifier) {
-				thumbnail=self.schemas[Type<MetadataViews.IPFSFile>().identifier]!.result as! MetadataViews.IPFSFile
-			}
-
-			if self.schemas.containsKey(Type<FindViews.SharedMedia>().identifier) {
-				thumbnail=self.schemas[Type<FindViews.SharedMedia>().identifier]!.result as! AnyStruct{MetadataViews.File}
-			}
-
-			if self.schemas.containsKey(Type<MetadataViews.Media>().identifier) {
-				let media=self.schemas[Type<MetadataViews.Media>().identifier]!.result as! MetadataViews.Media
-				if media.mediaType == "image" {
-					thumbnail=media.file
-				}
-			}
-
-			if self.schemas.containsKey(Type<FindViews.Medias>().identifier) {
-				let medias=self.schemas[Type<FindViews.Medias>().identifier]!.result as! FindViews.Medias 
-				for media in medias.items {
-					if media.mediaType == "thumbnail" {
-						thumbnail=media.file
-					}
-				}
-			}
-
 			return MetadataViews.Display(
 				name: self.name,
 				description: self.description,
-				thumbnail: thumbnail!
+				thumbnail: self.thumbnail.file
 			)
 
 
 		}
 
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
-		pub fun resolveView(_ type: Type): AnyStruct {
+		pub fun resolveView(_ type: Type): AnyStruct? {
 
 			if type == Type<MetadataViews.NFTCollectionDisplay>() {
 				let externalURL = MetadataViews.ExternalURL(self.minterPlatform.externalURL)
@@ -182,10 +142,6 @@ pub contract Dandy: NonFungibleToken {
 				)
 			}
 
-			if type == Type<MinterPlatform>() {
-				return self.minterPlatform
-			}
-
 			if type == Type<FindViews.Nounce>() {
 				return FindViews.Nounce(self.nounce)
 			}
@@ -198,23 +154,19 @@ pub contract Dandy: NonFungibleToken {
 				return self.resolveDisplay()
 			}
 
-			if type == Type<String>() {
-				return self.name
-			}
-
 			if self.schemas.keys.contains(type.identifier) {
 				return self.schemas[type.identifier]!.result
 			}
 
 			//Viewconverter: This is an example on how you as the last step in resolveView can check if there are converters for your type and run them
-			for converterValue in Dandy.viewConverters.keys {
-				for converter in Dandy.viewConverters[converterValue]! {
-					if converter.to == type {
-						let value= self.resolveView(converter.from)
-						return converter.convert(value)
-					}
-				}
-			}
+			// for converterValue in Dandy.viewConverters.keys {
+			// 	for converter in Dandy.viewConverters[converterValue]! {
+			// 		if converter.to == type {
+			// 			let value= self.resolveView(converter.from)
+			// 			return converter.convert(value)
+			// 		}
+			// 	}
+			// }
 			return nil
 		}
 
@@ -348,7 +300,7 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Forge(platform:platform)
 	}
 
-	access(account) fun mintNFT(name: String, description: String, platform:MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
+	access(account) fun mintNFT(name: String, description: String, thumbnail: MetadataViews.Media,  platform:MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
 		let views : {String: ViewInfo} = {}
 		for s in schemas {
 			//if you send in display we ignore it, this will be made for you
@@ -357,7 +309,7 @@ pub contract Dandy: NonFungibleToken {
 			}
 		}
 
-		let nft <-  create NFT(name: name, description:description, schemas:views, minterPlatform: platform, externalUrlPrefix:externalUrlPrefix)
+		let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, minterPlatform: platform, externalUrlPrefix:externalUrlPrefix)
 
 		emit Minted(id:nft.id, minter:nft.minterPlatform.name, name: name, description:description)
 		return <-  nft
@@ -375,8 +327,8 @@ pub contract Dandy: NonFungibleToken {
 			self.platform=platform
 		}
 
-		pub fun mintNFT(name: String, description: String, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
-			return <- Dandy.mintNFT(name: name, description: description, platform: self.platform, schemas: schemas, externalUrlPrefix:externalUrlPrefix)
+		pub fun mintNFT(name: String, description: String,thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
+			return <- Dandy.mintNFT(name: name, description: description, thumbnail: thumbnail, platform: self.platform, schemas: schemas, externalUrlPrefix:externalUrlPrefix)
 		}
 	}
 

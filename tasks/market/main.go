@@ -37,7 +37,7 @@ func main() {
 
 	o.SimpleTxArgs("adminSetFTInfo_flow", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find", o.Arguments())
-	o.SimpleTxArgs("adminSetSellDandyRules", "account", o.Arguments())
+	o.SimpleTxArgs("adminSetSellDandyRules", "find", o.Arguments().Account("account"))
 
 	//we advance the clock
 	o.TransactionFromFile("testClock").SignProposeAndPayAs("find").
@@ -113,12 +113,19 @@ func main() {
 			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
 
-	o.SimpleTxArgs("listNFTForSale", "user1", o.Arguments().
+	o.SimpleTxArgs("listNFTForAuctionEscrowed", "user1", o.Arguments().
 		Account("account").
 		String("Dandy").
 		UInt64(id2).
 		String("Flow").
-		UFix64(15.0))
+		UFix64(5.0).
+		UFix64(5.0+5.0).
+		UFix64(300.0).
+		UFix64(60.0).
+		UFix64(1.0).
+		UFix64(10.0))
+
+	// o.SimpleTxArgs("buyNFTForSale", "user2", o.Arguments().Account("account").String("user1").UInt64(id2).UFix64(10.0))
 
 	id := o.TransactionFromFile("mintDandy").
 		SignProposeAndPayAs("user1").
@@ -135,14 +142,19 @@ func main() {
 			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
 
-	o.SimpleTxArgs("listNFTForSale", "user1", o.Arguments().
+	o.SimpleTxArgs("listNFTForAuctionEscrowed", "user1", o.Arguments().
 		Account("account").
 		String("Dandy").
 		UInt64(id).
 		String("Flow").
+		UFix64(5.0).
+		UFix64(5.0+5.0).
+		UFix64(300.0).
+		UFix64(60.0).
+		UFix64(1.0).
 		UFix64(10.0))
 
-	o.SimpleTxArgs("buyNFTForSale", "user2", o.Arguments().Account("account").String("user1").UInt64(id).UFix64(10.0))
+	// o.SimpleTxArgs("buyNFTForSale", "user2", o.Arguments().Account("account").String("user1").UInt64(id).UFix64(10.0))
 
 	//transaction(address: Address, id: UInt64, amount: UFix64) {
 	/*

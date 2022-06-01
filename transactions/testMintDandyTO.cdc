@@ -22,7 +22,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
 		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
-		let media=MetadataViews.Media(file: httpFile, mediaType: "thumbnail")
+		let media=MetadataViews.Media(file: httpFile, mediaType: "image/thumbnail")
 
 		let rarity = FindViews.Rarity(rarity: rarityNum, rarityName:rarity, parts: {})
 
@@ -42,6 +42,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
+				thumbnail: media,
 				schemas: schemas, 
 				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"),
 				collectionDescription: "Neo Collectibles FIND",
@@ -62,7 +63,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artHttpFile=MetadataViews.HTTPFile(url:"https://nft.blocto.app/xtingles/xBloctopus.mp4")
 			let thumbnailFile=MetadataViews.HTTPFile(url:"https://nft.blocto.app/xtingles/preview-xBloctopus.png")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video")
-			let thumbnailMedia=MetadataViews.Media(file: thumbnailFile, mediaType: "thumbnail")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailFile, mediaType: "image/thumbnail")
 			let artTag=FindViews.Tag({"xtingle Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"video length" : 27.0})
 
@@ -70,6 +71,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "xtingle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
+				thumbnail: thumbnailMedia,
 				schemas: schemas, 
 				externalUrlPrefix: "https://nft.blocto.app/xtingles/",
 				collectionDescription: "xtingle FIND",
@@ -96,6 +98,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "flovatar ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
+				thumbnail: artMedia,
 				schemas: schemas, 
 				externalUrlPrefix: "https://flovatar.com/flovatars/",
 				collectionDescription: "flovatar FIND",
@@ -116,7 +119,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artHttpFile=MetadataViews.IPFSFile(cid:"https://giglabs.mypinata.cloud/ipfs/QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U", path:nil)
 			let thumbnailHttpFile=MetadataViews.IPFSFile(cid:"https://giglabs.mypinata.cloud/ipfs/QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR", path:nil)
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/ipfs")
-			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "thumbnail")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/thumbnail")
 
 			let artTag=FindViews.Tag({"ufcstrike Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"rank" : 295.0})
@@ -125,6 +128,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "ufcstrike ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
+				thumbnail: thumbnailMedia,
 				schemas: schemas, 
 				externalUrlPrefix: "https://giglabs.mypinata.cloud/ipfs/",
 				collectionDescription: "ufc strike FIND",
@@ -146,7 +150,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artHttpFile=MetadataViews.HTTPFile(url:"https://www.arlequin.gg/arlee?cid=bafybeidljddi5awmjxqitiyx7pqpjywup44hi5vee7fgjyaj6wohucrxje")
 			let thumbnailHttpFile=MetadataViews.HTTPFile(url:"https://bafybeidljddi5awmjxqitiyx7pqpjywup44hi5vee7fgjyaj6wohucrxje.ipfs.nftstorage.link/thumbnail.jpeg")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "3d model")
-			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "thumbnail")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/thumbnail")
 			
 			let artTag=FindViews.Tag({"arlequin Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"mint #" : 3.0})
@@ -155,6 +159,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "Arlequin ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
+				thumbnail: thumbnailMedia,
 				schemas: schemas, 
 				externalUrlPrefix: "https://www.arlequin.gg/arlee?cid=",
 				collectionDescription: "Arlequin FIND",

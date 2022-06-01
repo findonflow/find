@@ -28,7 +28,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let creativeWork=
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
-		let media=MetadataViews.HTTPFile(url:nftUrl)
+		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
+		let media=MetadataViews.Media(file: httpFile, mediaType: "image")
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
@@ -47,6 +48,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let token <- finLeases.mintDandy(minter: name, 
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
+				thumbnail: media,
 				schemas: schemas, 
 				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"),
 				collectionDescription: collectionDescription,

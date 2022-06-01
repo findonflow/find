@@ -30,20 +30,11 @@ pub contract FindMarketDirectOfferSoft {
 			self.saleItemExtraField=saleItemExtraField
 
 			var royalties : UFix64 = 0.0
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
-				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
-				for royalty in v.getRoyalties() {
-					royalties = royalties + royalty.cut
-				}
-			}
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
-				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
-				royalties = royalties + royalty.cut
-			}
-			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
-				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
-				for royalty in r {
-					royalties = royalties + royalty.cut
+			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
+				if let v = view as? MetadataViews.Royalties {
+					for royalty in v.getRoyalties() {
+						royalties = royalties + royalty.cut
+					}
 				}
 			}
 			self.totalRoyalties=royalties
@@ -65,18 +56,11 @@ pub contract FindMarketDirectOfferSoft {
 		}
 
 		pub fun getRoyalty() : MetadataViews.Royalties? {
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
-				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
+				if let v = view as? MetadataViews.Royalties {
+					return v
+				}
 			}
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
-				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
-				return MetadataViews.Royalties([royalty])
-			}
-			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
-				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
-				return MetadataViews.Royalties(royalty)
-			}
-
 			return  nil
 		}
 

@@ -42,20 +42,11 @@ pub contract FindMarketAuctionEscrow {
 			self.saleItemExtraField=saleItemExtraField
 
 			var royalties : UFix64 = 0.0
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
-				let v = self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
-				for royalty in v.getRoyalties() {
-					royalties = royalties + royalty.cut
-				}
-			}
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
-				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
-				royalties = royalties + royalty.cut
-			}
-			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
-				let r= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
-				for royalty in r {
-					royalties = royalties + royalty.cut
+			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
+				if let v = view as? MetadataViews.Royalties {
+					for royalty in v.getRoyalties() {
+						royalties = royalties + royalty.cut
+					}
 				}
 			}
 			self.totalRoyalties=royalties
@@ -71,18 +62,11 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun getRoyalty() : MetadataViews.Royalties? {
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalties>()) {
-				return self.pointer.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+			if let view = self.pointer.resolveView(Type<MetadataViews.Royalties>()) {
+				if let v = view as? MetadataViews.Royalties {
+					return v
+				}
 			}
-			if self.pointer.getViews().contains(Type<MetadataViews.Royalty>()) {
-				let royalty= self.pointer.resolveView(Type<MetadataViews.Royalty>())! as! MetadataViews.Royalty
-				return MetadataViews.Royalties([royalty])
-			}
-			if self.pointer.getViews().contains(Type<[MetadataViews.Royalty]>()) {
-				let royalty= self.pointer.resolveView(Type<[MetadataViews.Royalty]>())! as! [MetadataViews.Royalty]
-				return MetadataViews.Royalties(royalty)
-			}
-
 			return  nil
 		}
 
@@ -482,7 +466,7 @@ pub contract FindMarketAuctionEscrow {
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
-			
+
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "list item for auction"))
 
 			if !actionResult.allowed {

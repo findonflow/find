@@ -68,13 +68,11 @@
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "134",
         "views": [
-            "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "String",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
             "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+            "A.f8d6e0586b0a20c7.MetadataViews.Media",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork"
         ]
     },
