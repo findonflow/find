@@ -241,6 +241,16 @@ pub contract Admin {
 			return cap.borrow() ?? panic("Cannot borrow tenant reference.")
 		}
 
+		pub fun addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
+			let tenant = self.getTenantRef(tenant)
+			tenant.addSaleItem(item, type: "find")
+		}
+
+		pub fun removeFindBlockItem(tenant: Address, name: String) {
+			let tenant = self.getTenantRef(tenant)
+			tenant.removeSaleItem(name, type: "find")
+		}
+
 		pub fun setFindCut(tenant: Address, cut: UFix64?, rules: [FindMarket.TenantRule]?, status: String) {
 			let tenant = self.getTenantRef(tenant)
 			let oldCut = tenant.removeSaleItem("findRoyalty", type: "cut") 
