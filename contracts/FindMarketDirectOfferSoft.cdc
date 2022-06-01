@@ -46,7 +46,7 @@ pub contract FindMarketDirectOfferSoft {
 			self.offerCallback.borrow()!.acceptNonEscrowed(<- pointer.withdraw())
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties? {
+		pub fun getRoyalty() : MetadataViews.Royalties {
 			return self.pointer.getRoyalty()
 		}
 
