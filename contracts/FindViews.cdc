@@ -128,6 +128,11 @@ pub contract FindViews {
 		pub fun valid() : Bool 
 		pub fun getItemType() : Type 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver}
+
+		//There are just convenience functions for shared views in the standard
+		pub fun getRoyalty() : MetadataViews.Royalties? 
+		pub fun getTotalRoyaltiesCut() : UFix64
+
 	}
 
 	//An interface to say that this pointer can withdraw
@@ -160,6 +165,26 @@ pub contract FindViews {
 			return self.cap.address
 		}
 
+
+		pub fun getTotalRoyaltiesCut() :UFix64 {
+			var total=0.0
+			if let royalties = self.getRoyalty() {
+				for royalty in royalties.getRoyalties() {
+					total = total + royalty.cut
+				}
+			}
+			return total
+		}
+
+		pub fun getRoyalty() : MetadataViews.Royalties? {
+			if let royaltiesView = self.resolveView(Type<MetadataViews.Royalties>()) {
+				if let v = royaltiesView as? MetadataViews.Royalties {
+					return v
+				}
+			}
+			return nil
+		}
+
 		pub fun valid() : Bool {
 			if !self.cap.borrow()!.getIDs().contains(self.id) {
 				return false
@@ -177,6 +202,16 @@ pub contract FindViews {
 
 	}
 
+
+	pub fun getNounce(_ viewResolver: &AnyResource{MetadataViews.Resolver}) : UInt64 {
+		if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
+				if let v = nounce as? FindViews.Nounce {
+					return v.nounce
+			}
+		}
+		return 0
+	}
+
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
@@ -188,13 +223,7 @@ pub contract FindViews {
 
 			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
 
-			let nounceType= Type<FindViews.Nounce>()
-			if viewResolver.getViews().contains(nounceType) {
-				let nounce= viewResolver.resolveView(nounceType)! as! FindViews.Nounce
-				self.nounce=nounce.nounce
-			} else {
-				self.nounce=0
-			}
+			self.nounce=FindViews.getNounce(viewResolver)
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
@@ -220,12 +249,30 @@ pub contract FindViews {
 
 			let viewResolver=self.getViewResolver()
 
-			let nounceType= Type<FindViews.Nounce>()
-			if viewResolver.getViews().contains(nounceType) {
-				let nounce= viewResolver.resolveView(nounceType)! as! FindViews.Nounce
-				return nounce.nounce==self.nounce
+			if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
+				if let v = nounce as? FindViews.Nounce {
+					return v.nounce==self.nounce
+				}
 			}
 			return true
+		}
+
+		pub fun getTotalRoyaltiesCut() :UFix64 {
+			var total=0.0
+			if let royalties = self.getRoyalty() {
+				for royalty in royalties.getRoyalties() {
+					total = total + royalty.cut
+				}
+			}
+			return total
+		}
+		pub fun getRoyalty() : MetadataViews.Royalties? {
+			if let royaltiesView = self.resolveView(Type<MetadataViews.Royalties>()) {
+				if let v = royaltiesView as? MetadataViews.Royalties {
+					return v
+				}
+			}
+			return nil
 		}
 
 		pub fun withdraw() :@NonFungibleToken.NFT {

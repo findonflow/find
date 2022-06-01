@@ -189,20 +189,19 @@ pub contract FindMarket {
 			if !stopped.allowed {
 				status="stopped"
 			}
-			//418
 
 			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
 
 			if !deprecated.allowed {
 				status="deprecated"
 			}
+
 			if let validTime = item.getValidUntil() {
 				if validTime <= Clock.time() {
 					status="ended"
 				}
 			}
 			info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
-
 		}
 
 		return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
