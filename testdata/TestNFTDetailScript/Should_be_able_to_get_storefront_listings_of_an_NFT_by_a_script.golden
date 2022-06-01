@@ -78,6 +78,7 @@
         "data": {},
         "editionNumber": "2",
         "id": "134",
+        "media": null,
         "name": "Neo Motorcycle 2 of 3",
         "rarity": "",
         "royalties": [
@@ -110,16 +111,11 @@
             "A.f8d6e0586b0a20c7.Dandy.MinterPlatform",
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
             "String",
-            "A.f8d6e0586b0a20c7.MetadataViews.Display",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
             "A.f8d6e0586b0a20c7.MetadataViews.HTTPFile",
             "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-            "A.f8d6e0586b0a20c7.MetadataViews.Editions",
-            "A.f8d6e0586b0a20c7.FindViews.Tag",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.FindViews.Scalar"
+            "A.f8d6e0586b0a20c7.FindViews.CreativeWork"
         ]
     },
     "storefront": {
