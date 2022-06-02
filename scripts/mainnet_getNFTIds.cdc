@@ -98,7 +98,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let partyMansionDrinksCap = account.getCapability<&{PartyMansionDrinksContract.DrinkCollectionPublic}>(PartyMansionDrinksContract.CollectionPublicPath)
 	if partyMansionDrinksCap.check() {
-		ids["PartyBeers"] = partyMansionDrinksCap.borrow()!.getIDs()
+		ids["PartyMansionDrinksContract"] = partyMansionDrinksCap.borrow()!.getIDs()
 	}
 
 	let rareRoomCap = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
@@ -136,7 +136,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let motoGPCollectionCap = account.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
 	if motoGPCollectionCap.check() {
-		ids["MotoGP"] = motoGPCollectionCap.borrow()!.getIDs()
+		ids["MotoGPCard"] = motoGPCollectionCap.borrow()!.getIDs()
 	}
 
 	let gaiaCap = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
@@ -155,7 +155,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let mwaCap = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
 	if mwaCap.check() {
-		ids["MatrixWorldAssets"] = mwaCap.borrow()!.getIDs()
+		ids["MatrixWorldAssetsNFT"] = mwaCap.borrow()!.getIDs()
 	}
 
 	let mwffCap = account.getCapability<&{MatrixWorldFlowFestNFT.MatrixWorldFlowFestNFTCollectionPublic}>(MatrixWorldFlowFestNFT.CollectionPublicPath)
@@ -180,7 +180,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if geniaceCap.check() {
-		ids["Geniace"] = geniaceCap.borrow()!.getIDs()
+		ids["GeniaceNFT"] = geniaceCap.borrow()!.getIDs()
 	}
 
 	let ofCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
@@ -236,7 +236,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let mynftCap = account.getCapability<&{Mynft.MynftCollectionPublic}>(Mynft.CollectionPublicPath)
 	if mynftCap.check() {
-		ids["mynft"] = mynftCap.borrow()!.getIDs()
+		ids["Mynft"] = mynftCap.borrow()!.getIDs()
 	}
 
 	let neoAvatarCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoAvatar.CollectionPublicPath)
@@ -271,7 +271,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let zeedzCap = account.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
 	if zeedzCap.check(){
-		ids["Zeeds"]=zeedzCap.borrow()!.getIDs()
+		ids["ZeedzINO"]=zeedzCap.borrow()!.getIDs()
 	}
 
 	let dayCap = account.getCapability<&{MetadataViews.ResolverCollection}>(DayNFT.CollectionPublicPath)
