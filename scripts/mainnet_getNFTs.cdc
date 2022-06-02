@@ -1286,7 +1286,7 @@ pub fun	getDayNFT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 } 
 
 pub fun	getNecryptolis(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
-	return getItemForMetadataStandard(path: Necryptolis.ResolverCollectionPublicPath, owner: owner, externalFixedUrl: "https://necryptolis.com", id:id)
+	return getItemForMetadataStandard(path: Necryptolis.ResolverCollectionPublicPath, owner: owner, externalFixedUrl: "https://www.necryptolis.com", id:id)
 }
 
 pub fun	getFlowverseSocks(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {

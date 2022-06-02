@@ -1,28 +1,31 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-
-//mainnet
-import Beam from 0x86b4a0010a71cfc3 
 import GooberXContract from 0x34f2bf4a80bb0f69
+
+import SturdyItems from 0x427ceada271aa0b1
+import UFC_NFT from 0x329feb3ab062d289
+
+import Gaia from 0x8b148183c28ff88f
+
+import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
+import DGD_NFT from 0x329feb3ab062d289
+import The_Next_Cartel_NFT from 0x329feb3ab062d289
+import OneFootballCollectible from 0x6831760534292098
+import MatrixWorldAssetsNFT from 0xf20df769e658c257
+import Necryptolis from 0x718efe5e88fe48ea
 import RareRooms_NFT from 0x329feb3ab062d289
 import CNN_NFT from 0x329feb3ab062d289
+import Evolution from 0xf4264ac8f3256818
+import MintStoreItem from 0x20187093790b9aef
+import MotoGPCard from 0xa49cc0ee46c54bfb
+import SomePlaceCollectible from 0x667a16294a089ef8
 import Canes_Vault_NFT from 0x329feb3ab062d289
-import DGD_NFT from 0x329feb3ab062d289
 import RaceDay_NFT from 0x329feb3ab062d289
-import The_Next_Cartel_NFT from 0x329feb3ab062d289
-import ChainmonstersRewards from 0x93615d25d14fa337
-import MatrixWorldFlowFestNFT from 0x2d2750f240198f91
 import GeniaceNFT from 0xabda6627c70c7f52
-import OneFootballCollectible from 0x6831760534292098
 import GoatedGoats from 0x2068315349bdfce5
 import HaikuNFT from 0xf61e40c19db2a9e2
 import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
 import BarterYardPackNFT from 0xa95b021cf8a30d80
-import SturdyItems from 0x427ceada271aa0b1
-import Evolution from 0xf4264ac8f3256818
-import UFC_NFT from 0x329feb3ab062d289
-import MotoGPCard from 0xa49cc0ee46c54bfb
-import Gaia from 0x8b148183c28ff88f
 import Moments from 0xd4ad4740ee426334
 import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
@@ -36,7 +39,6 @@ import FlovatarMarketplace from  0x921ea449dffec68a
 import CharityNFT from "../contracts/CharityNFT.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-import MatrixWorldAssetsNFT from 0xf20df769e658c257
 
 import NeoAvatar from 0xb25138dbf45e5801
 import NeoVoucher from 0xb25138dbf45e5801
@@ -51,20 +53,14 @@ import Vouchers from 0x444f5ea22c6ea12c
 //xtingles
 import Collectible from 0xf5b0eb433389ac3f
 
-import StarlyCard from 0x5b82f21c0edf76e3
-import StarlyMetadataViews from 0x5b82f21c0edf76e3
 import Momentables from 0x9d21537544d9123d
 import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 import DayNFT from 0x1600b04bf033fb99
 import RaribleNFT from 0x01ab36aaf654a13e
-import Necryptolis from 0x718efe5e88fe48ea
 
 import FLOAT from 0x2d4c3caffbeab845
-
-import MintStoreItem from 0x20187093790b9aef
-import SomePlaceCollectible from 0x667a16294a089ef8
 
 import Bl0x from 0x7620acf6d7f2468a
 import Bl0xPack from 0x7620acf6d7f2468a
@@ -393,6 +389,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 
 	let raribleCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(RaribleNFT.collectionPublicPath)
 
+	if raribleCap.check() {
 	let mySockIds : [UInt64] = []
 	for id in raribleCap.borrow()!.getIDs() {
 		if sockIds.contains(id) {
@@ -400,6 +397,7 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		}
 	}
 	ids["FlowverseSocks"] = mySockIds
+	}
 
 
 	let floatCap = account.getCapability<&{MetadataViews.ResolverCollection}>(FLOAT.FLOATCollectionPublicPath)

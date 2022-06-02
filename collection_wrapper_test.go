@@ -16,7 +16,8 @@ func TestNewCollctionsWrapper(t *testing.T) {
 
 	o := overflow.NewOverflowMainnet().Start()
 
-	address := "0x886f3aeaf848c535"
+	//	address := "0x886f3aeaf848c535" //bjartek
+	address := "0x3c8dda02f6e1d356"
 
 	var items Items
 	o.ScriptFromFile("mainnet_getCollections_old").Args(o.Arguments().String(address)).RunMarshalAs(&items)
