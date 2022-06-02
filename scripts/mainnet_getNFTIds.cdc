@@ -57,6 +57,19 @@ import Momentables from 0x9d21537544d9123d
 import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
+import DayNFT from 0x1600b04bf033fb99
+import RaribleNFT from 0x01ab36aaf654a13e
+import Necryptolis from 0x718efe5e88fe48ea
+
+import FLOAT from 0x2d4c3caffbeab845
+
+import MintStoreItem from 0x20187093790b9aef
+import SomePlaceCollectible from 0x667a16294a089ef8
+
+import Bl0x from 0x7620acf6d7f2468a
+import Bl0xPack from 0x7620acf6d7f2468a
+
+
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let name: String
@@ -134,6 +147,14 @@ pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollect
 				case "BarterYardClubWerewolf": d  = getBYCW(owner:owner, id:id) 
 				case "Momentables": d  = getMomentables(owner:owner, id:id) 
 				case "Zeeds": d = getZeeds(owner:owner, id:id)
+				case "DayNFT" : d = getDayNFT(owner:owner, id:id)
+				case "Necryptolis" : d = getNecryptolis(owner:owner, id:id)
+				case "FlowverseSocks" : d = getFlowverseSocks(owner:owner, id:id)
+				case "FLOAT" : d = getFloat(owner:owner, id:id)
+				case "MintStore" : d = getMintStore(owner:owner, id:id)
+				case "SomePlace" : d = getSomePlace(owner:owner, id:id)
+				case "Bl0x" : d = getBl0x(owner: owner, id: id)
+				case "Bl0xPack" : d = getBl0xPack(owner: owner, id: id)
 
 			default:
 				panic("adapter for NFT not found: ".concat(key))
@@ -331,9 +352,9 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		ids["NeoVoucher"] = neoVoucherCap.borrow()!.getIDs()
 	}
 
-	let neoMemberCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
+	let neoMemberCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoMember.CollectionPublicPath)
 	if neoMemberCap.check() {
-		ids["NeoMember"] = neoVoucherCap.borrow()!.getIDs()
+		ids["NeoMember"] = neoMemberCap.borrow()!.getIDs()
 	}
 
 	let barterYardPackCap= account.getCapability<&{BarterYardPackNFT.BarterYardPackNFTCollectionPublic}>(BarterYardPackNFT.CollectionPublicPath)
@@ -356,6 +377,55 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		ids["Zeeds"]=zeedzCap.borrow()!.getIDs()
 	}
 
+	let dayCap = account.getCapability<&{MetadataViews.ResolverCollection}>(DayNFT.CollectionPublicPath)
+	if dayCap.check() {
+		ids["DayNFT"] = dayCap.borrow()!.getIDs()
+	}
+
+	let necroCap = account.getCapability<&{MetadataViews.ResolverCollection}>(Necryptolis.ResolverCollectionPublicPath)
+	if necroCap.check() {
+		ids["Necryptolis"] = necroCap.borrow()!.getIDs()
+	}
+
+
+	let sockIds : [UInt64] = [14813, 15013, 14946, 14808, 14899, 14792, 15016, 14961, 14816, 14796, 14992, 14977, 14815, 14863, 14817, 14814, 14875, 14960, 14985, 14850, 14849, 14966, 14826, 14972, 14795, 15021, 14950, 14847, 14970, 14833, 14786, 15010, 14953, 14799, 14883, 14947, 14844, 14801, 14886, 15015, 15023, 15027, 15029, 14802, 14810, 14948, 14955, 14957, 14988, 15007, 15009, 14837, 15024, 14803, 14973, 14969, 15002, 15017, 14797, 14894, 14881, 15025, 14791, 14979, 14789, 14993, 14873, 14939, 15005, 15006, 14869, 14889, 15004, 15008, 15026, 14990, 14998, 14898, 14819, 14840, 14974, 15019, 14856, 14838, 14787, 14876, 14996, 14798, 14855, 14824, 14843, 14959, 15020, 14862, 14822, 14897, 14830, 14790, 14867, 14878, 14991, 14835, 14818, 14892, 14800, 15000, 14857, 14986, 14805, 14812, 14962]
+
+
+	let raribleCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(RaribleNFT.collectionPublicPath)
+
+	let mySockIds : [UInt64] = []
+	for id in raribleCap.borrow()!.getIDs() {
+		if sockIds.contains(id) {
+			mySockIds.append(id)
+		}
+	}
+	ids["FlowverseSocks"] = mySockIds
+
+
+	let floatCap = account.getCapability<&{MetadataViews.ResolverCollection}>(FLOAT.FLOATCollectionPublicPath)
+	if floatCap.check() {
+		ids["FLOAT"] = floatCap.borrow()!.getIDs()
+	}
+
+  let mintStoreCap = account.getCapability<&{MintStoreItem.MintStoreItemCollectionPublic}>(MintStoreItem.CollectionPublicPath)
+	if mintStoreCap.check() {
+		ids["MintStore"] = mintStoreCap.borrow()!.getIDs()
+	}
+
+	let somePlaceCap =account.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
+	if somePlaceCap.check(){
+		ids["SomePlace"] = somePlaceCap.borrow()!.getIDs()
+	}
+
+	let bl0xCap = account.getCapability<&{MetadataViews.ResolverCollection}>(Bl0x.CollectionPublicPath)
+	if bl0xCap.check() {
+		ids["Bl0x"] = bl0xCap.borrow()!.getIDs()
+	}
+
+	let bl0xPackCap = account.getCapability<&{MetadataViews.ResolverCollection}>(Bl0xPack.CollectionPublicPath)
+	if bl0xPackCap.check() {
+		ids["Bl0xPack"] = bl0xPackCap.borrow()!.getIDs()
+	}
 
 	for key in ids.keys {
 		if ids[key]!.length == 0 {
@@ -363,30 +433,6 @@ pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		}
 	}
 	return ids
-}
-
-
-/*
-pub fun main(user: String, ids: {String:[UInt64]}): [MetadataCollectionItem] {
-	let resolvingAddress = FIND.resolve(user)
-	if resolvingAddress == nil {
-		return {}
-	}
-	let address = resolvingAddress!
-
-
-	return getNFTs(ownerAddress:address, ids:ids)
-}
-*/
-
-pub fun main(user: String) : {String: [UInt64]} {
-	let resolvingAddress = FIND.resolve(user)
-	if resolvingAddress == nil {
-		return {}
-	}
-	let address = resolvingAddress!
-
-	return getNFTIDs(ownerAddress: address)
 }
 
 pub fun	getFlovatar(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
@@ -888,7 +934,7 @@ pub fun	getSturdyItems(owner:PublicAccount, id:UInt64) : MetadataCollectionItem?
 
 pub fun	getFindCharity(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let charityCap = owner.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)
-	if charityCap.check() {
+	if !charityCap.check() {
 		return nil
 	}
 	let collection = charityCap.borrow()!
@@ -1235,6 +1281,117 @@ if !zeedzCap.check() {
 }
 
 
+pub fun	getDayNFT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	return getItemForMetadataStandard(path: DayNFT.CollectionPublicPath, owner: owner, externalFixedUrl: "https://day-nft.io", id:id)
+} 
+
+pub fun	getNecryptolis(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	return getItemForMetadataStandard(path: Necryptolis.ResolverCollectionPublicPath, owner: owner, externalFixedUrl: "https://necryptolis.com", id:id)
+}
+
+pub fun	getFlowverseSocks(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	let raribleCap = owner.getCapability<&{NonFungibleToken.CollectionPublic}>(RaribleNFT.collectionPublicPath)
+	if !raribleCap.check() {
+		return nil
+	}
+
+	let sockIds : [UInt64] = [14813, 15013, 14946, 14808, 14899, 14792, 15016, 14961, 14816, 14796, 14992, 14977, 14815, 14863, 14817, 14814, 14875, 14960, 14985, 14850, 14849, 14966, 14826, 14972, 14795, 15021, 14950, 14847, 14970, 14833, 14786, 15010, 14953, 14799, 14883, 14947, 14844, 14801, 14886, 15015, 15023, 15027, 15029, 14802, 14810, 14948, 14955, 14957, 14988, 15007, 15009, 14837, 15024, 14803, 14973, 14969, 15002, 15017, 14797, 14894, 14881, 15025, 14791, 14979, 14789, 14993, 14873, 14939, 15005, 15006, 14869, 14889, 15004, 15008, 15026, 14990, 14998, 14898, 14819, 14840, 14974, 15019, 14856, 14838, 14787, 14876, 14996, 14798, 14855, 14824, 14843, 14959, 15020, 14862, 14822, 14897, 14830, 14790, 14867, 14878, 14991, 14835, 14818, 14892, 14800, 15000, 14857, 14986, 14805, 14812, 14962]
+
+	if !sockIds.contains(id) {
+		return nil
+	}
+
+	let collection = raribleCap.borrow()!
+	collection.borrowNFT(id:id)!
+
+	return MetadataCollectionItem(
+		id: id,
+		name: "Flowverse socks",
+		image: "https://img.rarible.com/prod/video/upload/t_video_big/prod-itemAnimations/FLOW-A.01ab36aaf654a13e.RaribleNFT:15029/b1cedf3",
+		url: "https://www.flowverse.co/socks",
+		listPrice: nil,
+		listToken: nil,
+		contentType: "video",
+		rarity: ""
+	)
+}
+
+pub fun	getFloat(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	let address=owner.address!
+	return getItemForMetadataStandard(path: FLOAT.FLOATCollectionPublicPath, owner: owner, externalFixedUrl: "https://floats.city/".concat(address.toString()), id:id)
+}
+
+pub fun	getMintStore(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	let mintStoreCap = owner.getCapability<&{MintStoreItem.MintStoreItemCollectionPublic}>(MintStoreItem.CollectionPublicPath)
+	if !mintStoreCap.check() {
+		return nil
+	}
+	let collection = mintStoreCap.borrow()!
+	let nft = collection.borrowMintStoreItem(id: id)!
+	let display= nft.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+
+	let merchantName = MintStoreItem.getMerchant(merchantID:nft.data.merchantID)!
+	let editionData = MintStoreItem.EditionData(editionID: nft.data.editionID)!
+	var external_domain = ""
+	switch merchantName {
+	case "Bulls":
+		external_domain =  "https://bulls.mint.store"
+		break;
+	case "Charlotte Hornets":
+		external_domain =  "https://hornets.mint.store"
+		break;
+	default:
+		external_domain =  ""
+	}
+	if editionData!.metadata["nftType"]! == "Type C" {
+		external_domain =  "https://misa.art/collections/nft"
+	}
+
+	let name=editionData.name
+	let image = editionData.metadata["thumbnail"] ?? ""
+	return MetadataCollectionItem(
+		id: id,
+		name: name,
+		image: image,
+		url: external_domain,
+		listPrice: nil,
+		listToken: nil,
+		contentType: "image",
+		rarity: ""
+	)
+}
+	
+pub fun	getSomePlace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	let somePlaceCap =owner.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
+	if !somePlaceCap.check() {
+		return nil
+	}
+	let collection = somePlaceCap.borrow()!
+	let nft = collection.borrowCollectible(id: id)!
+	let setID = nft.setID
+	let setMetadata = SomePlaceCollectible.getMetadataForSetID(setID: setID)!
+	let editionMetadata = SomePlaceCollectible.getMetadataForNFTByUUID(uuid: nft.id)!
+	return MetadataCollectionItem(
+		id: id,
+		name: editionMetadata.getMetadata()["title"] ?? setMetadata.getMetadata()["title"] ?? "",
+		image: editionMetadata.getMetadata()["mediaURL"] ?? setMetadata.getMetadata()["mediaURL"] ?? "",
+		url: "https://some.place",
+		listPrice: nil,
+		listToken: nil,
+		contentType: "image",
+		rarity: ""
+	)
+}
+
+
+pub fun	getBl0xPack(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	return getItemForMetadataStandard(path: Bl0xPack.CollectionPublicPath, owner: owner, externalFixedUrl: "http://bl0x.xyz", id:id)
+}
+
+pub fun	getBl0x(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+	return getItemForMetadataStandard(path: Bl0x.CollectionPublicPath, owner: owner, externalFixedUrl: "http://bl0x.xyz", id:id)
+}
+
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
 pub fun getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, externalFixedUrl: String, id:UInt64) : MetadataCollectionItem? {
@@ -1266,3 +1423,21 @@ pub fun getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, extern
 	}
 	return nil
 }
+
+pub fun main(user: String) : {String: [UInt64]} {
+	let resolvingAddress = FIND.resolve(user)
+	if resolvingAddress == nil {
+		return {}
+	}
+	let address = resolvingAddress!
+
+	return getNFTIDs(ownerAddress: address)
+}
+
+
+/*
+pub fun main(address: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+
+	return getNFTs(ownerAddress:address, ids:ids)
+}
+*/
