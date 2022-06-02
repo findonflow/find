@@ -169,272 +169,6 @@ pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollect
 	return NFTs
 }
 
-pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
-	let account = getAccount(ownerAddress)
-	let ids: {String: [UInt64]} = {}
-
-
-	let flovatarCap = account.getCapability<&{Flovatar.CollectionPublic}>(Flovatar.CollectionPublicPath)  
-	if flovatarCap.check() {
-		ids["Flovatar"]=flovatarCap.borrow()!.getIDs()
-	}
-
-	let flovatarMarketCap = account.getCapability<&{FlovatarMarketplace.SalePublic}>(FlovatarMarketplace.CollectionPublicPath)
-	if flovatarMarketCap.check() {
-		ids["FlovatarForSale"]=flovatarMarketCap.borrow()!.getFlovatarIDs()
-	}
-
-	let versusMarketplace = account.getCapability<&{Marketplace.SalePublic}>(Marketplace.CollectionPublicPath)
-	if versusMarketplace.check() {
-		ids["VersusForSale"]=versusMarketplace.borrow()!.getIDs()
-	}
-
-	let versusArtCap=account.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
-	if versusArtCap.check() {
-		ids["Versus"]=versusArtCap.borrow()!.getIDs()
-	}
-
-	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
-	if goobersCap.check() {
-		ids["Gooberz"] = goobersCap.borrow()!.getIDs()
-	}
-
-	let partyMansionDrinksCap = account.getCapability<&{PartyMansionDrinksContract.DrinkCollectionPublic}>(PartyMansionDrinksContract.CollectionPublicPath)
-	if partyMansionDrinksCap.check() {
-		ids["PartyBeers"] = partyMansionDrinksCap.borrow()!.getIDs()
-	}
-
-	let rareRoomCap = account.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
-	if rareRoomCap.check() {
-		ids["RareRooms"] = rareRoomCap.borrow()!.getIDs()
-	}
-
-	let cnnCap = account.getCapability<&CNN_NFT.Collection{CNN_NFT.CNN_NFTCollectionPublic}>(CNN_NFT.CollectionPublicPath)
-	if cnnCap.check() {
-		ids["CNN"] = cnnCap.borrow()!.getIDs()
-	}
-
-	let canesVaultCap = account.getCapability<&Canes_Vault_NFT.Collection{Canes_Vault_NFT.Canes_Vault_NFTCollectionPublic}>(Canes_Vault_NFT.CollectionPublicPath)
-	if canesVaultCap.check() {
-		ids["Canes_Vault_NFT"] = canesVaultCap.borrow()!.getIDs()
-	}
-	let dgdCap = account.getCapability<&DGD_NFT.Collection{DGD_NFT.DGD_NFTCollectionPublic}>(DGD_NFT.CollectionPublicPath)
-	if dgdCap.check() {
-		ids["DGD_NFT"] = dgdCap.borrow()!.getIDs()
-	}
-
-	let raceDayCap = account.getCapability<&RaceDay_NFT.Collection{RaceDay_NFT.RaceDay_NFTCollectionPublic}>(RaceDay_NFT.CollectionPublicPath)
-	if raceDayCap.check() {
-		ids["RaceDay_NFT"] = raceDayCap.borrow()!.getIDs()
-	}
-
-	let nextCartelCap = account.getCapability<&The_Next_Cartel_NFT.Collection{The_Next_Cartel_NFT.The_Next_Cartel_NFTCollectionPublic}>(The_Next_Cartel_NFT.CollectionPublicPath)
-	if nextCartelCap.check() {
-		ids["The_Next_Cartel_NFT"] = nextCartelCap.borrow()!.getIDs()
-	}
-	let ufcCap = account.getCapability<&UFC_NFT.Collection{UFC_NFT.UFC_NFTCollectionPublic}>(UFC_NFT.CollectionPublicPath)
-	if ufcCap.check() {
-		ids["UFC"] = ufcCap.borrow()!.getIDs()
-	}
-
-	let motoGPCollectionCap = account.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
-	if motoGPCollectionCap.check() {
-		ids["MotoGP"] = motoGPCollectionCap.borrow()!.getIDs()
-	}
-
-	let gaiaCap = account.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
-	if gaiaCap.check() {
-		ids["Gaia"] = gaiaCap.borrow()!.getIDs()
-	}
-
-	let jambbCap = account.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
-	if jambbCap.check() {
-		ids["Jambb"] = jambbCap.borrow()!.getIDs()
-	}
-	let voucherCap = account.getCapability<&{Vouchers.CollectionPublic}>(Vouchers.CollectionPublicPath)
-	if voucherCap.check() {
-		ids["JambbVoucher"] = voucherCap.borrow()!.getIDs()
-	}
-
-	let mwaCap = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
-	if mwaCap.check() {
-		ids["MatrixWorldAssets"] = mwaCap.borrow()!.getIDs()
-	}
-
-	let mwffCap = account.getCapability<&{MatrixWorldFlowFestNFT.MatrixWorldFlowFestNFTCollectionPublic}>(MatrixWorldFlowFestNFT.CollectionPublicPath)
-	if mwffCap.check() {
-		ids["MatrixWorldFlowFest"] = mwffCap.borrow()!.getIDs()
-	}
-
-	let sturdyCap = account.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
-	if sturdyCap.check() {
-		ids["SturdyItems"] = sturdyCap.borrow()!.getIDs()
-	}
-
-	let charityCap = account.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)
-	if charityCap.check() {
-		ids["FindCharity"] = charityCap.borrow()!.getIDs()
-	}
-
-	let evolutionCap=account.getCapability<&{Evolution.EvolutionCollectionPublic}>(/public/f4264ac8f3256818_Evolution_Collection)
-	if evolutionCap.check() {
-		ids["Evolution"] = evolutionCap.borrow()!.getIDs()
-	}
-
-	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
-	if geniaceCap.check() {
-		ids["Geniace"] = geniaceCap.borrow()!.getIDs()
-	}
-
-	let ofCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
-	if ofCap.check() {
-		ids["OneFootballCollectible"] = ofCap.borrow()!.getIDs()
-	}
-
-	let cryptoPiggoCap = account.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
-	if cryptoPiggoCap.check() {
-		ids["CryptoPiggo"] = cryptoPiggoCap.borrow()!.getIDs()
-	}
-
-	let xtinglesCap= account.getCapability<&{Collectible.CollectionPublic}>(Collectible.CollectionPublicPath)
-	if xtinglesCap.check() {
-		ids["Xtingles"] = xtinglesCap.borrow()!.getIDs()
-	}
-
-	let goatsVoucherCap = account.getCapability<&{GoatedGoatsVouchers.GoatsVoucherCollectionPublic}>(GoatedGoatsVouchers.CollectionPublicPath)
-	if goatsVoucherCap.check() {
-		ids["GoatedGoatsVoucher"] = goatsVoucherCap.borrow()!.getIDs()
-	}
-
-	let goatsTraitVoucherCap = account.getCapability<&{TraitPacksVouchers.PackVoucherCollectionPublic}>(TraitPacksVouchers.CollectionPublicPath)
-	if goatsTraitVoucherCap.check() {
-		ids["GoatedGoatsTraitVoucher"] = goatsTraitVoucherCap.borrow()!.getIDs()
-	}
-
-	let goatsCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoats.CollectionPublicPath)
-	if goatsCap.check() {
-		ids["GoatedGoats"] = goatsCap.borrow()!.getIDs()
-	}
-
-	let goatsTraitCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoatsTrait.CollectionPublicPath)
-	if goatsTraitCap.check() {
-		ids["GoatedGoatsTrait"] = goatsTraitCap.borrow()!.getIDs()
-	}
-
-	let goatsTraitPackCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoatsTraitPack.CollectionPublicPath)
-	if goatsTraitPackCap.check() {
-		ids["GoatedGoatsTraitPack"] = goatsTraitPackCap.borrow()!.getIDs()
-	}
-
-
-	let bitkuCap = account.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
-	if bitkuCap.check() {
-		ids["Bitku"] = bitkuCap.borrow()!.getIDs()
-	}
-
-	let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
-	if klktnCap.check() {
-		ids["KLKTN"] = klktnCap.borrow()!.getIDs()
-	}
-
-	let mynftCap = account.getCapability<&{Mynft.MynftCollectionPublic}>(Mynft.CollectionPublicPath)
-	if mynftCap.check() {
-		ids["mynft"] = mynftCap.borrow()!.getIDs()
-	}
-
-	let neoAvatarCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoAvatar.CollectionPublicPath)
-	if neoAvatarCap.check() {
-		ids["NeoAvatar"] = neoAvatarCap.borrow()!.getIDs()
-	}
-
-	let neoVoucherCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
-	if neoVoucherCap.check() {
-		ids["NeoVoucher"] = neoVoucherCap.borrow()!.getIDs()
-	}
-
-	let neoMemberCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoMember.CollectionPublicPath)
-	if neoMemberCap.check() {
-		ids["NeoMember"] = neoMemberCap.borrow()!.getIDs()
-	}
-
-	let barterYardPackCap= account.getCapability<&{BarterYardPackNFT.BarterYardPackNFTCollectionPublic}>(BarterYardPackNFT.CollectionPublicPath)
-	if barterYardPackCap.check() {
-		ids["BarterYardClubPack"] = barterYardPackCap.borrow()!.getIDs()
-	}
-
-	let byCap = account.getCapability<&{MetadataViews.ResolverCollection}>(BarterYardClubWerewolf.CollectionPublicPath)
-	if byCap.check() {
-		ids["BarterYardClubWerewolf"] = byCap.borrow()!.getIDs()
-	}
-
-	let momentablesCap = account.getCapability<&{Momentables.MomentablesCollectionPublic}>(Momentables.CollectionPublicPath)
-	if momentablesCap.check(){
-		ids["Momentables"] = momentablesCap.borrow()!.getIDs()
-	}
-
-	let zeedzCap = account.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
-	if zeedzCap.check(){
-		ids["Zeeds"]=zeedzCap.borrow()!.getIDs()
-	}
-
-	let dayCap = account.getCapability<&{MetadataViews.ResolverCollection}>(DayNFT.CollectionPublicPath)
-	if dayCap.check() {
-		ids["DayNFT"] = dayCap.borrow()!.getIDs()
-	}
-
-	let necroCap = account.getCapability<&{MetadataViews.ResolverCollection}>(Necryptolis.ResolverCollectionPublicPath)
-	if necroCap.check() {
-		ids["Necryptolis"] = necroCap.borrow()!.getIDs()
-	}
-
-
-	let sockIds : [UInt64] = [14813, 15013, 14946, 14808, 14899, 14792, 15016, 14961, 14816, 14796, 14992, 14977, 14815, 14863, 14817, 14814, 14875, 14960, 14985, 14850, 14849, 14966, 14826, 14972, 14795, 15021, 14950, 14847, 14970, 14833, 14786, 15010, 14953, 14799, 14883, 14947, 14844, 14801, 14886, 15015, 15023, 15027, 15029, 14802, 14810, 14948, 14955, 14957, 14988, 15007, 15009, 14837, 15024, 14803, 14973, 14969, 15002, 15017, 14797, 14894, 14881, 15025, 14791, 14979, 14789, 14993, 14873, 14939, 15005, 15006, 14869, 14889, 15004, 15008, 15026, 14990, 14998, 14898, 14819, 14840, 14974, 15019, 14856, 14838, 14787, 14876, 14996, 14798, 14855, 14824, 14843, 14959, 15020, 14862, 14822, 14897, 14830, 14790, 14867, 14878, 14991, 14835, 14818, 14892, 14800, 15000, 14857, 14986, 14805, 14812, 14962]
-
-
-	let raribleCap = account.getCapability<&{NonFungibleToken.CollectionPublic}>(RaribleNFT.collectionPublicPath)
-
-	let mySockIds : [UInt64] = []
-	for id in raribleCap.borrow()!.getIDs() {
-		if sockIds.contains(id) {
-			mySockIds.append(id)
-		}
-	}
-	ids["FlowverseSocks"] = mySockIds
-
-
-	let floatCap = account.getCapability<&{MetadataViews.ResolverCollection}>(FLOAT.FLOATCollectionPublicPath)
-	if floatCap.check() {
-		ids["FLOAT"] = floatCap.borrow()!.getIDs()
-	}
-
-  let mintStoreCap = account.getCapability<&{MintStoreItem.MintStoreItemCollectionPublic}>(MintStoreItem.CollectionPublicPath)
-	if mintStoreCap.check() {
-		ids["MintStore"] = mintStoreCap.borrow()!.getIDs()
-	}
-
-	let somePlaceCap =account.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
-	if somePlaceCap.check(){
-		ids["SomePlace"] = somePlaceCap.borrow()!.getIDs()
-	}
-
-	let bl0xCap = account.getCapability<&{MetadataViews.ResolverCollection}>(Bl0x.CollectionPublicPath)
-	if bl0xCap.check() {
-		ids["Bl0x"] = bl0xCap.borrow()!.getIDs()
-	}
-
-	let bl0xPackCap = account.getCapability<&{MetadataViews.ResolverCollection}>(Bl0xPack.CollectionPublicPath)
-	if bl0xPackCap.check() {
-		ids["Bl0xPack"] = bl0xPackCap.borrow()!.getIDs()
-	}
-
-	for key in ids.keys {
-		if ids[key]!.length == 0 {
-			ids.remove(key: key)
-		}
-	}
-	return ids
-}
-
 pub fun	getFlovatar(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let flovatarCap = owner.getCapability<&{Flovatar.CollectionPublic}>(Flovatar.CollectionPublicPath)  
@@ -497,7 +231,7 @@ pub fun	getFlovatarSale(owner:PublicAccount, id:UInt64) : MetadataCollectionItem
 		rarity="rare"
 	}
 
- let price = saleCollection.getFlovatarPrice(tokenId: id)
+	let price = saleCollection.getFlovatarPrice(tokenId: id)
 
 
 
@@ -791,32 +525,43 @@ pub fun	getGaia(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let metadata = Gaia.getTemplateMetaData(templateID: nft.data.templateID)!
 
 	//For ballerz we can do this...
-	var url="http://ongaia.com/ballerz/".concat(metadata["id"]!)
+	var url="http://ongaia.com/"
 	var name=metadata["title"]!
 
 	if let seriesFullName=metadata["series"] {
-
-		if seriesFullName=="Shareef O\u{2019}Neal - Basketball" {
-			//If the series is basketball with shareef we can do this
-			url="http://ongaia.com/sharef/".concat(id.toString())
-			name=metadata["title"]!.concat(" #").concat(nft.data.mintNumber.toString())
-		}else if seriesFullName=="Bryson DeChambeau - Vegas, Baby!" {
+		if seriesFullName=="Bryson DeChambeau - Vegas, Baby!" {
 			//For golf there is yet another way
 			url="http://ongaia.com/bryson/".concat(nft.data.mintNumber.toString())
+			name=metadata["title"]!.concat(" #").concat(nft.data.mintNumber.toString())
+		} else {
+			//If the series is basketball with shareef we can do this
+			url="http://ongaia.com/shareef/nft/".concat(id.toString())
 			name=metadata["title"]!.concat(" #").concat(nft.data.mintNumber.toString())
 		}
 	}
 
-	return MetadataCollectionItem(
-		id: id,
-		name: name,
-		image: metadata["img"]!,
-		url: url,
-		listPrice: nil,
-		listToken: nil,
-		contentType: "image",
-		rarity: ""
-	)
+	let newCollections= ["ballerz", "sneakerz"]
+	if let mid = metadata["id"] {
+		if let uri = metadata["uri"] {
+			for c in newCollections {
+				if uri == "/collection/".concat(c).concat("//").concat(mid) {
+				url="http://ongaia.com/".concat(c).concat("/").concat(mid)
+			}
+		}
+	}
+}
+
+
+return MetadataCollectionItem(
+	id: id,
+	name: name,
+	image: metadata["img"]!,
+	url: url,
+	listPrice: nil,
+	listToken: nil,
+	contentType: "image",
+	rarity: ""
+)
 } 
 
 pub fun	getJambb(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
@@ -1261,23 +1006,23 @@ pub fun	getMomentables(owner:PublicAccount, id:UInt64) : MetadataCollectionItem?
 
 pub fun	getZeeds(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
-let zeedzCap = owner.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
-if !zeedzCap.check() {
-	return nil
-}
+	let zeedzCap = owner.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
+	if !zeedzCap.check() {
+		return nil
+	}
 	let collection = zeedzCap.borrow()!
-		let nft = collection.borrowZeedle(id: id)!
+	let nft = collection.borrowZeedle(id: id)!
 
-		return MetadataCollectionItem(
-			id: id,
-			name: nft.name,
-			image: "ipfs://".concat(nft.imageURI),
-			url: "http://zeedz.io",
-			listPrice: nil,
-			listToken: nil,
-			contentType: "image",
-			rarity: nft.rarity
-		)
+	return MetadataCollectionItem(
+		id: id,
+		name: nft.name,
+		image: "ipfs://".concat(nft.imageURI),
+		url: "http://zeedz.io",
+		listPrice: nil,
+		listToken: nil,
+		contentType: "image",
+		rarity: nft.rarity
+	)
 }
 
 
@@ -1360,7 +1105,7 @@ pub fun	getMintStore(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 		rarity: ""
 	)
 }
-	
+
 pub fun	getSomePlace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let somePlaceCap =owner.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
 	if !somePlaceCap.check() {
