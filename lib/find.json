@@ -174,6 +174,17 @@
                   }
                }
             },
+            "getNameDetails": {
+               "code": "import FIND from 0xf8d6e0586b0a20c7\nimport Profile from 0xf8d6e0586b0a20c7\nimport RelatedAccounts from 0xf8d6e0586b0a20c7\n\npub struct FINDReport {\n    pub let profile:Profile.UserReport?\n    pub let bids: [FIND.BidInfo]\n    pub let relatedAccounts: { String: Address}\n    pub let leases: [FIND.LeaseInformation]\n    pub let privateMode: Bool\n\n\n    init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool ) {\n        self.profile=profile\n        self.bids=bids\n        self.leases=leases\n        self.relatedAccounts=relatedAccounts\n        self.privateMode=privateMode\n    }\n}\n\npub struct NameReport {\n    pub let status: String\n    pub let cost: UFix64 \n    pub let leaseStatus: FIND.LeaseInformation?\n    pub let userReport: FINDReport? \n\n    init(status: String, cost: UFix64, leaseStatus: FIND.LeaseInformation?, userReport: FINDReport? ) {\n        self.status=status \n        self.cost=cost \n        self.leaseStatus=leaseStatus\n        self.userReport=userReport\n    }\n}\n\npub fun main(user: String) : NameReport? {\n\n    var findReport: FINDReport? = nil\n    var nameLease: FIND.LeaseInformation? = nil\n    if let address=FIND.resolve(user) {\n        let account=getAccount(address)\n        let bidCap = account.getCapability\u003c\u0026FIND.BidCollection{FIND.BidCollectionPublic}\u003e(FIND.BidPublicPath)\n        let leaseCap = account.getCapability\u003c\u0026FIND.LeaseCollection{FIND.LeaseCollectionPublic}\u003e(FIND.LeasePublicPath)\n        let profile=account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath).borrow()\n\n        findReport = FINDReport(\n            profile: profile?.asReport(),\n            relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),\n            bids: bidCap.borrow()?.getBids() ?? [],\n            leases: leaseCap.borrow()?.getLeaseInformation() ?? [],\n            privateMode: profile?.isPrivateModeEnabled() ?? false\n        )\n        if FIND.validateFindName(user) \u0026\u0026 findReport != nil {\n            for lease in findReport!.leases {\n                if lease.name == user {\n                    nameLease = lease\n                    break\n                }\n            }\n        }\n        \n    }\n\n    var nameReport : NameReport? = nil \n    if FIND.validateFindName(user) {\n        let status = FIND.status(user)\n        let cost=FIND.calculateCost(user)\n        var s=\"TAKEN\"    \n        if status.status == FIND.LeaseStatus.FREE {\n            s=\"FREE\"\n        } else if status.status == FIND.LeaseStatus.LOCKED {\n            s=\"LOCKED\"\n        }\n        nameReport = NameReport(status: s, cost: cost, leaseStatus: nameLease, userReport: findReport)\n    }\n    \n\n    return nameReport\n}",
+               "spec": {
+                  "order": [
+                     "user"
+                  ],
+                  "parameters": {
+                     "user": "String"
+                  }
+               }
+            },
             "getNameStatus": {
                "code": "import FIND from 0xf8d6e0586b0a20c7\nimport Profile from 0xf8d6e0586b0a20c7\n\npub fun main(name: String) :  \u0026{Profile.Public}? {\n    return FIND.lookup(name)\n}",
                "spec": {
@@ -1749,6 +1760,17 @@
                   }
                }
             },
+            "getNameDetails": {
+               "code": "import FIND from 0x097bafa4e0b48eef\nimport Profile from 0x097bafa4e0b48eef\nimport RelatedAccounts from 0x097bafa4e0b48eef\n\npub struct FINDReport {\n    pub let profile:Profile.UserReport?\n    pub let bids: [FIND.BidInfo]\n    pub let relatedAccounts: { String: Address}\n    pub let leases: [FIND.LeaseInformation]\n    pub let privateMode: Bool\n\n\n    init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool ) {\n        self.profile=profile\n        self.bids=bids\n        self.leases=leases\n        self.relatedAccounts=relatedAccounts\n        self.privateMode=privateMode\n    }\n}\n\npub struct NameReport {\n    pub let status: String\n    pub let cost: UFix64 \n    pub let leaseStatus: FIND.LeaseInformation?\n    pub let userReport: FINDReport? \n\n    init(status: String, cost: UFix64, leaseStatus: FIND.LeaseInformation?, userReport: FINDReport? ) {\n        self.status=status \n        self.cost=cost \n        self.leaseStatus=leaseStatus\n        self.userReport=userReport\n    }\n}\n\npub fun main(user: String) : NameReport? {\n\n    var findReport: FINDReport? = nil\n    var nameLease: FIND.LeaseInformation? = nil\n    if let address=FIND.resolve(user) {\n        let account=getAccount(address)\n        let bidCap = account.getCapability\u003c\u0026FIND.BidCollection{FIND.BidCollectionPublic}\u003e(FIND.BidPublicPath)\n        let leaseCap = account.getCapability\u003c\u0026FIND.LeaseCollection{FIND.LeaseCollectionPublic}\u003e(FIND.LeasePublicPath)\n        let profile=account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath).borrow()\n\n        findReport = FINDReport(\n            profile: profile?.asReport(),\n            relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),\n            bids: bidCap.borrow()?.getBids() ?? [],\n            leases: leaseCap.borrow()?.getLeaseInformation() ?? [],\n            privateMode: profile?.isPrivateModeEnabled() ?? false\n        )\n        if FIND.validateFindName(user) \u0026\u0026 findReport != nil {\n            for lease in findReport!.leases {\n                if lease.name == user {\n                    nameLease = lease\n                    break\n                }\n            }\n        }\n        \n    }\n\n    var nameReport : NameReport? = nil \n    if FIND.validateFindName(user) {\n        let status = FIND.status(user)\n        let cost=FIND.calculateCost(user)\n        var s=\"TAKEN\"    \n        if status.status == FIND.LeaseStatus.FREE {\n            s=\"FREE\"\n        } else if status.status == FIND.LeaseStatus.LOCKED {\n            s=\"LOCKED\"\n        }\n        nameReport = NameReport(status: s, cost: cost, leaseStatus: nameLease, userReport: findReport)\n    }\n    \n\n    return nameReport\n}",
+               "spec": {
+                  "order": [
+                     "user"
+                  ],
+                  "parameters": {
+                     "user": "String"
+                  }
+               }
+            },
             "getNameStatus": {
                "code": "import FIND from 0x097bafa4e0b48eef\nimport Profile from 0x097bafa4e0b48eef\n\npub fun main(name: String) :  \u0026{Profile.Public}? {\n    return FIND.lookup(name)\n}",
                "spec": {
@@ -3321,6 +3343,17 @@
                   ],
                   "parameters": {
                      "address": "Address"
+                  }
+               }
+            },
+            "getNameDetails": {
+               "code": "import FIND from 0x4cdc372285f27e1e\nimport Profile from 0x4cdc372285f27e1e\nimport RelatedAccounts from 0x4cdc372285f27e1e\n\npub struct FINDReport {\n    pub let profile:Profile.UserReport?\n    pub let bids: [FIND.BidInfo]\n    pub let relatedAccounts: { String: Address}\n    pub let leases: [FIND.LeaseInformation]\n    pub let privateMode: Bool\n\n\n    init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool ) {\n        self.profile=profile\n        self.bids=bids\n        self.leases=leases\n        self.relatedAccounts=relatedAccounts\n        self.privateMode=privateMode\n    }\n}\n\npub struct NameReport {\n    pub let status: String\n    pub let cost: UFix64 \n    pub let leaseStatus: FIND.LeaseInformation?\n    pub let userReport: FINDReport? \n\n    init(status: String, cost: UFix64, leaseStatus: FIND.LeaseInformation?, userReport: FINDReport? ) {\n        self.status=status \n        self.cost=cost \n        self.leaseStatus=leaseStatus\n        self.userReport=userReport\n    }\n}\n\npub fun main(user: String) : NameReport? {\n\n    var findReport: FINDReport? = nil\n    var nameLease: FIND.LeaseInformation? = nil\n    if let address=FIND.resolve(user) {\n        let account=getAccount(address)\n        let bidCap = account.getCapability\u003c\u0026FIND.BidCollection{FIND.BidCollectionPublic}\u003e(FIND.BidPublicPath)\n        let leaseCap = account.getCapability\u003c\u0026FIND.LeaseCollection{FIND.LeaseCollectionPublic}\u003e(FIND.LeasePublicPath)\n        let profile=account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath).borrow()\n\n        findReport = FINDReport(\n            profile: profile?.asReport(),\n            relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),\n            bids: bidCap.borrow()?.getBids() ?? [],\n            leases: leaseCap.borrow()?.getLeaseInformation() ?? [],\n            privateMode: profile?.isPrivateModeEnabled() ?? false\n        )\n        if FIND.validateFindName(user) \u0026\u0026 findReport != nil {\n            for lease in findReport!.leases {\n                if lease.name == user {\n                    nameLease = lease\n                    break\n                }\n            }\n        }\n        \n    }\n\n    var nameReport : NameReport? = nil \n    if FIND.validateFindName(user) {\n        let status = FIND.status(user)\n        let cost=FIND.calculateCost(user)\n        var s=\"TAKEN\"    \n        if status.status == FIND.LeaseStatus.FREE {\n            s=\"FREE\"\n        } else if status.status == FIND.LeaseStatus.LOCKED {\n            s=\"LOCKED\"\n        }\n        nameReport = NameReport(status: s, cost: cost, leaseStatus: nameLease, userReport: findReport)\n    }\n    \n\n    return nameReport\n}",
+               "spec": {
+                  "order": [
+                     "user"
+                  ],
+                  "parameters": {
+                     "user": "String"
                   }
                }
             },
