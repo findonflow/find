@@ -1032,8 +1032,16 @@ pub contract FindMarket {
 				let receiver = royaltyItem.receiver.address
 				let name = resolver(royaltyItem.receiver.address)
 
+				var walletCheck = true 
+
+				if !royaltyItem.receiver.check() { walletCheck = false }
+				if !royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
+					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
+					walletCheck = ref.checkWallet(ftType.identifier)
+				}
+
 				/* If the royalty receiver check failed */
-				if !royaltyItem.receiver.check() {
+				if !walletCheck {
 					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: FindMarket.residualAddress)
 					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 					if FindMarket.residualLedger.containsKey(receiver){
@@ -1070,6 +1078,7 @@ pub contract FindMarket {
 			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly.")
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
+
 		oldProfile.deposit(from: <- vault)
 	}
 
