@@ -23,6 +23,20 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			fulfillMarketDirectOfferSoft("user2", id, price)
 	})
 
+	t.Run("Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft"). 
+			destroyDandyCollection("user2"). 
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price).
+			acceptDirectOfferMarketSoft("user1", id, "user2", price).
+			saleItemListed("user1", "active_finished", price).
+			fulfillMarketDirectOfferSoft("user2", id, price)
+	})
+
 	t.Run("Should be able to increase offer", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

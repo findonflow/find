@@ -1092,6 +1092,14 @@ func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testDestroyDandyCollection").
+		SignProposeAndPayAs(user).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 type SaleItem struct {
 	Amount              string `json:"amount"`
 	AuctionReservePrice string `json:"auctionReservePrice"`

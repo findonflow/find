@@ -140,6 +140,14 @@ pub contract FindMarketDirectOfferSoft {
 		pub fun getTotalRoyalties() : UFix64 {
 			return self.totalRoyalties
 		}
+
+		pub fun getDisplay() : MetadataViews.Display {
+			return self.pointer.getDisplay()
+		}
+
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
+			return self.pointer.getNFTCollectionData()
+		}
 	}
 
 	pub resource interface SaleItemCollectionPublic {

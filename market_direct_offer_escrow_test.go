@@ -23,6 +23,20 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow"). 
+			destroyDandyCollection("user2"). 
+			directOfferMarketEscrowed("user2", "user1", id, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price)
+		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
+
+	})
+
 	t.Run("Should be able to increase offer", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

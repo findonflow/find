@@ -1214,6 +1214,8 @@ pub contract FindMarket {
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 
 		pub fun getTotalRoyalties() : UFix64 
+		pub fun getDisplay() : MetadataViews.Display 
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 	}
 
 	pub struct SaleItemInformation {

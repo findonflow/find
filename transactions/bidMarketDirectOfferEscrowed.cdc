@@ -2,6 +2,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
@@ -33,12 +34,23 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)
 		self.balanceBeforeBid=self.walletReference.balance
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
+
+		/* Check for nftCapability */
+		if !self.targetCapability.check() {
+			let cd = self.pointer.getNFTCollectionData()
+			// should use account.type here instead
+			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
+				panic("This collection public link is not set up properly.")
+			}
+			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+		}
 	}
 
 	pre {
 		self.bidsReference != nil : "This account does not have a bid collection"
 		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
-		self.targetCapability.check() : "The target collection for the item your are bidding on does not exist"
 	}
 
 	execute {
