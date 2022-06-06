@@ -1,19 +1,22 @@
-
+import CuratedCollection from "../contracts/CuratedCollection.cdc"
 transaction(name: String, items: [String]) {
 	prepare(account: AuthAccount) {
 
-		let path=/storage/FindCuratedCollections
-		let publicPath=/public/FindCuratedCollections
+		let path=CuratedCollection.storagePath
+		let publicPath=CuratedCollection.publicPath
 
-		var collections : {String: [String]} = {}
-		if account.borrow<&{String: [String]}>(from:path) != nil {
-			 collections=account.load<{String: [String]}>(from:path)!
+		if let ref = account.borrow<&CuratedCollection.Collection>(from:path) {
+			ref.setCuratedCollection(name: name, items: items)
+			return
 		}
-		collections[name] = items
-		account.save(collections, to: path)
-		let link = account.getCapability<&{String: [String]}>(publicPath)
+
+		let collection <- CuratedCollection.createCuratedCollection()
+		collection.setCuratedCollection(name: name, items: items)
+		account.save(<- collection, to: path)
+
+		let link = account.getCapability<&CuratedCollection.Collection>(publicPath)
 		if !link.check() {
-			account.link<&{String: [String]}>( publicPath, target: path)
+			account.link<&CuratedCollection.Collection>( publicPath, target: path)
 		}
 	}
 }

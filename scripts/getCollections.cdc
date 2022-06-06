@@ -1,6 +1,7 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import CuratedCollection from "../contracts/CuratedCollection.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 pub struct MetadataCollections {
@@ -138,11 +139,11 @@ pub fun main(user: String) : MetadataCollections? {
 		}
 	}
 
-	let publicPath=/public/FindCuratedCollections
-	let link = account.getCapability<&{String: [String]}>(publicPath)
+	let publicPath=CuratedCollection.publicPath
+	let link = account.getCapability<&CuratedCollection.Collection>(publicPath)
 	var curatedCollections : {String: [String]} = {}
 	if link.check() {
-		let curated = link.borrow()!
+		let curated = link.borrow()!.getCuratedCollection()
 		for curatedKey in curated.keys {
 			curatedCollections[curatedKey] = curated[curatedKey]!
 		}
