@@ -35,6 +35,10 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		/* Check for nftCapability */
 		if !self.targetCapability.check() {
 			let cd = item.getNFTCollectionData()
+			// should use account.type here instead
+			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
+				panic("This collection public link is not set up properly.")
+			}
 			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
 			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
 			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
