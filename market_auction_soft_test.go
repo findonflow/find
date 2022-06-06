@@ -50,6 +50,22 @@ func TestMarketAuctionSoft(t *testing.T) {
 			fulfillMarketAuctionSoft("user2", id, 15.0)
 	})
 
+	t.Run("Should be able to sell and buy at auction even buyer is without the collection.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			destroyDandyCollection("user2").
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionSoft("user2", id, 15.0)
+	})
+
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

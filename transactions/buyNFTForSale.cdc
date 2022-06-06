@@ -2,6 +2,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
@@ -29,13 +30,19 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet")
 	
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
+		/* Check for nftCapability */
+		if !self.targetCapability.check() {
+			let cd = item.getNFTCollectionData()
+			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+		}
+
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 	}
 
 	pre {
-		self.saleItemsCap.check() : "The sale item cap is not linked"
 		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
-		self.targetCapability.check() : "The target collection for the item your are bidding on does not exist"
 	}
 
 	execute {

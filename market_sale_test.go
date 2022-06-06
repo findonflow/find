@@ -32,6 +32,29 @@ func TestMarketSale(t *testing.T) {
 		otu.buyNFTForMarketSale("user2", "user1", id, price)
 	})
 
+	t.Run("Should be able to list a dandy for sale and buy it without the collection", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+		otu.listNFTForSale("user1", id, price)
+
+		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.025)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.destroyDandyCollection("user2").
+			buyNFTForMarketSale("user2", "user1", id, price)
+	})
+
 	t.Run("Should be able to change price of dandy", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().

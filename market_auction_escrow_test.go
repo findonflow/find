@@ -50,6 +50,22 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
 
+	t.Run("Should be able to sell and buy at auction even the buyer is without the collection", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			destroyDandyCollection("user2").
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+	})
+
 	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 

@@ -218,7 +218,7 @@ pub contract FindViews {
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-			return self.cap.borrow()!.borrowViewResolver(id: self.id)
+			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
 		}
 
 		pub fun getDisplay() : MetadataViews.Display {
@@ -344,7 +344,7 @@ pub contract FindViews {
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-			return self.cap.borrow()!.borrowViewResolver(id: self.id)
+			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
