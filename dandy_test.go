@@ -40,4 +40,56 @@ func TestDandy(t *testing.T) {
 		autogold.Equal(t, overallResult)
 
 	})
+
+	/* Test on dandy nft indexing {Mapping of minter} */
+	t.Run("Should be able to return the correct minter and dandies list", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry()
+		dandiesIDs := otu.mintThreeExampleDandies()
+
+		getDandiesIDsFor := otu.O.ScriptFromFile("getDandiesIDsFor").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("user1")).
+			RunReturnsJsonString()
+
+		otu.AutoGold("getDandiesIDsFor", getDandiesIDsFor)
+
+		getDandiesMinters := otu.O.ScriptFromFile("getDandiesMinters").
+			Args(otu.O.Arguments().
+				String("user1")).
+			RunReturnsJsonString()
+
+		otu.AutoGold("getDandiesMinters", getDandiesMinters)
+
+		/* mint new dandies and withdraw all of them */
+		dandiesIDs = append(dandiesIDs, otu.mintThreeExampleDandies()...)
+
+		otu.O.TransactionFromFile("testDestroyDandies").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				UInt64Array(dandiesIDs...)).
+			Test(otu.T).
+			AssertSuccess()
+
+		getDandiesIDsFor2 := otu.O.ScriptFromFile("getDandiesIDsFor").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("user1")).
+			RunReturnsJsonString()
+
+		otu.AutoGold("getDandiesIDsFor2", getDandiesIDsFor2)
+
+		getDandiesMinters2 := otu.O.ScriptFromFile("getDandiesMinters").
+			Args(otu.O.Arguments().
+				String("user1")).
+			RunReturnsJsonString()
+
+		otu.AutoGold("getDandiesMinters2", getDandiesMinters2)
+
+	})
 }
