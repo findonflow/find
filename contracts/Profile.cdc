@@ -485,7 +485,8 @@ pub contract Profile {
 		pub fun deposit(from: @FungibleToken.Vault) {
 			for w in self.wallets {
 				if from.isInstance(w.accept) {
-					w.receiver.borrow()!.deposit(from: <- from)
+					let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()))
+					ref.deposit(from: <- from)
 					return
 				}
 			} 

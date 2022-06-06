@@ -318,6 +318,18 @@ pub contract Admin {
 			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
 		}
 
+		/// ===================================================================================
+		// Royalty Residual
+		/// ===================================================================================
+
+		pub fun setResidualAddress(_ address: Address) {
+			FindMarket.setResidualAddress(address)
+		}
+
+		pub fun paidResidualRoyalty(address: Address, ftType: Type) {
+			FindMarket.paidResidualRoyalty(address: address, ftType: ftType)
+		}
+
 		init() {
 			self.capability = nil
 		}

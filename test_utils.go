@@ -92,6 +92,12 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		Test(otu.T).AssertSuccess()
 	otu.createUser(100.0, "account")
 
+	//link in the server in the versus client
+	otu.O.TransactionFromFile("testSetResidualAddress").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().Account("find")).
+		Test(otu.T).AssertSuccess()
+
 	return otu.tickClock(1.0)
 }
 
@@ -1087,6 +1093,25 @@ func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			Account("account")).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testDestroyFUSDVault").
+		SignProposeAndPayAs(user).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *OverflowTestUtils {
+	otu.O.TransactionFromFile("sendDandy").
+		SignProposeAndPayAs(sender).
+		Args(otu.O.Arguments().
+			String(receiver).
+			UInt64(id)).
 		Test(otu.T).
 		AssertSuccess()
 	return otu
