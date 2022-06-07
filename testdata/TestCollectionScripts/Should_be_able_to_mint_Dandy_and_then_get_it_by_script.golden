@@ -1,6 +1,7 @@
 `{
     "collections": {
         "Dandy": [
+            "Dandy90",
             "Dandy88",
             "Dandy87",
             "Dandy89"
@@ -10,12 +11,21 @@
     "items": {
         "Dandy87": {
             "collection": "Dandy",
-            "contentType": "image",
+            "contentTypes": [
+                "image/thumbnail"
+            ],
             "id": "87",
             "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-            "metadata": {},
-            "name": "Neo Motorcycle 1 of 3",
-            "rarity": "",
+            "medias": [
+                {
+                    "file": {
+                        "url": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"
+                    },
+                    "mediaType": "image/thumbnail"
+                }
+            ],
+            "name": "Neo Motorcycle 1 of 1",
+            "rarity": "rare",
             "scalar": {
                 "Speed": "100.00000000"
             },
@@ -28,39 +38,100 @@
         },
         "Dandy88": {
             "collection": "Dandy",
-            "contentType": "image",
+            "contentTypes": [
+                "video",
+                "image/thumbnail"
+            ],
             "id": "88",
-            "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-            "metadata": {},
-            "name": "Neo Motorcycle 2 of 3",
-            "rarity": "",
+            "image": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
+            "medias": [
+                {
+                    "file": {
+                        "url": "https://nft.blocto.app/xtingles/xBloctopus.mp4"
+                    },
+                    "mediaType": "video"
+                },
+                {
+                    "file": {
+                        "url": "https://nft.blocto.app/xtingles/preview-xBloctopus.png"
+                    },
+                    "mediaType": "image/thumbnail"
+                }
+            ],
+            "name": "xtingle 1 of 1",
+            "rarity": "rare",
             "scalar": {
-                "Speed": "100.00000000"
+                "video length": "27.00000000"
             },
             "tag": {
-                "NeoMotorCycleTag": "Tag1"
+                "xtingle Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://find.xyz/collection/user1/dandy/88",
+            "url": "https://nft.blocto.app/xtingles//88",
             "uuid": "88"
         },
         "Dandy89": {
             "collection": "Dandy",
-            "contentType": "image",
+            "contentTypes": [
+                "image"
+            ],
             "id": "89",
-            "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-            "metadata": {},
-            "name": "Neo Motorcycle 3 of 3",
-            "rarity": "",
+            "image": "https://flovatar.com/flovatars/1225/0x92ba5cba77fc1e87",
+            "medias": [
+                {
+                    "file": {
+                        "url": "https://flovatar.com/flovatars/1225/0x92ba5cba77fc1e87"
+                    },
+                    "mediaType": "image"
+                }
+            ],
+            "name": "flovatar 1 of 1",
+            "rarity": "rare",
             "scalar": {
-                "Speed": "100.00000000"
+                "rarity score": "2.20000000"
             },
             "tag": {
-                "NeoMotorCycleTag": "Tag1"
+                "flovatar Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://find.xyz/collection/user1/dandy/89",
+            "url": "https://flovatar.com/flovatars//89",
             "uuid": "89"
+        },
+        "Dandy90": {
+            "collection": "Dandy",
+            "contentTypes": [
+                "image/ipfs",
+                "image/thumbnail"
+            ],
+            "id": "90",
+            "image": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
+            "medias": [
+                {
+                    "file": {
+                        "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U",
+                        "path": ""
+                    },
+                    "mediaType": "image/ipfs"
+                },
+                {
+                    "file": {
+                        "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
+                        "path": ""
+                    },
+                    "mediaType": "image/thumbnail"
+                }
+            ],
+            "name": "ufcstrike 1 of 1",
+            "rarity": "rare",
+            "scalar": {
+                "rank": "295.00000000"
+            },
+            "tag": {
+                "ufcstrike Tag": "Tag1"
+            },
+            "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+            "url": "https://giglabs.mypinata.cloud/ipfs//90",
+            "uuid": "90"
         }
     }
 }`

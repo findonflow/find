@@ -51,24 +51,24 @@ pub struct MetadataCollectionItem {
 	pub let name: String
 	pub let image: String
 	pub let url: String
-	pub let contentType:String
+	pub let contentTypes:[String]
 	pub let rarity:String
 	//Refine later 
-	pub let metadata: {String : String}
+	pub let medias: [MetadataViews.Media]
 	pub let collection: String // <- This will be Alias unless they want something else
 	pub let tag: {String : String}
 	pub let scalar: {String : UFix64}
 
-	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentType: String, rarity: String, collection: String, tag: {String : String}, scalar: {String : UFix64}) {
+	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: String, medias: [MetadataViews.Media], collection: String, tag: {String : String}, scalar: {String : UFix64}) {
 		self.id=id
 		self.typeIdentifier = type.identifier
 		self.uuid = uuid
 		self.name=name
 		self.url=url
 		self.image=image
-		self.contentType=contentType
+		self.contentTypes=contentTypes
 		self.rarity=rarity
-		self.metadata={}
+		self.medias=medias
 		self.collection=collection
 		self.tag=tag
 		self.scalar=scalar
@@ -114,7 +114,17 @@ pub fun main(user: String) : MetadataCollections? {
 					var scalar : {String : UFix64}={}
 					if let s= FindViews.getScalar(nft) {
 						scalar=s.getScalar()
-					}				
+					}			
+
+					var medias : [MetadataViews.Media] = []
+					if let m= FindViews.getMedias(nft) {
+						medias=m.items
+					}	
+
+					let cotentTypes : [String] = []
+					for media in medias {
+						cotentTypes.append(media.mediaType)
+					}
 
 					let item = MetadataCollectionItem(
 						id: id,
@@ -123,8 +133,9 @@ pub fun main(user: String) : MetadataCollections? {
 						name: display.name,
 						image: display.thumbnail.uri(),
 						url: externalUrl,
-						contentType: "image",
+						contentTypes: cotentTypes,
 						rarity: rarity,
+						medias: medias,
 						collection: nftInfo.alias,
 						tag: tag,
 						scalar: scalar
