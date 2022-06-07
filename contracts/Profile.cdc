@@ -235,6 +235,7 @@ pub contract Profile {
 		pub fun getFollowers(): [FriendStatus]
 		pub fun getFollowing(): [FriendStatus]
 		pub fun getWallets() : [Wallet]
+		pub fun checkWallet(_ name: String) : Bool 
 		pub fun getLinks() : [Link]
 		pub fun deposit(from: @FungibleToken.Vault)
 		pub fun supportedFungigleTokenTypes() : [Type]
@@ -293,7 +294,7 @@ pub contract Profile {
 		pub fun addWallet(_ val : Wallet) 
 		pub fun removeWallet(_ val: String)
 		pub fun setWallets(_ val: [Wallet])
-
+		pub fun checkWallet(_ name: String) : Bool 
 		pub fun addLink(_ val: Link)
 		pub fun addLinkWithName(name:String, link:Link)
 
@@ -485,7 +486,8 @@ pub contract Profile {
 		pub fun deposit(from: @FungibleToken.Vault) {
 			for w in self.wallets {
 				if from.isInstance(w.accept) {
-					w.receiver.borrow()!.deposit(from: <- from)
+					let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
+					ref.deposit(from: <- from)
 					return
 				}
 			} 
@@ -500,6 +502,15 @@ pub contract Profile {
 			for wallet in self.wallets {
 				if wallet.name == name {
 					return true
+				}
+			}
+			return false
+		}
+
+		pub fun checkWallet(_ name: String) : Bool {
+			for wallet in self.wallets {
+				if wallet.name == name || wallet.accept.identifier == name {
+					return wallet.receiver.check()
 				}
 			}
 			return false

@@ -14,9 +14,13 @@ pub contract FindMarket {
 	access(contract) let  marketBidCollectionTypes : [Type]
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
+	pub event RoyaltyCouldNotBePaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo, residualAddress: Address)
 	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+
+	//Residual Royalty
+	pub var residualAddress : Address
 
 	// Tenant information
 	pub let TenantClientPublicPath: PublicPath
@@ -1007,9 +1011,11 @@ pub contract FindMarket {
 		let soldFor=vault.balance
 		let ftType=vault.getType()
 
+		/* Residual Royalty */
+		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
+		let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+
 		/* Check the total royalty to prevent changing of royalties */
-
-
 		let royalties = royalty.getRoyalties()
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
@@ -1021,7 +1027,25 @@ pub contract FindMarket {
 			for royaltyItem in royalties {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
+				let receiver = royaltyItem.receiver.address
 				let name = resolver(royaltyItem.receiver.address)
+
+				var walletCheck = true 
+
+				if !royaltyItem.receiver.check() { walletCheck = false }
+				if !royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
+					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
+					walletCheck = ref.checkWallet(ftType.identifier)
+				}
+
+				/* If the royalty receiver check failed */
+				if !walletCheck {
+					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: FindMarket.residualAddress)
+					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+					continue
+				}
+
+				/* If the royalty receiver check succeed */
 				emit RoyaltyPaid(tenant:tenant, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
@@ -1031,15 +1055,18 @@ pub contract FindMarket {
 			let cutAmount= soldFor * findCut.cut
 			let name = resolver(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly.")
+			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		if let tenantCut =cuts.tenantCut {
 			let cutAmount= soldFor * tenantCut.cut
 			let name = resolver(tenantCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly.")
+			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
+
 		oldProfile.deposit(from: <- vault)
 	}
 
@@ -1284,6 +1311,10 @@ pub contract FindMarket {
 		}
 	}
 
+	access(account) fun setResidualAddress(_ address: Address) {
+		FindMarket.residualAddress = address
+	}
+
 	init() {
 		self.tenantAddressName={}
 		self.tenantNameAddress={}
@@ -1299,6 +1330,8 @@ pub contract FindMarket {
 		self.listingName={}
 		self.marketBidTypes = []
 		self.marketBidCollectionTypes = []
+
+		self.residualAddress = self.account.address // This has to be changed
 
 	}
 
