@@ -191,15 +191,22 @@ pub contract FindMarket {
 				}
 				continue
 			} 
-			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
+			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"), seller: address, buyer: nil)
 			var status="active"
+
+			if !stopped.allowed && stopped.message == "Seller banned by Tenant" {
+				status="banned"
+				info.append(FindMarket.SaleItemInformation(item, status, false))
+				continue
+			}
+
 			if !stopped.allowed {
 				status="stopped"
 				info.append(FindMarket.SaleItemInformation(item, status, false))
 				continue
 			}
 
-			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
+			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"), seller: address, buyer: nil)
 
 			if !deprecated.allowed {
 				status="deprecated"
@@ -561,7 +568,7 @@ pub contract FindMarket {
 	pub resource interface TenantPublic {
 		pub fun getStoragePath(_ type: Type) : StoragePath 
 		pub fun getPublicPath(_ type: Type) : PublicPath
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : ActionResult
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
 		pub fun getBlockedNFT(marketType: Type) : [Type] 
@@ -707,8 +714,18 @@ pub contract FindMarket {
 			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
 		}
 
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : ActionResult{
+			/* Check for Honour Banning */
+			let profile = getAccount(FindMarket.tenantNameAddress[self.name]!).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() ?? panic("Cannot get reference to Profile to check honour banning")
+			if seller != nil && profile.isBanned(seller!) {
+				return ActionResult(allowed:false, message: "Seller banned by Tenant", name: "Profile Ban")
+			}
+			if buyer != nil && profile.isBanned(buyer!) {
+				return ActionResult(allowed:false, message: "Buyer banned by Tenant", name: "Profile Ban")
+			}
 
+
+			/* Check for Find Deny Rules */
 			for item in self.findSaleItems.values {
 				for rule in item.rules {
 					var relevantType=nftType
@@ -732,6 +749,7 @@ pub contract FindMarket {
 				}
 			}
 
+			/* Check for Tenant Allow Rules */
 			for item in self.tenantSaleItems.values {
 				let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 

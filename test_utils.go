@@ -1125,6 +1125,16 @@ func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *Ove
 	return otu
 }
 
+func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetProfileBan").
+		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			String(user)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 type SaleItem struct {
 	Amount              string `json:"amount"`
 	AuctionReservePrice string `json:"auctionReservePrice"`
