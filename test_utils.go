@@ -1106,6 +1106,14 @@ func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testDestroyDandyCollection").
+		SignProposeAndPayAs(user).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *OverflowTestUtils {
 	otu.O.TransactionFromFile("sendDandy").
 		SignProposeAndPayAs(sender).

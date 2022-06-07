@@ -73,7 +73,7 @@ pub contract FindViews {
 			self.mediaType=mediaType
 			self.protocol="shared"
 
-			if !pointer.getViews().contains(Type<OnChainFile>()) {
+			if pointer.resolveView(Type<OnChainFile>()) == nil {
 				panic("Cannot create shared media if the pointer does not contain StringMedia")
 			}
 		}
@@ -145,6 +145,10 @@ pub contract FindViews {
 		pub fun getRoyalty() : MetadataViews.Royalties
 		pub fun getTotalRoyaltiesCut() : UFix64
 
+		//Requred views 
+		pub fun getDisplay() : MetadataViews.Display
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
+
 	}
 
 	//An interface to say that this pointer can withdraw
@@ -159,6 +163,14 @@ pub contract FindViews {
 		init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
+
+			if !self.cap.check() {
+				panic("The capability is not valid.")
+			}
+			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
+			let display = FindViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
+			let nftCollectionData = FindViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
@@ -206,7 +218,25 @@ pub contract FindViews {
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-			return self.cap.borrow()!.borrowViewResolver(id: self.id)
+			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
+		}
+
+		pub fun getDisplay() : MetadataViews.Display {
+			if let royaltiesView = self.resolveView(Type<MetadataViews.Display>()) {
+				if let v = royaltiesView as? MetadataViews.Display {
+					return v
+				}
+			}
+			panic("MetadataViews Display View is not implemented on this NFT.")
+		}
+
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
+			if let royaltiesView = self.resolveView(Type<MetadataViews.NFTCollectionData>()) {
+				if let v = royaltiesView as? MetadataViews.NFTCollectionData {
+					return v
+				}
+			}
+			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 		}
 
 	}
@@ -285,6 +315,15 @@ pub contract FindViews {
 		return nil
 	}
 
+	pub fun getNFTCollectionData(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.NFTCollectionData? {
+		if let view = viewResolver.resolveView(Type<MetadataViews.NFTCollectionData>()) {
+			if let v = view as? MetadataViews.NFTCollectionData {
+				return v
+			}
+		}
+		return nil
+	}
+
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
@@ -294,13 +333,18 @@ pub contract FindViews {
 			self.cap=cap
 			self.id=id
 
-			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
+			if !self.cap.check() {
+				panic("The capability is not valid.")
+			}
 
+			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
+			let display = FindViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
+			let nftCollectionData = FindViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 			self.nounce=FindViews.getNounce(viewResolver)
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-			return self.cap.borrow()!.borrowViewResolver(id: self.id)
+			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
@@ -345,6 +389,24 @@ pub contract FindViews {
 				}
 			}
 			return MetadataViews.Royalties([])
+		}
+
+		pub fun getDisplay() : MetadataViews.Display {
+			if let royaltiesView = self.resolveView(Type<MetadataViews.Display>()) {
+				if let v = royaltiesView as? MetadataViews.Display {
+					return v
+				}
+			}
+			panic("MetadataViews Display View is not implemented on this NFT.")
+		}
+
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
+			if let royaltiesView = self.resolveView(Type<MetadataViews.NFTCollectionData>()) {
+				if let v = royaltiesView as? MetadataViews.NFTCollectionData {
+					return v
+				}
+			}
+			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 		}
 
 		pub fun withdraw() :@NonFungibleToken.NFT {

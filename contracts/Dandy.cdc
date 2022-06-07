@@ -182,24 +182,45 @@ pub contract Dandy: NonFungibleToken {
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
+		// Mapping of {Minter Platform Name : [NFT ID]}
+		access(self) let nftIndex: {String : {UInt64 : Bool}}
+
+
 		init () {
 			self.ownedNFTs <- {}
+			self.nftIndex = {}
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
 		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
+			let dandyToken <- token as! @NFT
+			let minterName = dandyToken.minterPlatform.name 
+			if self.nftIndex.containsKey(minterName) {
+				self.nftIndex[minterName]!.remove(key: withdrawID)
+				if self.nftIndex[minterName]!.length < 1 {
+					self.nftIndex.remove(key: minterName)
+				}
+			}
 
-			emit Withdraw(id: token.id, from: self.owner?.address)
+			emit Withdraw(id: dandyToken.id, from: self.owner?.address)
 
-			return <-token
+			return <-dandyToken
 		}
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
 		pub fun deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
+
+			let minterName = token.minterPlatform.name 
+			if self.nftIndex.containsKey(minterName) {
+				self.nftIndex[minterName]!.insert(key: token.id, false)
+			} else {
+				self.nftIndex[minterName] = {}
+				self.nftIndex[minterName]!.insert(key: token.id, false)
+			}
 
 			token.increaseNounce()
 
@@ -214,28 +235,11 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun getMinters(): [String] {
-
-			let minters: [String] = []
-			for id in self.ownedNFTs.keys {
-				let nft=self.borrow(id)
-				let minter=nft.minterPlatform.name
-				if !minters.contains(minter) {
-					minters.append(minter)
-				}
-			}
-			return minters
+			return self.nftIndex.keys
 		}
 
 		pub fun getIDsFor(minter: String): [UInt64] {
-
-			let ids: [UInt64] = []
-			for id in self.ownedNFTs.keys {
-				let nft=self.borrow(id)
-				if nft.minterPlatform.name == minter {
-					ids.append(id)
-				}
-			}
-			return ids
+			return self.nftIndex[minter]?.keys ?? []
 		}
 
 		// getIDs returns an array of the IDs that are in the collection

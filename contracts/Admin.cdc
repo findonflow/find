@@ -326,10 +326,6 @@ pub contract Admin {
 			FindMarket.setResidualAddress(address)
 		}
 
-		pub fun paidResidualRoyalty(address: Address, ftType: Type) {
-			FindMarket.paidResidualRoyalty(address: address, ftType: ftType)
-		}
-
 		init() {
 			self.capability = nil
 		}

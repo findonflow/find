@@ -21,8 +21,6 @@ pub contract FindMarket {
 
 	//Residual Royalty
 	pub var residualAddress : Address
-	// Mapping {Original Receiver : {Vault Type Identifier : Amount}}
-	access(contract) let residualLedger : {Address : {String : UFix64}}
 
 	// Tenant information
 	pub let TenantClientPublicPath: PublicPath
@@ -1044,16 +1042,6 @@ pub contract FindMarket {
 				if !walletCheck {
 					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: FindMarket.residualAddress)
 					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
-					if FindMarket.residualLedger.containsKey(receiver){
-						let ledger = &FindMarket.residualLedger[receiver]! as &{String : UFix64}
-						if ledger.containsKey(ftType.identifier) {
-							ledger[ftType.identifier] = ledger[ftType.identifier]! + cutAmount
-						} else {
-							ledger[ftType.identifier] = cutAmount
-						}
-					} else {
-						FindMarket.residualLedger[receiver] = {ftType.identifier : cutAmount}
-					}
 					continue
 				}
 
@@ -1253,6 +1241,8 @@ pub contract FindMarket {
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 
 		pub fun getTotalRoyalties() : UFix64 
+		pub fun getDisplay() : MetadataViews.Display 
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 	}
 
 	pub struct SaleItemInformation {
@@ -1325,23 +1315,6 @@ pub contract FindMarket {
 		FindMarket.residualAddress = address
 	}
 
-	access(account) fun paidResidualRoyalty(address: Address, ftType: Type) {
-		pre {
-			FindMarket.residualLedger.containsKey(address) : "This address does not exist"
-			FindMarket.residualLedger[address]!.containsKey(ftType.identifier) : "This address does not have any residual in type ".concat(ftType.identifier)
-		}
-		let ledger = &FindMarket.residualLedger[address]! as &{String : UFix64} 
-		ledger.remove(key: ftType.identifier) 
-
-		if FindMarket.residualLedger[address]!.length < 1 {
-			FindMarket.residualLedger.remove(key: address)
-		}
-	}
-
-	pub fun getResidualRoyalty() : {Address : {String : UFix64}} {
-		return FindMarket.residualLedger
-	}
-
 	init() {
 		self.tenantAddressName={}
 		self.tenantNameAddress={}
@@ -1359,7 +1332,6 @@ pub contract FindMarket {
 		self.marketBidCollectionTypes = []
 
 		self.residualAddress = self.account.address // This has to be changed
-		self.residualLedger = {}
 
 	}
 
