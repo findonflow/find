@@ -599,4 +599,68 @@ func TestMarketSale(t *testing.T) {
 		otu.AutoGold("events", res.Events)
 
 	})
+
+	/* Honour Banning */
+	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()
+		otu.listNFTForSale("user1", id[0], price)
+		otu.profileBan("user1")
+		otu.O.TransactionFromFile("listNFTForSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("Dandy").
+				UInt64(id[1]).
+				String("Flow").
+				UFix64(price).
+				UFix64(100.0)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		otu.O.TransactionFromFile("buyNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id[0]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		otu.cancelNFTForSale("user1", id[0])
+	})
+
+	t.Run("Should be able to ban user, user cannot buy NFT.", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()
+		otu.listNFTForSale("user1", id[0], price)
+		otu.profileBan("user2")
+
+		otu.O.TransactionFromFile("buyNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id[0]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+	})
 }

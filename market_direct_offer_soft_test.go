@@ -28,8 +28,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		id := otu.setupMarketAndDandy()
 		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferSoft"). 
-			destroyDandyCollection("user2"). 
+			setFlowDandyMarketOption("DirectOfferSoft").
+			destroyDandyCollection("user2").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
@@ -454,5 +454,121 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			}))
 		otu.AutoGold("events", res.Events)
 
+	})
+
+	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		otu.setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
+
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", ids[0], price).
+			directOfferMarketSoft("user2", "user1", ids[1], price).
+			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
+			profileBan("user1")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(ids[2]).
+				String("Flow").
+				UFix64(price).
+				UFix64(100.0)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should not be able to accept offer
+		otu.O.TransactionFromFile("acceptDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[1])).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should not be able to fulfill offer
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[0]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		//Should be able to cancel(reject) offer
+		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids[1])).
+			Test(otu.T).
+			AssertSuccess()
+	})
+
+	t.Run("Should be able to ban user, user can only retract offer", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		otu.setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
+
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", ids[0], price).
+			directOfferMarketSoft("user2", "user1", ids[1], price).
+			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
+			profileBan("user2")
+
+		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(ids[2]).
+				String("Flow").
+				UFix64(price).
+				UFix64(100.0)).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
+		// Should not be able to accept offer
+		otu.O.TransactionFromFile("acceptDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[1])).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
+		// Should not be able to fulfill offer
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[0]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
+		//Should be able to retract offer
+		otu.retractOfferDirectOfferSoft("user2", "user1", ids[1])
 	})
 }
