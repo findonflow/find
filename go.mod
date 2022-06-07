@@ -8,7 +8,7 @@ require (
 	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
-	github.com/onflow/cadence v0.23.3
+	github.com/onflow/cadence v0.21.3-0.20220601002855-8b113c539a2c
 	github.com/stretchr/testify v1.7.1
 )
 
@@ -107,6 +107,7 @@ require (
 	github.com/spf13/viper v1.10.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/thoas/go-funk v0.9.2 // indirect
+	github.com/turbolent/prettier v0.0.0-20210613180524-3a3f5a5b49ba // indirect
 	github.com/uber/jaeger-client-go v2.29.1+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
