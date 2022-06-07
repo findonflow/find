@@ -260,14 +260,14 @@ pub contract FindMarketSale {
 		}
 		
 		pub fun borrow(_ id: UInt64): &SaleItem {
-			return &self.items[id] as &SaleItem
+			return (&self.items[id] as &SaleItem?)!
 		}
 
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
 			pre{
 				self.items.containsKey(id) : "This id does not exist : ".concat(id.toString())
 			}
-			return &self.items[id] as &SaleItem{FindMarket.SaleItem}
+			return (&self.items[id] as &SaleItem{FindMarket.SaleItem}?)!
 		}
 
 		destroy() {
