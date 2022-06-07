@@ -58,7 +58,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: run tests
-        run: go test -json ./... > test.json
+        run: go test -timeout 15m -json ./... > test.json
       - name: Annotate tests
         if: always()
         uses: guyarb/golang-test-annotations@v0.5.0
