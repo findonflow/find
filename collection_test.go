@@ -13,8 +13,21 @@ func TestCollectionScripts(t *testing.T) {
 
 		otu.setupFIND().
 			setupDandy("user1").
-			registerDandyInNFTRegistry().
-			mintThreeExampleDandies()
+			registerDandyInNFTRegistry()
+
+		otu.O.TransactionFromFile("testMintDandyTO").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				String("user1").
+				UInt64(1).
+				String("Neo").
+				String("Neo Motorcycle").
+				String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
+				String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+				String("rare").
+				UFix64(50.0).
+				Account("user1")).
+			RunPrintEventsFull()
 
 		result := otu.O.ScriptFromFile("getCollections").
 			Args(otu.O.Arguments().String("user1")).
