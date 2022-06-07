@@ -183,7 +183,7 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) overflow.Tran
 		})).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 			"amount": "5.00000000",
-			"to":     "0x1cf0e2f2f715450",
+			"to":     "0x01cf0e2f2f715450",
 		})).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
 			"amount": "5.00000000",
@@ -220,7 +220,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 		})).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 			"amount": "5.00000000",
-			"to":     "0x1cf0e2f2f715450",
+			"to":     "0x01cf0e2f2f715450",
 		})).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
 			"amount": "5.00000000",
@@ -243,10 +243,6 @@ pub fun main() :  UFix64 {
 
 func (otu *OverflowTestUtils) accountAddress(name string) string {
 	address := otu.O.Account(name).Address().String()
-	for address[0:1] == "0" {
-		address = address[1:]
-	}
-
 	return fmt.Sprintf("0x%s", address)
 }
 

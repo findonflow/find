@@ -176,7 +176,7 @@ func TestAuction(t *testing.T) {
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "0.20000000",
-				"to":     "0x1cf0e2f2f715450",
+				"to":     "0x01cf0e2f2f715450",
 			}))
 	})
 
@@ -217,7 +217,7 @@ func TestAuction(t *testing.T) {
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "1.00000000",
-				"to":     "0x1cf0e2f2f715450",
+				"to":     "0x01cf0e2f2f715450",
 			}))
 
 	})
@@ -279,7 +279,7 @@ func TestAuction(t *testing.T) {
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "0.50000000",
-				"to":     "0x1cf0e2f2f715450",
+				"to":     "0x01cf0e2f2f715450",
 			}))
 	})
 
