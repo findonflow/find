@@ -107,15 +107,15 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
-      "address": "4cdc372285f27e1e",
+      "address": "39937dba71a38820",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
-      "address": "5a8852111cf6747f",
+      "address": "2fc71889e8a78241",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
-      "address": "51a26088d0730a56",
+      "address": "cba0a154f95d829e",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user2": {

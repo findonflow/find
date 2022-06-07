@@ -1,23 +1,23 @@
 {
-  "name": "@findonflow/find-flow-contracts",
-  "version": "1.0.0",
-  "description": "Cadence transactions and scripts to work with https://find.xyz ",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/findonflow/find.git"
-  },
-  "keywords": [
-    "cadence",
-    "client"
-  ],
-  "author": "Find on Flow LLP",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/findonflow/find/issues"
-  },
-  "homepage": "https://github.com/findonflow/find#readme"
+    "name": "@findonflow/find-flow-contracts",
+    "version": "1.1.0",
+    "description": "Cadence transactions and scripts to work with https://find.xyz ",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/findonflow/find.git"
+    },
+    "keywords": [
+        "cadence",
+        "client"
+    ],
+    "author": "Find on Flow LLP",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/findonflow/find/issues"
+    },
+    "homepage": "https://github.com/findonflow/find#readme"
 }
