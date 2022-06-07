@@ -1143,13 +1143,13 @@ pub contract FindMarket {
 	}
 
 	pub struct GhostListing{
-		pub let listingType: Type
+//		pub let listingType: Type
 		pub let listingTypeIdentifier: String
 		pub let id: UInt64
 
 
 		init(listingType:Type, id:UInt64) {
-			self.listingType=listingType
+//			self.listingType=listingType
 			self.listingTypeIdentifier=listingType.identifier
 			self.id=id
 		}
