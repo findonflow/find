@@ -526,6 +526,14 @@ pub contract FindMarket {
 			self.status=status
 		}
 
+		access(contract) fun removeRules(_ index: Int) : TenantRule {
+			return self.rules.remove(at: index)
+		}
+
+		access(contract) fun addRules(_ rule: TenantRule) {
+			self.rules.append(rule)
+		}
+
 		access(contract) fun alterStatus(_ status : String) {
 			self.status = status
 		}
@@ -602,7 +610,7 @@ pub contract FindMarket {
 				assert(rule.name == tenantRule.name, message: "Rule with same name already exist. Name: ".concat(rule.name))
 			}
 			*/
-			self.tenantSaleItems[optionName]!.rules.append(tenantRule)
+			self.tenantSaleItems[optionName]!.addRules(tenantRule)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
@@ -619,7 +627,7 @@ pub contract FindMarket {
 				counter = counter + 1
 				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
 			}
-			self.tenantSaleItems[optionName]!.rules.remove(at: counter)
+			self.tenantSaleItems[optionName]!.removeRules(counter)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
