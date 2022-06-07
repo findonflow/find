@@ -140,6 +140,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			collection.deposit(token: <- token)
 			i=i+1
 		}
+		i = 1
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -169,6 +170,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			collection.deposit(token: <- token)
 			i=i+1
 		}
+		i = 1
 	
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -182,12 +184,12 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			let token <- finLeases.mintDandy(minter: name, 
-			  nftName: "jambb ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+			  nftName: "bitku ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
 				schemas: schemas, 
 				externalUrlPrefix: "https://bitku.art/",
-				collectionDescription: "jambb FIND",
+				collectionDescription: "bitku FIND",
 				collectionExternalURL: "https://bitku.art/",
 				collectionSquareImage: "",
 				collectionBannerImage: "",
@@ -196,6 +198,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			collection.deposit(token: <- token)
 			i=i+1
 		}
+		i = 1
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -209,7 +212,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			let token <- finLeases.mintDandy(minter: name, 
-			  nftName: "jambb ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+			  nftName: "goatedgoats ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
 				schemas: schemas, 
@@ -223,6 +226,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			collection.deposit(token: <- token)
 			i=i+1
 		}	
+		i = 1
 		
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -236,12 +240,12 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			let token <- finLeases.mintDandy(minter: name, 
-			  nftName: "jambb ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+			  nftName: "klktn ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
 				schemas: schemas, 
 				externalUrlPrefix: "https://klktn.com/",
-				collectionDescription: "goatedgoatstraits FIND",
+				collectionDescription: "klktn FIND",
 				collectionExternalURL: "https://klktn.com/",
 				collectionSquareImage: "",
 				collectionBannerImage: "",
@@ -250,6 +254,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			collection.deposit(token: <- token)
 			i=i+1
 		}	
+		i = 1
 
 	}
 }
