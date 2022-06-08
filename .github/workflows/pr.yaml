@@ -37,7 +37,6 @@ jobs:
       - uses: zencargo/github-action-go-mod-tidy@v1
         with:
           go-version: 1.18 
-
   test:
     runs-on: ubuntu-latest
     env:
@@ -50,7 +49,9 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - uses: actions/cache@v2
+      - name: Set up gotestfmt
+        run: go install github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt@latest
+      - uses: actions/cache@v3
         with:
           path: |
             ~/go/pkg/mod
@@ -58,10 +59,20 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: run tests
-        run: go test -timeout 15m -json ./... > test.json
+      # Run tests with nice formatting. Save the original log in /tmp/gotest.log
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          go test -timeout 15m -json -v ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+      - name: Upload test log
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-log
+          path: /tmp/gotest.log
+          if-no-files-found: error
       - name: Annotate tests
         if: always()
         uses: guyarb/golang-test-annotations@v0.5.0
         with:
-          test-results: test.json
+          test-results: /tmp/gotest.log
