@@ -105,8 +105,8 @@
         "Dandy90": {
             "collection": "Dandy",
             "contentTypes": [
-                "video/ipfs",
-                "image/ipfs;display=thumbnail"
+                "video/mp4",
+                "image;display=thumbnail"
             ],
             "id": "90",
             "image": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
@@ -116,14 +116,14 @@
                         "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U",
                         "path": ""
                     },
-                    "mediaType": "video/ipfs"
+                    "mediaType": "video/mp4"
                 },
                 {
                     "file": {
                         "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
                         "path": ""
                     },
-                    "mediaType": "image/ipfs;display=thumbnail"
+                    "mediaType": "image;display=thumbnail"
                 }
             ],
             "name": "ufcstrike 1 of 1",
@@ -141,7 +141,7 @@
         "Dandy91": {
             "collection": "Dandy",
             "contentTypes": [
-                "video/ipfs",
+                "video/mp4",
                 "image/jpg;display=thumbnail"
             ],
             "id": "91",
@@ -152,7 +152,7 @@
                         "cid": "QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr",
                         "path": ""
                     },
-                    "mediaType": "video/ipfs"
+                    "mediaType": "video/mp4"
                 },
                 {
                     "file": {
@@ -176,7 +176,7 @@
         "Dandy92": {
             "collection": "Dandy",
             "contentTypes": [
-                "text/html;charset=UTF-8"
+                "text/plain"
             ],
             "id": "92",
             "image": "No one\nOf the year I hope it's on\nFor work",
@@ -184,10 +184,10 @@
                 {
                     "file": {
                         "content": "No one\nOf the year I hope it's on\nFor work",
-                        "mediaType": "text/html;charset=UTF-8",
+                        "mediaType": "text/plain",
                         "protocol": "onChain"
                     },
-                    "mediaType": "text/html;charset=UTF-8"
+                    "mediaType": "text/plain"
                 }
             ],
             "name": "bitku 1 of 1",
@@ -205,7 +205,7 @@
         "Dandy93": {
             "collection": "Dandy",
             "contentTypes": [
-                "image/ipfs"
+                "image"
             ],
             "id": "93",
             "image": "ipfs://QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a",
@@ -215,7 +215,7 @@
                         "cid": "QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a",
                         "path": ""
                     },
-                    "mediaType": "image/ipfs"
+                    "mediaType": "image"
                 }
             ],
             "name": "goatedgoats 1 of 1",

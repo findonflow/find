@@ -118,8 +118,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.IPFSFile(cid:"QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U", path:nil)
 			let thumbnailHttpFile=MetadataViews.IPFSFile(cid:"QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR", path:nil)
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/ipfs")
-			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/ipfs;display=thumbnail")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image;display=thumbnail")
 
 			let artTag=FindViews.Tag({"ufcstrike Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"rank" : 295.0})
@@ -148,7 +148,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.IPFSFile(cid:"QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr", path:nil)
 			let thumbnailHttpFile=MetadataViews.HTTPFile(url:"https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg")
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/ipfs")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/jpg;display=thumbnail")
 
 			let artTag=FindViews.Tag({"jambb Tag":"Tag1"})
@@ -176,8 +176,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "bitku ", description: "bitku_NFT", type:"text")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let artHttpFile=FindViews.OnChainFile(content:"No one\nOf the year I hope it's on\nFor work", mediaType: "text/html;charset=UTF-8")
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "text/html;charset=UTF-8")
+			let artHttpFile=FindViews.OnChainFile(content:"No one\nOf the year I hope it's on\nFor work", mediaType: "text/plain")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "text/plain")
 
 			let artTag=FindViews.Tag({"bitku Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"rank" : 0.0})
@@ -205,7 +205,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "goatedgoats ", description: "goatedgoats_NFT", type:"image")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.IPFSFile(cid:"QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a", path:nil)
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/ipfs")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image")
 
 			let artTag=FindViews.Tag({"goatedgoats Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"id" : 2389.0})
