@@ -1,9 +1,9 @@
 /* Alchemy Mainnet Wrapper */
-// import AlchemyMetadataWrapperMainnet from 0xeb8cb4c3157d5dac
-// import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
-// import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
-// import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
-// import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
+import AlchemyMetadataWrapperMainnet from 0xeb8cb4c3157d5dac
+import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
+import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
+import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
+import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 // /* Alchemy Testnet Wrapper */
 // import AlchemyMetadataWrapperTestnetfrom 0x5ff2c7b4c40de11
@@ -67,6 +67,9 @@ pub contract CollectionFactory {
         }
     }
 
+    //////////////////////////////////////////////////////////////
+    // Get all collections with ignoreItems that can be sent in
+    //////////////////////////////////////////////////////////////
     pub fun getCollections(user: String, maxItems: Int, shard: String, ignoreItems: {String : [UInt64]}) : CollectionReport? {
         switch shard {
             case "Alchemy-shard1": 
@@ -85,6 +88,9 @@ pub contract CollectionFactory {
             panic("Shard should only be : Alchemy-shard1, Alchemy-shard2,Alchemy-shard3,Alchemy-shard4 or NFTRegistry")
     }
 
+    //////////////////////////////////////////////////////////////
+    // Get specific collections 
+    //////////////////////////////////////////////////////////////
     pub fun getCollection(user: String, maxItems: Int, shard: String, collection: [String]) : CollectionReport? {
         switch shard {
             case "Alchemy-shard1": 
@@ -114,6 +120,9 @@ pub contract CollectionFactory {
         return getAccount(address!)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch All Collections in NFTRegistry
+    //////////////////////////////////////////////////////////////
     pub fun fetchNFTRegistry(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -231,7 +240,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
-
+    //////////////////////////////////////////////////////////////
+    // Fetch All Collections in Shard 1
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyShard1(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -354,6 +365,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch All Collections in Shard 2
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyShard2(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -476,6 +490,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch All Collections in Shard 3
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyShard3(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -598,6 +615,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch All Collections in Shard 4
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyShard4(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -720,6 +740,11 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+
+
+    //////////////////////////////////////////////////////////////
+    // Fetch Specific Collections in NFTRegistry
+    //////////////////////////////////////////////////////////////
     pub fun fetchNFTRegistryCollection(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -831,6 +856,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch Specific Collections in Shard 1
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard1(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -946,6 +974,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch Specific Collections in Shard 2
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard2(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -1061,6 +1092,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch Specific Collections in Shard 3
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard3(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
@@ -1176,6 +1210,9 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+    //////////////////////////////////////////////////////////////
+    // Fetch Specific Collections in Shard 4
+    //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard4(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
