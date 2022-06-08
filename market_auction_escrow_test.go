@@ -50,6 +50,22 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
 
+	t.Run("Should be able to sell and buy at auction even the buyer is without the collection", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			destroyDandyCollection("user2").
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+	})
+
 	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
@@ -615,6 +631,120 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			}))
 
 		otu.AutoGold("events", res.Events)
+
+	})
+
+	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		otu.setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
+
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", ids[0], price).
+			listNFTForEscrowedAuction("user1", ids[1], price).
+			auctionBidMarketEscrow("user2", "user1", ids[0], price+5.0).
+			tickClock(400.0).
+			profileBan("user1")
+
+			// Should not be able to list
+		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("Dandy").
+				UInt64(ids[2]).
+				String("Flow").
+				UFix64(price).
+				UFix64(price + 5.0).
+				UFix64(300.0).
+				UFix64(60.0).
+				UFix64(1.0).
+				UFix64(10.0)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should not be able to bid
+		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[1]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should not be able to fulfill
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[0])).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should be able to cancel
+		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids[1])).
+			Test(otu.T).AssertSuccess()
+
+	})
+
+	t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		otu.setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
+
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionEscrow").
+			listNFTForEscrowedAuction("user1", ids[0], price).
+			listNFTForEscrowedAuction("user1", ids[1], price).
+			auctionBidMarketEscrow("user2", "user1", ids[0], price+5.0).
+			tickClock(400.0).
+			profileBan("user2")
+
+		// Should not be able to bid
+		otu.O.TransactionFromFile("bidMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[1]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
+		// Should not be able to fulfill
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[0])).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
 
 	})
 }

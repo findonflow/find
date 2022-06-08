@@ -1,7 +1,7 @@
 {
-    "name": "find-flow-contracts-v2",
-    "version": "0.13.0",
-    "description": "Cadence contracts json for find",
+    "name": "@findonflow/find-flow-contracts",
+    "version": "1.1.0",
+    "description": "Cadence transactions and scripts to work with https://find.xyz ",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,9 +11,10 @@
         "url": "git+https://github.com/findonflow/find.git"
     },
     "keywords": [
-        "cadence"
+        "cadence",
+        "client"
     ],
-    "author": "Bjarte Karlsen",
+    "author": "Find on Flow LLP",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/findonflow/find/issues"

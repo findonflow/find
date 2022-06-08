@@ -14,9 +14,13 @@ pub contract FindMarket {
 	access(contract) let  marketBidCollectionTypes : [Type]
 
 	pub event RoyaltyPaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
+	pub event RoyaltyCouldNotBePaid(tenant:String, id: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo, residualAddress: Address)
 	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+
+	//Residual Royalty
+	pub var residualAddress : Address
 
 	// Tenant information
 	pub let TenantClientPublicPath: PublicPath
@@ -187,15 +191,22 @@ pub contract FindMarket {
 				}
 				continue
 			} 
-			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"))
+			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"), seller: address, buyer: nil)
 			var status="active"
+
+			if !stopped.allowed && stopped.message == "Seller banned by Tenant" {
+				status="banned"
+				info.append(FindMarket.SaleItemInformation(item, status, false))
+				continue
+			}
+
 			if !stopped.allowed {
 				status="stopped"
 				info.append(FindMarket.SaleItemInformation(item, status, false))
 				continue
 			}
 
-			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"))
+			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"), seller: address, buyer: nil)
 
 			if !deprecated.allowed {
 				status="deprecated"
@@ -557,7 +568,7 @@ pub contract FindMarket {
 	pub resource interface TenantPublic {
 		pub fun getStoragePath(_ type: Type) : StoragePath 
 		pub fun getPublicPath(_ type: Type) : PublicPath
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : ActionResult
 		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : TenantCuts 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
 		pub fun getBlockedNFT(marketType: Type) : [Type] 
@@ -703,8 +714,18 @@ pub contract FindMarket {
 			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
 		}
 
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction) : ActionResult{
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : ActionResult{
+			/* Check for Honour Banning */
+			let profile = getAccount(FindMarket.tenantNameAddress[self.name]!).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() ?? panic("Cannot get reference to Profile to check honour banning")
+			if seller != nil && profile.isBanned(seller!) {
+				return ActionResult(allowed:false, message: "Seller banned by Tenant", name: "Profile Ban")
+			}
+			if buyer != nil && profile.isBanned(buyer!) {
+				return ActionResult(allowed:false, message: "Buyer banned by Tenant", name: "Profile Ban")
+			}
 
+
+			/* Check for Find Deny Rules */
 			for item in self.findSaleItems.values {
 				for rule in item.rules {
 					var relevantType=nftType
@@ -728,6 +749,7 @@ pub contract FindMarket {
 				}
 			}
 
+			/* Check for Tenant Allow Rules */
 			for item in self.tenantSaleItems.values {
 				let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 
@@ -1007,9 +1029,11 @@ pub contract FindMarket {
 		let soldFor=vault.balance
 		let ftType=vault.getType()
 
+		/* Residual Royalty */
+		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
+		let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+
 		/* Check the total royalty to prevent changing of royalties */
-
-
 		let royalties = royalty.getRoyalties()
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
@@ -1021,7 +1045,25 @@ pub contract FindMarket {
 			for royaltyItem in royalties {
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
+				let receiver = royaltyItem.receiver.address
 				let name = resolver(royaltyItem.receiver.address)
+
+				var walletCheck = true 
+
+				if !royaltyItem.receiver.check() { walletCheck = false }
+				if !royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
+					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
+					walletCheck = ref.checkWallet(ftType.identifier)
+				}
+
+				/* If the royalty receiver check failed */
+				if !walletCheck {
+					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: FindMarket.residualAddress)
+					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+					continue
+				}
+
+				/* If the royalty receiver check succeed */
 				emit RoyaltyPaid(tenant:tenant, id: id, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
@@ -1031,15 +1073,18 @@ pub contract FindMarket {
 			let cutAmount= soldFor * findCut.cut
 			let name = resolver(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			findCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly.")
+			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		if let tenantCut =cuts.tenantCut {
 			let cutAmount= soldFor * tenantCut.cut
 			let name = resolver(tenantCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			tenantCut.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly.")
+			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
+
 		oldProfile.deposit(from: <- vault)
 	}
 
@@ -1214,6 +1259,8 @@ pub contract FindMarket {
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 
 		pub fun getTotalRoyalties() : UFix64 
+		pub fun getDisplay() : MetadataViews.Display 
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 	}
 
 	pub struct SaleItemInformation {
@@ -1282,6 +1329,10 @@ pub contract FindMarket {
 		}
 	}
 
+	access(account) fun setResidualAddress(_ address: Address) {
+		FindMarket.residualAddress = address
+	}
+
 	init() {
 		self.tenantAddressName={}
 		self.tenantNameAddress={}
@@ -1297,6 +1348,8 @@ pub contract FindMarket {
 		self.listingName={}
 		self.marketBidTypes = []
 		self.marketBidCollectionTypes = []
+
+		self.residualAddress = self.account.address // This has to be changed
 
 	}
 
