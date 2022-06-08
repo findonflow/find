@@ -63,7 +63,7 @@
                 "file": {
                     "url": "https://flovatar.com/api/image/166"
                 },
-                "mediaType": "image"
+                "mediaType": "image/svg"
             }
         ],
         "name": "flovatar 1 of 1",
