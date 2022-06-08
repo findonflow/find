@@ -63,13 +63,13 @@
                 "file": {
                     "url": "https://nft.blocto.app/xtingles/xBloctopus.mp4"
                 },
-                "mediaType": "video"
+                "mediaType": "video/mp4"
             },
             {
                 "file": {
                     "url": "https://nft.blocto.app/xtingles/preview-xBloctopus.png"
                 },
-                "mediaType": "image/thumbnail"
+                "mediaType": "image/png;display=thumbnail"
             }
         ],
         "name": "xtingle 1 of 1",
