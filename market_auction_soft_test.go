@@ -554,4 +554,115 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.AutoGold("events", res.Events)
 	})
+
+	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		otu.setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
+
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", ids[0], price).
+			listNFTForSoftAuction("user1", ids[1], price).
+			auctionBidMarketSoft("user2", "user1", ids[0], price+5.0).
+			tickClock(400.0).
+			profileBan("user1")
+
+			// Should not be able to list
+		otu.O.TransactionFromFile("listNFTForAuctionSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("Dandy").
+				UInt64(ids[2]).
+				String("Flow").
+				UFix64(price).
+				UFix64(price + 5.0).
+				UFix64(300.0).
+				UFix64(60.0).
+				UFix64(1.0).
+				UFix64(10.0)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+		// Should not be able to bid
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[1]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should not be able to fufil
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[0]).
+				UFix64(price + 5.0)).
+			Test(otu.T).
+			AssertFailure("Seller banned by Tenant")
+
+		// Should be able to cancel
+		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids[1])).
+			Test(otu.T).AssertSuccess()
+	})
+
+	t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		otu.setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
+
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", ids[0], price).
+			listNFTForSoftAuction("user1", ids[1], price).
+			auctionBidMarketSoft("user2", "user1", ids[0], price+5.0).
+			tickClock(400.0).
+			profileBan("user2")
+
+		// Should not be able to bid
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(ids[1]).
+				UFix64(price)).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
+		// Should not be able to fufil
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[0]).
+				UFix64(price + 5.0)).
+			Test(otu.T).
+			AssertFailure("Buyer banned by Tenant")
+
+	})
 }

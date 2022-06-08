@@ -204,7 +204,7 @@ pub contract FindMarketDirectOfferSoft {
 			}
 			let saleItem=self.borrow(id)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "cancel bid in direct offer soft"))
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "cancel bid in direct offer soft"), seller: nil, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -235,7 +235,7 @@ pub contract FindMarketDirectOfferSoft {
 			}
 			let saleItem=self.borrow(id)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "increase bid in direct offer soft"))
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "increase bid in direct offer soft"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -253,7 +253,7 @@ pub contract FindMarketDirectOfferSoft {
 			//If there are no bids from anybody else before we need to make the item
 			if !self.items.containsKey(id) {
 				let saleItem <- create SaleItem(pointer: item, callback: callback, validUntil: validUntil, saleItemExtraField: saleItemExtraField)
-				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "bid in direct offer soft"))
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "bid in direct offer soft"), seller: self.owner!.address, buyer: callback.address)
 
 				if !actionResult.allowed {
 					panic(actionResult.message)
@@ -270,7 +270,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic("You already have the latest bid on this item, use the incraseBid transaction")
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "bid in direct offer soft"))
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "bid in direct offer soft"), seller: self.owner!.address, buyer: callback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -302,7 +302,7 @@ pub contract FindMarketDirectOfferSoft {
 
 			let saleItem=self.borrow(id)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "reject offer in direct offer soft"))
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "reject offer in direct offer soft"), seller: nil, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -326,7 +326,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic("This direct offer is already expired")
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "accept offer in direct offer soft"))
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "accept offer in direct offer soft"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -353,13 +353,13 @@ pub contract FindMarketDirectOfferSoft {
 			if vault.getType() != saleItem.getFtType() {
 				panic("The FT vault sent in to fulfill does not match the required type")
 			}
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "fulfill directOffer"))
-
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "fulfill directOffer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
+			
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
+
+			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			self.emitEvent(saleItem: saleItem, status: "sold")
 			let nftInfo=saleItem.toNFTInfo()

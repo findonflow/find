@@ -22,7 +22,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
 		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
-		let media=MetadataViews.Media(file: httpFile, mediaType: "image/thumbnail")
+		let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
 		let rarity = FindViews.Rarity(rarity: rarityNum, rarityName:rarity, parts: {})
 
@@ -58,12 +58,12 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
-			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "xtingle ", description: "xtingle_NFT", type:"video/mp4")
+			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "xtingle ", description: "xtingle_NFT", type:"video")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.HTTPFile(url:"https://nft.blocto.app/xtingles/xBloctopus.mp4")
 			let thumbnailFile=MetadataViews.HTTPFile(url:"https://nft.blocto.app/xtingles/preview-xBloctopus.png")
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video")
-			let thumbnailMedia=MetadataViews.Media(file: thumbnailFile, mediaType: "image/thumbnail")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailFile, mediaType: "image/png;display=thumbnail")
 			let artTag=FindViews.Tag({"xtingle Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"video length" : 27.0})
 
@@ -89,10 +89,10 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "flovatar ", description: "flovatar_NFT", type:"image")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/flovatars/1225/0x92ba5cba77fc1e87")
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image")
+			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/api/image/166")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/svg")
 			let artTag=FindViews.Tag({"flovatar Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"rarity score" : 2.2})
+			let artScalar=FindViews.Scalar({"rarity score" : 2.2, "id" : 166.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			let token <- finLeases.mintDandy(minter: name, 
@@ -100,7 +100,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
 				schemas: schemas, 
-				externalUrlPrefix: "https://flovatar.com/flovatars/",
+				externalUrlPrefix: "https://flovatar.com/flovatars/166/0x886f3aeaf848c535",
 				collectionDescription: "flovatar FIND",
 				collectionExternalURL: "https://flovatar.com/",
 				collectionSquareImage: "https://miro.medium.com/max/1080/1*nD3N5BvxvH-wgLW1KPizoA.png",
@@ -114,12 +114,12 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
-			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "ufcstrike ", description: "ufcstrike_NFT", type:"video/ipfs")
+			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "ufcstrike ", description: "ufcstrike_NFT", type:"video")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.IPFSFile(cid:"QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U", path:nil)
 			let thumbnailHttpFile=MetadataViews.IPFSFile(cid:"QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR", path:nil)
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/ipfs")
-			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/thumbnail")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image;display=thumbnail")
 
 			let artTag=FindViews.Tag({"ufcstrike Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"rank" : 295.0})
@@ -130,7 +130,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 				description: artCreativeWork.description,
 				thumbnail: thumbnailMedia,
 				schemas: schemas, 
-				externalUrlPrefix: "https://giglabs.mypinata.cloud/ipfs/",
+				externalUrlPrefix: "https://www.ufcstrike.com",
 				collectionDescription: "ufc strike FIND",
 				collectionExternalURL: "https://ufcstrike.com/",
 				collectionSquareImage: "https://assets.website-files.com/62605ca984796169418ca5dc/628e9bba372af61fcf967e03_round-one-standard-p-1080.png",
@@ -140,7 +140,121 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			collection.deposit(token: <- token)
 			i=i+1
 		}
+		i = 1
 
+		while i <= maxEdition {
+			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
+			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "jambb ", description: "jambb_NFT", type:"video")
+			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
+			let artHttpFile=MetadataViews.IPFSFile(cid:"QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr", path:nil)
+			let thumbnailHttpFile=MetadataViews.HTTPFile(url:"https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
+			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/jpg;display=thumbnail")
+
+			let artTag=FindViews.Tag({"jambb Tag":"Tag1"})
+			let artScalar=FindViews.Scalar({"video length" : 45.0})
+
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
+			let token <- finLeases.mintDandy(minter: name, 
+			  nftName: "jambb ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+				description: artCreativeWork.description,
+				thumbnail: thumbnailMedia,
+				schemas: schemas, 
+				externalUrlPrefix: "https://www.jambb.com/c/moment/60024",
+				collectionDescription: "jambb FIND",
+				collectionExternalURL: "https://www.jambb.com/",
+				collectionSquareImage: "https://prod-jambb-issuance-static-public.s3.amazonaws.com/issuance-ui/logos/jambb-full-color-wordmark-inverted.svg",
+				collectionBannerImage: "https://s3.amazonaws.com/jambb-prod-issuance-ui-static-assets/avatars/b76cdd34-e728-4e71-a0ed-c277a628654a/jambb-logo-3d-hp-hero-07.png",
+			)
+
+			collection.deposit(token: <- token)
+			i=i+1
+		}
+		i = 1
 	
+		while i <= maxEdition {
+			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
+			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "bitku ", description: "bitku_NFT", type:"text")
+			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
+			let artHttpFile=FindViews.OnChainFile(content:"No one\nOf the year I hope it's on\nFor work", mediaType: "text/plain")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "text/plain")
+
+			let artTag=FindViews.Tag({"bitku Tag":"Tag1"})
+			let artScalar=FindViews.Scalar({"rank" : 0.0})
+
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
+			let token <- finLeases.mintDandy(minter: name, 
+			  nftName: "bitku ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+				description: artCreativeWork.description,
+				thumbnail: artMedia,
+				schemas: schemas, 
+				externalUrlPrefix: "https://bitku.art/#0x886f3aeaf848c535/188",
+				collectionDescription: "bitku FIND",
+				collectionExternalURL: "https://bitku.art/",
+				collectionSquareImage: "",
+				collectionBannerImage: "",
+			)
+
+			collection.deposit(token: <- token)
+			i=i+1
+		}
+		i = 1
+
+		while i <= maxEdition {
+			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
+			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "goatedgoats ", description: "goatedgoats_NFT", type:"image")
+			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
+			let artHttpFile=MetadataViews.IPFSFile(cid:"QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a", path:nil)
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image")
+
+			let artTag=FindViews.Tag({"goatedgoats Tag":"Tag1"})
+			let artScalar=FindViews.Scalar({"id" : 2389.0})
+
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
+			let token <- finLeases.mintDandy(minter: name, 
+			  nftName: "goatedgoats ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+				description: artCreativeWork.description,
+				thumbnail: artMedia,
+				schemas: schemas, 
+				externalUrlPrefix: "https://goatedgoats.com/",
+				collectionDescription: "goatedgoats FIND",
+				collectionExternalURL: "https://goatedgoats.com/",
+				collectionSquareImage: "https://goatedgoats.com/_next/image?url=%2FLogo.png&w=64&q=75",
+				collectionBannerImage: "",
+			)
+
+			collection.deposit(token: <- token)
+			i=i+1
+		}	
+		i = 1
+		
+		while i <= maxEdition {
+			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
+			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "klktn ", description: "klktn_NFT", type:"video")
+			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
+			let artHttpFile=MetadataViews.HTTPFile(url:"https://ipfs.io/ipfs/bafybeif3banecjnrz7afp54tb332f3zzigzbdcgmjk3k3dwp4iqlrwsbju/73ceab33cf76c2cf48a9a587119c87d21d4ec92b5748e743113c4ce8a1568b53.mp4")
+			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
+
+			let artTag=FindViews.Tag({"klktn Tag":"Tag1"})
+			let artScalar=FindViews.Scalar({"id" : 0.0})
+
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
+			let token <- finLeases.mintDandy(minter: name, 
+			  nftName: "klktn ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+				description: artCreativeWork.description,
+				thumbnail: artMedia,
+				schemas: schemas, 
+				externalUrlPrefix: "https://klktn.com/",
+				collectionDescription: "klktn FIND",
+				collectionExternalURL: "https://klktn.com/",
+				collectionSquareImage: "",
+				collectionBannerImage: "",
+			)
+
+			collection.deposit(token: <- token)
+			i=i+1
+		}	
+		i = 1
+
 	}
 }
