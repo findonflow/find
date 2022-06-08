@@ -57,6 +57,51 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
+    "AlchemyMetadataWrapperMainnet": {
+      "aliases": {
+        "mainnet": "0xeb8cb4c3157d5dac"
+      }
+    },
+    "AlchemyMetadataWrapperMainnetShard1": {
+      "aliases": {
+        "mainnet": "0xeb8cb4c3157d5dac"
+      }
+    },
+    "AlchemyMetadataWrapperMainnetShard2": {
+      "aliases": {
+        "mainnet": "0xeb8cb4c3157d5dac"
+      }
+    },
+    "AlchemyMetadataWrapperMainnetShard3": {
+      "aliases": {
+        "mainnet": "0xeb8cb4c3157d5dac"
+      }
+    },
+    "AlchemyMetadataWrapperMainnetShard4": {
+      "aliases": {
+        "mainnet": "0xeb8cb4c3157d5dac"
+      }
+    },
+    "AlchemyMetadataWrapperTestnet": {
+      "aliases": {
+        "testnet": "0x5ff2c7b4c40de11"
+      }
+    },
+    "AlchemyMetadataWrapperTestnetShard1": {
+      "aliases": {
+        "testnet": "0x5ff2c7b4c40de11"
+      }
+    },
+    "AlchemyMetadataWrapperTestnetShard2": {
+      "aliases": {
+        "testnet": "0x5ff2c7b4c40de11"
+      }
+    },
+    "AlchemyMetadataWrapperTestnetShard3": {
+      "aliases": {
+        "testnet": "0x5ff2c7b4c40de11"
+      }
+    },
     "FIND": "./contracts/FIND.cdc",
     "Dandy": "./contracts/Dandy.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
