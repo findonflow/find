@@ -6,16 +6,18 @@ pub contract FindMetadataFactory {
 
 	pub struct MetadataCollectionItem {
 		pub let id:UInt64
-		pub let typeIdentifier: String
 		pub let uuid: UInt64 
 		pub let name: String
 		pub let image: String
+		pub let collection: String
+		pub let source: String //which alchemy shard or our own Factory
+
+		pub let rarity:String
+		pub let subCollection: String // <- This will be Alias unless they want something else
+
 		pub let url: String
 		pub let contentTypes:[String]
-		pub let rarity:String
-		//Refine later 
 		pub let medias: [MetadataViews.Media]
-		pub let collection: String // <- This will be Alias unless they want something else
 		pub let tag: {String : String}
 		pub let scalar: {String : UFix64}
 
