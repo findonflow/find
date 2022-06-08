@@ -29,7 +29,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
 		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
-		let media=MetadataViews.Media(file: httpFile, mediaType: "image")
+		let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
