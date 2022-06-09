@@ -16,7 +16,7 @@
         "Dandy87": {
             "collection": "Dandy",
             "contentTypes": [
-                "thumbnail"
+                "image/png"
             ],
             "id": "87",
             "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
@@ -25,7 +25,7 @@
                     "file": {
                         "url": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"
                     },
-                    "mediaType": "thumbnail"
+                    "mediaType": "image/png"
                 }
             ],
             "name": "Neo Motorcycle 1 of 1",
@@ -43,8 +43,8 @@
         "Dandy88": {
             "collection": "Dandy",
             "contentTypes": [
-                "video",
-                "thumbnail"
+                "video/mp4",
+                "image/png;display=thumbnail"
             ],
             "id": "88",
             "image": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
@@ -53,13 +53,13 @@
                     "file": {
                         "url": "https://nft.blocto.app/xtingles/xBloctopus.mp4"
                     },
-                    "mediaType": "video"
+                    "mediaType": "video/mp4"
                 },
                 {
                     "file": {
                         "url": "https://nft.blocto.app/xtingles/preview-xBloctopus.png"
                     },
-                    "mediaType": "thumbnail"
+                    "mediaType": "image/png;display=thumbnail"
                 }
             ],
             "name": "xtingle 1 of 1",
@@ -77,7 +77,7 @@
         "Dandy89": {
             "collection": "Dandy",
             "contentTypes": [
-                "image"
+                "image/svg"
             ],
             "id": "89",
             "image": "https://flovatar.com/api/image/166",
@@ -86,7 +86,7 @@
                     "file": {
                         "url": "https://flovatar.com/api/image/166"
                     },
-                    "mediaType": "image"
+                    "mediaType": "image/svg"
                 }
             ],
             "name": "flovatar 1 of 1",
@@ -99,14 +99,14 @@
                 "flovatar Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://flovatar.com/api/image//89",
+            "url": "https://flovatar.com/flovatars/166/0x886f3aeaf848c535/89",
             "uuid": "89"
         },
         "Dandy90": {
             "collection": "Dandy",
             "contentTypes": [
-                "video",
-                "thumbnail"
+                "video/mp4",
+                "image;display=thumbnail"
             ],
             "id": "90",
             "image": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
@@ -116,14 +116,14 @@
                         "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U",
                         "path": ""
                     },
-                    "mediaType": "video"
+                    "mediaType": "video/mp4"
                 },
                 {
                     "file": {
                         "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
                         "path": ""
                     },
-                    "mediaType": "thumbnail"
+                    "mediaType": "image;display=thumbnail"
                 }
             ],
             "name": "ufcstrike 1 of 1",
@@ -135,14 +135,14 @@
                 "ufcstrike Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://giglabs.mypinata.cloud/ipfs//90",
+            "url": "https://www.ufcstrike.com/90",
             "uuid": "90"
         },
         "Dandy91": {
             "collection": "Dandy",
             "contentTypes": [
-                "video",
-                "thumbnail"
+                "video/mp4",
+                "image/jpg;display=thumbnail"
             ],
             "id": "91",
             "image": "https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg",
@@ -152,13 +152,13 @@
                         "cid": "QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr",
                         "path": ""
                     },
-                    "mediaType": "video"
+                    "mediaType": "video/mp4"
                 },
                 {
                     "file": {
                         "url": "https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg"
                     },
-                    "mediaType": "thumbnail"
+                    "mediaType": "image/jpg;display=thumbnail"
                 }
             ],
             "name": "jambb 1 of 1",
@@ -170,13 +170,13 @@
                 "jambb Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://www.jambb.com/c/moment//91",
+            "url": "https://www.jambb.com/c/moment/60024/91",
             "uuid": "91"
         },
         "Dandy92": {
             "collection": "Dandy",
             "contentTypes": [
-                "text"
+                "text/plain"
             ],
             "id": "92",
             "image": "No one\nOf the year I hope it's on\nFor work",
@@ -184,10 +184,10 @@
                 {
                     "file": {
                         "content": "No one\nOf the year I hope it's on\nFor work",
-                        "mediaType": "text",
+                        "mediaType": "text/plain",
                         "protocol": "onChain"
                     },
-                    "mediaType": "text"
+                    "mediaType": "text/plain"
                 }
             ],
             "name": "bitku 1 of 1",
@@ -199,7 +199,7 @@
                 "bitku Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://bitku.art//92",
+            "url": "https://bitku.art/#0x886f3aeaf848c535/188/92",
             "uuid": "92"
         },
         "Dandy93": {
@@ -233,7 +233,7 @@
         "Dandy94": {
             "collection": "Dandy",
             "contentTypes": [
-                "video"
+                "video/mp4"
             ],
             "id": "94",
             "image": "https://ipfs.io/ipfs/bafybeif3banecjnrz7afp54tb332f3zzigzbdcgmjk3k3dwp4iqlrwsbju/73ceab33cf76c2cf48a9a587119c87d21d4ec92b5748e743113c4ce8a1568b53.mp4",
@@ -242,7 +242,7 @@
                     "file": {
                         "url": "https://ipfs.io/ipfs/bafybeif3banecjnrz7afp54tb332f3zzigzbdcgmjk3k3dwp4iqlrwsbju/73ceab33cf76c2cf48a9a587119c87d21d4ec92b5748e743113c4ce8a1568b53.mp4"
                     },
-                    "mediaType": "video"
+                    "mediaType": "video/mp4"
                 }
             ],
             "name": "klktn 1 of 1",
