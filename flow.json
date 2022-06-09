@@ -77,31 +77,31 @@
 		},
 		"testnet-find": {
 			"address": "0xa16ab1d0abde3625",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${TESTNET_FIND}"
 		},
 		"testnet-find-admin": {
 			"address": "0x523c2b6d1ab6063d",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${TESTNET_FIND_ADMIN}"
 		},
 		"testnet-user1": {
 			"address": "96a0def8269d6bc4",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${TESTNET_FIND_USER1}"
 		},
 		"testnet-user2": {
 			"address": "72c7672537676b1b",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${TESTNET_FIND_USER2}"
 		},
 		"testnet-user3": {
 			"address": "60635d0971b40946",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${TESTNET_FIND_USER3}"
 		},
 		"mainnet-find": {
 			"address": "0x097bafa4e0b48eef",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${MAINNET_FIND}"
 		},
 		"mainnet-find-admin": {
 			"address": "0x09a86f2493ce2e9d",
-			"key": "${TESTNET_ACCOUNT}"
+			"key": "${MAINNET_FIND_ADMIN}"
 		}
 	},
 	"deployments": {
