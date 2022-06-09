@@ -10,7 +10,7 @@ func main() {
 
 	o := overflow.NewOverflowMainnet().Start()
 
-	user := "bjarte"
+	user := "bjartek"
 
 	res := o.ScriptFromFile("testFactoryCollectionMainnet").Args(o.Arguments().String(user)).RunReturnsJsonString()
 	fmt.Println(res)
