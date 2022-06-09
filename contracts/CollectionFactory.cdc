@@ -36,12 +36,16 @@ pub contract CollectionFactory {
 
     pub struct MetadataCollectionItem {
         pub let id:UInt64
-        pub let uuid: UInt64?
+        // pub let uuid: UInt64?
         pub let name: String
         pub let image: String
         pub let collection: String // <- This will be Alias unless they want something else
         pub let subCollection: String? // <- This will be Alias unless they want something else
-        pub let media: MetadataViews.Media? // <- This will only fetch the first media 
+        // pub let media: MetadataViews.Media? // <- This will only fetch the first media 
+
+        pub let media  : String
+        pub let mediaType : String 
+        pub let source : String 
 
         // Depend on discussion outcome 
         pub let url: String
