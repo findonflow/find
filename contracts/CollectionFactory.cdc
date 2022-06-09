@@ -5,9 +5,9 @@
 // import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 // /* Alchemy Testnet Wrapper */
-// import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
-// import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
-// import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
+import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
+import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
+import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
 /* NFTRegistry */
 /* In order to deploy this contract on testnet/mainet you have to comment out the code above for the relevant network */
