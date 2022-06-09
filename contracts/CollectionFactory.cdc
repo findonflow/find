@@ -10,6 +10,8 @@
 // import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
 /* NFTRegistry */
+/* In order to deploy this contract on testnet/mainet you have to comment out the code above for the relevant network */
+/* Note that if this is changed there are code in tasks/collectionFactoryTest that also must be changed */
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -64,6 +66,75 @@ pub contract CollectionFactory {
             self.scalar=scalar
         }
     }
+
+    /* 
+    Raw Response from Alchemy getNFTs()
+
+    [
+    {
+        "contract": {
+            "address": "0xf6fcbef550d97aa5",
+            "external_domain": "",
+            "name": "Mynft",
+            "public_collection_name": "Mynft.MynftCollectionPublic",
+            "public_path": "Mynft.CollectionPublicPath",
+            "storage_path": "Mynft.CollectionStoragePath"
+        },
+        "description": "\"Congratulations, you have won the S level Painting \\u{300c}Lightning\\u{300d}! You will be able to apply the painting to your own car after the game launch. This painting series is specifically designed for Flow Fest Mystery Pack event and no other copies will be made ever again. The owners of these NFTs will be regarded as the earliest supporters of the Racing Time. \"",
+        "external_domain_view_url": "",
+        "id": "27226",
+        "media": [
+            {
+                "mimetype": "image/jpeg",
+                "uri": "https://bafybeiacezpbfkmspzkvtrim6ucdczqerzi4miectybtuhaskflov7gipq.ipfs.dweb.link/"
+            }
+        ],
+        "metadata": {
+            "MD5Hash": "",
+            "arLink": "",
+            "artist": "",
+            "description": "\"Congratulations, you have won the S level Painting \\u{300c}Lightning\\u{300d}! You will be able to apply the painting to your own car after the game launch. This painting series is specifically designed for Flow Fest Mystery Pack event and no other copies will be made ever again. The owners of these NFTs will be regarded as the earliest supporters of the Racing Time. \"",
+            "ipfsLink": "https://bafybeiacezpbfkmspzkvtrim6ucdczqerzi4miectybtuhaskflov7gipq.ipfs.dweb.link/",
+            "name": "Lightning",
+            "type": "image/jpeg"
+        },
+        "title": "Lightning",
+        "token_uri": "",
+        "uuid": "60581263"
+    },
+    {
+        "contract": {
+            "address": "0xf6fcbef550d97aa5",
+            "external_domain": "",
+            "name": "Mynft",
+            "public_collection_name": "Mynft.MynftCollectionPublic",
+            "public_path": "Mynft.CollectionPublicPath",
+            "storage_path": "Mynft.CollectionStoragePath"
+        },
+        "description": "Mynft is a Flow-based NFT platform designed to connect east and west market, and Mynft specifically launched Chinese Four Symbols themes NFT for Flow Festival. Vermilion Bird is a red bird with a five-colored plumage and is perpetually covered in flames, represents the fire-element, the direction south, and the season summer correspondingly.",
+        "external_domain_view_url": "",
+        "id": "13958",
+        "media": [
+            {
+                "mimetype": "image/jpg",
+                "uri": ""
+            }
+        ],
+        "metadata": {
+            "MD5Hash": "19e229e53893e156d6eb901ab75cb78b",
+            "arLink": "-MJ1l-82OrTWbye3HWJRAS8Y4UKQV9B6u4T73F4x51c",
+            "artist": "",
+            "description": "Mynft is a Flow-based NFT platform designed to connect east and west market, and Mynft specifically launched Chinese Four Symbols themes NFT for Flow Festival. Vermilion Bird is a red bird with a five-colored plumage and is perpetually covered in flames, represents the fire-element, the direction south, and the season summer correspondingly.",
+            "ipfsLink": "",
+            "name": "Vermilion Bird #114",
+            "type": "image/jpg"
+        },
+        "title": "Vermilion Bird #114",
+        "token_uri": "",
+        "uuid": "60194724"
+    }
+]
+     */
 
     //////////////////////////////////////////////////////////////
     // Get all collections 
@@ -290,9 +361,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -405,9 +474,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -520,9 +587,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -635,9 +700,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -819,9 +882,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -906,9 +967,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -993,9 +1052,7 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
                 var media : MetadataViews.Media? = nil
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
@@ -1080,8 +1137,6 @@ pub contract CollectionFactory {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
                 }
 
                 var media : MetadataViews.Media? = nil

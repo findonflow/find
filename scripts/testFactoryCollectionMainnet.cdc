@@ -8,14 +8,18 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 
-pub fun main(user: String) : CollectionReport?{
-	return fetchAlchemyCollectionShard1(user: user, collectionIDs: {"Mynft": [
+pub fun main(user: String) : AnyStruct {
+    let ids : {String : [UInt64]} = {"Mynft": [
             27226,
-            16931,
-            27271,
             13958
-        ]})
+        ]}
+
+	// return fetchAlchemyCollectionShard1(user: user, collectionIDs: ids)
 	// return fetchAlchemyShard1(user: user, maxItems: 2)
+    let account = resolveAddress(user: user)
+    if account == nil { return nil }
+    return AlchemyMetadataWrapperMainnetShard1.getNFTs(ownerAddress: account!.address, ids: ids)
+
 }
 
 
