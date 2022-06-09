@@ -629,8 +629,8 @@ pub contract Profile {
 	}
 
 	init() {
-		self.publicPath = /public/findProfile2
-		self.publicReceiverPath = /public/findProfileReceiver2
-		self.storagePath = /storage/findProfile2
+		self.publicPath = /public/findProfile
+		self.publicReceiverPath = /public/findProfileReceiver
+		self.storagePath = /storage/findProfile
 	}
 }
