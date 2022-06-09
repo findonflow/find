@@ -1,12 +1,10 @@
-/* Alchemy Mainnet Wrapper */
-import AlchemyMetadataWrapperMainnet from 0xeb8cb4c3157d5dac
-import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
-import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
-import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
-import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
+// /* Alchemy Mainnet Wrapper */
+// import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
+// import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
+// import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
+// import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 // /* Alchemy Testnet Wrapper */
-// import AlchemyMetadataWrapperTestnetfrom 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
@@ -68,20 +66,20 @@ pub contract CollectionFactory {
     }
 
     //////////////////////////////////////////////////////////////
-    // Get all collections with ignoreItems that can be sent in
+    // Get all collections 
     //////////////////////////////////////////////////////////////
-    pub fun getCollections(user: String, maxItems: Int, shard: String, ignoreItems: {String : [UInt64]}) : CollectionReport? {
+    pub fun getCollections(user: String, maxItems: Int, shard: String) : CollectionReport? {
         switch shard {
             case "Alchemy-shard1": 
-                return self.fetchAlchemyShard1(user: user, maxItems: maxItems, ignoreItems: ignoreItems)
+                return self.fetchAlchemyShard1(user: user, maxItems: maxItems)
             case "Alchemy-shard2": 
-                return self.fetchAlchemyShard2(user: user, maxItems: maxItems, ignoreItems: ignoreItems)
+                return self.fetchAlchemyShard2(user: user, maxItems: maxItems)
             case "Alchemy-shard3": 
-                return self.fetchAlchemyShard3(user: user, maxItems: maxItems, ignoreItems: ignoreItems)
+                return self.fetchAlchemyShard3(user: user, maxItems: maxItems)
             case "Alchemy-shard4": 
-                return self.fetchAlchemyShard4(user: user, maxItems: maxItems, ignoreItems: ignoreItems)
+                return self.fetchAlchemyShard4(user: user, maxItems: maxItems)
             case "NFTRegistry": 
-                return self.fetchNFTRegistry(user: user, maxItems: maxItems, ignoreItems: ignoreItems)
+                return self.fetchNFTRegistry(user: user, maxItems: maxItems)
 
 
         }
@@ -91,18 +89,18 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Get specific collections 
     //////////////////////////////////////////////////////////////
-    pub fun getCollection(user: String, maxItems: Int, shard: String, collection: [String]) : CollectionReport? {
+    pub fun getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : CollectionReport? {
         switch shard {
             case "Alchemy-shard1": 
-                return self.fetchAlchemyCollectionShard1(user: user, maxItems: maxItems, collection: collection)
+                return self.fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
             case "Alchemy-shard2": 
-                return self.fetchAlchemyCollectionShard2(user: user, maxItems: maxItems, collection: collection)
+                return self.fetchAlchemyCollectionShard2(user: user, collectionIDs: collectionIDs)
             case "Alchemy-shard3": 
-                return self.fetchAlchemyCollectionShard3(user: user, maxItems: maxItems, collection: collection)
+                return self.fetchAlchemyCollectionShard3(user: user, collectionIDs: collectionIDs)
             case "Alchemy-shard4": 
-                return self.fetchAlchemyCollectionShard4(user: user, maxItems: maxItems, collection: collection)
+                return self.fetchAlchemyCollectionShard4(user: user, collectionIDs: collectionIDs)
             case "NFTRegistry": 
-                return self.fetchNFTRegistryCollection(user: user, maxItems: maxItems, collection: collection)
+                return self.fetchNFTRegistryCollection(user: user, collectionIDs: collectionIDs)
 
 
         }
@@ -123,7 +121,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in NFTRegistry
     //////////////////////////////////////////////////////////////
-    pub fun fetchNFTRegistry(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchNFTRegistry(user: String, maxItems: Int) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -143,11 +141,6 @@ pub contract CollectionFactory {
 
             collections.append(nftInfo.alias)
 
-            var ignoreItem = false
-            if ignoreItems.containsKey(nftInfo.alias) {
-                ignoreItem = true
-            }
-
             if !fetchItem {
                 extraIDs[nftInfo.alias] = collectionRef.getIDs()
                 continue
@@ -157,12 +150,6 @@ pub contract CollectionFactory {
             let collectionExtraIDs : [UInt64] = []
 
             for id in collectionRef.getIDs() { 
-
-                if ignoreItem {
-                    if ignoreItems[nftInfo.alias]!.contains(id) {
-                        continue
-                    }
-                }
 
                 if !fetchItem {
                     collectionExtraIDs.append(id)
@@ -243,7 +230,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard1(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyShard1(user: String, maxItems: Int) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -255,16 +242,6 @@ pub contract CollectionFactory {
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
                 extraIDs.remove(key: project)
-            }
-            if ignoreItems.containsKey(project) {
-                var i = 0 
-                while i < extraIDs[project]!.length {
-                    if ignoreItems[project]!.contains(extraIDs[project]![i]) {
-                        extraIDs[project]!.remove(at: i)
-                        continue
-                    }
-                    i = i + 1
-                }
             }
         }
 
@@ -368,7 +345,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 2
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard2(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyShard2(user: String, maxItems: Int) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -380,16 +357,6 @@ pub contract CollectionFactory {
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
                 extraIDs.remove(key: project)
-            }
-            if ignoreItems.containsKey(project) {
-                var i = 0 
-                while i < extraIDs[project]!.length {
-                    if ignoreItems[project]!.contains(extraIDs[project]![i]) {
-                        extraIDs[project]!.remove(at: i)
-                        continue
-                    }
-                    i = i + 1
-                }
             }
         }
 
@@ -493,7 +460,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard3(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyShard3(user: String, maxItems: Int) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -505,16 +472,6 @@ pub contract CollectionFactory {
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
                 extraIDs.remove(key: project)
-            }
-            if ignoreItems.containsKey(project) {
-                var i = 0 
-                while i < extraIDs[project]!.length {
-                    if ignoreItems[project]!.contains(extraIDs[project]![i]) {
-                        extraIDs[project]!.remove(at: i)
-                        continue
-                    }
-                    i = i + 1
-                }
             }
         }
 
@@ -618,7 +575,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 4
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard4(user: String, maxItems: Int, ignoreItems: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyShard4(user: String, maxItems: Int) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -630,16 +587,6 @@ pub contract CollectionFactory {
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
                 extraIDs.remove(key: project)
-            }
-            if ignoreItems.containsKey(project) {
-                var i = 0 
-                while i < extraIDs[project]!.length {
-                    if ignoreItems[project]!.contains(extraIDs[project]![i]) {
-                        extraIDs[project]!.remove(at: i)
-                        continue
-                    }
-                    i = i + 1
-                }
             }
         }
 
@@ -745,43 +692,31 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in NFTRegistry
     //////////////////////////////////////////////////////////////
-    pub fun fetchNFTRegistryCollection(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
+    pub fun fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
 
-        var counter = 0
-        var fetchItem : Bool = true
-
         let items : {String : [MetadataCollectionItem]} = {}
-        let collections : [String] = []
-        let extraIDs : {String : [UInt64]} = {}
 
-	    for nftInfo in NFTRegistry.getNFTInfoAll().values {
+	    for project in collectionIDs.keys {
 
-            if !collection.contains(nftInfo.alias) {
-                continue
-            }
+            let nftInfo = NFTRegistry.getNFTInfo(project)
 
-	    	let resolverCollectionCap= account!.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo.publicPath)
-            if !resolverCollectionCap.check() { continue }
-            
-            let collectionRef = resolverCollectionCap.borrow()!
-
-            collections.append(nftInfo.alias)
-
-            if !fetchItem {
-                extraIDs[nftInfo.alias] = collectionRef.getIDs()
+            if nftInfo == nil {
                 continue
             }
 
             let collectionItems : [MetadataCollectionItem] = []
-            let collectionExtraIDs : [UInt64] = []
+
+	    	let resolverCollectionCap= account!.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo!.publicPath)
+            if !resolverCollectionCap.check() { continue }
+            
+            let collectionRef = resolverCollectionCap.borrow()!
 
             for id in collectionRef.getIDs() { 
 
-                if !fetchItem {
-                    collectionExtraIDs.append(id)
+                if !collectionIDs[project]!.contains(id) {
                     continue
                 }
 
@@ -789,7 +724,7 @@ pub contract CollectionFactory {
                 let display= FindViews.getDisplay(nft) 
                 if display == nil { continue }
 
-                var externalUrl=nftInfo.externalFixedUrl
+                var externalUrl=nftInfo!.externalFixedUrl
                 if let externalUrlViw=FindViews.getExternalURL(nft) { 
                     externalUrl=externalUrlViw.url
                 }
@@ -833,82 +768,44 @@ pub contract CollectionFactory {
                     contentTypes: contentTypes,
                     rarity: rarity,
                     media: media,
-                    collection: nftInfo.alias,
-                    subCollection: nftInfo.alias, 
+                    collection: nftInfo!.alias,
+                    subCollection: nftInfo!.alias, 
                     tag: tag,
                     scalar: scalar
                 )
                 collectionItems.append(item)
 
-                counter = counter + 1
-                if counter >= maxItems {
-                    fetchItem = false
-                }
-            }
-            if collectionExtraIDs.length > 0 {
-                extraIDs[nftInfo.alias] = collectionExtraIDs 
             }
 
             if collectionItems.length > 0 {
-                items[nftInfo.alias] = collectionItems 
+                items[nftInfo!.alias] = collectionItems 
             }
         }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+        return CollectionReport(items: items,  collections : [], extraIDs : {})
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard1(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard1.getNFTIDs(ownerAddress: account!.address)
+        let fetchingIDs = collectionIDs
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-            if !collection.contains(project) {
-                extraIDs.remove(key: project)
-            }
-        }
-
-        for project in extraIDs.keys {
+        for project in fetchingIDs.keys {
             // For passing bugs
             if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
+                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
             }
 
             if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
+                fetchingIDs.remove(key: project)
             }
         }
-
-        let collections : [String] = extraIDs.keys
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
-
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
-
 
         for project in fetchingIDs.keys {
             let returnedNFTs = AlchemyMetadataWrapperMainnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
@@ -971,62 +868,31 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+        return CollectionReport(items: items,  collections : [], extraIDs : {})
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 2
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard2(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard2.getNFTIDs(ownerAddress: account!.address)
+        let fetchingIDs = collectionIDs
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-            if !collection.contains(project) {
-                extraIDs.remove(key: project)
-            }
-        }
-
-        for project in extraIDs.keys {
+        for project in fetchingIDs.keys {
             // For passing bugs
             if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
+                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
             }
 
             if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
+                fetchingIDs.remove(key: project)
             }
         }
-
-        let collections : [String] = extraIDs.keys
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
-
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
-
 
         for project in fetchingIDs.keys {
             let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
@@ -1089,62 +955,31 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+        return CollectionReport(items: items,  collections : [], extraIDs : {})
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard3(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard3.getNFTIDs(ownerAddress: account!.address)
+        let fetchingIDs = collectionIDs
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-            if !collection.contains(project) {
-                extraIDs.remove(key: project)
-            }
-        }
-
-        for project in extraIDs.keys {
+        for project in fetchingIDs.keys {
             // For passing bugs
             if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
+                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
             }
 
             if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
+                fetchingIDs.remove(key: project)
             }
         }
-
-        let collections : [String] = extraIDs.keys
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
-
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
-
 
         for project in fetchingIDs.keys {
             let returnedNFTs = AlchemyMetadataWrapperMainnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
@@ -1207,62 +1042,31 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+        return CollectionReport(items: items,  collections : [], extraIDs : {})
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 4
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard4(user: String, maxItems: Int, collection: [String]) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard4(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
 
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard4.getNFTIDs(ownerAddress: account!.address)
+        let fetchingIDs = collectionIDs
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-            if !collection.contains(project) {
-                extraIDs.remove(key: project)
-            }
-        }
-
-        for project in extraIDs.keys {
+        for project in fetchingIDs.keys {
             // For passing bugs
             if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
+                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
             }
 
             if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
+                fetchingIDs.remove(key: project)
             }
         }
-
-        let collections : [String] = extraIDs.keys
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
-
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
-
 
         for project in fetchingIDs.keys {
             let returnedNFTs = AlchemyMetadataWrapperMainnetShard4.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
@@ -1325,6 +1129,6 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+        return CollectionReport(items: items,  collections : [], extraIDs : {})
     }
 }
