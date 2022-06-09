@@ -966,12 +966,12 @@ pub contract FIND {
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrow(_ name: String): &FIND.Lease {
-			return &self.leases[name] as &FIND.Lease
+			return (&self.leases[name] as &FIND.Lease?)!
 		}
 
 		//borrow the auction
 		pub fun borrowAuction(_ name: String): &FIND.Auction {
-			return &self.auctions[name] as &FIND.Auction
+			return (&self.auctions[name] as &FIND.Auction?)!
 		}
 
 
@@ -1433,7 +1433,7 @@ pub contract FIND {
 		}
 
 		pub fun borrowBid(_ name: String): &Bid {
-			return &self.bids[name] as &Bid
+			return (&self.bids[name] as &Bid?)!
 		}
 
 		access(contract) fun setBidType(name: String, type: String) {
