@@ -303,6 +303,17 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseBid(buyer, name string, amount float64) *OverflowTestUtils {
+	otu.O.TransactionFromFile("increaseNameBid").SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(amount)).
+		Test(otu.T).
+		AssertSuccess()
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listNameForAuction").

@@ -464,7 +464,7 @@ pub contract FIND {
 		access(contract) fun deposit(token: @FIND.Lease)
 
 		access(contract)fun cancelUserBid(_ name: String) 
-		access(contract) fun increaseBid(_ name: String) 
+		access(contract) fun increaseBid(_ name: String, balance: UFix64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
@@ -632,13 +632,15 @@ pub contract FIND {
 			lease.setCallback(nil)
 		}
 
-		access(contract) fun increaseBid(_ name: String) {
+		access(contract) fun increaseBid(_ name: String, balance: UFix64) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
 			let lease = self.borrow(name)
 			let timestamp=Clock.time()
+
+			assert(balance >= lease.auctionMinBidIncrement, message: "Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
 
 			if self.auctions.containsKey(name) {
 				let auction = self.borrowAuction(name)
@@ -1412,12 +1414,13 @@ pub contract FIND {
 			}
 			let seller=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
+			let balance = vault.balance
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-			from.borrow()!.increaseBid(name)
+			from.borrow()!.increaseBid(name, balance: balance)
 		}
 
 		//cancel a bid, will panic if called after auction has started
