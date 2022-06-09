@@ -15,27 +15,27 @@ pub fun main(user: String) : AnyStruct {
     //     ]}
 
 	// return fetchAlchemyCollectionShard1(user: user, collectionIDs: ids)
-	// return fetchAlchemyShard1(user: user, maxItems: 2)
-    let account = resolveAddress(user: user)
-    if account == nil { return nil }
-    let a1 = fetchAlchemyShard1(user: user, maxItems: 200)
-    let a2 = fetchAlchemyShard2(user: user, maxItems: 200)
-    let a3 = fetchAlchemyShard3(user: user, maxItems: 200)
-    let a4 = fetchAlchemyShard4(user: user, maxItems: 200)
+	return fetchAlchemyShard1(user: user, maxItems: 2)
+    // let account = resolveAddress(user: user)
+    // if account == nil { return nil }
+    // let a1 = fetchAlchemyShard1(user: user, maxItems: 200)
+    // let a2 = fetchAlchemyShard2(user: user, maxItems: 200)
+    // let a3 = fetchAlchemyShard3(user: user, maxItems: 200)
+    // let a4 = fetchAlchemyShard4(user: user, maxItems: 200)
 
-    for project in a2!.items.keys {
-        a1!.items.insert(key: project, a2!.items.remove(key: project)!) 
-    }
+    // for project in a2!.items.keys {
+    //     a1!.items.insert(key: project, a2!.items.remove(key: project)!) 
+    // }
 
-    for project in a3!.items.keys {
-        a1!.items.insert(key: project, a3!.items.remove(key: project)!) 
-    }
+    // for project in a3!.items.keys {
+    //     a1!.items.insert(key: project, a3!.items.remove(key: project)!) 
+    // }
 
-    for project in a4!.items.keys {
-        a1!.items.insert(key: project, a4!.items.remove(key: project)!) 
-    }
+    // for project in a4!.items.keys {
+    //     a1!.items.insert(key: project, a4!.items.remove(key: project)!) 
+    // }
 
-    return a1
+    // return a1
 }
 
 
@@ -54,36 +54,32 @@ pub fun main(user: String) : AnyStruct {
 
     pub struct MetadataCollectionItem {
         pub let id:UInt64
-        pub let uuid: UInt64?
         pub let name: String
-        pub let image: String
         pub let collection: String // <- This will be Alias unless they want something else
-        pub let subCollection: String? // <- This will be Alias unless they want something else
-        pub let media: MetadataViews.Media? // <- This will only fetch the first media 
+        pub let subCollection: String // <- This will be Alias unless they want something else
+
+        pub let media  : String
+        pub let mediaType : String 
+        pub let source : String 
 
         // Depend on discussion outcome 
-        pub let url: String
-        pub let contentTypes:[String]
-        pub let rarity:String
-        pub let typeIdentifier: String
+        // pub let url: String
+        // pub let contentTypes:[String]
+        // pub let rarity:String
         //Refine later 
-        pub let tag: {String : String}
-        pub let scalar: {String : UFix64}
-
-        init(id:UInt64, type: Type, uuid: UInt64?, name:String, image:String, url:String, contentTypes: [String], rarity: String, media: MetadataViews.Media?, collection: String, subCollection: String?, tag: {String : String}, scalar: {String : UFix64}) {
+        pub let extra: {String : AnyStruct}
+        // pub let scalar: {String : UFix64}
+        pub let alchemy: AnyStruct
+        init(id:UInt64, name: String, collection: String, subCollection: String, media  : String, mediaType : String, source : String ,extra: {String : AnyStruct}, alchemy: AnyStruct) {
             self.id=id
-            self.typeIdentifier = type.identifier
-            self.uuid = uuid
-            self.name=name
-            self.url=url
-            self.image=image
-            self.contentTypes=contentTypes
-            self.rarity=rarity
-            self.media=media
-            self.collection=collection
-            self.subCollection=subCollection
-            self.tag=tag
-            self.scalar=scalar
+            self.name=name 
+            self.collection=collection 
+            self.subCollection=subCollection 
+            self.media=media 
+            self.mediaType=mediaType 
+            self.source=source 
+            self.extra=extra
+            self.alchemy=alchemy
         }
     }
 
@@ -117,7 +113,7 @@ pub fun main(user: String) : AnyStruct {
     }
 
     pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
-
+        let source = "Alchemy-shard1"
         let account = resolveAddress(user: user)
         if account == nil { return nil }
 
@@ -139,21 +135,22 @@ pub fun main(user: String) : AnyStruct {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
-                var media : MetadataViews.Media? = nil
+                var medias : MetadataViews.Media? = nil
+                var media = ""
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
                     let m = nft!.media[0]!
                     let mediaType = m.mimetype ?? ""
-                    media = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    medias = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    media = m.uri!
                 }
 
-                var contentTypes : [String] = []
+                var contentType = ""
                 for m in nft!.media {
                     if m != nil && m!.mimetype != nil {
-                        contentTypes.append(m!.mimetype!)
+                        contentType= m!.mimetype!
+                        break
                     }
                 }
                 
@@ -166,20 +163,22 @@ pub fun main(user: String) : AnyStruct {
                     }
                 }
 
+                let extra : {String : AnyStruct} = {}
+                extra["uuid"] = nft!.uuid
+                extra["url"] = nft!.token_uri ?? ""
+                extra["medias"] = medias
+                extra["metadata"] = tag
+
                 let item = MetadataCollectionItem(
                     id: nft!.id,
-                    type: nft!.getType() , // This is not useful 
-                    uuid: nft!.uuid ,      // This has to be optional 
                     name: nft!.title ?? "",
-                    image: url,
-                    url: nft!.token_uri ?? "",
-                    contentTypes: contentTypes,
-                    rarity: "",
-                    media: media,
                     collection: nft!.contract.name,
                     subCollection: "", 
-                    tag: tag,
-                    scalar: {}
+                    media: media,
+                    mediaType: contentType,
+                    source: source,
+                    extra: extra, 
+                    alchemy: nft
                 )
                 collectionItems.append(item)
             }
@@ -210,7 +209,7 @@ pub fun main(user: String) : AnyStruct {
 	// }
 
     pub fun fetchAlchemyShard1(user: String, maxItems: Int) : CollectionReport? {
-
+        let source = "Alchemy-shard1"
         let account = resolveAddress(user: user)
         if account == nil { return nil }
 
@@ -260,21 +259,22 @@ pub fun main(user: String) : AnyStruct {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
-                var media : MetadataViews.Media? = nil
+                var medias : MetadataViews.Media? = nil
+                var media = ""
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
                     let m = nft!.media[0]!
                     let mediaType = m.mimetype ?? ""
-                    media = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    medias = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    media = m.uri!
                 }
 
-                var contentTypes : [String] = []
+                var contentType = ""
                 for m in nft!.media {
                     if m != nil && m!.mimetype != nil {
-                        contentTypes.append(m!.mimetype!)
+                        contentType= m!.mimetype!
+                        break
                     }
                 }
                 
@@ -287,20 +287,22 @@ pub fun main(user: String) : AnyStruct {
                     }
                 }
 
+                let extra : {String : AnyStruct} = {}
+                extra["uuid"] = nft!.uuid
+                extra["url"] = nft!.token_uri ?? ""
+                extra["medias"] = medias
+                extra["metadata"] = tag
+
                 let item = MetadataCollectionItem(
                     id: nft!.id,
-                    type: nft!.getType() , // This is not useful 
-                    uuid: nft!.uuid ,      // This has to be optional 
                     name: nft!.title ?? "",
-                    image: url,
-                    url: nft!.token_uri ?? "",
-                    contentTypes: contentTypes,
-                    rarity: "",
-                    media: media,
                     collection: nft!.contract.name,
                     subCollection: "", 
-                    tag: tag,
-                    scalar: {}
+                    media: media,
+                    mediaType: contentType,
+                    source: source,
+                    extra: extra, 
+                    alchemy: nft
                 )
                 collectionItems.append(item)
             }
@@ -313,6 +315,7 @@ pub fun main(user: String) : AnyStruct {
     }
 
     pub fun fetchAlchemyShard2(user: String, maxItems: Int) : CollectionReport? {
+        let source = "Alchemy-shard2"
 
         let account = resolveAddress(user: user)
         if account == nil { return nil }
@@ -363,21 +366,22 @@ pub fun main(user: String) : AnyStruct {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
-                var media : MetadataViews.Media? = nil
+                var medias : MetadataViews.Media? = nil
+                var media = ""
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
                     let m = nft!.media[0]!
                     let mediaType = m.mimetype ?? ""
-                    media = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    medias = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    media = m.uri!
                 }
 
-                var contentTypes : [String] = []
+                var contentType = ""
                 for m in nft!.media {
                     if m != nil && m!.mimetype != nil {
-                        contentTypes.append(m!.mimetype!)
+                        contentType= m!.mimetype!
+                        break
                     }
                 }
                 
@@ -390,21 +394,24 @@ pub fun main(user: String) : AnyStruct {
                     }
                 }
 
+                let extra : {String : AnyStruct} = {}
+                extra["uuid"] = nft!.uuid
+                extra["url"] = nft!.token_uri ?? ""
+                extra["medias"] = medias
+                extra["metadata"] = tag
+
                 let item = MetadataCollectionItem(
                     id: nft!.id,
-                    type: nft!.getType() , // This is not useful 
-                    uuid: nft!.uuid ,      // This has to be optional 
                     name: nft!.title ?? "",
-                    image: url,
-                    url: nft!.token_uri ?? "",
-                    contentTypes: contentTypes,
-                    rarity: "",
-                    media: media,
                     collection: nft!.contract.name,
                     subCollection: "", 
-                    tag: tag,
-                    scalar: {}
+                    media: media,
+                    mediaType: contentType,
+                    source: source,
+                    extra: extra, 
+                    alchemy: nft
                 )
+                collectionItems.append(item)
                 collectionItems.append(item)
             }
 
@@ -416,6 +423,7 @@ pub fun main(user: String) : AnyStruct {
     }
 
     pub fun fetchAlchemyShard3(user: String, maxItems: Int) : CollectionReport? {
+        let source = "Alchemy-shard3"
 
         let account = resolveAddress(user: user)
         if account == nil { return nil }
@@ -466,21 +474,22 @@ pub fun main(user: String) : AnyStruct {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
-                var media : MetadataViews.Media? = nil
+                var medias : MetadataViews.Media? = nil
+                var media = ""
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
                     let m = nft!.media[0]!
                     let mediaType = m.mimetype ?? ""
-                    media = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    medias = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    media = m.uri!
                 }
 
-                var contentTypes : [String] = []
+                var contentType = ""
                 for m in nft!.media {
                     if m != nil && m!.mimetype != nil {
-                        contentTypes.append(m!.mimetype!)
+                        contentType= m!.mimetype!
+                        break
                     }
                 }
                 
@@ -493,20 +502,22 @@ pub fun main(user: String) : AnyStruct {
                     }
                 }
 
+                let extra : {String : AnyStruct} = {}
+                extra["uuid"] = nft!.uuid
+                extra["url"] = nft!.token_uri ?? ""
+                extra["medias"] = medias
+                extra["metadata"] = tag
+
                 let item = MetadataCollectionItem(
                     id: nft!.id,
-                    type: nft!.getType() , // This is not useful 
-                    uuid: nft!.uuid ,      // This has to be optional 
                     name: nft!.title ?? "",
-                    image: url,
-                    url: nft!.token_uri ?? "",
-                    contentTypes: contentTypes,
-                    rarity: "",
-                    media: media,
                     collection: nft!.contract.name,
                     subCollection: "", 
-                    tag: tag,
-                    scalar: {}
+                    media: media,
+                    mediaType: contentType,
+                    source: source,
+                    extra: extra, 
+                    alchemy: nft
                 )
                 collectionItems.append(item)
             }
@@ -519,6 +530,7 @@ pub fun main(user: String) : AnyStruct {
     }
 
     pub fun fetchAlchemyShard4(user: String, maxItems: Int) : CollectionReport? {
+        let source = "Alchemy-shard4"
 
         let account = resolveAddress(user: user)
         if account == nil { return nil }
@@ -569,21 +581,22 @@ pub fun main(user: String) : AnyStruct {
                 var url = ""
                 if nft!.external_domain_view_url != nil {
                     url = nft!.external_domain_view_url!
-                } else if nft!.media.length > 0 {
-                    url = nft!.media[0]?.uri ?? ""
-                }
+                } 
 
-                var media : MetadataViews.Media? = nil
+                var medias : MetadataViews.Media? = nil
+                var media = ""
                 if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
                     let m = nft!.media[0]!
                     let mediaType = m.mimetype ?? ""
-                    media = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    medias = MetadataViews.Media(file: MetadataViews.HTTPFile(url: m.uri! ), mediaType: mediaType)
+                    media = m.uri!
                 }
 
-                var contentTypes : [String] = []
+                var contentType = ""
                 for m in nft!.media {
                     if m != nil && m!.mimetype != nil {
-                        contentTypes.append(m!.mimetype!)
+                        contentType= m!.mimetype!
+                        break
                     }
                 }
                 
@@ -596,20 +609,22 @@ pub fun main(user: String) : AnyStruct {
                     }
                 }
 
+                let extra : {String : AnyStruct} = {}
+                extra["uuid"] = nft!.uuid
+                extra["url"] = nft!.token_uri ?? ""
+                extra["medias"] = medias
+                extra["metadata"] = tag
+
                 let item = MetadataCollectionItem(
                     id: nft!.id,
-                    type: nft!.getType() , // This is not useful 
-                    uuid: nft!.uuid ,      // This has to be optional 
                     name: nft!.title ?? "",
-                    image: url,
-                    url: nft!.token_uri ?? "",
-                    contentTypes: contentTypes,
-                    rarity: "",
-                    media: media,
                     collection: nft!.contract.name,
                     subCollection: "", 
-                    tag: tag,
-                    scalar: {}
+                    media: media,
+                    mediaType: contentType,
+                    source: source,
+                    extra: extra, 
+                    alchemy: nft
                 )
                 collectionItems.append(item)
             }

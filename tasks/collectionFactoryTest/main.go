@@ -8,18 +8,18 @@ import (
 
 func main() {
 
-	o := overflow.NewOverflowMainnet().Start()
+	// o := overflow.NewOverflowMainnet().Start()
 
-	user := "bjartek"
+	// user := "bjartek"
 
-	res := o.ScriptFromFile("testFactoryCollectionMainnet").Args(o.Arguments().String(user)).RunReturnsJsonString()
-	fmt.Println(res)
+	// res := o.ScriptFromFile("testFactoryCollectionMainnet").Args(o.Arguments().String(user)).RunReturnsJsonString()
+	// fmt.Println(res)
 
-	// o2 := overflow.NewOverflowTestnet().Start()
+	o2 := overflow.NewOverflowTestnet().Start()
 
-	// user2 := "0xde5b0e922aeb76f5"
+	user2 := "0xde5b0e922aeb76f5"
 
-	// res2 := o2.ScriptFromFile("testFactoryCollectionTestnet").Args(o2.Arguments().String(user2)).RunReturnsJsonString()
-	// fmt.Println(res2)
+	res2 := o2.ScriptFromFile("testFactoryCollectionTestnet").Args(o2.Arguments().String(user2)).RunReturnsJsonString()
+	fmt.Println(res2)
 
 }

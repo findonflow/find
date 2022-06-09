@@ -10,20 +10,20 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 
 
 pub fun main(user: String) : CollectionReport?{
-	return fetchNFTRegistryCollection(user: user, collectionIDs: {"Dandy": [
-            // 96939388,
-            // 96953249,
-            // 96939382,
-            // 96968935,
-            // 96953256,
-            // 96953259,
-            // 96939373,
-            // 96953255,
-            // 96968791,
-            96968792,
-            96968790
-        ]})
-	// return fetchNFTRegistry(user: user, maxItems: 2)
+	// return fetchNFTRegistryCollection(user: user, collectionIDs: {"Dandy": [
+    //         // 96939388,
+    //         // 96953249,
+    //         // 96939382,
+    //         // 96968935,
+    //         // 96953256,
+    //         // 96953259,
+    //         // 96939373,
+    //         // 96953255,
+    //         // 96968791,
+    //         96968792,
+    //         96968790
+    //     ]})
+	return fetchNFTRegistry(user: user, maxItems: 2)
 }
 
 
@@ -42,36 +42,31 @@ pub fun main(user: String) : CollectionReport?{
 
     pub struct MetadataCollectionItem {
         pub let id:UInt64
-        pub let uuid: UInt64?
         pub let name: String
-        pub let image: String
         pub let collection: String // <- This will be Alias unless they want something else
-        pub let subCollection: String? // <- This will be Alias unless they want something else
-        pub let media: MetadataViews.Media? // <- This will only fetch the first media 
+        pub let subCollection: String // <- This will be Alias unless they want something else
+
+        pub let media  : String
+        pub let mediaType : String 
+        pub let source : String 
 
         // Depend on discussion outcome 
-        pub let url: String
-        pub let contentTypes:[String]
-        pub let rarity:String
-        pub let typeIdentifier: String
+        // pub let url: String
+        // pub let contentTypes:[String]
+        // pub let rarity:String
         //Refine later 
-        pub let tag: {String : String}
-        pub let scalar: {String : UFix64}
+        pub let extra: {String : AnyStruct}
+        // pub let scalar: {String : UFix64}
 
-        init(id:UInt64, type: Type, uuid: UInt64?, name:String, image:String, url:String, contentTypes: [String], rarity: String, media: MetadataViews.Media?, collection: String, subCollection: String?, tag: {String : String}, scalar: {String : UFix64}) {
+        init(id:UInt64, name: String, collection: String, subCollection: String, media  : String, mediaType : String, source : String ,extra: {String : AnyStruct}) {
             self.id=id
-            self.typeIdentifier = type.identifier
-            self.uuid = uuid
-            self.name=name
-            self.url=url
-            self.image=image
-            self.contentTypes=contentTypes
-            self.rarity=rarity
-            self.media=media
-            self.collection=collection
-            self.subCollection=subCollection
-            self.tag=tag
-            self.scalar=scalar
+            self.name=name 
+            self.collection=collection 
+            self.subCollection=subCollection 
+            self.media=media 
+            self.mediaType=mediaType 
+            self.source=source 
+            self.extra=extra
         }
     }
 
@@ -88,7 +83,7 @@ pub fun main(user: String) : CollectionReport?{
 
 
     pub fun fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
-
+        let source = "NFTRegistry"
         let account = resolveAddress(user: user)
         if account == nil { return nil }
 
@@ -153,20 +148,27 @@ pub fun main(user: String) : CollectionReport?{
                     subCollection=sc.name
                 }	
 
+                let extra : {String : AnyStruct} = {}
+                extra["type"] = nft.getType() 
+                extra["uuid"] = nft.uuid
+                extra["url"] = externalUrl
+                extra["contentTypes"] = contentTypes
+                extra["rarity"] = rarity
+                extra["media"] = media
+                extra["tag"] = tag
+                extra["scalar"] = scalar
+
+
                 let item = MetadataCollectionItem(
                     id: id,
-                    type: nft.getType() ,
-                    uuid: nft.uuid ,
                     name: display!.name,
-                    image: display!.thumbnail.uri(),
-                    url: externalUrl,
-                    contentTypes: contentTypes,
-                    rarity: rarity,
-                    media: media,
                     collection: nftInfo!.alias,
                     subCollection: nftInfo!.alias, 
-                    tag: tag,
-                    scalar: scalar
+                    media: display!.thumbnail.uri(),
+                    mediaType: "image",
+                    source: source , 
+                    extra: extra 
+
                 )
                 collectionItems.append(item)
 
@@ -207,7 +209,7 @@ pub fun main(user: String) : CollectionReport?{
 	}
 
     pub fun fetchNFTRegistry(user: String, maxItems: Int) : CollectionReport? {
-
+        let source = "NFTRegistry"
         let account = resolveAddress(user: user)
         if account == nil { return nil }
 
@@ -279,20 +281,27 @@ pub fun main(user: String) : CollectionReport?{
                     subCollection=sc.name
                 }	
 
+                let extra : {String : AnyStruct} = {}
+                extra["type"] = nft.getType() 
+                extra["uuid"] = nft.uuid
+                extra["url"] = externalUrl
+                extra["contentTypes"] = contentTypes
+                extra["rarity"] = rarity
+                extra["media"] = media
+                extra["tag"] = tag
+                extra["scalar"] = scalar
+
+
                 let item = MetadataCollectionItem(
                     id: id,
-                    type: nft.getType() ,
-                    uuid: nft.uuid ,
                     name: display!.name,
-                    image: display!.thumbnail.uri(),
-                    url: externalUrl,
-                    contentTypes: contentTypes,
-                    rarity: rarity,
-                    media: media,
-                    collection: nftInfo.alias,
-                    subCollection: nftInfo.alias, 
-                    tag: tag,
-                    scalar: scalar
+                    collection: nftInfo!.alias,
+                    subCollection: nftInfo!.alias, 
+                    media: display!.thumbnail.uri(),
+                    mediaType: "image",
+                    source: source , 
+                    extra: extra 
+
                 )
                 collectionItems.append(item)
 
