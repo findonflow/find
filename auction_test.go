@@ -162,6 +162,28 @@ func TestAuction(t *testing.T) {
 			AssertFailure("There is already a higher bid on this lease")
 	})
 
+	t.Run("Should not be able to increase direct offer price less than increment", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user1").
+			registerUser("user2").
+			registerUser("user3").
+			directOffer("user2", "user1", 10.0)
+
+		otu.O.TransactionFromFile("increaseBid").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				String("user1").
+				UFix64(0.0)).
+			Test(otu.T).
+			AssertFailure("Increment should be greater than 10.00000000")
+
+	})
+
 	t.Run("Should start auction if we start out with smaller bid and then increase it with locked user", func(t *testing.T) {
 
 		otu := NewOverflowTest(t).
@@ -178,11 +200,11 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
-				UFix64(4.0)).
+				UFix64(10.0)).
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount": "8.00000000",
+				"amount": "14.00000000",
 				"bidder": "0xf3fcd2c1a78f5eee",
 				"name":   "user1",
 			}))
@@ -224,15 +246,36 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
-				UFix64(4.0)).
+				UFix64(10.0)).
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionStarted", map[string]interface{}{
-				"amount":       "8.00000000",
+				"amount":       "14.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
 				"name":         "user1",
 			}))
+	})
+
+	t.Run("Should not be able to increase bid less than increment", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForAuction("user1").
+			directOffer("user2", "user1", 4.0)
+
+		otu.O.TransactionFromFile("increaseBid").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				String("user1").
+				UFix64(0.0)).
+			Test(t).
+			AssertFailure("Increment should be greater than 10.00000000")
+
 	})
 
 	t.Run("Should be able to increase auction bid", func(t *testing.T) {
@@ -250,11 +293,11 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
-				UFix64(3.0)).
+				UFix64(10.0)).
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AuctionBid", map[string]interface{}{
-				"amount":       "8.00000000",
+				"amount":       "15.00000000",
 				"auctionEndAt": "86401.00000000",
 				"bidder":       "0xf3fcd2c1a78f5eee",
 				"name":         "user1",
