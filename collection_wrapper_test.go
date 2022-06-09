@@ -20,7 +20,8 @@ func TestNewCollctionsWrapper(t *testing.T) {
 	address := "0x01d7e57aa5598e47"
 
 	var items Items
-	o.ScriptFromFile("mainnet_getCollections_old").Args(o.Arguments().String(address)).RunMarshalAs(&items)
+	err := o.ScriptFromFile("mainnet_getCollections_old").Args(o.Arguments().String(address)).RunMarshalAs(&items)
+	assert.NoError(t, err)
 
 	oldData := map[string]Item{}
 
@@ -35,7 +36,8 @@ func TestNewCollctionsWrapper(t *testing.T) {
 
 	var newItems []Item
 	newData := map[string]Item{}
-	o.ScriptFromFile("mainnet_getNFTs").Args(o.Arguments().RawAccount(address).Argument(value)).RunMarshalAs(&newItems)
+	err = o.ScriptFromFile("mainnet_getNFTs").Args(o.Arguments().RawAccount(address).Argument(value)).RunMarshalAs(&newItems)
+	assert.NoError(t, err)
 	for _, value := range newItems {
 		newData[fmt.Sprintf("%s-%s", value.ID, value.Name)] = value
 	}
