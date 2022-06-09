@@ -83,8 +83,25 @@ func TestNFTDetailScript(t *testing.T) {
 	t.Run("Should be able to get media with thumbnail", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
-		ids := otu.setupMarketAndMintDandys()
+		otu.setupFIND().
+			createUser(10000.0, "user1").
+			registerUser("user1").
+			buyForge("user1").
+			createUser(100.0, "user2").
+			createUser(100.0, "user3").
+			registerUser("user2").
+			registerUser("user3")
+
+		ids := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry().
+			registerUserWithNameAndForge("user1", "neomotorcycle").
+			registerUserWithNameAndForge("user1", "xtingles").
+			registerUserWithNameAndForge("user1", "flovatar").
+			registerUserWithNameAndForge("user1", "ufcstrike").
+			registerUserWithNameAndForge("user1", "jambb").
+			registerUserWithNameAndForge("user1", "bitku").
+			registerUserWithNameAndForge("user1", "goatedgoats").
+			registerUserWithNameAndForge("user1", "klktn").
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").

@@ -39,7 +39,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), creativeWork, minterRoyalty, rarity, tag, scalar, FindViews.Medias([media])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "neomotorcycle", 
 			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: creativeWork.description,
 				thumbnail: media,
@@ -68,7 +68,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"video length" : 27.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "xtingles", 
 			  nftName: "xtingle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: thumbnailMedia,
@@ -95,7 +95,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"rarity score" : 2.2, "id" : 166.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "flovatar", 
 			  nftName: "flovatar ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
@@ -125,7 +125,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"rank" : 295.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "ufcstrike", 
 			  nftName: "ufcstrike ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: thumbnailMedia,
@@ -155,7 +155,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"video length" : 45.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "jambb", 
 			  nftName: "jambb ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: thumbnailMedia,
@@ -183,7 +183,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"rank" : 0.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "bitku", 
 			  nftName: "bitku ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
@@ -211,7 +211,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"id" : 2389.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "goatedgoats", 
 			  nftName: "goatedgoats ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
@@ -239,7 +239,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artScalar=FindViews.Scalar({"id" : 0.0})
 
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, minterRoyalty, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
-			let token <- finLeases.mintDandy(minter: name, 
+			let token <- finLeases.mintDandy(minter: "klktn", 
 			  nftName: "klktn ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 				description: artCreativeWork.description,
 				thumbnail: artMedia,
