@@ -231,8 +231,8 @@ pub contract FindViews {
 		}
 
 		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			if let royaltiesView = self.resolveView(Type<MetadataViews.NFTCollectionData>()) {
-				if let v = royaltiesView as? MetadataViews.NFTCollectionData {
+			if let collectionView = self.resolveView(Type<MetadataViews.NFTCollectionData>()) {
+				if let v = collectionView as? MetadataViews.NFTCollectionData {
 					return v
 				}
 			}
