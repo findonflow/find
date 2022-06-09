@@ -68,7 +68,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 			let url = linkUrls[titleName]!
 			let type = linkTypes[titleName]!
 
-			profile.addLinkWithName(name:titleName, link: Profile.Link(title: title, type: type, url: type))
+			profile.addLinkWithName(name:titleName, link: Profile.Link(title: title, type: type, url: url))
 		}
 		profile.emitUpdatedEvent()
 
