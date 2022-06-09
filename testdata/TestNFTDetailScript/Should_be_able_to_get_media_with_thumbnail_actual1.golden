@@ -54,10 +54,10 @@
     "findMarket": {},
     "nftDetail": {
         "collectionDescription": "Neo Collectibles FIND",
-        "collectionName": "user1",
+        "collectionName": "neomotorcycle",
         "data": {},
         "editionNumber": "",
-        "id": "137",
+        "id": "161",
         "media": [
             {
                 "file": {
@@ -93,7 +93,7 @@
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "137",
+        "uuid": "161",
         "views": [
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",

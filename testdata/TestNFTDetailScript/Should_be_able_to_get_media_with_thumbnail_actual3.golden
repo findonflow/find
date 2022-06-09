@@ -54,10 +54,10 @@
     "findMarket": {},
     "nftDetail": {
         "collectionDescription": "flovatar FIND",
-        "collectionName": "user1",
+        "collectionName": "flovatar",
         "data": {},
         "editionNumber": "",
-        "id": "139",
+        "id": "163",
         "media": [
             {
                 "file": {
@@ -94,13 +94,13 @@
         "thumbnail": "https://flovatar.com/api/image/166",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "139",
+        "uuid": "163",
         "views": [
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+            "A.f8d6e0586b0a20c7.MetadataViews.Media",
             "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
         ]
     },

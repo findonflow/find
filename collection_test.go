@@ -12,8 +12,18 @@ func TestCollectionScripts(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		otu.setupFIND().
-			setupDandy("user1").
-			registerDandyInNFTRegistry()
+			createUser(10000.0, "user1").
+			registerUser("user1").
+			buyForge("user1").
+			registerDandyInNFTRegistry().
+			registerUserWithNameAndForge("user1", "neomotorcycle").
+			registerUserWithNameAndForge("user1", "xtingles").
+			registerUserWithNameAndForge("user1", "flovatar").
+			registerUserWithNameAndForge("user1", "ufcstrike").
+			registerUserWithNameAndForge("user1", "jambb").
+			registerUserWithNameAndForge("user1", "bitku").
+			registerUserWithNameAndForge("user1", "goatedgoats").
+			registerUserWithNameAndForge("user1", "klktn")
 
 		otu.O.TransactionFromFile("testMintDandyTO").
 			SignProposeAndPayAs("user1").
