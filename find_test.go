@@ -14,10 +14,14 @@ Tests must be in the same folder as flow.json with contracts and transactions/sc
 func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to register a name", func(t *testing.T) {
-		NewOverflowTest(t).
+		otu := NewOverflowTest(t).
 			setupFIND().
 			createUser(100.0, "user1").
 			registerUser("user1")
+
+		result := otu.O.ScriptFromFile("getLeases").RunReturnsJsonString()
+
+		autogold.Equal(t, result)
 	})
 
 	t.Run("Should get error if you try to register a name and dont have enough money", func(t *testing.T) {

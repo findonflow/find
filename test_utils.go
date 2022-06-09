@@ -197,6 +197,12 @@ func (otu *OverflowTestUtils) registerUserWithName(buyer, name string) *Overflow
 	return otu
 }
 
+func (otu *OverflowTestUtils) registerUserWithNameAndForge(buyer, name string) *OverflowTestUtils {
+	otu.registerUserWithNameTransaction(buyer, name)
+	otu.buyForgeForName(buyer, name)
+	return otu
+}
+
 func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string) overflow.TransactionResult {
 	nameAddress := otu.accountAddress(buyer)
 	expireTime := otu.currentTime() + leaseDurationFloat
@@ -443,6 +449,20 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 		AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
 			"name":  user,
+			"addon": "forge",
+		}))
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) buyForgeForName(user, name string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("buyAddon").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().String(name).String("forge").UFix64(50.0)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
+			"name":  name,
 			"addon": "forge",
 		}))
 

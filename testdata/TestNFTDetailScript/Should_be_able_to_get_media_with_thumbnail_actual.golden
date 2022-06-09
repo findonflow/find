@@ -54,10 +54,10 @@
     "findMarket": {},
     "nftDetail": {
         "collectionDescription": "ufc strike FIND",
-        "collectionName": "user1",
+        "collectionName": "ufcstrike",
         "data": {},
         "editionNumber": "",
-        "id": "140",
+        "id": "164",
         "media": [
             {
                 "file": {
@@ -101,14 +101,14 @@
         "thumbnail": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "140",
+        "uuid": "164",
         "views": [
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+            "A.f8d6e0586b0a20c7.MetadataViews.Media",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media"
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
         ]
     },
     "storefront": ""
