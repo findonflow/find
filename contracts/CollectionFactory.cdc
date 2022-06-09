@@ -89,7 +89,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Get specific collections 
     //////////////////////////////////////////////////////////////
-    pub fun getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : CollectionReport? {
+    pub fun getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : {String : [MetadataCollectionItem]} {
         switch shard {
             case "Alchemy-shard1": 
                 return self.fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
@@ -692,10 +692,10 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in NFTRegistry
     //////////////////////////////////////////////////////////////
-    pub fun fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
         let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+        if account == nil { return {} }
 
         let items : {String : [MetadataCollectionItem]} = {}
 
@@ -781,16 +781,16 @@ pub contract CollectionFactory {
                 items[nftInfo!.alias] = collectionItems 
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return items
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
         let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+        if account == nil { return {} }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
@@ -868,16 +868,16 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return items
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 2
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
         let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+        if account == nil { return {} }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
@@ -955,16 +955,16 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return items
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
         let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+        if account == nil { return {} }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
@@ -1042,16 +1042,16 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return items
     }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 4
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard4(user: String, collectionIDs: {String : [UInt64]}) : CollectionReport? {
+    pub fun fetchAlchemyCollectionShard4(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
         let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+        if account == nil { return {} }
 
         let items : {String : [MetadataCollectionItem]} = {}
         
@@ -1129,6 +1129,6 @@ pub contract CollectionFactory {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return items
     }
 }
