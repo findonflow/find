@@ -12,7 +12,7 @@ func main() {
 	//	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find").UFix64(1.0))
 
 	//Deploy contracts to testnet
-	//	o.InitializeContracts()
+	o.InitializeContracts()
 
 	/*
 				//send flow to admin and user account
@@ -62,16 +62,16 @@ func main() {
 
 		createProfileAndGiftName(o, "user1")
 	*/
-	o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(500.0))
+	// o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(500.0))
 
-	registerUserWithNameAndForge(o, "user1", "neomotorcycle")
-	registerUserWithNameAndForge(o, "user1", "xtingles")
-	registerUserWithNameAndForge(o, "user1", "flovatar")
-	registerUserWithNameAndForge(o, "user1", "ufcstrike")
-	registerUserWithNameAndForge(o, "user1", "jambb")
-	registerUserWithNameAndForge(o, "user1", "bitku")
-	registerUserWithNameAndForge(o, "user1", "goatedgoats")
-	registerUserWithNameAndForge(o, "user1", "klktn")
+	// registerUserWithNameAndForge(o, "user1", "neomotorcycle")
+	// registerUserWithNameAndForge(o, "user1", "xtingles")
+	// registerUserWithNameAndForge(o, "user1", "flovatar")
+	// registerUserWithNameAndForge(o, "user1", "ufcstrike")
+	// registerUserWithNameAndForge(o, "user1", "jambb")
+	// registerUserWithNameAndForge(o, "user1", "bitku")
+	// registerUserWithNameAndForge(o, "user1", "goatedgoats")
+	// registerUserWithNameAndForge(o, "user1", "klktn")
 
 }
 
