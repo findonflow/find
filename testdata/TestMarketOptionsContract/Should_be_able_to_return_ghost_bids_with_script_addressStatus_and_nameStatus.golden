@@ -26,7 +26,6 @@
                 "ghosts": [
                     {
                         "id": "133",
-                        "listingType": "Type\u003cA.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid\u003e()",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid"
                     }
                 ],
@@ -88,7 +87,6 @@
                 "ghosts": [
                     {
                         "id": "133",
-                        "listingType": "Type\u003cA.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.Bid\u003e()",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.Bid"
                     }
                 ],

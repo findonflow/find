@@ -416,6 +416,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		result := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		autogold.Equal(t, result)
+
 	})
 
 	t.Run("Should be able to return ghost bids with script getStatus", func(t *testing.T) {

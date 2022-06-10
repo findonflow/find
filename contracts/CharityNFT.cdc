@@ -84,13 +84,13 @@ pub contract CharityNFT: NonFungibleToken {
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-			return &self.ownedNFTs[id] as &NonFungibleToken.NFT
+			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		//borrow charity
 		pub fun borrowCharity(id: UInt64): &{CharityNFT.Public}? {
 			if self.ownedNFTs[id] != nil {
-				let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+				let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 				return ref as! &NFT
 			} else {
 				return nil

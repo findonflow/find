@@ -382,14 +382,14 @@ pub contract FindMarketDirectOfferSoft {
 			pre{
 				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
 			}
-			return &self.items[id] as &SaleItem
+			return (&self.items[id] as &SaleItem?)!
 		}
 
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
 			pre{
 				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
 			}
-			return &self.items[id] as &SaleItem{FindMarket.SaleItem}
+			return (&self.items[id] as &SaleItem{FindMarket.SaleItem}?)!
 		}
 
 		destroy() {
@@ -557,14 +557,14 @@ pub contract FindMarketDirectOfferSoft {
 			pre{
 				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
 			}
-			return &self.bids[id] as &Bid
+			return (&self.bids[id] as &Bid?)!
 		}
 
 		pub fun borrowBidItem(_ id: UInt64): &{FindMarket.Bid} {
 			pre{
 				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
 			}
-			return &self.bids[id] as &Bid{FindMarket.Bid}
+			return (&self.bids[id] as &Bid{FindMarket.Bid}?)!
 		}
 
 		pub fun getBalance(_ id: UInt64) : UFix64 {

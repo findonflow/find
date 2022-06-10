@@ -254,7 +254,7 @@ pub contract Dandy: NonFungibleToken {
 				self.ownedNFTs[id] != nil : "NFT does not exist"
 			}
 
-			return &self.ownedNFTs[id] as &NonFungibleToken.NFT
+			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
@@ -262,7 +262,7 @@ pub contract Dandy: NonFungibleToken {
 				self.ownedNFTs[id] != nil : "NFT does not exist"
 			}
 
-			let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			return nft as! &Dandy.NFT
 		}
 
@@ -270,7 +270,7 @@ pub contract Dandy: NonFungibleToken {
 			pre {
 				self.ownedNFTs[id] != nil : "NFT does not exist"
 			}
-			let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT
+			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			return nft as! &Dandy.NFT
 		}
 
