@@ -47,7 +47,6 @@ func main() {
 	o.SimpleTxArgs("adminSetFTInfo_flow", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
-
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
 	// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
 
@@ -59,14 +58,31 @@ func main() {
 
 	createProfileAndGiftName(o, "find")
 	createProfileAndGiftName(o, "find-admin")
-	createProfileAndGiftName(o, "user1")
 
-	o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(100.0))
+	o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(500.0))
 
-	o.TransactionFromFile("buyAddon").SignProposeAndPayAs("user1").
-		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
+	registerUserWithNameAndForge(o, "user1", "neomotorcycle")
+	registerUserWithNameAndForge(o, "user1", "xtingles")
+	registerUserWithNameAndForge(o, "user1", "flovatar")
+	registerUserWithNameAndForge(o, "user1", "ufcstrike")
+	registerUserWithNameAndForge(o, "user1", "jambb")
+	registerUserWithNameAndForge(o, "user1", "bitku")
+	registerUserWithNameAndForge(o, "user1", "goatedgoats")
+	registerUserWithNameAndForge(o, "user1", "klktn")
+
+}
+
+func registerUserWithNameAndForge(o *overflow.Overflow, name, minter string) {
+
+	o.TransactionFromFile("register").
+		SignProposeAndPayAs(name).
+		Args(o.Arguments().
+			String(minter).
+			UFix64(5.0))
+
+	o.TransactionFromFile("buyAddon").SignProposeAndPayAs(name).
+		Args(o.Arguments().String(minter).String("forge").UFix64(50.0)).
 		RunPrintEventsFull()
-
 }
 
 func createProfileAndGiftName(o *overflow.Overflow, name string) {
