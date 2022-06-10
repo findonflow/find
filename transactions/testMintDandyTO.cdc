@@ -16,7 +16,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			panic("need dandy receicer")
 		}
 
-		let forgeType = Type<@Dandy.NFT>().identifier
+		let forgeType = Type<@Dandy.ForgeMinter>().identifier
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 

@@ -10,7 +10,7 @@ transaction() {
     }
 
     execute{
-        self.adminRef.addForgeCapabilities(type: Type<@Dandy.NFT>().identifier, cap: Dandy.getForgeCapability())
+        self.adminRef.addForgeCapabilities(type: Type<@Dandy.ForgeMinter>().identifier, cap: Dandy.getForgeCapability())
     }
 }
  

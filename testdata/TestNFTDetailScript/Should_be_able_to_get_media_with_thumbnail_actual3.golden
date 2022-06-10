@@ -57,7 +57,7 @@
         "collectionName": "flovatar",
         "data": {},
         "editionNumber": "",
-        "id": "163",
+        "id": "168",
         "media": [
             {
                 "file": {
@@ -94,7 +94,7 @@
         "thumbnail": "https://flovatar.com/api/image/166",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "163",
+        "uuid": "168",
         "views": [
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",

@@ -426,7 +426,7 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
 			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		Test(otu.T).
-		AssertSuccess().AssertEventCount(6).
+		AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
 			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 			"minter":      "user1",

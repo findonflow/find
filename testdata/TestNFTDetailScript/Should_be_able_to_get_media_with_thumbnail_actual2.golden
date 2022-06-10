@@ -57,7 +57,7 @@
         "collectionName": "xtingles",
         "data": {},
         "editionNumber": "",
-        "id": "162",
+        "id": "166",
         "media": [
             {
                 "file": {
@@ -99,14 +99,14 @@
         "thumbnail": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "162",
+        "uuid": "166",
         "views": [
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
             "A.f8d6e0586b0a20c7.MetadataViews.Media",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "A.f8d6e0586b0a20c7.FindViews.CreativeWork"
         ]
     },
     "storefront": ""

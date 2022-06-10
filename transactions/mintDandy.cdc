@@ -39,7 +39,9 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
 
-		finLeases.addForgeMinter(name: name, forgeMinterType: "dandy", description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage)
+		if !finLeases.borrow(name).containsForgeMinter(Type<@Dandy.ForgeMinter>().identifier) {
+			finLeases.addForgeMinter(name: name, forgeMinterType: Type<@Dandy.ForgeMinter>().identifier, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage)
+		}
 
 		while i <= maxEdition {
 
@@ -56,7 +58,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 										   externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
 			
 			
-			let token <- finLeases.mintWithForgeMinter(minter: name, forgeMinter: "dandy", mintData: mintData)
+			let token <- finLeases.mintWithForgeMinter(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
 			
 			collection.deposit(token: <- token)
 			i=i+1
