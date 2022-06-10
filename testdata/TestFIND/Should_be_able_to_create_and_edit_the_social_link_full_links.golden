@@ -12,12 +12,12 @@
         "CryptoTwitter": {
             "title": "0xBjartek",
             "type": "Twitter",
-            "url": "Twitter"
+            "url": "https://twitter.com/0xBjartek"
         },
         "FindTwitter": {
             "title": "find",
             "type": "Twitter",
-            "url": "Twitter"
+            "url": "https://twitter.com/findonflow"
         }
     },
     "name": "user1",
