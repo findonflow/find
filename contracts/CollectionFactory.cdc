@@ -314,7 +314,7 @@ pub contract CollectionFactory {
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard1.getNFTIDs(ownerAddress: account!.address)
+        let extraIDs = AlchemyMetadataWrapperTestnetShard1.getNFTIDs(ownerAddress: account!.address)
 
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
@@ -356,7 +356,7 @@ pub contract CollectionFactory {
 
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -401,7 +401,7 @@ pub contract CollectionFactory {
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard2.getNFTIDs(ownerAddress: account!.address)
+        let extraIDs = AlchemyMetadataWrapperTestnetShard2.getNFTIDs(ownerAddress: account!.address)
 
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
@@ -443,7 +443,7 @@ pub contract CollectionFactory {
 
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -488,7 +488,7 @@ pub contract CollectionFactory {
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard3.getNFTIDs(ownerAddress: account!.address)
+        let extraIDs = AlchemyMetadataWrapperTestnetShard3.getNFTIDs(ownerAddress: account!.address)
 
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
@@ -530,7 +530,7 @@ pub contract CollectionFactory {
 
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -565,6 +565,7 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
+		/*
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 4
     //////////////////////////////////////////////////////////////
@@ -575,7 +576,7 @@ pub contract CollectionFactory {
 
         let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperMainnetShard4.getNFTIDs(ownerAddress: account!.address)
+        let extraIDs = AlchemyMetadataWrapperTestnetShard4.getNFTIDs(ownerAddress: account!.address)
 
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
@@ -617,7 +618,7 @@ pub contract CollectionFactory {
 
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard4.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard4.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -651,6 +652,7 @@ pub contract CollectionFactory {
         }
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
+		*/
 
 
 
@@ -757,7 +759,7 @@ pub contract CollectionFactory {
         }
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -816,7 +818,7 @@ pub contract CollectionFactory {
         }
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -875,7 +877,7 @@ pub contract CollectionFactory {
         }
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -910,6 +912,7 @@ pub contract CollectionFactory {
         return items
     }
 
+		/*
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 4
     //////////////////////////////////////////////////////////////
@@ -934,7 +937,7 @@ pub contract CollectionFactory {
         }
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard4.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard4.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -968,6 +971,7 @@ pub contract CollectionFactory {
         }
         return items
     }
+		*/
 
     init() {
         self.FlowverseSocksIds = [14813, 15013, 14946, 14808, 14899, 14792, 15016, 14961, 14816, 14796, 14992, 14977, 14815, 14863, 14817, 14814, 14875, 14960, 14985, 14850, 14849, 14966, 14826, 14972, 14795, 15021, 14950, 14847, 14970, 14833, 14786, 15010, 14953, 14799, 14883, 14947, 14844, 14801, 14886, 15015, 15023, 15027, 15029, 14802, 14810, 14948, 14955, 14957, 14988, 15007, 15009, 14837, 15024, 14803, 14973, 14969, 15002, 15017, 14797, 14894, 14881, 15025, 14791, 14979, 14789, 14993, 14873, 14939, 15005, 15006, 14869, 14889, 15004, 15008, 15026, 14990, 14998, 14898, 14819, 14840, 14974, 15019, 14856, 14838, 14787, 14876, 14996, 14798, 14855, 14824, 14843, 14959, 15020, 14862, 14822, 14897, 14830, 14790, 14867, 14878, 14991, 14835, 14818, 14892, 14800, 15000, 14857, 14986, 14805, 14812, 14962]
