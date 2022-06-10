@@ -2,7 +2,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindViews from "../contracts/FindViews.cdc" 
 import FIND from "../contracts/FIND.cdc" 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
+//import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
@@ -19,6 +19,7 @@ pub struct NFTDetailReport {
 		self.allowedListingActions=allowedListingActions
 	}
 }
+
 
 pub struct ListingTypeReport {
 	pub let listingType: String 
@@ -159,6 +160,16 @@ pub struct Royalties {
 	}
 }
 
+
+pub struct StorefrontListing {
+	pub let foo:String
+
+	init() {
+
+		self.foo ="bar"
+	}
+}
+/*
 pub struct StorefrontListing {
 	pub let nftID:UInt64
 	pub let nftIdentifier: String
@@ -182,6 +193,7 @@ pub struct StorefrontListing {
 		self.listingID=listingId
 	}
 }
+*/
 
 pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user) 
@@ -204,6 +216,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	let findAddress=FindMarket.getFindTenantAddress()
 	let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
+	/*
 	var listings : StorefrontListing? = nil
 	let storefrontCap = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
 
@@ -217,6 +230,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 			}
 		}
 	}
+	*/
 
 	let tenantCap = FindMarket.getTenantCapability(findAddress)!
 	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up.")
@@ -229,7 +243,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 		}
 	}
 
-	return NFTDetailReport(findMarket:findMarket, storefront: listings, nftDetail: nftDetail, allowedListingActions: report)
+	return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report)
 
 }
 
