@@ -149,11 +149,23 @@ pub contract Admin {
 			Dandy.setViewConverters(from: from, converters: converters)
 		}
 
-		pub fun createForge(platform: Dandy.MinterPlatform) : @Dandy.Forge {
+		/// ===================================================================================
+		// Forge
+		/// ===================================================================================
+
+		pub fun createForgeMinter(platform: FIND.MinterPlatform) : @Dandy.ForgeMinter {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			return <- Dandy.createForge(platform:platform)
+			return <- Dandy.adminCreateForgeMinter(platform)
+		}
+
+		pub fun addForgeCapabilities(type: String, cap: Capability<&{FIND.Forge}>) {
+			FIND.addForgeCapabilities(type: type, cap: cap)
+		}
+
+		pub fun removeForgeCapabilities(type: String) {
+			FIND.removeForgeCapabilities(type: type)
 		}
 
 		/// ===================================================================================

@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hexops/autogold"
@@ -25,7 +26,7 @@ func TestCollectionScripts(t *testing.T) {
 			registerUserWithNameAndForge("user1", "goatedgoats").
 			registerUserWithNameAndForge("user1", "klktn")
 
-		otu.O.TransactionFromFile("testMintDandyTO").
+		_, err := otu.O.TransactionFromFile("testMintDandyTO").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -37,13 +38,16 @@ func TestCollectionScripts(t *testing.T) {
 				String("rare").
 				UFix64(50.0).
 				Account("user1")).
-			RunPrintEventsFull()
+			RunGetEventsWithNameOrError("hello")
 
-		result := otu.O.ScriptFromFile("getCollections").
-			Args(otu.O.Arguments().String("user1")).
-			RunReturnsJsonString()
+		// result := otu.O.ScriptFromFile("getCollections").
+		// 	Args(otu.O.Arguments().String("user1")).
+		// 	RunReturnsJsonString()
+		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		fmt.Println(err)
+		fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		autogold.Equal(t, `result`)
 
-		autogold.Equal(t, result)
 	})
 
 }

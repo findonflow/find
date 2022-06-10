@@ -62,7 +62,7 @@ pub contract FIND {
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, validUntil: UFix64, lockedUntil: UFix64)
 
-	pub event CastForge(name: String, uuid: UInt64, forgeType: String, action: String)
+	pub event CastForgeMinter(name: String, uuid: UInt64, forgeMinterType: String, action: String)
 
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
@@ -77,7 +77,7 @@ pub contract FIND {
 	pub let LeasePublicPath: PublicPath
 
 	//forge 
-	access(contract) let forgeCasterCapabilities : {String : Capability<&{Forge}>}
+	access(contract) let forgeCapabilities : {String : Capability<&{Forge}>}
 
 	pub fun getLeases() : [NetworkLease] {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -289,11 +289,12 @@ pub contract FIND {
 
 	// ForgeMinter Interface 
 	pub resource interface ForgeMinter {
-		pub fun mint(minterPlatform: MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT 
+		access(contract) let platform: FIND.MinterPlatform
+		access(account) fun mint(platform: MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT 
 	}
 
 	pub resource interface Forge {
-		access(account) fun createForge() : @{ForgeMinter}
+		access(account) fun createForgeMinter(_ platform: MinterPlatform) : @{ForgeMinter}
 	}
 
 	/*
@@ -319,7 +320,7 @@ pub contract FIND {
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 		access(contract) var addons: {String: Bool}
-		access(contract) var forges: @{String : {ForgeMinter}}
+		access(contract) var forgeMinters: @{String : {ForgeMinter}}
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
@@ -332,40 +333,44 @@ pub contract FIND {
 			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
 			self.addons={}
-			self.forges<-{}
+			self.forgeMinters<-{}
 		}
 
 		destroy() {
-			destroy self.forges
+			destroy self.forgeMinters
 		}
 
-		access(contract) fun addForge(_ forge: @{ForgeMinter}) {
+		access(contract) fun addForgeMinter(_ forgeMinter: @{ForgeMinter}) {
 			pre{
-				!self.forges.containsKey(forge.getType().identifier) : "This forge minter already exist :".concat(forge.getType().identifier)
+				!self.forgeMinters.containsKey(forgeMinter.getType().identifier) : "This forge minter already exist :".concat(forgeMinter.getType().identifier)
 			}
-			let key = forge.getType().identifier
-			self.forges[key] <-! forge
-			emit CastForge(name: self.name, uuid: self.uuid, forgeType: key, action: "addForge")
+			let key = forgeMinter.getType().identifier
+			self.forgeMinters[key] <-! forgeMinter
+			emit CastForgeMinter(name: self.name, uuid: self.uuid, forgeMinterType: key, action: "addForgeMinter")
 		}
 
-		access(contract) fun removeForge(_ forge: String) {
+		access(contract) fun removeforgeMinter(_ forgeMinter: String) {
 			pre{
-				self.forges.containsKey(forge) : "This forge minter does not exist :".concat(forge)
+				self.forgeMinters.containsKey(forgeMinter) : "This forge minter does not exist :".concat(forgeMinter)
 			}
-			destroy self.forges.remove(key: forge)!
-			emit CastForge(name: self.name, uuid: self.uuid, forgeType: forge, action: "removeForge")
+			destroy self.forgeMinters.remove(key: forgeMinter)!
+			emit CastForgeMinter(name: self.name, uuid: self.uuid, forgeMinterType: forgeMinter, action: "removeForgeMinter")
 		}
 
-		access(contract) fun borrowForge(_ forge: String) : &{ForgeMinter}? {
-			return &self.forges[forge] as &{ForgeMinter}?
+		access(contract) fun borrowForgeMinter(_ forgeMinter: String) : &{ForgeMinter}? {
+			return &self.forgeMinters[forgeMinter] as &{ForgeMinter}?
 		}
 
-		pub fun getForges() : [String] {
-			return self.forges.keys
+		pub fun getForgeMinters() : [String] {
+			return self.forgeMinters.keys
 		}
 
-		pub fun containsForge(_ forge: String) : Bool {
-			return self.forges.containsKey(forge)
+		pub fun containsForgeMinter(_ forgeMinter: String) : Bool {
+			return self.forgeMinters.containsKey(forgeMinter)
+		}
+
+		pub fun getForgeMinterPlatform(_ forgeMinter: String) : MinterPlatform? {
+			return self.forgeMinters[forgeMinter]?.platform
 		}
 
 		pub fun addAddon(_ addon:String) {
@@ -588,33 +593,33 @@ pub contract FIND {
 		// 	return <- Dandy.mintNFT(name:nftName, description:description, thumbnail: thumbnail, platform: self.createPlatform(name: minter, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage), schemas: schemas, externalUrlPrefix:externalUrlPrefix)
 		// }
 
-		pub fun mintWithForge(minter: String, forge: String, name: String, description: String, externalURL: String, squareImage: String, bannerImage: String, mintData: AnyStruct) : @NonFungibleToken.NFT {
+		pub fun mintWithForgeMinter(minter: String, forgeMinter: String, mintData: AnyStruct) : @NonFungibleToken.NFT {
 			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
+				self.leases.containsKey(minter) : "Invalid name=".concat(minter)
 			}
 
-			let lease = self.borrow(name)
-			assert(lease.containsForge(forge) , message: "This name is not equipped with specified forge. Name: ".concat(forge))
-			let forge = lease.borrowForge(forge)!
+			let lease = self.borrow(minter)
+			assert(lease.containsForgeMinter(forgeMinter) , message: "This name is not equipped with specified forge minter. Name: ".concat(minter))
+			let forgeMinter = lease.borrowForgeMinter(forgeMinter)!
 
-			let minterPlatform = self.createPlatform(name: name, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
-			return <- forge.mint(minterPlatform: minterPlatform, data: mintData)
+			return <- forgeMinter.mint(platform: forgeMinter.platform, data: mintData)
 		}
 
 		// add forge to the collection of forge under find name
-		pub fun addForge(name: String, forgeType: String) {
+		pub fun addForgeMinter(name: String, forgeMinterType: String, description: String, externalURL: String, squareImage: String, bannerImage: String) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
-				FIND.forgeCasterCapabilities.containsKey(forgeType) : "Invalid forge type=".concat(forgeType)
+				FIND.forgeCapabilities.containsKey(forgeMinterType) : "Invalid forge minter type=".concat(forgeMinterType)
 			}
+			let minterPlatform = self.createPlatform(name: name, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
 
 			let lease = self.borrow(name)
 
-			let forgeCap = FIND.forgeCasterCapabilities[forgeType]! 
-			let forgeRef = forgeCap.borrow() ?? panic("Forge capability is not set up properly.")
-			let forge <- forgeRef.createForge()
+			let forgeMinterCap = FIND.forgeCapabilities[forgeMinterType]! 
+			let forgeMinterRef = forgeMinterCap.borrow() ?? panic("Forge capability is not set up properly.")
+			let forgeMinter <- forgeMinterRef.createForgeMinter(minterPlatform)
 
-			lease.addForge(<- forge)
+			lease.addForgeMinter(<- forgeMinter)
 		}
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
@@ -1629,25 +1634,25 @@ pub contract FIND {
 
 	}
 
-	pub fun getForgeCasters() : [String] {
-		return self.forgeCasterCapabilities.keys
+	pub fun getForges() : [String] {
+		return self.forgeCapabilities.keys
 	}
 
-	access(account) fun addForgeCreatorCapabilities(type: String, cap: Capability<&{Forge}>) {
+	access(account) fun addForgeCapabilities(type: String, cap: Capability<&{Forge}>) {
 		pre{
-			!self.forgeCasterCapabilities.containsKey(type) : "This forge is already registered."
+			!self.forgeCapabilities.containsKey(type) : "This forge is already registered."
 			cap.check() : "Capability is not set properly."
 		}
 
-		self.forgeCasterCapabilities[type] = cap
+		self.forgeCapabilities[type] = cap
 	}
 
-	access(account) fun removeForgeCreatorCapabilities(type: String) {
+	access(account) fun removeForgeCapabilities(type: String) {
 		pre{
-			self.forgeCasterCapabilities.containsKey(type) : "This forge is not registered."
+			self.forgeCapabilities.containsKey(type) : "This forge is not registered."
 		}
 
-		self.forgeCasterCapabilities.remove(key: type)!
+		self.forgeCapabilities.remove(key: type)!
 	}
 
 	init() {
@@ -1660,7 +1665,7 @@ pub contract FIND {
 		self.BidPublicPath=/public/findBids
 		self.BidStoragePath=/storage/findBids
 
-		self.forgeCasterCapabilities={}
+		self.forgeCapabilities={}
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 

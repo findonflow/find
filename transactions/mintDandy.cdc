@@ -38,6 +38,9 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
+
+		finLeases.addForgeMinter(name: name, forgeMinterType: "dandy", description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage)
+
 		while i <= maxEdition {
 
 			let editioned= MetadataViews.Edition(name: nil, number:i, max:maxEdition)
@@ -45,18 +48,16 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let editions = MetadataViews.Editions([editioned, set])
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let schemas: [AnyStruct] = [ editions, creativeWork, media, minterRoyalty, tag, scalar ]
-			let token <- finLeases.mintDandy(minter: name, 
-			  nftName: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
-				description: creativeWork.description,
-				thumbnail: media,
-				schemas: schemas, 
-				externalUrlPrefix: "https://find.xyz/collection/".concat(name).concat("/dandy"),
-				collectionDescription: collectionDescription,
-				collectionExternalURL: collectionExternalURL, 
-				collectionSquareImage: collectionSquareImage,
-				collectionBannerImage: collectionBannerImage
-				)
-
+			
+			let mintData = Dandy.DandyInfo(name: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+										   description: creativeWork.description, 
+										   thumbnail: media, 
+										   schemas: schemas, 
+										   externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
+			
+			
+			let token <- finLeases.mintWithForgeMinter(minter: name, forgeMinter: "dandy", mintData: mintData)
+			
 			collection.deposit(token: <- token)
 			i=i+1
 		}
