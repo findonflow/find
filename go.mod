@@ -3,12 +3,12 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220607084328-ce84aec1250a
+	github.com/bjartek/overflow v0.0.0-20220610053455-82230094dfbc
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
-	github.com/onflow/cadence v0.21.3-0.20220601002855-8b113c539a2c
+	github.com/onflow/cadence v0.24.1
 	github.com/stretchr/testify v1.7.1
 )
 
@@ -77,16 +77,16 @@ require (
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/onflow/atree v0.3.1-0.20220531231935-525fbc26f40a // indirect
-	github.com/onflow/flow-cli v0.35.0 // indirect
+	github.com/onflow/flow-cli v0.36.0 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v0.11.2-0.20220513155751-c4c1f8d59f83 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.11.2-0.20220513155751-c4c1f8d59f83 // indirect
-	github.com/onflow/flow-emulator v0.32.0 // indirect
+	github.com/onflow/flow-emulator v0.33.1 // indirect
 	github.com/onflow/flow-ft/lib/go/contracts v0.5.0 // indirect
-	github.com/onflow/flow-go v0.26.2 // indirect
-	github.com/onflow/flow-go-sdk v0.24.1-0.20220513205729-d1f58d47c4e3 // indirect
+	github.com/onflow/flow-go v0.26.3 // indirect
+	github.com/onflow/flow-go-sdk v0.26.1 // indirect
 	github.com/onflow/flow-go/crypto v0.24.3 // indirect
 	github.com/onflow/flow/protobuf/go/flow v0.3.1 // indirect
-	github.com/onflow/sdks v0.4.2 // indirect
+	github.com/onflow/sdks v0.4.4 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
