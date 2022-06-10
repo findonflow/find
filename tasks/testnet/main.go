@@ -15,54 +15,54 @@ func main() {
 	//	o.InitializeContracts()
 
 	/*
-					//send flow to admin and user account
-					o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find-admin").UFix64(1000.0))
-					o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("user1").UFix64(1000.0))
+				//send flow to admin and user account
+				o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find-admin").UFix64(1000.0))
+				o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("user1").UFix64(1000.0))
 
-					//first step create the adminClient as the fin user
-					o.TransactionFromFile("setup_fin_1_create_client").
-						SignProposeAndPayAs("find-admin").
-						RunPrintEventsFull()
+				//first step create the adminClient as the fin user
+				o.TransactionFromFile("setup_fin_1_create_client").
+					SignProposeAndPayAs("find-admin").
+					RunPrintEventsFull()
 
-					//link in the server in the versus client
-					o.TransactionFromFile("setup_fin_2_register_client").
-						SignProposeAndPayAs("find").
-						Args(o.Arguments().Account("find-admin")).
-						RunPrintEventsFull()
+				//link in the server in the versus client
+				o.TransactionFromFile("setup_fin_2_register_client").
+					SignProposeAndPayAs("find").
+					Args(o.Arguments().Account("find-admin")).
+					RunPrintEventsFull()
 
-					//set up fin network as the fin user
-					o.TransactionFromFile("setup_fin_3_create_network").
-						SignProposeAndPayAs("find-admin").
-						RunPrintEventsFull()
+				//set up fin network as the fin user
+				o.TransactionFromFile("setup_fin_3_create_network").
+					SignProposeAndPayAs("find-admin").
+					RunPrintEventsFull()
 
-					o.TransactionFromFile("setup_find_market_1").
-						SignProposeAndPayAs("find").
-						RunPrintEventsFull()
+				o.TransactionFromFile("setup_find_market_1").
+					SignProposeAndPayAs("find").
+					RunPrintEventsFull()
 
-					//link in the server in the versus client
-					o.TransactionFromFile("setup_find_market_2").
-						SignProposeAndPayAs("find-admin").
-						Args(o.Arguments().Account("find")).
-						RunPrintEventsFull()
+				//link in the server in the versus client
+				o.TransactionFromFile("setup_find_market_2").
+					SignProposeAndPayAs("find-admin").
+					Args(o.Arguments().Account("find")).
+					RunPrintEventsFull()
 
-					o.SimpleTxArgs("adminSetFTInfo_flow", "find-admin", o.Arguments())
-					o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
-					o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
-					o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
-				// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
+				o.SimpleTxArgs("adminSetFTInfo_flow", "find-admin", o.Arguments())
+				o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
+				o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
+				o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
+			// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
 
-				//	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
-				//	o.SimpleTxArgs("testSetSellNeoTestnetRules", "find-admin", o.Arguments().Account("find"))
+			//	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
+			//	o.SimpleTxArgs("testSetSellNeoTestnetRules", "find-admin", o.Arguments().Account("find"))
 
-				//o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments().Account("find"))
-				o.SimpleTxArgs("adminSetSellDandyRules", "find-admin", o.Arguments().Account("find"))
+			//o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments().Account("find"))
+			o.SimpleTxArgs("adminSetSellDandyRules", "find-admin", o.Arguments().Account("find"))
 
-				createProfileAndGiftName(o, "find")
-				createProfileAndGiftName(o, "find-admin")
+			createProfileAndGiftName(o, "find")
+			createProfileAndGiftName(o, "find-admin")
 
-			createProfileAndGiftName(o, "user1")
-		o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(500.0))
+		createProfileAndGiftName(o, "user1")
 	*/
+	o.SimpleTxArgs("adminSendFUSD", "account", o.Arguments().Account("user1").UFix64(500.0))
 
 	registerUserWithNameAndForge(o, "user1", "neomotorcycle")
 	registerUserWithNameAndForge(o, "user1", "xtingles")
@@ -81,7 +81,8 @@ func registerUserWithNameAndForge(o *overflow.Overflow, name, minter string) {
 		SignProposeAndPayAs(name).
 		Args(o.Arguments().
 			String(minter).
-			UFix64(5.0))
+			UFix64(5.0)).
+		RunPrintEventsFull()
 
 	o.TransactionFromFile("buyAddon").SignProposeAndPayAs(name).
 		Args(o.Arguments().String(minter).String("forge").UFix64(50.0)).
