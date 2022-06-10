@@ -2,6 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 pub contract Dandy: NonFungibleToken {
 

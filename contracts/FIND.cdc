@@ -62,7 +62,9 @@ pub contract FIND {
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, validUntil: UFix64, lockedUntil: UFix64)
 
-		//store bids made by a bidder to somebody elses leases
+	pub event CastForge(name: String, uuid: UInt64, forgeType: String, action: String)
+
+	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
 	pub let BidStoragePath: StoragePath
 
@@ -73,6 +75,9 @@ pub contract FIND {
 	//store the leases you own
 	pub let LeaseStoragePath: StoragePath
 	pub let LeasePublicPath: PublicPath
+
+	//forge 
+	access(contract) let forgeCasterCapabilities : {String : Capability<&{Forge}>}
 
 	pub fun getLeases() : [NetworkLease] {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -287,6 +292,10 @@ pub contract FIND {
 		pub fun mint(minterPlatform: MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT 
 	}
 
+	pub resource interface Forge {
+		access(account) fun createForge() : @{ForgeMinter}
+	}
+
 	/*
 	=============================================================
 	Lease is a collection/resource for storing the token leases 
@@ -310,6 +319,7 @@ pub contract FIND {
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 		access(contract) var addons: {String: Bool}
+		access(contract) var forges: @{String : {ForgeMinter}}
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
@@ -322,6 +332,40 @@ pub contract FIND {
 			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
 			self.addons={}
+			self.forges<-{}
+		}
+
+		destroy() {
+			destroy self.forges
+		}
+
+		access(contract) fun addForge(_ forge: @{ForgeMinter}) {
+			pre{
+				!self.forges.containsKey(forge.getType().identifier) : "This forge minter already exist :".concat(forge.getType().identifier)
+			}
+			let key = forge.getType().identifier
+			self.forges[key] <-! forge
+			emit CastForge(name: self.name, uuid: self.uuid, forgeType: key, action: "addForge")
+		}
+
+		access(contract) fun removeForge(_ forge: String) {
+			pre{
+				self.forges.containsKey(forge) : "This forge minter does not exist :".concat(forge)
+			}
+			destroy self.forges.remove(key: forge)!
+			emit CastForge(name: self.name, uuid: self.uuid, forgeType: forge, action: "removeForge")
+		}
+
+		access(contract) fun borrowForge(_ forge: String) : &{ForgeMinter}? {
+			return &self.forges[forge] as &{ForgeMinter}?
+		}
+
+		pub fun getForges() : [String] {
+			return self.forges.keys
+		}
+
+		pub fun containsForge(_ forge: String) : Bool {
+			return self.forges.containsKey(forge)
 		}
 
 		pub fun addAddon(_ addon:String) {
@@ -529,10 +573,10 @@ pub contract FIND {
 			self.networkWallet=networkWallet
 		}
 
-		// access(contract) fun createPlatform(name: String, description: String, externalURL: String, squareImage: String, bannerImage: String) : Dandy.MinterPlatform{
-		// 	let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		// 	return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
-		// }
+		access(contract) fun createPlatform(name: String, description: String, externalURL: String, squareImage: String, bannerImage: String) : FIND.MinterPlatform{
+			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return FIND.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
+		}
 
 		// pub fun mintDandy(minter: String, nftName: String, description: String, thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix: String?, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) : @Dandy.NFT {
 
@@ -544,7 +588,34 @@ pub contract FIND {
 		// 	return <- Dandy.mintNFT(name:nftName, description:description, thumbnail: thumbnail, platform: self.createPlatform(name: minter, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage), schemas: schemas, externalUrlPrefix:externalUrlPrefix)
 		// }
 
+		pub fun mintWithForge(minter: String, forge: String, name: String, description: String, externalURL: String, squareImage: String, bannerImage: String, mintData: AnyStruct) : @NonFungibleToken.NFT {
+			pre {
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
+			}
 
+			let lease = self.borrow(name)
+			assert(lease.containsForge(forge) , message: "This name is not equipped with specified forge. Name: ".concat(forge))
+			let forge = lease.borrowForge(forge)!
+
+			let minterPlatform = self.createPlatform(name: name, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
+			return <- forge.mint(minterPlatform: minterPlatform, data: mintData)
+		}
+
+		// add forge to the collection of forge under find name
+		pub fun addForge(name: String, forgeType: String) {
+			pre {
+				self.leases.containsKey(name) : "Invalid name=".concat(name)
+				FIND.forgeCasterCapabilities.containsKey(forgeType) : "Invalid forge type=".concat(forgeType)
+			}
+
+			let lease = self.borrow(name)
+
+			let forgeCap = FIND.forgeCasterCapabilities[forgeType]! 
+			let forgeRef = forgeCap.borrow() ?? panic("Forge capability is not set up properly.")
+			let forge <- forgeRef.createForge()
+
+			lease.addForge(<- forge)
+		}
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {
@@ -561,20 +632,11 @@ pub contract FIND {
 				panic("Expect 50 FUSD for forge addon")
 			}
 
-			if addon=="forge" {
-				lease.addForge()
-			}
-
 			lease.addAddon(addon)
 
 			//put something in your storage
 			emit AddonActivated(name: name, addon: addon)
 			self.networkWallet.borrow()!.deposit(from: <- vault)
-		}
-
-		// add forge to the collection of forge under find name
-		pub fun addForge() {
-
 		}
 
 		pub fun getLease(_ name: String) : LeaseInformation? {
@@ -1566,6 +1628,28 @@ pub contract FIND {
 		return true
 
 	}
+
+	pub fun getForgeCasters() : [String] {
+		return self.forgeCasterCapabilities.keys
+	}
+
+	access(account) fun addForgeCreatorCapabilities(type: String, cap: Capability<&{Forge}>) {
+		pre{
+			!self.forgeCasterCapabilities.containsKey(type) : "This forge is already registered."
+			cap.check() : "Capability is not set properly."
+		}
+
+		self.forgeCasterCapabilities[type] = cap
+	}
+
+	access(account) fun removeForgeCreatorCapabilities(type: String) {
+		pre{
+			self.forgeCasterCapabilities.containsKey(type) : "This forge is not registered."
+		}
+
+		self.forgeCasterCapabilities.remove(key: type)!
+	}
+
 	init() {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND
@@ -1575,6 +1659,8 @@ pub contract FIND {
 
 		self.BidPublicPath=/public/findBids
 		self.BidStoragePath=/storage/findBids
+
+		self.forgeCasterCapabilities={}
 
 		let wallet=self.account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
