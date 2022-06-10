@@ -13,7 +13,6 @@ import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 /* In order to deploy this contract on testnet/mainet you have to comment out the code above for the relevant network */
 /* Note that if this is changed there are code in tasks/collectionFactoryTest that also must be changed */
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
