@@ -23,17 +23,17 @@ pub fun main(user: String) : CollectionReport?{
     //         96968792,
     //         96968790
     //     ]})
-	return fetchNFTRegistry(user: user, maxItems: 2)
+	return fetchNFTRegistry(user: user, maxItems: 2, targetCollections:[])
 }
 
 
 
     pub struct CollectionReport {
         pub let items : {String : [MetadataCollectionItem]} 
-        pub let collections : [String] 
+        pub let collections : {String : Int} // mapping of collection to no. of ids 
         pub let extraIDs : {String : [UInt64]} 
 
-        init(items: {String : [MetadataCollectionItem]},  collections : [String], extraIDs : {String : [UInt64]} ) {
+        init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
             self.items=items 
             self.collections=collections 
             self.extraIDs=extraIDs
@@ -178,7 +178,7 @@ pub fun main(user: String) : CollectionReport?{
                 items[nftInfo!.alias] = collectionItems 
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return CollectionReport(items: items,  collections : {}, extraIDs : {})
     }
 
 	pub fun getMedias(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Medias? {
@@ -208,7 +208,7 @@ pub fun main(user: String) : CollectionReport?{
 		return nil
 	}
 
-    pub fun fetchNFTRegistry(user: String, maxItems: Int) : CollectionReport? {
+    pub fun fetchNFTRegistry(user: String, maxItems: Int, targetCollections:[String]) : CollectionReport? {
         let source = "NFTRegistry"
         let account = resolveAddress(user: user)
         if account == nil { return nil }
@@ -217,7 +217,7 @@ pub fun main(user: String) : CollectionReport?{
         var fetchItem : Bool = true
 
         let items : {String : [MetadataCollectionItem]} = {}
-        let collections : [String] = []
+        let collections : {String : Int} = {}
         let extraIDs : {String : [UInt64]} = {}
 
 	    for nftInfo in NFTRegistry.getNFTInfoAll().values {
@@ -226,7 +226,17 @@ pub fun main(user: String) : CollectionReport?{
             
             let collectionRef = resolverCollectionCap.borrow()!
 
-            collections.append(nftInfo.alias)
+            // by pass if this is not the target collection
+            if targetCollections.length >0 && !targetCollections.contains(nftInfo.alias) {
+                collections.insert(key: nftInfo.alias, collectionRef.getIDs().length)
+                extraIDs[nftInfo.alias] = collectionRef.getIDs()
+                continue
+            }
+
+            // insert collection
+            collections.insert(key: nftInfo.alias, collectionRef.getIDs().length)
+
+            // if max items reached, will not fetch more items 
 
             if !fetchItem {
                 extraIDs[nftInfo.alias] = collectionRef.getIDs()

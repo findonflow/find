@@ -17,7 +17,7 @@ func main() {
 
 	o2 := overflow.NewOverflowTestnet().Start()
 
-	user2 := "0xde5b0e922aeb76f5"
+	user2 := "0x5a41930b8b435bdf"
 
 	res2 := o2.ScriptFromFile("testFactoryCollectionTestnet").Args(o2.Arguments().String(user2)).RunReturnsJsonString()
 	fmt.Println(res2)

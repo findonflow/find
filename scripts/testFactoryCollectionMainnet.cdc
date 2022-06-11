@@ -15,7 +15,7 @@ pub fun main(user: String) : AnyStruct {
     //     ]}
 
 	// return fetchAlchemyCollectionShard1(user: user, collectionIDs: ids)
-	return fetchAlchemyShard1(user: user, maxItems: 2)
+	return fetchAlchemyShard1(user: user, maxItems: 2, targetCollections: ["TuneGO"])
     // let account = resolveAddress(user: user)
     // if account == nil { return nil }
     // let a1 = fetchAlchemyShard1(user: user, maxItems: 200)
@@ -42,10 +42,10 @@ pub fun main(user: String) : AnyStruct {
 
     pub struct CollectionReport {
         pub let items : {String : [MetadataCollectionItem]} 
-        pub let collections : [String] 
+        pub let collections : {String : Int} // mapping of collection to no. of ids 
         pub let extraIDs : {String : [UInt64]} 
 
-        init(items: {String : [MetadataCollectionItem]},  collections : [String], extraIDs : {String : [UInt64]} ) {
+        init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
             self.items=items 
             self.collections=collections 
             self.extraIDs=extraIDs
@@ -187,7 +187,7 @@ pub fun main(user: String) : AnyStruct {
                 items[project] = collectionItems
             }
         }
-        return CollectionReport(items: items,  collections : [], extraIDs : {})
+        return CollectionReport(items: items,  collections : {}, extraIDs : {})
     }
 
 	// pub fun getMedias(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Medias? {
@@ -208,7 +208,7 @@ pub fun main(user: String) : AnyStruct {
 	// 	return nil
 	// }
 
-    pub fun fetchAlchemyShard1(user: String, maxItems: Int) : CollectionReport? {
+    pub fun fetchAlchemyShard1(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
         let source = "Alchemy-shard1"
         let account = resolveAddress(user: user)
         if account == nil { return nil }
@@ -225,10 +225,19 @@ pub fun main(user: String) : AnyStruct {
 
         extraIDs = byPassBug(extraIDs)
 
-        let collections : [String] = extraIDs.keys
+        let collections : {String : Int} = {}
+        for key in extraIDs.keys {
+            collections[key] = extraIDs[key]!.length
+        }
         let fetchingIDs : {String : [UInt64]} = {}
         var fetchedCount : Int = 0
         for project in extraIDs.keys {
+
+            // by pass if this is not the target collection
+            if targetCollections.length > 0 && !targetCollections.contains(project) {
+                continue
+            }
+
             if extraIDs[project]!.length + fetchedCount > maxItems {
                 let array : [UInt64] = []
                 while fetchedCount < maxItems {
@@ -313,7 +322,7 @@ pub fun main(user: String) : AnyStruct {
         }
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
-
+/* 
     pub fun fetchAlchemyShard2(user: String, maxItems: Int) : CollectionReport? {
         let source = "Alchemy-shard2"
 
@@ -635,3 +644,4 @@ pub fun main(user: String) : AnyStruct {
         }
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
+    */
