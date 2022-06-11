@@ -116,19 +116,5 @@
             "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
         ]
     },
-    "storefront": {
-        "amount": "10.00000000",
-        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        "listingID": "138",
-        "nftID": "134",
-        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "saleCut": [
-            {
-                "address": "0x179b6b1cb6755e31",
-                "amount": "10.00000000",
-                "findName": "user1"
-            }
-        ],
-        "storefront": "137"
-    }
+    "storefront": ""
 }`
