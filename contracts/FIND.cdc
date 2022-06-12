@@ -5,8 +5,8 @@ import FUSD from "./standard/FUSD.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
-// import Dandy from "./Dandy.cdc"
 import Sender from "./Sender.cdc"
+import FindForge from "./FindForge.cdc"
 /*
 
 ///FIND
@@ -77,7 +77,7 @@ pub contract FIND {
 	pub let LeasePublicPath: PublicPath
 
 	//forge 
-	access(contract) let forgeCapabilities : {String : Capability<&{Forge}>}
+	access(contract) let forgeCapabilities : {String : Capability<&{FindForge.Forge}>}
 
 	pub fun getLeases() : [NetworkLease] {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -266,36 +266,7 @@ pub contract FIND {
 		}
 	}
 
-	// PlatformMinter is a compulsory element for minters 
-	pub struct MinterPlatform {
-		pub let platform: Capability<&{FungibleToken.Receiver}>
-		pub let platformPercentCut: UFix64
-		pub let name: String
-		pub let description: String 
-		pub let externalURL: String 
-		pub let squareImage: String 
-		pub let bannerImage: String 
 
-		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64, description: String, externalURL: String, squareImage: String, bannerImage: String) {
-			self.platform=platform
-			self.platformPercentCut=platformPercentCut
-			self.name=name
-			self.description=description 
-			self.externalURL=externalURL 
-			self.squareImage=squareImage 
-			self.bannerImage=bannerImage
-		}
-	}
-
-	// ForgeMinter Interface 
-	pub resource interface ForgeMinter {
-		access(contract) let platform: FIND.MinterPlatform
-		access(account) fun mint(platform: MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT 
-	}
-
-	pub resource interface Forge {
-		access(account) fun createForgeMinter(_ platform: MinterPlatform) : @{ForgeMinter}
-	}
 
 	/*
 	=============================================================
@@ -320,7 +291,7 @@ pub contract FIND {
 		access(contract) var auctionExtensionOnLateBid: UFix64
 		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
 		access(contract) var addons: {String: Bool}
-		access(contract) var forgeMinters: @{String : {ForgeMinter}}
+		access(contract) var forgeMinters: @{String : {FindForge.ForgeMinter}}
 
 		init(name:String, networkCap: Capability<&Network>) {
 			self.name=name
@@ -340,7 +311,7 @@ pub contract FIND {
 			destroy self.forgeMinters
 		}
 
-		access(contract) fun addForgeMinter(_ forgeMinter: @{ForgeMinter}) {
+		access(contract) fun addForgeMinter(_ forgeMinter: @{FindForge.ForgeMinter}) {
 			pre{
 				!self.forgeMinters.containsKey(forgeMinter.getType().identifier) : "This forge minter already exist :".concat(forgeMinter.getType().identifier)
 			}
@@ -357,8 +328,8 @@ pub contract FIND {
 			emit CastForgeMinter(name: self.name, uuid: self.uuid, forgeMinterType: forgeMinter, action: "removeForgeMinter")
 		}
 
-		access(contract) fun borrowForgeMinter(_ forgeMinter: String) : &{ForgeMinter}? {
-			return &self.forgeMinters[forgeMinter] as &{ForgeMinter}?
+		access(contract) fun borrowForgeMinter(_ forgeMinter: String) : &{FindForge.ForgeMinter}? {
+			return &self.forgeMinters[forgeMinter] as &{FindForge.ForgeMinter}?
 		}
 
 		pub fun getForgeMinters() : [String] {
@@ -369,7 +340,7 @@ pub contract FIND {
 			return self.forgeMinters.containsKey(forgeMinter)
 		}
 
-		pub fun getForgeMinterPlatform(_ forgeMinter: String) : MinterPlatform? {
+		pub fun getForgeMinterPlatform(_ forgeMinter: String) : FindForge.MinterPlatform? {
 			return self.forgeMinters[forgeMinter]?.platform
 		}
 
@@ -578,9 +549,9 @@ pub contract FIND {
 			self.networkWallet=networkWallet
 		}
 
-		access(contract) fun createPlatform(name: String, description: String, externalURL: String, squareImage: String, bannerImage: String) : FIND.MinterPlatform{
+		access(contract) fun createPlatform(name: String, description: String, externalURL: String, squareImage: String, bannerImage: String) : FindForge.MinterPlatform{
 			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			return FIND.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
+			return FindForge.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
 		}
 
 		pub fun mintWithForgeMinter(minter: String, forgeMinter: String, mintData: AnyStruct) : @NonFungibleToken.NFT {
@@ -1628,7 +1599,7 @@ pub contract FIND {
 		return self.forgeCapabilities.keys
 	}
 
-	access(account) fun addForgeCapabilities(type: String, cap: Capability<&{Forge}>) {
+	access(account) fun addForgeCapabilities(type: String, cap: Capability<&{FindForge.Forge}>) {
 		pre{
 			!self.forgeCapabilities.containsKey(type) : "This forge is already registered."
 			cap.check() : "Capability is not set properly."

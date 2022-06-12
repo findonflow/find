@@ -104,8 +104,8 @@
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
             "A.f8d6e0586b0a20c7.MetadataViews.Media",
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork"
         ]
     },

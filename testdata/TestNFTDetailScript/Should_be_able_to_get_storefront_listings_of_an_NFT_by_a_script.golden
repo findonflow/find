@@ -111,24 +111,10 @@
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "A.f8d6e0586b0a20c7.MetadataViews.Media"
         ]
     },
-    "storefront": {
-        "amount": "10.00000000",
-        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-        "listingID": "140",
-        "nftID": "136",
-        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "saleCut": [
-            {
-                "address": "0x179b6b1cb6755e31",
-                "amount": "10.00000000",
-                "findName": "user1"
-            }
-        ],
-        "storefront": "139"
-    }
+    "storefront": ""
 }`

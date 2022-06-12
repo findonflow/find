@@ -45,11 +45,6 @@ func main() {
 					Args(o.Arguments().Account("find")).
 					RunPrintEventsFull()
 
-				//add Dandy forge to registry
-				o.TransactionFromFile("adminAddForgeCapabilities").
-					SignProposeAndPayAs("find-admin").
-					RunPrintEventsFull()
-
 				o.SimpleTxArgs("adminSetFTInfo_flow", "find-admin", o.Arguments())
 				o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
 				o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())

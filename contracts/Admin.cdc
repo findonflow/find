@@ -3,6 +3,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
+import FindForge from "./FindForge.cdc"
 import Debug from "./Debug.cdc"
 import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
@@ -153,14 +154,14 @@ pub contract Admin {
 		// Forge
 		/// ===================================================================================
 
-		pub fun createForgeMinter(platform: FIND.MinterPlatform) : @Dandy.ForgeMinter {
+		pub fun createForgeMinter(platform: FindForge.MinterPlatform) : @Dandy.ForgeMinter {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			return <- Dandy.adminCreateForgeMinter(platform)
 		}
 
-		pub fun addForgeCapabilities(type: String, cap: Capability<&{FIND.Forge}>) {
+		pub fun addForgeCapabilities(type: String, cap: Capability<&{FindForge.Forge}>) {
 			FIND.addForgeCapabilities(type: type, cap: cap)
 		}
 
@@ -349,6 +350,8 @@ pub contract Admin {
 
 		self.AdminProxyPublicPath= /public/findAdminProxy
 		self.AdminProxyStoragePath=/storage/findAdminProxy
+
+		FIND.addForgeCapabilities(type: Type<@Dandy.ForgeMinter>().identifier, cap: Dandy.getForgeCapability())
 	}
 
 }

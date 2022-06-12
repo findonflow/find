@@ -2,7 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import FindForge from "../contracts/FindForge.cdc"
 
 pub contract Dandy: NonFungibleToken {
 
@@ -61,10 +61,10 @@ pub contract Dandy: NonFungibleToken {
 		access(contract) let name: String
 		access(contract) let description: String
 		access(contract) let thumbnail: MetadataViews.Media
-		access(contract) let minterPlatform: FIND.MinterPlatform
+		access(contract) let minterPlatform: FindForge.MinterPlatform
 
 
-		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo},  minterPlatform: FIND.MinterPlatform, externalUrlPrefix: String?) {
+		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo},  minterPlatform: FindForge.MinterPlatform, externalUrlPrefix: String?) {
 
 			self.id = self.uuid
 			self.schemas=schemas
@@ -298,7 +298,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 	}
 
-	access(account) fun mintNFT(name: String, description: String, thumbnail: MetadataViews.Media,  platform:FIND.MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
+	access(account) fun mintNFT(name: String, description: String, thumbnail: MetadataViews.Media,  platform:FindForge.MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
 		let views : {String: ViewInfo} = {}
 		for s in schemas {
 			//if you send in display we ignore it, this will be made for you
@@ -317,14 +317,14 @@ pub contract Dandy: NonFungibleToken {
 		Dandy.viewConverters[from.identifier] = converters
 	}
 
-	pub resource ForgeMinter : FIND.ForgeMinter {
-		access(contract) let platform: FIND.MinterPlatform
+	pub resource ForgeMinter : FindForge.ForgeMinter {
+		pub let platform: FindForge.MinterPlatform
 
-		init(platform: FIND.MinterPlatform) {
+		init(platform: FindForge.MinterPlatform) {
 			self.platform=platform
 		}
 
-		access(account) fun mint(platform: FIND.MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT {
+		access(account) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT {
 			let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
 			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)
 		}
@@ -334,18 +334,18 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Forge()
 	}
 
-	access(account) fun adminCreateForgeMinter(_ platform: FIND.MinterPlatform) : @ForgeMinter {
+	access(account) fun adminCreateForgeMinter(_ platform: FindForge.MinterPlatform) : @ForgeMinter {
 		return <- create Dandy.ForgeMinter(platform)
 	}
 
-	pub resource Forge : FIND.Forge {
-		access(account) fun createForgeMinter(_ platform: FIND.MinterPlatform) : @ForgeMinter {
+	pub resource Forge : FindForge.Forge {
+		access(account) fun createForgeMinter(_ platform: FindForge.MinterPlatform) : @ForgeMinter {
 			return <- Dandy.adminCreateForgeMinter(platform)
 		}
 	}
 
-	pub fun getForgeCapability() : Capability<&{FIND.Forge}> {
-		return self.account.getCapability<&{FIND.Forge}>(Dandy.ForgePublicPath)
+	pub fun getForgeCapability() : Capability<&{FindForge.Forge}> {
+		return self.account.getCapability<&{FindForge.Forge}>(Dandy.ForgePublicPath)
 	}
 
 	// public function that anyone can call to create a new empty collection
@@ -374,7 +374,7 @@ pub contract Dandy: NonFungibleToken {
 		self.viewConverters={}
 
 		self.account.save(<- Dandy.createForge(), to: Dandy.ForgeStoragePath)
-		self.account.link<&Dandy.Forge{FIND.Forge}>(Dandy.ForgePublicPath, target: Dandy.ForgeStoragePath)
+		self.account.link<&Dandy.Forge{FindForge.Forge}>(Dandy.ForgePublicPath, target: Dandy.ForgeStoragePath)
 
 		emit ContractInitialized()
 	}

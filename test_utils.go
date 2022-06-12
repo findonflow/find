@@ -98,11 +98,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		Args(otu.O.Arguments().Account("find")).
 		Test(otu.T).AssertSuccess()
 
-	//add Dandy forge to registry
-	otu.O.TransactionFromFile("adminAddForgeCapabilities").
-		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess()
-
 	return otu.tickClock(1.0)
 }
 
