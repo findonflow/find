@@ -933,8 +933,6 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
-
-			emit EnglishAuction(name: name, uuid:tokenRef.uuid, seller: self.owner!.address, sellerName:FIND.reverseLookup(self.owner!.address), amount: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!, status: "cancel_listing", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, endsAt: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
 			
 			tokenRef.setStartAuctionPrice(nil)
 			tokenRef.setReservePrice(nil)

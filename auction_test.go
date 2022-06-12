@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 )
 
 /*
@@ -686,6 +687,28 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1").UFix64(10.0)).
 			Test(t).
 			AssertFailure("cannot bid on name that is free")
+
+	})
+
+	t.Run("Should be able to cancel finished auction that did not meet reserve price", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForAuction("user1").
+			bid("user2", "user1", 15.0).
+			expireAuction().tickClock(2.0)
+
+		result := otu.O.TransactionFromFile("cancelNameAuction").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().StringArray("user1")).
+			Test(t).
+			AssertSuccess()
+
+		autogold.Equal(t, result.Events)
 
 	})
 
