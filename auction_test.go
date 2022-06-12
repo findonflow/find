@@ -367,6 +367,30 @@ func TestAuction(t *testing.T) {
 			}))
 	})
 
+	t.Run("Should be able to sell locked name at auction", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2").
+			expireLease().
+			listForAuction("user1").
+			auctionBid("user2", "user1", 20.0).
+			expireAuction()
+
+		result := otu.O.TransactionFromFile("fulfillNameAuction").
+			SignProposeAndPayAs("user2"). //the buy
+			Args(otu.O.Arguments().
+				Account("user1").
+				String("user1")).
+			Test(t).
+			AssertSuccess()
+
+		autogold.Equal(t, result.Events)
+	})
+
 	t.Run("Should not allow double bid from same author", func(t *testing.T) {
 
 		otu := NewOverflowTest(t).
