@@ -162,7 +162,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.accountAddress("user1"),
 				"sellerName":  "user1",
