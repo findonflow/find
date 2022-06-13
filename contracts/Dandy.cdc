@@ -375,9 +375,10 @@ pub contract Dandy: NonFungibleToken {
 		self.ForgePublicPath = /public/findDandyForge
 		self.viewConverters={}
 
-		self.account.save(<- Dandy.createForge(), to: Dandy.ForgeStoragePath)
-		self.account.link<&Dandy.Forge{FindForge.Forge}>(Dandy.ForgePublicPath, target: Dandy.ForgeStoragePath)
+	//	self.account.save(<- Dandy.createForge(), to: Dandy.ForgeStoragePath)
+	//	self.account.link<&Dandy.Forge{FindForge.Forge}>(Dandy.ForgePublicPath, target: Dandy.ForgeStoragePath)
 
+		//TODO: Register itself in the FindForge
 		emit ContractInitialized()
 	}
 }

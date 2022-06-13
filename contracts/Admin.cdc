@@ -5,7 +5,6 @@ import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import FindForge from "./FindForge.cdc"
 import Debug from "./Debug.cdc"
-import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FTRegistry from "./FTRegistry.cdc"
@@ -157,6 +156,7 @@ pub contract Admin {
 		// Forge
 		/// ===================================================================================
 
+		/*
 		pub fun createForgeMinter(platform: FindForge.MinterPlatform) : @Dandy.ForgeMinter {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -173,6 +173,7 @@ pub contract Admin {
 			//TODO: these needs to be on FindForge
 			FIND.removeForgeCapabilities(type: type)
 		}
+		*/
 
 		/// ===================================================================================
 		// Fungible Token Registry 

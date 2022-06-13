@@ -281,7 +281,7 @@ pub contract FIND {
 	You can use methods on it to renew the lease or to move to another profile
 	*/
 	pub resource Lease {
-		access(contract) let name: String
+		access(account) let name: String
 		access(contract) let networkCap: Capability<&Network> 
 		access(contract) var salePrice: UFix64?
 		access(contract) var auctionStartPrice: UFix64?
