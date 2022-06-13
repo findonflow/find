@@ -9,7 +9,7 @@ import FindMarket from "./FindMarket.cdc"
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionEscrow {
 
-	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?)
+	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 	pub resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer
@@ -257,7 +257,7 @@ pub contract FindMarketAuctionEscrow {
 			return self.tenantCapability.borrow()!
 		}
 
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String) {
+		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
 			let nftInfo=saleItem.toNFTInfo()
@@ -265,13 +265,19 @@ pub contract FindMarketAuctionEscrow {
 			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
 
+
+			var previousBuyerName : String?=nil
+			if let pb= previousBuyer {
+				previousBuyerName = FIND.reverseLookup(pb)
+			}
+
 			let buyer=saleItem.getBuyer()
 			if buyer != nil {
 				let buyerName=FIND.reverseLookup(buyer!)
 				let profile = FIND.lookup(buyer!.toString())
-				emit EnglishAuction(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.auctionEndsAt)
+				emit EnglishAuction(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: previousBuyer, previousBuyerName:previousBuyerName)
 			} else {
-				emit EnglishAuction(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, endsAt: saleItem.auctionEndsAt)
+				emit EnglishAuction(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 			}
 		}
 
@@ -302,8 +308,11 @@ pub contract FindMarketAuctionEscrow {
 				panic("bid ".concat(newOfferBalance.toString()).concat(" must be larger then previous bid+bidIncrement ").concat(minBid.toString()))
 			}
 
+
+			var previousBuyer:Address?=nil
 			if newOffer.address != previousOffer.address {
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
+				previousBuyer=previousOffer.address
 			}
 
 			saleItem.setCallback(newOffer)
@@ -313,7 +322,7 @@ pub contract FindMarketAuctionEscrow {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer)
 
 		}
 
@@ -374,14 +383,13 @@ pub contract FindMarketAuctionEscrow {
 			if let valid = saleItem.getValidUntil() {
 				assert( valid >= Clock.time(), message: "This auction listing is already expired")
 			}
-
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
 			let endsAt=timestamp + duration
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing")
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil)
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -410,7 +418,7 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
-			self.emitEvent(saleItem: saleItem, status: status)
+			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil)
 			let id=saleItem.getId()
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
@@ -449,7 +457,7 @@ pub contract FindMarketAuctionEscrow {
 				let nftInfo= saleItem.toNFTInfo()
 				let royalty=saleItem.getRoyalty()
 
-				self.emitEvent(saleItem: saleItem, status: "sold")
+				self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 
 				let vault <- saleItem.acceptEscrowedBid()
 				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
@@ -475,7 +483,7 @@ pub contract FindMarketAuctionEscrow {
 
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "active_listed")
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil)
 
 		}
 

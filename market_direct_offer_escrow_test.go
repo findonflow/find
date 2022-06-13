@@ -139,10 +139,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", newPrice),
-				"id":     fmt.Sprintf("%d", id),
-				"buyer":  otu.accountAddress("user3"),
-				"status": "offered",
+				"amount":        fmt.Sprintf("%.8f", newPrice),
+				"id":            fmt.Sprintf("%d", id),
+				"buyer":         otu.accountAddress("user3"),
+				"previousBuyer": otu.accountAddress("user2"),
+				"status":        "active_offered",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
 				"amount": fmt.Sprintf("%.8f", price),
