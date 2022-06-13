@@ -665,4 +665,34 @@ func TestMarketAuctionSoft(t *testing.T) {
 			AssertFailure("Buyer banned by Tenant")
 
 	})
+
+	t.Run("Should emit previous bidder if outbid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			saleItemListed("user1", "active_ongoing", 15.0)
+
+		otu.O.TransactionFromFile("bidMarketAuctionSoft").
+			SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				UInt64(id).
+				UFix64(20.0)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+				"amount":        fmt.Sprintf("%.8f", 20.0),
+				"id":            fmt.Sprintf("%d", id),
+				"buyer":         otu.accountAddress("user3"),
+				"previousBuyer": otu.accountAddress("user2"),
+				"status":        "active_ongoing",
+			}))
+	})
+
 }

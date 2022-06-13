@@ -9,7 +9,7 @@ import FindMarket from "./FindMarket.cdc"
 
 pub contract FindMarketDirectOfferEscrow {
 
-	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?)
+	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 
 	pub resource SaleItem : FindMarket.SaleItem {
@@ -190,11 +190,11 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "cancel")
+			self.emitEvent(saleItem: saleItem, status: "cancel", previousBuyer:nil)
 			destroy <- self.items.remove(key: id)
 		}
 
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String) {
+		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer: Address?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
 			let nftInfo=saleItem.toNFTInfo()
@@ -203,7 +203,12 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = FIND.lookup(buyer.toString())
 
-			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil)
+			var previousBuyerName : String?=nil
+			if let pb= previousBuyer {
+				previousBuyerName = FIND.reverseLookup(pb)
+			}
+
+			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 		}
 
 		//The only thing we do here is basically register an event
@@ -219,7 +224,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "active_offered")
+			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:nil)
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
@@ -239,10 +244,9 @@ pub contract FindMarketDirectOfferEscrow {
 				
 				self.items[id] <-! saleItem
 				let item=self.borrow(id)
-				self.emitEvent(saleItem: item, status: "active_offered")
+				self.emitEvent(saleItem: item, status: "active_offered", previousBuyer:nil)
 				return 
 			}
-
 
 			let saleItem=self.borrow(id)
 
@@ -264,11 +268,12 @@ pub contract FindMarketDirectOfferEscrow {
 				panic("There is already a higher bid on this item")
 			}
 			//somebody else has the highest item so we cancel it
+			let previousBuyer=saleItem.offerCallback.address
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
 			saleItem.setValidUntil(validUntil)
 			saleItem.setCallback(callback)
 
-			self.emitEvent(saleItem: saleItem, status: "offered")
+			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:previousBuyer)
 
 		}
 
@@ -286,7 +291,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "rejected")
+			self.emitEvent(saleItem: saleItem, status: "rejected", previousBuyer:nil)
 
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)
@@ -318,7 +323,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let royalty=saleItem.getRoyalty()
 			let nftInfo=saleItem.toNFTInfo()
 
-			self.emitEvent(saleItem: saleItem, status: "sold")
+			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			let vault <- saleItem.acceptEscrowedBid()
 			FindMarket.pay(tenant: self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
 			destroy <- self.items.remove(key: id)
@@ -478,6 +483,7 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
+			Debug.log("cancel bid")
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
