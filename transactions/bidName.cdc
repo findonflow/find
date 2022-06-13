@@ -92,9 +92,7 @@ transaction(name: String, amount: UFix64) {
 
 		if created {
 			profile.emitCreatedEvent()
-		} else {
-			profile.emitUpdatedEvent()
-		}
+		} 
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
