@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 )
 
 /*
@@ -161,7 +162,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.accountAddress("user1"),
 				"sellerName":  "user1",
@@ -364,6 +365,30 @@ func TestAuction(t *testing.T) {
 				"status":    "active_ongoing",
 				"buyerName": "user2",
 			}))
+	})
+
+	t.Run("Should be able to sell locked name at auction", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2").
+			expireLease().
+			listForAuction("user1").
+			auctionBid("user2", "user1", 20.0).
+			expireAuction()
+
+		result := otu.O.TransactionFromFile("fulfillNameAuction").
+			SignProposeAndPayAs("user2"). //the buy
+			Args(otu.O.Arguments().
+				Account("user1").
+				String("user1")).
+			Test(t).
+			AssertSuccess()
+
+		autogold.Equal(t, result.Events)
 	})
 
 	t.Run("Should not allow double bid from same author", func(t *testing.T) {
@@ -686,6 +711,28 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1").UFix64(10.0)).
 			Test(t).
 			AssertFailure("cannot bid on name that is free")
+
+	})
+
+	t.Run("Should be able to cancel finished auction that did not meet reserve price", func(t *testing.T) {
+
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			createUser(100.0, "user2").
+			registerUser("user1").
+			registerUser("user2").
+			listForAuction("user1").
+			bid("user2", "user1", 15.0).
+			expireAuction().tickClock(2.0)
+
+		result := otu.O.TransactionFromFile("cancelNameAuction").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().StringArray("user1")).
+			Test(t).
+			AssertSuccess()
+
+		autogold.Equal(t, result.Events)
 
 	})
 

@@ -39,7 +39,7 @@ pub contract FIND {
 
 
 	//event when FT is sent
-	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, ftType:Type)
+	pub event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, ftType:String)
 
 	/// An event to singla that there is a name in the network
 	pub event Name(name: String)
@@ -212,7 +212,7 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			let profile=network.lookup(to) ?? panic("could not find name")
 			let fromAddress= from.owner!.address
-			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType()) 
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
 			profile.deposit(from: <- vault)
 			return 
 		}
@@ -417,7 +417,7 @@ pub contract FIND {
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=self.name
 
 			emit EnglishAuction(name: self.name, uuid: lease.uuid, seller: owner, sellerName:ownerName, amount: offer.getBalance(self.name), auctionReservePrice: lease.auctionReservePrice!, status: "active_ongoing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, endsAt: self.endsAt ,validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
 		}
@@ -600,7 +600,7 @@ pub contract FIND {
 			let bidder= callback.address
 			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=lease.name
 
 			let endsAt=timestamp + duration
 			emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:FIND.reverseLookup(owner), amount: offer.getBalance(name), auctionReservePrice: lease.auctionReservePrice!, status: "active_ongoing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, endsAt: endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
@@ -630,7 +630,7 @@ pub contract FIND {
 				let bidder= callback.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=lease.owner!.address
-				let ownerName=lease.getProfile()!.getName()
+				let ownerName=lease.name
 				var amount : UFix64 = 0.0
 				if callback.check() {
 					amount = callback.borrow()!.getBalance(name)
@@ -664,7 +664,7 @@ pub contract FIND {
 			let bidder= lease.offerCallback!.address
 			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=lease.name
 
 			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
 			Debug.log("Offer is at ".concat(balance.toString()))
@@ -732,7 +732,7 @@ pub contract FIND {
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=lease.name
 
 
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
@@ -766,7 +766,7 @@ pub contract FIND {
 				let bidder= cb.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=lease.owner!.address
-				let ownerName=lease.getProfile()!.getName()
+				let ownerName=lease.name
 				Debug.log("we have a blind bid so we cancel that")
 				emit DirectOffer(name: name, uuid:lease.uuid, seller: owner, sellerName: ownerName, amount: cb.borrow()!.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
 				
@@ -795,7 +795,7 @@ pub contract FIND {
 				let bidder= auction.latestBidCallback.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=lease.owner!.address
-				let ownerName=lease.getProfile()!.getName()
+				let ownerName=lease.name
 
 
 				let leaseInfo = self.getLease(name)!
@@ -836,7 +836,12 @@ pub contract FIND {
 				let offer= cb.borrow()!
 				let newProfile= getAccount(cb.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 				let soldFor=offer.getBalance(name)
-				emit Sale(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
+
+				if lease.salePrice == nil || lease.salePrice != soldFor {
+					emit DirectOffer(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
+				} else {
+					emit Sale(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
+				}
 				//move the token to the new profile
 				lease.move(profile: newProfile)
 
@@ -905,7 +910,7 @@ pub contract FIND {
 				let bidder= cb.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=tokenRef.owner!.address
-				let ownerName=tokenRef.getProfile()!.getName()
+				let ownerName=tokenRef.name
 				Debug.log("we have a blind bid so we cancel that")
 				emit DirectOffer(name: name, uuid:tokenRef.uuid, seller: owner, sellerName: ownerName, amount: cb.borrow()!.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
 				cb.borrow()!.cancel(name)
@@ -936,8 +941,6 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
-
-			emit EnglishAuction(name: name, uuid:tokenRef.uuid, seller: self.owner!.address, sellerName:FIND.reverseLookup(self.owner!.address), amount: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!, status: "cancel_listing", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, endsAt: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
 			
 			tokenRef.setStartAuctionPrice(nil)
 			tokenRef.setReservePrice(nil)

@@ -571,4 +571,34 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		//Should be able to retract offer
 		otu.retractOfferDirectOfferSoft("user2", "user1", ids[1])
 	})
+
+	t.Run("Should return money when outbid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price)
+
+		newPrice := 11.0
+		otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
+			SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("user1").
+				String("Dandy").
+				UInt64(id).
+				String("Flow").
+				UFix64(newPrice).
+				UFix64(100.0)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"amount":        fmt.Sprintf("%.8f", newPrice),
+				"id":            fmt.Sprintf("%d", id),
+				"buyer":         otu.accountAddress("user3"),
+				"previousBuyer": otu.accountAddress("user2"),
+				"status":        "active_offered",
+			}))
+	})
 }
