@@ -27,9 +27,9 @@ pub contract FIND {
 
 
 	//Old events not in use anymore we cannot remove
-  	pub event Sold()
+ 	pub event Sold()
 	pub event SoldAuction()
-  	pub event DirectOfferRejected()
+ 	pub event DirectOfferRejected()
 	pub event DirectOfferCanceled()
 	pub event AuctionStarted()
 	pub event AuctionCanceled()

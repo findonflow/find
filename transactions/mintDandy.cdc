@@ -39,9 +39,21 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
 
+		let lease=finLeases.borrow(name)
+
 		if !finLeases.borrow(name).containsForgeMinter(Type<@Dandy.ForgeMinter>().identifier) {
 			finLeases.addForgeMinter(name: name, forgeMinterType: Type<@Dandy.ForgeMinter>().identifier, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage)
 		}
+
+		//TODO: psudo code
+		//TODO; if your lease cannot mint this type then panic with good error message?
+		//TODO: add method to check if you can mint with lease/type
+		/*
+		FindForge.mint(lease: lease, type: Type<>, function(minter:&{FindForge.Minter}){
+			let token <- minter.mint(mintData: mintData)
+		})
+		*/
+
 
 		while i <= maxEdition {
 
@@ -56,7 +68,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 										   thumbnail: media, 
 										   schemas: schemas, 
 										   externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
-			
 			
 			let token <- finLeases.mintWithForgeMinter(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
 			

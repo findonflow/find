@@ -13,7 +13,6 @@ pub contract Dandy: NonFungibleToken {
 	pub let ForgePublicPath: PublicPath
 	pub var totalSupply: UInt64
 
-
 	/*store all valid type converters for Dandys
 	This is to be able to make the contract compatible with the forthcomming NFT standard. 
 
@@ -313,10 +312,13 @@ pub contract Dandy: NonFungibleToken {
 		return <-  nft
 	}
 
+	/*
 	access(account) fun setViewConverters(from: Type, converters: [AnyStruct{ViewConverter}]) {
 		Dandy.viewConverters[from.identifier] = converters
 	}
+	*/
 
+	//TODO: do we want to store minter 
 	pub resource ForgeMinter : FindForge.ForgeMinter {
 		pub let platform: FindForge.MinterPlatform
 
@@ -324,7 +326,7 @@ pub contract Dandy: NonFungibleToken {
 			self.platform=platform
 		}
 
-		access(account) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT {
+		access(account) fun mint(data: AnyStruct) : @NonFungibleToken.NFT {
 			let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
 			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)
 		}

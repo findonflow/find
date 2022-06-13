@@ -142,6 +142,7 @@ pub contract Admin {
 			Debug.enable(value)
 		}
 
+		/*
 		pub fun setViewConverters(from: Type, converters: [{Dandy.ViewConverter}]) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -149,7 +150,9 @@ pub contract Admin {
 
 			Dandy.setViewConverters(from: from, converters: converters)
 		}
+		*/
 
+		//TODO: we cannot have it here
 		/// ===================================================================================
 		// Forge
 		/// ===================================================================================
@@ -162,10 +165,12 @@ pub contract Admin {
 		}
 
 		pub fun addForgeCapabilities(type: String, cap: Capability<&{FindForge.Forge}>) {
+			//TODO: these needs to be on FindForge
 			FIND.addForgeCapabilities(type: type, cap: cap)
 		}
 
 		pub fun removeForgeCapabilities(type: String) {
+			//TODO: these needs to be on FindForge
 			FIND.removeForgeCapabilities(type: type)
 		}
 
@@ -351,7 +356,8 @@ pub contract Admin {
 		self.AdminProxyPublicPath= /public/findAdminProxy
 		self.AdminProxyStoragePath=/storage/findAdminProxy
 
-		FIND.addForgeCapabilities(type: Type<@Dandy.ForgeMinter>().identifier, cap: Dandy.getForgeCapability())
+		//TODO:Do this in Dandy contract
+		FindForge.addForgeCapabilities(type: Type<@Dandy.ForgeMinter>().identifier, cap: Dandy.getForgeCapability())
 	}
 
 }
