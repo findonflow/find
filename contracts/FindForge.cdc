@@ -79,8 +79,8 @@ pub contract FindForge {
 			FindForge.forgeTypes.contains(nftType) : "This forge is not supported "
 		}
 
-		if lease.checkAddon(addon: "forge") {
-			panic("Please purchase forge addon to continue to forging.")
+		if !lease.checkAddon(addon: "forge") {
+			panic("Please purchase forge addon to start forging. Name: ".concat(lease.getName()))
 		}
 
 		let name = lease.getName() 
@@ -109,8 +109,8 @@ pub contract FindForge {
 		}
 		let name = lease.getName()
 
-		if lease.checkAddon(addon: "forge") {
-			panic("Please purchase forge addon to continue to forging.")
+		if !lease.checkAddon(addon: "forge") {
+			panic("Please purchase forge addon to start forging. Name: ".concat(lease.getName()))
 		}
 
 		let minterPlatform = FindForge.minterPlatforms[nftType.identifier]![name] ?? panic("The minter platform is not set. Please set up properly before mint.")

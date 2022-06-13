@@ -64,7 +64,7 @@ pub contract Dandy: NonFungibleToken {
 
 		// access(contract) let minterPlatform: FindForge.MinterPlatform
 		// 	let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
-		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo}, platform: FindForge.MinterPlatform) {
+		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo}, platform: FindForge.MinterPlatform, externalUrlPrefix: String?) {
 			self.id = self.uuid
 			self.schemas=schemas
 			self.thumbnail=thumbnail
@@ -73,6 +73,10 @@ pub contract Dandy: NonFungibleToken {
 			self.nounce=0
 			self.primaryCutPaid=false
 			self.platform=platform
+			if externalUrlPrefix != nil {
+				let mvt = Type<MetadataViews.ExternalURL>()
+				self.schemas[mvt.identifier] = ViewInfo(typ:mvt, result: MetadataViews.ExternalURL(externalUrlPrefix!.concat("/").concat(self.id.toString())))
+			}
 		}
 
 		pub fun increaseNounce() {
@@ -80,7 +84,22 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun getMinterPlatform() : FindForge.MinterPlatform {
-			return FindForge.getMinterPlatform(name: self.platform.name, nftType: self.getType()) ?? self.platform
+			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, nftType: self.getType()) {
+				
+				let name = self.platform.name
+				let platform = self.platform.platform
+				let platformPercentCut = self.platform.platformPercentCut
+				let minterCut = self.platform.minterCut
+
+				let description = fetch.description
+				let externalURL = fetch.externalURL
+				let squareImage = fetch.squareImage
+				let bannerImage = fetch.bannerImage
+				let socials = fetch.socials
+				return FindForge.MinterPlatform(name: name, platform:platform, platformPercentCut: platformPercentCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
+			}
+
+			return self.platform
 		}
 
 		pub fun getViews() : [Type] {
@@ -150,7 +169,12 @@ pub contract Dandy: NonFungibleToken {
 				let externalURL = MetadataViews.ExternalURL(minterPlatform.externalURL)
 				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.squareImage), mediaType: "image")
 				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.bannerImage), mediaType: "image")
-				return MetadataViews.NFTCollectionDisplay(name: minterPlatform.name, description: minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: {})
+
+				let socialMap : {String : MetadataViews.ExternalURL} = {}
+				for social in minterPlatform.socials.keys {
+					socialMap[social] = MetadataViews.ExternalURL(minterPlatform.socials[social]!)
+				}
+				return MetadataViews.NFTCollectionDisplay(name: minterPlatform.name, description: minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socialMap)
 			}
 
 			if type == Type<MetadataViews.NFTCollectionData>() {
@@ -313,7 +337,7 @@ pub contract Dandy: NonFungibleToken {
 			}
 		}
 
-		let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, platform: platform)
+		let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, platform: platform, externalUrlPrefix:externalUrlPrefix)
 
 		emit Minted(id:nft.id, minter:nft.platform.name, name: name, description:description)
 		return <-  nft

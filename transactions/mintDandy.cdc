@@ -49,7 +49,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let minterRoyalty=MetadataViews.Royalties(cutInfos:[MetadataViews.Royalty(receiver: receiver, cut: 0.05, description: "artist")])
 		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
 		let scalar=FindViews.Scalar({"Speed" : 100.0})
 
@@ -62,7 +61,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let set= MetadataViews.Edition(name: "set", number:i, max:maxEdition)
 			let editions = MetadataViews.Editions([editioned, set])
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let schemas: [AnyStruct] = [ editions, creativeWork, media, minterRoyalty, tag, scalar ]
+			let schemas: [AnyStruct] = [ editions, creativeWork, media, tag, scalar ]
 			
 			let mintData = Dandy.DandyInfo(name: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 												description: creativeWork.description, 

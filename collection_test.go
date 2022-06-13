@@ -42,9 +42,7 @@ func TestCollectionScripts(t *testing.T) {
 		result := otu.O.ScriptFromFile("getCollections").
 			Args(otu.O.Arguments().String("user1")).
 			RunReturnsJsonString()
-		// fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-		// fmt.Println(err)
-		// fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
 		autogold.Equal(t, result)
 
 	})

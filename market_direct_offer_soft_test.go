@@ -390,7 +390,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount":      "0.50000000",
 				"findName":    "user1",
 				"id":          fmt.Sprintf("%d", id),
-				"royaltyName": "artist",
+				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
@@ -441,7 +441,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount":      "0.50000000",
 				"findName":    "user1",
 				"id":          fmt.Sprintf("%d", id),
-				"royaltyName": "artist",
+				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
