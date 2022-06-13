@@ -6,6 +6,7 @@ import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FindForge from "../contracts/FindForge.cdc"
 
 transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
 	prepare(account: AuthAccount) {
@@ -24,6 +25,22 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		}
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let lease=finLeases.borrow(name)
+		let nftType = Type<@Dandy.NFT>()
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: collectionDescription, 
+										externalURL: collectionExternalURL, 
+										squareImage: collectionSquareImage, 
+										bannerImage: collectionBannerImage, 
+										socials: {
+											"Twitter" : "https://twitter.com/home" ,
+											"Discord" : "discord.gg/"
+										})
+		}
 
 		let creativeWork=
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
@@ -39,43 +56,32 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
 
-		let lease=finLeases.borrow(name)
+		while i <= maxEdition {
 
+			let editioned= MetadataViews.Edition(name: nil, number:i, max:maxEdition)
+			let set= MetadataViews.Edition(name: "set", number:i, max:maxEdition)
+			let editions = MetadataViews.Editions([editioned, set])
+			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
+			let schemas: [AnyStruct] = [ editions, creativeWork, media, minterRoyalty, tag, scalar ]
+			
+			let mintData = Dandy.DandyInfo(name: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
+												description: creativeWork.description, 
+												thumbnail: media, 
+												schemas: schemas, 
+												externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
+			
+			let mintFN = Dandy.mintFN()
 
-		/*
-		if !finLeases.borrow(name).containsForgeMinter(Type<@Dandy.ForgeMinter>().identifier) {
-			finLeases.addForgeMinter(name: name, forgeMinterType: Type<@Dandy.ForgeMinter>().identifier, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
+
+			// let token <- minter.mint(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
+			
+			collection.deposit(token: <- token)
+			i=i+1
 		}
-		*/
-		//TODO: psudo code
-		//TODO; if your lease cannot mint this type then panic with good error message?
-		//TODO: add method to check if you can mint with lease/type
-		/*
-		FindForge.mint(lease: lease, type: Type<@Dandy.ForgeMinte>(), function(minter:&{FindForge.Minter}){
 
-			while i <= maxEdition {
 
-				let editioned= MetadataViews.Edition(name: nil, number:i, max:maxEdition)
-				let set= MetadataViews.Edition(name: "set", number:i, max:maxEdition)
-				let editions = MetadataViews.Editions([editioned, set])
-				let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-				let schemas: [AnyStruct] = [ editions, creativeWork, media, minterRoyalty, tag, scalar ]
-				
-				let mintData = Dandy.DandyInfo(name: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
-												 description: creativeWork.description, 
-												 thumbnail: media, 
-												 schemas: schemas, 
-												 externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
-				
-				let token <- minter.mint(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
-				
-				collection.deposit(token: <- token)
-				i=i+1
-			}
 
-			let token <- minter.mint(mintData: mintData)
-		})
-		*/
 
 	}
 }

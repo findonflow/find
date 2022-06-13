@@ -151,30 +151,6 @@ pub contract Admin {
 		}
 		*/
 
-		//TODO: we cannot have it here
-		/// ===================================================================================
-		// Forge
-		/// ===================================================================================
-
-		/*
-		pub fun createForgeMinter(platform: FindForge.MinterPlatform) : @Dandy.ForgeMinter {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			return <- Dandy.adminCreateForgeMinter(platform)
-		}
-
-		pub fun addForgeCapabilities(type: String, cap: Capability<&{FindForge.Forge}>) {
-			//TODO: these needs to be on FindForge
-			FIND.addForgeCapabilities(type: type, cap: cap)
-		}
-
-		pub fun removeForgeCapabilities(type: String) {
-			//TODO: these needs to be on FindForge
-			FIND.removeForgeCapabilities(type: type)
-		}
-		*/
-
 		/// ===================================================================================
 		// Fungible Token Registry 
 		/// ===================================================================================
@@ -357,8 +333,6 @@ pub contract Admin {
 		self.AdminProxyPublicPath= /public/findAdminProxy
 		self.AdminProxyStoragePath=/storage/findAdminProxy
 
-		//TODO:Do this in Dandy contract
-		FindForge.addForgeCapabilities(type: Type<@Dandy.ForgeMinter>().identifier, cap: Dandy.getForgeCapability())
 	}
 
 }

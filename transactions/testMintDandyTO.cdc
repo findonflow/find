@@ -6,6 +6,7 @@ import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FindForge from "../contracts/FindForge.cdc"
 
 transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, rarity: String, rarityNum:UFix64, to: Address) {
 	prepare(account: AuthAccount) {
@@ -15,10 +16,9 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		if !dandyCap.check() {
 			panic("need dandy receicer")
 		}
-
-		let forgeType = Type<@Dandy.ForgeMinter>().identifier
-
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let mintFN = Dandy.mintFN()
+		let nftType = Type<@Dandy.NFT>()
 
 		let creativeWork=
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
@@ -37,13 +37,22 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
 
-		finLeases.addForgeMinter(name: "neomotorcycle", 
-								 forgeMinterType: forgeType, 
-								 description: "Neo Collectibles FIND", 
-								 externalURL: "https://neomotorcycles.co.uk/index.html", 
-								 squareImage: "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp", 
-								 bannerImage: "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")
-
+		var minterName="neomotorcycle"
+		var lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "Neo Collectibles FIND", 
+										externalURL: "https://neomotorcycles.co.uk/index.html", 
+										squareImage: "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp", 
+										bannerImage: "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1",
+										socials: {
+											"Twitter" : "https://twitter.com/MotorcyclesNeo" ,
+											"Discord" : "https://discord.com/invite/XwSdNydezR"
+										})
+		}
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -56,14 +65,28 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
 			
-			let token <- finLeases.mintWithForgeMinter(minter: "neomotorcycle", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			
 			collection.deposit(token: <- token)
 			i=i+1
 		}
 		i = 1
 
-		finLeases.addForgeMinter(name: "xtingles", forgeMinterType: forgeType, description: "xtingle FIND", externalURL: "https://xtingles.com/", squareImage: "https://xtingles-strapi-prod.s3.us-east-2.amazonaws.com/copy_of_upcoming_drops_db41fbf287.png", bannerImage: "https://xtingles.com/images/main-metaverse.png")
+		minterName="xtingles"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "xtingle FIND", 
+										externalURL: "https://xtingles.com/", 
+										squareImage: "https://xtingles-strapi-prod.s3.us-east-2.amazonaws.com/copy_of_upcoming_drops_db41fbf287.png",
+										bannerImage: "https://xtingles.com/images/main-metaverse.png",
+										socials: {
+											"Discord" : "https://discord.com/invite/XZDYE6jEuq"
+										})
+		}
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -83,13 +106,27 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://nft.blocto.app/xtingles/")
 			
-			let token <- finLeases.mintWithForgeMinter(minter: "xtingles", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			collection.deposit(token: <- token)
 			i=i+1
 		}
 		i = 1
 
-		finLeases.addForgeMinter(name: "flovatar", forgeMinterType: forgeType, description: "flovatar FIND", externalURL: "https://flovatar.com/", squareImage: "https://miro.medium.com/max/1080/1*nD3N5BvxvH-wgLW1KPizoA.png", bannerImage: "https://miro.medium.com/max/1400/1*WjFBUweGaThcTR-UOZ6TnA.gif")
+		minterName="flovatar"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "flovatar FIND", 
+										externalURL: "https://flovatar.com/", 
+										squareImage: "https://miro.medium.com/max/1080/1*nD3N5BvxvH-wgLW1KPizoA.png",
+										bannerImage: "https://miro.medium.com/max/1400/1*WjFBUweGaThcTR-UOZ6TnA.gif",
+										socials: {
+											"Discord" : "https://discord.gg/flovatar" , 
+											"Twitter" : "https://twitter.com/flovatar"
+										})
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -107,14 +144,28 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://flovatar.com/flovatars/166/0x886f3aeaf848c535")
 			
-			let token <- finLeases.mintWithForgeMinter(minter:  "flovatar", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			
 			collection.deposit(token: <- token)
 			i=i+1
 		}
 		i = 1
 
-		finLeases.addForgeMinter(name:"ufcstrike", forgeMinterType: forgeType, description: "ufc strike FIND", externalURL: "https://ufcstrike.com/", squareImage: "https://assets.website-files.com/62605ca984796169418ca5dc/628e9bba372af61fcf967e03_round-one-standard-p-1080.png", bannerImage: "https://s3.us-east-2.amazonaws.com/giglabs.assets.ufc/4f166ac23e10bb510319e82fe9ed2c7d")
+		minterName="ufcstrike"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "ufc strike FIND", 
+										externalURL:  "https://ufcstrike.com/", 
+										squareImage: "https://assets.website-files.com/62605ca984796169418ca5dc/628e9bba372af61fcf967e03_round-one-standard-p-1080.png",
+										bannerImage: "https://s3.us-east-2.amazonaws.com/giglabs.assets.ufc/4f166ac23e10bb510319e82fe9ed2c7d",
+										socials: {
+											"Discord" : "https://discord.gg/UFCStrike" , 
+											"Twitter" : "https://twitter.com/UFCStrikeNFT"
+										})
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -134,7 +185,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://www.ufcstrike.com")
 			
-			let token <- finLeases.mintWithForgeMinter(minter:  "ufcstrike", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			
 			collection.deposit(token: <- token)
 			i=i+1
@@ -142,6 +193,22 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		i = 1
 
 		finLeases.addForgeMinter(name:"jambb", forgeMinterType: forgeType, description: "jambb FIND", externalURL: "https://www.jambb.com/", squareImage: "https://prod-jambb-issuance-static-public.s3.amazonaws.com/issuance-ui/logos/jambb-full-color-wordmark-inverted.svg", bannerImage: "https://s3.amazonaws.com/jambb-prod-issuance-ui-static-assets/avatars/b76cdd34-e728-4e71-a0ed-c277a628654a/jambb-logo-3d-hp-hero-07.png")
+
+		minterName="jambb"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "jambb FIND", 
+										externalURL:  "https://www.jambb.com/", 
+										squareImage: "https://prod-jambb-issuance-static-public.s3.amazonaws.com/issuance-ui/logos/jambb-full-color-wordmark-inverted.svg",
+										bannerImage: "https://s3.amazonaws.com/jambb-prod-issuance-ui-static-assets/avatars/b76cdd34-e728-4e71-a0ed-c277a628654a/jambb-logo-3d-hp-hero-07.png",
+										socials: {
+											"Discord" : "https://discord.gg/VWWfaEP8CA" , 
+											"Twitter" : "https://twitter.com/JambbApp"
+										})
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -161,7 +228,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://www.ufcstrike.com")
 			
-			let token <- finLeases.mintWithForgeMinter(minter: "jambb", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			
 			collection.deposit(token: <- token)
 			i=i+1
@@ -169,6 +236,21 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		i = 1
 	
 		finLeases.addForgeMinter(name:"bitku", forgeMinterType: forgeType, description: "bitku FIND", externalURL: "https://bitku.art/", squareImage: "", bannerImage: "")
+
+		minterName="bitku"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "bitku FIND",
+										externalURL: "https://bitku.art/",
+										squareImage: "",
+										bannerImage: "",
+										socials: {
+											"Github" : "https://github.com/docmarionum1/bitku#readme"
+										})
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -186,20 +268,27 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://bitku.art/#0x886f3aeaf848c535/188")
 			
-			let token <- finLeases.mintWithForgeMinter(minter: "bitku", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			
 			collection.deposit(token: <- token)
 			i=i+1
 		}
 		i = 1
 
-		finLeases.addForgeMinter(name:"goatedgoats", 
-								 forgeMinterType: forgeType, 
-								 description: "goatedgoats FIND",
-								 externalURL: "https://goatedgoats.com/", 
-								 squareImage: "https://goatedgoats.com/_next/image?url=%2FLogo.png&w=64&q=75", 
-								 bannerImage: ""
-								 )
+		minterName="goatedgoats"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "goatedgoats FIND",
+										externalURL: "https://goatedgoats.com/", 
+										squareImage: "https://goatedgoats.com/_next/image?url=%2FLogo.png&w=64&q=75", 
+										bannerImage: "",
+										socials: {
+											"Discord" : "https://discord.com/invite/goatedgoats"
+										})
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -217,7 +306,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://goatedgoats.com/")
 			
-			let token <- finLeases.mintWithForgeMinter(minter: "goatedgoats", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 
 			collection.deposit(token: <- token)
 			i=i+1
@@ -231,6 +320,22 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								 squareImage: "", 
 								 bannerImage: ""
 								 )
+
+		minterName="klktn"
+		lease=finLeases.borrow(minterName)
+		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+			/* set up minterPlatform */
+			FindForge.setMinterPlatform(lease: lease, 
+										nftType: Type<@Dandy.NFT>(), 
+										minterCut: 0.05, 
+										description: "klktn FIND",
+										externalURL: "https://klktn.com/", 
+										squareImage: "", 
+										bannerImage: "",
+										socials: {
+											"Twitter" : "https://twitter.com/KlktNofficial" ,
+											"Twitter" : "https://discord.gg/wDc8yEcbeD"
+										})
 
 		while i <= maxEdition {
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
@@ -248,7 +353,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://klktn.com/")
 			
-			let token <- finLeases.mintWithForgeMinter(minter: "klktn", forgeMinter: forgeType, mintData: mintData)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
 			
 			collection.deposit(token: <- token)
 			i=i+1
