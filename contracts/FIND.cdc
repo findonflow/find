@@ -404,7 +404,7 @@ pub contract FIND {
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=self.name
 
 			emit EnglishAuction(name: self.name, uuid: lease.uuid, seller: owner, sellerName:ownerName, amount: offer.getBalance(self.name), auctionReservePrice: lease.auctionReservePrice!, status: "active_ongoing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, endsAt: self.endsAt ,validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
 		}
@@ -597,7 +597,7 @@ pub contract FIND {
 			let bidder= callback.address
 			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=lease.name
 
 			let endsAt=timestamp + duration
 			emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:FIND.reverseLookup(owner), amount: offer.getBalance(name), auctionReservePrice: lease.auctionReservePrice!, status: "active_ongoing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, endsAt: endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
@@ -627,7 +627,7 @@ pub contract FIND {
 				let bidder= callback.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=lease.owner!.address
-				let ownerName=lease.getProfile()!.getName()
+				let ownerName=lease.name
 				var amount : UFix64 = 0.0
 				if callback.check() {
 					amount = callback.borrow()!.getBalance(name)
@@ -661,7 +661,7 @@ pub contract FIND {
 			let bidder= lease.offerCallback!.address
 			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=lease.name
 
 			let balance=lease.offerCallback!.borrow()!.getBalance(name) 
 			Debug.log("Offer is at ".concat(balance.toString()))
@@ -729,7 +729,7 @@ pub contract FIND {
 			}
 			let bidderName= profile!.getName()
 			let owner=lease.owner!.address
-			let ownerName=lease.getProfile()!.getName()
+			let ownerName=lease.name
 
 
 			Debug.log("Balance of lease is at ".concat(balance.toString()))
@@ -763,7 +763,7 @@ pub contract FIND {
 				let bidder= cb.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=lease.owner!.address
-				let ownerName=lease.getProfile()!.getName()
+				let ownerName=lease.name
 				Debug.log("we have a blind bid so we cancel that")
 				emit DirectOffer(name: name, uuid:lease.uuid, seller: owner, sellerName: ownerName, amount: cb.borrow()!.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
 				
@@ -792,7 +792,7 @@ pub contract FIND {
 				let bidder= auction.latestBidCallback.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=lease.owner!.address
-				let ownerName=lease.getProfile()!.getName()
+				let ownerName=lease.name
 
 
 				let leaseInfo = self.getLease(name)!
@@ -907,7 +907,7 @@ pub contract FIND {
 				let bidder= cb.address
 				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!.getName()
 				let owner=tokenRef.owner!.address
-				let ownerName=tokenRef.getProfile()!.getName()
+				let ownerName=tokenRef.name
 				Debug.log("we have a blind bid so we cancel that")
 				emit DirectOffer(name: name, uuid:tokenRef.uuid, seller: owner, sellerName: ownerName, amount: cb.borrow()!.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
 				cb.borrow()!.cancel(name)
