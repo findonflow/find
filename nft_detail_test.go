@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/hexops/autogold"
@@ -26,6 +27,20 @@ func TestNFTDetailScript(t *testing.T) {
 				StringArray()).
 			RunReturnsJsonString()
 
+		viewList := []string{
+			"A.f8d6e0586b0a20c7.FindViews.Nounce",
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.MetadataViews.Media",
+		}
+		for _, item := range viewList {
+			actual = strings.Replace(actual, item, "checked", -1)
+		}
+
+		actual = otu.replaceID(actual, ids)
+
 		autogold.Equal(t, actual)
 	})
 
@@ -48,6 +63,18 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
 		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		viewList := []string{
+			"A.f8d6e0586b0a20c7.FindViews.Nounce",
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.MetadataViews.Media",
+		}
+		for _, item := range viewList {
+			actual = strings.Replace(actual, item, "checked", -1)
+		}
+		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
 	})
@@ -76,6 +103,19 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(ids[1]).
 				StringArray()).
 			RunReturnsJsonString()
+
+		viewList := []string{
+			"A.f8d6e0586b0a20c7.FindViews.Nounce",
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.MetadataViews.Media",
+		}
+		for _, item := range viewList {
+			actual = strings.Replace(actual, item, "checked", -1)
+		}
+		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
 	})
@@ -137,6 +177,19 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(dandyIds[0]).
 				StringArray()).
 			RunReturnsJsonString()
+		actual1 = otu.replaceID(actual1, dandyIds)
+
+		viewList := []string{
+			"A.f8d6e0586b0a20c7.FindViews.Nounce",
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.MetadataViews.Media",
+		}
+		for _, item := range viewList {
+			actual1 = strings.Replace(actual1, item, "checked", -1)
+		}
 
 		otu.AutoGold("actual1", actual1)
 
@@ -147,6 +200,11 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(dandyIds[1]).
 				StringArray()).
 			RunReturnsJsonString()
+		actual2 = otu.replaceID(actual2, dandyIds)
+
+		for _, item := range viewList {
+			actual2 = strings.Replace(actual2, item, "checked", -1)
+		}
 
 		otu.AutoGold("actual2", actual2)
 
@@ -157,6 +215,11 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(dandyIds[2]).
 				StringArray()).
 			RunReturnsJsonString()
+		actual3 = otu.replaceID(actual3, dandyIds)
+
+		for _, item := range viewList {
+			actual3 = strings.Replace(actual3, item, "checked", -1)
+		}
 
 		otu.AutoGold("actual3", actual3)
 
@@ -167,6 +230,11 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(dandyIds[3]).
 				StringArray()).
 			RunReturnsJsonString()
+		actual4 = otu.replaceID(actual4, dandyIds)
+
+		for _, item := range viewList {
+			actual4 = strings.Replace(actual4, item, "checked", -1)
+		}
 
 		otu.AutoGold("actual", actual4)
 	})
@@ -194,6 +262,7 @@ func TestNFTDetailScript(t *testing.T) {
 			alterMarketOption("DirectOfferEscrow", "stop")
 
 		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
 	})
@@ -219,6 +288,7 @@ func TestNFTDetailScript(t *testing.T) {
 			alterMarketOption("AuctionEscrow", "stop")
 
 		actual := otu.O.ScriptFromFile("getMarketBlockedNFT").RunReturnsJsonString()
+		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
 	})
@@ -241,6 +311,7 @@ func TestNFTDetailScript(t *testing.T) {
 			blockDandy("testBlockItem")
 
 		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		actual = otu.replaceID(actual, ids)
 		autogold.Equal(t, actual)
 	})
 

@@ -25,7 +25,7 @@ func TestCollectionScripts(t *testing.T) {
 			registerUserWithNameAndForge("user1", "goatedgoats").
 			registerUserWithNameAndForge("user1", "klktn")
 
-		otu.O.TransactionFromFile("testMintDandyTO").
+		events := otu.O.TransactionFromFile("testMintDandyTO").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -37,11 +37,21 @@ func TestCollectionScripts(t *testing.T) {
 				String("rare").
 				UFix64(50.0).
 				Account("user1")).
-			RunPrintEventsFull()
+			Test(t).
+			AssertSuccess()
+
+		dandyIds := []uint64{}
+		for _, event := range events.Events {
+			if event.Name == "A.f8d6e0586b0a20c7.Dandy.Deposit" {
+				dandyIds = append(dandyIds, event.GetFieldAsUInt64("id"))
+			}
+		}
 
 		result := otu.O.ScriptFromFile("getCollections").
 			Args(otu.O.Arguments().String("user1")).
 			RunReturnsJsonString()
+
+		result = otu.replaceID(result, dandyIds)
 
 		autogold.Equal(t, result)
 

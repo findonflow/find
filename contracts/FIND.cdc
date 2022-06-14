@@ -171,8 +171,17 @@ pub contract FIND {
 		if !leaseCap.check() {
 			return nil
 		}
-
+		
 		let profileFindName= Profile.find(address).getFindName()
+
+		if profileFindName != "" {
+			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+				if network.readStatus(profileFindName).status == FIND.LeaseStatus.TAKEN {
+					return profileFindName
+				}
+			}
+		}
+
 		let leases = leaseCap.borrow()!.getLeaseInformation() 
 		var time : UFix64?= nil
 		var name :String?= nil
@@ -191,9 +200,6 @@ pub contract FIND {
 				}
 			}
 
-			if profileFindName == lease.name {
-				return lease.name
-			}
 		}
 		return name
 	}
@@ -570,9 +576,9 @@ pub contract FIND {
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
 			for name in self.leases.keys {
-				if !FIND.validateFindName(name) {
-					continue
-				}
+				// if !FIND.validateFindName(name) {
+				// 	continue
+				// }
 				let lease=self.getLease(name)
 				if lease != nil && lease!.status != "FREE" {
 					info.append(lease!)

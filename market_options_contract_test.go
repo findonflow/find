@@ -34,6 +34,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
 		result := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		result = otu.replaceID(result, ids)
 		autogold.Equal(t, result)
 
 	})
@@ -63,6 +64,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
 		result := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user2")).RunReturnsJsonString()
+		result = otu.replaceID(result, ids)
 		autogold.Equal(t, result)
 	})
 

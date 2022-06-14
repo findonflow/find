@@ -236,12 +236,18 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 3, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		result := otu.O.TransactionFromFile("delistAllNFTSale").
+		res := otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Account("account")).
 			Test(otu.T).AssertSuccess()
 
-		otu.AutoGold("events", result.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+
+		otu.AutoGold("events", result)
 	})
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {
@@ -469,7 +475,12 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 
@@ -525,7 +536,12 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 
@@ -596,7 +612,12 @@ func TestMarketSale(t *testing.T) {
 					"tenant":      "find",
 				}))
 		*/
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 

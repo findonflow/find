@@ -18,7 +18,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		}
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let mintFN = Dandy.mintFN()
-		let nftType = Type<@Dandy.NFT>()
+		let forgeType = Dandy.getForgeType()
 
 		let creativeWork=
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
@@ -29,6 +29,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let rarity = FindViews.Rarity(rarity: rarityNum, rarityName:rarity, parts: {})
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
 		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
 		let scalar=FindViews.Scalar({"Speed" : 100.0})
@@ -38,10 +39,10 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		var minterName="neomotorcycle"
 		var lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "Neo Collectibles FIND", 
 										externalURL: "https://neomotorcycles.co.uk/index.html", 
@@ -64,19 +65,18 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			
-			collection.deposit(token: <- token)
 			i=i+1
 		}
 		i = 1
-
+		
 		minterName="xtingles"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "xtingle FIND", 
 										externalURL: "https://xtingles.com/", 
@@ -105,18 +105,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://nft.blocto.app/xtingles/")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}
 		i = 1
 
 		minterName="flovatar"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "flovatar FIND", 
 										externalURL: "https://flovatar.com/", 
@@ -144,19 +143,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://flovatar.com/flovatars/166/0x886f3aeaf848c535")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-			
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}
 		i = 1
 
 		minterName="ufcstrike"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "ufc strike FIND", 
 										externalURL:  "https://ufcstrike.com/", 
@@ -186,19 +183,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://www.ufcstrike.com")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-			
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}
 		i = 1
 
 		minterName="jambb"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "jambb FIND", 
 										externalURL:  "https://www.jambb.com/", 
@@ -228,19 +223,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://www.ufcstrike.com")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-			
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}
 		i = 1
 	
 		minterName="bitku"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "bitku FIND",
 										externalURL: "https://bitku.art/",
@@ -267,19 +260,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://bitku.art/#0x886f3aeaf848c535/188")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-			
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}
 		i = 1
 
 		minterName="goatedgoats"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "goatedgoats FIND",
 										externalURL: "https://goatedgoats.com/", 
@@ -306,19 +297,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://goatedgoats.com/")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}	
 		i = 1
-		
+
 		minterName="klktn"
 		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: "klktn FIND",
 										externalURL: "https://klktn.com/", 
@@ -346,12 +335,10 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								schemas: schemas, 
 								externalUrlPrefix:"https://klktn.com/")
 			
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
-			
-			collection.deposit(token: <- token)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}	
 		i = 1
-
+		
 	}
 }

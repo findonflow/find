@@ -1,255 +1,134 @@
-[]*overflow.FormatedEvent{
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{
-				name: "UTC",
-			},
-		},
-		Fields: map[string]interface{}{
-			"amount": "10.00000000",
-			"from":   "0xf3fcd2c1a78f5eee",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FindMarketSale.Sale",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount":      "10.00000000",
-			"buyer":       "0xf3fcd2c1a78f5eee",
-			"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-			"buyerName":   "user2",
-			"endsAt":      "100.00000000",
-			"id":          "134",
-			"nft": map[string]interface{}{
-				"collectionDescription": "Neo Collectibles FIND",
-				"collectionName":        "user1",
-				"editionNumber":         "1",
-				"id":                    "134",
-				"name":                  "Neo Motorcycle 1 of 3",
-				"rarity":                "",
-				"scalars": map[string]interface{}{
-					"Speed":              "100.00000000",
-					"edition_set_max":    "3.00000000",
-					"edition_set_number": "1.00000000",
-				},
-				"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
-				"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-				"totalInEdition": "3",
-				"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
-			},
-			"saleID":     "139",
-			"seller":     "0xe03daebed8ca0615",
-			"sellerName": "user3",
-			"status":     "sold",
-			"tenant":     "find",
-			"vaultType":  "A.f8d6e0586b0a20c7.FUSD.Vault",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"address":  "0x179b6b1cb6755e31",
-			"amount":   "0.50000000",
-			"findName": "user1",
-			"id":       "134",
-			"nft": map[string]interface{}{
-				"collectionDescription": "Neo Collectibles FIND",
-				"collectionName":        "user1",
-				"editionNumber":         "1",
-				"id":                    "134",
-				"name":                  "Neo Motorcycle 1 of 3",
-				"rarity":                "",
-				"scalars": map[string]interface{}{
-					"Speed":              "100.00000000",
-					"edition_set_max":    "3.00000000",
-					"edition_set_number": "1.00000000",
-				},
-				"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
-				"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-				"totalInEdition": "3",
-				"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
-			},
-			"residualAddress": "0x01cf0e2f2f715450",
-			"royaltyName":     "minter",
-			"saleID":          "139",
-			"tenant":          "find",
-			"vaultType":       "A.f8d6e0586b0a20c7.FUSD.Vault",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "0.50000000",
-			"from":   "",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "0.50000000",
-			"to":     "0x01cf0e2f2f715450",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"address":  "0xf8d6e0586b0a20c7",
-			"amount":   "0.25000000",
-			"findName": "",
-			"id":       "134",
-			"nft": map[string]interface{}{
-				"collectionDescription": "Neo Collectibles FIND",
-				"collectionName":        "user1",
-				"editionNumber":         "1",
-				"id":                    "134",
-				"name":                  "Neo Motorcycle 1 of 3",
-				"rarity":                "",
-				"scalars": map[string]interface{}{
-					"Speed":              "100.00000000",
-					"edition_set_max":    "3.00000000",
-					"edition_set_number": "1.00000000",
-				},
-				"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
-				"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-				"totalInEdition": "3",
-				"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
-			},
-			"royaltyName": "platform",
-			"saleID":      "139",
-			"tenant":      "find",
-			"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "0.25000000",
-			"from":   "",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "0.25000000",
-			"to":     "0xf8d6e0586b0a20c7",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"address":  "0xf8d6e0586b0a20c7",
-			"amount":   "0.25000000",
-			"findName": "",
-			"id":       "134",
-			"nft": map[string]interface{}{
-				"collectionDescription": "Neo Collectibles FIND",
-				"collectionName":        "user1",
-				"editionNumber":         "1",
-				"id":                    "134",
-				"name":                  "Neo Motorcycle 1 of 3",
-				"rarity":                "",
-				"scalars": map[string]interface{}{
-					"Speed":              "100.00000000",
-					"edition_set_max":    "3.00000000",
-					"edition_set_number": "1.00000000",
-				},
-				"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
-				"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-				"totalInEdition": "3",
-				"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
-			},
-			"royaltyName": "find",
-			"saleID":      "139",
-			"tenant":      "find",
-			"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "0.25000000",
-			"from":   "",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "0.25000000",
-			"to":     "0xf8d6e0586b0a20c7",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "9.00000000",
-			"to":     "0xe03daebed8ca0615",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.Dandy.Withdraw",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"from": "0xe03daebed8ca0615",
-			"id":   "134",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.Dandy.Deposit",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"id": "134",
-			"to": "0xf3fcd2c1a78f5eee",
-		},
-	},
-}
+`{
+  "name": "A.f8d6e0586b0a20c7.FindMarketSale.Sale",
+  "time": "1970-01-01T00:00:00Z",
+  "fields": {
+    "amount": "10.00000000",
+    "buyer": "0xf3fcd2c1a78f5eee",
+    "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+    "buyerName": "user2",
+    "endsAt": "100.00000000",
+    "id": "ID0",
+    "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": "1",
+      "id": "ID0",
+      "name": "Neo Motorcycle 1 of 3",
+      "rarity": "",
+      "scalars": {
+        "Speed": "100.00000000",
+        "edition_set_max": "3.00000000",
+        "edition_set_number": "1.00000000"
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
+      "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": "3",
+      "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+    },
+    "saleID": "ID0",
+    "seller": "0xe03daebed8ca0615",
+    "sellerName": "user3",
+    "status": "sold",
+    "tenant": "find",
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
+  }
+}{
+  "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid",
+  "time": "1970-01-01T00:00:00Z",
+  "fields": {
+    "address": "0x179b6b1cb6755e31",
+    "amount": "0.50000000",
+    "findName": "user1",
+    "id": "ID0",
+    "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": "1",
+      "id": "ID0",
+      "name": "Neo Motorcycle 1 of 3",
+      "rarity": "",
+      "scalars": {
+        "Speed": "100.00000000",
+        "edition_set_max": "3.00000000",
+        "edition_set_number": "1.00000000"
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
+      "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": "3",
+      "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+    },
+    "residualAddress": "0x01cf0e2f2f715450",
+    "royaltyName": "minter",
+    "saleID": "ID0",
+    "tenant": "find",
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
+  }
+}{
+  "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
+  "time": "1970-01-01T00:00:00Z",
+  "fields": {
+    "address": "0xf8d6e0586b0a20c7",
+    "amount": "0.25000000",
+    "findName": "",
+    "id": "ID0",
+    "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": "1",
+      "id": "ID0",
+      "name": "Neo Motorcycle 1 of 3",
+      "rarity": "",
+      "scalars": {
+        "Speed": "100.00000000",
+        "edition_set_max": "3.00000000",
+        "edition_set_number": "1.00000000"
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
+      "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": "3",
+      "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+    },
+    "royaltyName": "platform",
+    "saleID": "ID0",
+    "tenant": "find",
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
+  }
+}{
+  "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
+  "time": "1970-01-01T00:00:00Z",
+  "fields": {
+    "address": "0xf8d6e0586b0a20c7",
+    "amount": "0.25000000",
+    "findName": "",
+    "id": "ID0",
+    "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": "1",
+      "id": "ID0",
+      "name": "Neo Motorcycle 1 of 3",
+      "rarity": "",
+      "scalars": {
+        "Speed": "100.00000000",
+        "edition_set_max": "3.00000000",
+        "edition_set_number": "1.00000000"
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
+      "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": "3",
+      "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+    },
+    "royaltyName": "find",
+    "saleID": "ID0",
+    "tenant": "find",
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
+  }
+}`

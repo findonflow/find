@@ -62,8 +62,6 @@ pub contract Dandy: NonFungibleToken {
 		access(contract) let thumbnail: MetadataViews.Media
 		access(contract) let platform: FindForge.MinterPlatform
 
-		// access(contract) let minterPlatform: FindForge.MinterPlatform
-		// 	let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
 		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo}, platform: FindForge.MinterPlatform, externalUrlPrefix: String?) {
 			self.id = self.uuid
 			self.schemas=schemas
@@ -84,7 +82,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun getMinterPlatform() : FindForge.MinterPlatform {
-			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, nftType: self.getType()) {
+			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, forgeType: Dandy.getForgeType()) {
 				
 				let name = self.platform.name
 				let platform = self.platform.platform
@@ -373,6 +371,9 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Collection()
 	}
 
+	pub fun getForgeType() : Type {
+		return Type<@Forge>()
+	}
 
 	/// This struct interface is used on a contract level to convert from one View to another. 
 	/// See Dandy nft for an example on how to convert one type to another
@@ -394,7 +395,7 @@ pub contract Dandy: NonFungibleToken {
 		self.viewConverters={}
 
 		//TODO: Add the Forge resource aswell
-		FindForge.addPublicForgeType(type: Type<@NFT>())
+		FindForge.addPublicForgeType(forge: <- create Forge())
 
 		emit ContractInitialized()
 	}

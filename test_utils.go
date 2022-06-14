@@ -3,6 +3,7 @@ package test_main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -1149,6 +1150,63 @@ func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 		Test(otu.T).
 		AssertSuccess()
 	return otu
+}
+
+func (otu *OverflowTestUtils) setFindName(user, name string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testSetMainName").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string {
+	counter := 0
+	for _, id := range dandyIds {
+		result = strings.Replace(result, fmt.Sprint(id)+`"`, "ID"+fmt.Sprint(counter)+`"`, -1)
+		counter = counter + 1
+	}
+	return result
+}
+
+func (otu *OverflowTestUtils) replaceEvent(events []*overflow.FormatedEvent, dandyIds []uint64) string {
+	string := ""
+	for _, event := range events {
+		string = string + event.String()
+	}
+
+	counter := 0
+	for _, id := range dandyIds {
+		string = strings.Replace(string, fmt.Sprint(id)+`"`, "ID"+fmt.Sprint(counter)+`"`, -1)
+		counter = counter + 1
+	}
+	return string
+}
+
+func (otu *OverflowTestUtils) retrieveEvent(events []*overflow.FormatedEvent, eventNames []string) string {
+	string := ""
+	for _, event := range events {
+		for _, eventName := range eventNames {
+			if event.Name == eventName {
+				string = fmt.Sprintf("%s%s", string, event.String())
+			}
+		}
+	}
+
+	return string
+}
+
+func (otu *OverflowTestUtils) getIDFromEvent(events []*overflow.FormatedEvent, eventName, field string) []uint64 {
+	Ids := []uint64{}
+	for _, event := range events {
+		if event.Name == eventName {
+			Ids = append(Ids, event.GetFieldAsUInt64(field))
+		}
+	}
+
+	return Ids
 }
 
 type SaleItem struct {

@@ -57,11 +57,11 @@
         "collectionName": "flovatar",
         "data": {},
         "editionNumber": "",
-        "id": "169",
+        "id": "ID2",
         "media": [
             {
                 "file": {
-                    "url": "https://flovatar.com/api/image/166"
+                    "url": "https://flovatar.com/api/image/ID4"
                 },
                 "mediaType": "image/svg"
             }
@@ -91,17 +91,17 @@
         "tags": {
             "flovatar Tag": "Tag1"
         },
-        "thumbnail": "https://flovatar.com/api/image/166",
+        "thumbnail": "https://flovatar.com/api/image/ID4",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "169",
+        "uuid": "ID2",
         "views": [
-            "A.f8d6e0586b0a20c7.FindViews.Nounce",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media"
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked"
         ]
     },
     "storefront": ""

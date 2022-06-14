@@ -26,11 +26,11 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
-		let nftType = Type<@Dandy.NFT>()
-		if !FindForge.checkMinterPlatform(name: lease.getName(), nftType: nftType ) {
+		let forgeType = Dandy.getForgeType()
+		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
-										nftType: Type<@Dandy.NFT>(), 
+										forgeType: forgeType, 
 										minterCut: 0.05, 
 										description: collectionDescription, 
 										externalURL: collectionExternalURL, 
@@ -48,7 +48,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
 		let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
-		let receiver=account.getCapability<&{FungibleToken.Receiver, MetadataViews.ResolverCollection}>(Profile.publicReceiverPath)
+		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
 		let scalar=FindViews.Scalar({"Speed" : 100.0})
 
@@ -71,11 +72,10 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			
 			let mintFN = Dandy.mintFN()
 
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN, collection: collection)
+			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 
 			// let token <- minter.mint(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
-			
-			collection.deposit(token: <- token)
+		
 			i=i+1
 		}
 

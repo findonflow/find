@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/bjartek/overflow/overflow"
 )
 
@@ -68,12 +66,17 @@ func main() {
 
 	o.TransactionFromFile("testMintFusd").
 		SignProposeAndPayAsService().
-		Args(o.Arguments().Account("user1").UFix64(100.0)).
+		Args(o.Arguments().Account("user1").UFix64(100000.0)).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("register").
 		SignProposeAndPayAs("user1").
 		Args(o.Arguments().String("user1").UFix64(5.0)).
+		RunPrintEventsFull()
+
+	o.TransactionFromFile("testMintFlow").
+		SignProposeAndPayAsService().
+		Args(o.Arguments().Account("user1").UFix64(10000.0)).
 		RunPrintEventsFull()
 
 	o.TransactionFromFile("testMintFusd").
@@ -100,22 +103,46 @@ func main() {
 		Args(o.Arguments().String("user1").String("forge").UFix64(50.0)).
 		RunPrintEventsFull()
 
-	id2 := o.TransactionFromFile("mintDandy").
+	// id2 := o.TransactionFromFile("mintDandyTO").
+	// 	SignProposeAndPayAs("user1").
+	// 	Args(o.Arguments().
+	// 		String("user1").
+	// 		UInt64(3).
+	// 		String("Neo").
+	// 		String("Neo Motorcycle").
+	// 		String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
+	// 		String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+	// 		String("Neo Collectibles FIND").
+	// 		String("https://neomotorcycles.co.uk/index.html").
+	// 		String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+	// 		String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
+	// 	RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
+
+	// fmt.Println(id2)
+
+	buyName(o, "user1", "neomotorcycle")
+	// buyName(o, "user1", "xtingles")
+	// buyName(o, "user1", "flovatar")
+	// buyName(o, "user1", "ufcstrike")
+	// buyName(o, "user1", "jambb")
+	// buyName(o, "user1", "bitku")
+	// buyName(o, "user1", "goatedgoats")
+	// buyName(o, "user1", "klktn")
+
+	o.TransactionFromFile("testMintDandyTO").
 		SignProposeAndPayAs("user1").
 		Args(o.Arguments().
 			String("user1").
-			UInt64(3).
+			UInt64(1).
 			String("Neo").
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
 			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-			String("Neo Collectibles FIND").
-			String("https://neomotorcycles.co.uk/index.html").
-			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
-		RunGetIdFromEventPrintAll("A.f8d6e0586b0a20c7.Dandy.Minted", "id")
+			String("rare").
+			UFix64(50.0).
+			Account("user1")).
+		RunPrintEventsFull()
 
-	fmt.Println(id2)
 	/*
 		o.SimpleTxArgs("listNFTForSale", "user1", o.Arguments().
 			Account("account").
@@ -202,5 +229,20 @@ func main() {
 						o.SimpleTxArgs("bidMarket", "user1", o.Arguments().Account("user2").UInt64(id).UFix64(5.0))
 						o.SimpleTxArgs("increasebidMarket", "user1", o.Arguments().UInt64(id).UFix64(5.0))
 	*/
+
+}
+
+func buyName(o *overflow.Overflow, buyer, name string) {
+	o.TransactionFromFile("register").
+		SignProposeAndPayAs(buyer).
+		Args(o.Arguments().
+			String(name).
+			UFix64(5.0)).
+		RunPrintEventsFull()
+
+	o.TransactionFromFile("buyAddon").
+		SignProposeAndPayAs(buyer).
+		Args(o.Arguments().String(name).String("forge").UFix64(50.0)).
+		RunPrintEventsFull()
 
 }

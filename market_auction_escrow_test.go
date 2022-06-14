@@ -577,7 +577,13 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		otu.AutoGold("events", res.Events)
+
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 
@@ -631,7 +637,13 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			}))
 
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+
+		otu.AutoGold("events", result)
 
 	})
 

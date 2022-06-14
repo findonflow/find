@@ -507,7 +507,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"royaltyName": "platform",
 			}))
 
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 	})
 
 	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
@@ -552,7 +557,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"royaltyName": "platform",
 			}))
 
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 	})
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {

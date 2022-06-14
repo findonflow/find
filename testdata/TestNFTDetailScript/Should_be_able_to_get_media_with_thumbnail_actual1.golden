@@ -57,7 +57,7 @@
         "collectionName": "neomotorcycle",
         "data": {},
         "editionNumber": "",
-        "id": "165",
+        "id": "ID0",
         "media": [
             {
                 "file": {
@@ -93,13 +93,13 @@
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "165",
+        "uuid": "ID0",
         "views": [
-            "A.f8d6e0586b0a20c7.FindViews.Nounce",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked"
         ]
     },
     "storefront": ""
