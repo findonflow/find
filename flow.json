@@ -111,7 +111,8 @@
 		"Debug": "./contracts/Debug.cdc",
 		"FTRegistry": "./contracts/FTRegistry.cdc",
 		"NFTRegistry": "./contracts/NFTRegistry.cdc",
-		"FindForge": "./contracts/FindForge.cdc"
+		"FindForge": "./contracts/FindForge.cdc",
+		"ExampleNFT": "./contracts/standard/ExampleNFT.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -239,7 +240,8 @@
 				"RelatedAccounts",
 				"FTRegistry",
 				"NFTRegistry",
-				"NFTStorefront"
+				"NFTStorefront",
+				"ExampleNFT"
 			],
 			"emulator-find": [],
 			"emulator-user1": [],

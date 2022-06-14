@@ -51,6 +51,7 @@ func TestCollectionScripts(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			RunReturnsJsonString()
 
+		result = otu.replaceDandyList(result, dandyIds)
 		result = otu.replaceID(result, dandyIds)
 
 		autogold.Equal(t, result)

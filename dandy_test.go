@@ -52,6 +52,7 @@ func TestDandy(t *testing.T) {
 			String("A.f8d6e0586b0a20c7.MetadataViews.ExternalURL")).RunReturnsJsonString()
 
 		overallResult := fmt.Sprintf("%s%s%s", res, result, urlResult)
+		overallResult = otu.replaceID(overallResult, dandyIds)
 		autogold.Equal(t, overallResult)
 
 	})
@@ -72,7 +73,9 @@ func TestDandy(t *testing.T) {
 				String("user1")).
 			RunReturnsJsonString()
 
-		getDandiesIDsFor = otu.replaceID(getDandiesIDsFor, dandiesIDs)
+		for _, id := range dandiesIDs {
+			getDandiesIDsFor = strings.Replace(getDandiesIDsFor, fmt.Sprint(id)+`"`, `DandyID"`, -1)
+		}
 
 		otu.AutoGold("getDandiesIDsFor", getDandiesIDsFor)
 
@@ -110,7 +113,7 @@ func TestDandy(t *testing.T) {
 				String("user1")).
 			RunReturnsJsonString()
 
-			getDandiesMinters2 = otu.replaceID(getDandiesMinters2, dandiesIDs)
+		getDandiesMinters2 = otu.replaceID(getDandiesMinters2, dandiesIDs)
 
 		otu.AutoGold("getDandiesMinters2", getDandiesMinters2)
 

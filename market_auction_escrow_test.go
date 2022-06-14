@@ -579,10 +579,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			}))
 
 		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
+		nftID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "listingId")
 
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
-		result = otu.replaceID(result, []uint64{id})
 		result = otu.replaceID(result, saleIDs)
+		result = otu.replaceID(result, nftID)
 		otu.AutoGold("events", result)
 
 	})

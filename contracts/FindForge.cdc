@@ -23,6 +23,7 @@ pub contract FindForge {
 		pub let platform: Capability<&{FungibleToken.Receiver}>
 		pub let platformPercentCut: UFix64
 		pub let name: String 
+		pub let minter: Address
 		//todo: do we need name here?
 
 		//a user should be able to change these 6?
@@ -35,6 +36,7 @@ pub contract FindForge {
 
 		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64, minterCut: UFix64? ,description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 			self.name=name
+			self.minter=FIND.lookupAddress(self.name)!
 			self.platform=platform
 			self.platformPercentCut=platformPercentCut
 			self.description=description 
@@ -46,8 +48,7 @@ pub contract FindForge {
 		}
 
 		pub fun getMinterFTReceiver() : Capability<&{FungibleToken.Receiver}> {
-			let address = FIND.lookup(self.name)?.getAddress() ?? panic("This name is not linked to address properly. ")
-			return getAccount(address).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return getAccount(self.minter).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		}
 
 	}
@@ -147,7 +148,7 @@ pub contract FindForge {
 		let new = FIND.reverseLookup(to)
 		let from = lease.owner!.address
 
-		// emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
+		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
 
 
 	}

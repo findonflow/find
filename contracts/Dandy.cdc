@@ -9,8 +9,6 @@ pub contract Dandy: NonFungibleToken {
 	pub let CollectionStoragePath: StoragePath
 	pub let CollectionPrivatePath: PrivatePath
 	pub let CollectionPublicPath: PublicPath
-	pub let ForgeStoragePath: StoragePath
-	pub let ForgePublicPath: PublicPath
 	pub var totalSupply: UInt64
 
 	/*store all valid type converters for Dandys
@@ -360,12 +358,6 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Forge()
 	}
 
-	pub fun mintFN() : (() : @{FindForge.Forge}) {
-		return fun() : @{FindForge.Forge} {
-			return <- Dandy.createForge()
-		}
-	}
-
 	// public function that anyone can call to create a new empty collection
 	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
@@ -390,8 +382,6 @@ pub contract Dandy: NonFungibleToken {
 		self.CollectionPublicPath = /public/findDandy
 		self.CollectionPrivatePath = /private/findDandy
 		self.CollectionStoragePath = /storage/findDandy
-		self.ForgeStoragePath = /storage/findDandyForge
-		self.ForgePublicPath = /public/findDandyForge
 		self.viewConverters={}
 
 		//TODO: Add the Forge resource aswell

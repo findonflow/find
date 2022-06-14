@@ -70,8 +70,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 												schemas: schemas, 
 												externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
 			
-			let mintFN = Dandy.mintFN()
-
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 
 			// let token <- minter.mint(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)

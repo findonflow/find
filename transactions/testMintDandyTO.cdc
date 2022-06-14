@@ -17,7 +17,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			panic("need dandy receicer")
 		}
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		let mintFN = Dandy.mintFN()
 		let forgeType = Dandy.getForgeType()
 
 		let creativeWork=
