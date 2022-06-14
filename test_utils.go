@@ -299,7 +299,7 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 			"amount": fmt.Sprintf("%.8f", amount),
 			"buyer":  otu.accountAddress(buyer),
 			"name":   name,
-			"status": "offered",
+			"status": "active_offered",
 		}))
 
 	return otu

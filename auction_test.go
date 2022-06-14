@@ -615,12 +615,13 @@ func TestAuction(t *testing.T) {
 				"to":     "0xf3fcd2c1a78f5eee",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
-				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
-				"sellerName": "user1",
-				"amount":     "15.00000000",
-				"status":     "active_ongoing",
-				"buyerName":  "user3",
+				"name":              "user1",
+				"seller":            "0x179b6b1cb6755e31",
+				"sellerName":        "user1",
+				"amount":            "15.00000000",
+				"status":            "active_ongoing",
+				"buyerName":         "user3",
+				"previousBuyerName": "user2",
 			}))
 
 	})
@@ -810,4 +811,25 @@ func TestAuction(t *testing.T) {
 
 	})
 
+	t.Run("Should register previousBuyer if direct offer outbid", func(t *testing.T) {
+
+		o := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, "user1").
+			registerUser("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			createUser(100.0, "user3").
+			registerUser("user3").
+			directOffer("user2", "user1", 4.0)
+
+		result := o.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
+			Args(o.O.Arguments().
+				String("user1").
+				UFix64(10.0)).
+			Test(t).
+			AssertSuccess()
+
+		autogold.Equal(t, result.Events)
+	})
 }
