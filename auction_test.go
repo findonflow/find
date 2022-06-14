@@ -155,7 +155,8 @@ func TestAuction(t *testing.T) {
 			createUser(100.0, "user2").
 			registerUser("user2").
 			listForSale("user1").
-			directOffer("user2", "user1", 4.0)
+			directOffer("user2", "user1", 4.0).
+			setProfile("user1")
 
 		otu.O.TransactionFromFile("fulfillName").
 			SignProposeAndPayAs("user1"). //the buy
@@ -179,6 +180,10 @@ func TestAuction(t *testing.T) {
 				"amount": "0.20000000",
 				"to":     "0x01cf0e2f2f715450",
 			}))
+
+		json := otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("0x179b6b1cb6755e31")).RunReturnsJsonString()
+		autogold.Equal(t, json)
+
 	})
 
 	t.Run("Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
