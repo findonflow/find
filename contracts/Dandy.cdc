@@ -339,6 +339,7 @@ pub contract Dandy: NonFungibleToken {
 
 		let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, platform: platform, externalUrlPrefix:externalUrlPrefix)
 
+		//TODO: remove this
 		emit Minted(id:nft.id, minter:nft.platform.name, name: name, description:description)
 		return <-  nft
 	}
@@ -392,9 +393,9 @@ pub contract Dandy: NonFungibleToken {
 		self.ForgePublicPath = /public/findDandyForge
 		self.viewConverters={}
 
+		//TODO: Add the Forge resource aswell
 		FindForge.addPublicForgeType(type: Type<@NFT>())
 
-		//TODO: Register itself in the FindForge
 		emit ContractInitialized()
 	}
 }

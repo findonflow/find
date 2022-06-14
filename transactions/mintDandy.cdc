@@ -48,7 +48,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
 		let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
-		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiver=account.getCapability<&{FungibleToken.Receiver, MetadataViews.ResolverCollection}>(Profile.publicReceiverPath)
 		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
 		let scalar=FindViews.Scalar({"Speed" : 100.0})
 
@@ -71,16 +71,13 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			
 			let mintFN = Dandy.mintFN()
 
-			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN)
+			let token <- FindForge.mint(lease: lease, nftType: nftType, data: mintData, mintFN: mintFN, collection: collection)
 
 			// let token <- minter.mint(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
 			
 			collection.deposit(token: <- token)
 			i=i+1
 		}
-
-
-
 
 	}
 }

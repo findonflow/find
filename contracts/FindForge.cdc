@@ -7,6 +7,8 @@ import Profile from "../contracts/Profile.cdc"
 pub contract FindForge {
 
 	access(contract) let minterPlatforms : {String : {String: MinterPlatform}}
+
+	//TODO: make this {Type: @{Forge}}
 	access(contract) let forgeTypes : [Type]
 	access(contract) var platformCut: UFix64 
 
@@ -121,6 +123,10 @@ pub contract FindForge {
 
 		assert(nft.isInstance(nftType), message: "The type passed in does not match with the minting NFT type. ")
 
+		//TODO: deposit into collection, borrow back viewResolver. Emit a good event
+
+		//nftType (identifier), id, uuid, name, thumbnail, to, toName
+		//Mint event
 		destroy forge
 
 		return <- nft
