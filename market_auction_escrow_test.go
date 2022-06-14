@@ -545,6 +545,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
@@ -579,11 +580,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			}))
 
 		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
-		nftID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "listingId")
 
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
 		result = otu.replaceID(result, saleIDs)
-		result = otu.replaceID(result, nftID)
+
 		otu.AutoGold("events", result)
 
 	})
@@ -605,6 +606,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
+
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").

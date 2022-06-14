@@ -1,14 +1,14 @@
 `{
     "collections": {
         "Dandy": [
-            "DandyID2",
-            "DandyID4",
-            "DandyID7",
-            "DandyID1",
-            "DandyID5",
-            "DandyID3",
-            "DandyID0",
-            "DandyID6"
+            "DandyID",
+            "DandyID",
+            "DandyID",
+            "DandyID",
+            "DandyID",
+            "DandyID",
+            "DandyID",
+            "DandyID"
         ]
     },
     "curatedCollections": {},

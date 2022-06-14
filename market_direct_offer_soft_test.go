@@ -368,6 +368,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			acceptDirectOfferMarketSoft("user1", id, "user2", price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
@@ -401,12 +402,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-			saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "saleID")
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "saleID")
 
-			result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer"})
-			result = otu.replaceID(result, []uint64{id})
-			result = otu.replaceID(result, saleIDs)
-			otu.AutoGold("events", result)
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 
@@ -424,6 +425,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			setFindCut(0.035)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
@@ -457,12 +459,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-			saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "saleID")
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "saleID")
 
-			result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer"})
-			result = otu.replaceID(result, []uint64{id})
-			result = otu.replaceID(result, saleIDs)
-			otu.AutoGold("events", result)
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 

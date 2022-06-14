@@ -482,6 +482,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
@@ -532,6 +533,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").

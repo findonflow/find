@@ -7,18 +7,18 @@
     "buyerAvatar": "",
     "buyerName": "",
     "endsAt": "100.00000000",
-    "id": "ID2",
+    "id": "ID0",
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
-      "editionNumber": "3",
-      "id": "ID2",
-      "name": "Neo Motorcycle 3 of 3",
+      "editionNumber": "1",
+      "id": "ID0",
+      "name": "Neo Motorcycle 1 of 3",
       "rarity": "",
       "scalars": {
         "Speed": "100.00000000",
         "edition_set_max": "3.00000000",
-        "edition_set_number": "3.00000000"
+        "edition_set_number": "1.00000000"
       },
       "tags": {
         "NeoMotorCycleTag": "Tag1"
@@ -43,18 +43,18 @@
     "buyerAvatar": "",
     "buyerName": "",
     "endsAt": "100.00000000",
-    "id": "ID0",
+    "id": "ID2",
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
-      "editionNumber": "1",
-      "id": "ID0",
-      "name": "Neo Motorcycle 1 of 3",
+      "editionNumber": "3",
+      "id": "ID2",
+      "name": "Neo Motorcycle 3 of 3",
       "rarity": "",
       "scalars": {
         "Speed": "100.00000000",
         "edition_set_max": "3.00000000",
-        "edition_set_number": "1.00000000"
+        "edition_set_number": "3.00000000"
       },
       "tags": {
         "NeoMotorCycleTag": "Tag1"

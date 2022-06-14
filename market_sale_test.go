@@ -440,6 +440,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[0], price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, ids)
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("buyNFTForSale").
@@ -501,6 +502,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[0], price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, ids)
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("buyNFTForSale").
