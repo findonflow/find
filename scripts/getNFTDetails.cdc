@@ -71,7 +71,7 @@ pub struct NFTDetail {
 		/* Rarity */
 		self.rarity=nil
 		if let r = FindViews.getRarity(item) {
-		  self.rarity=r.rarityName
+			self.rarity=r.rarityName
 		}
 
 
@@ -83,29 +83,18 @@ pub struct NFTDetail {
 			self.scalars=scalar.getScalar()
 		}
 		/* Medias */
-		let mediasView=FindViews.getMedias(item)
-		if mediasView != nil {
-			let view = mediasView!
-			if view as? FindViews.Medias != nil {
-				let media = view as! FindViews.Medias
-				for m in media.items {
-					let url = m.file.uri() 
-					let type = m.mediaType
-					self.media[url] = type
-				}
+		if let medias=FindViews.getMedias(item) {
+			for m in medias.items {
+				let url = m.file.uri() 
+				let type = m.mediaType
+				self.media[url] = type
 			}
 		}
 
-		let mediaView=FindViews.getMedia(item)
-		if mediaView != nil {
-			let view = mediaView!
-			if view as? MetadataViews.Media != nil {
-				let media = view as! MetadataViews.Media
-				let url = media.file.uri() 
-				let type = media.mediaType
-				self.media[url] = type
-
-			}
+		if let media=FindViews.getMedia(item) {
+			let url = media.file.uri() 
+			let type = media.mediaType
+			self.media[url] = type
 		}
 
 		let display = FindViews.getDisplay(item) ?? panic("Could not find display")
@@ -118,19 +107,19 @@ pub struct NFTDetail {
 		/* Edition */
 		self.editionNumber=nil
 		self.totalInEdition=nil
-			if let editions = FindViews.getEditions(item) {
-				for edition in editions.infoList {
-					if edition.name == nil {
-						self.editionNumber=edition.number
-						self.totalInEdition=edition.max
-					} else {
-						self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
-						if edition.max != nil {
-							self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
-						}
+		if let editions = FindViews.getEditions(item) {
+			for edition in editions.infoList {
+				if edition.name == nil {
+					self.editionNumber=edition.number
+					self.totalInEdition=edition.max
+				} else {
+					self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
+					if edition.max != nil {
+						self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
 					}
 				}
 			}
+		}
 
 		/* Royalties */
 		self.royalties=resolveRoyalties(pointer)
@@ -314,15 +303,15 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : L
 
 pub fun ignoreViews() : [Type] {
 	return [
-		Type<MetadataViews.NFTCollectionDisplay>() , 
-		Type<FindViews.Rarity>() ,
-		Type<FindViews.Tag>() , 
-		Type<FindViews.Scalar>() ,
-		Type<FindViews.Medias>() ,
-		Type<MetadataViews.Display>() ,
-		Type<MetadataViews.Edition>() ,
-		Type<MetadataViews.Editions>() , 
-		Type<MetadataViews.Media>()  
-		
+	Type<MetadataViews.NFTCollectionDisplay>() , 
+	Type<FindViews.Rarity>() ,
+	Type<FindViews.Tag>() , 
+	Type<FindViews.Scalar>() ,
+	Type<FindViews.Medias>() ,
+	Type<MetadataViews.Display>() ,
+	Type<MetadataViews.Edition>() ,
+	Type<MetadataViews.Editions>() , 
+	Type<MetadataViews.Media>()  
+
 	]
 }

@@ -58,22 +58,10 @@
         "data": {},
         "editionNumber": "",
         "id": "ID2",
-        "media": [
-            {
-                "file": {
-                    "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U",
-                    "path": ""
-                },
-                "mediaType": "video/mp4"
-            },
-            {
-                "file": {
-                    "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
-                    "path": ""
-                },
-                "mediaType": "image;display=thumbnail"
-            }
-        ],
+        "media": {
+            "ipfs://QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U": "video/mp4",
+            "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR": "image;display=thumbnail"
+        },
         "name": "ufcstrike 1 of 1",
         "rarity": "rare",
         "royalties": [
@@ -103,7 +91,6 @@
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID2",
         "views": [
-            "checked",
             "checked",
             "checked",
             "checked",

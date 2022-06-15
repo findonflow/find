@@ -58,20 +58,10 @@
         "data": {},
         "editionNumber": "",
         "id": "ID1",
-        "media": [
-            {
-                "file": {
-                    "url": "https://nft.blocto.app/xtingles/xBloctopus.mp4"
-                },
-                "mediaType": "video/mp4"
-            },
-            {
-                "file": {
-                    "url": "https://nft.blocto.app/xtingles/preview-xBloctopus.png"
-                },
-                "mediaType": "image/png;display=thumbnail"
-            }
-        ],
+        "media": {
+            "https://nft.blocto.app/xtingles/preview-xBloctopus.png": "image/png;display=thumbnail",
+            "https://nft.blocto.app/xtingles/xBloctopus.mp4": "video/mp4"
+        },
         "name": "xtingle 1 of 1",
         "rarity": "rare",
         "royalties": [
@@ -101,7 +91,6 @@
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID1",
         "views": [
-            "checked",
             "checked",
             "checked",
             "checked",
