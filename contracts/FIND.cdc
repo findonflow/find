@@ -1,10 +1,10 @@
 import MetadataViews from "./standard/MetadataViews.cdc"
+import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
-import Dandy from "./Dandy.cdc"
 import Sender from "./Sender.cdc"
 /*
 
@@ -173,8 +173,17 @@ pub contract FIND {
 		if !leaseCap.check() {
 			return nil
 		}
-
+		
 		let profileFindName= Profile.find(address).getFindName()
+
+		if profileFindName != "" {
+			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+				if network.readStatus(profileFindName).status == FIND.LeaseStatus.TAKEN {
+					return profileFindName
+				}
+			}
+		}
+
 		let leases = leaseCap.borrow()!.getLeaseInformation() 
 		var time : UFix64?= nil
 		var name :String?= nil
@@ -193,9 +202,6 @@ pub contract FIND {
 				}
 			}
 
-			if profileFindName == lease.name {
-				return lease.name
-			}
 		}
 		return name
 	}
@@ -262,6 +268,8 @@ pub contract FIND {
 		}
 	}
 
+
+
 	/*
 	=============================================================
 	Lease is a collection/resource for storing the token leases 
@@ -297,6 +305,17 @@ pub contract FIND {
 			self.auctionMinBidIncrement=10.0
 			self.offerCallback=nil
 			self.addons={}
+		}
+
+		pub fun getName() : String {
+			return self.name 
+		}
+
+		pub fun checkAddon(addon: String) : Bool {
+			if !self.addons.containsKey(addon) {
+				return false
+			}
+			return self.addons[addon]!
 		}
 
 		pub fun addAddon(_ addon:String) {
@@ -511,21 +530,6 @@ pub contract FIND {
 			self.networkWallet=networkWallet
 		}
 
-		access(contract) fun createPlatform(name: String, description: String, externalURL: String, squareImage: String, bannerImage: String) : Dandy.MinterPlatform{
-			let receiverCap=FIND.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			return Dandy.MinterPlatform(name:name, receiverCap:receiverCap, platformPercentCut: 0.025, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage)
-		}
-
-		pub fun mintDandy(minter: String, nftName: String, description: String, thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix: String?, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) : @Dandy.NFT {
-
-			let lease = self.borrow(minter)
-			if !lease.addons.containsKey("forge") {
-				panic("You do not have the forge addon, buy it first")
-			}
-
-			return <- Dandy.mintNFT(name:nftName, description:description, thumbnail: thumbnail, platform: self.createPlatform(name: minter, description: collectionDescription, externalURL: collectionExternalURL, squareImage: collectionSquareImage, bannerImage: collectionBannerImage), schemas: schemas, externalUrlPrefix:externalUrlPrefix)
-		}
-
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
@@ -546,6 +550,11 @@ pub contract FIND {
 			//put something in your storage
 			emit AddonActivated(name: name, addon: addon)
 			self.networkWallet.borrow()!.deposit(from: <- vault)
+		}
+
+		pub fun checkAddon(name:String, addon: String) : Bool {
+			let lease = self.borrow(name)
+			return lease.checkAddon(addon: addon)
 		}
 
 		pub fun getLease(_ name: String) : LeaseInformation? {
@@ -576,9 +585,9 @@ pub contract FIND {
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
 			for name in self.leases.keys {
-				if !FIND.validateFindName(name) {
-					continue
-				}
+				// if !FIND.validateFindName(name) {
+				// 	continue
+				// }
 				let lease=self.getLease(name)
 				if lease != nil && lease!.status != "FREE" {
 					info.append(lease!)
@@ -1549,6 +1558,7 @@ pub contract FIND {
 		return true
 
 	}
+
 	init() {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND

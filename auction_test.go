@@ -44,7 +44,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "85",
+				"uuid":        "89",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -57,7 +57,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "87",
+				"uuid":        "91",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -94,7 +94,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "85",
+				"uuid":        "89",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -107,7 +107,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "87",
+				"uuid":        "91",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -120,7 +120,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "89",
+				"uuid":        "93",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -385,7 +385,7 @@ func TestAuction(t *testing.T) {
 			auctionBid("user2", "user1", 20.0).
 			expireAuction()
 
-		result := otu.O.TransactionFromFile("fulfillNameAuction").
+		res := otu.O.TransactionFromFile("fulfillNameAuction").
 			SignProposeAndPayAs("user2"). //the buy
 			Args(otu.O.Arguments().
 				Account("user1").
@@ -393,7 +393,10 @@ func TestAuction(t *testing.T) {
 			Test(t).
 			AssertSuccess()
 
-		autogold.Equal(t, result.Events)
+		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction", "A.f8d6e0586b0a20c7.FIND.RoyaltyPaid"})
+		result = otu.replaceID(result, uuid)
+		autogold.Equal(t, result)
 	})
 
 	t.Run("Should not allow double bid from same author", func(t *testing.T) {
@@ -732,13 +735,16 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 15.0).
 			expireAuction().tickClock(2.0)
 
-		result := otu.O.TransactionFromFile("cancelNameAuction").
+		res := otu.O.TransactionFromFile("cancelNameAuction").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertSuccess()
 
-		autogold.Equal(t, result.Events)
+		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction"})
+		result = otu.replaceID(result, uuid)
+		autogold.Equal(t, result)
 
 	})
 
@@ -828,13 +834,17 @@ func TestAuction(t *testing.T) {
 			registerUser("user3").
 			directOffer("user2", "user1", 4.0)
 
-		result := o.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
+		res := o.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
 			Args(o.O.Arguments().
 				String("user1").
 				UFix64(10.0)).
 			Test(t).
 			AssertSuccess()
 
-		autogold.Equal(t, result.Events)
+		uuids := o.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.DirectOffer", "uuid")
+		result := o.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.DirectOffer"})
+		result = o.replaceID(result, uuids)
+
+		autogold.Equal(t, result)
 	})
 }

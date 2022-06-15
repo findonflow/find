@@ -2,6 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FindForge from "../contracts/FindForge.cdc"
 
 pub contract Dandy: NonFungibleToken {
 
@@ -9,7 +10,6 @@ pub contract Dandy: NonFungibleToken {
 	pub let CollectionPrivatePath: PrivatePath
 	pub let CollectionPublicPath: PublicPath
 	pub var totalSupply: UInt64
-
 
 	/*store all valid type converters for Dandys
 	This is to be able to make the contract compatible with the forthcomming NFT standard. 
@@ -33,6 +33,22 @@ pub contract Dandy: NonFungibleToken {
 			self.result=result
 		}
 	}
+
+	pub struct DandyInfo {
+		pub let name: String
+		pub let description: String
+		pub let thumbnail: MetadataViews.Media
+		pub let schemas: [AnyStruct]
+		pub let externalUrlPrefix:String?
+
+		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix:String?) {
+			self.name=name 
+			self.description=description 
+			self.thumbnail=thumbnail 
+			self.schemas=schemas 
+			self.externalUrlPrefix=externalUrlPrefix 
+		}
+	}
 	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
 		pub let id: UInt64
 		access(self) var nounce: UInt64
@@ -42,19 +58,17 @@ pub contract Dandy: NonFungibleToken {
 		access(contract) let name: String
 		access(contract) let description: String
 		access(contract) let thumbnail: MetadataViews.Media
-		access(contract) let minterPlatform: MinterPlatform
+		access(contract) let platform: FindForge.MinterPlatform
 
-
-		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo},  minterPlatform: MinterPlatform, externalUrlPrefix: String?) {
-
+		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: {String: ViewInfo}, platform: FindForge.MinterPlatform, externalUrlPrefix: String?) {
 			self.id = self.uuid
 			self.schemas=schemas
 			self.thumbnail=thumbnail
-			self.minterPlatform=minterPlatform
 			self.name=name
 			self.description=description
 			self.nounce=0
 			self.primaryCutPaid=false
+			self.platform=platform
 			if externalUrlPrefix != nil {
 				let mvt = Type<MetadataViews.ExternalURL>()
 				self.schemas[mvt.identifier] = ViewInfo(typ:mvt, result: MetadataViews.ExternalURL(externalUrlPrefix!.concat("/").concat(self.id.toString())))
@@ -65,6 +79,24 @@ pub contract Dandy: NonFungibleToken {
 			self.nounce=self.nounce+1
 		}
 
+		pub fun getMinterPlatform() : FindForge.MinterPlatform {
+			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, forgeType: Dandy.getForgeType()) {
+				
+				let name = self.platform.name
+				let platform = self.platform.platform
+				let platformPercentCut = self.platform.platformPercentCut
+				let minterCut = self.platform.minterCut
+
+				let description = fetch.description
+				let externalURL = fetch.externalURL
+				let squareImage = fetch.squareImage
+				let bannerImage = fetch.bannerImage
+				let socials = fetch.socials
+				return FindForge.MinterPlatform(name: name, platform:platform, platformPercentCut: platformPercentCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
+			}
+
+			return self.platform
+		}
 
 		pub fun getViews() : [Type] {
 
@@ -105,7 +137,12 @@ pub contract Dandy: NonFungibleToken {
 				royalties.appendAll(multipleRoylaties.getRoyalties())
 			}
 
-			let royalty=MetadataViews.Royalty(receiver : self.minterPlatform.platform, cut: self.minterPlatform.platformPercentCut, description:"platform")
+			if self.platform.minterCut != nil {
+				let royalty = MetadataViews.Royalty(receiver: self.platform.getMinterFTReceiver(), cut: self.platform.minterCut!, description: "minter")
+				royalties.append(royalty)
+			}
+
+			let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "platform")
 			royalties.append(royalty)
 
 			return MetadataViews.Royalties(cutInfos:royalties)
@@ -124,10 +161,16 @@ pub contract Dandy: NonFungibleToken {
 		pub fun resolveView(_ type: Type): AnyStruct? {
 
 			if type == Type<MetadataViews.NFTCollectionDisplay>() {
-				let externalURL = MetadataViews.ExternalURL(self.minterPlatform.externalURL)
-				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.squareImage), mediaType: "image")
-				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: self.minterPlatform.bannerImage), mediaType: "image")
-				return MetadataViews.NFTCollectionDisplay(name: self.minterPlatform.name, description: self.minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: {})
+				let minterPlatform = self.getMinterPlatform()
+				let externalURL = MetadataViews.ExternalURL(minterPlatform.externalURL)
+				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.squareImage), mediaType: "image")
+				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.bannerImage), mediaType: "image")
+
+				let socialMap : {String : MetadataViews.ExternalURL} = {}
+				for social in minterPlatform.socials.keys {
+					socialMap[social] = MetadataViews.ExternalURL(minterPlatform.socials[social]!)
+				}
+				return MetadataViews.NFTCollectionDisplay(name: minterPlatform.name, description: minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socialMap)
 			}
 
 			if type == Type<MetadataViews.NFTCollectionData>() {
@@ -196,7 +239,8 @@ pub contract Dandy: NonFungibleToken {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			let dandyToken <- token as! @NFT
-			let minterName = dandyToken.minterPlatform.name 
+			let minterPlatform = dandyToken.getMinterPlatform()
+			let minterName = minterPlatform.name 
 			if self.nftIndex.containsKey(minterName) {
 				self.nftIndex[minterName]!.remove(key: withdrawID)
 				if self.nftIndex[minterName]!.length < 1 {
@@ -214,7 +258,8 @@ pub contract Dandy: NonFungibleToken {
 		pub fun deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
 
-			let minterName = token.minterPlatform.name 
+			let minterPlatform = token.getMinterPlatform()
+			let minterName = minterPlatform.name 
 			if self.nftIndex.containsKey(minterName) {
 				self.nftIndex[minterName]!.insert(key: token.id, false)
 			} else {
@@ -279,31 +324,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 	}
 
-	pub struct MinterPlatform {
-		pub let platform: Capability<&{FungibleToken.Receiver}>
-		pub let platformPercentCut: UFix64
-		pub let name: String
-		pub let description: String 
-		pub let externalURL: String 
-		pub let squareImage: String 
-		pub let bannerImage: String 
-
-		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64, description: String, externalURL: String, squareImage: String, bannerImage: String) {
-			self.platform=platform
-			self.platformPercentCut=platformPercentCut
-			self.name=name
-			self.description=description 
-			self.externalURL=externalURL 
-			self.squareImage=squareImage 
-			self.bannerImage=bannerImage
-		}
-	}
-
-	access(account)  fun createForge(platform: MinterPlatform) : @Forge {
-		return <- create Forge(platform:platform)
-	}
-
-	access(account) fun mintNFT(name: String, description: String, thumbnail: MetadataViews.Media,  platform:MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
+	access(account) fun mintNFT(name: String, description: String, thumbnail: MetadataViews.Media,  platform:FindForge.MinterPlatform, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
 		let views : {String: ViewInfo} = {}
 		for s in schemas {
 			//if you send in display we ignore it, this will be made for you
@@ -312,27 +333,29 @@ pub contract Dandy: NonFungibleToken {
 			}
 		}
 
-		let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, minterPlatform: platform, externalUrlPrefix:externalUrlPrefix)
+		let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, platform: platform, externalUrlPrefix:externalUrlPrefix)
 
-		emit Minted(id:nft.id, minter:nft.minterPlatform.name, name: name, description:description)
+		//TODO: remove this
+		emit Minted(id:nft.id, minter:nft.platform.name, name: name, description:description)
 		return <-  nft
 	}
 
+	/*
 	access(account) fun setViewConverters(from: Type, converters: [AnyStruct{ViewConverter}]) {
 		Dandy.viewConverters[from.identifier] = converters
 	}
+	*/
 
-	//This is not used right now but might be here for white label things
-	pub resource Forge {
-		access(contract) let platform: MinterPlatform
-
-		init(platform: MinterPlatform) {
-			self.platform=platform
+	//TODO: do we want to store minter 
+	pub resource Forge: FindForge.Forge {
+		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+			let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
+			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)
 		}
+	}
 
-		pub fun mintNFT(name: String, description: String,thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix:String?) : @NFT {
-			return <- Dandy.mintNFT(name: name, description: description, thumbnail: thumbnail, platform: self.platform, schemas: schemas, externalUrlPrefix:externalUrlPrefix)
-		}
+	access(account) fun createForge() : @{FindForge.Forge} {
+		return <- create Forge()
 	}
 
 	// public function that anyone can call to create a new empty collection
@@ -340,6 +363,9 @@ pub contract Dandy: NonFungibleToken {
 		return <- create Collection()
 	}
 
+	pub fun getForgeType() : Type {
+		return Type<@Forge>()
+	}
 
 	/// This struct interface is used on a contract level to convert from one View to another. 
 	/// See Dandy nft for an example on how to convert one type to another
@@ -357,6 +383,9 @@ pub contract Dandy: NonFungibleToken {
 		self.CollectionPrivatePath = /private/findDandy
 		self.CollectionStoragePath = /storage/findDandy
 		self.viewConverters={}
+
+		//TODO: Add the Forge resource aswell
+		FindForge.addPublicForgeType(forge: <- create Forge())
 
 		emit ContractInitialized()
 	}

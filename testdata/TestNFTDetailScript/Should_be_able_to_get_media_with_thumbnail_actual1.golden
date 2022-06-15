@@ -57,7 +57,7 @@
         "collectionName": "neomotorcycle",
         "data": {},
         "editionNumber": "",
-        "id": "161",
+        "id": "ID0",
         "media": [
             {
                 "file": {
@@ -73,7 +73,7 @@
                 "address": "0x179b6b1cb6755e31",
                 "cut": "0.05000000",
                 "findName": "user1",
-                "royaltyName": "artist"
+                "royaltyName": "minter"
             },
             {
                 "address": "0xf8d6e0586b0a20c7",
@@ -93,13 +93,13 @@
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "161",
+        "uuid": "ID0",
         "views": [
-            "A.f8d6e0586b0a20c7.FindViews.Nounce",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork"
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked"
         ]
     },
     "storefront": ""

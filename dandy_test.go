@@ -2,6 +2,7 @@ package test_main
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hexops/autogold"
@@ -24,6 +25,20 @@ func TestDandy(t *testing.T) {
 		id := dandyIds[0]
 		res := otu.O.ScriptFromFile("getNFTViews").Args(otu.O.Arguments().String("user1").String("Dandy").UInt64(id)).RunReturnsJsonString()
 
+		viewList := []string{
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
+			"A.f8d6e0586b0a20c7.MetadataViews.Display",
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+			"A.f8d6e0586b0a20c7.FindViews.Tag",
+			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.FindViews.Scalar",
+			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+			"A.f8d6e0586b0a20c7.MetadataViews.Editions",
+			"A.f8d6e0586b0a20c7.MetadataViews.Media",
+		}
+		for _, item := range viewList {
+			res = strings.Replace(res, item, "checked", -1)
+		}
 		result := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
 			String("user1").
 			String("Dandy").
@@ -37,6 +52,7 @@ func TestDandy(t *testing.T) {
 			String("A.f8d6e0586b0a20c7.MetadataViews.ExternalURL")).RunReturnsJsonString()
 
 		overallResult := fmt.Sprintf("%s%s%s", res, result, urlResult)
+		overallResult = otu.replaceID(overallResult, dandyIds)
 		autogold.Equal(t, overallResult)
 
 	})
@@ -57,12 +73,18 @@ func TestDandy(t *testing.T) {
 				String("user1")).
 			RunReturnsJsonString()
 
+		for _, id := range dandiesIDs {
+			getDandiesIDsFor = strings.Replace(getDandiesIDsFor, fmt.Sprint(id)+`"`, `DandyID"`, -1)
+		}
+
 		otu.AutoGold("getDandiesIDsFor", getDandiesIDsFor)
 
 		getDandiesMinters := otu.O.ScriptFromFile("getDandiesMinters").
 			Args(otu.O.Arguments().
 				String("user1")).
 			RunReturnsJsonString()
+
+		getDandiesMinters = otu.replaceID(getDandiesMinters, dandiesIDs)
 
 		otu.AutoGold("getDandiesMinters", getDandiesMinters)
 
@@ -82,12 +104,16 @@ func TestDandy(t *testing.T) {
 				String("user1")).
 			RunReturnsJsonString()
 
+		getDandiesIDsFor2 = otu.replaceID(getDandiesIDsFor2, dandiesIDs)
+
 		otu.AutoGold("getDandiesIDsFor2", getDandiesIDsFor2)
 
 		getDandiesMinters2 := otu.O.ScriptFromFile("getDandiesMinters").
 			Args(otu.O.Arguments().
 				String("user1")).
 			RunReturnsJsonString()
+
+		getDandiesMinters2 = otu.replaceID(getDandiesMinters2, dandiesIDs)
 
 		otu.AutoGold("getDandiesMinters2", getDandiesMinters2)
 

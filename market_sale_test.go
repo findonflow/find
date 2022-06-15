@@ -236,12 +236,18 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 3, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		result := otu.O.TransactionFromFile("delistAllNFTSale").
+		res := otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Account("account")).
 			Test(otu.T).AssertSuccess()
 
-		otu.AutoGold("events", result.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+
+		otu.AutoGold("events", result)
 	})
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {
@@ -434,6 +440,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[0], price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, ids)
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("buyNFTForSale").
@@ -458,7 +465,7 @@ func TestMarketSale(t *testing.T) {
 				"amount":      "0.50000000",
 				"findName":    "user1",
 				"id":          fmt.Sprintf("%d", ids[0]),
-				"royaltyName": "artist",
+				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
@@ -469,7 +476,12 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 
@@ -490,6 +502,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[0], price)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, ids)
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("buyNFTForSale").
@@ -514,7 +527,7 @@ func TestMarketSale(t *testing.T) {
 				"amount":      "0.50000000",
 				"findName":    "user1",
 				"id":          fmt.Sprintf("%d", ids[0]),
-				"royaltyName": "artist",
+				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
@@ -525,7 +538,12 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 
@@ -584,7 +602,7 @@ func TestMarketSale(t *testing.T) {
 					"findName":        "user1",
 					"residualAddress": otu.accountAddress("find"),
 					"id":              fmt.Sprintf("%d", ids[0]),
-					"royaltyName":     "artist",
+					"royaltyName":     "minter",
 					"tenant":          "find",
 				})).
 				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
@@ -596,7 +614,12 @@ func TestMarketSale(t *testing.T) {
 					"tenant":      "find",
 				}))
 		*/
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
+		result = otu.replaceID(result, ids)
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 
 	})
 

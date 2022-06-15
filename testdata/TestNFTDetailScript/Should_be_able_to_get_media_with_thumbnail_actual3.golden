@@ -57,11 +57,11 @@
         "collectionName": "flovatar",
         "data": {},
         "editionNumber": "",
-        "id": "163",
+        "id": "ID2",
         "media": [
             {
                 "file": {
-                    "url": "https://flovatar.com/api/image/166"
+                    "url": "https://flovatar.com/api/image/943"
                 },
                 "mediaType": "image/svg"
             }
@@ -73,7 +73,7 @@
                 "address": "0x179b6b1cb6755e31",
                 "cut": "0.05000000",
                 "findName": "user1",
-                "royaltyName": "artist"
+                "royaltyName": "minter"
             },
             {
                 "address": "0xf8d6e0586b0a20c7",
@@ -85,23 +85,23 @@
         "scalars": {
             "edition_nft_max": "1.00000000",
             "edition_nft_number": "1.00000000",
-            "id": "166.00000000",
+            "id": "943.00000000",
             "rarity score": "2.20000000"
         },
         "tags": {
             "flovatar Tag": "Tag1"
         },
-        "thumbnail": "https://flovatar.com/api/image/166",
+        "thumbnail": "https://flovatar.com/api/image/943",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "163",
+        "uuid": "ID2",
         "views": [
-            "A.f8d6e0586b0a20c7.FindViews.Nounce",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked"
         ]
     },
     "storefront": ""
