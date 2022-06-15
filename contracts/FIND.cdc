@@ -82,6 +82,14 @@ pub contract FIND {
 	pub let LeasePublicPath: PublicPath
 
 
+	pub fun getLeases() : [NetworkLease] {
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.profiles.values
+		}
+		panic("Network is not set up")
+	}
+
+
 	//These methods are basically just here for convenience
 
 	/// Calculate the cost of an name
