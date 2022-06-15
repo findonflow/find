@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220610053455-82230094dfbc
+	github.com/bjartek/overflow v0.0.0-20220615085807-e4685bb67e59
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
