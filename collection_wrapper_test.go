@@ -1,17 +1,7 @@
 package test_main
 
-import (
-	"encoding/json"
-	"fmt"
-	"testing"
-
-	"github.com/bjartek/overflow/overflow"
-	"github.com/stretchr/testify/assert"
-)
-
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
-*/
 func TestNewCollctionsWrapper(t *testing.T) {
 
 	o := overflow.NewOverflowMainnet().Start()
@@ -60,3 +50,4 @@ type Item struct {
 type Items struct {
 	Items map[string]Item `json:"items"`
 }
+*/

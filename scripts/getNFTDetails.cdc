@@ -47,19 +47,19 @@ pub struct NFTDetail {
 	pub var totalInEdition: UInt64?
 	pub var scalars : {String: UFix64}
 	pub var tags : {String: String}
-	pub var media: [MetadataViews.Media]
+	pub var media : {String: String} //url to mediaType
 	pub var collectionName: String? 
 	pub var collectionDescription: String? 
 	pub var data: {String : AnyStruct?}
 	pub var views :[String]
 
-	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}){
+	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}, resolvedViews: [Type]){
 
 		let item = pointer.getViewResolver()
 
 		self.scalars={}
 		self.tags={}
-		self.media=[]
+		self.media={}
 		self.collectionName=nil
 		self.collectionDescription=nil
 
@@ -71,7 +71,7 @@ pub struct NFTDetail {
 		/* Rarity */
 		self.rarity=nil
 		if let r = FindViews.getRarity(item) {
-		  self.rarity=r.rarityName
+			self.rarity=r.rarityName
 		}
 
 
@@ -80,18 +80,22 @@ pub struct NFTDetail {
 		}			
 
 		if let scalar=FindViews.getScalar(item){
-				self.scalars=scalar.getScalar()
+			self.scalars=scalar.getScalar()
 		}
 		/* Medias */
-		let mediaView=item.resolveView(Type<FindViews.Medias>())
-		if mediaView != nil {
-			let view = mediaView!
-			if view as? FindViews.Medias != nil {
-				let media = view as! FindViews.Medias
-				self.media=media.items
+		if let medias=FindViews.getMedias(item) {
+			for m in medias.items {
+				let url = m.file.uri() 
+				let type = m.mediaType
+				self.media[url] = type
 			}
 		}
-	
+
+		if let media=FindViews.getMedia(item) {
+			let url = media.file.uri() 
+			let type = media.mediaType
+			self.media[url] = type
+		}
 
 		let display = FindViews.getDisplay(item) ?? panic("Could not find display")
 		self.name=display.name
@@ -103,31 +107,35 @@ pub struct NFTDetail {
 		/* Edition */
 		self.editionNumber=nil
 		self.totalInEdition=nil
-			if let editions = FindViews.getEditions(item) {
-				for edition in editions.infoList {
-					if edition.name == nil {
-						self.editionNumber=edition.number
-						self.totalInEdition=edition.max
-					} else {
-						self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
-						if edition.max != nil {
-							self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
-						}
+		if let editions = FindViews.getEditions(item) {
+			for edition in editions.infoList {
+				if edition.name == nil {
+					self.editionNumber=edition.number
+					self.totalInEdition=edition.max
+				} else {
+					self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
+					if edition.max != nil {
+						self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
 					}
 				}
 			}
+		}
 
 		/* Royalties */
 		self.royalties=resolveRoyalties(pointer)
-		self.data=views
 
 		self.views=[]
 		for view in item.getViews() {
 			if ignoreViews().contains(view) {
 				continue
 			}
+			if resolvedViews.contains(view) {
+				continue
+			}
 			self.views.append(view.identifier)
 		}
+		self.data=views
+
 	}
 
 }
@@ -255,41 +263,21 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 
 	let viewTypes = pointer.getViews() 
 	var nftViews: {String : AnyStruct} = {}
+	var resolvedViews: [Type] = []
 	for viewType in viewTypes {
-		if views.contains(getType(viewType)) {
+		if views.contains(viewType.identifier) {
 			if let view = pointer.resolveView(viewType) {
-				nftViews[getType(viewType)] = view! 
+				nftViews[viewType.identifier] = view! 
+				resolvedViews.append(viewType)
 			}
 		}
 	}
-	return NFTDetail(pointer, views: nftViews)
+	return NFTDetail(pointer, views: nftViews, resolvedViews: resolvedViews)
 
 
 }
 
 /* Helper Function */
-pub fun getType(_ type: Type) : String {
-	let identifier = type.identifier
-	var dots = 0
-	var counter = 0 
-	while counter < identifier.length {
-		if identifier[counter] == "." {
-			dots = dots + 1
-			if dots == 3 {
-				break
-			}
-		}
-		counter = counter + 1
-	}
-	if dots == 0 {
-		return identifier
-	}
-	if counter + 1 > identifier.length {
-		panic("Identifier is ".concat(identifier))
-	}
-	return identifier.slice(from: counter + 1, upTo: identifier.length)
-}
-
 pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	let array : [Royalties] = []
 	for royalty in pointer.getRoyalty().getRoyalties() {
@@ -315,13 +303,15 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : L
 
 pub fun ignoreViews() : [Type] {
 	return [
-		Type<MetadataViews.NFTCollectionDisplay>() , 
-		Type<FindViews.Rarity>() ,
-		Type<FindViews.Tag>() , 
-		Type<FindViews.Scalar>() ,
-		Type<FindViews.Medias>() ,
-		Type<MetadataViews.Display>() ,
-		Type<MetadataViews.Edition>() ,
-		Type<MetadataViews.Editions>() 
+	Type<MetadataViews.NFTCollectionDisplay>() , 
+	Type<FindViews.Rarity>() ,
+	Type<FindViews.Tag>() , 
+	Type<FindViews.Scalar>() ,
+	Type<FindViews.Medias>() ,
+	Type<MetadataViews.Display>() ,
+	Type<MetadataViews.Edition>() ,
+	Type<MetadataViews.Editions>() , 
+	Type<MetadataViews.Media>()  
+
 	]
 }

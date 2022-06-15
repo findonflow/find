@@ -1,45 +1,5 @@
 `{
     "allowedListingActions": {
-        "FindMarketAuctionEscrow": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-            "status": "active"
-        },
-        "FindMarketAuctionSoft": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-            "status": "active"
-        },
-        "FindMarketDirectOfferEscrow": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
-            "status": "active"
-        },
-        "FindMarketDirectOfferSoft": {
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-            "status": "active"
-        },
         "FindMarketSale": {
             "ftAlias": [
                 "Flow"
@@ -75,7 +35,34 @@
     "nftDetail": {
         "collectionDescription": "Neo Collectibles FIND",
         "collectionName": "user1",
-        "data": {},
+        "data": {
+            "A.f8d6e0586b0a20c7.FindViews.CreativeWork": {
+                "artist": "Neo",
+                "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+                "name": "Neo Motorcycle",
+                "type": "image"
+            },
+            "A.f8d6e0586b0a20c7.FindViews.Nounce": {
+                "nounce": "1"
+            },
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": {
+                "url": "https://find.xyz/collection/user1/dandy/ID1"
+            },
+            "A.f8d6e0586b0a20c7.MetadataViews.Royalties": {
+                "cutInfos": [
+                    {
+                        "cut": "0.05000000",
+                        "description": "minter",
+                        "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"
+                    },
+                    {
+                        "cut": "0.02500000",
+                        "description": "platform",
+                        "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0xf8d6e0586b0a20c7, path: /public/findProfileReceiver)"
+                    }
+                ]
+            }
+        },
         "editionNumber": "2",
         "id": "ID1",
         "media": {
@@ -110,11 +97,7 @@
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID1",
         "views": [
-            "checked",
-            "checked",
-            "checked",
-            "checked",
-            "checked"
+            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData"
         ]
     },
     "storefront": ""

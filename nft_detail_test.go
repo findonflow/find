@@ -11,7 +11,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 	price := 10.00
 
-	t.Run("Should be able to get nft details of item", func(t *testing.T) {
+	t.Run("Should be able to get nft details of item with script", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
 		ids := otu.setupMarketAndMintDandys()
@@ -27,17 +27,58 @@ func TestNFTDetailScript(t *testing.T) {
 				StringArray()).
 			RunReturnsJsonString()
 
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.Media",
-		}
-		for _, item := range viewList {
-			actual = strings.Replace(actual, item, "checked", -1)
-		}
+		actual = otu.replaceID(actual, ids)
+
+		autogold.Equal(t, actual)
+	})
+
+	t.Run("Should be able to get nft details of item if listed in rule with no listing type", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry()
+		otu.O.TransactionFromFile("adminSetSellDandyRules").
+			SignProposeAndPayAs("find").
+			Args(otu.O.Arguments().
+				Account("account")).
+			Test(otu.T).
+			AssertSuccess()
+		otu.listNFTForSale("user1", ids[1], price)
+
+		actual := otu.O.ScriptFromFile("getNFTDetails").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("Dandy").
+				UInt64(ids[1]).
+				StringArray()).
+			RunReturnsJsonString()
+
+		actual = otu.replaceID(actual, ids)
+
+		autogold.Equal(t, actual)
+	})
+
+	t.Run("Should be able to get nft details of item with views", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		ids := otu.setupMarketAndMintDandys()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("Sale").
+			listNFTForSale("user1", ids[1], price)
+
+		actual := otu.O.ScriptFromFile("getNFTDetails").
+			Args(otu.O.Arguments().
+				String("user1").
+				String("Dandy").
+				UInt64(ids[1]).
+				StringArray(
+					"A.f8d6e0586b0a20c7.FindViews.Nounce",
+					// "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+					"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+					"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+					"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+				)).
+			RunReturnsJsonString()
 
 		actual = otu.replaceID(actual, ids)
 
@@ -63,17 +104,7 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
 		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.Media",
-		}
-		for _, item := range viewList {
-			actual = strings.Replace(actual, item, "checked", -1)
-		}
+
 		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
@@ -110,7 +141,6 @@ func TestNFTDetailScript(t *testing.T) {
 			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
 			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.Media",
 		}
 		for _, item := range viewList {
 			actual = strings.Replace(actual, item, "checked", -1)
@@ -185,7 +215,6 @@ func TestNFTDetailScript(t *testing.T) {
 			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
 			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.Media",
 		}
 		for _, item := range viewList {
 			actual1 = strings.Replace(actual1, item, "checked", -1)

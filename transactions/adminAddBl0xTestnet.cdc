@@ -12,7 +12,6 @@ transaction(tenant: Address) {
         
     }
     execute{
-
         self.adminRef.setNFTInfo(
             alias: "Bl0x", 
             type: Type<@Bl0x.NFT>(), 
@@ -25,7 +24,7 @@ transaction(tenant: Address) {
 
         let rules = [
             FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
-            FindMarket.TenantRule(name:"Neo", types:[Type<@Bl0x.NFT>()], ruleType: "nft", allow: true)
+            FindMarket.TenantRule(name:"Bl0x", types:[Type<@Bl0x.NFT>()], ruleType: "nft", allow: true)
         ]
 
         let tenantSaleItem = FindMarket.TenantSaleItem(

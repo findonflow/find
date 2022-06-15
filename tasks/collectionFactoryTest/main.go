@@ -17,9 +17,18 @@ func main() {
 
 	o2 := overflow.NewOverflowTestnet().Start()
 
-	user2 := "0x5a41930b8b435bdf"
+	res2 := o2.ScriptFromFile("getFactoryCollectionsAll").NamedArguments(map[string]string{
+		"user": "christian",
+	}).RunReturnsJsonString()
 
-	res2 := o2.ScriptFromFile("testFactoryCollectionTestnet").Args(o2.Arguments().String(user2)).RunReturnsJsonString()
+	//pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
+	// res3 := o2.ScriptFromFile("getNFTDetails").NamedArguments(map[string]string{
+	// 	"user":                 "christian",
+	// 	"nftAliasOrIdentifier": "Dandy",
+	// 	"id":                   "97168801",
+	// 	"views":                `["A.862f7bac4e02c854.FindViews.CreativeWork"]`,
+	// }).RunReturnsJsonString()
+
 	fmt.Println(res2)
 
 }
