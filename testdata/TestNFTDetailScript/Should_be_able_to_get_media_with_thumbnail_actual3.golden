@@ -53,20 +53,28 @@
     },
     "findMarket": {},
     "nftDetail": {
-        "collectionDescription": "flovatar FIND",
-        "collectionName": "flovatar",
+        "collectionDescription": "ufc strike FIND",
+        "collectionName": "ufcstrike",
         "data": {},
         "editionNumber": "",
         "id": "ID2",
         "media": [
             {
                 "file": {
-                    "url": "https://flovatar.com/api/image/943"
+                    "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U",
+                    "path": ""
                 },
-                "mediaType": "image/svg"
+                "mediaType": "video/mp4"
+            },
+            {
+                "file": {
+                    "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
+                    "path": ""
+                },
+                "mediaType": "image;display=thumbnail"
             }
         ],
-        "name": "flovatar 1 of 1",
+        "name": "ufcstrike 1 of 1",
         "rarity": "rare",
         "royalties": [
             {
@@ -83,15 +91,14 @@
             }
         ],
         "scalars": {
+            "Reach": "120.00000000",
             "edition_nft_max": "1.00000000",
-            "edition_nft_number": "1.00000000",
-            "id": "943.00000000",
-            "rarity score": "2.20000000"
+            "edition_nft_number": "1.00000000"
         },
         "tags": {
-            "flovatar Tag": "Tag1"
+            "signature-move": "Rare Naked Choke"
         },
-        "thumbnail": "https://flovatar.com/api/image/943",
+        "thumbnail": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID2",

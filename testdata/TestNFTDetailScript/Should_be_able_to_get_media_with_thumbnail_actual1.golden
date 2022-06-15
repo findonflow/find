@@ -58,14 +58,9 @@
         "data": {},
         "editionNumber": "",
         "id": "ID0",
-        "media": [
-            {
-                "file": {
-                    "url": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"
-                },
-                "mediaType": "image/png"
-            }
-        ],
+        "media": {
+            "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
+        },
         "name": "Neo Motorcycle 1 of 1",
         "rarity": "rare",
         "royalties": [
@@ -83,12 +78,12 @@
             }
         ],
         "scalars": {
-            "Speed": "100.00000000",
+            "Speed": "200.00000000",
             "edition_nft_max": "1.00000000",
             "edition_nft_number": "1.00000000"
         },
         "tags": {
-            "NeoMotorCycleTag": "Tag1"
+            "Color": "Pearl"
         },
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "totalInEdition": "",

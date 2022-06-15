@@ -91,10 +91,10 @@
         "scalars": {
             "edition_nft_max": "1.00000000",
             "edition_nft_number": "1.00000000",
-            "video length": "27.00000000"
+            "video_length": "27.00000000"
         },
         "tags": {
-            "xtingle Tag": "Tag1"
+            "Author": "Xtingles"
         },
         "thumbnail": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
         "totalInEdition": "",

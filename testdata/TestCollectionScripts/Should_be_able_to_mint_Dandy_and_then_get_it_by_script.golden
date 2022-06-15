@@ -6,8 +6,6 @@
             "DandyID",
             "DandyID",
             "DandyID",
-            "DandyID",
-            "DandyID",
             "DandyID"
         ]
     },
@@ -31,10 +29,10 @@
             "name": "Neo Motorcycle 1 of 1",
             "rarity": "rare",
             "scalar": {
-                "Speed": "100.00000000"
+                "Speed": "200.00000000"
             },
             "tag": {
-                "NeoMotorCycleTag": "Tag1"
+                "Color": "Pearl"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://find.xyz/collection/user1/dandy/ID0",
@@ -65,10 +63,10 @@
             "name": "xtingle 1 of 1",
             "rarity": "rare",
             "scalar": {
-                "video length": "27.00000000"
+                "video_length": "27.00000000"
             },
             "tag": {
-                "xtingle Tag": "Tag1"
+                "Author": "Xtingles"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://nft.blocto.app/xtingles//ID1",
@@ -77,38 +75,10 @@
         "DandyID2": {
             "collection": "Dandy",
             "contentTypes": [
-                "image/svg"
-            ],
-            "id": "ID2",
-            "image": "https://flovatar.com/api/image/943",
-            "medias": [
-                {
-                    "file": {
-                        "url": "https://flovatar.com/api/image/943"
-                    },
-                    "mediaType": "image/svg"
-                }
-            ],
-            "name": "flovatar 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "id": "943.00000000",
-                "rarity score": "2.20000000"
-            },
-            "tag": {
-                "flovatar Tag": "Tag1"
-            },
-            "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://flovatar.com/flovatars/943/0x886f3aeaf848c535/ID2",
-            "uuid": "ID2"
-        },
-        "DandyID3": {
-            "collection": "Dandy",
-            "contentTypes": [
                 "video/mp4",
                 "image;display=thumbnail"
             ],
-            "id": "ID3",
+            "id": "ID2",
             "image": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
             "medias": [
                 {
@@ -129,22 +99,22 @@
             "name": "ufcstrike 1 of 1",
             "rarity": "rare",
             "scalar": {
-                "rank": "295.00000000"
+                "Reach": "120.00000000"
             },
             "tag": {
-                "ufcstrike Tag": "Tag1"
+                "signature-move": "Rare Naked Choke"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://www.ufcstrike.com/ID3",
-            "uuid": "ID3"
+            "url": "https://www.ufcstrike.com/ID2",
+            "uuid": "ID2"
         },
-        "DandyID4": {
+        "DandyID3": {
             "collection": "Dandy",
             "contentTypes": [
                 "video/mp4",
                 "image/jpg;display=thumbnail"
             ],
-            "id": "ID4",
+            "id": "ID3",
             "image": "https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg",
             "medias": [
                 {
@@ -167,47 +137,18 @@
                 "video length": "45.00000000"
             },
             "tag": {
-                "jambb Tag": "Tag1"
+                "Author": "Jack Black"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://www.ufcstrike.com/ID4",
-            "uuid": "ID4"
+            "url": "https://www.jambb.com/ID3",
+            "uuid": "ID3"
         },
-        "DandyID5": {
-            "collection": "Dandy",
-            "contentTypes": [
-                "text/plain"
-            ],
-            "id": "ID5",
-            "image": "No one\nOf the year I hope it's on\nFor work",
-            "medias": [
-                {
-                    "file": {
-                        "content": "No one\nOf the year I hope it's on\nFor work",
-                        "mediaType": "text/plain",
-                        "protocol": "onChain"
-                    },
-                    "mediaType": "text/plain"
-                }
-            ],
-            "name": "bitku 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "rank": "0.00000000"
-            },
-            "tag": {
-                "bitku Tag": "Tag1"
-            },
-            "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://bitku.art/#0x886f3aeaf848c535/188/ID5",
-            "uuid": "ID5"
-        },
-        "DandyID6": {
+        "DandyID4": {
             "collection": "Dandy",
             "contentTypes": [
                 "image"
             ],
-            "id": "ID6",
+            "id": "ID4",
             "image": "ipfs://QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a",
             "medias": [
                 {
@@ -221,22 +162,22 @@
             "name": "goatedgoats 1 of 1",
             "rarity": "rare",
             "scalar": {
-                "id": "2389.00000000"
+                "trait-slots": "5.00000000"
             },
             "tag": {
-                "goatedgoats Tag": "Tag1"
+                "Color": "Black"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://goatedgoats.com//ID6",
-            "uuid": "ID6"
+            "url": "https://goatedgoats.com//ID4",
+            "uuid": "ID4"
         },
-        "DandyID7": {
+        "DandyID5": {
             "collection": "Dandy",
             "contentTypes": [
                 "video/mp4"
             ],
-            "id": "ID7",
-            "image": "https://ipfs.io/ipfs/bafybeif3banecjnrz7afp54tb332f3zzigzbdcgmjk3k3dwp4iqlrwsbju/73ceab33cf76c2cf48a9a587119c87d21d4ec92b5748e743113c4ce8a1568b53.mp4",
+            "id": "ID5",
+            "image": "https://helloeddi.files.wordpress.com/2020/11/kevin1.jpg?w=982\u0026h=1360?w=650",
             "medias": [
                 {
                     "file": {
@@ -251,11 +192,11 @@
                 "id": "0.00000000"
             },
             "tag": {
-                "klktn Tag": "Tag1"
+                "Author": "Kevin Woo"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://klktn.com//ID7",
-            "uuid": "ID7"
+            "url": "https://klktn.com//ID5",
+            "uuid": "ID5"
         }
     }
 }`
