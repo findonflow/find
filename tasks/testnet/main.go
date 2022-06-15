@@ -8,7 +8,6 @@ func main() {
 
 	//g := gwtf.NewGoWithTheFlowEmulator().InitializeContracts().CreateAccounts("emulator-account")
 	o := overflow.NewOverflowTestnet().Start()
-	//	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments().Account("find"))
 
 	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().Account("find").UFix64(1.0))
 
@@ -49,7 +48,7 @@ func main() {
 	o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
-	o.SimpleTxArgs("adminSetNFTInfo_Flovatar", "find-admin", o.Arguments())
+	//		o.SimpleTxArgs("adminSetNFTInfo_Flovatar", "find-admin", o.Arguments())
 	// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
 
 	//	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
@@ -71,6 +70,10 @@ func main() {
 	// registerUserWithNameAndForge(o, "user1", "bitku")
 	registerUserWithNameAndForge(o, "user1", "goatedgoats")
 	registerUserWithNameAndForge(o, "user1", "klktn")
+
+	//	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminAddFlovatarTestnet", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminAddVersusTestnet", "find-admin", o.Arguments().Account("find"))
 
 }
 
