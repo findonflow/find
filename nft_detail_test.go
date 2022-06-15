@@ -27,17 +27,6 @@ func TestNFTDetailScript(t *testing.T) {
 				StringArray()).
 			RunReturnsJsonString()
 
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-		}
-		for _, item := range viewList {
-			actual = strings.Replace(actual, item, "checked", -1)
-		}
-
 		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
@@ -63,17 +52,6 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(ids[1]).
 				StringArray()).
 			RunReturnsJsonString()
-
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-		}
-		for _, item := range viewList {
-			actual = strings.Replace(actual, item, "checked", -1)
-		}
 
 		actual = otu.replaceID(actual, ids)
 
@@ -126,16 +104,7 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
 		actual := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-		}
-		for _, item := range viewList {
-			actual = strings.Replace(actual, item, "checked", -1)
-		}
+
 		actual = otu.replaceID(actual, ids)
 
 		autogold.Equal(t, actual)
