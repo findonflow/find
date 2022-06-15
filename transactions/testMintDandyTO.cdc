@@ -130,7 +130,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "flovatar ", description: "flovatar_NFT", type:"image")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/api/image/166")
+			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/api/image/166 ")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/svg")
 			let artTag=FindViews.Tag({"flovatar Tag":"Tag1"})
 			let artScalar=FindViews.Scalar({"rarity score" : 2.2, "id" : 166.0})

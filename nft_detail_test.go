@@ -220,7 +220,6 @@ func TestNFTDetailScript(t *testing.T) {
 		for _, item := range viewList {
 			actual3 = strings.Replace(actual3, item, "checked", -1)
 		}
-
 		otu.AutoGold("actual3", actual3)
 
 		actual4 := otu.O.ScriptFromFile("getNFTDetails").

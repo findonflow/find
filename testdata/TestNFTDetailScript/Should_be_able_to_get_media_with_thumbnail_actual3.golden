@@ -61,7 +61,7 @@
         "media": [
             {
                 "file": {
-                    "url": "https://flovatar.com/api/image/ID2"
+                    "url": "https://flovatar.com/api/image/166 "
                 },
                 "mediaType": "image/svg"
             }
@@ -91,7 +91,7 @@
         "tags": {
             "flovatar Tag": "Tag1"
         },
-        "thumbnail": "https://flovatar.com/api/image/ID2",
+        "thumbnail": "https://flovatar.com/api/image/166 ",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID2",

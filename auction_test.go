@@ -44,7 +44,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "88",
+				"uuid":        "89",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -57,7 +57,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "90",
+				"uuid":        "91",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -94,7 +94,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "88",
+				"uuid":        "89",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -107,7 +107,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "90",
+				"uuid":        "91",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -120,7 +120,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "92",
+				"uuid":        "93",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -834,13 +834,17 @@ func TestAuction(t *testing.T) {
 			registerUser("user3").
 			directOffer("user2", "user1", 4.0)
 
-		result := o.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
+		res := o.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
 			Args(o.O.Arguments().
 				String("user1").
 				UFix64(10.0)).
 			Test(t).
 			AssertSuccess()
 
-		autogold.Equal(t, result.Events)
+		uuids := o.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.DirectOffer", "uuid")
+		result := o.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.DirectOffer"})
+		result = o.replaceID(result, uuids)
+
+		autogold.Equal(t, result)
 	})
 }

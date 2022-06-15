@@ -12,6 +12,7 @@ pub contract FindForge {
 	pub event Minted(nftType: String, id: UInt64, uuid: UInt64, nftName: String, nftThumbnail: String, from: Address, fromName: String, to: Address, toName: String?)
 
 	access(contract) let minterPlatforms : {Type : {String: MinterPlatform}}
+	access(contract) let platformHelper : @PlatformHelper
 
 	//TODO: make this {Type: @{Forge}}
 	access(contract) let forgeTypes : @{Type : {Forge}}
@@ -53,14 +54,31 @@ pub contract FindForge {
 
 	}
 
-	// ForgeMinter Interface 
-	pub resource interface Forge{
-		access(account) fun mint(platform: MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT 
+	pub resource interface IPlatformHelper {
+		pub fun getMinterPlatform() : MinterPlatform
 	}
 
-	// pub resource interface ForgeMinter 
-	// 	access(account) fun createForge(_ platform: FindForge.MinterPlatform) : @AnyResource{Forge} 
-	// }
+	pub resource PlatformHelper : IPlatformHelper {
+		access(contract) var minterPlatform : MinterPlatform?
+
+		init() {
+			self.minterPlatform = nil
+		}
+
+		pub fun setMinterPlatform(_ platform: MinterPlatform) {
+			self.minterPlatform=platform
+		}
+
+		pub fun getMinterPlatform() : MinterPlatform {
+			return self.minterPlatform ?? panic("Minter platform resource is not set up propoerly.")
+		}
+
+	}
+
+	// ForgeMinter Interface 
+	pub resource interface Forge{
+		pub fun mint(platform: &PlatformHelper{IPlatformHelper}, data: AnyStruct) : @NonFungibleToken.NFT 
+	}
 
 	access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
 		return &FindForge.forgeTypes[type] as &{Forge}?
@@ -128,10 +146,12 @@ pub contract FindForge {
 		}
 
 		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
+		let platformRef = self.borrowPlatformHelper()
+		platformRef.setMinterPlatform(minterPlatform)
 
 		let forge = FindForge.borrowForge(forgeType) ?? panic("The type passed in does not match with the minting NFT type. ")
 
-		let nft <- forge.mint(platform: minterPlatform, data: data) 
+		let nft <- forge.mint(platform: platformRef, data: data) 
 
 		let id = nft.id 
 		let uuid = nft.uuid 
@@ -207,11 +227,17 @@ pub contract FindForge {
 		FindForge.platformCut = cut
 	}
 
+	access(account) fun borrowPlatformHelper() : &PlatformHelper {
+		return (&self.platformHelper as &PlatformHelper?)!
+	}
+
 	init() {
 		self.minterPlatforms={}
 		self.publicForges=[]
 		self.forgeTypes<-{}
 		self.platformCut=0.025
+
+		self.platformHelper <- create PlatformHelper()
 	}
 
 }

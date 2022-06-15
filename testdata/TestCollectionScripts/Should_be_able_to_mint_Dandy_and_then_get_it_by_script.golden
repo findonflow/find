@@ -80,11 +80,11 @@
                 "image/svg"
             ],
             "id": "ID2",
-            "image": "https://flovatar.com/api/image/166",
+            "image": "https://flovatar.com/api/image/166 ",
             "medias": [
                 {
                     "file": {
-                        "url": "https://flovatar.com/api/image/166"
+                        "url": "https://flovatar.com/api/image/166 "
                     },
                     "mediaType": "image/svg"
                 }

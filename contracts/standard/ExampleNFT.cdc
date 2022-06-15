@@ -241,12 +241,13 @@ pub contract ExampleNFT: NonFungibleToken {
     }
 
     pub resource Forge: FindForge.Forge {
-		access(account) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT {
+		pub fun mint(platform: &FindForge.PlatformHelper{FindForge.IPlatformHelper}, data: AnyStruct) : @NonFungibleToken.NFT {
 			let info = data as? ExampleNFTInfo ?? panic("The data passed in is not in form of ExampleNFTInfo.")
             let royalties : [MetadataViews.Royalty] = []
-            royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))
-            if platform.minterCut != nil {
-                royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "minter"))
+            let platformInfo = platform.getMinterPlatform()
+            royalties.append(MetadataViews.Royalty(receiver:platformInfo.platform, cut: platformInfo.platformPercentCut, description: "platform"))
+            if platformInfo.minterCut != nil {
+                royalties.append(MetadataViews.Royalty(receiver:platformInfo.getMinterFTReceiver(), cut: platformInfo.minterCut!, description: "minter"))
             }
 			return <- ExampleNFT.mintNFT(name: info.name,
                                         description: info.description,
