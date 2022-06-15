@@ -61,6 +61,8 @@ pub contract FIND {
 	/// Emitted if a bid occurs at a name that is too low or not for sale
 	pub event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
 
+	pub event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
+
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
 	pub let BidStoragePath: StoragePath
@@ -866,6 +868,11 @@ pub contract FIND {
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
 					self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+					if lease.salePrice == nil || lease.salePrice != soldFor {
+						emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
+					} else {
+						emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "Sale")
+					}
 				}
 
 				//why not use Profile to send money :P
@@ -905,6 +912,7 @@ pub contract FIND {
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
 				self.networkWallet.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "EnglishAuction")
 			}
 
 			//why not use FIND to send money :P

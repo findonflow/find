@@ -394,7 +394,7 @@ func TestAuction(t *testing.T) {
 			AssertSuccess()
 
 		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction"})
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction", "A.f8d6e0586b0a20c7.FIND.RoyaltyPaid"})
 		result = otu.replaceID(result, uuid)
 		autogold.Equal(t, result)
 	})
