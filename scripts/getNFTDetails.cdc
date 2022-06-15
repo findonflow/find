@@ -47,6 +47,9 @@ pub struct NFTDetail {
 	pub var totalInEdition: UInt64?
 	pub var scalars : {String: UFix64}
 	pub var tags : {String: String}
+	//pub var media : {String: String} //url to mediaType
+
+
 	pub var media: [MetadataViews.Media]
 	pub var collectionName: String? 
 	pub var collectionDescription: String? 
@@ -94,6 +97,7 @@ pub struct NFTDetail {
 
 
 		/*
+		need to add this to media
 		let media =FindViews.getMedia(item)
 		if media != nil{
 			self.media.append(media!)
