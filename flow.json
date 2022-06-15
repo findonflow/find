@@ -17,7 +17,7 @@
 			"source": "./contracts/standard/FUSD.cdc",
 			"aliases": {
 				"testnet": "0xe223d8a629e49c68",
-				"mainnet" : "0x3c5959b568896393"
+				"mainnet": "0x3c5959b568896393"
 			}
 		},
 		"FungibleToken": {
@@ -25,7 +25,7 @@
 			"aliases": {
 				"testnet": "9a0766d93b6608b7",
 				"emulator": "ee82856bf20e2aa6",
-				"mainnet" :"0xf233dcee88fe0abe"
+				"mainnet": "0xf233dcee88fe0abe"
 			}
 		},
 		"FlowToken": {
@@ -33,7 +33,7 @@
 			"aliases": {
 				"testnet": "0x7e60df042a9c0868",
 				"emulator": "0x0ae53cb6e3f42a79",
-				"mainnet" : "0x1654653399040a61"
+				"mainnet": "0x1654653399040a61"
 			}
 		},
 		"FIND": "./contracts/FIND.cdc",
@@ -41,9 +41,9 @@
 		"Sender": "./contracts/Sender.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
 		"Admin": "./contracts/Admin.cdc",
-		"Clock": "./contracts/Clock.cdc", 
+		"Clock": "./contracts/Clock.cdc",
 		"Profile": "./contracts/Profile.cdc",
-		"Debug" : "./contracts/Debug.cdc"
+		"Debug": "./contracts/Debug.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -141,11 +141,11 @@
 				"CharityNFT",
 				"Sender",
 				"RelatedAccounts"
-			], 
-			"emulator-find" : [],
-			"emulator-user1" : [],
-			"emulator-user2" : [],
-			"emulator-user3" : []
+			],
+			"emulator-find": [],
+			"emulator-user1": [],
+			"emulator-user2": [],
+			"emulator-user3": []
 		}
 	}
 }

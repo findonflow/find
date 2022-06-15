@@ -450,7 +450,7 @@ pub contract FIND {
 		access(contract) fun deposit(token: @FIND.Lease)
 
 		access(contract)fun cancelUserBid(_ name: String) 
-		access(contract) fun increaseBid(_ name: String) 
+		access(contract) fun increaseBid(_ name: String, balance: UFix64) 
 
 		//place a bid on a token
 		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
@@ -634,13 +634,15 @@ pub contract FIND {
 			lease.setCallback(nil)
 		}
 
-		access(contract) fun increaseBid(_ name: String) {
+		access(contract) fun increaseBid(_ name: String, balance: UFix64) {
 			pre {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
 			let lease = self.borrow(name)
 			let timestamp=Clock.time()
+
+			assert(balance >= lease.auctionMinBidIncrement, message: "Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
 
 			if self.auctions.containsKey(name) {
 				let auction = self.borrowAuction(name)
@@ -964,12 +966,12 @@ pub contract FIND {
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrow(_ name: String): &FIND.Lease {
-			return &self.leases[name] as &FIND.Lease
+			return (&self.leases[name] as &FIND.Lease?)!
 		}
 
 		//borrow the auction
 		pub fun borrowAuction(_ name: String): &FIND.Auction {
-			return &self.auctions[name] as &FIND.Auction
+			return (&self.auctions[name] as &FIND.Auction?)!
 		}
 
 
@@ -1408,13 +1410,13 @@ pub contract FIND {
 				panic("cannot increaseBid on name that is free")
 			}
 			let seller=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-
+			let balance = vault.balance
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-			from.borrow()!.increaseBid(name)
+			from.borrow()!.increaseBid(name, balance: balance)
 		}
 
 		//cancel a bid, will panic if called after auction has started
@@ -1431,7 +1433,7 @@ pub contract FIND {
 		}
 
 		pub fun borrowBid(_ name: String): &Bid {
-			return &self.bids[name] as &Bid
+			return (&self.bids[name] as &Bid?)!
 		}
 
 		access(contract) fun setBidType(name: String, type: String) {
