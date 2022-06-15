@@ -12,7 +12,7 @@ pub contract FindForge {
 	pub event Minted(nftType: String, id: UInt64, uuid: UInt64, nftName: String, nftThumbnail: String, from: Address, fromName: String, to: Address, toName: String?)
 
 	access(contract) let minterPlatforms : {Type : {String: MinterPlatform}}
-	access(contract) let platformHelper : @PlatformHelper
+	access(contract) let verifier : @Verifier
 
 	//TODO: make this {Type: @{Forge}}
 	access(contract) let forgeTypes : @{Type : {Forge}}
@@ -54,30 +54,13 @@ pub contract FindForge {
 
 	}
 
-	pub resource interface IPlatformHelper {
-		pub fun getMinterPlatform() : MinterPlatform
-	}
-
-	pub resource PlatformHelper : IPlatformHelper {
-		access(contract) var minterPlatform : MinterPlatform?
-
-		init() {
-			self.minterPlatform = nil
-		}
-
-		pub fun setMinterPlatform(_ platform: MinterPlatform) {
-			self.minterPlatform=platform
-		}
-
-		pub fun getMinterPlatform() : MinterPlatform {
-			return self.minterPlatform ?? panic("Minter platform resource is not set up propoerly.")
-		}
+	pub resource Verifier {
 
 	}
 
 	// ForgeMinter Interface 
 	pub resource interface Forge{
-		pub fun mint(platform: &PlatformHelper{IPlatformHelper}, data: AnyStruct) : @NonFungibleToken.NFT 
+		pub fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @NonFungibleToken.NFT 
 	}
 
 	access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
@@ -146,12 +129,11 @@ pub contract FindForge {
 		}
 
 		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
-		let platformRef = self.borrowPlatformHelper()
-		platformRef.setMinterPlatform(minterPlatform)
+		let verifier = self.borrowVerifier()
 
 		let forge = FindForge.borrowForge(forgeType) ?? panic("The type passed in does not match with the minting NFT type. ")
 
-		let nft <- forge.mint(platform: platformRef, data: data) 
+		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 
 		let id = nft.id 
 		let uuid = nft.uuid 
@@ -227,8 +209,8 @@ pub contract FindForge {
 		FindForge.platformCut = cut
 	}
 
-	access(account) fun borrowPlatformHelper() : &PlatformHelper {
-		return (&self.platformHelper as &PlatformHelper?)!
+	access(account) fun borrowVerifier() : &Verifier {
+		return (&self.verifier as &Verifier?)!
 	}
 
 	init() {
@@ -237,7 +219,7 @@ pub contract FindForge {
 		self.forgeTypes<-{}
 		self.platformCut=0.025
 
-		self.platformHelper <- create PlatformHelper()
+		self.verifier <- create Verifier()
 	}
 
 }

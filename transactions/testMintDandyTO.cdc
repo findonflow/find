@@ -130,17 +130,17 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "flovatar ", description: "flovatar_NFT", type:"image")
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/api/image/166 ")
+			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/api/image/943")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/svg")
 			let artTag=FindViews.Tag({"flovatar Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"rarity score" : 2.2, "id" : 166.0})
+			let artScalar=FindViews.Scalar({"rarity score" : 2.2, "id" : 943.0})
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			
 			let mintData = Dandy.DandyInfo(name: "flovatar ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,
 								thumbnail: artMedia,
 								schemas: schemas, 
-								externalUrlPrefix:"https://flovatar.com/flovatars/166/0x886f3aeaf848c535")
+								externalUrlPrefix:"https://flovatar.com/flovatars/943/0x886f3aeaf848c535")
 			
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
