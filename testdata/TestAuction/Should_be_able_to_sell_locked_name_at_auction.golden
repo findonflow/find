@@ -59,6 +59,23 @@
 		},
 	},
 	&overflow.FormatedEvent{
+		Name: "A.f8d6e0586b0a20c7.FIND.RoyaltyPaid",
+		Time: time.Time{
+			ext: 62135596800,
+			loc: &time.Location{name: "UTC"},
+		},
+		Fields: map[string]interface{}{
+			"address":     "0x01cf0e2f2f715450",
+			"amount":      "1.00000000",
+			"findName":    "",
+			"name":        "user1",
+			"royaltyName": "Network",
+			"saleType":    "EnglishAuction",
+			"uuid":        "106",
+			"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
+		},
+	},
+	&overflow.FormatedEvent{
 		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
 		Time: time.Time{
 			ext: 62135596800,
