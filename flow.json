@@ -145,15 +145,15 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find": {
-			"address": "862f7bac4e02c854",
+			"address": "ef91ae4563085867",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find-admin": {
-			"address": "6248c2715ff8c88b",
+			"address": "1da272abebf652d9",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user1": {
-			"address": "907b1e9fd706c235",
+			"address": "f9c5cb76fa0c5206",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user2": {
@@ -189,7 +189,8 @@
 				"Sender",
 				"RelatedAccounts",
 				"FTRegistry",
-				"NFTRegistry"
+				"NFTRegistry",
+				"FindForge"
 			]
 		},
 		"testnet": {
@@ -212,7 +213,8 @@
 				"RelatedAccounts",
 				"FTRegistry",
 				"NFTRegistry",
-				"CollectionFactory"
+				"CollectionFactory",
+				"FindForge"
 			]
 		},
 		"emulator": {
