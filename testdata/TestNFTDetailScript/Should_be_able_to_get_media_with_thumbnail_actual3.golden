@@ -61,7 +61,7 @@
         "media": [
             {
                 "file": {
-                    "url": "https://flovatar.com/api/image/ID2"
+                    "url": "https://flovatar.com/api/image/943"
                 },
                 "mediaType": "image/svg"
             }
@@ -85,13 +85,13 @@
         "scalars": {
             "edition_nft_max": "1.00000000",
             "edition_nft_number": "1.00000000",
-            "id": "166.00000000",
+            "id": "943.00000000",
             "rarity score": "2.20000000"
         },
         "tags": {
             "flovatar Tag": "Tag1"
         },
-        "thumbnail": "https://flovatar.com/api/image/ID2",
+        "thumbnail": "https://flovatar.com/api/image/943",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID2",

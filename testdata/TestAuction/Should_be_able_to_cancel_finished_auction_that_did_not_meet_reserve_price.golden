@@ -9,6 +9,8 @@
     "endsAt": "86401.00000000",
     "lockedUntil": "39312001.00000000",
     "name": "user1",
+    "previousBuyer": "",
+    "previousBuyerName": "",
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
     "status": "cancel_reserved_not_met",

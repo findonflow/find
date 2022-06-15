@@ -348,7 +348,7 @@ pub contract Dandy: NonFungibleToken {
 
 	//TODO: do we want to store minter 
 	pub resource Forge: FindForge.Forge {
-		access(account) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT {
+		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
 			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)
 		}

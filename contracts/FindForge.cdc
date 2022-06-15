@@ -12,6 +12,7 @@ pub contract FindForge {
 	pub event Minted(nftType: String, id: UInt64, uuid: UInt64, nftName: String, nftThumbnail: String, from: Address, fromName: String, to: Address, toName: String?)
 
 	access(contract) let minterPlatforms : {Type : {String: MinterPlatform}}
+	access(contract) let verifier : @Verifier
 
 	//TODO: make this {Type: @{Forge}}
 	access(contract) let forgeTypes : @{Type : {Forge}}
@@ -53,14 +54,14 @@ pub contract FindForge {
 
 	}
 
-	// ForgeMinter Interface 
-	pub resource interface Forge{
-		access(account) fun mint(platform: MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT 
+	pub resource Verifier {
+
 	}
 
-	// pub resource interface ForgeMinter 
-	// 	access(account) fun createForge(_ platform: FindForge.MinterPlatform) : @AnyResource{Forge} 
-	// }
+	// ForgeMinter Interface 
+	pub resource interface Forge{
+		pub fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @NonFungibleToken.NFT 
+	}
 
 	access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
 		return &FindForge.forgeTypes[type] as &{Forge}?
@@ -128,10 +129,11 @@ pub contract FindForge {
 		}
 
 		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
+		let verifier = self.borrowVerifier()
 
 		let forge = FindForge.borrowForge(forgeType) ?? panic("The type passed in does not match with the minting NFT type. ")
 
-		let nft <- forge.mint(platform: minterPlatform, data: data) 
+		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 
 		let id = nft.id 
 		let uuid = nft.uuid 
@@ -207,11 +209,17 @@ pub contract FindForge {
 		FindForge.platformCut = cut
 	}
 
+	access(account) fun borrowVerifier() : &Verifier {
+		return (&self.verifier as &Verifier?)!
+	}
+
 	init() {
 		self.minterPlatforms={}
 		self.publicForges=[]
 		self.forgeTypes<-{}
 		self.platformCut=0.025
+
+		self.verifier <- create Verifier()
 	}
 
 }

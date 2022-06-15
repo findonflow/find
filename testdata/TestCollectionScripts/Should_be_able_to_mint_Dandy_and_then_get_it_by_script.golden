@@ -80,11 +80,11 @@
                 "image/svg"
             ],
             "id": "ID2",
-            "image": "https://flovatar.com/api/image/166",
+            "image": "https://flovatar.com/api/image/943",
             "medias": [
                 {
                     "file": {
-                        "url": "https://flovatar.com/api/image/166"
+                        "url": "https://flovatar.com/api/image/943"
                     },
                     "mediaType": "image/svg"
                 }
@@ -92,14 +92,14 @@
             "name": "flovatar 1 of 1",
             "rarity": "rare",
             "scalar": {
-                "id": "166.00000000",
+                "id": "943.00000000",
                 "rarity score": "2.20000000"
             },
             "tag": {
                 "flovatar Tag": "Tag1"
             },
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "url": "https://flovatar.com/flovatars/166/0x886f3aeaf848c535/ID2",
+            "url": "https://flovatar.com/flovatars/943/0x886f3aeaf848c535/ID2",
             "uuid": "ID2"
         },
         "DandyID3": {

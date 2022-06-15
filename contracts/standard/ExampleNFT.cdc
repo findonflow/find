@@ -241,7 +241,7 @@ pub contract ExampleNFT: NonFungibleToken {
     }
 
     pub resource Forge: FindForge.Forge {
-		access(account) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct) : @NonFungibleToken.NFT {
+		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? ExampleNFTInfo ?? panic("The data passed in is not in form of ExampleNFTInfo.")
             let royalties : [MetadataViews.Royalty] = []
             royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))

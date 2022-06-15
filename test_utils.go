@@ -1152,15 +1152,15 @@ func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) setFindName(user, name string) *OverflowTestUtils {
-	otu.O.TransactionFromFile("testSetMainName").
-		SignProposeAndPayAs(user).
-		Args(otu.O.Arguments().
-			String(name)).
-		Test(otu.T).
-		AssertSuccess()
-	return otu
-}
+// func (otu *OverflowTestUtils) setFindName(user, name string) *OverflowTestUtils {
+// 	otu.O.TransactionFromFile("testSetMainName").
+// 		SignProposeAndPayAs(user).
+// 		Args(otu.O.Arguments().
+// 			String(name)).
+// 		Test(otu.T).
+// 		AssertSuccess()
+// 	return otu
+// }
 
 func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string {
 	counter := 0
