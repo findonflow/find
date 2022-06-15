@@ -110,7 +110,9 @@
 		"Profile": "./contracts/Profile.cdc",
 		"Debug": "./contracts/Debug.cdc",
 		"FTRegistry": "./contracts/FTRegistry.cdc",
-		"NFTRegistry": "./contracts/NFTRegistry.cdc"
+		"NFTRegistry": "./contracts/NFTRegistry.cdc",
+		"FindForge": "./contracts/FindForge.cdc",
+		"ExampleNFT": "./contracts/standard/ExampleNFT.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -216,6 +218,7 @@
 		"emulator": {
 			"emulator-account": [
 				"FIND",
+				"FindForge",
 				"NonFungibleToken",
 				"Clock",
 				"Profile",
@@ -237,7 +240,8 @@
 				"RelatedAccounts",
 				"FTRegistry",
 				"NFTRegistry",
-				"NFTStorefront"
+				"NFTStorefront",
+				"ExampleNFT"
 			],
 			"emulator-find": [],
 			"emulator-user1": [],

@@ -482,6 +482,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
@@ -499,7 +500,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      "0.50000000",
-				"royaltyName": "artist",
+				"royaltyName": "minter",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
@@ -507,7 +508,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"royaltyName": "platform",
 			}))
 
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 	})
 
 	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
@@ -527,6 +533,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		status = otu.replaceID(status, []uint64{id})
 		otu.AutoGold("status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
@@ -544,7 +551,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      "0.50000000",
-				"royaltyName": "artist",
+				"royaltyName": "minter",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
@@ -552,7 +559,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"royaltyName": "platform",
 			}))
 
-		otu.AutoGold("events", res.Events)
+		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "saleID")
+
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction"})
+		result = otu.replaceID(result, []uint64{id})
+		result = otu.replaceID(result, saleIDs)
+		otu.AutoGold("events", result)
 	})
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {

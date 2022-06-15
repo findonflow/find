@@ -3,8 +3,8 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
+import FindForge from "./FindForge.cdc"
 import Debug from "./Debug.cdc"
-import Dandy from "./Dandy.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FTRegistry from "./FTRegistry.cdc"
@@ -141,6 +141,7 @@ pub contract Admin {
 			Debug.enable(value)
 		}
 
+		/*
 		pub fun setViewConverters(from: Type, converters: [{Dandy.ViewConverter}]) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -148,13 +149,7 @@ pub contract Admin {
 
 			Dandy.setViewConverters(from: from, converters: converters)
 		}
-
-		pub fun createForge(platform: Dandy.MinterPlatform) : @Dandy.Forge {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			return <- Dandy.createForge(platform:platform)
-		}
+		*/
 
 		/// ===================================================================================
 		// Fungible Token Registry 
@@ -337,6 +332,7 @@ pub contract Admin {
 
 		self.AdminProxyPublicPath= /public/findAdminProxy
 		self.AdminProxyStoragePath=/storage/findAdminProxy
+
 	}
 
 }

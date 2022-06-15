@@ -1,72 +1,21 @@
-[]*overflow.FormatedEvent{
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{
-				name: "UTC",
-			},
-		},
-		Fields: map[string]interface{}{
-			"amount":              "20.00000000",
-			"auctionReservePrice": "20.00000000",
-			"buyer":               "0xf3fcd2c1a78f5eee",
-			"buyerName":           "",
-			"endsAt":              "31622401.00000000",
-			"lockedUntil":         "39312001.00000000",
-			"name":                "user1",
-			"previousBuyer":       "",
-			"previousBuyerName":   "",
-			"seller":              "0x179b6b1cb6755e31",
-			"sellerName":          "",
-			"status":              "sold",
-			"uuid":                "106",
-			"validUntil":          "31536001.00000000",
-			"vaultType":           "A.f8d6e0586b0a20c7.FUSD.Vault",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "20.00000000",
-			"from":   "",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "1.00000000",
-			"from":   "",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "1.00000000",
-			"to":     "0x01cf0e2f2f715450",
-		},
-	},
-	&overflow.FormatedEvent{
-		Name: "A.f8d6e0586b0a20c7.FUSD.TokensDeposited",
-		Time: time.Time{
-			ext: 62135596800,
-			loc: &time.Location{name: "UTC"},
-		},
-		Fields: map[string]interface{}{
-			"amount": "19.00000000",
-			"to":     "0x179b6b1cb6755e31",
-		},
-	},
-}
+`{
+  "name": "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
+  "time": "1970-01-01T00:00:00Z",
+  "fields": {
+    "amount": "20.00000000",
+    "auctionReservePrice": "20.00000000",
+    "buyer": "0xf3fcd2c1a78f5eee",
+    "buyerName": "",
+    "endsAt": "31622401.00000000",
+    "lockedUntil": "39312001.00000000",
+    "name": "user1",
+    "previousBuyer": "",
+    "previousBuyerName": "",
+    "seller": "0x179b6b1cb6755e31",
+    "sellerName": "",
+    "status": "sold",
+    "uuid": "ID0",
+    "validUntil": "31536001.00000000",
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
+  }
+}`

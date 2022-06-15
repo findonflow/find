@@ -1,15 +1,15 @@
 `[
     "A.f8d6e0586b0a20c7.FindViews.Nounce",
     "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-    "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
-    "A.f8d6e0586b0a20c7.MetadataViews.Display",
-    "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-    "A.f8d6e0586b0a20c7.MetadataViews.Media",
-    "A.f8d6e0586b0a20c7.MetadataViews.Editions",
-    "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-    "A.f8d6e0586b0a20c7.FindViews.Tag",
-    "A.f8d6e0586b0a20c7.FindViews.Scalar",
-    "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+    "checked",
+    "checked",
+    "checked",
+    "checked",
+    "checked",
+    "checked",
+    "checked",
+    "checked",
+    "checked"
 ]{
     "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
     "name": "Neo Motorcycle 1 of 3",
@@ -17,5 +17,5 @@
         "url": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"
     }
 }{
-    "url": "https://find.xyz/collection/user1/dandy/110"
+    "url": "https://find.xyz/collection/user1/dandy/ID0"
 }`

@@ -57,7 +57,7 @@
         "collectionName": "xtingles",
         "data": {},
         "editionNumber": "",
-        "id": "162",
+        "id": "ID1",
         "media": [
             {
                 "file": {
@@ -79,7 +79,7 @@
                 "address": "0x179b6b1cb6755e31",
                 "cut": "0.05000000",
                 "findName": "user1",
-                "royaltyName": "artist"
+                "royaltyName": "minter"
             },
             {
                 "address": "0xf8d6e0586b0a20c7",
@@ -99,14 +99,14 @@
         "thumbnail": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
         "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "162",
+        "uuid": "ID1",
         "views": [
-            "A.f8d6e0586b0a20c7.FindViews.Nounce",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.f8d6e0586b0a20c7.MetadataViews.Media",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked"
         ]
     },
     "storefront": ""
