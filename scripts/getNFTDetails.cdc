@@ -80,7 +80,7 @@ pub struct NFTDetail {
 		}			
 
 		if let scalar=FindViews.getScalar(item){
-				self.scalars=scalar.getScalar()
+			self.scalars=scalar.getScalar()
 		}
 		/* Medias */
 		let mediaView=item.resolveView(Type<FindViews.Medias>())
@@ -91,7 +91,14 @@ pub struct NFTDetail {
 				self.media=media.items
 			}
 		}
-	
+
+
+		/*
+		let media =FindViews.getMedia(item)
+		if media != nil{
+			self.media.append(media!)
+		}
+		*/
 
 		let display = FindViews.getDisplay(item) ?? panic("Could not find display")
 		self.name=display.name

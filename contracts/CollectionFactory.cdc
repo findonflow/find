@@ -39,13 +39,13 @@ pub contract CollectionFactory {
         pub let id:UInt64
         pub let name: String
         pub let collection: String // <- This will be Alias unless they want something else
-        pub let subCollection: String // <- This will be Alias unless they want something else
+        pub let subCollection: String? // <- This will be Alias unless they want something else
 
         pub let media  : String
         pub let mediaType : String 
         pub let source : String 
 
-        init(id:UInt64, name: String, collection: String, subCollection: String, media  : String, mediaType : String, source : String) {
+        init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String) {
             self.id=id
             self.name=name 
             self.collection=collection 
@@ -749,7 +749,7 @@ pub contract CollectionFactory {
                     id: id,
                     name: display!.name,
                     collection: nftInfo!.alias,
-                    subCollection: nftInfo!.alias, 
+                    subCollection: subCollection, 
                     media: display!.thumbnail.uri(),
                     mediaType: "image",
                     source: source

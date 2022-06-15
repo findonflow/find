@@ -333,6 +333,15 @@ pub contract FindViews {
 		return nil
 	}
 
+	pub fun getMedia(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Media? {
+		if let view = viewResolver.resolveView(Type<MetadataViews.Media>()) {
+			if let v = view as? MetadataViews.Media {
+				return v
+			}
+		}
+		return nil
+	}
+
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
