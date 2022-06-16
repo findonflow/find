@@ -36,7 +36,7 @@ import GoatedGoatsTrait from 0x2068315349bdfce5
 import GoatedGoatsTraitPack from 0x2068315349bdfce5
 
 import HaikuNFT from 0xf61e40c19db2a9e2
-// import KlktnNFT from 0xabd6e80be7e9682c
+import KlktnNFT from 0xabd6e80be7e9682c
 import Mynft from 0xf6fcbef550d97aa5
 import NeoAvatar from 0xb25138dbf45e5801
 import NeoVoucher from 0xb25138dbf45e5801
@@ -1097,38 +1097,38 @@ pub fun main(address: Address) : MetadataCollections? {
 			results["Bitku"] = items
 		}
 	}
-	// let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
-	// if klktnCap.check() {
-	// 	let items: [String] = []
-	// 	let collection = klktnCap.borrow()!
-	// 	for id in collection.getIDs() {
-	// 		let nft = collection.borrowKlktnNFT(id: id)!
+	 let klktnCap = account.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
+	 if klktnCap.check() {
+	 	let items: [String] = []
+	 	let collection = klktnCap.borrow()!
+	 	for id in collection.getIDs() {
+	 		let nft = collection.borrowKlktnNFT(id: id)!
 
-	// 		let metadata=nft.getNFTMetadata()
-	// 		/*
+	 		let metadata=nft.getNFTMetadata()
+	 		/*
 
-	// 		Result: {"uri": "ipfs://bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym", "name": "Kevin Woo - What is KLKTN?", "mimeType": "video/mp4", "media": "https://ipfs.io/ipfs/bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym/fb91ad34d61dde04f02ad240f0ca924902d8b4a3da25daaf0bb1ed769977848c.mp4", "description": "K-pop sensation Kevin Woo has partnered up with KLKTN to enhance his artist to fan interactions and experiences within his fandom. Join our chat to learn more: https://discord.gg/UJxb4erfUw"}
+	 		Result: {"uri": "ipfs://bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym", "name": "Kevin Woo - What is KLKTN?", "mimeType": "video/mp4", "media": "https://ipfs.io/ipfs/bafybeifsiousmtmcruuelgyiku3xa5hmw7ylsyqfdvpjsea7r4xa74bhym/fb91ad34d61dde04f02ad240f0ca924902d8b4a3da25daaf0bb1ed769977848c.mp4", "description": "K-pop sensation Kevin Woo has partnered up with KLKTN to enhance his artist to fan interactions and experiences within his fandom. Join our chat to learn more: https://discord.gg/UJxb4erfUw"}
 
-	// 		*/
-	// 		let item = MetadataCollectionItem(
-	// 			id: id,
-	// 			name: metadata["name"]!,
-	// 			image: metadata["media"]!,
-	// 			url: "https://klktn.com/",
-	// 			listPrice: nil,
-	// 			listToken: nil,
-	// 			contentType: "video", //metadata["mimeType"]!,
-	// 			rarity: ""
-	// 		)
-	// 		let itemId="KLKTN".concat(id.toString())
-	// 		items.append(itemId)
-	// 		resultMap[itemId] = item
-	// 	}
+	 		*/
+	 		let item = MetadataCollectionItem(
+	 			id: id,
+	 			name: metadata["name"]!,
+	 			image: metadata["media"]!,
+	 			url: "https://klktn.com/",
+	 			listPrice: nil,
+	 			listToken: nil,
+	 			contentType: "video", //metadata["mimeType"]!,
+	 			rarity: ""
+	 		)
+	 		let itemId="KLKTN".concat(id.toString())
+	 		items.append(itemId)
+	 		resultMap[itemId] = item
+	 	}
 
-	// 	if items.length != 0 {
-	// 		results["KLKTN"] = items
-	// 	}
-	// }
+	 	if items.length != 0 {
+	 		results["KLKTN"] = items
+	 	}
+	 }
 
 	let mynftCap = account.getCapability<&{Mynft.MynftCollectionPublic}>(Mynft.CollectionPublicPath)
 	if mynftCap.check() {
