@@ -113,8 +113,6 @@ pub contract FindToken : FungibleToken {
         }
     }
 
-    access(contract) 
-
     pub resource Minter {
         pub fun mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
             pre {

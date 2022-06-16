@@ -1247,6 +1247,13 @@ pub contract FIND {
 				name: name
 			)
 
+			// Pay Reward Token
+			if let rewardVault = FindRewardToken.getRewardVault(FIND.account.address) {
+				if !rewardVault.check() {
+					emit TokensCanNotBeRewarded(findName: name, address: profile.address, amount: amount, task: task, tokenType: tokenType)
+				}
+			}
+
 			emit Register(name: name, owner:profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 			emit Name(name: name)
 			self.profiles[name] =  lease
@@ -1562,6 +1569,12 @@ pub contract FIND {
 		}
 		return true
 
+	}
+
+	access(contract) fun emitTokenEventFN() : ((String, Address, UFix64, String, String) : Void) {
+		return fun (name: String, address: Address, amount: UFix64, task: String, tokenType: String) {
+			emit TokensCanNotBeRewarded(findName: name, address: address, amount: amount, task: task, tokenType: tokenType)
+		}
 	}
 
 	init() {

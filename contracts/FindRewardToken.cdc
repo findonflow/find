@@ -57,7 +57,7 @@ pub contract FindRewardToken {
     }
 
     pub resource interface FindReward {
-        pub fun reward(name: String, receiver: &{FungibleToken.Receiver}, task: String, emitEvent:((String, Address, UFix64, String) : Void)) 
+        pub fun reward(name: String, receiver: &{FungibleToken.Receiver}, task: String, emitEvent:((String, Address, UFix64, String, String) : Void)) 
     } 
 
     access(account) fun addTenantRewardToken(tenant: Address, cap: Capability<&{FindReward}>) {
@@ -74,8 +74,13 @@ pub contract FindRewardToken {
         self.tenantTokenCapabilities.remove(key: tenant)
     }
 
+    pub fun getRewardVault(_ tenant: Address) : Capability<&{FindReward}>? {
+        return FindRewardToken.tenantTokenCapabilities[tenant]
+    }
+
     init(){
         self.defaultTaskRewards = {
+            "FindName_Register" : 10.0,
             "FindName_Sale_List" : 1.0, 
             "FindName_Sale_Buy" : 1.0
         } 
