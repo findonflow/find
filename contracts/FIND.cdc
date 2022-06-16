@@ -64,9 +64,9 @@ pub contract FIND {
 
 	pub event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
 
-    pub event TokensRewarded(findName: String, address: Address, amount: UFix64, task: String, tokenType: String)
+    pub event TokensRewarded(tenant: Address, findName: String, address: Address, amount: UFix64, task: String, tokenType: String)
 
-    pub event TokensCanNotBeRewarded(findName: String, address: Address, amount: UFix64, task: String, tokenType: String)
+    pub event TokensCanNotBeRewarded(tenant: Address, findName: String, address: Address, amount: UFix64?, task: String, tokenType: String?)
 
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
@@ -1248,11 +1248,7 @@ pub contract FIND {
 			)
 
 			// Pay Reward Token
-			if let rewardVault = FindRewardToken.getRewardVault(FIND.account.address) {
-				if !rewardVault.check() {
-					emit TokensCanNotBeRewarded(findName: name, address: profile.address, amount: amount, task: task, tokenType: tokenType)
-				}
-			}
+			FIND.reward(tenant: FIND.account.address, findName: name, receiver: lease.address, task: "FindName_Register")
 
 			emit Register(name: name, owner:profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 			emit Name(name: name)
@@ -1571,9 +1567,21 @@ pub contract FIND {
 
 	}
 
-	access(contract) fun emitTokenEventFN() : ((String, Address, UFix64, String, String) : Void) {
-		return fun (name: String, address: Address, amount: UFix64, task: String, tokenType: String) {
-			emit TokensCanNotBeRewarded(findName: name, address: address, amount: amount, task: task, tokenType: tokenType)
+	access(contract) fun reward(tenant: Address, findName: String, receiver: Address, task: String) {
+		if let rewardVault = FindRewardToken.getRewardVault(tenant) {
+			if !rewardVault.check() {
+				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address:receiver, amount: nil, task: task, tokenType: nil)
+				return
+			}
+
+			let rewardPaid = rewardVault.borrow()!.reward(name: findName, receiver: receiver, task: task)
+			if !rewardPaid.success {
+				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address: receiver, amount: rewardPaid.amount, task: task, tokenType: rewardPaid.tokenType.identifier)
+				return
+			} 
+			if rewardPaid.amount != 0.0 {
+				emit TokensRewarded(tenant: tenant, findName: findName, address: receiver, amount: rewardPaid.amount, task: task, tokenType: rewardPaid.tokenType.identifier)
+			}
 		}
 	}
 
