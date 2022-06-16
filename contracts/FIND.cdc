@@ -6,6 +6,7 @@ import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import Sender from "./Sender.cdc"
+import FindRewardToken from "./FindRewardToken.cdc"
 /*
 
 ///FIND
@@ -62,6 +63,10 @@ pub contract FIND {
 	pub event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
 
 	pub event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
+
+    pub event TokensRewarded(findName: String, address: Address, amount: UFix64, task: String, tokenType: String)
+
+    pub event TokensCanNotBeRewarded(findName: String, address: Address, amount: UFix64, task: String, tokenType: String)
 
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath

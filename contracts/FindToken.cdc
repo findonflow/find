@@ -13,11 +13,12 @@ pub contract FindToken : FungibleToken {
     pub event TokensRewarded(findName: String, address: Address, amount: UFix64, task: String)
 
     pub var totalSupply: UFix64
-
+    pub let initialSupply: UFix64 
     pub let vaultStoragePath: StoragePath 
     pub let receiverPublicPath: PublicPath 
     pub let balancePublicPath: PublicPath 
     pub let providerPath: PrivatePath 
+    pub let minterPath: StoragePath 
     pub let findRewardPath: PrivatePath 
 
     // Map tenantToken to custom task rewards 
@@ -26,7 +27,7 @@ pub contract FindToken : FungibleToken {
     // Map address : {Task : Latest Claim TimeStamp}
     access(contract) let claimRecords: {Address : {String : UFix64}}
 
-    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindRewardToken.FindReward {
+    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindRewardToken.VaultViews , FindRewardToken.FindReward {
 
         pub var balance: UFix64 
         
@@ -53,10 +54,37 @@ pub contract FindToken : FungibleToken {
             destroy vault
         }
 
-        pub fun reward(name: String, receiver: &{FungibleToken.Receiver}, task: String) {
-            pre{
-                FindToken.taskRewards.containsKey(task) : "This task is not set up for rewards."
+        pub fun getViews() : [Type] {
+            return [
+                Type<FindRewardToken.FTVaultData>()
+            ]
+        }
+
+        pub fun resolveView(_ view: Type) : AnyStruct? {
+            switch view {
+                case Type<FindRewardToken.FTVaultData>() :
+                    return FindRewardToken.FTVaultData(
+                            storagePath: FindToken.vaultStoragePath,
+                            receiverPath: FindToken.receiverPublicPath,
+                            balancePath: FindToken.balancePublicPath,
+                            providerPath: FindToken.providerPath,
+                            findRewardPath: FindToken.findRewardPath,
+                            receiverType: Type<&FindToken.Vault{FungibleToken.Receiver}>(),
+                            balanceType: Type<&FindToken.Vault{FungibleToken.Balance}>(),
+                            providerType: Type<&FindToken.Vault{FungibleToken.Provider}>(),
+                            findRewardType: Type<&FindToken.Vault{FindRewardToken.FindReward}>(),
+                            createEmptyVault: FindToken.createEmptyVaultFN()
+                        )
+                default : 
+                    return nil 
             }
+        }
+
+        pub fun reward(name: String, receiver: &{FungibleToken.Receiver}, task: String) {
+            if FindToken.taskRewards[task] == nil {
+                return 
+            }
+
             let amount = FindToken.taskRewards[task]! 
 
             if amount == 0.0 {
@@ -79,28 +107,51 @@ pub contract FindToken : FungibleToken {
         return <- create FindToken.Vault(balance: 0.0)
     }
 
-    pub resource Minter {
-        pub var allowedAmount: UFix64 
+    pub fun createEmptyVaultFN() : (() : @FungibleToken.Vault) {
+        return fun () : @FungibleToken.Vault {
+            return <- FindToken.createEmptyVault()
+        }
+    }
 
-        pub fun mintTokens(amount: UFix64) : @Vault {
+    access(contract) 
+
+    pub resource Minter {
+        pub fun mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
             pre {
                 amount > 0.0: "Amount minted must be greater than zero"
-                amount <= self.allowedAmount: "Amount minted must be less than the allowed amount"
             }
             FindToken.totalSupply = FindToken.totalSupply + amount 
-            
+            emit TokensMinted(amount: amount)
+            return <-create Vault(balance: amount)
         }
     }
 
     init(){
         self.totalSupply = 0.0
+        self.initialSupply = 100000000.0
+
         self.vaultStoragePath = /storage/findTokenVault 
         self.receiverPublicPath = /public/findTokenReceiver 
         self.balancePublicPath = /public/findTokenBalance 
         self.providerPath = /private/findTokenProvider 
+        self.minterPath = /storage/findTokenMinter
         self.findRewardPath = /private/findTokenReward
         self.taskRewards = {}
         self.claimRecords = {}
+
+        let minter <- create Minter()
+        let vault <- create Vault(balance: 0.0)
+
+        vault.deposit(from: <- minter.mintTokens(self.initialSupply))
+
+        self.account.save(<- vault, to: self.vaultStoragePath)
+        self.account.link<&Vault{FungibleToken.Receiver}>(self.receiverPublicPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FungibleToken.Balance}>(self.balancePublicPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FungibleToken.Provider}>(self.providerPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FindRewardToken.FindReward}>(self.findRewardPath, target: self.vaultStoragePath)
+        
+        self.account.save(<- minter, to: self.minterPath)
+
     }
 
 }
