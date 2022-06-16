@@ -8,7 +8,7 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
-	user := "0xde5b0e922aeb76f5"
+	user := "0xc9496260a8804171"
 
 	// o.ScriptFromFile("getCollections").Args(o.Arguments().String(user)).Run()
 	//user := "0xfbd6c52b7e6fe7be"
