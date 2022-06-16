@@ -1,5 +1,5 @@
 import Admin from "../contracts/Admin.cdc"
-import Bl0x from 0xe8124d8428980aa6
+import Art from 0x99ca04281098b33d
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 
@@ -13,28 +13,27 @@ transaction(tenant: Address) {
     }
     execute{
         self.adminRef.setNFTInfo(
-            alias: "Bl0x", 
-            type: Type<@Bl0x.NFT>(), 
-            icon: "https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg", 
-            providerPath: Bl0x.CollectionPrivatePath, 
-            publicPath: Bl0x.CollectionPublicPath, 
-            storagePath: Bl0x.CollectionStoragePath, 
+            alias: "Versus", 
+            type: Type<@Art.NFT>(), 
+            icon: "https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg",
+            providerPath: /private/versusArtCollection,
+            publicPath: Art.CollectionPublicPath, 
+            storagePath: Art.CollectionStoragePath, 
             allowedFTTypes: nil, 
-            address:0xe8124d8428980aa6, externalFixedUrl: "bl0x-5ccsb92pb-findonflow.vercel.app")
+						address:0x99ca04281098b33d, externalFixedUrl: "https://versus.auction")
 
         let rules = [
             FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
-            FindMarket.TenantRule(name:"Bl0x", types:[Type<@Bl0x.NFT>()], ruleType: "nft", allow: true)
+            FindMarket.TenantRule(name:"Versus", types:[Type<@Art.NFT>()], ruleType: "nft", allow: true)
         ]
 
         let tenantSaleItem = FindMarket.TenantSaleItem(
-            name: "FlowBl0x", 
+            name: "FlowVersus", 
             cut: nil, 
             rules: rules, 
             status:"active"
         )
 
         self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)
-        
     }
 }

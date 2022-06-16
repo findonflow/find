@@ -28,10 +28,14 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let rarity = FindViews.Rarity(rarity: rarityNum, rarityName:rarity, parts: {})
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
+		let nftReceiver=getAccount(to).getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
-		let tag=FindViews.Tag({"NeoMotorCycleTag":"Tag1"})
-		let scalar=FindViews.Scalar({"Speed" : 100.0})
+		let tag=FindViews.Tag({
+			"Color":"Pearl" 
+		})
+		let scalar=FindViews.Scalar({
+			"Speed" : 200.0
+		})
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
@@ -54,6 +58,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		}
 
 		while i <= maxEdition {
+
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), creativeWork, rarity, tag, scalar, FindViews.Medias([media])]
@@ -94,8 +99,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let thumbnailFile=MetadataViews.HTTPFile(url:"https://nft.blocto.app/xtingles/preview-xBloctopus.png")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailFile, mediaType: "image/png;display=thumbnail")
-			let artTag=FindViews.Tag({"xtingle Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"video length" : 27.0})
+			let artTag=FindViews.Tag({"Author":"Xtingles"})
+			let artScalar=FindViews.Scalar({"video_length" : 27.0})
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
 			
 			let mintData = Dandy.DandyInfo(name: "xtingle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
@@ -103,44 +108,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								thumbnail: thumbnailMedia,
 								schemas: schemas, 
 								externalUrlPrefix:"https://nft.blocto.app/xtingles/")
-			
-			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
-			i=i+1
-		}
-		i = 1
-
-		minterName="flovatar"
-		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
-			/* set up minterPlatform */
-			FindForge.setMinterPlatform(lease: lease, 
-										forgeType: forgeType, 
-										minterCut: 0.05, 
-										description: "flovatar FIND", 
-										externalURL: "https://flovatar.com/", 
-										squareImage: "https://miro.medium.com/max/1080/1*nD3N5BvxvH-wgLW1KPizoA.png",
-										bannerImage: "https://miro.medium.com/max/1400/1*WjFBUweGaThcTR-UOZ6TnA.gif",
-										socials: {
-											"Discord" : "https://discord.gg/flovatar" , 
-											"Twitter" : "https://twitter.com/flovatar"
-										})
-		}
-
-		while i <= maxEdition {
-			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
-			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "flovatar ", description: "flovatar_NFT", type:"image")
-			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let artHttpFile=MetadataViews.HTTPFile(url:"https://flovatar.com/api/image/943")
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image/svg")
-			let artTag=FindViews.Tag({"flovatar Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"rarity score" : 2.2, "id" : 943.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
-			
-			let mintData = Dandy.DandyInfo(name: "flovatar ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
-								description: artCreativeWork.description,
-								thumbnail: artMedia,
-								schemas: schemas, 
-								externalUrlPrefix:"https://flovatar.com/flovatars/943/0x886f3aeaf848c535")
 			
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
@@ -172,8 +139,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let thumbnailHttpFile=MetadataViews.IPFSFile(cid:"QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR", path:nil)
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image;display=thumbnail")
-			let artTag=FindViews.Tag({"ufcstrike Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"rank" : 295.0})
+			let artTag=FindViews.Tag({"signature-move":"Rare Naked Choke"})
+			let artScalar=FindViews.Scalar({"Reach" : 120.0})
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:  "ufcstrike ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
@@ -212,7 +179,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let thumbnailHttpFile=MetadataViews.HTTPFile(url:"https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/jpg;display=thumbnail")
-			let artTag=FindViews.Tag({"jambb Tag":"Tag1"})
+			let artTag=FindViews.Tag({"Author":"Jack Black"})
 			let artScalar=FindViews.Scalar({"video length" : 45.0})
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
 			
@@ -220,44 +187,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 								description: artCreativeWork.description,
 								thumbnail: thumbnailMedia,
 								schemas: schemas, 
-								externalUrlPrefix:"https://www.ufcstrike.com")
-			
-			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
-			i=i+1
-		}
-		i = 1
-	
-		minterName="bitku"
-		lease=finLeases.borrow(minterName)
-		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
-			/* set up minterPlatform */
-			FindForge.setMinterPlatform(lease: lease, 
-										forgeType: forgeType, 
-										minterCut: 0.05, 
-										description: "bitku FIND",
-										externalURL: "https://bitku.art/",
-										squareImage: "",
-										bannerImage: "",
-										socials: {
-											"Github" : "https://github.com/docmarionum1/bitku#readme"
-										})
-		}
-
-		while i <= maxEdition {
-			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
-			let artCreativeWork=FindViews.CreativeWork(artist: artist, name: "bitku ", description: "bitku_NFT", type:"text")
-			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let artHttpFile=FindViews.OnChainFile(content:"No one\nOf the year I hope it's on\nFor work", mediaType: "text/plain")
-			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "text/plain")
-			let artTag=FindViews.Tag({"bitku Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"rank" : 0.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
-			
-			let mintData = Dandy.DandyInfo(name:"bitku ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
-								description: artCreativeWork.description,
-								thumbnail: artMedia,
-								schemas: schemas, 
-								externalUrlPrefix:"https://bitku.art/#0x886f3aeaf848c535/188")
+								externalUrlPrefix:"https://www.jambb.com")
 			
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
@@ -286,8 +216,8 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.IPFSFile(cid:"QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a", path:nil)
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image")
-			let artTag=FindViews.Tag({"goatedgoats Tag":"Tag1"})
-			let artScalar=FindViews.Scalar({"id" : 2389.0})
+			let artTag=FindViews.Tag({"Color":"Black"})
+			let artScalar=FindViews.Scalar({"trait-slots" : 5.0})
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:"goatedgoats ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
@@ -324,13 +254,15 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.HTTPFile(url:"https://ipfs.io/ipfs/bafybeif3banecjnrz7afp54tb332f3zzigzbdcgmjk3k3dwp4iqlrwsbju/73ceab33cf76c2cf48a9a587119c87d21d4ec92b5748e743113c4ce8a1568b53.mp4")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
-			let artTag=FindViews.Tag({"klktn Tag":"Tag1"})
+			let thumbnailMedia=MetadataViews.Media(file: MetadataViews.HTTPFile("https://helloeddi.files.wordpress.com/2020/11/kevin1.jpg?w=982&h=1360?w=650"), mediaType: "image/jpeg")
+
+			let artTag=FindViews.Tag({"Author":"Kevin Woo"})
 			let artScalar=FindViews.Scalar({"id" : 0.0})
 			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:"klktn ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,
-								thumbnail: artMedia,
+								thumbnail: thumbnailMedia,
 								schemas: schemas, 
 								externalUrlPrefix:"https://klktn.com/")
 			

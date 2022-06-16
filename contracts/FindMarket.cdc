@@ -808,7 +808,6 @@ pub contract FindMarket {
 			}
 
 			// Tenant Rules have to be allow rules
-			containsListingType = false
 			for item in self.tenantSaleItems.values {
 				var allowedFTTypes : [Type] = []
 				for rule in item.rules {
@@ -818,15 +817,16 @@ pub contract FindMarket {
 					if rule.types.contains(nftType) && rule.allow {
 						containsNFTType = true
 					} 
-					if rule.types.contains(marketType) && rule.allow {
-						containsListingType = true
-					} 				
-					if containsListingType && containsNFTType {
-						return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
-					}
+					if rule.ruleType == "listing" && !rule.types.contains(marketType) && rule.allow {
+						containsListingType = false
+					} 
+				}				
+				if containsListingType && containsNFTType {
+					return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
 				}
+				
 				containsNFTType = false 
-				containsListingType = false
+				containsListingType = true
 			}
 			return nil
 		}

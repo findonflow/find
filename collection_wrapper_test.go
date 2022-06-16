@@ -1,12 +1,7 @@
 package test_main
 
-import (
-	"testing"
-)
-
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
-*/
 func TestNewCollctionsWrapper(t *testing.T) {
 	/*
 		o := overflow.NewOverflowMainnet().Start()
@@ -40,9 +35,9 @@ func TestNewCollctionsWrapper(t *testing.T) {
 		oldJson, _ := json.MarshalIndent(oldData, "", "   ")
 		newJson, _ := json.MarshalIndent(newData, "", "   ")
 		assert.JSONEq(t, string(oldJson), string(newJson))
-	*/
-}
 
+}
+*/
 type Item struct {
 	ContentType string `json:"contentType"`
 	ID          string `json:"id"`
