@@ -98,7 +98,6 @@ transaction(name: String, amount: UFix64) {
 					profile.addWallet(tokenWallet)
 				}
 			}
-
 		}
 
 		if !profile.hasWallet("Flow") {
