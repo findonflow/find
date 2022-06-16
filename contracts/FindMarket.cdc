@@ -1057,11 +1057,10 @@ pub contract FindMarket {
 				let name = resolver(royaltyItem.receiver.address)
 
 				var walletCheck = true 
-
 				if !royaltyItem.receiver.check() { 
 					// if the capability is not valid, royalty cannot be paid
 					walletCheck = false 
-				} else if royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
+				} else if royaltyItem.receiver.borrow()!.isInstance(Type<@Profile.User>()){ 
 					// if the capability is valid -> it is a User resource -> check if the wallet is set up.
 					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
 					walletCheck = ref.checkWallet(ftType.identifier)
