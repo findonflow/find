@@ -1058,8 +1058,9 @@ pub contract FindMarket {
 
 				var walletCheck = true 
 
-				if !royaltyItem.receiver.check() { walletCheck = false }
-				if !royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
+				if !royaltyItem.receiver.check() { 
+					walletCheck = false 
+				} else if royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
 					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
 					walletCheck = ref.checkWallet(ftType.identifier)
 				}
