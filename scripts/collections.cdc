@@ -28,7 +28,7 @@ import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
 // import GeniaceNFT from 0xabda6627c70c7f52
 // import OneFootballCollectible from 0x6831760534292098
-// import CryptoPiggo from 0xd3df824bf81910a4
+import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
 import GoatedGoats from 0x2068315349bdfce5
@@ -65,7 +65,7 @@ import RaribleNFT from 0x01ab36aaf654a13e
 import FLOAT from 0x2d4c3caffbeab845
 
 import MintStoreItem from 0x20187093790b9aef
-// import SomePlaceCollectible from 0x667a16294a089ef8
+import SomePlaceCollectible from 0x667a16294a089ef8
 
 pub struct MetadataCollections {
 
@@ -917,32 +917,32 @@ pub fun main(address: Address) : MetadataCollections? {
 	// }
 
 
-	// let cryptoPiggoCap = account.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
-	// if cryptoPiggoCap.check() {
-	// 	let items: [String] = []
-	// 	let collection = cryptoPiggoCap.borrow()!
-	// 	for id in collection.getIDs() {
-	// 		let nft = collection.borrowItem(id: id)!
-	// 		let item=MetadataCollectionItem(
-	// 			id: id,
-	// 			name: "CryptoPiggo #".concat(id.toString()),
-	// 			image: "https://s3.us-west-2.amazonaws.com/crypto-piggo.nft/piggo-".concat(id.toString()).concat(".png"),
-	// 			url: "https://rareworx.com/piggo/details/".concat(id.toString()),
-	// 			listPrice: nil,
-	// 			listToken: nil,
-	// 			contentType: "image",
-	// 			rarity: ""
+	 let cryptoPiggoCap = account.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
+	 if cryptoPiggoCap.check() {
+	 	let items: [String] = []
+	 	let collection = cryptoPiggoCap.borrow()!
+	 	for id in collection.getIDs() {
+	 		let nft = collection.borrowItem(id: id)!
+	 		let item=MetadataCollectionItem(
+	 			id: id,
+	 			name: "CryptoPiggo #".concat(id.toString()),
+	 			image: "https://s3.us-west-2.amazonaws.com/crypto-piggo.nft/piggo-".concat(id.toString()).concat(".png"),
+	 			url: "https://rareworx.com/piggo/details/".concat(id.toString()),
+	 			listPrice: nil,
+	 			listToken: nil,
+	 			contentType: "image",
+	 			rarity: ""
 
-	// 		)
-	// 		let itemId="CryptoPiggo".concat(id.toString())
-	// 		items.append(itemId)
-	// 		resultMap[itemId] = item
+	 		)
+	 		let itemId="CryptoPiggo".concat(id.toString())
+	 		items.append(itemId)
+	 		resultMap[itemId] = item
 
-	// 	}
-	// 	if items.length != 0 {
-	// 		results["CryptoPiggo"] = items
-	// 	}
-	// }
+	 	}
+	 	if items.length != 0 {
+	 		results["CryptoPiggo"] = items
+	 	}
+	 }
 
 	// let xtingles = Collectible.getCollectibleDatas(address:address) 
 	// if xtingles.length > 0 {
@@ -1408,34 +1408,34 @@ pub fun main(address: Address) : MetadataCollections? {
 	}
 
 
-//     let somePlaceCap =account.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
-// 		if somePlaceCap.check() {
-// 		  let items: [String] = []
-// 		  let collection = somePlaceCap.borrow()!
-// 		  for id in collection.getIDs() {
-// 				let nft = collection.borrowCollectible(id: id)!
-// 		    let setID = nft.setID
-// 				let setMetadata = SomePlaceCollectible.getMetadataForSetID(setID: setID)!
-// 				let editionMetadata = SomePlaceCollectible.getMetadataForNFTByUUID(uuid: nft.id)!
-//         let item = MetadataCollectionItem(
-// 				id: id,
-// 				name: editionMetadata.getMetadata()["title"] ?? setMetadata.getMetadata()["title"] ?? "",
-// 				image: editionMetadata.getMetadata()["mediaURL"] ?? setMetadata.getMetadata()["mediaURL"] ?? "",
-// 				url: "https://some.place",
-// 				listPrice: nil,
-// 				listToken: nil,
-// 				contentType: "image",
-// 				rarity: ""
-// 			)
-// 			let itemId="SomePlace".concat(id.toString())
-// 			items.append(itemId)
-// 			resultMap[itemId] = item
-// 		}
-// 		if items.length != 0 {
-// 			results["some.place"] = items
-// 		}
- 
-//   }
+     let somePlaceCap =account.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
+ 		if somePlaceCap.check() {
+ 		  let items: [String] = []
+ 		  let collection = somePlaceCap.borrow()!
+ 		  for id in collection.getIDs() {
+ 				let nft = collection.borrowCollectible(id: id)!
+ 		    let setID = nft.setID
+ 				let setMetadata = SomePlaceCollectible.getMetadataForSetID(setID: setID)!
+ 				let editionMetadata = SomePlaceCollectible.getMetadataForNFTByUUID(uuid: nft.id)!
+         let item = MetadataCollectionItem(
+ 				id: id,
+ 				name: editionMetadata.getMetadata()["title"] ?? setMetadata.getMetadata()["title"] ?? "",
+ 				image: editionMetadata.getMetadata()["mediaURL"] ?? setMetadata.getMetadata()["mediaURL"] ?? "",
+ 				url: "https://some.place",
+ 				listPrice: nil,
+ 				listToken: nil,
+ 				contentType: "image",
+ 				rarity: ""
+ 			)
+ 			let itemId="SomePlace".concat(id.toString())
+ 			items.append(itemId)
+ 			resultMap[itemId] = item
+ 		}
+ 		if items.length != 0 {
+ 			results["some.place"] = items
+ 		}
+
+   }
  	if results.keys.length == 0 {
 		return nil
 	}
