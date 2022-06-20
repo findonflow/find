@@ -535,14 +535,25 @@ pub contract FIND {
 				self.leases.containsKey(name) : "Invalid name=".concat(name)
 			}
 
+			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+			if !network.publicEnabled {
+				panic("Public registration is not enabled yet")
+			}
+
+			if network.addonPrices[addon] == nil {
+				panic("This addon is not available.")
+			}
+			let addonPrice = network.addonPrices[addon]!
+
 			let lease = self.borrow(name)
 
 			if lease.addons.containsKey(addon) {
 				panic("You already have this addon")
 			}
 
-			if addon=="forge" && vault.balance != 50.0 {
-				panic("Expect 50 FUSD for forge addon")
+			if vault.balance != addonPrice {
+				panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
 			}
 
 			lease.addAddon(addon)
@@ -1122,7 +1133,10 @@ pub contract FIND {
 
 		init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>, publicEnabled:Bool) {
 			self.leasePeriod=leasePeriod
-			self.addonPrices = { "artifact" : 50.0 }
+			self.addonPrices = { 
+				"artifact" : 50.0 , 
+				"forge" : 50.0     // will have to run transactions on this when update on mainnet.
+				}
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut
 			self.defaultPrice=defaultPrice
