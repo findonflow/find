@@ -48,6 +48,10 @@ pub contract FindMarketAuctionSoft {
 
 		//Here we do not get a vault back, it is sent in to the method itself
 		pub fun acceptNonEscrowedBid() { 
+			pre{
+				self.offerCallback != nil : "There is no bid offer to the item."
+				self.offerCallback!.check() : "Bidder unlinked bid collection capability."
+			}
 			self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 		}
 
@@ -57,7 +61,7 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getBalance() : UFix64 {
 			if let cb= self.offerCallback {
-				return cb.borrow()!.getBalance(self.getId())
+				return cb.borrow()?.getBalance(self.getId()) ?? panic("Bidder unlinked bid collection capability.")
 			}
 			return self.auctionStartPrice
 		}
@@ -291,14 +295,15 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			let timestamp=Clock.time()
-			let newOfferBalance=newOffer.borrow()!.getBalance(id)
+			let newOfferBalance=newOffer.borrow()?.getBalance(id) ?? panic("The new offer bid capability is invalid.")
 
 			let previousOffer = saleItem.offerCallback!
 
 
 			var minBid=oldBalance + saleItem.auctionMinBidIncrement
 			if newOffer.address != previousOffer.address {
-				minBid = previousOffer.borrow()!.getBalance(id) + saleItem.auctionMinBidIncrement
+				let previousBalance = previousOffer.borrow()?.getBalance(id) ?? panic("Previous bidder unlinked the bid ccollection capability.")
+				minBid = previousBalance + saleItem.auctionMinBidIncrement
 			}
 
 			if newOfferBalance < minBid {
@@ -370,7 +375,7 @@ pub contract FindMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()!.getBalance(id)
+			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked the bid collection capability.")
 
 			if saleItem.auctionStartPrice >  balance {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
@@ -589,6 +594,9 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
+			if !bid.nftCap.check() {
+				panic("Bidder unlinked the nft receiver capability.")
+			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			destroy bid
 		}
@@ -645,6 +653,9 @@ pub contract FindMarketAuctionSoft {
 			bid.setBidAt(Clock.time())
 			bid.setBalance(bid.balance + increaseBy)
 
+			if !bid.from.check(){
+				panic("Seller unlinked the SaleItem collection capability.")
+			}
 			bid.from.borrow()!.registerIncreasedBid(id, oldBalance: oldBalance)
 		}
 

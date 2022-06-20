@@ -70,7 +70,8 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			self.capability!.borrow()!.setWallet(wallet)
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			walletRef.setWallet(wallet)
 		}
 
 		pub fun getFindMarketClient():  &FindMarket.TenantClient{
@@ -88,7 +89,8 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			self.capability!.borrow()!.setPublicEnabled(enabled)
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			walletRef.setPublicEnabled(enabled)
 		}
 
 		pub fun setAddonPrice(name: String, price: UFix64) {
@@ -96,7 +98,8 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			self.capability!.borrow()!.setAddonPrice(name: name, price: price)
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			walletRef.setAddonPrice(name: name, price: price)
 		}
 
 		pub fun setPrice(default: UFix64, additional : {Int: UFix64}) {
@@ -104,7 +107,8 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			self.capability!.borrow()!.setPrice(default: default, additionalPrices: additional)
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			walletRef.setPrice(default: default, additionalPrices: additional)
 		}
 
 		pub fun register(name: String, profile: Capability<&{Profile.Public}>, leases: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>){
@@ -113,7 +117,8 @@ pub contract Admin {
 				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
 
-			self.capability!.borrow()!.internal_register(name:name, profile: profile, leases: leases)
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			walletRef.internal_register(name:name, profile: profile, leases: leases)
 		}
 
 		pub fun mintCharity(metadata : {String: String}, recipient: Capability<&{NonFungibleToken.CollectionPublic}>){

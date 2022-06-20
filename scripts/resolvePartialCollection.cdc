@@ -29,7 +29,7 @@ pub struct ViewCollectionPointer {
 	}
 
 	pub fun valid(_ id: UInt64) : Bool {
-		if !self.cap.borrow()!.getIDs().contains(id) {
+		if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(id) {
 			return false
 		}
 		return true
@@ -40,6 +40,9 @@ pub struct ViewCollectionPointer {
 	}
 
 	pub fun getViewResolver(_ id: UInt64) : &AnyResource{MetadataViews.Resolver} {
+		pre{
+			self.cap.check() : "The pointer capability is invalid."
+		}
 		return self.cap.borrow()!.borrowViewResolver(id: id)
 	}
 
@@ -80,7 +83,7 @@ pub struct ViewCollectionPointer {
 }
 
 pub fun createViewReadPointer(address:Address, aliasOrIdentifier:String) : ViewCollectionPointer {
-	let path= NFTRegistry.getNFTInfo(aliasOrIdentifier)!.publicPath
+	let path= NFTRegistry.getNFTInfo(aliasOrIdentifier)?.publicPath ?? panic("This is not supported in NFT Registry. Identifier: ".concat(aliasOrIdentifier))
 	let cap= getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
 	let pointer= ViewCollectionPointer(cap: cap, aliasOrIdentifier: aliasOrIdentifier)
 	return pointer

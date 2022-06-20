@@ -89,7 +89,9 @@ pub contract FindForge {
 	}
 
 	pub fun setMinterPlatform(lease: &FIND.Lease, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
-
+		pre{
+			FindForge.minterPlatforms.containsKey(forgeType) : "This forge type is not supported."
+		}
 		let name = lease.getName() 
 		if FindForge.minterPlatforms[forgeType]![name] == nil {
 			assert(FindForge.publicForges.contains(forgeType) , message: "This forge is not supported publicly.")
