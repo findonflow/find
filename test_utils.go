@@ -262,11 +262,10 @@ func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
-			"amount":     "10.00000000",
-			"status":     "active_listed",
-			"name":       name,
-			"seller":     otu.accountAddress(name),
-			"sellerName": name,
+			"amount": "10.00000000",
+			"status": "active_listed",
+			"name":   name,
+			"seller": otu.accountAddress(name),
 		}))
 	return otu
 }
@@ -1216,6 +1215,31 @@ func (otu *OverflowTestUtils) getIDFromEvent(events []*overflow.FormatedEvent, e
 	}
 
 	return Ids
+}
+
+func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("moveNameTO").
+		SignProposeAndPayAs(owner).
+		Args(otu.O.Arguments().String(name).String(otu.accountAddress(receiver))).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
+			"name": name,
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("cancelNameAuction").
+		SignProposeAndPayAs(owner).
+		Args(otu.O.Arguments().StringArray(name)).
+		Test(otu.T).
+		AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			"name":       name,
+			"sellerName": owner,
+			"status":     "cancel_listing",
+		}))
+	return otu
 }
 
 type SaleItem struct {
