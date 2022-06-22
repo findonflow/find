@@ -293,8 +293,11 @@ func TestFIND(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
 			createUser(100.0, user).
+			createUser(100.0, "user2").
 			setProfile(user).
-			registerUser(user)
+			setProfile("user2").
+			registerUser(user).
+			registerUser("user2")
 
 		otu.O.TransactionFromFile("buyAddon").
 			SignProposeAndPayAs(user).
@@ -311,13 +314,13 @@ func TestFIND(t *testing.T) {
 
 		/* Should not be able to buy addons with wrong balance */
 		otu.O.TransactionFromFile("buyAddon").
-			SignProposeAndPayAs(user).
+			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
-				String(user).
-				String("artifact").
+				String("user2").
+				String("forge").
 				UFix64(10.0)).
 			Test(otu.T).
-			AssertFailure("Expect 50.00000000 FUSD for artifact addon")
+			AssertFailure("Expect 50.00000000 FUSD for forge addon")
 
 		/* Should not be able to buy addons that does not exist */
 		otu.O.TransactionFromFile("buyAddon").
