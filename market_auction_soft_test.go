@@ -9,14 +9,43 @@ import (
 
 func TestMarketAuctionSoft(t *testing.T) {
 
-	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
-		otu := NewOverflowTest(t)
+	otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+	price := 10.0
+	preIncrement := 5.0
+	id := otu.setupMarketAndDandy()
+	otu.registerFtInRegistry().
+		setFlowDandyMarketOption("AuctionSoft").
+		setProfile("user1").
+		setProfile("user2")
+
+	otu.O.TransactionFromFile("testMintFusd").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			Account("user2").
+			UFix64(1000.0)).
+		Test(otu.T).
+		AssertSuccess()
+
+	otu.O.TransactionFromFile("testMintFlow").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			Account("user2").
+			UFix64(1000.0)).
+		Test(otu.T).
+		AssertSuccess()
+
+	otu.O.TransactionFromFile("testMintUsdc").
+		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			Account("user2").
+			UFix64(1000.0)).
+		Test(otu.T).
+		AssertSuccess()
+
+	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
+
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
 		otu.O.TransactionFromFile("listNFTForAuctionSoft").
@@ -31,65 +60,53 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).AssertFailure("Auction listing for this item is already created.")
+
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 	t.Run("Should be able to sell at auction", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionSoft("user2", id, 15.0)
+
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should be able to sell and buy at auction even buyer is without the collection.", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			destroyDandyCollection("user2").
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionSoft("user2", id, 15.0)
+
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			increaseAuctionBidMarketSoft("user2", id, 5.0, price+10.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+10.0).
 			fulfillMarketAuctionSoft("user2", id, price+10.0)
+
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should not be able to bid expired auction listing", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			tickClock(100.0)
 
@@ -101,16 +118,13 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertFailure("This auction listing is already expired")
+
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").
@@ -121,16 +135,13 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 	t.Run("Should be able to cancel an auction", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
 		name := "user1"
@@ -150,13 +161,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to cancel an ended auction", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			tickClock(4000.0).
@@ -169,6 +175,10 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertFailure("Cannot cancel finished auction, fulfill it instead")
+
+		otu.fulfillMarketAuctionSoft("user2", id, price+5.0).
+			sendDandy("user1", "user2", id)
+
 	})
 
 	t.Run("Cannot fulfill a not yet ended auction", func(t *testing.T) {
@@ -192,16 +202,13 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price + 5.0)).
 			Test(otu.T).AssertFailure("Auction has not ended yet")
+
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 	t.Run("Should allow seller to cancel auction if it failed to meet reserve price", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+1.0).
 			tickClock(400.0).
@@ -225,14 +232,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to bid and increase bid by same user", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		preIncrement := 5.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+preIncrement).
 			saleItemListed("user1", "active_ongoing", price+preIncrement)
@@ -246,17 +247,11 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("must be larger then previous bid+bidIncrement")
 
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		price := 10.0
-		preIncrement := 5.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft")
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
 
@@ -276,16 +271,11 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
+		otu.alterMarketOption("AuctionSoft", "enable")
 	})
 
 	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price)
+		otu.listNFTForSoftAuction("user1", id, price)
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
 
@@ -329,7 +319,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(510.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).AssertSuccess()
 		otu.auctionBidMarketSoft("user1", "user2", id, price+5.0)
 
@@ -341,15 +331,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess()
 
+		otu.alterMarketOption("AuctionSoft", "enable").
+			sendDandy("user1", "user2", id)
+
 	})
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction and delist after stopped", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft")
 
 		otu.alterMarketOption("AuctionSoft", "stop")
 
@@ -416,16 +403,22 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
+		/* Reset */
+		otu.alterMarketOption("AuctionSoft", "enable")
+
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id).
+				UFix64(price + 5.0)).
+			Test(otu.T).
+			AssertSuccess()
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should not be able to bid below listing price", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
 		otu.O.TransactionFromFile("bidMarketAuctionSoft").SignProposeAndPayAs("user2").
@@ -436,16 +429,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(1.0)).
 			Test(otu.T).AssertFailure("You need to bid more then the starting price of 10.00000000")
 
+		otu.delistAllNFTForSoftAuction("user1")
+
 	})
 
 	t.Run("Should not be able to bid less the previous bidder", func(t *testing.T) {
-		otu := NewOverflowTest(t)
-
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0)
 
@@ -457,7 +446,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(5.0)).
 			Test(otu.T).AssertFailure("bid 5.00000000 must be larger then previous bid+bidIncrement 16.00000000")
-
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 	/* Testing on Royalties */
@@ -467,23 +456,18 @@ func TestMarketAuctionSoft(t *testing.T) {
 	// find 0.025
 	// tenant nil
 	t.Run("Royalties should be sent to correspondence upon fulfill action", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 5.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		price = 5.0
+
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
-			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			setProfile("user1").
-			setProfile("user2")
+			auctionBidMarketSoft("user2", "user1", id, price+5.0)
 
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		status = otu.replaceID(status, []uint64{id})
-		otu.AutoGold("status", status)
+		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
@@ -513,28 +497,24 @@ func TestMarketAuctionSoft(t *testing.T) {
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction"})
 		result = otu.replaceID(result, []uint64{id})
 		result = otu.replaceID(result, saleIDs)
-		otu.AutoGold("events", result)
+		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action events", result)
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 5.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		price = 5.0
+
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			setProfile("user1").
-			setProfile("user2").
 			setFindCut(0.035)
 
 		otu.tickClock(500.0)
 
 		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		status = otu.replaceID(status, []uint64{id})
-		otu.AutoGold("status", status)
+		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
 
 		res := otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
@@ -564,25 +544,17 @@ func TestMarketAuctionSoft(t *testing.T) {
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction"})
 		result = otu.replaceID(result, []uint64{id})
 		result = otu.replaceID(result, saleIDs)
-		otu.AutoGold("events", result)
+		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		otu.setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			createUser(100.0, "user3").
-			registerUser("user2").
-			registerUser("user3")
+		price = 10.0
 
 		ids := otu.mintThreeExampleDandies()
 
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", ids[0], price).
+		otu.listNFTForSoftAuction("user1", ids[0], price).
 			listNFTForSoftAuction("user1", ids[1], price).
 			auctionBidMarketSoft("user2", "user1", ids[0], price+5.0).
 			tickClock(400.0).
@@ -632,24 +604,28 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(ids[1])).
 			Test(otu.T).AssertSuccess()
+
+		otu.removeProfileBan("user1")
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[0]).
+				UFix64(price + 5.0)).
+			Test(otu.T).
+			AssertSuccess()
+
+		otu.delistAllNFTForSoftAuction("user1")
+
 	})
 
 	t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		otu.setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			createUser(100.0, "user3").
-			registerUser("user2").
-			registerUser("user3")
+		price = 10.0
 
 		ids := otu.mintThreeExampleDandies()
 
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", ids[0], price).
+		otu.listNFTForSoftAuction("user1", ids[0], price).
 			listNFTForSoftAuction("user1", ids[1], price).
 			auctionBidMarketSoft("user2", "user1", ids[0], price+5.0).
 			tickClock(400.0).
@@ -676,16 +652,23 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).
 			AssertFailure("Buyer banned by Tenant")
 
+		/* Reset */
+		otu.removeProfileBan("user2")
+		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(ids[0]).
+				UFix64(price + 5.0)).
+			Test(otu.T).
+			AssertSuccess()
+		otu.delistAllNFTForSoftAuction("user1")
+
 	})
 
 	t.Run("Should emit previous bidder if outbid", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			saleItemListed("user1", "active_ongoing", 15.0)
@@ -705,6 +688,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				"previousBuyer": otu.accountAddress("user2"),
 				"status":        "active_ongoing",
 			}))
+
+		otu.delistAllNFTForSoftAuction("user1")
 	})
 
 }

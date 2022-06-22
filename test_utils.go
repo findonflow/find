@@ -29,6 +29,12 @@ func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *Ov
 	return otu
 }
 
+func (otu *OverflowTestUtils) AutoGoldRename(fullname string, value interface{}) *OverflowTestUtils {
+	fullname = strings.Replace(fullname, " ", "_", -1)
+	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"/"+fullname))
+	return otu
+}
+
 func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 	otu.setupFIND().
 		setupDandy("user1").
@@ -487,6 +493,16 @@ func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *Overflow
 	return otu
 }
 
+func (otu *OverflowTestUtils) cancelAllNFTForSale(name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("delistAllNFTSale").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listNFTForSale").
@@ -497,7 +513,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
-			UFix64(100.0)).
+			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"status": "active_listed",
@@ -522,7 +538,7 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			UFix64(300.0).
 			UFix64(60.0).
 			UFix64(1.0).
-			UFix64(10.0)).
+			UFix64(otu.currentTime() + 10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
@@ -531,6 +547,16 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			"id":                  fmt.Sprintf("%d", id),
 			"seller":              otu.accountAddress(name),
 		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllMarketAuctionEscrowed").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).AssertSuccess()
 	return otu
 }
 
@@ -548,7 +574,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			UFix64(300.0).
 			UFix64(60.0).
 			UFix64(1.0).
-			UFix64(10.0)).
+			UFix64(otu.currentTime() + 10.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
@@ -557,6 +583,16 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			"id":                  fmt.Sprintf("%d", id),
 			"seller":              otu.accountAddress(name),
 		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllMarketAuctionSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).AssertSuccess()
 	return otu
 }
 
@@ -1143,6 +1179,16 @@ func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *Ove
 
 func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetProfileBan").
+		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			String(user)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) removeProfileBan(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminRemoveProfileBan").
 		SignProposeAndPayAs("account").
 		Args(otu.O.Arguments().
 			String(user)).
