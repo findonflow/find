@@ -401,7 +401,7 @@ pub contract FIND {
 		}
 
 		pub fun getBalance() : UFix64 {
-			let cb = self.latestBidCallback.borrow() ?? panic("The bidder has unlinked the capability")
+			let cb = self.latestBidCallback.borrow() ?? panic("The bidder has unlinked the capability. bidder address: ".concat(self.latestBidCallback.address.toString()))
 			return cb.getBalance(self.name)
 		}
 
@@ -412,7 +412,7 @@ pub contract FIND {
 			var previousBuyer: Address?=nil
 			if callback.address != self.latestBidCallback.address {
 				if offer.getBalance(self.name) <= self.getBalance() {
-					panic("bid must be larger then previous bid")
+					panic("bid must be larger then current bid. Current bid is : ".concat(self.getBalance().toString()).concat(". New bid is at : ").concat(offer.getBalance(self.name).toString()))
 				}
 				previousBuyer=self.latestBidCallback.address
 				//we send the money back
@@ -542,7 +542,7 @@ pub contract FIND {
 			let lease = self.borrow(name)
 
 			if lease.addons.containsKey(addon) {
-				panic("You already have this addon")
+				panic("You already have this addon : ".concat(addon))
 			}
 
 			if addon=="forge" && vault.balance != 50.0 {
@@ -618,7 +618,7 @@ pub contract FIND {
 
 
 			let bidder= callback.address
-			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability.")
+			let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(bidder.toString()))
 			let owner=lease.owner!.address
 			let ownerName=lease.name
 
@@ -648,7 +648,7 @@ pub contract FIND {
 			if let callback = lease.offerCallback {
 
 				let bidder= callback.address
-				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability.")
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(bidder.toString()))
 				let owner=lease.owner!.address
 				let ownerName=lease.name
 				var amount : UFix64 = 0.0
@@ -686,7 +686,7 @@ pub contract FIND {
 			let owner=lease.owner!.address
 			let ownerName=lease.name
 
-			let balance=lease.offerCallback!.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability.")
+			let balance=lease.offerCallback!.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
 			Debug.log("Offer is at ".concat(balance.toString()))
 			if lease.salePrice == nil  && lease.auctionStartPrice == nil{
 
@@ -726,18 +726,18 @@ pub contract FIND {
 				return
 			} 
 
-			let balance=callback.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability.")
+			let balance=callback.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(callback.address.toString()))
 			var previousBuyer:Address?=nil
 			if let cb= lease.offerCallback {
 				if cb.address == callback.address {
 					panic("You already have the latest bid on this item, use the incraseBid transaction")
 				}
-				let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability.")
+				let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
 				let currentBalance=cbRef.getBalance(name)
 
 				Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
 				if currentBalance >= balance {
-					panic("There is already a higher bid on this lease")
+					panic("There is already a higher bid on this lease. Current bid is : ".concat(currentBalance.toString()).concat(" New bid is at : ").concat(balance.toString()))
 				}
 				previousBuyer=cb.address
 				cbRef.cancel(name)
@@ -788,11 +788,11 @@ pub contract FIND {
 			if let cb= lease.offerCallback {
 
 				let bidder= cb.address
-				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability.")
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(cb.address.toString()))
 				let owner=lease.owner!.address
 				let ownerName=lease.name
 				Debug.log("we have a blind bid so we cancel that")
-				let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability.")
+				let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
 				emit DirectOffer(name: name, uuid:lease.uuid, seller: owner, sellerName: ownerName, amount: cbRef.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
 
 				cbRef.cancel(name)
@@ -818,7 +818,7 @@ pub contract FIND {
 				}
 
 				let bidder= auction.latestBidCallback.address
-				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability.")
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(bidder.toString()))
 				let owner=lease.owner!.address
 				let ownerName=lease.name
 
@@ -830,7 +830,7 @@ pub contract FIND {
 				} else {
 					emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:ownerName, amount: balance, auctionReservePrice: lease.auctionReservePrice!, status: "cancel_listing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, endsAt: auction.endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
 				}
-				let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability.")
+				let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
 				cbRef.cancel(name)
 				destroy <- self.auctions.remove(key: name)!
 			}
@@ -875,7 +875,7 @@ pub contract FIND {
 				let vault <- offer.fulfillLease(<- token)
 				if self.networkCut != 0.0 {
 					let cutAmount= soldFor * self.networkCut
-					let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly.")
+					let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
 					networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
 					if lease.salePrice == nil || lease.salePrice != soldFor {
 						emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
@@ -917,12 +917,12 @@ pub contract FIND {
 
 			let token <- self.leases.remove(key: name)!
 
-			let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability.")
+			let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(auction.latestBidCallback.address.toString()))
 
 			let vault <- cbRef.fulfillLease(<- token)
 			if self.networkCut != 0.0 {
 				let cutAmount= soldFor * self.networkCut
-				let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly.")
+				let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
 				networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
 				emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "EnglishAuction")
 			}
@@ -944,11 +944,11 @@ pub contract FIND {
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= tokenRef.offerCallback {
 				let bidder= cb.address
-				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability.")
+				let bidderName= getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()?.getName() ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(bidder.toString()))
 				let owner=tokenRef.owner!.address
 				let ownerName=tokenRef.name
 				Debug.log("we have a blind bid so we cancel that")
-				let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability.")
+				let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
 				emit DirectOffer(name: name, uuid:tokenRef.uuid, seller: owner, sellerName: ownerName, amount: cbRef.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
 				cbRef.cancel(name)
 				tokenRef.setCallback(nil)
@@ -999,7 +999,7 @@ pub contract FIND {
 			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil())
 			token.move(profile: profile)
-			let walletRef = to.borrow() ?? panic("The receiver capability is not valid. ")
+			let walletRef = to.borrow() ?? panic("The receiver capability is not valid. wallet address : ".concat(to.address.toString()))
 			walletRef.deposit(token: <- token)
 		}
 
@@ -1175,7 +1175,7 @@ pub contract FIND {
 				if vault.balance != cost {
 					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
 				}
-				let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid.")
+				let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
 				walletRef.deposit(from: <- vault)
 
 				emit Register(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
@@ -1478,7 +1478,7 @@ pub contract FIND {
 
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			if !from.check() {
-				panic("The seller unlinked the lease collection capability.")
+				panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
 			}
 			from.borrow()!.increaseBid(name, balance: balance)
 		}
@@ -1493,7 +1493,7 @@ pub contract FIND {
 			}
 			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			if !from.check() {
-				panic("The seller unlinked the lease collection capability.")
+				panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
 			}
 			from.borrow()!.cancelUserBid(name)
 			self.cancel(name)

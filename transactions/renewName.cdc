@@ -6,7 +6,7 @@ transaction(name: String, amount: UFix64) {
 
 		let price=FIND.calculateCost(name)
 		if amount != price {
-			panic("expected renew cost is not the same as calculated renew cost")
+			panic("expected renew cost : ".concat(price.toString()).concat(" is not the same as calculated renew cost : ").concat(amount.toString()))
 		}
 		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
 		let payVault <- vaultRef.withdraw(amount: price) as! @FUSD.Vault

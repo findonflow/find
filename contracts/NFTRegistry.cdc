@@ -112,14 +112,14 @@ pub contract NFTRegistry {
 	}
 
 	access(account) fun removeNFTInfoByTypeIdentifier(_ typeIdentifier: String) : NFTInfo {
-		let info = NFTRegistry.nonFungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this NonFungibleToken Registry.")
+		let info = NFTRegistry.nonFungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this NonFungibleToken Registry. Type : ".concat(typeIdentifier))
 		NFTRegistry.aliasMap.remove(key: info.alias)
 		emit NFTInfoRemoved(alias:info!.alias, typeIdentifier: info!.typeIdentifier)
 		return info 
 	}
 
 	access(account) fun removeNFTInfoByAlias(_ alias: String) : NFTInfo {
-		let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias.")
+		let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias. Alias : ".concat(alias))
 		return self.removeNFTInfoByTypeIdentifier(typeIdentifier)
 	}
 

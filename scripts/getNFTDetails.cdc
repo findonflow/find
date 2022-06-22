@@ -211,7 +211,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	let address = resolveAddress!
 
 	let account = getAccount(address) 
-	let publicPath = NFTRegistry.getNFTInfo(nftAliasOrIdentifier)?.publicPath ?? panic("This NFT is not supported by NFT Registry")
+	let publicPath = NFTRegistry.getNFTInfo(nftAliasOrIdentifier)?.publicPath ?? panic("This NFT is not supported by NFT Registry. Type : ".concat(nftAliasOrIdentifier))
 	let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
 	let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
 
@@ -241,7 +241,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	*/
 
 	let tenantCap = FindMarket.getTenantCapability(findAddress)!
-	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up.")
+	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
 
 	let marketTypes = FindMarket.getSaleItemTypes()
 	var report : {String : ListingTypeReport} = {}

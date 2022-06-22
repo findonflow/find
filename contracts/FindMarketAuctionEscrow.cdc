@@ -62,7 +62,7 @@ pub contract FindMarketAuctionEscrow {
 		pub fun getBalance() : UFix64 {
 			if let cb= self.offerCallback {
 				if !cb.check() {
-					panic("Bidder unlinked the bid collection capability.")
+					panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
 				}
 				return cb.borrow()!.getBalance(self.getId())
 			}
@@ -318,7 +318,7 @@ pub contract FindMarketAuctionEscrow {
 			var previousBuyer:Address?=nil
 			if newOffer.address != previousOffer.address {
 				if !previousOffer.check() {
-					panic("Previous bidder unlinked the bid collection capability.")
+					panic("Previous bidder unlinked the bid collection capability. bidder address : ".concat(previousOffer.address.toString()))
 				}
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
 				previousBuyer=previousOffer.address
@@ -383,7 +383,7 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked bid collection capability.")
+			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked bid collection capability. bidder address : ".concat(callback.address.toString()))
 
 			if saleItem.auctionStartPrice >  balance {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
@@ -599,7 +599,7 @@ pub contract FindMarketAuctionEscrow {
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			if !bid.nftCap.check() {
-				panic("Bidder unlinked the nft receiver capability.")
+				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
 			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
@@ -659,7 +659,7 @@ pub contract FindMarketAuctionEscrow {
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 			if !bid.from.check() {
-				panic("Seller unlinked SaleItem collection capability.")
+				panic("Seller unlinked SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
 			}
 			bid.from.borrow()!.registerIncreasedBid(id, oldBalance:oldBalance)
 		}
@@ -670,7 +670,7 @@ pub contract FindMarketAuctionEscrow {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			if !self.receiver.check() {
-				panic("Seller unlinked the SaleItem collection capability.")
+				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
 			}
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
 			destroy bid

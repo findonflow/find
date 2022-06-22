@@ -133,7 +133,7 @@ pub contract FindForge {
 		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
 		let verifier = self.borrowVerifier()
 
-		let forge = FindForge.borrowForge(forgeType) ?? panic("The type passed in does not match with the minting NFT type. ")
+		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
 
 		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 

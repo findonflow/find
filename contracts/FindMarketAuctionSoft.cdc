@@ -61,7 +61,7 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getBalance() : UFix64 {
 			if let cb= self.offerCallback {
-				return cb.borrow()?.getBalance(self.getId()) ?? panic("Bidder unlinked bid collection capability.")
+				return cb.borrow()?.getBalance(self.getId()) ?? panic("Bidder unlinked bid collection capability. bidder address : ".concat(cb.address.toString()))
 			}
 			return self.auctionStartPrice
 		}
@@ -302,7 +302,7 @@ pub contract FindMarketAuctionSoft {
 
 			var minBid=oldBalance + saleItem.auctionMinBidIncrement
 			if newOffer.address != previousOffer.address {
-				let previousBalance = previousOffer.borrow()?.getBalance(id) ?? panic("Previous bidder unlinked the bid ccollection capability.")
+				let previousBalance = previousOffer.borrow()?.getBalance(id) ?? panic("Previous bidder unlinked the bid ccollection capability. bidder address : ".concat(previousOffer.address.toString()))
 				minBid = previousBalance + saleItem.auctionMinBidIncrement
 			}
 
@@ -375,7 +375,7 @@ pub contract FindMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked the bid collection capability.")
+			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(callback.address.toString()))
 
 			if saleItem.auctionStartPrice >  balance {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
@@ -442,7 +442,7 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			if vault.getType() != saleItem.vaultType {
-				panic("The FT vault sent in to fulfill does not match the required type")
+				panic("The FT vault sent in to fulfill does not match the required type. Required Type : ".concat(saleItem.vaultType.identifier).concat(" . Sent-in vault type : ".concat(vault.getType().identifier)))
 			}
 
 			if vault.balance < saleItem.auctionReservePrice {
@@ -595,7 +595,7 @@ pub contract FindMarketAuctionSoft {
 
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			if !bid.nftCap.check() {
-				panic("Bidder unlinked the nft receiver capability.")
+				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
 			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			destroy bid
@@ -654,7 +654,7 @@ pub contract FindMarketAuctionSoft {
 			bid.setBalance(bid.balance + increaseBy)
 
 			if !bid.from.check(){
-				panic("Seller unlinked the SaleItem collection capability.")
+				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
 			}
 			bid.from.borrow()!.registerIncreasedBid(id, oldBalance: oldBalance)
 		}
