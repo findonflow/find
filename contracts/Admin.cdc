@@ -70,7 +70,7 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.setWallet(wallet)
 		}
 
@@ -79,8 +79,8 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-      let path = FindMarket.TenantClientStoragePath
-      return Admin.account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+      		let path = FindMarket.TenantClientStoragePath
+      		return Admin.account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Find market tenant client Reference.")
 		}
 
 		/// Enable or disable public registration 
@@ -89,7 +89,7 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.setPublicEnabled(enabled)
 		}
 
@@ -98,7 +98,7 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.setAddonPrice(name: name, price: price)
 		}
 
@@ -107,7 +107,7 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.setPrice(default: default, additionalPrices: additional)
 		}
 
@@ -117,7 +117,7 @@ pub contract Admin {
 				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
 
-			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. ")
+			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.internal_register(name:name, profile: profile, leases: leases)
 		}
 
@@ -238,7 +238,7 @@ pub contract Admin {
 			let string = FindMarket.getTenantPathForAddress(tenant)
 			let pp = PrivatePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
 			let cap = Admin.account.getCapability<&FindMarket.Tenant>(pp)
-			return cap.borrow() ?? panic("Cannot borrow tenant reference.")
+			return cap.borrow() ?? panic("Cannot borrow tenant reference from path. Path : ".concat(pp.toString()) )
 		}
 
 		pub fun addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
