@@ -255,4 +255,50 @@ func TestFIND(t *testing.T) {
 		otu.AutoGold("link_removed", profile)
 	})
 
+	t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
+
+		user := "user1"
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, user).
+			createUser(100.0, "user2").
+			setProfile(user).
+			setProfile("user2").
+			registerUser(user).
+			registerUser("user2")
+
+		otu.O.TransactionFromFile("buyAddon").
+			SignProposeAndPayAs(user).
+			Args(otu.O.Arguments().
+				String(user).
+				String("forge").
+				UFix64(50.0)).
+			Test(otu.T).
+			AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
+				"name":  user,
+				"addon": "forge",
+			}))
+
+		/* Should not be able to buy addons with wrong balance */
+		otu.O.TransactionFromFile("buyAddon").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				String("user2").
+				String("forge").
+				UFix64(10.0)).
+			Test(otu.T).
+			AssertFailure("Expect 50.00000000 FUSD for forge addon")
+
+		/* Should not be able to buy addons that does not exist */
+		otu.O.TransactionFromFile("buyAddon").
+			SignProposeAndPayAs(user).
+			Args(otu.O.Arguments().
+				String(user).
+				String("dandy").
+				UFix64(10.0)).
+			Test(otu.T).
+			AssertFailure("This addon is not available.")
+
+	})
 }
