@@ -586,6 +586,16 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 	return otu
 }
 
+func (otu *OverflowTestUtils) delistAllNFT(name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllMarketListings").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("cancelAllMarketAuctionSoft").
@@ -772,13 +782,23 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
-			UFix64(100.0)).
+			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllMarketDirectOfferEscrowed").
+		SignProposeAndPayAs(signer).
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).AssertSuccess()
 	return otu
 }
 
@@ -793,13 +813,23 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
-			UFix64(100.0)).
+			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllMarketDirectOfferSoft").
+		SignProposeAndPayAs(signer).
+		Args(otu.O.Arguments().
+			Account("account")).
+		Test(otu.T).AssertSuccess()
 	return otu
 }
 
@@ -1172,6 +1202,20 @@ func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *Ove
 		Args(otu.O.Arguments().
 			String(receiver).
 			UInt64(id)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) sendFT(receiver, sender, ft string, amount float64) *OverflowTestUtils {
+	otu.O.TransactionFromFile("sendFT").
+		SignProposeAndPayAs(sender).
+		Args(otu.O.Arguments().
+			String(receiver).
+			UFix64(amount).
+			String(ft).
+			String("").
+			String("")).
 		Test(otu.T).
 		AssertSuccess()
 	return otu

@@ -384,7 +384,7 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
+				"amount":      "0.35000000",
 				"findName":    "",
 				"id":          fmt.Sprintf("%d", ids[0]),
 				"royaltyName": "find",

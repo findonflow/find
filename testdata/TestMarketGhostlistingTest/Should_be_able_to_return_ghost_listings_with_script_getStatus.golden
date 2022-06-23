@@ -14,7 +14,7 @@
                             "minimumBidIncrement": "1.00000000",
                             "reservePrice": "15.00000000",
                             "startPrice": "10.00000000",
-                            "timestamp": "1.00000000"
+                            "timestamp": "1401.00000000"
                         },
                         "bidder": "",
                         "bidderName": "",
@@ -23,7 +23,7 @@
                         "listingId": "ID1",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-                        "listingValidUntil": "10.00000000",
+                        "listingValidUntil": "1411.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -72,7 +72,7 @@
                 "auctionReservePrice": "",
                 "auctionStartPrice": "",
                 "cost": "5.00000000",
-                "currentTime": "1.00000000",
+                "currentTime": "1401.00000000",
                 "extensionOnLateBid": "300.00000000",
                 "latestBid": "",
                 "latestBidBy": "",
@@ -101,7 +101,7 @@
             "wallets": [
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "109.50100000",
+                    "balance": "417.00100000",
                     "name": "Flow",
                     "tags": [
                         "flow"
