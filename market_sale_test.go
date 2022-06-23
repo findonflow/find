@@ -55,6 +55,29 @@ func TestMarketSale(t *testing.T) {
 			buyNFTForMarketSale("user2", "user1", id, price)
 	})
 
+	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
+		otu := NewOverflowTest(t).
+			setupFIND().
+			setupDandy("user1").
+			createUser(100.0, "user2").
+			registerUser("user2").
+			registerFtInRegistry().
+			setFlowDandyMarketOption("Sale")
+
+		price := 10.0
+		id := otu.mintThreeExampleDandies()[0]
+		otu.listNFTForSale("user1", id, price).
+			sendDandy("user2", "user1", id)
+
+		otu.O.TransactionFromFile("delistNFTSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(id)).
+			Test(otu.T).AssertSuccess()
+
+	})
+
 	t.Run("Should be able to change price of dandy", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().

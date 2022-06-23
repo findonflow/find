@@ -9,7 +9,7 @@ import FindMarket from "./FindMarket.cdc"
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionSoft {
 
-	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
+	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 	pub resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer
@@ -256,13 +256,16 @@ pub contract FindMarketAuctionSoft {
 		access(self) fun emitEvent(saleItem: &SaleItem, status: String,previousBuyer:Address?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
-			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
 			let buyer=saleItem.getBuyer()
 
-
+			var nftInfo:FindMarket.NFTInfo?=nil 
+			if saleItem.checkPointer() {
+				nftInfo=saleItem.toNFTInfo()
+			}
+	
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
 				previousBuyerName = FIND.reverseLookup(pb)
@@ -397,12 +400,16 @@ pub contract FindMarketAuctionSoft {
 			let saleItem=self.borrow(id)
 
 			var status="cancel"
-			if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
-				if saleItem.hasAuctionMetReservePrice() {
-					panic("Cannot cancel finished auction, fulfill it instead")
-				}
-				status="cancel_reserved_not_met"
+			if saleItem.checkPointer() {
+				if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+					if saleItem.hasAuctionMetReservePrice() {
+						panic("Cannot cancel finished auction, fulfill it instead")
+					}
+					status="cancel_reserved_not_met"
 
+				}
+			} else {
+				status = "cancel_ghostlisting"
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item from soft-auction"), seller: nil, buyer: nil)

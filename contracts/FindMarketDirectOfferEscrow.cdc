@@ -9,7 +9,7 @@ import FindMarket from "./FindMarket.cdc"
 
 pub contract FindMarketDirectOfferEscrow {
 
-	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
+	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 
 	pub resource SaleItem : FindMarket.SaleItem {
@@ -197,11 +197,15 @@ pub contract FindMarketDirectOfferEscrow {
 		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer: Address?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
-			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = FIND.lookup(buyer.toString())
+
+			var nftInfo:FindMarket.NFTInfo?=nil
+			if saleItem.checkPointer() {
+				nftInfo=saleItem.toNFTInfo()
+			}
 
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
@@ -285,11 +289,13 @@ pub contract FindMarketDirectOfferEscrow {
 
 			let saleItem=self.borrow(id)
 
+
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "reject in direct offer"), seller: nil, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
+
 
 			self.emitEvent(saleItem: saleItem, status: "rejected", previousBuyer:nil)
 
