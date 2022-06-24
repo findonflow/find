@@ -4,6 +4,7 @@
   "fields": {
     "amount": "10.00000000",
     "buyer": "0xe03daebed8ca0615",
+    "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user3",
     "lockedUntil": "39312001.00000000",
     "name": "user1",
