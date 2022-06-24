@@ -207,7 +207,7 @@ pub contract FindViews {
 		}
 
 		pub fun valid() : Bool {
-			if !self.cap.borrow()!.getIDs().contains(self.id) {
+			if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
 				return false
 			}
 			return true
@@ -378,7 +378,7 @@ pub contract FindViews {
 		}
 
 		pub fun valid() : Bool {
-			if !self.cap.borrow()!.getIDs().contains(self.id) {
+			if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
 				return false
 			}
 
@@ -428,10 +428,16 @@ pub contract FindViews {
 		}
 
 		pub fun withdraw() :@NonFungibleToken.NFT {
+			if !self.cap.check() {
+				panic("The pointer capability is invalid.")
+			}
 			return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
 		}
 
 		pub fun deposit(_ nft: @NonFungibleToken.NFT){
+			pre{
+				self.cap.check() : "The pointer capablity is invalid."
+			}
 			self.cap.borrow()!.deposit(token: <- nft)
 		}
 

@@ -8,7 +8,7 @@ pub fun main(user: String) : [String] {
 	}
 	let account = getAccount(address!)
 	let cap = account.getCapability<&Dandy.Collection{Dandy.CollectionPublic}>(Dandy.CollectionPublicPath)
-	let ref = cap.borrow() ?? panic("Cannot borrow reference to Dandy Collection")
+	let ref = cap.borrow() ?? panic("Cannot borrow reference to Dandy Collection. Account address : ".concat(address!.toString()))
 
 	return ref.getMinters()
 }

@@ -7,7 +7,7 @@ pub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentif
 	let address =FIND.lookupAddress(name)!
 
 	// Get collection public path from NFT Registry
-	let nftInfo = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet")
+	let nftInfo = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
 	let collectionPublicPath = nftInfo.publicPath
 	let collection= getAccount(address).getCapability(collectionPublicPath).borrow<&{MetadataViews.ResolverCollection}>()!
 

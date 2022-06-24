@@ -34,6 +34,9 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
+			pre{
+				self.offerCallback.check() : "Bidder unlinked bid collection capability."
+			}
 			let pointer= self.pointer as! FindViews.AuthNFTPointer
 			let vault <- self.offerCallback.borrow()!.accept(<- pointer.withdraw())
 			return <- vault
@@ -44,6 +47,9 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun getBalance() : UFix64 {
+			pre{
+				self.offerCallback.check() : "Bidder unlinked bid collection capability."
+			}
 			return self.offerCallback.borrow()!.getBalance(self.getId())
 		}
 
@@ -101,6 +107,9 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun getFtType() : Type  {
+			pre{
+				self.offerCallback.check() : "Bidder unlinked bid collection capability."
+			}
 			return self.offerCallback.borrow()!.getVaultType(self.getId())
 		}
 
@@ -260,7 +269,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()!.getBalance(id)
+			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(callback.address.toString()))
 
 			let currentBalance=saleItem.getBalance()
 			Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
@@ -269,7 +278,8 @@ pub contract FindMarketDirectOfferEscrow {
 			}
 			//somebody else has the highest item so we cancel it
 			let previousBuyer=saleItem.offerCallback.address
-			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
+			let previousCB = saleItem.offerCallback.borrow() ?? panic("Previous bidder unlinked the bid collection capability. bidder address : ".concat(previousBuyer.toString()))
+			previousCB.cancelBidFromSaleItem(id)
 			saleItem.setValidUntil(validUntil)
 			saleItem.setCallback(callback)
 
@@ -428,6 +438,9 @@ pub contract FindMarketDirectOfferEscrow {
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
+			if !bid.nftCap.check() {
+				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
+			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
@@ -471,7 +484,9 @@ pub contract FindMarketDirectOfferEscrow {
 			let bid =self.borrowBid(id)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
-
+			if !bid.from.check() {
+				panic("Seller unlinked SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
+			}
 			bid.from.borrow()!.registerIncreasedBid(id)
 		}
 
@@ -483,6 +498,9 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
+			pre{
+				self.receiver.check() : "This user does not have receiver vault set up. User: ".concat(self.receiver.address.toString())
+			}
 			Debug.log("cancel bid")
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault

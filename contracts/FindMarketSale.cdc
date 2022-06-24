@@ -170,6 +170,7 @@ pub contract FindMarketSale {
 			pre {
 				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
 				self.owner!.address != nftCap.address : "You cannot buy your own listing"
+				nftCap.check() : "The nft receiver capability passed in is invalid."
 			}
 
 			let saleItem=self.borrow(id)
