@@ -100,14 +100,14 @@ pub contract FTRegistry {
     }
 
     access(account) fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo {
-        let info = FTRegistry.fungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this Fungible Token Registry.")
+        let info = FTRegistry.fungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this Fungible Token Registry. Type : ".concat(typeIdentifier))
         FTRegistry.aliasMap.remove(key: info.alias)
         emit FTInfoRemoved(alias:info!.alias, typeIdentifier: info!.typeIdentifier)
         return info 
     }
 
     access(account) fun removeFTInfoByAlias(_ alias: String) : FTInfo {
-        let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias.")
+        let typeIdentifier = self.getTypeIdentifier(alias) ?? panic("Cannot find type identifier from this alias. Alias : ".concat(alias))
         return self.removeFTInfoByTypeIdentifier(typeIdentifier)
     }
 

@@ -48,6 +48,9 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
+			pre{
+				self.offerCallback!.check() : "bidder unlinked the bid collection capability."
+			}
 			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 			return <- vault
 		}
@@ -58,6 +61,9 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getBalance() : UFix64 {
 			if let cb= self.offerCallback {
+				if !cb.check() {
+					panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
+				}
 				return cb.borrow()!.getBalance(self.getId())
 			}
 			return self.auctionStartPrice
@@ -298,7 +304,7 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			let timestamp=Clock.time()
-			let newOfferBalance=newOffer.borrow()!.getBalance(id)
+			let newOfferBalance=newOffer.borrow()?.getBalance(id) ?? panic("The new offer bid capability is invalid.")
 
 			let previousOffer = saleItem.offerCallback!
 
@@ -314,6 +320,9 @@ pub contract FindMarketAuctionEscrow {
 
 			var previousBuyer:Address?=nil
 			if newOffer.address != previousOffer.address {
+				if !previousOffer.check() {
+					panic("Previous bidder unlinked the bid collection capability. bidder address : ".concat(previousOffer.address.toString()))
+				}
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
 				previousBuyer=previousOffer.address
 			}
@@ -377,7 +386,7 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()!.getBalance(id)
+			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked bid collection capability. bidder address : ".concat(callback.address.toString()))
 
 			if saleItem.auctionStartPrice >  balance {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
@@ -419,7 +428,7 @@ pub contract FindMarketAuctionEscrow {
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
-
+			
 			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
@@ -596,6 +605,9 @@ pub contract FindMarketAuctionEscrow {
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
+			if !bid.nftCap.check() {
+				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
+			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
@@ -653,7 +665,9 @@ pub contract FindMarketAuctionEscrow {
 
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
-
+			if !bid.from.check() {
+				panic("Seller unlinked SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
+			}
 			bid.from.borrow()!.registerIncreasedBid(id, oldBalance:oldBalance)
 		}
 
@@ -662,6 +676,9 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
+			if !self.receiver.check() {
+				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
+			}
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
 			destroy bid
 		}

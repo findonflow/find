@@ -216,8 +216,8 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: path)!
 
 		// Get supported NFT and FT Information from Registries from input alias
-		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet")
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet")
+		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
 		

@@ -10,7 +10,7 @@ transaction(name: String, amount: UFix64, recipient: String) {
 		let address = resolveAddress!
 		let price=FIND.calculateCost(name)
 		if price != amount {
-			panic("Calculated cost does not match expected cost")
+			panic("Calculated cost : ".concat(price.toString()).concat(" does not match expected cost").concat(amount.toString()))
 		}
 		log("The cost for registering this name is ".concat(price.toString()))
 

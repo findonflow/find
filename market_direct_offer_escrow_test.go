@@ -67,6 +67,46 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
+	t.Run("Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			destroyDandyCollection("user2").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			sendDandy("user2", "user1", id)
+
+		otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(id)).
+			Test(otu.T).
+			AssertSuccess()
+
+	})
+
+	t.Run("Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferEscrow").
+			destroyDandyCollection("user2").
+			directOfferMarketEscrowed("user2", "user1", id, price).
+			sendDandy("user2", "user1", id)
+
+		otu.O.TransactionFromFile("retractOfferMarketDirectOfferEscrowed").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id)).
+			Test(otu.T).
+			AssertSuccess()
+
+	})
+
 	t.Run("Should be able to increase offer", func(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).

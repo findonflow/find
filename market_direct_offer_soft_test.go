@@ -66,6 +66,46 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sendFT("user1", "user2", "Flow", price)
 	})
 
+	t.Run("Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			destroyDandyCollection("user2").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price).
+			sendDandy("user2", "user1", id)
+
+		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(id)).
+			Test(otu.T).
+			AssertSuccess()
+	})
+
+	t.Run("Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("DirectOfferSoft").
+			destroyDandyCollection("user2").
+			directOfferMarketSoft("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price).
+			sendDandy("user2", "user1", id)
+
+		otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64(id)).
+			Test(otu.T).
+			AssertSuccess()
+	})
+
 	t.Run("Should be able to increase offer", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
