@@ -11,7 +11,6 @@ pub contract FindRewardToken {
 
         pub fun getViews() : [Type]
         pub fun resolveView(_ view: Type): AnyStruct?
-        pub fun getVaultType() : Type
     }
 
     pub struct FTVaultData {

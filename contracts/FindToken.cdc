@@ -118,9 +118,9 @@ pub contract FindToken : FungibleToken {
                 return nil
             }
 
-            // if !FindToken.claimRecords.containsKey(receiver) {
-            //     FindToken.claimRecords[receiver] = {}
-            // }
+            if !FindToken.claimRecords.containsKey(receiver) {
+                FindToken.claimRecords[receiver] = {}
+            }
             FindToken.claimRecords[receiver]!.insert(key: task, Clock.time())
             return amount
         }
@@ -197,11 +197,11 @@ pub contract FindToken : FungibleToken {
         self.account.link<&Vault{FungibleToken.Receiver, FindRewardToken.VaultViews}>(self.receiverPublicPath, target: self.vaultStoragePath)
         self.account.link<&Vault{FungibleToken.Balance, FindRewardToken.VaultViews}>(self.balancePublicPath, target: self.vaultStoragePath)
         self.account.link<&Vault{FungibleToken.Provider, FindRewardToken.VaultViews}>(self.providerPath, target: self.vaultStoragePath)
-        self.account.link<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews}>(self.findRewardPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews, FungibleToken.Provider}>(self.findRewardPath, target: self.vaultStoragePath)
         
         self.account.save(<- minter, to: self.minterPath)
 
-        FindRewardToken.addTenantRewardToken(tenant: FindToken.account.address, cap: FindToken.account.getCapability<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews}>(self.findRewardPath))
+        FindRewardToken.addTenantRewardToken(tenant: FindToken.account.address, cap: FindToken.account.getCapability<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews, FungibleToken.Provider}>(self.findRewardPath))
 
     }
 

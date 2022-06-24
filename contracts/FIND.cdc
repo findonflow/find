@@ -1576,7 +1576,7 @@ pub contract FIND {
 
 			let vault = rewardVaultCap.borrow()!
 			let rewardAmount = vault.reward(name: findName, receiver: receiver, task: task)
-			let vaultType = vault.getVaultType()
+			let vaultType = vault.getType()
 
 			if rewardAmount == nil {
 				return 
