@@ -66,6 +66,36 @@ func TestMarketAuctionSoft(t *testing.T) {
 			fulfillMarketAuctionSoft("user2", id, 15.0)
 	})
 
+	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
+		otu := NewOverflowTest(t)
+
+		price := 10.0
+		id := otu.setupMarketAndDandy()
+		otu.registerFtInRegistry().
+			setFlowDandyMarketOption("AuctionSoft").
+			listNFTForSoftAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			destroyDandyCollection("user2").
+			auctionBidMarketSoft("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			sendDandy("user2", "user1", id)
+
+		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(id)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", id),
+				"seller": otu.accountAddress("user1"),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", 15.0),
+				"status": "cancel_ghostlisting",
+			}))
+	})
+
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
 		otu := NewOverflowTest(t)
 
