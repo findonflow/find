@@ -8,28 +8,30 @@ import (
 )
 
 func TestFTRegistry(t *testing.T) {
+	otu := NewOverflowTest(t).
+		setupFIND().
+		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "Flow",
+			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		})
 
+	o := otu.O
 	t.Run("Should be able to registry flow token and get it", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			})
 
-		o := otu.O
 		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsJsonString()
 
-		otu.AutoGold("by_alias", result)
+		otu.AutoGoldRename("Should be able to registry flow token and get it by alias", result)
 
 		result = o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
 			RunReturnsJsonString()
 
-		otu.AutoGold("by_identifier", result)
+		otu.AutoGoldRename("Should be able to registry flow token and get it by identifier", result)
+	})
 
+	t.Run("Should not be able to overrride a ft without removing it first", func(t *testing.T) {
 		/* Should not be able to overrride a ft without removing it first */
 		o.TransactionFromFile("adminSetFTInfo_flow").
 			SignProposeAndPayAs("find").
@@ -37,27 +39,33 @@ func TestFTRegistry(t *testing.T) {
 			Test(t).
 			AssertFailure("This FungibleToken Register already exist")
 
-		/* Should be able to registry flow token, fusd token and get list from it */
+	})
+
+	t.Run("Should be able to registry flow token, fusd token and get list from it", func(t *testing.T) {
 		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 			"alias":          "FUSD",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
 		})
 
-		result = otu.O.ScriptFromFile("getFTInfoAll").RunReturnsJsonString()
-		otu.AutoGold("get_FUSD", result)
+		result := otu.O.ScriptFromFile("getFTInfoAll").RunReturnsJsonString()
+		otu.AutoGoldRename("Should not be able to overrride a ft without removing it first", result)
+	})
 
+	t.Run("Should be able to registry usdc token and get it", func(t *testing.T) {
 		/* Should be able to registry usdc token and get it */
 		otu.registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 			"alias":          "USDC",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
 		})
 
-		result = o.ScriptFromFile("getFTInfo").
+		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FiatToken.Vault")).
 			RunReturnsJsonString()
 
-		otu.AutoGold("get_USDC", result)
+		otu.AutoGoldRename("Should be able to registry usdc token and get it", result)
+	})
 
+	t.Run("Should be able to send usdc to another name", func(t *testing.T) {
 		/* Should be able to send usdc to another name */
 		otu.createUser(100.0, "user1").
 			createUser(100.0, "user2").
@@ -90,7 +98,9 @@ func TestFTRegistry(t *testing.T) {
 				"tag":       "test",
 				"message":   "This is a message",
 			}))
+	})
 
+	t.Run("Should be able to send fusd to another name", func(t *testing.T) {
 		/* Should be able to send fusd to another name */
 		o.TransactionFromFile("sendFT").
 			SignProposeAndPayAs("user2").
@@ -118,7 +128,9 @@ func TestFTRegistry(t *testing.T) {
 				"tag":       "test",
 				"message":   "This is a message",
 			}))
+	})
 
+	t.Run("Should be able to send flow to another name", func(t *testing.T) {
 		/* Should be able to send flow to another name */
 		o.TransactionFromFile("sendFT").
 			SignProposeAndPayAs("user2").
@@ -146,7 +158,9 @@ func TestFTRegistry(t *testing.T) {
 				"tag":       "test",
 				"message":   "This is a message",
 			}))
+	})
 
+	t.Run("Should be able to registry and remove them", func(t *testing.T) {
 		/* Should be able to remove them */
 		otu.removeFTInFtRegistry("adminRemoveFTInfoByAlias", "FUSD",
 			"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
