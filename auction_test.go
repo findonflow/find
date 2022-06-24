@@ -257,7 +257,7 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(10.0)).
 			Test(otu.T).
-			AssertFailure("bid must be larger then previous bid")
+			AssertFailure("bid must be larger then current bid. Current bid is : 20.00000000. New bid is at : 10.00000000")
 	})
 
 	t.Run("Should be able to sell lease from offer directly", func(t *testing.T) {

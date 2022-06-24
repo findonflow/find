@@ -8,7 +8,7 @@ transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: Stri
 
 	prepare(account: AuthAccount) {
 
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet")
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {

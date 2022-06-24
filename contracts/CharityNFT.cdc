@@ -115,7 +115,8 @@ pub contract CharityNFT: NonFungibleToken {
 		var newNFT <- create NFT(initID: CharityNFT.totalSupply, metadata:metadata)
 
 		// deposit it in the recipient's account using their reference
-		recipient.borrow()!.deposit(token: <-newNFT)
+		let collectionRef = recipient.borrow() ?? panic("Cannot borrow reference to collection public. ")
+		collectionRef.deposit(token: <-newNFT)
 		emit Minted(id: CharityNFT.totalSupply, metadata:metadata, to: recipient.address)
 
 		CharityNFT.totalSupply = CharityNFT.totalSupply + 1 
