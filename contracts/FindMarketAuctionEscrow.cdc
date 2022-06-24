@@ -419,7 +419,6 @@ pub contract FindMarketAuctionEscrow {
 					}
 					status="cancel_reserved_not_met"
 				}
-
 			} else {
 				status = "cancel_ghostlisting"
 			}

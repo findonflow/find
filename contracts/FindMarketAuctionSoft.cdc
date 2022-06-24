@@ -265,11 +265,11 @@ pub contract FindMarketAuctionSoft {
 			let id=saleItem.getId()
 			let buyer=saleItem.getBuyer()
 
-			var nftInfo:FindMarket.NFTInfo?=nil 
+			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo()
 			}
-	
+			
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
 				previousBuyerName = FIND.reverseLookup(pb)
@@ -414,9 +414,8 @@ pub contract FindMarketAuctionSoft {
 
 				}
 			} else {
-				status = "cancel_ghostlisting"
+				status="cancel_ghostlisting"
 			}
-
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item from soft-auction"), seller: nil, buyer: nil)
 
 			if !actionResult.allowed {
