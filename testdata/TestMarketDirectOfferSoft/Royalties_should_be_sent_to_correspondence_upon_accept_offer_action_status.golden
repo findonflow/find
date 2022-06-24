@@ -15,7 +15,7 @@
                         "listingId": "ID0",
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-                        "listingValidUntil": "100.00000000",
+                        "listingValidUntil": "301.00000000",
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
@@ -55,7 +55,7 @@
                 "auctionReservePrice": "",
                 "auctionStartPrice": "",
                 "cost": "5.00000000",
-                "currentTime": "1.00000000",
+                "currentTime": "201.00000000",
                 "extensionOnLateBid": "300.00000000",
                 "latestBid": "",
                 "latestBidBy": "",
@@ -92,7 +92,7 @@
                 },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "100.00100000",
+                    "balance": "197.50100000",
                     "name": "Flow",
                     "tags": [
                         "flow"

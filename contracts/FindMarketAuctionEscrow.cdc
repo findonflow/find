@@ -9,7 +9,7 @@ import FindMarket from "./FindMarket.cdc"
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionEscrow {
 
-	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
+	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 	pub resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer
@@ -48,6 +48,9 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
+			pre{
+				self.offerCallback!.check() : "bidder unlinked the bid collection capability."
+			}
 			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 			return <- vault
 		}
@@ -58,6 +61,9 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getBalance() : UFix64 {
 			if let cb= self.offerCallback {
+				if !cb.check() {
+					panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
+				}
 				return cb.borrow()!.getBalance(self.getId())
 			}
 			return self.auctionStartPrice
@@ -260,11 +266,14 @@ pub contract FindMarketAuctionEscrow {
 		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
-			let nftInfo=saleItem.toNFTInfo()
 			let balance=saleItem.getBalance()
 			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
 
+			var nftInfo:FindMarket.NFTInfo?=nil 
+			if saleItem.checkPointer() {
+				nftInfo=saleItem.toNFTInfo()
+			}
 
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
@@ -295,7 +304,7 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			let timestamp=Clock.time()
-			let newOfferBalance=newOffer.borrow()!.getBalance(id)
+			let newOfferBalance=newOffer.borrow()?.getBalance(id) ?? panic("The new offer bid capability is invalid.")
 
 			let previousOffer = saleItem.offerCallback!
 
@@ -311,6 +320,9 @@ pub contract FindMarketAuctionEscrow {
 
 			var previousBuyer:Address?=nil
 			if newOffer.address != previousOffer.address {
+				if !previousOffer.check() {
+					panic("Previous bidder unlinked the bid collection capability. bidder address : ".concat(previousOffer.address.toString()))
+				}
 				previousOffer.borrow()!.cancelBidFromSaleItem(id)
 				previousBuyer=previousOffer.address
 			}
@@ -374,7 +386,7 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()!.getBalance(id)
+			let balance=callback.borrow()?.getBalance(id) ?? panic("Bidder unlinked bid collection capability. bidder address : ".concat(callback.address.toString()))
 
 			if saleItem.auctionStartPrice >  balance {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
@@ -400,11 +412,15 @@ pub contract FindMarketAuctionEscrow {
 			let saleItem=self.borrow(id)
 
 			var status = "cancel_listing"
-			if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
-				if saleItem.hasAuctionMetReservePrice() {
-					panic("Cannot cancel finished auction, fulfill it instead")
+			if saleItem.checkPointer() {
+				if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+					if saleItem.hasAuctionMetReservePrice() {
+						panic("Cannot cancel finished auction, fulfill it instead")
+					}
+					status="cancel_reserved_not_met"
 				}
-				status="cancel_reserved_not_met"
+			} else {
+				status = "cancel_ghostlisting"
 			}
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for auction"), seller: nil, buyer: nil)
@@ -412,7 +428,7 @@ pub contract FindMarketAuctionEscrow {
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
-
+			
 			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
@@ -589,6 +605,9 @@ pub contract FindMarketAuctionEscrow {
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
+			if !bid.nftCap.check() {
+				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
+			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
@@ -646,7 +665,9 @@ pub contract FindMarketAuctionEscrow {
 
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
-
+			if !bid.from.check() {
+				panic("Seller unlinked SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
+			}
 			bid.from.borrow()!.registerIncreasedBid(id, oldBalance:oldBalance)
 		}
 
@@ -655,6 +676,9 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
+			if !self.receiver.check() {
+				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
+			}
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
 			destroy bid
 		}

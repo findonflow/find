@@ -10,7 +10,7 @@
                 "auctionReservePrice": "",
                 "auctionStartPrice": "",
                 "cost": "5.00000000",
-                "currentTime": "1.00000000",
+                "currentTime": "1401.00000000",
                 "extensionOnLateBid": "300.00000000",
                 "latestBid": "",
                 "latestBidBy": "",
@@ -37,13 +37,13 @@
                         "item": {
                             "amount": "15.00000000",
                             "auction": {
-                                "auctionEndsAt": "301.00000000",
+                                "auctionEndsAt": "1701.00000000",
                                 "currentPrice": "15.00000000",
                                 "extentionOnLateBid": "60.00000000",
                                 "minimumBidIncrement": "1.00000000",
                                 "reservePrice": "15.00000000",
                                 "startPrice": "10.00000000",
-                                "timestamp": "1.00000000"
+                                "timestamp": "1401.00000000"
                             },
                             "bidder": "0xf3fcd2c1a78f5eee",
                             "bidderName": "user2",
@@ -52,7 +52,7 @@
                             "listingId": "ID1",
                             "listingStatus": "active",
                             "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-                            "listingValidUntil": "301.00000000",
+                            "listingValidUntil": "1701.00000000",
                             "nft": {
                                 "collectionDescription": "Neo Collectibles FIND",
                                 "collectionName": "user1",
@@ -79,7 +79,7 @@
                             "seller": "0x179b6b1cb6755e31",
                             "sellerName": "user1"
                         },
-                        "timestamp": "1.00000000"
+                        "timestamp": "1401.00000000"
                     }
                 ]
             },
@@ -118,7 +118,7 @@
                 },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "60.00100000",
+                    "balance": "735.00100000",
                     "name": "Flow",
                     "tags": [
                         "flow"
@@ -126,7 +126,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-                    "balance": "95.00000000",
+                    "balance": "1095.00000000",
                     "name": "FUSD",
                     "tags": [
                         "fusd",
@@ -135,7 +135,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-                    "balance": "100.00000000",
+                    "balance": "1100.00000000",
                     "name": "USDC",
                     "tags": [
                         "usdc",

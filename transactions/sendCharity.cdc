@@ -14,6 +14,10 @@ transaction(
 		self.receiverCap= getAccount(recipient).getCapability<&{NonFungibleToken.CollectionPublic}>(CharityNFT.CollectionPublicPath)
 	}
 
+	pre{
+		self.receiverCap.check() : "Receiver doesn't have receiving vault set up properly."
+	}
+
 	execute {
 		let nft <- self.charityCollection.withdraw(withdrawID: id)
 		self.receiverCap.borrow()!.deposit(token: <- nft)

@@ -323,7 +323,7 @@ pub contract FindMarket {
 		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
 		let optRef = collectionCap.borrow() 
 		if optRef == nil {
-			panic("Account not properly set up, cannot borrow bid item collection")
+			panic("Account not properly set up, cannot borrow bid item collection. Account address : ".concat(collectionCap.address.toString()))
 		}
 		let ref=optRef!
 		let bidItem=ref.borrowBidItem(id)
@@ -331,7 +331,7 @@ pub contract FindMarket {
 		let saleItemCollectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: bidItem.getSellerAddress())
 		let saleRef = saleItemCollectionCap.borrow() 
 		if saleRef == nil {
-			panic("Seller account is not properly set up, cannot borrow sale item collection")
+			panic("Seller account is not properly set up, cannot borrow sale item collection. Seller address : ".concat(saleItemCollectionCap.address.toString()))
 		}
 		let sale=saleRef!
 		let item=sale.borrowSaleItem(id)
@@ -724,7 +724,7 @@ pub contract FindMarket {
 
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : ActionResult{
 			/* Check for Honour Banning */
-			let profile = getAccount(FindMarket.tenantNameAddress[self.name]!).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() ?? panic("Cannot get reference to Profile to check honour banning")
+			let profile = getAccount(FindMarket.tenantNameAddress[self.name]!).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() ?? panic("Cannot get reference to Profile to check honour banning. Tenant Name : ".concat(self.name))
 			if seller != nil && profile.isBanned(seller!) {
 				return ActionResult(allowed:false, message: "Seller banned by Tenant", name: "Profile Ban")
 			}
@@ -1057,11 +1057,16 @@ pub contract FindMarket {
 				let name = resolver(royaltyItem.receiver.address)
 
 				var walletCheck = true 
-
-				if !royaltyItem.receiver.check() { walletCheck = false }
-				if !royaltyItem.receiver.borrow()!.isInstance(Type<&Profile.User>()){ 
+				if !royaltyItem.receiver.check() { 
+					// if the capability is not valid, royalty cannot be paid
+					walletCheck = false 
+				} else if royaltyItem.receiver.borrow()!.isInstance(Type<@Profile.User>()){ 
+					// if the capability is valid -> it is a User resource -> check if the wallet is set up.
 					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
 					walletCheck = ref.checkWallet(ftType.identifier)
+				} else if !royaltyItem.receiver.borrow()!.isInstance(ftType){ 
+					// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
+					walletCheck = false 
 				}
 
 				/* If the royalty receiver check failed */
@@ -1081,7 +1086,7 @@ pub contract FindMarket {
 			let cutAmount= soldFor * findCut.cut
 			let name = resolver(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly.")
+			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
@@ -1089,7 +1094,7 @@ pub contract FindMarket {
 			let cutAmount= soldFor * tenantCut.cut
 			let name = resolver(tenantCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly.")
+			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
@@ -1135,7 +1140,7 @@ pub contract FindMarket {
 				self.scalars=scalar.getScalar()
 			}
 
-			let display = FindViews.getDisplay(item) ?? panic("cannot find display!")
+			let display = FindViews.getDisplay(item) ?? panic("cannot get MetadataViews.Display View")
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier

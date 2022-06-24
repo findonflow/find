@@ -158,7 +158,9 @@ pub contract FindViews {
 
 	pub struct ViewReadPointer : Pointer {
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
-		pub let id: UInt64
+		pub let id: UInt64 
+		pub let uuid: UInt64 
+		pub let itemType: Type 
 
 		init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
 			self.cap=cap
@@ -170,7 +172,8 @@ pub contract FindViews {
 			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
 			let display = FindViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
 			let nftCollectionData = FindViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
-
+			self.uuid=viewResolver.uuid
+			self.itemType=viewResolver.getType()
 		}
 
 		pub fun resolveView(_ type: Type) : AnyStruct? {
@@ -178,7 +181,7 @@ pub contract FindViews {
 		}
 
 		pub fun getUUID() :UInt64{
-			return self.getViewResolver().uuid
+			return self.uuid
 		}
 
 		pub fun getViews() : [Type]{
@@ -207,14 +210,14 @@ pub contract FindViews {
 		}
 
 		pub fun valid() : Bool {
-			if !self.cap.borrow()!.getIDs().contains(self.id) {
+			if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
 				return false
 			}
 			return true
 		}
 
 		pub fun getItemType() : Type {
-			return self.getViewResolver().getType()
+			return self.itemType
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
@@ -346,6 +349,8 @@ pub contract FindViews {
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
 		pub let nounce: UInt64
+		pub let uuid: UInt64 
+		pub let itemType: Type
 
 		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
 			self.cap=cap
@@ -359,6 +364,8 @@ pub contract FindViews {
 			let display = FindViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
 			let nftCollectionData = FindViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 			self.nounce=FindViews.getNounce(viewResolver)
+			self.uuid=viewResolver.uuid
+			self.itemType=viewResolver.getType()
 		}
 
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
@@ -370,7 +377,7 @@ pub contract FindViews {
 		}
 
 		pub fun getUUID() :UInt64{
-			return self.getViewResolver().uuid
+			return self.uuid
 		}
 
 		pub fun getViews() : [Type]{
@@ -378,7 +385,7 @@ pub contract FindViews {
 		}
 
 		pub fun valid() : Bool {
-			if !self.cap.borrow()!.getIDs().contains(self.id) {
+			if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
 				return false
 			}
 
@@ -428,10 +435,16 @@ pub contract FindViews {
 		}
 
 		pub fun withdraw() :@NonFungibleToken.NFT {
+			if !self.cap.check() {
+				panic("The pointer capability is invalid.")
+			}
 			return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
 		}
 
 		pub fun deposit(_ nft: @NonFungibleToken.NFT){
+			pre{
+				self.cap.check() : "The pointer capablity is invalid."
+			}
 			self.cap.borrow()!.deposit(token: <- nft)
 		}
 
@@ -439,7 +452,7 @@ pub contract FindViews {
 			return self.cap.address
 		}
 		pub fun getItemType() : Type {
-			return self.getViewResolver().getType()
+			return self.itemType
 		}
 	}
 
