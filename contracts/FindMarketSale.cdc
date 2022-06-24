@@ -12,7 +12,7 @@ A Find Market for direct sales
 */
 pub contract FindMarketSale {
 
-	pub event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
+	pub event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
 	//A sale item for a direct sale
 	pub resource SaleItem : FindMarket.SaleItem{
@@ -241,14 +241,20 @@ pub contract FindMarketSale {
 
 			let saleItem <- self.items.remove(key: id)!
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"), seller: nil, buyer: nil)
+			if saleItem.checkPointer() {
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"), seller: nil, buyer: nil)
 
-			if !actionResult.allowed {
-				panic(actionResult.message)
+				if !actionResult.allowed {
+					panic(actionResult.message)
+				}
+				let owner=self.owner!.address
+				emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+				destroy saleItem
+				return
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: nil, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			destroy saleItem
 		}
 
