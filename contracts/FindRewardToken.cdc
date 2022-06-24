@@ -4,25 +4,14 @@ pub contract FindRewardToken {
 
     // Map tenantToken to custom task rewards 
     access(contract) let defaultTaskRewards:  {String : UFix64}
-    access(contract) let tenantTokenCapabilities: {Address : Capability<&{FindReward , VaultViews}>}
-
-    pub struct rewardPaid {
-        pub let success: Bool 
-        pub let amount: UFix64
-        pub let tokenType: Type 
-
-        init(success: Bool, amount: UFix64, tokenType: Type) {
-            self.success=success 
-            self.amount=amount 
-            self.tokenType=tokenType
-        }
-    }
+    access(contract) let tenantTokenCapabilities: {Address : Capability<&{FindReward , VaultViews, FungibleToken.Provider}>}
 
     pub resource interface VaultViews {
         pub var balance: UFix64 
 
         pub fun getViews() : [Type]
         pub fun resolveView(_ view: Type): AnyStruct?
+        pub fun getVaultType() : Type
     }
 
     pub struct FTVaultData {
@@ -75,10 +64,10 @@ pub contract FindRewardToken {
     }
 
     pub resource interface FindReward {
-        pub fun reward(name: String, receiver: Address, task: String) : rewardPaid
+        pub fun reward(name: String, receiver: Address, task: String) : UFix64?
     } 
 
-    access(account) fun addTenantRewardToken(tenant: Address, cap: Capability<&{FindReward, VaultViews}>) {
+    access(account) fun addTenantRewardToken(tenant: Address, cap: Capability<&{FindReward, VaultViews, FungibleToken.Provider}>) {
         pre{
             self.tenantTokenCapabilities[tenant] == nil : "This tenant token has already registered."
         }
@@ -92,11 +81,11 @@ pub contract FindRewardToken {
         self.tenantTokenCapabilities.remove(key: tenant)
     }
 
-    access(account) fun getRewardVault(_ tenant: Address) : Capability<&{FindReward , VaultViews}>? {
+    access(account) fun getRewardVault(_ tenant: Address) : Capability<&{FindReward , VaultViews, FungibleToken.Provider}>? {
         return FindRewardToken.tenantTokenCapabilities[tenant]
     }
 
-    access(account) fun getRewardVaults() : [Capability<&{FindReward , VaultViews}>] {
+    access(account) fun getRewardVaults() : [Capability<&{FindReward , VaultViews , FungibleToken.Provider}>] {
         return FindRewardToken.tenantTokenCapabilities.values
     }
 

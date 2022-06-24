@@ -11,10 +11,13 @@ pub contract FindToken : FungibleToken {
     pub event TokensMinted(amount: UFix64)
     pub event TokensBurned(amount: UFix64)
     pub event TokensRewarded(findName: String, address: Address, amount: UFix64, task: String)
+    pub event TokenRewardMultiplier(multiplier: UFix64)
 
     pub let tokenAlias: String
     pub var totalSupply: UFix64
     pub let initialSupply: UFix64 
+
+    
     pub let vaultStoragePath: StoragePath 
     pub let receiverPublicPath: PublicPath 
     pub let balancePublicPath: PublicPath 
@@ -22,8 +25,15 @@ pub contract FindToken : FungibleToken {
     pub let minterPath: StoragePath 
     pub let findRewardPath: PrivatePath 
 
+
+    /***********************************************************
+    Implementation on Token Contract for being reward token
+    ***********************************************************/
     // Map tenantToken to custom task rewards 
     access(contract) let taskRewards: {String : UFix64}
+
+    // Multiplier 
+    pub var taskRewardsMultiplier: UFix64
 
     // Map address : {Task : Latest Claim TimeStamp}
     access(contract) let claimRecords: {Address : {String : UFix64}}
@@ -74,7 +84,7 @@ pub contract FindToken : FungibleToken {
                             balancePath: FindToken.balancePublicPath,
                             providerPath: FindToken.providerPath,
                             findRewardPath: FindToken.findRewardPath,
-                            vaultType: FindToken.getTokenType(),
+                            vaultType: FindToken.getVaultType(),
                             receiverType: Type<&FindToken.Vault{FungibleToken.Receiver, FindRewardToken.VaultViews}>(),
                             balanceType: Type<&FindToken.Vault{FungibleToken.Balance, FindRewardToken.VaultViews}>(),
                             providerType: Type<&FindToken.Vault{FungibleToken.Provider, FindRewardToken.VaultViews}>(),
@@ -93,30 +103,26 @@ pub contract FindToken : FungibleToken {
             }
         }
 
-        pub fun reward(name: String, receiver: Address, task: String) : FindRewardToken.rewardPaid {
+        /***********************************************************
+        Implementation on Token Contract for being reward token
+        ***********************************************************/
+        // The name here is just for emitting events for token contract
+        pub fun reward(name: String, receiver: Address, task: String) : UFix64? {
             if FindToken.taskRewards[task] == nil {
-                return FindRewardToken.rewardPaid(success: true, amount: 0.0, tokenType: FindToken.getTokenType())
+                return nil
             }
 
-            let amount = FindToken.taskRewards[task]! 
+            let amount = FindToken.taskRewards[task]! * FindToken.taskRewardsMultiplier
 
             if amount == 0.0 {
-                return FindRewardToken.rewardPaid(success: true, amount: 0.0, tokenType: FindToken.getTokenType())
+                return nil
             }
 
-            let receivingVaultCap = FindToken.getReceiverCapability(address: receiver)
-            if !receivingVaultCap.check() {
-                return FindRewardToken.rewardPaid(success: false, amount: amount, tokenType: FindToken.getTokenType())
-            }
-            let receivingVault = receivingVaultCap.borrow()!
-            emit TokensRewarded(findName: name, address: receiver, amount: amount, task: task)
-            if !FindToken.claimRecords.containsKey(receiver) {
-                FindToken.claimRecords[receiver] = {}
-            }
+            // if !FindToken.claimRecords.containsKey(receiver) {
+            //     FindToken.claimRecords[receiver] = {}
+            // }
             FindToken.claimRecords[receiver]!.insert(key: task, Clock.time())
-            let vault <- self.withdraw(amount: amount)
-            receivingVault.deposit(from: <- vault)
-            return FindRewardToken.rewardPaid(success: true, amount: amount, tokenType: FindToken.getTokenType())
+            return amount
         }
 
     }
@@ -140,6 +146,14 @@ pub contract FindToken : FungibleToken {
             emit TokensMinted(amount: amount)
             return <-create Vault(balance: amount)
         }
+
+        pub fun setRewardMultiplier(_ multiplier: UFix64) {
+            pre{
+                multiplier > 0.0 : "Multiplier cannot be less than 0.0"
+            }
+            FindToken.taskRewardsMultiplier = multiplier
+            emit TokenRewardMultiplier(multiplier: multiplier)
+        }
     }
 
     pub fun getBalanceCapability(address: Address) : Capability<&{FungibleToken.Balance}> {
@@ -150,7 +164,7 @@ pub contract FindToken : FungibleToken {
         return getAccount(address).getCapability<&{FungibleToken.Receiver}>(FindToken.receiverPublicPath)
     }
 
-    pub fun getTokenType() : Type {
+    pub fun getVaultType() : Type {
         return Type<@Vault>()
     }
 
@@ -164,12 +178,18 @@ pub contract FindToken : FungibleToken {
         self.balancePublicPath = /public/findTokenBalance 
         self.providerPath = /private/findTokenProvider 
         self.minterPath = /storage/findTokenMinter
-        self.findRewardPath = /private/findTokenReward
-        self.taskRewards = FindRewardToken.getDefaultTaskRewards()
         self.claimRecords = {}
 
         let minter <- create Minter()
         let vault <- create Vault(balance: 0.0)
+
+        /***********************************************************
+        Implementation on Token Contract for being reward token
+        ***********************************************************/
+        self.taskRewardsMultiplier = 1.0
+        emit TokenRewardMultiplier(multiplier: 1.0)
+        self.findRewardPath = /private/findTokenReward
+        self.taskRewards = FindRewardToken.getDefaultTaskRewards()
 
         vault.deposit(from: <- minter.mintTokens(self.initialSupply))
 

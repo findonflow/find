@@ -64,7 +64,7 @@ pub contract FIND {
 
 	pub event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
 
-    pub event TokensRewarded(tenant: Address, findName: String, address: Address, amount: UFix64, task: String, tokenType: String)
+    pub event TokensRewarded(tenant: Address, findName: String, address: Address, amount: UFix64?, task: String, tokenType: String)
 
     pub event TokensCanNotBeRewarded(tenant: Address, findName: String, address: Address, amount: UFix64?, task: String, tokenType: String?)
 
@@ -1568,20 +1568,35 @@ pub contract FIND {
 	}
 
 	access(contract) fun reward(tenant: Address, findName: String, receiver: Address, task: String) {
-		if let rewardVault = FindRewardToken.getRewardVault(tenant) {
-			if !rewardVault.check() {
+		if let rewardVaultCap = FindRewardToken.getRewardVault(tenant) {
+			if !rewardVaultCap.check() {
 				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address:receiver, amount: nil, task: task, tokenType: nil)
 				return
 			}
 
-			let rewardPaid = rewardVault.borrow()!.reward(name: findName, receiver: receiver, task: task)
-			if !rewardPaid.success {
-				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address: receiver, amount: rewardPaid.amount, task: task, tokenType: rewardPaid.tokenType.identifier)
-				return
-			} 
-			if rewardPaid.amount != 0.0 {
-				emit TokensRewarded(tenant: tenant, findName: findName, address: receiver, amount: rewardPaid.amount, task: task, tokenType: rewardPaid.tokenType.identifier)
+			let vault = rewardVaultCap.borrow()!
+			let rewardAmount = vault.reward(name: findName, receiver: receiver, task: task)
+			let vaultType = vault.getVaultType()
+
+			if rewardAmount == nil {
+				return 
 			}
+
+			if rewardAmount! >= vault.balance {
+				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address:receiver, amount: rewardAmount, task: task, tokenType: vaultType.identifier)
+				return
+			}
+
+			let profileVault = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+			if profileVault == nil || !profileVault!.checkWallet(vaultType.identifier) {
+				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address:receiver, amount: rewardAmount, task: task, tokenType: vaultType.identifier)
+				return
+			}
+
+			let reward <- vault.withdraw(amount: rewardAmount!) 
+			profileVault!.deposit(from: <- reward)
+			emit TokensRewarded(tenant: tenant, findName: findName, address: receiver, amount: rewardAmount, task: task, tokenType: vaultType.identifier)
+			
 		}
 	}
 
