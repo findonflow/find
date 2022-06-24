@@ -4,168 +4,75 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
-	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFTRegistry(t *testing.T) {
-	t.Run("Should be able to registry flow token", func(t *testing.T) {
-		NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			})
+	otu := NewOverflowTest(t).
+		setupFIND().
+		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "Flow",
+			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		})
 
-	})
-
+	o := otu.O
 	t.Run("Should be able to registry flow token and get it", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			})
 
-		o := otu.O
-		result := o.ScriptFromFile("getFTInfo").
-			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
-			RunReturnsJsonString()
-
-		autogold.Equal(t, result)
-
-	})
-
-	t.Run("Should be able to registry flow token and get it by alias", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			})
-
-		o := otu.O
 		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsJsonString()
 
-		autogold.Equal(t, result)
-	})
+		otu.AutoGoldRename("Should be able to registry flow token and get it by alias", result)
 
-	t.Run("Should be able to registry flow token, fusd token and get list from it", func(t *testing.T) {
-		
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-			})
+		result = o.ScriptFromFile("getFTInfo").
+			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
+			RunReturnsJsonString()
 
-		result := otu.O.ScriptFromFile("getFTInfoAll").RunReturnsJsonString()
-		autogold.Equal(t, result)
-
+		otu.AutoGoldRename("Should be able to registry flow token and get it by identifier", result)
 	})
 
 	t.Run("Should not be able to overrride a ft without removing it first", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			})
-
-		o := otu.O
+		/* Should not be able to overrride a ft without removing it first */
 		o.TransactionFromFile("adminSetFTInfo_flow").
 			SignProposeAndPayAs("find").
 			Args(o.Arguments()).
 			Test(t).
 			AssertFailure("This FungibleToken Register already exist")
-	})
-
-	t.Run("Should be able to registry and remove flow token by Alias, as well as return nil on scripts", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			removeFTInFtRegistry("adminRemoveFTInfoByAlias", "Flow",
-				"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
-					"alias":          "Flow",
-					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				})
-
-		o := otu.O
-		aliasResult := o.ScriptFromFile("getFTInfo").
-			Args(o.Arguments().String("Flow")).
-			RunReturnsInterface()
-		assert.Equal(t, "", aliasResult)
-
-		infoResult := o.ScriptFromFile("getFTInfo").
-			Args(o.Arguments().String("Flow")).
-			RunReturnsInterface()
-		assert.Equal(t, "", infoResult)
 
 	})
 
-	t.Run("Should be able to registry and remove flow token by Type Identifier, as well as return nil on scripts", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "Flow",
-				"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-			}).
-			removeFTInFtRegistry("adminRemoveFTInfoByTypeIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
-					"alias":          "Flow",
-					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				})
+	t.Run("Should be able to registry flow token, fusd token and get list from it", func(t *testing.T) {
+		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUSD",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+		})
 
-		o := otu.O
-		aliasResult := o.ScriptFromFile("getFTInfo").
-			Args(o.Arguments().String("A.0ae53cb6e3f42a79.FlowToken.Vault")).
-			RunReturnsInterface()
-		assert.Equal(t, "", aliasResult)
-
-		infoResult := o.ScriptFromFile("getFTInfo").
-			Args(o.Arguments().String("Flow")).
-			RunReturnsInterface()
-		assert.Equal(t, "", infoResult)
-
+		result := otu.O.ScriptFromFile("getFTInfoAll").RunReturnsJsonString()
+		otu.AutoGoldRename("Should not be able to overrride a ft without removing it first", result)
 	})
 
 	t.Run("Should be able to registry usdc token and get it", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-				"alias":          "USDC",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-			})
+		/* Should be able to registry usdc token and get it */
+		otu.registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "USDC",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+		})
 
-		o := otu.O
 		result := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FiatToken.Vault")).
 			RunReturnsJsonString()
 
-		autogold.Equal(t, result)
-
+		otu.AutoGoldRename("Should be able to registry usdc token and get it", result)
 	})
 
 	t.Run("Should be able to send usdc to another name", func(t *testing.T) {
-
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
+		/* Should be able to send usdc to another name */
+		otu.createUser(100.0, "user1").
 			createUser(100.0, "user2").
-			registerFtInRegistry().
 			registerUser("user1").
 			registerUser("user2")
 
-		otu.O.TransactionFromFile("sendFT").
+		o.TransactionFromFile("sendFT").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -194,18 +101,10 @@ func TestFTRegistry(t *testing.T) {
 	})
 
 	t.Run("Should be able to send fusd to another name", func(t *testing.T) {
-
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerFtInRegistry().
-			registerUser("user1").
-			registerUser("user2")
-
-		otu.O.TransactionFromFile("sendFT").
+		/* Should be able to send fusd to another name */
+		o.TransactionFromFile("sendFT").
 			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
+			Args(o.Arguments().
 				String("user1").
 				UFix64(5.0).
 				String("FUSD").
@@ -232,18 +131,10 @@ func TestFTRegistry(t *testing.T) {
 	})
 
 	t.Run("Should be able to send flow to another name", func(t *testing.T) {
-
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerFtInRegistry().
-			registerUser("user1").
-			registerUser("user2")
-
-		otu.O.TransactionFromFile("sendFT").
+		/* Should be able to send flow to another name */
+		o.TransactionFromFile("sendFT").
 			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
+			Args(o.Arguments().
 				String("user1").
 				UFix64(5.0).
 				String("Flow").
@@ -267,5 +158,30 @@ func TestFTRegistry(t *testing.T) {
 				"tag":       "test",
 				"message":   "This is a message",
 			}))
+	})
+
+	t.Run("Should be able to registry and remove them", func(t *testing.T) {
+		/* Should be able to remove them */
+		otu.removeFTInFtRegistry("adminRemoveFTInfoByAlias", "FUSD",
+			"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
+				"alias":          "FUSD",
+				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+			}).
+			removeFTInFtRegistry("adminRemoveFTInfoByTypeIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
+					"alias":          "Flow",
+					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				})
+
+		aliasResult := o.ScriptFromFile("getFTInfo").
+			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FUSD.Vault")).
+			RunReturnsInterface()
+		assert.Equal(t, "", aliasResult)
+
+		infoResult := o.ScriptFromFile("getFTInfo").
+			Args(o.Arguments().String("Flow")).
+			RunReturnsInterface()
+		assert.Equal(t, "", infoResult)
+
 	})
 }

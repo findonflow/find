@@ -211,7 +211,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = FIND.lookup(buyer.toString())
 
-			var nftInfo:FindMarket.NFTInfo?=nil
+			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo()
 			}

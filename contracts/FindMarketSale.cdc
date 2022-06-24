@@ -254,7 +254,11 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: nil, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			if !saleItem.checkPointer() {
+				emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: nil, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			} else {
+				emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			}
 			destroy saleItem
 		}
 

@@ -12,23 +12,20 @@ Tests must be in the same folder as flow.json with contracts and transactions/sc
 */
 func TestAuction(t *testing.T) {
 
+	otu := NewOverflowTest(t).
+		setupFIND().
+		createUser(100.0, "user1").
+		registerUser("user1")
+
 	t.Run("Should list a name for sale", func(t *testing.T) {
 
-		NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			registerUser("user1").
-			listForSale("user1")
+		otu.listForSale("user1")
 
 	})
 
 	t.Run("Should be able list names for sale and delist some", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			registerUser("user1").
-			registerUserWithName("user1", "name1").
+		otu.registerUserWithName("user1", "name1").
 			registerUserWithName("user1", "name2").
 			listForSale("user1").
 			listNameForSale("user1", "name1").
@@ -74,13 +71,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able list names for sale and delist them ALL", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			registerUser("user1").
-			registerUserWithName("user1", "name1").
-			registerUserWithName("user1", "name2").
-			listForSale("user1").
+		otu.listForSale("user1").
 			listNameForSale("user1", "name1").
 			listNameForSale("user1", "name2")
 
@@ -136,11 +127,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to direct offer on name for sale", func(t *testing.T) {
 
-		NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			registerUser("user1").
-			createUser(100.0, "user2").
+		otu.createUser(100.0, "user2").
 			registerUser("user2").
 			listForSale("user1").
 			directOffer("user2", "user1", 4.0)
@@ -148,15 +135,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to direct offer on name for sale and fulfill it", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			registerUser("user1").
-			createUser(100.0, "user2").
-			registerUser("user2").
-			listForSale("user1").
-			directOffer("user2", "user1", 4.0).
-			setProfile("user1")
+		otu.setProfile("user1")
 
 		otu.O.TransactionFromFile("fulfillName").
 			SignProposeAndPayAs("user1"). //the buy
@@ -188,13 +167,8 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
+		otu.moveNameTo("user2", "user1", "user1").
 			createUser(100.0, "user3").
-			registerUser("user1").
-			registerUser("user2").
 			registerUser("user3").
 			listForAuction("user1").
 			bid("user2", "user1", 8.0).
@@ -230,14 +204,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not allow auction bid lower then the current one", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			createUser(100.0, "user3").
-			registerUser("user1").
-			registerUser("user2").
-			registerUser("user3").
+		otu.moveNameTo("user3", "user1", "user1").
 			listForAuction("user1").
 			bid("user2", "user1", 8.0).
 			auctionBid("user3", "user1", 20.0)
@@ -252,12 +219,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to sell lease from offer directly", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
+		otu.cancelNameAuction("user1", "user1").
 			listForSale("user1")
 
 		buyer := "user2"
@@ -386,7 +348,7 @@ func TestAuction(t *testing.T) {
 			expireAuction()
 
 		res := otu.O.TransactionFromFile("fulfillNameAuction").
-			SignProposeAndPayAs("user2"). //the buy
+			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("user1").
 				String("user1")).
@@ -401,12 +363,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not allow double bid from same author", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
+		otu.moveNameTo("user2", "user1", "user1").
 			expireLease().
 			listForAuction("user1").
 			bid("user2", "user1", 10.0)
@@ -450,15 +407,6 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to increase bid less than increment", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
-			listForAuction("user1").
-			directOffer("user2", "user1", 4.0)
-
 		otu.O.TransactionFromFile("increaseNameBid").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
@@ -471,15 +419,6 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to increase auction bid", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
-			listForAuction("user1").
-			bid("user2", "user1", 5.0)
-
 		otu.O.TransactionFromFile("increaseNameBid").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
@@ -491,7 +430,6 @@ func TestAuction(t *testing.T) {
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
 				"sellerName": "user1",
-				"amount":     "15.00000000",
 				"status":     "active_ongoing",
 				"buyerName":  "user2",
 			}))
@@ -500,12 +438,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to manually start auction with lower bid", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
+		otu.cancelNameAuction("user1", "user1").
 			listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
 
@@ -516,12 +449,11 @@ func TestAuction(t *testing.T) {
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
-				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
-				"sellerName": "user1",
-				"amount":     "4.00000000",
-				"status":     "active_ongoing",
-				"buyerName":  "user2",
+				"name":      "user1",
+				"seller":    "0x179b6b1cb6755e31",
+				"amount":    "4.00000000",
+				"status":    "active_ongoing",
+				"buyerName": "user2",
 			}))
 
 	})
@@ -529,12 +461,7 @@ func TestAuction(t *testing.T) {
 	//todo test when user is locked
 	t.Run("Should be able to cancel blind bid", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
+		otu.cancelNameAuction("user1", "user1").
 			listForSale("user1").
 			directOffer("user2", "user1", 4.0)
 
@@ -584,13 +511,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to cancel bid when auction has started", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
-			listForAuction("user1").
+		otu.listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
 		otu.O.TransactionFromFile("cancelNameBid").
@@ -636,14 +557,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should extend auction on late bid", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			createUser(100.0, "user3").
-			registerUser("user1").
-			registerUser("user2").
-			registerUser("user3").
+		otu.cancelNameAuction("user1", "user1").
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
@@ -671,12 +585,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to cancel unfinished auction", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
+		otu.cancelNameAuction("user1", "user1").
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
@@ -704,13 +613,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to bid on lease that is free, and not cleaned up", func(t *testing.T) {
 
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			createUser(100.0, "user2").
-			registerUser("user1").
-			registerUser("user2").
-			listForSale("user1")
+		otu.listForSale("user1")
 
 		otu.expireLease().tickClock(2.0)
 		otu.expireLock().tickClock(2.0)
@@ -824,7 +727,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should register previousBuyer if direct offer outbid", func(t *testing.T) {
 
-		o := NewOverflowTest(t).
+		otu := NewOverflowTest(t).
 			setupFIND().
 			createUser(100.0, "user1").
 			registerUser("user1").
@@ -834,16 +737,16 @@ func TestAuction(t *testing.T) {
 			registerUser("user3").
 			directOffer("user2", "user1", 4.0)
 
-		res := o.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
-			Args(o.O.Arguments().
+		res := otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
 				String("user1").
 				UFix64(10.0)).
 			Test(t).
 			AssertSuccess()
 
-		uuids := o.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.DirectOffer", "uuid")
-		result := o.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.DirectOffer"})
-		result = o.replaceID(result, uuids)
+		uuids := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.DirectOffer", "uuid")
+		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.DirectOffer"})
+		result = otu.replaceID(result, uuids)
 
 		autogold.Equal(t, result)
 	})
