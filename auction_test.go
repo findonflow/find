@@ -141,7 +141,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to direct offer on name for sale and fulfill it", func(t *testing.T) {
 
-		otu.setProfile("user1")
+		otu.setProfile("user2")
 
 		otu.O.TransactionFromFile("fulfillName").
 			SignProposeAndPayAs("user1"). //the buy
