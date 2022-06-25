@@ -26,7 +26,7 @@ import MatrixWorldAssetsNFT from 0xf20df769e658c257
 
 import SturdyItems from 0x427ceada271aa0b1
 import Evolution from 0xf4264ac8f3256818
-// import GeniaceNFT from 0xabda6627c70c7f52
+import GeniaceNFT from 0xabda6627c70c7f52
 // import OneFootballCollectible from 0x6831760534292098
 import CryptoPiggo from 0xd3df824bf81910a4
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
@@ -50,7 +50,7 @@ import BarterYardClubWerewolf from  0x28abb9f291cadaf2
 import Vouchers from 0x444f5ea22c6ea12c
 
 //xtingles
-// import Collectible from 0xf5b0eb433389ac3f
+import Collectible from 0xf5b0eb433389ac3f
 
 import StarlyCard from 0x5b82f21c0edf76e3
 import StarlyMetadataViews from 0x5b82f21c0edf76e3
@@ -848,44 +848,44 @@ pub fun main(address: Address) : MetadataCollections? {
 	 }
 
 
-	// let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
-	// if geniaceCap.check() {
-	// 	let geniace=geniaceCap.borrow()!
-	// 	let nfts = geniace.getIDs()
-	// 	let items: [String] = []
-	// 	for id in nfts{
-	// 		// the metadata is a JSON stored on IPFS at the address nft.tokenURI
-	// 		let nft = geniace.borrowGeniaceNFT(id: id)!
-	// 		let metadata = nft.metadata
-	// 		var rarity=""
-	// 		if metadata.rarity == GeniaceNFT.Rarity.Collectible {
-	// 			rarity="Collectible"
-	// 		}else if metadata.rarity == GeniaceNFT.Rarity.Rare {
-	// 			rarity="Rare"
-	// 		}else if metadata.rarity == GeniaceNFT.Rarity.UltraRare {
-	// 			rarity="UltraRare"
-	// 		}
+	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+	if geniaceCap.check() {
+		let geniace=geniaceCap.borrow()!
+		let nfts = geniace.getIDs()
+		let items: [String] = []
+		for id in nfts{
+			// the metadata is a JSON stored on IPFS at the address nft.tokenURI
+			let nft = geniace.borrowGeniaceNFT(id: id)!
+			let metadata = nft.metadata
+			var rarity=""
+			if metadata.rarity == GeniaceNFT.Rarity.Collectible {
+				rarity="Collectible"
+			}else if metadata.rarity == GeniaceNFT.Rarity.Rare {
+				rarity="Rare"
+			}else if metadata.rarity == GeniaceNFT.Rarity.UltraRare {
+				rarity="UltraRare"
+			}
 
-	// 		let item=MetadataCollectionItem(
-	// 			id: id,
-	// 			name: metadata.name,
-	// 			image: metadata.imageUrl,
-	// 			url: "https://www.geniace.com/product/".concat(id.toString()),
-	// 			listPrice: nil,
-	// 			listToken: nil,
-	// 			contentType: metadata.data["mimetype"]!,
-	// 			rarity: rarity,
-	// 		)
+			let item=MetadataCollectionItem(
+				id: id,
+				name: metadata.name,
+				image: metadata.imageUrl,
+				url: "https://www.geniace.com/product/".concat(id.toString()),
+				listPrice: nil,
+				listToken: nil,
+				contentType: metadata.data["mimetype"]!,
+				rarity: rarity,
+			)
 
-	// 		let itemId="Geniace".concat(id.toString())
-	// 		items.append(itemId)
-	// 		resultMap[itemId] = item
-	// 	}
+			let itemId="Geniace".concat(id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
+		}
 
-	// 	if items.length != 0 {
-	// 		results["Geniace"] = items
-	// 	}
-	// }
+		if items.length != 0 {
+			results["Geniace"] = items
+		}
+	}
 
 	// // https://flow-view-source.com/mainnet/account/0x6831760534292098/contract/OneFootballCollectible
 	// let oneFootballCollectibleCap = account.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
@@ -944,37 +944,37 @@ pub fun main(address: Address) : MetadataCollections? {
 	 	}
 	 }
 
-	// let xtingles = Collectible.getCollectibleDatas(address:address) 
-	// if xtingles.length > 0 {
-	// 	let items: [String] = []
-	// 	for nft in xtingles {
+	let xtingles = Collectible.getCollectibleDatas(address:address) 
+	if xtingles.length > 0 {
+		let items: [String] = []
+		for nft in xtingles {
 
-	// 		var image=nft.metadata.link
+			var image=nft.metadata.link
 
-	// 		let prefix="https://"
-	// 		if image.slice(from:0, upTo:prefix.length) != prefix {
-	// 			image="ipfs://".concat(image)
-	// 		}
-	// 		let item=MetadataCollectionItem(
-	// 			id: nft.id,
-	// 			name: nft.metadata.name.concat(" #").concat(nft.metadata.edition.toString()),
-	// 			image: image,
-	// 			url: "http://xtingles.com",
-	// 			listPrice: nil,
-	// 			listToken: nil,
-	// 			contentType: "video",
-	// 			rarity: ""
-	// 		)
-	// 		let itemId="Xtingles".concat(nft.id.toString())
-	// 		items.append(itemId)
-	// 		resultMap[itemId] = item
+			let prefix="https://"
+			if image.slice(from:0, upTo:prefix.length) != prefix {
+				image="ipfs://".concat(image)
+			}
+			let item=MetadataCollectionItem(
+				id: nft.id,
+				name: nft.metadata.name.concat(" #").concat(nft.metadata.edition.toString()),
+				image: image,
+				url: "http://xtingles.com",
+				listPrice: nil,
+				listToken: nil,
+				contentType: "video",
+				rarity: ""
+			)
+			let itemId="Xtingles".concat(nft.id.toString())
+			items.append(itemId)
+			resultMap[itemId] = item
 
 
-	// 	}
-	// 	if items.length != 0 {
-	// 		results["Xtingles"] = items
-	// 	}
-	// }
+		}
+		if items.length != 0 {
+			results["Xtingles"] = items
+		}
+	}
 
 
 	let bl0xItems : [String] = []
