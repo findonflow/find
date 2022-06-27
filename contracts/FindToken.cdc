@@ -10,7 +10,6 @@ pub contract FindToken : FungibleToken {
 
     pub event TokensMinted(amount: UFix64)
     pub event TokensBurned(amount: UFix64)
-    pub event TokensRewarded(findName: String, address: Address, amount: UFix64, task: String)
     pub event TokenRewardMultiplier(multiplier: UFix64)
 
     pub let tokenAlias: String
@@ -202,7 +201,7 @@ pub contract FindToken : FungibleToken {
         self.account.save(<- minter, to: self.minterPath)
 
         FindRewardToken.addTenantRewardToken(tenant: FindToken.account.address, cap: FindToken.account.getCapability<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews, FungibleToken.Provider}>(self.findRewardPath))
-
+        emit TokensInitialized(initialSupply: self.initialSupply)
     }
 
 }
