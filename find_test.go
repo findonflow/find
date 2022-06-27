@@ -110,6 +110,7 @@ func TestFIND(t *testing.T) {
 			Args(otu.O.Arguments().StringArray("find-admin").Account("find")).
 			Test(otu.T).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"name": "find-admin",
 			}))
@@ -129,6 +130,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1").String("user2")).
 			Test(t).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 				"name": "user1",
 			}))
@@ -147,6 +149,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("dapper").String("user2")).
 			Test(t).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
@@ -161,6 +164,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("dapper")).
 			Test(t).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
@@ -177,7 +181,8 @@ func TestFIND(t *testing.T) {
 		otu.O.TransactionFromFile("setPrivateMode").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Boolean(true)).
-			Test(t).AssertSuccess()
+			Test(t).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		assert.Contains(t, value, `"privateMode": "true"`)
@@ -185,7 +190,8 @@ func TestFIND(t *testing.T) {
 		otu.O.TransactionFromFile("setPrivateMode").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Boolean(false)).
-			Test(t).AssertSuccess()
+			Test(t).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		value = otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		assert.Contains(t, value, `"privateMode": "false"`)
@@ -221,7 +227,8 @@ func TestFIND(t *testing.T) {
 				StringMap(map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}).
 				StringArray()).
 			Test(t).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.AutoGold("first_edit", result.Events)
 
@@ -246,7 +253,8 @@ func TestFIND(t *testing.T) {
 				StringMap(map[string]string{}).
 				StringArray("FindTwitter")).
 			Test(t).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.AutoGold("second_edit", result2.Events)
 
@@ -275,6 +283,7 @@ func TestFIND(t *testing.T) {
 				UFix64(50.0)).
 			Test(otu.T).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
 				"name":  user,
 				"addon": "forge",

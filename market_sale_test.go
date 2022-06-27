@@ -65,7 +65,9 @@ func TestMarketSale(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(id)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 	})
 
@@ -171,7 +173,9 @@ func TestMarketSale(t *testing.T) {
 		res := otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Account("account")).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
 
@@ -214,7 +218,9 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+			AssertComputationLessThenOrEqual(standardComputationalLimit) 
+
 
 		otu.alterMarketOption("Sale", "enable")
 
@@ -228,7 +234,9 @@ func TestMarketSale(t *testing.T) {
 				Account("account").
 				UInt64Array(ids[1])).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		otu.alterMarketOption("Sale", "enable")
 
@@ -300,7 +308,9 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price).
 				UFix64(100.0)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
@@ -310,7 +320,9 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user2").
@@ -322,7 +334,9 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price).
 				UFix64(100.0)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		otu.cancelNFTForSale("user2", ids[0])
 		itemsForSale = otu.getItemsForSale("user2")
@@ -353,6 +367,7 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit). 
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
@@ -405,6 +420,7 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit). 
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.35000000",
@@ -506,7 +522,9 @@ func TestMarketSale(t *testing.T) {
 				String("FUSD").
 				UFix64(price).
 				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 		otu.destroyFUSDVault("user1")
 
 		res := otu.O.TransactionFromFile("buyNFTForSale").
@@ -517,7 +535,9 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[0]).
 				UFix64(price)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 		/*
 			  TODO maybe add back after overflow v3
 				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{

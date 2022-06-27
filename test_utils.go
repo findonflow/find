@@ -23,6 +23,7 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
+const standardComputationalLimit = 1000.0
 
 func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
 	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
@@ -75,35 +76,42 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("setup_fin_1_create_client").
 		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+		Test(otu.T).AssertSuccess().AssertNoEvents().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	//link in the server in the versus client
 	otu.O.TransactionFromFile("setup_fin_2_register_client").
 		SignProposeAndPayAsService().
 		Args(otu.O.Arguments().Account("find")).
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+		Test(otu.T).AssertSuccess().AssertNoEvents().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	//set up fin network as the fin user
 	otu.O.TransactionFromFile("setup_fin_3_create_network").
 		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+		Test(otu.T).AssertSuccess().AssertNoEvents().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	otu.O.TransactionFromFile("setup_find_market_1").
 		SignProposeAndPayAsService().
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+		Test(otu.T).AssertSuccess().AssertNoEvents().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	//link in the server in the versus client
 	otu.O.TransactionFromFile("setup_find_market_2").
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 	otu.createUser(100.0, "account")
 
 	//link in the server in the versus client
 	otu.O.TransactionFromFile("testSetResidualAddress").
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("find")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	return otu.tickClock(1.0)
 }
@@ -125,6 +133,7 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		Args(otu.O.Arguments().String(name)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Created", map[string]interface{}{
 			"account":   nameAddress,
 			"userName":  name,
@@ -182,6 +191,7 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) overflow.Tran
 			UFix64(5.0)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 			"validUntil":  expireTimeString,
 			"lockedUntil": lockedTimeString,
@@ -225,6 +235,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 			UFix64(5.0)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 			"validUntil":  expireTimeString,
 			"lockedUntil": lockedTimeString,
@@ -267,6 +278,7 @@ func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
 			String(name).
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 			"amount": "10.00000000",
 			"status": "active_listed",
@@ -284,6 +296,7 @@ func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTest
 			String(name).
 			UFix64(10.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 			"amount":     "10.00000000",
 			"status":     "active_listed",
@@ -301,6 +314,7 @@ func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *O
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", amount),
 			"buyer":  otu.accountAddress(buyer),
@@ -322,6 +336,7 @@ func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
 			UFix64(auctionDurationFloat).
 			UFix64(300.0)). //extention on late bid
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"amount":              "5.00000000",
 			"auctionReservePrice": "20.00000000",
@@ -342,6 +357,7 @@ func (otu *OverflowTestUtils) bid(buyer, name string, amount float64) *OverflowT
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"amount":    fmt.Sprintf("%.8f", amount),
 			"endsAt":    endTimeSting,
@@ -363,6 +379,7 @@ func (otu *OverflowTestUtils) auctionBid(buyer, name string, amount float64) *Ov
 			UFix64(amount)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"amount":    fmt.Sprintf("%.8f", amount),
 			"endsAt":    endTimeSting,
@@ -428,6 +445,7 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
 			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 			"minter":      "user1",
@@ -449,6 +467,7 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 		Args(otu.O.Arguments().String(user).String("forge").UFix64(50.0)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
 			"name":  user,
 			"addon": "forge",
@@ -463,6 +482,7 @@ func (otu *OverflowTestUtils) buyForgeForName(user, name string) *OverflowTestUt
 		Args(otu.O.Arguments().String(name).String("forge").UFix64(50.0)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
 			"name":  name,
 			"addon": "forge",
@@ -485,6 +505,7 @@ func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *Overflow
 			Account("account").
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
@@ -499,7 +520,8 @@ func (otu *OverflowTestUtils) cancelAllNFTForSale(name string) *OverflowTestUtil
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -515,6 +537,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"status": "active_listed",
 			"amount": fmt.Sprintf("%.8f", price),
@@ -540,6 +563,7 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			UFix64(1.0).
 			UFix64(otu.currentTime() + 10.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
 			"amount":              fmt.Sprintf("%.8f", price),
@@ -556,7 +580,8 @@ func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *Overf
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -576,6 +601,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 			UFix64(1.0).
 			UFix64(otu.currentTime() + 10.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
 			"amount":              fmt.Sprintf("%.8f", price),
@@ -592,7 +618,8 @@ func (otu *OverflowTestUtils) delistAllNFT(name string) *OverflowTestUtils {
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -602,7 +629,8 @@ func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowT
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -640,6 +668,7 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -659,6 +688,7 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
@@ -677,6 +707,7 @@ func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint6
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
@@ -707,6 +738,7 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -726,6 +758,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -744,6 +777,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
@@ -762,6 +796,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", totalPrice),
 			"id":     fmt.Sprintf("%d", id),
@@ -784,6 +819,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -798,7 +834,8 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) 
 		SignProposeAndPayAs(signer).
 		Args(otu.O.Arguments().
 			Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -815,6 +852,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -829,7 +867,8 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *Ove
 		SignProposeAndPayAs(signer).
 		Args(otu.O.Arguments().
 			Account("account")).
-		Test(otu.T).AssertSuccess()
+		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -841,6 +880,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
@@ -859,6 +899,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
@@ -877,6 +918,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 			Account("account").
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"status": "rejected",
 			"id":     fmt.Sprintf("%d", id),
@@ -894,6 +936,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller stri
 			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
@@ -910,6 +953,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferSoft(name string, id uint64, pric
 			Account("account").
 			UInt64Array(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"status": "cancel_rejected",
 			"id":     fmt.Sprintf("%d", id),
@@ -927,6 +971,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, 
 			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
@@ -943,6 +988,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrowFromBidder(name string, 
 			Account("account").
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
@@ -961,6 +1007,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 			String(name).
 			UInt64(id)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(name),
@@ -980,6 +1027,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
@@ -998,6 +1046,7 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
@@ -1040,6 +1089,7 @@ func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName str
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertEmitEvent(overflow.NewTestEvent(eventName, eventResult))
 
 	return otu
@@ -1051,6 +1101,7 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 		Args(otu.O.Arguments().String(argument)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertEmitEvent(overflow.NewTestEvent(eventName, eventResult))
 
 	return otu
@@ -1061,6 +1112,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
 			"alias":          "Dandy",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -1075,6 +1127,7 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 		Args(otu.O.Arguments().String(argument)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRemoved", map[string]interface{}{
 			"alias":          "Dandy",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -1105,7 +1158,8 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 		SignProposeAndPayAs(user).
 		Args(otu.O.Arguments().String("https://find.xyz/assets/img/avatars/avatar14.png")).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -1203,7 +1257,8 @@ func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *Ove
 			String(receiver).
 			UInt64(id)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -1217,7 +1272,8 @@ func (otu *OverflowTestUtils) sendFT(receiver, sender, ft string, amount float64
 			String("").
 			String("")).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 	return otu
 }
 
@@ -1312,6 +1368,7 @@ func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *Overflow
 		SignProposeAndPayAs(owner).
 		Args(otu.O.Arguments().String(name).String(otu.accountAddress(receiver))).
 		Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 			"name": name,
 		}))
@@ -1324,6 +1381,7 @@ func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTes
 		Args(otu.O.Arguments().StringArray(name)).
 		Test(otu.T).
 		AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 			"name":       name,
 			"sellerName": owner,

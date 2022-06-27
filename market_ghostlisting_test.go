@@ -160,7 +160,9 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("Flow").
 				UFix64(15.0).
 				UFix64(800.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))
@@ -263,7 +265,9 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("Flow").
 				UFix64(15.0).
 				UFix64(otu.currentTime() + 800.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))

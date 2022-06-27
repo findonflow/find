@@ -112,6 +112,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress("user1"),
@@ -181,6 +182,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
@@ -252,6 +254,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
@@ -316,7 +319,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.O.TransactionFromFile("increaseBidMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
@@ -324,7 +328,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(price + 10.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.tickClock(500.0)
 
@@ -334,7 +339,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(30.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.alterMarketOption("AuctionSoft", "enable")
 		otu.O.TransactionFromFile("listNFTForAuctionSoft").
@@ -350,7 +356,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UFix64(60.0).
 				UFix64(1.0).
 				UFix64(otu.currentTime() + 10.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 		otu.auctionBidMarketSoft("user1", "user2", id, price+5.0)
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
@@ -359,7 +367,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(id)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.alterMarketOption("AuctionSoft", "enable").
 			sendDandy("user1", "user2", id)
@@ -443,7 +452,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price + 5.0)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 		otu.sendDandy("user1", "user2", id)
 	})
 
@@ -506,6 +517,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
@@ -553,6 +565,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.35000000",
@@ -633,7 +646,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(ids[1])).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.removeProfileBan("user1")
 		otu.O.TransactionFromFile("fulfillMarketAuctionSoft").
@@ -643,7 +657,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(ids[0]).
 				UFix64(price + 5.0)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.delistAllNFTForSoftAuction("user1")
 
@@ -711,6 +726,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(20.0)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"amount":        fmt.Sprintf("%.8f", 20.0),
 				"id":            fmt.Sprintf("%d", id),

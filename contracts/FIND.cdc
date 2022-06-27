@@ -360,6 +360,10 @@ pub contract FIND {
 			network.move(name: self.name, profile: profile)
 		}
 
+		access(contract) fun getNetwork() : &FIND.Network {
+			return self.networkCap.borrow() ?? panic("The network is not up")
+		}
+
 		pub fun getLeaseExpireTime() : UFix64 {
 			let network = self.networkCap.borrow() ?? panic("The network is not up")
 			return network.getLeaseExpireTime(self.name)
@@ -376,7 +380,20 @@ pub contract FIND {
 		}
 
 		pub fun getLeaseStatus() : LeaseStatus {
-			return FIND.status(self.name).status
+			let network = self.networkCap.borrow() ?? panic("The network is not up")
+			if let lease= network.profiles[self.name] {
+				let time=Clock.time()
+
+				if time >= lease.lockedUntil {
+					return LeaseStatus.FREE
+				}
+
+				if time >= lease.validUntil {
+					return LeaseStatus.LOCKED
+				}
+				return 	LeaseStatus.TAKEN
+			}
+			return LeaseStatus.FREE
 		}
 	}
 
@@ -759,7 +776,8 @@ pub contract FIND {
 
 
 			let bidder= callback.address
-			let profile=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+			let profileCap=getAccount(bidder).getCapability<&{Profile.Public}>(Profile.publicPath)
+			let profile = profileCap.borrow()
 			if profile == nil {
 				panic("Create a profile before you make a bid")
 			}
@@ -779,8 +797,43 @@ pub contract FIND {
 			}
 
 			if lease.salePrice != nil && balance >= lease.salePrice! {
-				Debug.log("Direct sale!")
-				self.fulfill(name)
+				// Debug.log("Direct sale!")
+				// self.fulfill(name) 
+
+				//fulfill name sale here : 
+				let oldProfile=lease.getProfile()!
+				let offer= callback.borrow()!
+
+				let network = lease.getNetwork()
+				let networkProfile = network.profiles[lease.name]!
+				let validUntil = networkProfile.validUntil
+				let lockedUntil = networkProfile.lockedUntil
+
+				if lease.salePrice != balance {
+					emit DirectOffer(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: balance, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:profileCap.address, buyerName:FIND.reverseLookup(profileCap.address), validUntil: validUntil, lockedUntil: lockedUntil, previousBuyer:nil, previousBuyerName:nil)
+				} else {
+					emit Sale(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: balance, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:profileCap.address, buyerName:FIND.reverseLookup(profileCap.address), validUntil: validUntil, lockedUntil: lockedUntil)
+				}
+				//move the token to the new profile
+				lease.move(profile: profileCap)
+
+				let token <- self.leases.remove(key: name)!
+				let vault <- offer.fulfillLease(<- token)
+				if self.networkCut != 0.0 {
+					let cutAmount= balance * self.networkCut
+					let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
+					networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
+					if lease.salePrice == nil || lease.salePrice != balance {
+						emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
+					} else {
+						emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "Sale")
+					}
+				}
+
+				//why not use Profile to send money :P
+				oldProfile.deposit(from: <- vault)
+				return
+
 			}	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
 				self.startAuction(name)
 			} else {
@@ -1466,7 +1519,6 @@ pub contract FIND {
 
 			let bid <- create Bid(from: from, name:name, vault: <- vault)
 			let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
-
 
 			let callbackCapability =self.owner!.getCapability<&BidCollection{BidCollectionPublic}>(FIND.BidPublicPath)
 			let oldToken <- self.bids[bid.name] <- bid

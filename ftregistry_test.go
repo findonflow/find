@@ -81,7 +81,8 @@ func TestFTRegistry(t *testing.T) {
 				String("test").
 				String("This is a message")).
 			Test(t).AssertSuccess().
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FiatToken.TokensDeposited", map[string]interface{}{
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FiatToken.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
 				"to":     "0x179b6b1cb6755e31",
 			})).
@@ -111,7 +112,8 @@ func TestFTRegistry(t *testing.T) {
 				String("test").
 				String("This is a message")).
 			Test(t).AssertSuccess().
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
+		AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
 				"to":     "0x179b6b1cb6755e31",
 			})).
@@ -141,7 +143,8 @@ func TestFTRegistry(t *testing.T) {
 				String("test").
 				String("This is a message")).
 			Test(t).AssertSuccess().
-			AssertEmitEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
+		AssertEmitEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
 				"to":     "0x179b6b1cb6755e31",
 			})).

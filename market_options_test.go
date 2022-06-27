@@ -34,7 +34,9 @@ func TestMarketOptions(t *testing.T) {
 				UFix64(price).
 				UFix64(100.0)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 
 		otu.delistAllNFT("user1")
 	})
@@ -98,6 +100,7 @@ func TestMarketOptions(t *testing.T) {
 				UFix64(price).
 				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit). 
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
 				"amount": fmt.Sprintf("%.8f", price),
@@ -156,6 +159,7 @@ func TestMarketOptions(t *testing.T) {
 				UFix64(price).
 				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit). 
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
 				"amount": fmt.Sprintf("%.8f", price),

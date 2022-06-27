@@ -23,7 +23,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Account("user2").
 			UFix64(1000.0)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess() 
 
 	otu.O.TransactionFromFile("testMintFlow").
 		SignProposeAndPayAsService().
@@ -31,7 +31,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Account("user2").
 			UFix64(1000.0)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess() 
 
 	otu.O.TransactionFromFile("testMintUsdc").
 		SignProposeAndPayAsService().
@@ -39,7 +39,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Account("user2").
 			UFix64(1000.0)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess() 
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
@@ -83,7 +83,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+			AssertComputationLessThenOrEqual(standardComputationalLimit) 
+
 	})
 
 	t.Run("Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
@@ -103,7 +105,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+			AssertComputationLessThenOrEqual(standardComputationalLimit) 
+
 	})
 
 	t.Run("Should be able to increase offer", func(t *testing.T) {
@@ -284,6 +288,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 			/* Reset */
 		otu.alterMarketOption("DirectOfferSoft", "enable")
+		
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
@@ -291,7 +296,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 		otu.sendDandy("user1", "user2", id).
 			sendFT("user1", "user2", "Flow", price)
 
@@ -422,6 +429,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
@@ -478,6 +486,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.35000000",
@@ -562,7 +571,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(ids[1])).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess(). 
+		AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.removeProfileBan("user1").
 			cancelAllDirectOfferMarketSoft("user1")
@@ -636,6 +646,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(newPrice).
 				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
+		AssertComputationLessThenOrEqual(standardComputationalLimit). 
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        fmt.Sprintf("%.8f", newPrice),
 				"id":            fmt.Sprintf("%d", id),

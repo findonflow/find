@@ -61,7 +61,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(60.0).
 				UFix64(1.0).
 				UFix64(10.0)).
-			Test(otu.T).AssertFailure("Auction listing for this item is already created.")
+			Test(otu.T).
+			AssertFailure("Auction listing for this item is already created.")
 
 		otu.delistAllNFTForEscrowedAuction("user1")
 	})
@@ -111,10 +112,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress("user1"),
-				"buyer": otu.accountAddress("user2"),
+				"buyer":  otu.accountAddress("user2"),
 				"amount": fmt.Sprintf("%.8f", 15.0),
 				"status": "cancel_ghostlisting",
 			}))
@@ -146,7 +148,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
-			Test(otu.T).AssertFailure("This auction listing is already expired")
+			Test(otu.T).
+			AssertFailure("This auction listing is already expired")
 
 		otu.delistAllNFTForEscrowedAuction("user1")
 	})
@@ -163,7 +166,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
-			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+			Test(otu.T).
+			AssertFailure("You cannot bid on your own resource")
 
 		otu.delistAllNFTForEscrowedAuction("user1")
 	})
@@ -185,6 +189,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String(name).
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
@@ -208,6 +213,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
@@ -233,7 +239,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(id)).
-			Test(otu.T).AssertFailure("Cannot cancel finished auction, fulfill it instead")
+			Test(otu.T).
+			AssertFailure("Cannot cancel finished auction, fulfill it instead")
 
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowed").
 			SignProposeAndPayAs(name).
@@ -242,7 +249,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String(name).
 				UInt64(id)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.sendDandy("user1", "user2", id)
 
@@ -259,7 +267,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				String("user1").
 				UInt64(id)).
-			Test(otu.T).AssertFailure("This auction is not live")
+			Test(otu.T).
+			AssertFailure("This auction is not live")
 
 		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
@@ -271,7 +280,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				String("user1").
 				UInt64(id)).
-			Test(otu.T).AssertFailure("Auction has not ended yet")
+			Test(otu.T).
+			AssertFailure("Auction has not ended yet")
 
 		otu.delistAllNFTForEscrowedAuction("user1")
 
@@ -294,6 +304,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress(name),
@@ -374,7 +385,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String("user1").
 				UInt64(id).
 				UFix64(price)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.O.TransactionFromFile("increaseBidMarketAuctionEscrowed").
 			SignProposeAndPayAs("user2").
@@ -382,7 +395,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id).
 				UFix64(price + 10.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.tickClock(500.0)
 
@@ -391,7 +406,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64(id)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.alterMarketOption("AuctionEscrow", "enable")
 		otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
@@ -407,7 +424,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(60.0).
 				UFix64(1.0).
 				UFix64(otu.currentTime() + 10.0)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
+
 		otu.auctionBidMarketEscrow("user1", "user2", id, price+5.0)
 
 		otu.alterMarketOption("AuctionEscrow", "deprecate")
@@ -416,7 +436,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(id)).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.alterMarketOption("AuctionEscrow", "enable")
 		otu.delistAllNFTForEscrowedAuction("user2").
@@ -499,7 +521,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.delistAllNFTForEscrowedAuction("user1").
 			sendDandy("user1", "user2", id)
@@ -570,6 +593,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
@@ -626,6 +650,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.35000000",
@@ -717,7 +742,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(ids[1])).
-			Test(otu.T).AssertSuccess()
+			Test(otu.T).
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		/* Reset */
 		otu.removeProfileBan("user1")
@@ -729,7 +756,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String("user1").
 				UInt64(ids[0])).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	})
 
@@ -774,7 +802,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				String("user1").
 				UInt64(ids[0])).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.sendDandy("user1", "user2", ids[0])
 		otu.delistAllNFTForEscrowedAuction("user2")
@@ -793,6 +822,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UInt64(id).
 				UFix64(20.0)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"amount":        fmt.Sprintf("%.8f", 20.0),
 				"id":            fmt.Sprintf("%d", id),

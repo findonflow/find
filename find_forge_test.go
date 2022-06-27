@@ -39,7 +39,8 @@ func TestFindForge(t *testing.T) {
 				String("Example NFT square image").
 				String("Example NFT banner image")).
 			Test(t).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		dandyIds := []uint64{}
 		for _, event := range events.Events {

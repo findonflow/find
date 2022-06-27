@@ -22,7 +22,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Account("user2").
 			UFix64(1000.0)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess() 
 
 	otu.O.TransactionFromFile("testMintFlow").
 		SignProposeAndPayAsService().
@@ -30,7 +30,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Account("user2").
 			UFix64(1000.0)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess() 
 
 	otu.O.TransactionFromFile("testMintUsdc").
 		SignProposeAndPayAsService().
@@ -38,7 +38,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Account("user2").
 			UFix64(1000.0)).
 		Test(otu.T).
-		AssertSuccess()
+		AssertSuccess() 
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
@@ -83,7 +83,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	})
 
@@ -103,7 +104,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 	})
 
@@ -193,6 +195,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				UFix64(newPrice).
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"amount":        fmt.Sprintf("%.8f", newPrice),
 				"id":            fmt.Sprintf("%d", id),
@@ -440,6 +443,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
@@ -492,6 +496,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				Account("account").
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.35000000",
@@ -565,7 +570,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				Account("account").
 				UInt64Array(ids[0])).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		otu.removeProfileBan("user1").
 			cancelAllDirectOfferMarketEscrowed("user1")

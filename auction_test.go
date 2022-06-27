@@ -15,7 +15,24 @@ func TestAuction(t *testing.T) {
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createUser(100.0, "user1").
-		registerUser("user1")
+		createUser(100.0, "user2").
+		// createUser(100.0, "user3").
+		registerUser("user1").
+		registerUser("user2").
+		// registerUser("user3").
+		registerUserWithName("user1", "name1").
+		registerUserWithName("user1", "name2")
+
+	// t.Run("Test1", func(t *testing.T) {
+
+	// 	otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user2").
+	// 		Args(otu.O.Arguments().
+	// 			String("user1").
+	// 			UFix64(10.0)).
+	// 	Test(otu.T).
+	// 		AssertSuccess().
+	// 		AssertComputationLessThenOrEqual(standardComputationalLimit - 1000)
+	// })
 
 	t.Run("Should list a name for sale", func(t *testing.T) {
 
@@ -25,9 +42,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able list names for sale and delist some", func(t *testing.T) {
 
-		otu.registerUserWithName("user1", "name1").
-			registerUserWithName("user1", "name2").
-			listForSale("user1").
+		otu.listForSale("user1").
 			listNameForSale("user1", "name1").
 			listNameForSale("user1", "name1")
 
@@ -41,7 +56,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "89",
+				"uuid":        "110",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -54,7 +69,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "91",
+				"uuid":        "114",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -65,6 +80,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().StringArray("user1", "name1")).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertEmitEvent(expected...)
 
 	})
@@ -85,7 +101,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "89",
+				"uuid":        "110",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -98,7 +114,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "91",
+				"uuid":        "114",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -111,7 +127,7 @@ func TestAuction(t *testing.T) {
 				"seller":      "0x179b6b1cb6755e31",
 				"sellerName":  "user1",
 				"status":      "cancel",
-				"uuid":        "93",
+				"uuid":        "116",
 				"validUntil":  "31536001.00000000",
 				"vaultType":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 			}),
@@ -121,27 +137,26 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user1"). //the buy
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertEmitEvent(expected...)
 
 	})
 
 	t.Run("Should be able to direct offer on name for sale", func(t *testing.T) {
 
-		otu.createUser(100.0, "user2").
-			registerUser("user2").
-			listForSale("user1").
-			directOffer("user2", "user1", 4.0)
+		otu.listForSale("user1").
+			directOffer("user2", "user1", 4.0).
+			setProfile("user1")
 	})
 
 	t.Run("Should be able to direct offer on name for sale and fulfill it", func(t *testing.T) {
-
-		otu.setProfile("user1")
 
 		otu.O.TransactionFromFile("fulfillName").
 			SignProposeAndPayAs("user1"). //the buy
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.accountAddress("user1"),
@@ -182,6 +197,7 @@ func TestAuction(t *testing.T) {
 				String("user1")).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     otu.accountAddress("user1"),
@@ -214,17 +230,20 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(10.0)).
 			Test(otu.T).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("bid must be larger then current bid. Current bid is : 20.00000000. New bid is at : 10.00000000")
+
+		otu.cancelNameAuction("user1", "user1")
+
 	})
 
 	t.Run("Should be able to sell lease from offer directly", func(t *testing.T) {
 
-		otu.cancelNameAuction("user1", "user1").
-			listForSale("user1")
+		otu.listForSale("user1")
 
 		buyer := "user2"
 		name := "user1"
-		amount := 10.0
+		amount := 11.0
 
 		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs(buyer).
 			Args(otu.O.Arguments().
@@ -232,21 +251,22 @@ func TestAuction(t *testing.T) {
 				UFix64(amount)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":       "user1",
 				"seller":     otu.accountAddress("user1"),
 				"sellerName": "user1",
-				"amount":     "10.00000000",
+				"amount":     "11.00000000",
 				"status":     "sold",
 				"buyer":      otu.accountAddress(buyer),
 				"buyerName":  buyer,
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "9.50000000",
+				"amount": "10.45000000",
 				"to":     "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "0.50000000",
+				"amount": "0.55000000",
 				"to":     "0x01cf0e2f2f715450",
 			}))
 	})
@@ -281,6 +301,7 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(5.0)).
 			Test(otu.T).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("There is already a higher bid on this lease")
 	})
 
@@ -302,6 +323,7 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(0.0)).
 			Test(otu.T).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("Increment should be greater than 10.00000000")
 
 	})
@@ -325,6 +347,7 @@ func TestAuction(t *testing.T) {
 				UFix64(10.0)).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":      "user1",
 				"seller":    otu.accountAddress("user1"),
@@ -353,7 +376,8 @@ func TestAuction(t *testing.T) {
 				Account("user1").
 				String("user1")).
 			Test(t).
-			AssertSuccess()
+			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction", "A.f8d6e0586b0a20c7.FIND.RoyaltyPaid"})
@@ -373,6 +397,7 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(15.0)).
 			Test(otu.T).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("You already have the latest bid on this item, use the incraseBid transaction")
 
 	})
@@ -395,6 +420,7 @@ func TestAuction(t *testing.T) {
 				UFix64(10.0)).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
@@ -413,6 +439,7 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(0.0)).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("Increment should be greater than 10.00000000")
 
 	})
@@ -426,6 +453,7 @@ func TestAuction(t *testing.T) {
 				UFix64(10.0)).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
@@ -448,6 +476,7 @@ func TestAuction(t *testing.T) {
 				String("user1")).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":      "user1",
 				"seller":    "0x179b6b1cb6755e31",
@@ -470,6 +499,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
@@ -499,6 +529,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":       "user1",
 				"seller":     "0x179b6b1cb6755e31",
@@ -518,6 +549,7 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("Cannot cancel a bid that is in an auction")
 	})
 
@@ -539,6 +571,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1").UFix64(15.0)).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
@@ -568,6 +601,7 @@ func TestAuction(t *testing.T) {
 			Args(otu.O.Arguments().String("user1").UFix64(15.0)).
 			Test(t).
 			AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
@@ -593,6 +627,7 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "5.00000000",
 				"to":     "0xf3fcd2c1a78f5eee",
@@ -622,6 +657,7 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().String("user1").UFix64(10.0)).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("cannot bid on name that is free")
 
 	})
@@ -642,6 +678,7 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertSuccess()
 
 		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
@@ -667,6 +704,7 @@ func TestAuction(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().StringArray("user1")).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("Cannot cancel finished auction")
 
 	})
@@ -681,6 +719,7 @@ func TestAuction(t *testing.T) {
 		otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1").UFix64(5.0)).
 			Test(otu.T).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertFailure("cannot bid on your own name")
 
 	})
@@ -705,6 +744,7 @@ func TestAuction(t *testing.T) {
 				UFix64(auctionDurationFloat).
 				UFix64(300.0)). //extention on late bid
 			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       name,
 				"seller":     otu.accountAddress(name),
@@ -742,6 +782,7 @@ func TestAuction(t *testing.T) {
 				String("user1").
 				UFix64(10.0)).
 			Test(t).
+			AssertComputationLessThenOrEqual(standardComputationalLimit).
 			AssertSuccess()
 
 		uuids := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.DirectOffer", "uuid")
