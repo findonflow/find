@@ -35,18 +35,6 @@ pub contract FindViews {
 		}
 	}
 
-	/// Medias is an optional view for collections that issue objects with multiple Media sources in it
-    ///
-    pub struct Medias {
-
-        /// An arbitrary-sized list for any number of Media items
-        pub let items: [MetadataViews.Media]
-
-        init(_ items: [MetadataViews.Media]) {
-            self.items = items
-        }
-    }
-
 	pub struct OnChainFile : MetadataViews.File{
 		pub let content: String
 		pub let mediaType: String
@@ -170,8 +158,8 @@ pub contract FindViews {
 				panic("The capability is not valid.")
 			}
 			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
-			let display = FindViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
-			let nftCollectionData = FindViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+			let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
+			let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 			self.uuid=viewResolver.uuid
 			self.itemType=viewResolver.getType()
 		}
@@ -201,10 +189,8 @@ pub contract FindViews {
 		}
 
 		pub fun getRoyalty() : MetadataViews.Royalties {
-			if let royaltiesView = self.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = royaltiesView as? MetadataViews.Royalties {
-					return v
-				}
+			if let v = MetadataViews.getRoyalties(self.getViewResolver()) {
+				return v
 			}
 			return MetadataViews.Royalties([])
 		}
@@ -225,19 +211,15 @@ pub contract FindViews {
 		}
 
 		pub fun getDisplay() : MetadataViews.Display {
-			if let royaltiesView = self.resolveView(Type<MetadataViews.Display>()) {
-				if let v = royaltiesView as? MetadataViews.Display {
-					return v
-				}
+			if let v = MetadataViews.getDisplay(self.getViewResolver()) {
+				return v
 			}
 			panic("MetadataViews Display View is not implemented on this NFT.")
 		}
 
 		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			if let collectionView = self.resolveView(Type<MetadataViews.NFTCollectionData>()) {
-				if let v = collectionView as? MetadataViews.NFTCollectionData {
-					return v
-				}
+			if let v = MetadataViews.getNFTCollectionData(self.getViewResolver()) {
+				return v
 			}
 			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 		}
@@ -253,16 +235,6 @@ pub contract FindViews {
 		}
 		return 0
 	}
-
-	pub fun getNFTCollectionDisplay(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.NFTCollectionDisplay? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) {
-			if let v = view as? MetadataViews.NFTCollectionDisplay {
-				return v
-			}
-		}
-		return nil
-	}
-
 
 	pub fun getRarity(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Rarity? {
 		if let view = viewResolver.resolveView(Type<FindViews.Rarity>()) {
@@ -285,51 +257,6 @@ pub contract FindViews {
 	pub fun getScalar(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Scalar? {
 		if let view = viewResolver.resolveView(Type<FindViews.Scalar>()) {
 			if let v = view as? FindViews.Scalar {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getDisplay(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Display? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.Display>()) {
-			if let v = view as? MetadataViews.Display {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getEditions(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Editions? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.Editions>()) {
-			if let v = view as? MetadataViews.Editions {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getExternalURL(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.ExternalURL? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.ExternalURL>()) {
-			if let v = view as? MetadataViews.ExternalURL {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getNFTCollectionData(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.NFTCollectionData? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.NFTCollectionData>()) {
-			if let v = view as? MetadataViews.NFTCollectionData {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getMedias(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Medias? {
-		if let view = viewResolver.resolveView(Type<FindViews.Medias>()) {
-			if let v = view as? FindViews.Medias {
 				return v
 			}
 		}
@@ -361,8 +288,8 @@ pub contract FindViews {
 			}
 
 			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
-			let display = FindViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
-			let nftCollectionData = FindViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+			let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
+			let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 			self.nounce=FindViews.getNounce(viewResolver)
 			self.uuid=viewResolver.uuid
 			self.itemType=viewResolver.getType()
@@ -408,28 +335,22 @@ pub contract FindViews {
 		}
 
 		pub fun getRoyalty() : MetadataViews.Royalties {
-			if let royaltiesView = self.resolveView(Type<MetadataViews.Royalties>()) {
-				if let v = royaltiesView as? MetadataViews.Royalties {
-					return v
-				}
+			if let v = MetadataViews.getRoyalties(self.getViewResolver()) {
+				return v
 			}
 			return MetadataViews.Royalties([])
 		}
 
 		pub fun getDisplay() : MetadataViews.Display {
-			if let royaltiesView = self.resolveView(Type<MetadataViews.Display>()) {
-				if let v = royaltiesView as? MetadataViews.Display {
-					return v
-				}
+			if let v = MetadataViews.getDisplay(self.getViewResolver()) {
+				return v
 			}
 			panic("MetadataViews Display View is not implemented on this NFT.")
 		}
 
 		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			if let royaltiesView = self.resolveView(Type<MetadataViews.NFTCollectionData>()) {
-				if let v = royaltiesView as? MetadataViews.NFTCollectionData {
-					return v
-				}
+			if let v = MetadataViews.getNFTCollectionData(self.getViewResolver()) {
+				return v
 			}
 			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 		}

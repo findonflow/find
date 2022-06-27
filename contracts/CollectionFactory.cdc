@@ -261,11 +261,11 @@ pub contract CollectionFactory {
                 }
 
                 let nft = collectionRef.borrowViewResolver(id: id) 
-                let display= FindViews.getDisplay(nft) 
+                let display= MetadataViews.getDisplay(nft) 
                 if display == nil { continue }
 
                 var subCollection : String? = nil
-                if let sc= FindViews.getNFTCollectionDisplay(nft) {
+                if let sc= MetadataViews.getNFTCollectionDisplay(nft) {
                     subCollection=sc.name
                 }	
 
@@ -737,11 +737,11 @@ pub contract CollectionFactory {
                 }
 
                 let nft = collectionRef.borrowViewResolver(id: id) 
-                let display= FindViews.getDisplay(nft) 
+                let display= MetadataViews.getDisplay(nft) 
                 if display == nil { continue }
 
                 var subCollection : String? = nil
-                if let sc= FindViews.getNFTCollectionDisplay(nft) {
+                if let sc= MetadataViews.getNFTCollectionDisplay(nft) {
                     subCollection=sc.name
                 }	
 

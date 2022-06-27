@@ -63,7 +63,7 @@ pub struct NFTDetail {
 		self.collectionName=nil
 		self.collectionDescription=nil
 
-		if let grouping=FindViews.getNFTCollectionDisplay(item) {
+		if let grouping=MetadataViews.getNFTCollectionDisplay(item) {
 			self.collectionName=grouping.name
 			self.collectionDescription=grouping.description
 		}
@@ -83,7 +83,7 @@ pub struct NFTDetail {
 			self.scalars=scalar.getScalar()
 		}
 		/* Medias */
-		if let medias=FindViews.getMedias(item) {
+		if let medias=MetadataViews.getMedias(item) {
 			for m in medias.items {
 				let url = m.file.uri() 
 				let type = m.mediaType
@@ -97,7 +97,7 @@ pub struct NFTDetail {
 			self.media[url] = type
 		}
 
-		let display = FindViews.getDisplay(item) ?? panic("Could not find display")
+		let display = MetadataViews.getDisplay(item) ?? panic("Could not find display")
 		self.name=display.name
 		self.thumbnail=display.thumbnail.uri()
 		self.type=item.getType().identifier
@@ -107,7 +107,7 @@ pub struct NFTDetail {
 		/* Edition */
 		self.editionNumber=nil
 		self.totalInEdition=nil
-		if let editions = FindViews.getEditions(item) {
+		if let editions = MetadataViews.getEditions(item) {
 			for edition in editions.infoList {
 				if edition.name == nil {
 					self.editionNumber=edition.number
@@ -307,7 +307,7 @@ pub fun ignoreViews() : [Type] {
 	Type<FindViews.Rarity>() ,
 	Type<FindViews.Tag>() , 
 	Type<FindViews.Scalar>() ,
-	Type<FindViews.Medias>() ,
+	Type<MetadataViews.Medias>() ,
 	Type<MetadataViews.Display>() ,
 	Type<MetadataViews.Edition>() ,
 	Type<MetadataViews.Editions>() , 
