@@ -722,4 +722,20 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.delistAllNFTForSoftAuction("user1")
 	})
 
+	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
+
+		otu.registerDUCInRegistry().
+			sendExampleNFT("user1", "account").
+			setDUCExampleNFT()
+
+		saleItemID := otu.listNFTForSoftAuctionDUC("user1", 0, price)
+
+		otu.saleItemListed("user1", "active_listed", price).
+			auctionBidMarketSoftDUC("user2", "user1", saleItemID[0], price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionSoftDUC("user2", saleItemID[0], 15.0)
+
+		otu.sendExampleNFT("user1", "user2")
+	})
 }

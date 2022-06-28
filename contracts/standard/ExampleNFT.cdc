@@ -10,8 +10,10 @@
 */
 
 import NonFungibleToken from "./NonFungibleToken.cdc"
+import FungibleToken from "./FungibleToken.cdc"
 import MetadataViews from "./MetadataViews.cdc"
 import FindForge from "../FindForge.cdc"
+import DapperUtilityCoin from "./DapperUtilityCoin.cdc"
 
 pub contract ExampleNFT: NonFungibleToken {
 
@@ -95,7 +97,7 @@ pub contract ExampleNFT: NonFungibleToken {
                         self.id
                     )
                 case Type<MetadataViews.Royalties>():
-                        self.royalties
+                    return self.royalties
 
                 case Type<MetadataViews.ExternalURL>():
                     return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
@@ -287,5 +289,13 @@ pub contract ExampleNFT: NonFungibleToken {
 		FindForge.addPublicForgeType(forge: <- create Forge())
 
         emit ContractInitialized()
+
+        // Deposit exampleNFTs for testing
+        let dapper = getAccount(ExampleNFT.account.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        let minterCut = MetadataViews.Royalty(recepient:dapper , cut: 0.01, description: "minter")
+        let royalties : [MetadataViews.Royalty] = []
+        royalties.append(minterCut)
+        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", royalties: MetadataViews.Royalties(cutInfos:royalties))
+        ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft)
     }
 }

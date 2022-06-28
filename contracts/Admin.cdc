@@ -251,9 +251,9 @@ pub contract Admin {
 			tenant.removeSaleItem(name, type: "find")
 		}
 
-		pub fun setFindCut(tenant: Address, cut: UFix64?, rules: [FindMarket.TenantRule]?, status: String) {
+		pub fun setFindCut(tenant: Address, saleItemName: String, cut: UFix64?, rules: [FindMarket.TenantRule]?, status: String) {
 			let tenant = self.getTenantRef(tenant)
-			let oldCut = tenant.removeSaleItem("findRoyalty", type: "cut") 
+			let oldCut = tenant.removeSaleItem(saleItemName, type: "cut")
 
 			var newCut = oldCut.cut! 
 			if cut != nil {
@@ -269,6 +269,25 @@ pub contract Admin {
 				name: oldCut.name, 
 				cut: newCut ,
 				rules: newRules, 
+				status: status
+			)
+			tenant.addSaleItem(newSaleItem, type: "cut")
+		}
+
+		pub fun addFindCut(tenant: Address, FindCutName: String, rayalty: MetadataViews.Royalty, rules: [FindMarket.TenantRule], status: String) {
+			pre{
+				rules.length > 0 : "Rules cannot be empty array"
+			}
+			let tenant = self.getTenantRef(tenant)
+
+			if tenant.checkFindCuts(FindCutName) {
+				panic("This find cut already exist")
+			}
+
+			let newSaleItem = FindMarket.TenantSaleItem(
+				name: FindCutName, 
+				cut: rayalty ,
+				rules: rules, 
 				status: status
 			)
 			tenant.addSaleItem(newSaleItem, type: "cut")

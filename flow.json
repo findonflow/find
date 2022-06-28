@@ -92,6 +92,20 @@
 				"testnet": "0x5ff2c7b4c40de11"
 			}
 		},
+		"DapperUtilityCoin": {
+			"source": "./contracts/standard/DapperUtilityCoin.cdc",
+			"aliases": {
+				"mainnet": "0xead892083b3e2c6c",
+				"testnet": "0x82ec283f88a62e65"
+			}
+		},
+		"TokenForwarding": {
+			"source": "./contracts/standard/TokenForwarding.cdc",
+			"aliases": {
+				"mainnet": "0xe544175ee0461c4b",
+				"testnet": "0x51ea0e37c27a1f1a"
+			}
+		},
 		"FIND": "./contracts/FIND.cdc",
 		"CollectionFactory": "./contracts/CollectionFactory.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
@@ -243,6 +257,8 @@
 				"FTRegistry",
 				"NFTRegistry",
 				"NFTStorefront",
+				"DapperUtilityCoin",
+				"TokenForwarding",
 				"ExampleNFT"
 			],
 			"emulator-find": [],
