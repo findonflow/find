@@ -648,4 +648,20 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.cancelAllDirectOfferMarketSoft("user1")
 	})
+
+	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+
+		otu.registerDUCInRegistry().
+			sendExampleNFT("user1", "account").
+			setDUCExampleNFT()
+
+		saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price).
+			acceptDirectOfferMarketSoftDUC("user1", saleItemID[0], "user2", price).
+			saleItemListed("user1", "active_finished", price).
+			fulfillMarketDirectOfferSoftDUC("user2", saleItemID[0], price)
+
+		otu.sendExampleNFT("user1", "user2")
+	})
 }

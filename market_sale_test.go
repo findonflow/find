@@ -550,6 +550,24 @@ func TestMarketSale(t *testing.T) {
 		result = otu.replaceID(result, ids)
 		result = otu.replaceID(result, saleIDs)
 		otu.AutoGoldRename("Royalties should be sent to residual account if royalty receiver is not working events", result)
+		otu.cancelAllNFTForSale("user1")
+	})
+
+	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+		otu.registerDUCInRegistry().
+			sendExampleNFT("user1", "account").
+			setDUCExampleNFT()
+
+		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
+
+		otu.checkRoyalty("user1", 0, "minter", "ExampleNFT", 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.buyNFTForMarketSaleDUC("user2", "user1", saleItemID[0], price).
+			sendExampleNFT("user1", "user2")
 
 	})
 

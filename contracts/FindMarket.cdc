@@ -599,6 +599,18 @@ pub contract FindMarket {
 			self.findCuts= {}
 		}
 
+		access(account) fun checkFindSaleItem(_ saleItemName: String) : Bool {
+			return self.findSaleItems.containsKey(saleItemName)
+		}
+
+		access(account) fun checkTenantSaleItem(_ saleItemName: String) : Bool {
+			return self.tenantSaleItems.containsKey(saleItemName)
+		}
+
+		access(account) fun checkFindCuts(_ cutName: String) : Bool {
+			return self.findCuts.containsKey(cutName)
+		}
+
 		access(account) fun alterMarketOption(name: String, status: String) {
 			pre{
 				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)

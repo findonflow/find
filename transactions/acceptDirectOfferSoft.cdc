@@ -20,7 +20,7 @@ transaction(marketplace:Address, id: UInt64) {
 		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftIdentifier)!
 
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
-		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
+		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
 
 		market.acceptOffer(pointer)
 

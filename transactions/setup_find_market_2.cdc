@@ -11,7 +11,7 @@ transaction(tenantAddress: Address) {
 
 		// pass in the default cut rules here
 		let cut = [
-			FindMarket.TenantRule( name:"standard ft", types:[Type<@FUSD.Vault>(), Type<@FlowToken.Vault>()], ruleType:"ft", allow:true)
+			FindMarket.TenantRule( name:"standard ft", types:[Type<@FUSD.Vault>(), Type<@FlowToken.Vault>()], ruleType:"ft", allow:true) 
 		]
 		
 		//We create a tenant that has both auctions and direct offers
