@@ -5,6 +5,7 @@
     "amount": "20.00000000",
     "auctionReservePrice": "20.00000000",
     "buyer": "0xf3fcd2c1a78f5eee",
+    "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "",
     "endsAt": "31622401.00000000",
     "lockedUntil": "39312001.00000000",

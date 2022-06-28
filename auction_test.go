@@ -29,12 +29,14 @@ func TestAuction(t *testing.T) {
 			registerUserWithName("user1", "name2").
 			listForSale("user1").
 			listNameForSale("user1", "name1").
-			listNameForSale("user1", "name1")
+			listNameForSale("user1", "name1").
+			setProfile("user1")
 
 		expected := []*overflow.FormatedEvent{
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
+				"buyerAvatar": "",
 				"buyerName":   "",
 				"lockedUntil": "39312001.00000000",
 				"name":        "user1",
@@ -48,6 +50,7 @@ func TestAuction(t *testing.T) {
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
+				"buyerAvatar": "",
 				"buyerName":   "",
 				"lockedUntil": "39312001.00000000",
 				"name":        "name1",
@@ -79,6 +82,7 @@ func TestAuction(t *testing.T) {
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
+				"buyerAvatar": "",
 				"buyerName":   "",
 				"lockedUntil": "39312001.00000000",
 				"name":        "user1",
@@ -92,6 +96,7 @@ func TestAuction(t *testing.T) {
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
+				"buyerAvatar": "",
 				"buyerName":   "",
 				"lockedUntil": "39312001.00000000",
 				"name":        "name1",
@@ -105,6 +110,7 @@ func TestAuction(t *testing.T) {
 			overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
 				"amount":      "10.00000000",
 				"buyer":       "",
+				"buyerAvatar": "",
 				"buyerName":   "",
 				"lockedUntil": "39312001.00000000",
 				"name":        "name2",
@@ -135,7 +141,7 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should be able to direct offer on name for sale and fulfill it", func(t *testing.T) {
 
-		otu.setProfile("user1")
+		otu.setProfile("user2")
 
 		otu.O.TransactionFromFile("fulfillName").
 			SignProposeAndPayAs("user1"). //the buy
@@ -147,6 +153,7 @@ func TestAuction(t *testing.T) {
 				"seller":      otu.accountAddress("user1"),
 				"sellerName":  "user1",
 				"lockedUntil": "39312001.00000000",
+				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
 				"buyerName":   "user2",
 				"validUntil":  "31536001.00000000",
 				"status":      "sold",
@@ -173,7 +180,8 @@ func TestAuction(t *testing.T) {
 			listForAuction("user1").
 			bid("user2", "user1", 8.0).
 			bid("user3", "user1", 20.0).
-			expireAuction()
+			expireAuction().
+			setProfile("user3")
 
 		otu.O.TransactionFromFile("fulfillNameAuction").
 			SignProposeAndPayAs("user3"). //the buy
@@ -183,13 +191,14 @@ func TestAuction(t *testing.T) {
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
-				"name":       "user1",
-				"seller":     otu.accountAddress("user1"),
-				"sellerName": "user1",
-				"amount":     "20.00000000",
-				"status":     "sold",
-				"buyer":      otu.accountAddress("user3"),
-				"buyerName":  "user3",
+				"name":        "user1",
+				"seller":      otu.accountAddress("user1"),
+				"sellerName":  "user1",
+				"amount":      "20.00000000",
+				"status":      "sold",
+				"buyer":       otu.accountAddress("user3"),
+				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+				"buyerName":   "user3",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "19.00000000",
@@ -220,7 +229,8 @@ func TestAuction(t *testing.T) {
 	t.Run("Should be able to sell lease from offer directly", func(t *testing.T) {
 
 		otu.cancelNameAuction("user1", "user1").
-			listForSale("user1")
+			listForSale("user1").
+			setProfile("user2")
 
 		buyer := "user2"
 		name := "user1"
@@ -233,13 +243,14 @@ func TestAuction(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
-				"name":       "user1",
-				"seller":     otu.accountAddress("user1"),
-				"sellerName": "user1",
-				"amount":     "10.00000000",
-				"status":     "sold",
-				"buyer":      otu.accountAddress(buyer),
-				"buyerName":  buyer,
+				"name":        "user1",
+				"seller":      otu.accountAddress("user1"),
+				"sellerName":  "user1",
+				"amount":      "10.00000000",
+				"status":      "sold",
+				"buyer":       otu.accountAddress(buyer),
+				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+				"buyerName":   buyer,
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
 				"amount": "9.50000000",
@@ -345,7 +356,8 @@ func TestAuction(t *testing.T) {
 			expireLease().
 			listForAuction("user1").
 			auctionBid("user2", "user1", 20.0).
-			expireAuction()
+			expireAuction().
+			setProfile("user2")
 
 		res := otu.O.TransactionFromFile("fulfillNameAuction").
 			SignProposeAndPayAs("user2").
@@ -636,7 +648,8 @@ func TestAuction(t *testing.T) {
 			registerUser("user2").
 			listForAuction("user1").
 			bid("user2", "user1", 15.0).
-			expireAuction().tickClock(2.0)
+			expireAuction().tickClock(2.0).
+			setProfile("user2")
 
 		res := otu.O.TransactionFromFile("cancelNameAuction").
 			SignProposeAndPayAs("user1").
@@ -735,7 +748,8 @@ func TestAuction(t *testing.T) {
 			registerUser("user2").
 			createUser(100.0, "user3").
 			registerUser("user3").
-			directOffer("user2", "user1", 4.0)
+			directOffer("user2", "user1", 4.0).
+			setProfile("user3")
 
 		res := otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
