@@ -61,7 +61,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let editioned= MetadataViews.Edition(name: "nft", number:i, max:maxEdition)
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), creativeWork, rarity, tag, scalar, FindViews.Medias([media])]
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), creativeWork, rarity, tag, scalar, MetadataViews.Medias([media])]
 			
 			let mintData = Dandy.DandyInfo(name: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: creativeWork.description, 
@@ -101,7 +101,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailFile, mediaType: "image/png;display=thumbnail")
 			let artTag=FindViews.Tag({"Author":"Xtingles"})
 			let artScalar=FindViews.Scalar({"video_length" : 27.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, MetadataViews.Medias([artMedia, thumbnailMedia])]
 			
 			let mintData = Dandy.DandyInfo(name: "xtingle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,
@@ -141,7 +141,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image;display=thumbnail")
 			let artTag=FindViews.Tag({"signature-move":"Rare Naked Choke"})
 			let artScalar=FindViews.Scalar({"Reach" : 120.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, MetadataViews.Medias([artMedia, thumbnailMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:  "ufcstrike ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,
@@ -181,7 +181,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let thumbnailMedia=MetadataViews.Media(file: thumbnailHttpFile, mediaType: "image/jpg;display=thumbnail")
 			let artTag=FindViews.Tag({"Author":"Jack Black"})
 			let artScalar=FindViews.Scalar({"video length" : 45.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia, thumbnailMedia])]
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, MetadataViews.Medias([artMedia, thumbnailMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:"jambb ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,
@@ -218,7 +218,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "image")
 			let artTag=FindViews.Tag({"Color":"Black"})
 			let artScalar=FindViews.Scalar({"trait-slots" : 5.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, MetadataViews.Medias([artMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:"goatedgoats ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,
@@ -258,7 +258,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 			let artTag=FindViews.Tag({"Author":"Kevin Woo"})
 			let artScalar=FindViews.Scalar({"id" : 0.0})
-			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, FindViews.Medias([artMedia])]
+			let schemas: [AnyStruct] = [ MetadataViews.Editions([editioned]), artCreativeWork, artMedia, rarity, artTag, artScalar, MetadataViews.Medias([artMedia])]
 			
 			let mintData = Dandy.DandyInfo(name:"klktn ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 								description: artCreativeWork.description,

@@ -1122,7 +1122,7 @@ pub contract FindMarket {
 			self.collectionName=nil
 			self.collectionDescription=nil
 
-			if let ncd = FindViews.getNFTCollectionDisplay(item) {
+			if let ncd = MetadataViews.getNFTCollectionDisplay(item) {
 				self.collectionName=ncd.name
 				self.collectionDescription=ncd.description
 			}
@@ -1140,7 +1140,7 @@ pub contract FindMarket {
 				self.scalars=scalar.getScalar()
 			}
 
-			let display = FindViews.getDisplay(item) ?? panic("cannot get MetadataViews.Display View")
+			let display = MetadataViews.getDisplay(item) ?? panic("cannot get MetadataViews.Display View")
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
@@ -1149,7 +1149,7 @@ pub contract FindMarket {
 			self.editionNumber=nil
 			self.totalInEdition=nil
 
-			if let editions = FindViews.getEditions(item) {
+			if let editions = MetadataViews.getEditions(item) {
 				for edition in editions.infoList {
 					if edition.name == nil {
 						self.editionNumber=edition.number

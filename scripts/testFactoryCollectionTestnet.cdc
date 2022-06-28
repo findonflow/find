@@ -111,11 +111,11 @@ pub fun main(user: String) : CollectionReport?{
                 }
 
                 let nft = collectionRef.borrowViewResolver(id: id) 
-                let display= FindViews.getDisplay(nft) 
+                let display= MetadataViews.getDisplay(nft) 
                 if display == nil { continue }
 
                 var externalUrl=nftInfo!.externalFixedUrl
-                if let externalUrlViw=FindViews.getExternalURL(nft) { 
+                if let externalUrlViw=MetadataViews.getExternalURL(nft) { 
                     externalUrl=externalUrlViw.url
                 }
 
@@ -181,9 +181,9 @@ pub fun main(user: String) : CollectionReport?{
         return CollectionReport(items: items,  collections : {}, extraIDs : {})
     }
 
-	pub fun getMedias(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Medias? {
-		if let view = viewResolver.resolveView(Type<FindViews.Medias>()) {
-			if let v = view as? FindViews.Medias {
+	pub fun getMedias(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Medias? {
+		if let view = viewResolver.resolveView(Type<MetadataViews.Medias>()) {
+			if let v = view as? MetadataViews.Medias {
 				return v
 			}
 		}
@@ -254,11 +254,11 @@ pub fun main(user: String) : CollectionReport?{
                 }
 
                 let nft = collectionRef.borrowViewResolver(id: id) 
-                let display= FindViews.getDisplay(nft) 
+                let display= MetadataViews.getDisplay(nft) 
                 if display == nil { continue }
 
                 var externalUrl=nftInfo.externalFixedUrl
-                if let externalUrlViw=FindViews.getExternalURL(nft) { 
+                if let externalUrlViw=MetadataViews.getExternalURL(nft) { 
                     externalUrl=externalUrlViw.url
                 }
 
@@ -287,7 +287,7 @@ pub fun main(user: String) : CollectionReport?{
                 }	
 
                 var subCollection : String? = nil
-                if let sc= FindViews.getNFTCollectionDisplay(nft) {
+                if let sc= MetadataViews.getNFTCollectionDisplay(nft) {
                     subCollection=sc.name
                 }	
 
