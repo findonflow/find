@@ -94,10 +94,10 @@ pub fun main(user: String) : MetadataCollections? {
 			for id in collection.getIDs() {
 				let nft = collection.borrowViewResolver(id: id) 
 				
-				if let display= FindViews.getDisplay(nft) {
+				if let display= MetadataViews.getDisplay(nft) {
 					var externalUrl=nftInfo.externalFixedUrl
 
-					if let externalUrlViw=FindViews.getExternalURL(nft) { 
+					if let externalUrlViw=MetadataViews.getExternalURL(nft) { 
 						externalUrl=externalUrlViw.url
 					}
 
@@ -117,7 +117,7 @@ pub fun main(user: String) : MetadataCollections? {
 					}			
 
 					var medias : [MetadataViews.Media] = []
-					if let m= FindViews.getMedias(nft) {
+					if let m= MetadataViews.getMedias(nft) {
 						medias=m.items
 					}	
 

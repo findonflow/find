@@ -10,10 +10,10 @@ pub contract FindMetadataFactory {
 		pub let name: String
 		pub let image: String
 		pub let collection: String
-		pub let source: String //which alchemy shard or our own Factory
+		// pub let source: String //which alchemy shard or our own Factory
 
 		pub let rarity:String
-		pub let subCollection: String // <- This will be Alias unless they want something else
+		pub let subCollection: String? // <- This will be Alias unless they want something else
 
 		pub let url: String
 		pub let contentTypes:[String]
@@ -21,9 +21,8 @@ pub contract FindMetadataFactory {
 		pub let tag: {String : String}
 		pub let scalar: {String : UFix64}
 
-		init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: String, medias: [MetadataViews.Media], collection: String, tag: {String : String}, scalar: {String : UFix64}) {
+		init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: String, medias: [MetadataViews.Media], collection: String, subCollection: String?, tag: {String : String}, scalar: {String : UFix64}) {
 			self.id=id
-			self.typeIdentifier = type.identifier
 			self.uuid = uuid
 			self.name=name
 			self.url=url
@@ -34,6 +33,7 @@ pub contract FindMetadataFactory {
 			self.collection=collection
 			self.tag=tag
 			self.scalar=scalar
+			self.subCollection=subCollection
 		}
 	}
 
@@ -51,10 +51,10 @@ pub contract FindMetadataFactory {
 			for id in collection.getIDs() {
 				let nft = collection.borrowViewResolver(id: id) 
 
-				if let display= FindViews.getDisplay(nft) {
+				if let display= MetadataViews.getDisplay(nft) {
 					var externalUrl=nftInfo.externalFixedUrl
 
-					if let externalUrlViw=FindViews.getExternalURL(nft) { 
+					if let externalUrlViw=MetadataViews.getExternalURL(nft) { 
 						externalUrl=externalUrlViw.url
 					}
 
@@ -74,13 +74,18 @@ pub contract FindMetadataFactory {
 					}			
 
 					var medias : [MetadataViews.Media] = []
-					if let m= FindViews.getMedias(nft) {
+					if let m= MetadataViews.getMedias(nft) {
 						medias=m.items
 					}	
 
 					let cotentTypes : [String] = []
 					for media in medias {
 						cotentTypes.append(media.mediaType)
+					}
+
+					var subCollection : String? = nil 
+					if let sc= MetadataViews.getNFTCollectionDisplay(nft) {
+						subCollection=sc.name
 					}
 
 					let item = MetadataCollectionItem(
@@ -94,6 +99,7 @@ pub contract FindMetadataFactory {
 						rarity: rarity,
 						medias: medias,
 						collection: nftInfo.alias,
+						subCollection: subCollection,
 						tag: tag,
 						scalar: scalar
 					)
