@@ -64,9 +64,9 @@ pub contract FIND {
 
 	pub event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
 
-    pub event TokensRewarded(tenant: Address, findName: String, address: Address, amount: UFix64?, task: String, tokenType: String)
+    pub event TokensRewarded(tenant: Address, findName: String?, address: Address, amount: UFix64?, task: String, tokenType: String)
 
-    pub event TokensCanNotBeRewarded(tenant: Address, findName: String, address: Address, amount: UFix64?, task: String, tokenType: String?)
+    pub event TokensCanNotBeRewarded(tenant: Address, findName: String?, address: Address, amount: UFix64?, task: String, tokenType: String?)
 
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
@@ -915,6 +915,8 @@ pub contract FIND {
 
 				//why not use Profile to send money :P
 				oldProfile.deposit(from: <- vault)
+				FIND.reward(tenant: FIND.account.address, findName: name, receiver: cb.address, task: "findName_fulfill_buyer")
+				FIND.reward(tenant: FIND.account.address, findName: name, receiver: self.owner!.address, task: "findName_fulfill_seller")
 				return
 			}
 
@@ -959,7 +961,8 @@ pub contract FIND {
 
 			//why not use FIND to send money :P
 			oldProfile.deposit(from: <- vault)
-
+			FIND.reward(tenant: FIND.account.address, findName: name, receiver: cbRef.owner!.address, task: "findName_fulfill_buyer")
+			FIND.reward(tenant: FIND.account.address, findName: name, receiver: self.owner!.address, task: "findName_fulfill_seller")
 			destroy auction
 
 		}
@@ -1293,7 +1296,7 @@ pub contract FIND {
 			)
 
 			// Pay Reward Token
-			FIND.reward(tenant: FIND.account.address, findName: name, receiver: lease.address, task: "FindName_Register")
+			FIND.reward(tenant: FIND.account.address, findName: name, receiver: lease.address, task: "findName_register")
 
 			emit Register(name: name, owner:profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 			emit Name(name: name)
@@ -1623,7 +1626,7 @@ pub contract FIND {
 
 	}
 
-	access(contract) fun reward(tenant: Address, findName: String, receiver: Address, task: String) {
+	access(account) fun reward(tenant: Address, findName: String?, receiver: Address, task: String) {
 		if let rewardVaultCap = FindRewardToken.getRewardVault(tenant) {
 			if !rewardVaultCap.check() {
 				emit TokensCanNotBeRewarded(tenant: tenant, findName: findName, address:receiver, amount: nil, task: task, tokenType: nil)
@@ -1631,7 +1634,7 @@ pub contract FIND {
 			}
 
 			let vault = rewardVaultCap.borrow()!
-			let rewardAmount = vault.reward(name: findName, receiver: receiver, task: task)
+			let rewardAmount = vault.reward(receiver: receiver, task: task)
 			let vaultType = vault.getType()
 
 			if rewardAmount == nil {
@@ -1653,6 +1656,12 @@ pub contract FIND {
 			profileVault!.deposit(from: <- reward)
 			emit TokensRewarded(tenant: tenant, findName: findName, address: receiver, amount: rewardAmount, task: task, tokenType: vaultType.identifier)
 			
+		}
+	}
+
+	access(account) fun rewardFN() : ((Address, String?, Address, String) : Void ) {
+		return fun (tenant: Address, findName: String?, receiver: Address, task: String) : Void {
+			return FIND.reward(tenant: tenant, findName: findName, receiver: receiver, task: task)
 		}
 	}
 

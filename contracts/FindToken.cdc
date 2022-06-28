@@ -106,7 +106,7 @@ pub contract FindToken : FungibleToken {
         Implementation on Token Contract for being reward token
         ***********************************************************/
         // The name here is just for emitting events for token contract
-        pub fun reward(name: String, receiver: Address, task: String) : UFix64? {
+        pub fun reward(receiver: Address, task: String) : UFix64? {
             if FindToken.taskRewards[task] == nil {
                 return nil
             }
