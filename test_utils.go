@@ -23,7 +23,7 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
-const standardComputationalLimit = 1000.0
+const standardComputationalLimit = 2000.0
 
 func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
 	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
@@ -445,7 +445,7 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
 		Test(otu.T).
 		AssertSuccess().
-		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
 			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 			"minter":      "user1",
@@ -738,7 +738,7 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -758,7 +758,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 			UInt64(id).
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
-		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -819,7 +819,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
-		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),
@@ -852,7 +852,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
-		AssertComputationLessThenOrEqual(standardComputationalLimit + 500).
+		AssertComputationLessThenOrEqual(standardComputationalLimit).
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"amount": fmt.Sprintf("%.8f", price),
 			"id":     fmt.Sprintf("%d", id),

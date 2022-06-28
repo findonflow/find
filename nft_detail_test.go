@@ -191,9 +191,7 @@ func TestNFTDetailScript(t *testing.T) {
 				String("rare").
 				UFix64(50.0).
 				Account("user1")).
-			Test(otu.T).AssertSuccess(). 
-			AssertComputationLessThenOrEqual(standardComputationalLimit) 
-
+			Test(otu.T).AssertSuccess()
 
 		dandyIds := []uint64{}
 		for _, event := range result.Events {

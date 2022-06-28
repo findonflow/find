@@ -199,11 +199,16 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "cancel", previousBuyer:nil)
+			var nftInfo: FindMarket.NFTInfo? = nil 
+			if saleItem.checkPointer() {
+				nftInfo = saleItem.toNFTInfo()
+			}
+
+			self.emitEvent(saleItem: saleItem, status: "cancel", previousBuyer:nil, nftInfo: nftInfo)
 			destroy <- self.items.remove(key: id)
 		}
 
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer: Address?) {
+		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer: Address?, nftInfo: FindMarket.NFTInfo?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
 			let balance=saleItem.getBalance()
@@ -211,10 +216,10 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = FIND.lookup(buyer.toString())
 
-			var nftInfo:FindMarket.NFTInfo?=nil 
-			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo()
-			}
+			// var nftInfo:FindMarket.NFTInfo?=nil 
+			// if saleItem.checkPointer() {
+			// 	nftInfo=saleItem.toNFTInfo()
+			// }
 
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
@@ -237,7 +242,12 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:nil)
+			if !saleItem.checkPointer() {
+				panic("SaleItem pointer is invalid")
+			}
+			let nftInfo = saleItem.toNFTInfo()
+
+			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:nil, nftInfo: nftInfo)
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
@@ -257,7 +267,11 @@ pub contract FindMarketDirectOfferEscrow {
 				
 				self.items[id] <-! saleItem
 				let item=self.borrow(id)
-				self.emitEvent(saleItem: item, status: "active_offered", previousBuyer:nil)
+				if !item.checkPointer() {
+					panic("SaleItem pointer is invalid")
+				}
+				let nftInfo = item.toNFTInfo()
+				self.emitEvent(saleItem: item, status: "active_offered", previousBuyer:nil, nftInfo: nftInfo)
 				return 
 			}
 
@@ -287,7 +301,12 @@ pub contract FindMarketDirectOfferEscrow {
 			saleItem.setValidUntil(validUntil)
 			saleItem.setCallback(callback)
 
-			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:previousBuyer)
+			if !saleItem.checkPointer() {
+				panic("SaleItem pointer is invalid")
+			}
+			let nftInfo = saleItem.toNFTInfo()
+
+			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:previousBuyer, nftInfo: nftInfo)
 
 		}
 
@@ -306,8 +325,12 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
+			var nftInfo: FindMarket.NFTInfo? = nil
+			if saleItem.checkPointer() {
+				nftInfo = saleItem.toNFTInfo()
+			}
 
-			self.emitEvent(saleItem: saleItem, status: "rejected", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "rejected", previousBuyer:nil, nftInfo: nftInfo)
 
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)
@@ -339,7 +362,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let royalty=saleItem.getRoyalty()
 			let nftInfo=saleItem.toNFTInfo()
 
-			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil, nftInfo: nftInfo)
 			let vault <- saleItem.acceptEscrowedBid()
 			FindMarket.pay(tenant: self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
 			destroy <- self.items.remove(key: id)

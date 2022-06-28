@@ -263,17 +263,12 @@ pub contract FindMarketAuctionEscrow {
 			return self.tenantCapability.borrow()!
 		}
 
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?) {
+		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?, nftInfo: FindMarket.NFTInfo?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
 			let balance=saleItem.getBalance()
 			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
-
-			var nftInfo:FindMarket.NFTInfo?=nil 
-			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo()
-			}
 
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
@@ -334,7 +329,12 @@ pub contract FindMarketAuctionEscrow {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer)
+
+			if !saleItem.checkPointer() {
+				panic("SaleItem pointer is invalid")
+			}
+			let nftInfo = saleItem.toNFTInfo()
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer, nftInfo: nftInfo)
 
 		}
 
@@ -401,7 +401,12 @@ pub contract FindMarketAuctionEscrow {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil)
+			if !saleItem.checkPointer() {
+				panic("SaleItem pointer is invalid")
+			}
+			let nftInfo = saleItem.toNFTInfo()
+
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil, nftInfo: nftInfo)
 		}
 
 		pub fun cancel(_ id: UInt64) {
@@ -434,7 +439,11 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
-			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil)
+			var nftInfo: FindMarket.NFTInfo? = nil 
+			if saleItem.checkPointer() {
+				nftInfo = saleItem.toNFTInfo()
+			}
+			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil, nftInfo: nftInfo)
 			let id=saleItem.getId()
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
@@ -470,10 +479,13 @@ pub contract FindMarketAuctionEscrow {
 					return
 				}
 
+				if !saleItem.checkPointer() {
+					panic("SaleItem pointer is invalid")
+				}
 				let nftInfo= saleItem.toNFTInfo()
 				let royalty=saleItem.getRoyalty()
 
-				self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
+				self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil, nftInfo: nftInfo)
 
 				let vault <- saleItem.acceptEscrowedBid()
 				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) })
@@ -499,7 +511,11 @@ pub contract FindMarketAuctionEscrow {
 
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil)
+			if !saleItemRef.checkPointer() {
+				panic("SaleItem pointer is invalid")
+			}
+			let nftInfo = saleItemRef.toNFTInfo()
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil, nftInfo: nftInfo)
 
 		}
 

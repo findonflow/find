@@ -160,9 +160,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("Flow").
 				UFix64(15.0).
 				UFix64(800.0)).
-			Test(otu.T).AssertSuccess(). 
-		AssertComputationLessThenOrEqual(standardComputationalLimit)
-
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))
@@ -175,7 +174,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				Account("account").
 				String("user1").
 				UInt64(id)).
-			Test(otu.T).AssertFailure("NFT does not exist")
+			Test(otu.T).AssertFailure("SaleItem pointer is invalid")
 
 		/* Reset */
 		otu.sendDandy("user1", "user2", id).
@@ -265,9 +264,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 				String("Flow").
 				UFix64(15.0).
 				UFix64(otu.currentTime() + 800.0)).
-			Test(otu.T).AssertSuccess(). 
-		AssertComputationLessThenOrEqual(standardComputationalLimit)
-
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(standardComputationalLimit)
 
 		itemsForSale = otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))
