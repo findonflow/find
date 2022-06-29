@@ -119,24 +119,11 @@ pub fun main(user: String) : CollectionReport?{
                     externalUrl=externalUrlViw.url
                 }
 
-                var rarity=""
-                if let r = FindViews.getRarity(nft) {
-                    rarity=r.rarityName
-                }
-
-                var tag : {String : String}={}
-                if let t= FindViews.getTags(nft) {
-                    tag=t.getTag()
-                }			
-
-                var scalar : {String : UFix64}={}
-                if let s= getScalar(nft) {
-                    scalar=s.getScalar()
-                }			
-
+                let rarity=MetadataViews.getRarity(nft)
+								let traits = MetadataViews.getTraits(nft)
                 var media : MetadataViews.Media? = nil
                 let contentTypes : [String] = []
-                if let m= getMedias(nft) {
+                if let m= MetadataViews.getMedias(nft) {
                     media=m.items[0]
                     for item in m.items {
                         contentTypes.append(item.mediaType)
@@ -144,7 +131,7 @@ pub fun main(user: String) : CollectionReport?{
                 }	
 
                 var subCollection : String? = nil
-                if let sc= getNFTCollectionDisplay(nft) {
+                if let sc= MetadataViews.getNFTCollectionDisplay(nft) {
                     subCollection=sc.name
                 }	
 
@@ -155,8 +142,7 @@ pub fun main(user: String) : CollectionReport?{
                 extra["contentTypes"] = contentTypes
                 extra["rarity"] = rarity
                 extra["media"] = media
-                extra["tag"] = tag
-                extra["scalar"] = scalar
+                extra["traits"] = traits
 
 
                 let item = MetadataCollectionItem(
@@ -180,33 +166,6 @@ pub fun main(user: String) : CollectionReport?{
         }
         return CollectionReport(items: items,  collections : {}, extraIDs : {})
     }
-
-	pub fun getMedias(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Medias? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.Medias>()) {
-			if let v = view as? MetadataViews.Medias {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getNFTCollectionDisplay(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.NFTCollectionDisplay? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) {
-			if let v = view as? MetadataViews.NFTCollectionDisplay {
-				return v
-			}
-		}
-		return nil
-	}
-
-    pub fun getScalar(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Scalar? {
-		if let view = viewResolver.resolveView(Type<FindViews.Scalar>()) {
-			if let v = view as? FindViews.Scalar {
-				return v
-			}
-		}
-		return nil
-	}
 
     pub fun fetchNFTRegistry(user: String, maxItems: Int, targetCollections:[String]) : CollectionReport? {
         let source = "NFTRegistry"
@@ -262,24 +221,12 @@ pub fun main(user: String) : CollectionReport?{
                     externalUrl=externalUrlViw.url
                 }
 
-                var rarity=""
-                if let r = FindViews.getRarity(nft) {
-                    rarity=r.rarityName
-                }
-
-                var tag : {String : String}={}
-                if let t= FindViews.getTags(nft) {
-                    tag=t.getTag()
-                }			
-
-                var scalar : {String : UFix64}={}
-                if let s= getScalar(nft) {
-                    scalar=s.getScalar()
-                }			
+								let rarity = MetadataViews.getRarity(nft)
+								let traits = MetadataViews.getTraits(nft)
 
                 var media : MetadataViews.Media? = nil
                 let contentTypes : [String] = []
-                if let m= getMedias(nft) {
+                if let m= MetadataViews.getMedias(nft) {
                     media=m.items[0]
                     for item in m.items {
                         contentTypes.append(item.mediaType)
@@ -298,9 +245,7 @@ pub fun main(user: String) : CollectionReport?{
                 extra["contentTypes"] = contentTypes
                 extra["rarity"] = rarity
                 extra["media"] = media
-                extra["tag"] = tag
-                extra["scalar"] = scalar
-
+                extra["traits"] = traits
 
                 let item = MetadataCollectionItem(
                     id: id,

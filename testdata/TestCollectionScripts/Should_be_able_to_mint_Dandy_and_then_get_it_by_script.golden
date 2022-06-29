@@ -27,13 +27,25 @@
                 }
             ],
             "name": "Neo Motorcycle 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "Speed": "200.00000000"
+            "rarity": {
+                "description": "rare",
+                "max": "50.00000000",
+                "score": "100.00000000"
             },
-            "tag": {
-                "Color": "Pearl"
-            },
+            "traits": [
+                {
+                    "displayType": "String",
+                    "name": "Color",
+                    "rarity": "",
+                    "value": "Pearl"
+                },
+                {
+                    "displayType": "Numeric",
+                    "name": "Speed",
+                    "rarity": "",
+                    "value": "200.00000000"
+                }
+            ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://find.xyz/collection/user1/dandy/ID0",
             "uuid": "ID0"
@@ -61,13 +73,25 @@
                 }
             ],
             "name": "xtingle 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "video_length": "27.00000000"
+            "rarity": {
+                "description": "rare",
+                "max": "50.00000000",
+                "score": "100.00000000"
             },
-            "tag": {
-                "Author": "Xtingles"
-            },
+            "traits": [
+                {
+                    "displayType": "String",
+                    "name": "Author",
+                    "rarity": "",
+                    "value": "Xtingels"
+                },
+                {
+                    "displayType": "Numeric",
+                    "name": "video_length",
+                    "rarity": "",
+                    "value": "27.00000000"
+                }
+            ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://nft.blocto.app/xtingles//ID1",
             "uuid": "ID1"
@@ -97,13 +121,25 @@
                 }
             ],
             "name": "ufcstrike 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "Reach": "120.00000000"
+            "rarity": {
+                "description": "rare",
+                "max": "50.00000000",
+                "score": "100.00000000"
             },
-            "tag": {
-                "signature-move": "Rare Naked Choke"
-            },
+            "traits": [
+                {
+                    "displayType": "String",
+                    "name": "Signature_move",
+                    "rarity": "",
+                    "value": "Rare naked choke"
+                },
+                {
+                    "displayType": "Numeric",
+                    "name": "Reach",
+                    "rarity": "",
+                    "value": "120.00000000"
+                }
+            ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://www.ufcstrike.com/ID2",
             "uuid": "ID2"
@@ -132,13 +168,25 @@
                 }
             ],
             "name": "jambb 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "video length": "45.00000000"
+            "rarity": {
+                "description": "rare",
+                "max": "50.00000000",
+                "score": "100.00000000"
             },
-            "tag": {
-                "Author": "Jack Black"
-            },
+            "traits": [
+                {
+                    "displayType": "String",
+                    "name": "Author",
+                    "rarity": "",
+                    "value": "Jack Black"
+                },
+                {
+                    "displayType": "Numeric",
+                    "name": "video_length",
+                    "rarity": "",
+                    "value": "45.00000000"
+                }
+            ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://www.jambb.com/ID3",
             "uuid": "ID3"
@@ -160,13 +208,25 @@
                 }
             ],
             "name": "goatedgoats 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "trait-slots": "5.00000000"
+            "rarity": {
+                "description": "rare",
+                "max": "50.00000000",
+                "score": "100.00000000"
             },
-            "tag": {
-                "Color": "Black"
-            },
+            "traits": [
+                {
+                    "displayType": "String",
+                    "name": "Color",
+                    "rarity": "",
+                    "value": "Black"
+                },
+                {
+                    "displayType": "Numeric",
+                    "name": "trait-slots",
+                    "rarity": "",
+                    "value": "5.00000000"
+                }
+            ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://goatedgoats.com//ID4",
             "uuid": "ID4"
@@ -187,13 +247,25 @@
                 }
             ],
             "name": "klktn 1 of 1",
-            "rarity": "rare",
-            "scalar": {
-                "id": "0.00000000"
+            "rarity": {
+                "description": "rare",
+                "max": "50.00000000",
+                "score": "100.00000000"
             },
-            "tag": {
-                "Author": "Kevin Woo"
-            },
+            "traits": [
+                {
+                    "displayType": "String",
+                    "name": "Author",
+                    "rarity": "",
+                    "value": "Kevin Woo"
+                },
+                {
+                    "displayType": "Numeric",
+                    "name": "id",
+                    "rarity": "",
+                    "value": "0.00000000"
+                }
+            ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://klktn.com//ID5",
             "uuid": "ID5"

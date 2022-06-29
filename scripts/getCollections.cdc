@@ -52,14 +52,13 @@ pub struct MetadataCollectionItem {
 	pub let image: String
 	pub let url: String
 	pub let contentTypes:[String]
-	pub let rarity:String
+	pub let rarity:MetadataViews.Rarity?
 	//Refine later 
 	pub let medias: [MetadataViews.Media]
 	pub let collection: String // <- This will be Alias unless they want something else
-	pub let tag: {String : String}
-	pub let scalar: {String : UFix64}
+	pub let traits: [MetadataViews.Trait]
 
-	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: String, medias: [MetadataViews.Media], collection: String, tag: {String : String}, scalar: {String : UFix64}) {
+	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: MetadataViews.Rarity?, medias: [MetadataViews.Media], collection: String, traits: [MetadataViews.Trait]) {
 		self.id=id
 		self.typeIdentifier = type.identifier
 		self.uuid = uuid
@@ -70,8 +69,7 @@ pub struct MetadataCollectionItem {
 		self.rarity=rarity
 		self.medias=medias
 		self.collection=collection
-		self.tag=tag
-		self.scalar=scalar
+		self.traits=traits
 	}
 }
 
@@ -101,20 +99,8 @@ pub fun main(user: String) : MetadataCollections? {
 						externalUrl=externalUrlViw.url
 					}
 
-					var rarity=""
-					if let r = FindViews.getRarity(nft) {
-						rarity=r.rarityName
-					}
-
-					var tag : {String : String}={}
-					if let t= FindViews.getTags(nft) {
-						tag=t.getTag()
-					}			
-
-					var scalar : {String : UFix64}={}
-					if let s= FindViews.getScalar(nft) {
-						scalar=s.getScalar()
-					}			
+					let rarity = MetadataViews.getRarity(nft)
+					let traits = MetadataViews.getTraits(nft)
 
 					var medias : [MetadataViews.Media] = []
 					if let m= MetadataViews.getMedias(nft) {
@@ -137,8 +123,7 @@ pub fun main(user: String) : MetadataCollections? {
 						rarity: rarity,
 						medias: medias,
 						collection: nftInfo.alias,
-						tag: tag,
-						scalar: scalar
+						traits:traits?.traits ?? [],
 					)
 					let itemId = nftInfo.alias.concat(item.id.toString())
 					items.append(itemId)

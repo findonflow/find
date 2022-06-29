@@ -73,7 +73,7 @@ func TestNFTDetailScript(t *testing.T) {
 				UInt64(ids[1]).
 				StringArray(
 					"A.f8d6e0586b0a20c7.FindViews.Nounce",
-					// "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+					"A.f8d6e0586b0a20c7.MetadataViews.Traits",
 					"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 					"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
 					"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
@@ -141,6 +141,7 @@ func TestNFTDetailScript(t *testing.T) {
 			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
 			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
 		}
 		for _, item := range viewList {
 			actual = strings.Replace(actual, item, "checked", -1)
@@ -215,6 +216,8 @@ func TestNFTDetailScript(t *testing.T) {
 			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
 			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
+			"A.f8d6e0586b0a20c7.MetadataViews.Rarity",
 		}
 		for _, item := range viewList {
 			actual1 = strings.Replace(actual1, item, "checked", -1)
