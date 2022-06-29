@@ -186,24 +186,15 @@ pub contract FIND {
 
 		let leaseCol = leaseCap.borrow()!
 		let nameLeases = leaseCol.getNames() 
-		var time : UFix64?= nil
-		var name :String?= nil
 		for nameLease in nameLeases {
 
 			//filter out all leases that are FREE or LOCKED since they are not actice
-			if network.readStatus(nameLease).status != FIND.LeaseStatus.TAKEN {
-				continue
-			}
-
-			let validUntil = network.getLeaseExpireTime(nameLease)
-			//if we have not set a 
-			if time == nil || validUntil < time! {
-				time=validUntil
-				name=nameLease
+			if network.readStatus(nameLease).status == FIND.LeaseStatus.TAKEN {
+				return nameLease
 			}
 
 		}
-		return name
+		return nil
 	}
 
 	/// Deposit FT to name
@@ -1045,28 +1036,16 @@ pub contract FIND {
 			if sellerProfile.getFindName() == name {
 				let network = FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
 				let nameLeases = self.getNames() 
-				var time : UFix64?= nil
-				var newName :String?= nil
 				for nameLease in nameLeases {
 
 					//filter out all leases that are FREE or LOCKED since they are not actice
-					if network.readStatus(nameLease).status != FIND.LeaseStatus.TAKEN {
-						continue
-					}
-
-					let validUntil = network.getLeaseExpireTime(nameLease)
-					//if we have not set a 
-					if time == nil || validUntil < time! {
-						time=validUntil
-						newName=nameLease
+					if network.readStatus(nameLease).status == FIND.LeaseStatus.TAKEN {
+						sellerProfile.setFindName(nameLease)
+						return
 					}
 
 				}
-				if newName == nil {
-					sellerProfile.setFindName("")
-					return 
-				}
-				sellerProfile.setFindName(newName!)
+				sellerProfile.setFindName("")				
 			}
 
 		}
