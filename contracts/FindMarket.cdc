@@ -1042,7 +1042,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?)) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?), rewardFN: ((Address, String?, Address, String) : Void )) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -1111,6 +1111,10 @@ pub contract FindMarket {
 		}
 
 		oldProfile.deposit(from: <- vault)
+
+		let tenantAddress = FindMarket.tenantNameAddress[tenant]!
+		rewardFN(tenant: tenantAddress, findName: resolver(buyer!), receiver: buyer!, task: "findMarket_fulfill_buyer")
+		rewardFN(tenant: tenantAddress, findName: resolver(seller), receiver: seller, task: "findMarket_fulfill_seller")
 	}
 
 	pub struct NFTInfo {

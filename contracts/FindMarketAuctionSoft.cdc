@@ -470,7 +470,7 @@ pub contract FindMarketAuctionSoft {
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			saleItem.acceptNonEscrowedBid()
 
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: FIND.reverseLookupFN())
+			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: FIND.reverseLookupFN(), rewardFN: FIND.rewardFN())
 
 			destroy <- self.items.remove(key: id)
 

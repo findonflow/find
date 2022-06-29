@@ -126,7 +126,9 @@
 		"FTRegistry": "./contracts/FTRegistry.cdc",
 		"NFTRegistry": "./contracts/NFTRegistry.cdc",
 		"FindForge": "./contracts/FindForge.cdc",
-		"ExampleNFT": "./contracts/standard/ExampleNFT.cdc"
+		"ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
+		"FindRewardToken": "./contracts/FindRewardToken.cdc",
+		"FindToken": "./contracts/FindToken.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -233,6 +235,8 @@
 		},
 		"emulator": {
 			"emulator-account": [
+				"FindRewardToken",
+				"FindToken",
 				"FIND",
 				"FindForge",
 				"NonFungibleToken",

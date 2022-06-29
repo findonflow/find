@@ -267,6 +267,14 @@
             "tags": null,
             "wallets": [
                 {
+                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+                    "balance": "10.00000000",
+                    "name": "FindToken",
+                    "tags": [
+                        "FindToken"
+                    ]
+                },
+                {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "balance": "100.00100000",
                     "name": "Flow",

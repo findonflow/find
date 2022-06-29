@@ -13,6 +13,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
+import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
@@ -90,6 +91,34 @@ transaction(name: String, amount: UFix64) {
 		}
 
 		let profile=acct.borrow<&Profile.User>(from: Profile.storagePath)!
+
+		/* Add Reward Tokens */
+		let rewardTokenCaps = FindRewardToken.getRewardVaultViews() 
+		for rewardTokenCap in rewardTokenCaps {
+			if !rewardTokenCap.check() {
+				continue
+			}
+			if let VaultData = rewardTokenCap.borrow()!.resolveView(Type<FindRewardToken.FTVaultData>()) {
+				let v = VaultData as! FindRewardToken.FTVaultData
+				let userTokenCap = acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
+				if userTokenCap.check() {
+					if !profile.hasWallet(v.tokenAlias) {
+						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+						profile.addWallet(tokenWallet)
+					}
+					continue
+				}
+				acct.save( <- v.createEmptyVault() , to: v.storagePath)
+				acct.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
+				acct.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
+				if !profile.hasWallet(v.tokenAlias) {
+					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+					profile.addWallet(tokenWallet)
+				}
+			}
+
+		}
+
 		if !profile.hasWallet("Flow") {
 			let flowWallet=Profile.Wallet( name:"Flow", receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
 	
