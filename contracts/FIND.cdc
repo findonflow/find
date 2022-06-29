@@ -184,8 +184,11 @@ pub contract FIND {
 		let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
 
 		if profileFindName != "" {
-			if network.readStatus(profileFindName).status == FIND.LeaseStatus.TAKEN {
-				return profileFindName
+			let status = network.readStatus(profileFindName)
+			if status.owner != nil && status.owner! == address {
+				if status.status == FIND.LeaseStatus.TAKEN {
+					return profileFindName
+				}
 			}
 		}
 
@@ -194,10 +197,12 @@ pub contract FIND {
 		for nameLease in nameLeases {
 
 			//filter out all leases that are FREE or LOCKED since they are not actice
-			if network.readStatus(nameLease).status == FIND.LeaseStatus.TAKEN {
-				return nameLease
+			let status = network.readStatus(nameLease)
+			if status.owner != nil && status.owner! == address {
+				if status.status == FIND.LeaseStatus.TAKEN {
+					return nameLease
+				}
 			}
-
 		}
 		return nil
 	}
@@ -887,13 +892,13 @@ pub contract FIND {
 				let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
 				let soldFor=offer.getBalance(name)
 
+				//move the token to the new profile
+				lease.move(profile: newProfile)
 				if lease.salePrice == nil || lease.salePrice != soldFor {
 					emit DirectOffer(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
 				} else {
 					emit Sale(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
 				}
-				//move the token to the new profile
-				lease.move(profile: newProfile)
 
 				let token <- self.leases.remove(key: name)!
 				let vault <- offer.fulfillLease(<- token)
@@ -934,13 +939,13 @@ pub contract FIND {
 			}
 			let newProfile= getAccount(auctionRef.latestBidCallback.address).getCapability<&{Profile.Public}>(Profile.publicPath)
 			let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
-			emit EnglishAuction(name: name, uuid:lease.uuid, seller: lease.owner!.address, sellerName:FIND.reverseLookup(lease.owner!.address), amount: soldFor, auctionReservePrice: lease.auctionReservePrice!, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, endsAt: self.borrowAuction(name).endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
 
 
-			let auction <- self.auctions.remove(key: name)!
 
 			//move the token to the new profile
 			lease.move(profile: newProfile)
+			emit EnglishAuction(name: name, uuid:lease.uuid, seller: lease.owner!.address, sellerName:FIND.reverseLookup(lease.owner!.address), amount: soldFor, auctionReservePrice: lease.auctionReservePrice!, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, endsAt: self.borrowAuction(name).endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
+			let auction <- self.auctions.remove(key: name)!
 
 			let token <- self.leases.remove(key: name)!
 
