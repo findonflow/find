@@ -57,8 +57,11 @@ pub struct NFTDetail {
 
 		let item = pointer.getViewResolver()
 
-		self.scalars={}
-		self.tags={}
+		let nftInfo = FindMarket.NFTInfo(item: item, pointer.id)
+
+		self.scalars=nftInfo.scalars
+		self.tags=nftInfo.tags
+		self.rarity=nftInfo.rarity
 		self.media={}
 		self.collectionName=nil
 		self.collectionDescription=nil
@@ -68,20 +71,6 @@ pub struct NFTDetail {
 			self.collectionDescription=grouping.description
 		}
 
-		/* Rarity */
-		self.rarity=nil
-		if let r = FindViews.getRarity(item) {
-			self.rarity=r.rarityName
-		}
-
-
-		if let t= FindViews.getTags(item) {
-			self.tags=t.getTag()
-		}			
-
-		if let scalar=FindViews.getScalar(item){
-			self.scalars=scalar.getScalar()
-		}
 		/* Medias */
 		if let medias=MetadataViews.getMedias(item) {
 			for m in medias.items {
@@ -89,12 +78,6 @@ pub struct NFTDetail {
 				let type = m.mediaType
 				self.media[url] = type
 			}
-		}
-
-		if let media=FindViews.getMedia(item) {
-			let url = media.file.uri() 
-			let type = media.mediaType
-			self.media[url] = type
 		}
 
 		let display = MetadataViews.getDisplay(item) ?? panic("Could not find display")
@@ -105,21 +88,8 @@ pub struct NFTDetail {
 		self.uuid=pointer.getUUID()
 
 		/* Edition */
-		self.editionNumber=nil
-		self.totalInEdition=nil
-		if let editions = MetadataViews.getEditions(item) {
-			for edition in editions.infoList {
-				if edition.name == nil {
-					self.editionNumber=edition.number
-					self.totalInEdition=edition.max
-				} else {
-					self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
-					if edition.max != nil {
-						self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
-					}
-				}
-			}
-		}
+		self.editionNumber=nftInfo.editionNumber
+		self.totalInEdition=nftInfo.totalInEdition
 
 		/* Royalties */
 		self.royalties=resolveRoyalties(pointer)
@@ -137,8 +107,8 @@ pub struct NFTDetail {
 		self.data=views
 
 	}
-
 }
+
 
 pub struct StoreFrontCut {
 
@@ -304,9 +274,6 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : L
 pub fun ignoreViews() : [Type] {
 	return [
 	Type<MetadataViews.NFTCollectionDisplay>() , 
-	Type<FindViews.Rarity>() ,
-	Type<FindViews.Tag>() , 
-	Type<FindViews.Scalar>() ,
 	Type<MetadataViews.Medias>() ,
 	Type<MetadataViews.Display>() ,
 	Type<MetadataViews.Edition>() ,

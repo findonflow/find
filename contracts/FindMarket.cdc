@@ -813,7 +813,7 @@ pub contract FindMarket {
 					}
 				}
 				if containsListingType && containsNFTType {
-						return nil
+					return nil
 				}
 				containsNFTType = false 
 				containsListingType = true
@@ -836,7 +836,7 @@ pub contract FindMarket {
 				if containsListingType && containsNFTType {
 					return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
 				}
-				
+
 				containsNFTType = false 
 				containsListingType = true
 			}
@@ -1121,15 +1121,14 @@ pub contract FindMarket {
 		pub var rarity:String?
 		pub var editionNumber: UInt64? 
 		pub var totalInEdition: UInt64?
-		pub var scalars : {String: UFix64}
-		pub var tags : {String: String}
+		pub var scalars: {String:UFix64}
+		pub var tags : {String:String}
 		pub var collectionName: String? 
 		pub var collectionDescription: String? 
 
 		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
 
-			self.scalars={}
-			self.tags={}
+			self.tags = {}
 
 			self.collectionName=nil
 			self.collectionDescription=nil
@@ -1139,17 +1138,61 @@ pub contract FindMarket {
 				self.collectionDescription=ncd.description
 			}
 
-			self.rarity=nil
-			if let rarity = FindViews.getRarity(item) {
-				self.rarity=rarity.rarityName
+			self.scalars = {}
+			self.rarity= nil 
+			if let rarity = MetadataViews.getRarity(item) {
+				if rarity.description != nil {
+					self.rarity=""
+				}
+
+				if rarity.score != nil {
+					self.scalars["rarity_score"] = rarity.score!
+				}
+				if rarity.max != nil {
+					self.scalars["rarity_max"] = rarity.max!
+				}
 			}
 
-			if let tags = FindViews.getTags(item) {
-				self.tags=tags.getTag()
-			}
+			let numericValues  = {"Date" : true, "Numeric":true, "Number":true, "date":true, "numeric":true, "number":true}
 
-			if let scalar = FindViews.getScalar(item) {
-				self.scalars=scalar.getScalar()
+			if let traits =  MetadataViews.getTraits(item) {
+				for trait in traits.traits {
+
+					let name = trait.name
+					let display = trait.displayType ?? "String"
+
+					let traitName = "trait_".concat(name)
+
+					if numericValues[display] != nil {
+						if let value = trait.value as? Number {
+							self.scalars[traitName]  = UFix64(value)
+						}
+					} else {
+						if let value = trait.value as? String {
+							self.tags[traitName]  = value
+						}
+						if let value = trait.value as? Bool {
+							if value {
+								self.tags[traitName]  = "true"
+							}else {
+								self.tags[traitName]  = "false"
+							}
+						}
+
+					}
+					if let rarity = trait.rarity {
+						if rarity.description != nil {
+							self.tags[traitName.concat("_rarity")] = rarity.description!
+						}
+
+						if rarity.score != nil {
+							self.scalars[traitName.concat("_rarity_score")] = rarity.score!
+						}
+						if rarity.max != nil {
+							self.scalars[traitName.concat("_rarity_max")] = rarity.max!
+						}
+					}
+				}
 			}
 
 			let display = MetadataViews.getDisplay(item) ?? panic("cannot get MetadataViews.Display View")
@@ -1178,13 +1221,13 @@ pub contract FindMarket {
 	}
 
 	pub struct GhostListing{
-//		pub let listingType: Type
+		//		pub let listingType: Type
 		pub let listingTypeIdentifier: String
 		pub let id: UInt64
 
 
 		init(listingType:Type, id:UInt64) {
-//			self.listingType=listingType
+			//			self.listingType=listingType
 			self.listingTypeIdentifier=listingType.identifier
 			self.id=id
 		}

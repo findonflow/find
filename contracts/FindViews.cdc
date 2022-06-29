@@ -3,38 +3,6 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
 
-	pub struct Tag {
-		access(self) let tag : {String : String} 
-
-		init(tag: {String : String}) {
-			self.tag = tag 
-		}
-
-		pub fun getTag() : {String : String} {
-			return self.tag
-		}
-	}
-
-	pub struct Scalar {
-		access(self) let scalar : {String : UFix64} 
-
-		init(scalar: {String : UFix64}) {
-			self.scalar = scalar 
-		}
-
-		pub fun getScalar() : {String : UFix64} {
-			return self.scalar
-		}
-	}
-
-	pub struct Files {
-		pub let media : {String: &{MetadataViews.File}}
-
-		init(_ items: {String: &{MetadataViews.File}}) {
-			self.media=items
-		}
-	}
-
 	pub struct OnChainFile : MetadataViews.File{
 		pub let content: String
 		pub let mediaType: String
@@ -90,33 +58,6 @@ pub contract FindViews {
 		}
 	}
 
-	// Would this work for rarity? Hoodlums, flovatar, Basicbeasts? comments?
-	pub struct Rarity{
-		pub let rarity: UFix64
-		pub let rarityName: String
-		pub let parts: {String: RarityPart}
-
-		init(rarity: UFix64, rarityName: String, parts:{String:RarityPart}) {
-			self.rarity=rarity
-			self.rarityName=rarityName
-			self.parts=parts
-		}
-	}
-
-	pub struct RarityPart{
-
-		pub let rarity: UFix64
-		pub let rarityName: String
-		pub let name: String
-
-		init(rarity: UFix64, rarityName: String, name:String) {
-
-			self.rarity=rarity
-			self.rarityName=rarityName
-			self.name=name
-		}
-
-	}
 
 	/// A basic pointer that can resolve data and get owner/id/uuid and gype
 	pub struct interface Pointer {
@@ -223,7 +164,6 @@ pub contract FindViews {
 			}
 			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 		}
-
 	}
 
 
@@ -236,41 +176,6 @@ pub contract FindViews {
 		return 0
 	}
 
-	pub fun getRarity(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Rarity? {
-		if let view = viewResolver.resolveView(Type<FindViews.Rarity>()) {
-			if let v = view as? FindViews.Rarity {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getTags(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Tag? {
-		if let view = viewResolver.resolveView(Type<FindViews.Tag>()) {
-			if let v = view as? FindViews.Tag {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getScalar(_ viewResolver: &{MetadataViews.Resolver}) : FindViews.Scalar? {
-		if let view = viewResolver.resolveView(Type<FindViews.Scalar>()) {
-			if let v = view as? FindViews.Scalar {
-				return v
-			}
-		}
-		return nil
-	}
-
-	pub fun getMedia(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Media? {
-		if let view = viewResolver.resolveView(Type<MetadataViews.Media>()) {
-			if let v = view as? MetadataViews.Media {
-				return v
-			}
-		}
-		return nil
-	}
 
 	pub struct AuthNFTPointer : Pointer, AuthPointer{
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
