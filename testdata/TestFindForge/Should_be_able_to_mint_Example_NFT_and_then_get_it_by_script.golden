@@ -14,8 +14,7 @@
             "medias": null,
             "name": "Neo",
             "rarity": "",
-            "scalar": {},
-            "tag": {},
+            "traits": null,
             "typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
             "url": "https://example-nft.onflow.org/ID0",
             "uuid": "ID0"

@@ -61,6 +61,22 @@
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0xf8d6e0586b0a20c7, path: /public/findProfileReceiver)"
                     }
                 ]
+            },
+            "A.f8d6e0586b0a20c7.MetadataViews.Traits": {
+                "traits": [
+                    {
+                        "displayType": "String",
+                        "name": "NeoMotorCycleTag",
+                        "rarity": "",
+                        "value": "Tag1"
+                    },
+                    {
+                        "displayType": "Numeric",
+                        "name": "Speed",
+                        "rarity": "",
+                        "value": "100.00000000"
+                    }
+                ]
             }
         },
         "editionNumber": "2",

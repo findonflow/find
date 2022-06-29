@@ -1142,7 +1142,7 @@ pub contract FindMarket {
 			self.rarity= nil 
 			if let rarity = MetadataViews.getRarity(item) {
 				if rarity.description != nil {
-					self.rarity=""
+					self.rarity=rarity.description!
 				}
 
 				if rarity.score != nil {
@@ -1161,7 +1161,7 @@ pub contract FindMarket {
 					let name = trait.name
 					let display = trait.displayType ?? "String"
 
-					let traitName = "trait_".concat(name)
+					let traitName = name
 
 					if numericValues[display] != nil {
 						if let value = trait.value as? Number {

@@ -52,7 +52,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
 		let traits = MetadataViews.Traits([])
-		traits.addTrait(MetadataViews.Trait(name: "NeoMotorCycleTag", value: "Tag", displayType:"String", rarity:nil))
+		traits.addTrait(MetadataViews.Trait(name: "NeoMotorCycleTag", value: "Tag1", displayType:"String", rarity:nil))
 		traits.addTrait(MetadataViews.Trait(name: "Speed", value: 100.0, displayType:"Numeric", rarity:nil))
 
 		let collection=dandyCap.borrow()!
@@ -64,7 +64,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let set= MetadataViews.Edition(name: "set", number:i, max:maxEdition)
 			let editions = MetadataViews.Editions([editioned, set])
 			let description=creativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
-			let schemas: [AnyStruct] = [ editions, creativeWork, media, traits ]
+			let schemas: [AnyStruct] = [ editions, creativeWork, MetadataViews.Medias([media]), traits ]
 			
 			let mintData = Dandy.DandyInfo(name: "Neo Motorcycle ".concat(i.toString()).concat(" of ").concat(maxEdition.toString()), 
 												description: creativeWork.description, 

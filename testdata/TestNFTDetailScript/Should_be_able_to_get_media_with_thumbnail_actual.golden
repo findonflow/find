@@ -81,7 +81,9 @@
         "scalars": {
             "edition_nft_max": "1.00000000",
             "edition_nft_number": "1.00000000",
-            "video length": "45.00000000"
+            "rarity_max": "50.00000000",
+            "rarity_score": "100.00000000",
+            "video_length": "45.00000000"
         },
         "tags": {
             "Author": "Jack Black"
@@ -91,6 +93,8 @@
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": "ID3",
         "views": [
+            "checked",
+            "checked",
             "checked",
             "checked",
             "checked",
