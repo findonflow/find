@@ -116,14 +116,14 @@ func TestFIND(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to send lease to another name", func(t *testing.T) {
+	otu = NewOverflowTest(t).
+		setupFIND().
+		createUser(100.0, "user1").
+		registerUser("user1").
+		createUser(100.0, "user2").
+		registerUser("user2")
 
-		otu = NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, "user1").
-			registerUser("user1").
-			createUser(100.0, "user2").
-			registerUser("user2")
+	t.Run("Should be able to send lease to another name", func(t *testing.T) {
 
 		otu.O.TransactionFromFile("moveNameTO").
 			SignProposeAndPayAs("user1").
@@ -132,6 +132,29 @@ func TestFIND(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 				"name": "user1",
 			}))
+	})
+
+	t.Run("Should automatically set Find Name to empty if sender have none", func(t *testing.T) {
+
+		value := otu.O.ScriptFromFile("getName").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(value)
+		assert.Equal(t, `""`, value)
+
+		otu.moveNameTo("user2", "user1", "user1")
+
+	})
+
+	t.Run("Should automatically set Find Name if sender have one", func(t *testing.T) {
+
+		otu.registerUserWithName("user1", "name1").
+			moveNameTo("user1", "user2", "user1")
+
+		value := otu.O.ScriptFromFile("getName").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
+		fmt.Println(value)
+		assert.Equal(t, `"name1"`, value)
+
+		otu.moveNameTo("user2", "user1", "user1")
+
 	})
 
 	otu = NewOverflowTest(t).

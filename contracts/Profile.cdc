@@ -246,7 +246,7 @@ pub contract Profile {
 
 		access(contract) fun internal_addFollower(_ val: FriendStatus)
 		access(contract) fun internal_removeFollower(_ address: Address) 
-
+		access(account) fun setFindName(_ val: String)
 	}
 
 	pub resource interface Owner {
