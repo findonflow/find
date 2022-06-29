@@ -176,30 +176,30 @@ pub contract FIND {
 		
 		let profileFindName= Profile.find(address).getFindName()
 
+		let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
+
 		if profileFindName != "" {
-			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-				if network.readStatus(profileFindName).status == FIND.LeaseStatus.TAKEN {
-					return profileFindName
-				}
+			if network.readStatus(profileFindName).status == FIND.LeaseStatus.TAKEN {
+				return profileFindName
 			}
 		}
 
-		let leases = leaseCap.borrow()!.getLeaseInformation() 
+		let leaseCol = leaseCap.borrow()!
+		let nameLeases = leaseCol.getNames() 
 		var time : UFix64?= nil
 		var name :String?= nil
-		for lease in leases {
+		for nameLease in nameLeases {
 
 			//filter out all leases that are FREE or LOCKED since they are not actice
-			if lease.status != "TAKEN" {
+			if network.readStatus(nameLease).status != FIND.LeaseStatus.TAKEN {
 				continue
 			}
 
+			let validUntil = network.getLeaseExpireTime(nameLease)
 			//if we have not set a 
-			if profileFindName == "" {
-				if time == nil || lease.validUntil < time! {
-					time=lease.validUntil
-					name=lease.name
-				}
+			if time == nil || validUntil < time! {
+				time=validUntil
+				name=nameLease
 			}
 
 		}
@@ -511,7 +511,7 @@ pub contract FIND {
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
 		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
-
+		access(contract) fun getNames() : [String]
 	}
 
 
@@ -598,6 +598,10 @@ pub contract FIND {
 
 			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.addons.keys)
 		}
+
+		access(contract) fun getNames() : [String] {
+			return self.leases.keys
+		} 
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
 			var info: [LeaseInformation]=[]
@@ -1028,6 +1032,43 @@ pub contract FIND {
 			token.move(profile: profile)
 			let walletRef = to.borrow() ?? panic("The receiver capability is not valid. wallet address : ".concat(to.address.toString()))
 			walletRef.deposit(token: <- token)
+
+			// set FindNames 
+			// buyer
+			let buyerProfile = profile.borrow()!
+			if buyerProfile.getFindName() == "" {
+				buyerProfile.setFindName(name)
+			}
+
+			// seller 
+			let sellerProfile = Profile.find(self.owner!.address)
+			if sellerProfile.getFindName() == name {
+				let network = FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
+				let nameLeases = self.getNames() 
+				var time : UFix64?= nil
+				var newName :String?= nil
+				for nameLease in nameLeases {
+
+					//filter out all leases that are FREE or LOCKED since they are not actice
+					if network.readStatus(nameLease).status != FIND.LeaseStatus.TAKEN {
+						continue
+					}
+
+					let validUntil = network.getLeaseExpireTime(nameLease)
+					//if we have not set a 
+					if time == nil || validUntil < time! {
+						time=validUntil
+						newName=nameLease
+					}
+
+				}
+				if newName == nil {
+					sellerProfile.setFindName("")
+					return 
+				}
+				sellerProfile.setFindName(newName!)
+			}
+
 		}
 
 		//depoit a lease token into the lease collection, not available from the outside
