@@ -63,6 +63,7 @@ transaction(name: String, amount: UFix64) {
 		}
 
 		var created=false
+		var updated=true
 		let profileCap = acct.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {
 			let profile <-Profile.createUser(name:name, createdAt: "find")
@@ -104,23 +105,30 @@ transaction(name: String, amount: UFix64) {
 			let flowWallet=Profile.Wallet( name:"Flow", receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
 	
 			profile.addWallet(flowWallet)
+			updated=true
 		}
 		if !profile.hasWallet("FUSD") {
 			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"]))
+			updated=true
 		}
 
 		if !profile.hasWallet("USDC") {
 			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:acct.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
+			updated=true
 		}
 
  		//If find name not set and we have a profile set it.
 		if profile.getFindName() == "" {
 			profile.setFindName(name)
+			// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
+			updated=false
 		}
 
 		if created {
 			profile.emitCreatedEvent()
-		} 
+		} else if updated {
+			profile.emitUpdatedEvent()
+		}
 
 		let receiverCap=acct.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()

@@ -84,6 +84,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 		}
 
 		var created=false
+		var updated=false
 		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {
 			let profile <-Profile.createUser(name:name, createdAt: "find")
@@ -98,23 +99,28 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
 	
 			profile.addWallet(flowWallet)
+			updated=true
 		}
 		if !profile.hasWallet("FUSD") {
 			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"]))
+			updated=true
 		}
 
 		if !profile.hasWallet("USDC") {
 			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
+			updated=true
 		}
 
  		//If find name not set and we have a profile set it.
 		if profile.getFindName() == "" {
 			profile.setFindName(name)
+			// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
+			updated=false
 		}
 
 		if created {
 			profile.emitCreatedEvent()
-		} else {
+		} else if updated {
 			profile.emitUpdatedEvent()
 		}
 
