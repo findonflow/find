@@ -78,6 +78,7 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier: S
 		}
 
 		var created=false
+		var updated=false
 		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {
 			let profile <-Profile.createUser(name:name, createdAt: "find")
@@ -92,14 +93,19 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier: S
 			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
 	
 			profile.addWallet(flowWallet)
+			updated=true
 		}
 		if !profile.hasWallet("DUC") {
 			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:getAccount(dapperAddress).getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), names: ["duc", "dapperUtilityCoin","dapper"]))
+			updated=true
 		}
 
  		//If find name not set and we have a profile set it.
 		if profile.getFindName() == "" {
 			profile.setFindName(name)
+
+			// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
+			updated=false
 		}
 
 		if created {

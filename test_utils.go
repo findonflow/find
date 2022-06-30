@@ -1449,6 +1449,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
+			Account("account").
 			String(seller).
 			UInt64(id).
 			UFix64(price)).
