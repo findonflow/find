@@ -167,8 +167,8 @@ func TestAuction(t *testing.T) {
 				"to":     "0x01cf0e2f2f715450",
 			}))
 
-		// json := otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("0x179b6b1cb6755e31")).RunReturnsJsonString()
-		// autogold.Equal(t, json)
+		json := otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("0x179b6b1cb6755e31")).RunReturnsJsonString()
+		autogold.Equal(t, json)
 
 	})
 

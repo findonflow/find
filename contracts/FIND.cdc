@@ -358,7 +358,37 @@ pub contract FIND {
 
 		access(contract) fun move(profile: Capability<&{Profile.Public}>) {
 			let network= self.networkCap.borrow() ?? panic("The network is not up")
+			let senderAddress= network.profiles[self.name]!.address
 			network.move(name: self.name, profile: profile)
+
+
+			// set FindNames 
+			// receiver 
+			let receiver = profile.borrow() ?? panic("The profile capability is invalid")
+			if receiver.getFindName() == "" {
+				receiver.setFindName(self.name)
+			}
+
+			// sender 
+			let sender = Profile.find(senderAddress)
+			if sender.getFindName() == self.name {
+				let network = FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
+				let leaseCol = getAccount(senderAddress).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()!
+				let nameLeases = leaseCol.getNames() 
+				for nameLease in nameLeases {
+
+					//filter out all leases that are FREE or LOCKED since they are not actice
+					let status = network.readStatus(nameLease)
+					if status.owner != nil && status.owner! == senderAddress {
+						if status.status == FIND.LeaseStatus.TAKEN {
+							sender.setFindName(nameLease)
+							return 
+						}
+					}
+
+				}
+				sender.setFindName("")			
+			}
 		}
 
 		pub fun getLeaseExpireTime() : UFix64 {
@@ -1036,33 +1066,6 @@ pub contract FIND {
 			token.move(profile: profile)
 			let walletRef = to.borrow() ?? panic("The receiver capability is not valid. wallet address : ".concat(to.address.toString()))
 			walletRef.deposit(token: <- token)
-
-			// set FindNames 
-			// buyer
-			let buyerProfile = profile.borrow()!
-			if buyerProfile.getFindName() == "" {
-				buyerProfile.setFindName(name)
-			}
-
-			// seller 
-			let sellerProfile = Profile.find(self.owner!.address)
-			if sellerProfile.getFindName() == name {
-				let network = FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
-				let nameLeases = self.getNames() 
-				for nameLease in nameLeases {
-
-					//filter out all leases that are FREE or LOCKED since they are not actice
-					let status = network.readStatus(nameLease)
-					if status.owner != nil && status.owner! == self.owner!.address {
-						if status.status == FIND.LeaseStatus.TAKEN {
-							sellerProfile.setFindName(nameLease)
-							return
-						}
-					}
-
-				}
-				sellerProfile.setFindName("")				
-			}
 
 		}
 
