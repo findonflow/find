@@ -43,8 +43,27 @@ pub fun main(user: String) : NameReport? {
 		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
+		var profileReport = profile?.asReport() 
+		if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
+			profileReport = Profile.UserReport(
+				findName: "",
+				address: profileReport!.address,
+				name: profileReport!.name,
+				gender: profileReport!.gender,
+				description: profileReport!.description,
+				tags: profileReport!.tags,
+				avatar: profileReport!.avatar,
+				links: profileReport!.links,
+				wallets: profileReport!.wallets, 
+				following: profileReport!.following,
+				followers: profileReport!.followers,
+				allowStoringFollowers: profileReport!.allowStoringFollowers,
+				createdAt: profileReport!.createdAt
+			)
+		}
+
 		findReport = FINDReport(
-			profile: profile?.asReport(),
+			profile: profileReport,
 			relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
 			bids: bidCap.borrow()?.getBids() ?? [],
 			leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
