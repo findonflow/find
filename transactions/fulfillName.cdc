@@ -6,10 +6,5 @@ transaction(name: String) {
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		finLeases.fulfill(name)
-
-		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
-		if profile.getFindName() == name {
-			profile.setFindName("")
-		}
 	}
 }

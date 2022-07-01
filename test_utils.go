@@ -133,7 +133,7 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Created", map[string]interface{}{
 			"account":   nameAddress,
 			"userName":  name,
-			"findName":  name,
+			"findName":  "",
 			"createdAt": "find",
 		}))
 

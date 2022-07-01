@@ -191,10 +191,9 @@ func TestAuction(t *testing.T) {
 			Test(t).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
-				"name":   "user1",
-				"seller": otu.accountAddress("user1"),
-				// sellerName should be name1 / name2, fix is in another pr
-				"sellerName":  "user1",
+				"name":        "user1",
+				"seller":      otu.accountAddress("user1"),
+				"sellerName":  "name2",
 				"amount":      "20.00000000",
 				"status":      "sold",
 				"buyer":       otu.accountAddress("user3"),
@@ -244,10 +243,9 @@ func TestAuction(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
-				"name":   "user1",
-				"seller": otu.accountAddress("user1"),
-				// sellerName should be name1 / name2, fix is in another pr
-				"sellerName":  "user1",
+				"name":        "user1",
+				"seller":      otu.accountAddress("user1"),
+				"sellerName":  "name2",
 				"amount":      "11.00000000",
 				"status":      "sold",
 				"buyer":       otu.accountAddress(buyer),
