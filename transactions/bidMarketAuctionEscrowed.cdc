@@ -279,7 +279,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: bidSstoragePath)
 		self.balanceBeforeBid=self.walletReference.balance
-		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
+		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: item.getItemID())
 	}
 
 	pre {
