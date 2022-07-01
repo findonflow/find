@@ -1052,9 +1052,12 @@ pub contract FIND {
 				for nameLease in nameLeases {
 
 					//filter out all leases that are FREE or LOCKED since they are not actice
-					if network.readStatus(nameLease).status == FIND.LeaseStatus.TAKEN {
-						sellerProfile.setFindName(nameLease)
-						return
+					let status = network.readStatus(nameLease)
+					if status.owner != nil && status.owner! == self.owner!.address {
+						if status.status == FIND.LeaseStatus.TAKEN {
+							sellerProfile.setFindName(nameLease)
+							return
+						}
 					}
 
 				}

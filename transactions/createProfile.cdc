@@ -123,9 +123,11 @@ transaction(name: String) {
 
  		//If find name not set and we have a profile set it.
 		if profile.getFindName() == "" {
-			profile.setFindName(name)
-			// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
-			updated=false
+			if let findName = FIND.reverseLookup(acct.address) {
+				profile.setFindName(findName)
+				// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
+				updated=false
+			}
 		}
 
 		if created {

@@ -15,6 +15,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
+import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
@@ -100,6 +101,34 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		}
 
 		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
+
+		/* Add Reward Tokens */
+		let rewardTokenCaps = FindRewardToken.getRewardVaultViews() 
+		for rewardTokenCap in rewardTokenCaps {
+			if !rewardTokenCap.check() {
+				continue
+			}
+			if let VaultData = rewardTokenCap.borrow()!.resolveView(Type<FindRewardToken.FTVaultData>()) {
+				let v = VaultData as! FindRewardToken.FTVaultData
+				let userTokenCap = account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
+				if userTokenCap.check() {
+					if !profile.hasWallet(v.tokenAlias) {
+						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+						profile.addWallet(tokenWallet)
+					}
+					continue
+				}
+				account.save( <- v.createEmptyVault() , to: v.storagePath)
+				account.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
+				account.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
+				if !profile.hasWallet(v.tokenAlias) {
+					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+					profile.addWallet(tokenWallet)
+				}
+			}
+
+		}
+
 		if !profile.hasWallet("Flow") {
 			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
 	
@@ -114,13 +143,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		if !profile.hasWallet("USDC") {
 			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
 			updated=true
-		}
-
- 		//If find name not set and we have a profile set it.
-		if profile.getFindName() == "" {
-			profile.setFindName(name)
-			// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
-			updated=false
 		}
 
 		if created {

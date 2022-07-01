@@ -136,7 +136,7 @@ transaction(name: String, amount: UFix64) {
 			updated=true
 		}
 
- 		//If find name not set and we have a profile set it.
+  		//If find name not set and we have a profile set it.
 		if profile.getFindName() == "" {
 			profile.setFindName(name)
 			// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
