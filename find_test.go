@@ -162,7 +162,8 @@ func TestFIND(t *testing.T) {
 		createUser(100.0, "user1").
 		registerUser("user1").
 		createUser(100.0, "user2").
-		registerUser("user2")
+		registerUser("user2").
+		setProfile("user2")
 
 	t.Run("Should be able to register related account and remove it", func(t *testing.T) {
 
@@ -222,6 +223,16 @@ func TestFIND(t *testing.T) {
 		autogold.Equal(t, value)
 
 	})
+
+	t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
+
+		nameAddress := otu.accountAddress("user2")
+		otu.moveNameTo("user2", "user1", "user2")
+		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(nameAddress)).RunReturnsJsonString()
+		autogold.Equal(t, value)
+
+	})
+
 	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
 
 		otu = NewOverflowTest(t).
