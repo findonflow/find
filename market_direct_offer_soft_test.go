@@ -664,4 +664,16 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.sendExampleNFT("user1", "user2")
 	})
+
+	t.Run("Should be able to offer an NFT and fulfill it with id != uuid", func(t *testing.T) {
+
+		saleItemID := otu.directOfferMarketSoftExampleNFT("user2", "user1", 0, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price).
+			acceptDirectOfferMarketSoft("user1", saleItemID[0], "user2", price).
+			saleItemListed("user1", "active_finished", price).
+			fulfillMarketDirectOfferSoft("user2", saleItemID[0], price)
+
+		otu.sendExampleNFT("user1", "user2")
+	})
 }

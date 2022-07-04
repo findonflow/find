@@ -571,4 +571,18 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to list an NFT for sale and buy it. where id != uuid", func(t *testing.T) {
+		saleItem := otu.listExampleNFTForSale("user1", 0, price)
+
+		otu.checkRoyalty("user1", 0, "minter", "ExampleNFT", 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.buyNFTForMarketSale("user2", "user1", saleItem[0], price).
+			sendExampleNFT("user1", "user2")
+
+	})
+
 }
