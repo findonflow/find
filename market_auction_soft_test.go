@@ -738,4 +738,18 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.sendExampleNFT("user1", "user2")
 	})
+
+	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
+
+		saleItemID := otu.listExampleNFTForSoftAuction("user1", 0, price)
+
+		otu.saleItemListed("user1", "active_listed", price).
+			auctionBidMarketSoft("user2", "user1", saleItemID[0], price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionSoft("user2", saleItemID[0], 15.0)
+
+		otu.sendExampleNFT("user1", "user2")
+	})
+
 }

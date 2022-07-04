@@ -609,4 +609,18 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 
 	})
+
+	t.Run("Should be able to offer an NFT and fulfill it with id != uuid", func(t *testing.T) {
+
+		otu.registerDUCInRegistry().
+			sendExampleNFT("user1", "account").
+			setDUCExampleNFT()
+
+		saleItem := otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price)
+		otu.acceptDirectOfferMarketEscrowed("user1", saleItem[0], "user2", price)
+
+	})
+
 }
