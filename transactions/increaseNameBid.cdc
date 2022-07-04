@@ -3,9 +3,12 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 
 transaction(name: String, amount: UFix64) {
+
+	let vaultRef : &FUSD.Vault?
+	let bids : &FIND.BidCollection?
+
 	prepare(account: AuthAccount) {
 
-		let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
 		
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 
@@ -21,10 +24,17 @@ transaction(name: String, amount: UFix64) {
 			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
+		self.vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault)
+		self.bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
+	}
 
-		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
-		let bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)!
-		bids.increaseBid(name: name, vault: <- vault)
+	pre{
+		self.vaultRef != nil : "Could not borrow reference to the fusdVault!"
+		self.bids != nil : "Could not borrow reference to bid collection"
+	}
 
+	execute{
+		let vault <- self.vaultRef!.withdraw(amount: amount) as! @FUSD.Vault
+		self.bids!.increaseBid(name: name, vault: <- vault)
 	}
 }

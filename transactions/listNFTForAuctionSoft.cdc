@@ -19,6 +19,11 @@ import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
+	
+	let saleItems : &FindMarketAuctionSoft.SaleItemCollection?
+	let pointer : FindViews.AuthNFTPointer
+	let vaultType : Type
+	
 	prepare(account: AuthAccount) {
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
@@ -238,7 +243,6 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
 		}
 		//SYNC with register
-		let saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>())!)!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
@@ -254,14 +258,25 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 			)
 		}
 		
-		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		// Ben : panic on some unreasonable inputs in trxn 
-		assert(minimumBidIncrement > 0.0, message:"Minimum bid increment should be larger than 0.")
-		assert((auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0, message:"Acution ReservePrice should be in step of minimum bid increment." )
-		assert(auctionDuration > 0.0, message: "Auction Duration should be greater than 0.")
-		assert(auctionExtensionOnLateBid > 0.0, message: "Auction Duration should be greater than 0.")
+		self.saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
+		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
+		self.vaultType= ft.type
+
 		
-		saleItems.listForAuction(pointer: pointer, vaultType: ft.type, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: {})
+
+	}
+
+	pre{
+		// Ben : panic on some unreasonable inputs in trxn 
+		minimumBidIncrement > 0.0 :"Minimum bid increment should be larger than 0."
+		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment." 
+		auctionDuration > 0.0 : "Auction Duration should be greater than 0."
+		auctionExtensionOnLateBid > 0.0 : "Auction Duration should be greater than 0."
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	}
+
+	execute{
+		self.saleItems!.listForAuction(pointer: self.pointer, vaultType: self.vaultType, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: {})
 
 	}
 }
