@@ -19,6 +19,11 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, directSellPrice:UFix64, validUntil: UFix64?) {
+	
+	let saleItems : &FindMarketSale.SaleItemCollection?
+	let pointer : FindViews.AuthNFTPointer
+	let vaultType : Type
+	
 	prepare(account: AuthAccount) {
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
@@ -228,17 +233,25 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier: S
 		}
 		//SYNC with register
 
-		// Get the salesItemRef from tenant
-		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
 		let ft = FTRegistry.getFTInfo(Type<@DapperUtilityCoin.Vault>().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(Type<@DapperUtilityCoin.Vault>().identifier))
 
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
+		// Get the salesItemRef from tenant
+		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
+		self.vaultType= ft.type
+	}
 
-		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	}
+
+	execute{
+		self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+
 	}
 }
 
