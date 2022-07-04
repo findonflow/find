@@ -542,7 +542,7 @@ pub contract FIND {
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
 		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
-		access(contract) fun getNames() : [String]
+		access(account) fun getNames() : [String]
 	}
 
 
@@ -630,7 +630,7 @@ pub contract FIND {
 			return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.addons.keys)
 		}
 
-		access(contract) fun getNames() : [String] {
+		access(account) fun getNames() : [String] {
 			return self.leases.keys
 		} 
 
