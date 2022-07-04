@@ -26,7 +26,7 @@ transaction(marketplace:Address, id: UInt64) {
 			)
 		}
 
-		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
+		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
 		let market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)!
 		market.acceptDirectOffer(pointer)
 

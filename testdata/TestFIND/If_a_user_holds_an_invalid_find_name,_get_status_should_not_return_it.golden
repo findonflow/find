@@ -1,0 +1,61 @@
+`{
+    "FINDReport": {
+        "bids": null,
+        "itemsForSale": {},
+        "leases": null,
+        "marketBids": {},
+        "privateMode": "false",
+        "profile": {
+            "address": "0xf3fcd2c1a78f5eee",
+            "allowStoringFollowers": "true",
+            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+            "createdAt": "find",
+            "description": "",
+            "findName": "",
+            "followers": null,
+            "following": null,
+            "gender": "",
+            "links": {},
+            "name": "user2",
+            "tags": null,
+            "wallets": [
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+                    "balance": "10.00000000",
+                    "name": "FindToken",
+                    "tags": [
+                        "FindToken"
+                    ]
+                },
+                {
+                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "balance": "100.00100000",
+                    "name": "Flow",
+                    "tags": [
+                        "flow"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "balance": "95.00000000",
+                    "name": "FUSD",
+                    "tags": [
+                        "fusd",
+                        "stablecoin"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+                    "balance": "100.00000000",
+                    "name": "USDC",
+                    "tags": [
+                        "usdc",
+                        "stablecoin"
+                    ]
+                }
+            ]
+        },
+        "relatedAccounts": {}
+    },
+    "NameReport": ""
+}`

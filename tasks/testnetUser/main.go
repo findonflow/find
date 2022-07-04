@@ -8,12 +8,12 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
-	user := "0xc9496260a8804171"
+	user := "0xad372a7095a0d983"
 
 	// o.ScriptFromFile("getCollections").Args(o.Arguments().String(user)).Run()
 	//user := "0xfbd6c52b7e6fe7be"
 
-	// o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(1000.0))
+	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(1000.0))
 
 	o.TransactionFromFile("testMintDandyTO").
 		SignProposeAndPayAs("user1").
