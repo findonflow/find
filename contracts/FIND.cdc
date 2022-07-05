@@ -312,6 +312,10 @@ pub contract FIND {
 			return self.name 
 		}
 
+		pub fun getAddon() : [String] {
+			return self.addons.keys
+		}
+
 		pub fun checkAddon(addon: String) : Bool {
 			if !self.addons.containsKey(addon) {
 				return false
@@ -319,7 +323,7 @@ pub contract FIND {
 			return self.addons[addon]!
 		}
 
-		pub fun addAddon(_ addon:String) {
+		access(contract) fun addAddon(_ addon:String) {
 			self.addons[addon]=true
 		}
 
@@ -541,8 +545,11 @@ pub contract FIND {
 
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
-		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
+		// pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
+		pub fun getAddon(name:String) : [String]
+		pub fun checkAddon(name:String, addon: String) : Bool
 		access(account) fun getNames() : [String]
+		access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) 
 	}
 
 
@@ -598,6 +605,11 @@ pub contract FIND {
 			emit AddonActivated(name: name, addon: addon)
 			let networkWallet = self.networkWallet.borrow() ?? panic("The network is not up")
 			networkWallet.deposit(from: <- vault)
+		}
+
+		pub fun getAddon(name: String) : [String] {
+			let lease = self.borrow(name)
+			return lease.getAddon()
 		}
 
 		pub fun checkAddon(name:String, addon: String) : Bool {
@@ -1182,10 +1194,21 @@ pub contract FIND {
 		pub case LOCKED
 	}
 
+	pub resource interface NetworkPublic{
+		pub fun getSecondaryCut() : UFix64 
+		pub fun getWallet() : Capability<&{FungibleToken.Receiver}> 
+		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) 
+		pub fun lookup(_ name: String) : &{Profile.Public}? 
+		pub fun readStatus(_ name: String): NameStatus 
+		pub fun calculateCost(_ name: String) : UFix64
+		access(account) fun getLeaseExpireTime(_ name: String) : UFix64 
+		access(account) fun getLeaseLockedUntil(_ name: String) : UFix64 
+	}
+
 	/*
 	The main network resource that holds the state of the names in the network
 	*/
-	pub resource Network  {
+	pub resource Network : NetworkPublic {
 		access(contract) var wallet: Capability<&{FungibleToken.Receiver}>
 		access(contract) let leasePeriod: UFix64
 		access(contract) let lockPeriod: UFix64
@@ -1254,14 +1277,14 @@ pub contract FIND {
 		}
 
 
-		access(contract) fun getLeaseExpireTime(_ name: String) : UFix64{
+		access(account) fun getLeaseExpireTime(_ name: String) : UFix64{
 			if let lease= self.profiles[name] {
 				return lease.validUntil
 			}
 			panic("Could not find profile with name=".concat(name))
 		}
 
-		access(contract) fun getLeaseLockedUntil(_ name: String) : UFix64{
+		access(account) fun getLeaseLockedUntil(_ name: String) : UFix64{
 			if let lease= self.profiles[name] {
 				return lease.lockedUntil
 			}
@@ -1389,6 +1412,14 @@ pub contract FIND {
 
 		pub fun setPublicEnabled(_ enabled: Bool) {
 			self.publicEnabled=enabled
+		}
+
+		pub fun getSecondaryCut() : UFix64 {
+			return self.secondaryCut
+		}
+
+		pub fun getWallet() : Capability<&{FungibleToken.Receiver}> {
+			return self.wallet
 		}
 	}
 

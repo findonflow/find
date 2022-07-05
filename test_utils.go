@@ -97,7 +97,19 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("account")).
 		Test(otu.T).AssertSuccess()
+
+	// Setup Lease Market
+	otu.O.TransactionFromFile("setup_find_market_1").
+		SignProposeAndPayAs("user4").
+		Test(otu.T).AssertSuccess().AssertNoEvents()
+
+	//link in the server in the client
+	otu.O.TransactionFromFile("setup_find_lease_market_2").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().Account("user4")).
+		Test(otu.T).AssertSuccess()
 	otu.createUser(100.0, "account")
+	otu.createUser(100.0, "user4")
 
 	//link in the server in the versus client
 	otu.O.TransactionFromFile("testSetResidualAddress").
@@ -529,6 +541,25 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 	return otu
 }
 
+func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listLeaseForSale").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name).
+			String("Flow").
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
+			"status": "active_listed",
+			"amount": fmt.Sprintf("%.8f", price),
+			"name":   name,
+			"seller": otu.accountAddress(user),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
@@ -650,6 +681,24 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 			"buyer":  otu.accountAddress(name),
+			"status": "sold",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) buyLeaseForMarketSale(buyer string, seller string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("buyLeaseForSale").
+		SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", price),
+			"name":   name,
+			"seller": otu.accountAddress(seller),
+			"buyer":  otu.accountAddress(buyer),
 			"status": "sold",
 		}))
 	return otu
@@ -1037,6 +1086,24 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 
 }
 
+func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformation {
+
+	var findReport Report
+	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
+		String(name)).
+		RunMarshalAs(&findReport)
+	if err != nil {
+		swallowErr(err)
+	}
+	var list []SaleItemInformation
+	for _, saleItemCollectionReport := range findReport.FINDReport.LeasesForSale {
+		list = append(list, saleItemCollectionReport.Items...)
+	}
+	fmt.Println(findReport.FINDReport)
+	return list
+
+}
+
 func swallowErr(err error) {
 }
 
@@ -1132,6 +1199,17 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *Overf
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			Account("account").
+			String(marketType)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFlowLeaseMarketOption(marketType string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetSellLeaseForFlow").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("user4").
 			String(marketType)).
 		Test(otu.T).
 		AssertSuccess()
@@ -1566,6 +1644,8 @@ type FINDReport struct {
 	RelatedAccounts map[string]interface{}               `json:"relatedAccounts"`
 	Leases          []interface{}                        `json:"leases"`
 	PrivateMode     string                               `json:"privateMode"`
+	LeasesForSale   map[string]SaleItemCollectionReport  `json:"leasesForSale"`
+	LeasesBids      map[string]MarketBidCollectionPublic `json:"leasesBids"`
 	ItemsForSale    map[string]SaleItemCollectionReport  `json:"itemsForSale"`
 	MarketBids      map[string]MarketBidCollectionPublic `json:"marketBids"`
 }
@@ -1586,6 +1666,9 @@ type BidInfo struct {
 	BidTypeIdentifier string `json:"bidTypeIdentifier"`
 	// Timestamp         string              `json:"timestamp"`
 	Item SaleItemInformation `json:"item"`
+
+	// For Names
+	Name string `json:"name"`
 }
 
 type SaleItemInformation struct {
@@ -1604,6 +1687,10 @@ type SaleItemInformation struct {
 	ListingValidUntil     string       `json:"listingValidUntil"`
 	Auction               *AuctionItem `json:"auction,omitempty"`
 	ListingStatus         string       `json:"listingStatus"`
+
+	// For Names
+	LeaseIdentifier string `json:"leaseIdentifier"`
+	LeaseName       string `json:"leaseName"`
 }
 
 type NFTInfo struct {

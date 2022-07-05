@@ -14,6 +14,8 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
+import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
+import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(name: String, amount: UFix64) {
 	prepare(acct: AuthAccount) {
@@ -239,6 +241,18 @@ transaction(name: String, amount: UFix64) {
 		if !asBidCap.check() {
 			acct.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			acct.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
+		}
+
+		let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
+		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
+		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
+		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
+
+		let leaseSaleItemCap= acct.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
+		if !leaseSaleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			acct.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+			acct.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
 		}
 		//SYNC with register
 

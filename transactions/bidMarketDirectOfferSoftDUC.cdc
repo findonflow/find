@@ -17,6 +17,8 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
+import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
+import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(dapperAddress: Address, marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, amount: UFix64, validUntil: UFix64?) {
 
@@ -231,6 +233,18 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, nftAliasO
 		if !asBidCap.check() {
 			account.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
+		}
+
+		let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
+		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
+		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
+		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
+
+		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
+		if !leaseSaleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
 		}
 		//SYNC with register
 
