@@ -500,7 +500,7 @@ pub contract FindMarketDirectOfferSoft {
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			if !bid.nftCap.check() {
-
+				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
 			}
 			bid.nftCap.borrow()!.deposit(token: <- nft)
 			destroy bid
