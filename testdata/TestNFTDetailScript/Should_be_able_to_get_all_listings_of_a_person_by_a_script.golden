@@ -250,6 +250,8 @@
                 "validUntil": "31536001.00000000"
             }
         ],
+        "leasesBids": {},
+        "leasesForSale": {},
         "marketBids": {},
         "privateMode": "false",
         "profile": {

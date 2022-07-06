@@ -21,6 +21,11 @@ import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
+
+	let saleItems : &FindLeaseMarketSale.SaleItemCollection?
+	let pointer : FindLeaseMarket.AuthLeasePointer
+	let vaultType : Type
+
 	prepare(account: AuthAccount) {
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
@@ -256,17 +261,26 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 		//SYNC with register
 
 		// Get the salesItemRef from tenant
-		let saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseTenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>()))!
+		self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseTenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>()))!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
+		self.vaultType= ft.type
 
 		let leaseCap=account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let lease=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 
 
-		let pointer= FindLeaseMarket.AuthLeasePointer(cap: leaseCap, ref:lease, name: leaseName)
-		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+		self.pointer= FindLeaseMarket.AuthLeasePointer(cap: leaseCap, ref:lease, name: leaseName)
+
+	}
+
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	}
+
+	execute{
+		self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
 	}
 }
 
