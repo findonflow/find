@@ -510,12 +510,35 @@ func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *Overflow
 	return otu
 }
 
+func (otu *OverflowTestUtils) cancelLeaseForSale(user, name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("delistLeaseSale").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			StringArray(name)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
+			"status": "cancel",
+			"name":   name,
+			"seller": otu.accountAddress(user),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) cancelAllNFTForSale(name string) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("delistAllNFTSale").
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account")).
+		Test(otu.T).AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) cancelAllLeaseForSale(name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("delistAllLeaseSale").
+		SignProposeAndPayAs(name).
 		Test(otu.T).AssertSuccess()
 	return otu
 }
@@ -1099,7 +1122,6 @@ func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformatio
 	for _, saleItemCollectionReport := range findReport.FINDReport.LeasesForSale {
 		list = append(list, saleItemCollectionReport.Items...)
 	}
-	fmt.Println(findReport.FINDReport)
 	return list
 
 }
@@ -1225,6 +1247,15 @@ func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *Ov
 	return otu
 }
 
+func (otu *OverflowTestUtils) alterLeaseMarketOption(marketType, ruleName string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testAlterLeaseMarketOption").
+		SignProposeAndPayAs("user4").
+		Args(otu.O.Arguments().String(marketType).String(ruleName)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) removeMarketOption(marketType string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("removeMarketOption").
 		SignProposeAndPayAsService().
@@ -1245,9 +1276,30 @@ func (otu *OverflowTestUtils) removeTenantRule(optionName, tenantRuleName string
 	return otu
 }
 
+func (otu *OverflowTestUtils) removeLeaseTenantRule(optionName, tenantRuleName string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("removeTenantRule").
+		SignProposeAndPayAs("user4").
+		Args(otu.O.Arguments().
+			String(optionName).
+			String(tenantRuleName)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("setTenantRuleFUSD").
 		SignProposeAndPayAsService().
+		Args(otu.O.Arguments().
+			String(optionName)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) setLeaseTenantRuleFUSD(optionName string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setTenantRuleFUSD").
+		SignProposeAndPayAs("user4").
 		Args(otu.O.Arguments().
 			String(optionName)).
 		Test(otu.T).
@@ -1260,6 +1312,17 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().
 			Account("account").
+			UFix64(cut)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFindLeaseCut(cut float64) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetFindCut").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("user4").
 			UFix64(cut)).
 		Test(otu.T).
 		AssertSuccess()
@@ -1286,6 +1349,14 @@ func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("testDestroyDandyCollection").
+		SignProposeAndPayAs(user).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) destroyLeaseCollection(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testDestroyLeaseCollection").
 		SignProposeAndPayAs(user).
 		Test(otu.T).
 		AssertSuccess()
@@ -1327,9 +1398,29 @@ func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) leaseProfileBan(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetProfileBan").
+		SignProposeAndPayAs("user4").
+		Args(otu.O.Arguments().
+			String(user)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) removeProfileBan(user string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminRemoveProfileBan").
 		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			String(user)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminRemoveProfileBan").
+		SignProposeAndPayAs("user4").
 		Args(otu.O.Arguments().
 			String(user)).
 		Test(otu.T).
@@ -1454,6 +1545,16 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) setDUCLease() *OverflowTestUtils {
+	otu.O.TransactionFromFile("adminSetSellDUCLeaseRules").
+		SignProposeAndPayAs("find").
+		Args(otu.O.Arguments().
+			Account("user4")).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price float64) []uint64 {
 
 	res := otu.O.TransactionFromFile("listNFTForSaleDUC").
@@ -1468,6 +1569,21 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 		Test(otu.T).AssertSuccess()
 
 	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
+
+}
+
+func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listLeaseForSaleDUC").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(name).
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess()
+
+	return otu
 
 }
 
@@ -1487,6 +1603,25 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
 			"buyer":  otu.accountAddress(name),
+			"status": "sold",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("buyLeaseForSaleDUC").
+		SignProposeAndPayAs(buyer).PayloadSigner("account").
+		Args(otu.O.Arguments().
+			Account("account").
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
+			"amount": fmt.Sprintf("%.8f", price),
+			"name":   name,
+			"seller": otu.accountAddress(seller),
+			"buyer":  otu.accountAddress(buyer),
 			"status": "sold",
 		}))
 	return otu

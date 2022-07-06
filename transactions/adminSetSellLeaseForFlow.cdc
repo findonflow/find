@@ -10,7 +10,7 @@ transaction(tenant: Address, market: String){
 
         var marketType : [Type] = [Type<@FindLeaseMarketSale.SaleItem>()]
 
-        let saleItem = FindMarket.TenantSaleItem(name:"FlowDandy".concat(market), cut: nil, rules:[
+        let saleItem = FindMarket.TenantSaleItem(name:"FlowLease".concat(market), cut: nil, rules:[
             FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
             FindMarket.TenantRule(name:"Lease", types:[Type<@FIND.Lease>()], ruleType: "nft", allow: true),
             FindMarket.TenantRule(name: market, types:marketType, ruleType: "listing", allow: true)

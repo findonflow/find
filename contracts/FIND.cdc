@@ -550,6 +550,7 @@ pub contract FIND {
 		pub fun checkAddon(name:String, addon: String) : Bool
 		access(account) fun getNames() : [String]
 		access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) 
+		pub fun getLeaseUUID(_ name: String) : UInt64 
 	}
 
 
@@ -615,6 +616,10 @@ pub contract FIND {
 		pub fun checkAddon(name:String, addon: String) : Bool {
 			let lease = self.borrow(name)
 			return lease.checkAddon(addon: addon)
+		}
+
+		pub fun getLeaseUUID(_ name: String) : UInt64 {
+			return self.borrow(name).uuid
 		}
 
 		pub fun getLease(_ name: String) : LeaseInformation? {

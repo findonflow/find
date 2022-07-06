@@ -1,0 +1,168 @@
+`{
+    "FINDReport": {
+        "bids": null,
+        "itemsForSale": {},
+        "leases": [
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "201.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "user1",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            },
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "201.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "name1",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            },
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "201.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "name3",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            },
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "201.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "name2",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            }
+        ],
+        "leasesBids": {},
+        "leasesForSale": {
+            "FindLeaseMarketSale": {
+                "ghosts": null,
+                "items": [
+                    {
+                        "amount": "10.00000000",
+                        "auction": "",
+                        "bidder": "",
+                        "bidderName": "",
+                        "ftAlias": "Flow",
+                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                        "lease": {
+                            "addons": null,
+                            "address": "0x179b6b1cb6755e31",
+                            "cost": "5.00000000",
+                            "lockedUntil": "39312001.00000000",
+                            "name": "name1",
+                            "status": "TAKEN",
+                            "validUntil": "31536001.00000000"
+                        },
+                        "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
+                        "leaseName": "name1",
+                        "listingId": "184",
+                        "listingStatus": "active",
+                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketSale.SaleItem",
+                        "listingValidUntil": "301.00000000",
+                        "saleItemExtraField": {},
+                        "saleType": "active_listed",
+                        "seller": "0x179b6b1cb6755e31",
+                        "sellerName": "user1"
+                    }
+                ]
+            }
+        },
+        "marketBids": {},
+        "privateMode": "false",
+        "profile": {
+            "address": "0x179b6b1cb6755e31",
+            "allowStoringFollowers": "true",
+            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+            "createdAt": "find",
+            "description": "",
+            "findName": "user1",
+            "followers": null,
+            "following": null,
+            "gender": "",
+            "links": {},
+            "name": "user1",
+            "tags": null,
+            "wallets": [
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+                    "balance": "40.00000000",
+                    "name": "FindToken",
+                    "tags": [
+                        "FindToken"
+                    ]
+                },
+                {
+                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "balance": "137.00100000",
+                    "name": "Flow",
+                    "tags": [
+                        "flow"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "balance": "80.00000000",
+                    "name": "FUSD",
+                    "tags": [
+                        "fusd",
+                        "stablecoin"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+                    "balance": "100.00000000",
+                    "name": "USDC",
+                    "tags": [
+                        "usdc",
+                        "stablecoin"
+                    ]
+                }
+            ]
+        },
+        "relatedAccounts": {}
+    },
+    "NameReport": {
+        "cost": "5.00000000",
+        "status": "TAKEN"
+    }
+}`
