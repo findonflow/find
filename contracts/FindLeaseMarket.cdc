@@ -16,8 +16,8 @@ pub contract FindLeaseMarket {
 
 	access(contract) let network: Capability<&FIND.Network{FIND.NetworkPublic}>
 
-	pub event RoyaltyPaid(tenant:String, name: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, lease:LeaseInfo)
-	pub event RoyaltyCouldNotBePaid(tenant:String, name: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, lease:LeaseInfo, residualAddress: Address)
+	pub event RoyaltyPaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo)
+	pub event RoyaltyCouldNotBePaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo, residualAddress: Address)
 	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
 	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
 	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], listingTypes:[String], status:String)
@@ -414,15 +414,15 @@ pub contract FindLeaseMarket {
 
 			if let receivingVault = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath).borrow() {
 				receivingVault.deposit(from: <- vault.withdraw(amount: networkCutAmount))
-				emit RoyaltyPaid(tenant:tenant, name: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, lease:leaseInfo)
+				emit RoyaltyPaid(tenant:tenant, leaseName: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			} else {
-				emit RoyaltyCouldNotBePaid(tenant:tenant, name: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, lease:leaseInfo, residualAddress: FindMarket.residualAddress)
+				emit RoyaltyCouldNotBePaid(tenant:tenant, leaseName: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo, residualAddress: FindMarket.residualAddress)
 				residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: networkCutAmount))
 			}
 
 		} else {
 			/* If the royalty receiver check succeed */
-			emit RoyaltyPaid(tenant:tenant, name: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, lease:leaseInfo)
+			emit RoyaltyPaid(tenant:tenant, leaseName: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			network.getWallet().borrow()!.deposit(from: <- vault.withdraw(amount: networkCutAmount))
 		}
 
@@ -430,7 +430,7 @@ pub contract FindLeaseMarket {
 		if let findCut =cuts.findCut {
 			let cutAmount= soldFor * findCut.cut
 			let name = FIND.reverseLookup(findCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, name: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, lease:leaseInfo)
+			emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
@@ -438,7 +438,7 @@ pub contract FindLeaseMarket {
 		if let tenantCut =cuts.tenantCut {
 			let cutAmount= soldFor * tenantCut.cut
 			let name = FIND.reverseLookup(tenantCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, name: leaseName, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, lease:leaseInfo)
+			emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
