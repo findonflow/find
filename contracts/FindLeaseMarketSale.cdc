@@ -63,16 +63,16 @@ pub contract FindLeaseMarketSale {
 			return nil
 		}
 
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
-		}
-
 		pub fun getLeaseName() : String {
 			return self.pointer.name
 		}
 
 		pub fun getItemType() : Type {
 			return Type<@FIND.Lease>()
+		}
+
+		pub fun getId() : UInt64 {
+			return self.pointer.getUUID()
 		}
 
 		pub fun getSeller() : Address {

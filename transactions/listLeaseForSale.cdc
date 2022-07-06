@@ -267,11 +267,10 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 		self.vaultType= ft.type
 
-		let leaseCap=account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let lease=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 
 
-		self.pointer= FindLeaseMarket.AuthLeasePointer(cap: leaseCap, ref:lease, name: leaseName)
+		self.pointer= FindLeaseMarket.AuthLeasePointer(ref:lease, name: leaseName)
 
 	}
 

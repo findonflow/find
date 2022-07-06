@@ -318,22 +318,80 @@ pub contract FindLeaseMarket {
 
 	/////// Pointer Section
 
-	pub struct AuthLeasePointer {
+	pub struct interface LeasePointer {
+		pub let name: String
+		pub let uuid: UInt64
+
+		pub fun valid() : Bool
+		pub fun getUUID() :UInt64
+		pub fun getLease() : FIND.LeaseInformation 
+		pub fun owner() : Address
+		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic} 
+	}
+
+	pub struct ReadLeasePointer : LeasePointer {
 		access(self) let cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 		pub let name: String
 		pub let uuid: UInt64
 
-		init(cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>, ref:&FIND.LeaseCollection, name: String) {
-			self.cap=cap
+		// Passing in the reference here to ensure that is the owner
+		init(name: String) {
+
+			let address = FIND.lookupAddress(name) ?? panic("This lease name is not owned")
+
+			self.cap=getAccount(address).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			self.name=name
 
 			if !self.cap.check() {
 				panic("The capability is not valid.")
 			}
 
-			if !self.cap.borrow()!.getNames().contains(name) {
-				panic("Account does not own the name. Account : ".concat(cap.address.toString()))
+			self.uuid = self.cap.borrow()!.getLeaseUUID(name)
+
+		}
+
+		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic} {
+			return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
+		}
+
+		pub fun getLease() : FIND.LeaseInformation {
+			return self.borrow().getLease(self.name) ?? panic("The owner doesn't hold the lease anymore".concat(self.name))
+		}
+
+		pub fun getUUID() :UInt64{
+			return self.uuid
+		}
+
+		pub fun owner() : Address {
+			return self.cap.address
+		}
+
+		pub fun valid() : Bool {
+			if !self.cap.check() || !self.cap.borrow()!.getNames().contains(self.name) {
+				return false
 			}
+
+			if Clock.time() > FindLeaseMarket.getNetwork().getLeaseExpireTime(self.name) {
+				return false
+			}
+			return true
+		}
+	}
+
+	pub struct AuthLeasePointer : LeasePointer {
+		access(self) let cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
+		pub let name: String
+		pub let uuid: UInt64
+
+		// Passing in the reference here to ensure that is the owner
+		init(ref:&FIND.LeaseCollection, name: String) {
+			self.cap=getAccount(ref.owner!.address).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			self.name=name
+
+			if !self.cap.check() {
+				panic("The capability is not valid.")
+			}
+
 			self.uuid = self.cap.borrow()!.getLeaseUUID(name)
 
 			if !ref.getNames().contains(name) {
@@ -460,7 +518,7 @@ pub contract FindLeaseMarket {
 		pub let lockedUntil: UFix64
 		pub let addons: [String]
 
-		init(_ pointer: FindLeaseMarket.AuthLeasePointer){
+		init(_ pointer: AnyStruct{FindLeaseMarket.LeasePointer}){
 			let network = FindLeaseMarket.getNetwork()
 			let name = pointer.name
 			let status= network.readStatus(name)
@@ -487,7 +545,6 @@ pub contract FindLeaseMarket {
 	}
 
 	pub resource interface SaleItem {
-		access(contract) var pointer: FindLeaseMarket.AuthLeasePointer
 		//this is the type of sale this is, active, cancelled etc
 		pub fun getSaleType(): String
 		pub fun getSeller(): Address
@@ -505,8 +562,6 @@ pub contract FindLeaseMarket {
 		pub fun getItemType(): Type
 		//The id of the nft for sale
 		pub fun getLeaseName() : String
-		//The id of this sale item, ie the UUID of the item listed for sale
-		pub fun getId() : UInt64
 
 		pub fun getBalance(): UFix64
 		pub fun getAuction(): AuctionItem?
@@ -514,6 +569,7 @@ pub contract FindLeaseMarket {
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
+		pub fun getId() : UInt64
 	}
 
 	pub resource interface Bid {

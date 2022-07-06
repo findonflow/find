@@ -130,7 +130,9 @@
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
     "FindToken": "./contracts/FindToken.cdc",
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
-    "FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc"
+    "FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
+    "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
+    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -275,7 +277,9 @@
         "TokenForwarding",
         "ExampleNFT",
         "FindLeaseMarket",
-        "FindLeaseMarketSale"
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft"
       ],
       "emulator-find": [],
       "emulator-user1": [],

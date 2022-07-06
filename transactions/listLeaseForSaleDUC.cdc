@@ -256,10 +256,9 @@ transaction(dapperAddress: Address, leaseName: String, directSellPrice:UFix64, v
 		let ft = FTRegistry.getFTInfo(Type<@DapperUtilityCoin.Vault>().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(Type<@DapperUtilityCoin.Vault>().identifier))
 		self.vaultType= ft.type
 
-		let providerCap=account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		let ref=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 
-		self.pointer= FindLeaseMarket.AuthLeasePointer(cap: providerCap, ref: ref, name: leaseName)
+		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
 	}
 
 	pre{

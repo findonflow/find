@@ -575,10 +575,10 @@ func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price f
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
-			"status": "active_listed",
-			"amount": fmt.Sprintf("%.8f", price),
-			"name":   name,
-			"seller": otu.accountAddress(user),
+			"status":    "active_listed",
+			"amount":    fmt.Sprintf("%.8f", price),
+			"leaseName": name,
+			"seller":    otu.accountAddress(user),
 		}))
 	return otu
 }

@@ -6,7 +6,7 @@
     "buyer": "",
     "buyerAvatar": "",
     "buyerName": "",
-    "endsAt": "301.00000000",
+    "endsAt": "101.00000000",
     "leaseInfo": {
       "addons": null,
       "address": "0x179b6b1cb6755e31",
@@ -16,7 +16,7 @@
       "status": "TAKEN",
       "validUntil": "31536001.00000000"
     },
-    "name": "name3",
+    "leaseName": "name3",
     "saleID": "ID0",
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
@@ -32,7 +32,7 @@
     "buyer": "",
     "buyerAvatar": "",
     "buyerName": "",
-    "endsAt": "301.00000000",
+    "endsAt": "101.00000000",
     "leaseInfo": {
       "addons": null,
       "address": "0x179b6b1cb6755e31",
@@ -42,7 +42,7 @@
       "status": "TAKEN",
       "validUntil": "31536001.00000000"
     },
-    "name": "name2",
+    "leaseName": "name2",
     "saleID": "ID1",
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
@@ -58,7 +58,7 @@
     "buyer": "",
     "buyerAvatar": "",
     "buyerName": "",
-    "endsAt": "301.00000000",
+    "endsAt": "101.00000000",
     "leaseInfo": {
       "addons": null,
       "address": "0x179b6b1cb6755e31",
@@ -68,7 +68,7 @@
       "status": "TAKEN",
       "validUntil": "31536001.00000000"
     },
-    "name": "name1",
+    "leaseName": "name1",
     "saleID": "ID2",
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
