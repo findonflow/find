@@ -1,12 +1,23 @@
 import FIND from "../contracts/FIND.cdc"
 
 transaction() {
+
+	let finLeases : &FIND.LeaseCollection?
+
 	prepare(acct: AuthAccount) {
-		let finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		let leases = finLeases.getLeaseInformation()
+		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
+
+	}
+
+	pre{
+		self.finLeases != nil : "Cannot borrow reference to find lease collection"
+	}
+
+	execute{
+		let leases = self.finLeases!.getLeaseInformation()
 		for lease in leases {
 			if lease.salePrice != nil {
-				finLeases.delistSale(lease.name)
+				self.finLeases!.delistSale(lease.name)
 			}
 		}
 	}

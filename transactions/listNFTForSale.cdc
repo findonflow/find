@@ -21,6 +21,11 @@ import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
+	
+	let saleItems : &FindMarketSale.SaleItemCollection?
+	let pointer : FindViews.AuthNFTPointer
+	let vaultType : Type
+
 	prepare(account: AuthAccount) {
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
@@ -253,9 +258,6 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 		}
 		//SYNC with register
 
-		// Get the salesItemRef from tenant
-		let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))!
-
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
@@ -269,9 +271,18 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 					target: nft.storagePath
 			)
 		}
+		// Get the salesItemRef from tenant
+		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
+		self.vaultType= ft.type
+	}
 
-		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		saleItems.listForSale(pointer: pointer, vaultType: ft.type, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	}
+
+	execute{
+		self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
 	}
 }
 

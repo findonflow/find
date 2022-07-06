@@ -93,9 +93,9 @@
                 {
                     "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
                     "balance": "80.00000000",
-                    "name": "FindToken",
+                    "name": "FIND",
                     "tags": [
-                        "FindToken"
+                        "FIND"
                     ]
                 },
                 {

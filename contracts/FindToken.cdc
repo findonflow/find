@@ -168,7 +168,7 @@ pub contract FindToken : FungibleToken {
     }
 
     init(){
-        self.tokenAlias = "FindToken"
+        self.tokenAlias = "FIND"
         self.totalSupply = 0.0
         self.initialSupply = 100000000.0
 

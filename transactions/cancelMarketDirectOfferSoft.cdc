@@ -2,12 +2,23 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 
 transaction(marketplace:Address, ids: [UInt64]) {
+
+	let saleItems : &FindMarketDirectOfferSoft.SaleItemCollection?
+
 	prepare(account: AuthAccount) {
 
 		let tenant=FindMarket.getTenant(marketplace)
-		let saleItems= account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>()))!
+		self.saleItems= account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>()))
+
+	}
+
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	}
+
+	execute {
 		for id in ids {
-			saleItems.cancel(id)
+			self.saleItems!.cancel(id)
 		}
 	}
 }

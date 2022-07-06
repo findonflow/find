@@ -583,6 +583,22 @@ func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price f
 	return otu
 }
 
+func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, price float64) []uint64 {
+
+	res := otu.O.TransactionFromFile("listNFTForSale").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account").
+			String("ExampleNFT").
+			UInt64(id).
+			String("Flow").
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess()
+	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
+
+}
+
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
@@ -607,6 +623,25 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 			"seller":              otu.accountAddress(name),
 		}))
 	return otu
+}
+
+func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id uint64, price float64) []uint64 {
+
+	res := otu.O.TransactionFromFile("listNFTForAuctionEscrowed").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account").
+			String("ExampleNFT").
+			UInt64(id).
+			String("Flow").
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0).
+			UFix64(otu.currentTime() + 10.0)).
+		Test(otu.T).AssertSuccess()
+	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "id")
 }
 
 func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *OverflowTestUtils {
@@ -867,6 +902,22 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 			"buyer":  otu.accountAddress(name),
 		}))
 	return otu
+}
+
+func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
+
+	res := otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(seller).
+			String("ExampleNFT").
+			UInt64(id).
+			String("Flow").
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess()
+	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", "id")
 }
 
 func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) *OverflowTestUtils {
@@ -1656,6 +1707,27 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 
 }
 
+func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint64, price float64) []uint64 {
+
+	res := otu.O.TransactionFromFile("listNFTForAuctionSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account").
+			String("ExampleNFT").
+			UInt64(id).
+			String("Flow").
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0).
+			UFix64(otu.currentTime() + 10.0)).
+		Test(otu.T).AssertSuccess()
+
+	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "id")
+
+}
+
 func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("bidMarketAuctionSoftDUC").
@@ -1704,6 +1776,23 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 			String(seller).
 			String("ExampleNFT").
 			UInt64(id).
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess()
+
+	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
+}
+
+func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
+
+	res := otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
+		SignProposeAndPayAs(name).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(seller).
+			String("ExampleNFT").
+			UInt64(id).
+			String("Flow").
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess()

@@ -114,7 +114,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", id),
 				"seller": otu.accountAddress("user1"),
-				"buyer": otu.accountAddress("user2"),
+				"buyer":  otu.accountAddress("user2"),
 				"amount": fmt.Sprintf("%.8f", 15.0),
 				"status": "cancel_ghostlisting",
 			}))
@@ -801,6 +801,23 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"status":        "active_ongoing",
 			}))
 		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
+
+		otu.registerDUCInRegistry().
+			sendExampleNFT("user1", "account").
+			setDUCExampleNFT()
+
+		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
+
+		otu.saleItemListed("user1", "active_listed", price).
+			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionEscrow("user1", saleItem[0], "user2", price+5.0).
+			sendExampleNFT("user1", "user2")
+
 	})
 
 }

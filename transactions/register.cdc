@@ -18,6 +18,11 @@ import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(name: String, amount: UFix64) {
+
+	let vaultRef : &FUSD.Vault?
+	let leases : &FIND.LeaseCollection?
+	let price : UFix64
+
 	prepare(acct: AuthAccount) {
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
@@ -256,20 +261,20 @@ transaction(name: String, amount: UFix64) {
 		}
 		//SYNC with register
 
+		self.price=FIND.calculateCost(name)
+		log("The cost for registering this name is ".concat(self.price.toString()))
+		self.vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault)
+		self.leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
+	}
 
+	pre{
+		self.vaultRef != nil : "Could not borrow reference to the fusdVault!"
+		self.leases != nil : "Could not borrow reference to find lease collection"
+		self.price == amount : "Calculated cost : ".concat(self.price.toString()).concat(" does not match expected cost : ").concat(amount.toString())
+	}
 
-		let price=FIND.calculateCost(name)
-		if price != amount {
-			panic("Calculated cost : ".concat(price.toString()).concat(" does not match expected cost : ").concat(amount.toString()))
-		}
-		log("The cost for registering this name is ".concat(price.toString()))
-
-		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
-
-		let payVault <- vaultRef.withdraw(amount: price) as! @FUSD.Vault
-
-		let leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
-		leases.register(name: name, vault: <- payVault)
-
+	execute{
+		let payVault <- self.vaultRef!.withdraw(amount: self.price) as! @FUSD.Vault
+		self.leases!.register(name: name, vault: <- payVault)
 	}
 }

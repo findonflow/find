@@ -6,6 +6,10 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(marketplace:Address, id: UInt64) {
+
+	let market : &FindMarketDirectOfferEscrow.SaleItemCollection?
+	let pointer : FindViews.AuthNFTPointer
+
 	prepare(account: AuthAccount) {
 
 		let tenant=FindMarket.getTenant(marketplace)
@@ -26,9 +30,16 @@ transaction(marketplace:Address, id: UInt64) {
 			)
 		}
 
-		let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
-		let market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)!
-		market.acceptDirectOffer(pointer)
+		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
+		self.market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
 
+	}
+
+	pre{
+		self.market != nil : "Cannot borrow reference to saleItem"
+	}
+
+	execute{
+		self.market!.acceptDirectOffer(self.pointer)
 	}
 }

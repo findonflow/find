@@ -2,17 +2,23 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 
 transaction(marketplace:Address) {
+
+	let saleItems : &FindMarketAuctionEscrow.SaleItemCollection?
+
 	prepare(account: AuthAccount) {
-
 		let tenant = FindMarket.getTenant(marketplace)
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionEscrow.SaleItem>())
-		let cap = FindMarket.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)
-		let ref = cap.borrow() ?? panic("Cannot borrow reference to the capability.")
+		self.saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>()))
 
-		let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>()))!
-		let ids = ref.getIds()
+	}
+
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to the saleItem capability."
+	}
+
+	execute {
+		let ids = self.saleItems!.getIds()
 		for id in ids {
-			saleItems.cancel(id)
+			self.saleItems!.cancel(id)
 		}
 	}
 }

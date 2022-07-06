@@ -2,11 +2,22 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(marketplace:Address, id: UInt64) {
+
+	let bidsReference : &FindMarketAuctionEscrow.MarketBidCollection?
+
 	prepare(account: AuthAccount) {
 		let tenant=FindMarket.getTenant(marketplace)
-		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())!
-		let bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)!
+		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
+		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
 
-		bidsReference.fulfillAuction(id)
+		
+	}
+
+	pre{
+		self.bidsReference != nil : "Cannot borrow reference to bid collection."
+	}
+
+	execute{
+		self.bidsReference!.fulfillAuction(id)
 	}
 }

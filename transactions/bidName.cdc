@@ -18,6 +18,10 @@ import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(name: String, amount: UFix64) {
+
+	let vaultRef : &FUSD.Vault?
+	let bidRef : &FIND.BidCollection?
+
 	prepare(acct: AuthAccount) {
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
@@ -230,11 +234,17 @@ transaction(name: String, amount: UFix64) {
 		}
 		//SYNC with register
 
+		self.vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault)
+		self.bidRef = acct.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
+	}
 
-		let vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
-		let vault <- vaultRef.withdraw(amount: amount) as! @FUSD.Vault
-		let bids = acct.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)!
-		bids.bid(name: name, vault: <- vault)
+	pre{
+		self.vaultRef != nil : "Could not borrow reference to the fusdVault!" 
+		self.bidRef != nil : "Could not borrow reference to the bid collection!" 
+	}
 
+	execute {
+		let vault <- self.vaultRef!.withdraw(amount: amount) as! @FUSD.Vault
+		self.bidRef!.bid(name: name, vault: <- vault)
 	}
 }

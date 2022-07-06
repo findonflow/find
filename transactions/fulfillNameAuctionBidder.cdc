@@ -5,6 +5,9 @@ import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(owner: Address, name: String) {
+
+	let leaseCollectionOwner : &FIND.LeaseCollection{FIND.LeaseCollectionPublic}?
+
 	prepare(acct: AuthAccount) {
 
 
@@ -68,8 +71,15 @@ transaction(owner: Address, name: String) {
 			acct.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
 
-		let leaseCollectionOwner = getAccount(owner).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		leaseCollectionOwner.borrow()!.fulfillAuction(name)
+		self.leaseCollectionOwner = getAccount(owner).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()
 
+	}
+
+	pre{
+		self.leaseCollectionOwner != nil : "Cannot borrow reference to find lease collection. Account address: ".concat(owner.toString())
+	}
+
+	execute {
+		self.leaseCollectionOwner!.fulfillAuction(name)
 	}
 }
