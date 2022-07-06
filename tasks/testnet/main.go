@@ -50,6 +50,7 @@ func main() {
 	o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find-admin", o.Arguments())
+	o.SimpleTxArgs("adminSetNFTInfo_FLOAT", "find-admin", o.Arguments())
 	// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
 
 	//	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
