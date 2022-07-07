@@ -59,6 +59,7 @@ import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 import DayNFT from 0x1600b04bf033fb99
+import DaysOnFlow from 0x799da0ef17f38104
 import RaribleNFT from 0x01ab36aaf654a13e
 import Necryptolis from 0x718efe5e88fe48ea
 
@@ -1287,7 +1288,7 @@ pub fun main(address: Address) : MetadataCollections? {
 
 
 	let dayItems: [String] =[]
-  let dayNFT = getItemForMetadataStandard(path: DayNFT.CollectionPublicPath, account: account, externalFixedUrl: "https://day-nft.io")
+  	let dayNFT = getItemForMetadataStandard(path: DayNFT.CollectionPublicPath, account: account, externalFixedUrl: "https://day-nft.io")
 	for item in dayNFT {
 		let itemId="DayNFT".concat(item.id.toString())
 		dayItems.append(itemId)
@@ -1298,9 +1299,22 @@ pub fun main(address: Address) : MetadataCollections? {
 		results["DayNFT"] = dayItems
 	}
 
+
+	let daysOnFlowItems: [String] =[]
+  let daysOnFlowNFT = getItemForMetadataStandard(path: DaysOnFlow.CollectionPublicPath, account: account, externalFixedUrl: "https://day-nft.io")
+	for item in daysOnFlowNFT {
+		let itemId="DaysOnFlowNFT".concat(item.id.toString())
+		daysOnFlowItems.append(itemId)
+		resultMap[itemId] = item
+	}
+
+	if daysOnFlowItems.length != 0 {
+		results["DaysOnFlowNFT"] = daysOnFlowItems
+	}
+
 	let necryptolisItems: [String] =[]
 	let necryptolisNFT = getItemForMetadataStandard(path: Necryptolis.ResolverCollectionPublicPath, account: account, externalFixedUrl: "https://www.necryptolis.com")
-	
+
 	for item in necryptolisNFT {
 		let itemId="Necryptolis".concat(item.id.toString())
 		necryptolisItems.append(itemId)
