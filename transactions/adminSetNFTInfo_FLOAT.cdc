@@ -1,5 +1,5 @@
 import Admin from "../contracts/Admin.cdc"
-import Dandy from 0x0afe396ebc8eee65
+import FLOAT from 0x0afe396ebc8eee65
 
 transaction() {
 
@@ -11,7 +11,7 @@ transaction() {
     }
     execute{
         let type: Type = Type<@FLOAT.NFT>()
-        self.adminRef.setNFTInfo(alias: "FLOAT", type: type, icon: "https://testnet.floats.city/floatlogowebpage.png", providerPath: /private/floatHasNoPrivatePath, publicPath: FLOAT.FLOATCollectionPublicPath, storagePath: FLOAT.FLOATCollectionStoragePath, allowedFTTypes: nil, address: 0x0afe396ebc8eee65, externalFixedUrl: "testnet.floats.city")
+        self.adminRef.setNFTInfo(alias: "FLOAT", type: type, icon: "https://testnet.floats.city/floatlogowebpage.png", providerPath: /private/FLOATCollectionPublicPath, publicPath: /public/FLOATCollectionPublicPath, storagePath: /storage/FLOATCollectionStoragePath, allowedFTTypes: nil, address: 0x0afe396ebc8eee65, externalFixedUrl: "testnet.floats.city")
 
     }
 }
