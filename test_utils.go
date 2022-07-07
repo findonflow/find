@@ -518,9 +518,9 @@ func (otu *OverflowTestUtils) cancelLeaseForSale(user, name string) *OverflowTes
 			StringArray(name)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
-			"status": "cancel",
-			"name":   name,
-			"seller": otu.accountAddress(user),
+			"status":    "cancel",
+			"leaseName": name,
+			"seller":    otu.accountAddress(user),
 		}))
 	return otu
 }
@@ -785,11 +785,11 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSale(buyer string, seller string,
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
-			"amount": fmt.Sprintf("%.8f", price),
-			"name":   name,
-			"seller": otu.accountAddress(seller),
-			"buyer":  otu.accountAddress(buyer),
-			"status": "sold",
+			"amount":    fmt.Sprintf("%.8f", price),
+			"leaseName": name,
+			"seller":    otu.accountAddress(seller),
+			"buyer":     otu.accountAddress(buyer),
+			"status":    "sold",
 		}))
 	return otu
 }
@@ -960,6 +960,23 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseDirectOfferLeaseMarketSoft(user, name string, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("increaseBidLeaseMarketDirectOfferSoft").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", totalPrice),
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+			"status":    "active_offered",
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
@@ -1028,12 +1045,38 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 	return otu
 }
 
+func (otu *OverflowTestUtils) directOfferLeaseMarketSoft(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name).
+			String("Flow").
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", price),
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("cancelAllMarketDirectOfferSoft").
 		SignProposeAndPayAs(signer).
 		Args(otu.O.Arguments().
 			Account("account")).
+		Test(otu.T).AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) cancelAllDirectOfferLeaseMarketSoft(signer string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllLeaseMarketDirectOfferSoft").
+		SignProposeAndPayAs(signer).
 		Test(otu.T).AssertSuccess()
 	return otu
 }
@@ -1070,6 +1113,23 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 			"buyer":  otu.accountAddress(buyer),
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "active_accepted",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) acceptLeaseDirectOfferMarketSoft(buyer, seller string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("acceptLeaseDirectOfferSoft").
+		SignProposeAndPayAs(seller).
+		Args(otu.O.Arguments().
+			String(name)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"leaseName": name,
+			"seller":    otu.accountAddress(seller),
+			"buyer":     otu.accountAddress(buyer),
+			"amount":    fmt.Sprintf("%.8f", price),
+			"status":    "active_accepted",
 		}))
 	return otu
 }
@@ -1124,6 +1184,22 @@ func (otu *OverflowTestUtils) rejectDirectOfferSoft(name string, id uint64, pric
 	return otu
 }
 
+func (otu *OverflowTestUtils) rejectDirectOfferLeaseSoft(user, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelLeaseMarketDirectOfferSoft").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			StringArray(name)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"status":    "cancel_rejected",
+			"leaseName": name,
+			"seller":    otu.accountAddress(user),
+			"amount":    fmt.Sprintf("%.8f", price),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, id uint64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
@@ -1136,6 +1212,21 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, 
 			"status": "cancel",
 			"id":     fmt.Sprintf("%d", id),
 			"seller": otu.accountAddress(seller),
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseSoft(buyer, seller, name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("retractOfferLeaseMarketDirectOfferSoft").
+		SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			String(name)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"status":    "cancel",
+			"leaseName": name,
+			"seller":    otu.accountAddress(seller),
 		}))
 	return otu
 }
@@ -1225,6 +1316,23 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 			"buyer":  otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+			"amount":    fmt.Sprintf("%.8f", price),
+			"status":    "sold",
 		}))
 	return otu
 }
@@ -1763,11 +1871,11 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
-			"amount": fmt.Sprintf("%.8f", price),
-			"name":   name,
-			"seller": otu.accountAddress(seller),
-			"buyer":  otu.accountAddress(buyer),
-			"status": "sold",
+			"amount":    fmt.Sprintf("%.8f", price),
+			"leaseName": name,
+			"seller":    otu.accountAddress(seller),
+			"buyer":     otu.accountAddress(buyer),
+			"status":    "sold",
 		}))
 	return otu
 }
@@ -1931,6 +2039,20 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 	return otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
 }
 
+func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoftDUC").
+		SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(name).
+			UFix64(price).
+			UFix64(otu.currentTime() + 100.0)).
+		Test(otu.T).AssertSuccess()
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
 
 	res := otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
@@ -1967,6 +2089,24 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uin
 	return otu
 }
 
+func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("acceptLeaseDirectOfferSoftDUC").
+		SignProposeAndPayAs(seller).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(name)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"leaseName": name,
+			"seller":    otu.accountAddress(seller),
+			"buyer":     otu.accountAddress(buyer),
+			"amount":    fmt.Sprintf("%.8f", price),
+			"status":    "active_accepted",
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("fulfillMarketDirectOfferSoftDUC").
@@ -1981,6 +2121,23 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id ui
 			"buyer":  otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoftDUC").
+		SignProposeAndPayAs(user).PayloadSigner("account").
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+			"amount":    fmt.Sprintf("%.8f", price),
+			"status":    "sold",
 		}))
 	return otu
 }

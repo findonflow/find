@@ -345,6 +345,7 @@ transaction(leaseName: String, amount: UFix64) {
 			panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
 		}
 		let address = resolveAddress!
+		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
 		self.saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find lease sale item cap")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketSale.SaleItemCollection>())
 

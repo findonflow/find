@@ -55,7 +55,9 @@
                 "validUntil": "31536001.00000000"
             },
             {
-                "addons": null,
+                "addons": [
+                    "forge"
+                ],
                 "address": "0x179b6b1cb6755e31",
                 "auctionEnds": "",
                 "auctionReservePrice": "",
@@ -74,14 +76,14 @@
         ],
         "leasesBids": {},
         "leasesForSale": {
-            "FindLeaseMarketSale": {
+            "FindLeaseMarketDirectOfferSoft": {
                 "ghosts": null,
                 "items": [
                     {
                         "amount": "10.00000000",
                         "auction": "",
-                        "bidder": "",
-                        "bidderName": "",
+                        "bidder": "0xf3fcd2c1a78f5eee",
+                        "bidderName": "user2",
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                         "lease": {
@@ -95,12 +97,12 @@
                         },
                         "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
                         "leaseName": "name1",
-                        "listingId": "204",
+                        "listingId": "214",
                         "listingStatus": "active",
-                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketSale.SaleItem",
+                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.SaleItem",
                         "listingValidUntil": "301.00000000",
                         "saleItemExtraField": {},
-                        "saleType": "active_listed",
+                        "saleType": "active_finished",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
                     }
@@ -133,7 +135,7 @@
                 },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "137.00100000",
+                    "balance": "215.50100000",
                     "name": "Flow",
                     "tags": [
                         "flow"
@@ -141,7 +143,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-                    "balance": "80.00000000",
+                    "balance": "30.00000000",
                     "name": "FUSD",
                     "tags": [
                         "fusd",

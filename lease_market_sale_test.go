@@ -318,7 +318,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.25000000",
 				"findName":    "",
-				"name":        "name1",
+				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
@@ -326,7 +326,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				"address":     otu.accountAddress("find"),
 				"amount":      "0.50000000",
 				"findName":    "",
-				"name":        "name1",
+				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
@@ -360,7 +360,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				"address":     otu.accountAddress("account"),
 				"amount":      "0.35000000",
 				"findName":    "",
-				"name":        "name1",
+				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
@@ -368,7 +368,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				"address":     otu.accountAddress("find"),
 				"amount":      "0.50000000",
 				"findName":    "",
-				"name":        "name1",
+				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))

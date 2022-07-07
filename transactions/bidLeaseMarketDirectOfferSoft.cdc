@@ -1,21 +1,21 @@
-import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import Profile from "../contracts/Profile.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FIND from "../contracts/FIND.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import FiatToken from "../contracts/standard/FiatToken.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
+import Dandy from "../contracts/Dandy.cdc"
+import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
@@ -24,14 +24,13 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 // import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
+transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
-	let saleItems : &FindLeaseMarketSale.SaleItemCollection?
-	let pointer : FindLeaseMarket.AuthLeasePointer
-	let vaultType : Type
+	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
+	let ftVaultType: Type
 
 	prepare(account: AuthAccount) {
-
+		
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
 		//Add exising FUSD or create a new one and add it
@@ -159,8 +158,8 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let market = FindMarket.getFindTenantAddress()
-		let tenantCapability= FindMarket.getTenantCapability(market)!
+		let marketplace = FindMarket.getFindTenantAddress()
+		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 
 		let tenant = tenantCapability.borrow()!
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
@@ -340,27 +339,29 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 		// }
 		//SYNC with register
 
-		// Get the salesItemRef from tenant
-		let leaseTenant = leaseTenantCapability.borrow()!
-		self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseTenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>()))!
+		let resolveAddress = FIND.resolve(leaseName)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}
+		let address = resolveAddress!
 
-		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		self.vaultType= ft.type
 
-		let lease=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
+		self.ftVaultType = ft.type
+
+		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		assert(walletReference.balance > amount , message: "Bidder has to have enough balance in wallet")
 
 
-		self.pointer= FindLeaseMarket.AuthLeasePointer(ref:lease, name: leaseName)
+		let leaseTenant = leaseTenantCapability.borrow()!
+		let bidStoragePath=leaseTenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())!
+		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: bidStoragePath)
 
 	}
 
-	pre{
-		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	pre {
+		self.bidsReference != nil : "This account does not have a bid collection"
 	}
 
-	execute{
-		self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+	execute {
+		self.bidsReference!.bid(name:leaseName, amount: amount, vaultType: self.ftVaultType, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
 	}
 }
-
