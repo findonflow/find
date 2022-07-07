@@ -6,7 +6,6 @@ import FindMarket from "../contracts/FindMarket.cdc"
 transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 
 	let bidsReference: &FindMarketAuctionSoft.MarketBidCollection
-	let walletReference : &FungibleToken.Vault
 
 
 	prepare(account: AuthAccount) {
@@ -19,7 +18,10 @@ transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath)
+		if ft.alias != "DUC" && walletReference == nil {
+			panic("No suitable wallet linked for this account")
+		}
 	}
 
 	execute {

@@ -3,16 +3,16 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
@@ -24,35 +24,26 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 // import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
+transaction(dapperAddress: Address, leaseName: String, amount: UFix64) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
-	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
-	let balanceBeforeBid: UFix64
-	let pointer: FindViews.ViewReadPointer
+	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}> 
+	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let ftVaultType: Type
 
 	prepare(account: AuthAccount) {
-		
+
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
 		//Add exising FUSD or create a new one and add it
 		let name = account.address.toString()
-		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
-			account.save(<- fusd, to: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-		}
-
-		let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-		if !usdcCap.check() {
-				account.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
-				account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		if !ducReceiver.check() {
+			let dapper = getAccount(dapperAddress)
+			// Create a new Forwarder resource for DUC and store it in the new account's storage
+			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
+			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
+			// Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
+			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinReceiver)
 		}
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
@@ -63,7 +54,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 
 		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
-			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
+			account.save(<- FIND.createEmptyBidCollection(receiver: ducReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
@@ -144,24 +135,20 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 			profile.addWallet(flowWallet)
 			updated=true
 		}
-		if !profile.hasWallet("FUSD") {
-			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"]))
-			updated=true
-		}
-
-		if !profile.hasWallet("USDC") {
-			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
+		if !profile.hasWallet("DUC") {
+			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:getAccount(dapperAddress).getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), names: ["duc", "dapperUtilityCoin","dapper"]))
 			updated=true
 		}
 
 		if created {
 			profile.emitCreatedEvent()
-		} else if updated {
+		} else {
 			profile.emitUpdatedEvent()
 		}
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 
 		let tenant = tenantCapability.borrow()!
@@ -342,42 +329,32 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		// }
 		//SYNC with register
 
-		let resolveAddress = FIND.resolve(user)
-		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let resolveAddress = FIND.resolve(leaseName)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}
 		let address = resolveAddress!
 
-		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
+		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+		let leaseTenant = leaseTenantCapability.borrow()!
 
+		self.saleItemsCap= FindMarketAuctionSoft.getSaleItemCapability(marketplace:leaseMarketplace, user:address) ?? panic("cannot find sale item cap")
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>())
+
+		let item = FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)
+
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
+		
 		self.ftVaultType = ft.type
 
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		let bidStoragePath=leaseTenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
-		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())!
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: bidStoragePath)
-		self.balanceBeforeBid=self.walletReference.balance
-		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
-
-		/* Check for nftCapability */
-		if !self.targetCapability.check() {
-			let cd = self.pointer.getNFTCollectionData()
-			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
-			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-		}
+		self.bidsReference= account.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
 	}
 
 	pre {
 		self.bidsReference != nil : "This account does not have a bid collection"
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
 	}
 
 	execute {
-		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
+		self.bidsReference!.bid(name:leaseName, amount: amount, vaultType: self.ftVaultType, bidExtraField: {})
 	}
 }

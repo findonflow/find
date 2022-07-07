@@ -680,6 +680,30 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 	return otu
 }
 
+func (otu *OverflowTestUtils) listLeaseForSoftAuction(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listLeaseForAuctionSoft").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name).
+			String("Flow").
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0).
+			UFix64(otu.currentTime() + 10.0)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"status":              "active_listed",
+			"amount":              fmt.Sprintf("%.8f", price),
+			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
+			"leaseName":           name,
+			"seller":              otu.accountAddress(user),
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) delistAllNFT(name string) *OverflowTestUtils {
 
 	otu.O.TransactionFromFile("cancelAllMarketListings").
@@ -696,6 +720,14 @@ func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowT
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account")).
+		Test(otu.T).AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) delistAllLeaseForSoftAuction(name string) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("cancelAllLeaseMarketAuctionSoft").
+		SignProposeAndPayAs(name).
 		Test(otu.T).AssertSuccess()
 	return otu
 }
@@ -798,10 +830,38 @@ func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint6
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseAuctionBidLeaseMarketSoft(buyer string, name string, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("increaseBidLeaseMarketAuctionSoft").
+		SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", totalPrice),
+			"leaseName": name,
+			"buyer":     otu.accountAddress(buyer),
+			"status":    "active_ongoing",
+		}))
+	return otu
+}
+
 func (otu *OverflowTestUtils) saleItemListed(name string, saleType string, price float64) *OverflowTestUtils {
 
 	t := otu.T
 	itemsForSale := otu.getItemsForSale(name)
+
+	assert.Equal(t, 1, len(itemsForSale))
+	assert.Equal(t, saleType, itemsForSale[0].SaleType)
+	assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+	return otu
+}
+
+func (otu *OverflowTestUtils) saleLeaseListed(name string, saleType string, price float64) *OverflowTestUtils {
+
+	t := otu.T
+	itemsForSale := otu.getLeasesForSale(name)
 
 	assert.Equal(t, 1, len(itemsForSale))
 	assert.Equal(t, saleType, itemsForSale[0].SaleType)
@@ -843,6 +903,23 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 			"status": "active_ongoing",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) auctionBidLeaseMarketSoft(buyer string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidLeaseMarketAuctionSoft").
+		SignProposeAndPayAs(buyer).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", price),
+			"leaseName": name,
+			"buyer":     otu.accountAddress(buyer),
+			"status":    "active_ongoing",
 		}))
 	return otu
 }
@@ -1113,6 +1190,23 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 			"buyer":  otu.accountAddress(name),
 			"amount": fmt.Sprintf("%.8f", price),
 			"status": "sold",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillLeaseMarketAuctionSoft").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+			"amount":    fmt.Sprintf("%.8f", price),
+			"status":    "sold",
 		}))
 	return otu
 }
@@ -1707,6 +1801,25 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 
 }
 
+func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("listLeaseForAuctionSoftDUC").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(name).
+			UFix64(price).
+			UFix64(price + 5.0).
+			UFix64(300.0).
+			UFix64(60.0).
+			UFix64(1.0).
+			UFix64(otu.currentTime() + 10.0)).
+		Test(otu.T).AssertSuccess()
+
+	return otu
+
+}
+
 func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint64, price float64) []uint64 {
 
 	res := otu.O.TransactionFromFile("listNFTForAuctionSoft").
@@ -1744,6 +1857,41 @@ func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string
 			"id":     fmt.Sprintf("%d", id),
 			"buyer":  otu.accountAddress(name),
 			"status": "active_ongoing",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("bidLeaseMarketAuctionSoftDUC").
+		SignProposeAndPayAs(user).
+		Args(otu.O.Arguments().
+			Account("account").
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"amount":    fmt.Sprintf("%.8f", price),
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+			"status":    "active_ongoing",
+		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("fulfillLeaseMarketAuctionSoftDUC").
+		SignProposeAndPayAs(user).PayloadSigner("account").
+		Args(otu.O.Arguments().
+			String(name).
+			UFix64(price)).
+		Test(otu.T).AssertSuccess().
+		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"leaseName": name,
+			"buyer":     otu.accountAddress(user),
+			"amount":    fmt.Sprintf("%.8f", price),
+			"status":    "sold",
 		}))
 	return otu
 }

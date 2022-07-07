@@ -388,15 +388,15 @@ pub contract FindLeaseMarket {
 			self.cap=getAccount(ref.owner!.address).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			self.name=name
 
+			if !ref.getNames().contains(name) {
+				panic("Please pass in the corresponding lease collection reference.")
+			}
+
 			if !self.cap.check() {
 				panic("The capability is not valid.")
 			}
 
 			self.uuid = self.cap.borrow()!.getLeaseUUID(name)
-
-			if !ref.getNames().contains(name) {
-				panic("Please pass in the corresponding lease collection reference.")
-			}
 		}
 
 		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic} {

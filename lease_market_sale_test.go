@@ -494,7 +494,6 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "account").
 			setDUCLease()
 
 		otu.listLeaseForSaleDUC("user1", "name1", price)

@@ -1,0 +1,178 @@
+`{
+    "FINDReport": {
+        "bids": null,
+        "itemsForSale": {},
+        "leases": [
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "7701.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "name1",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            },
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "7701.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "name3",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            },
+            {
+                "addons": null,
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "7701.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "name2",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            },
+            {
+                "addons": [
+                    "forge"
+                ],
+                "address": "0x179b6b1cb6755e31",
+                "auctionEnds": "",
+                "auctionReservePrice": "",
+                "auctionStartPrice": "",
+                "cost": "5.00000000",
+                "currentTime": "7701.00000000",
+                "extensionOnLateBid": "300.00000000",
+                "latestBid": "",
+                "latestBidBy": "",
+                "lockedUntil": "39312001.00000000",
+                "name": "user1",
+                "salePrice": "",
+                "status": "TAKEN",
+                "validUntil": "31536001.00000000"
+            }
+        ],
+        "leasesBids": {},
+        "leasesForSale": {
+            "FindLeaseMarketAuctionSoft": {
+                "ghosts": null,
+                "items": [
+                    {
+                        "amount": "10.00000000",
+                        "auction": {
+                            "auctionEndsAt": "7501.00000000",
+                            "currentPrice": "10.00000000",
+                            "extentionOnLateBid": "60.00000000",
+                            "minimumBidIncrement": "1.00000000",
+                            "reservePrice": "10.00000000",
+                            "startPrice": "5.00000000",
+                            "timestamp": "7701.00000000"
+                        },
+                        "bidder": "0xf3fcd2c1a78f5eee",
+                        "bidderName": "user2",
+                        "ftAlias": "Flow",
+                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                        "lease": {
+                            "addons": null,
+                            "address": "0x179b6b1cb6755e31",
+                            "cost": "5.00000000",
+                            "lockedUntil": "39312001.00000000",
+                            "name": "name1",
+                            "status": "TAKEN",
+                            "validUntil": "31536001.00000000"
+                        },
+                        "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
+                        "leaseName": "name1",
+                        "listingId": "214",
+                        "listingStatus": "ended",
+                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.SaleItem",
+                        "listingValidUntil": "7501.00000000",
+                        "saleItemExtraField": {},
+                        "saleType": "finished_completed",
+                        "seller": "0x179b6b1cb6755e31",
+                        "sellerName": "user1"
+                    }
+                ]
+            }
+        },
+        "marketBids": {},
+        "privateMode": "false",
+        "profile": {
+            "address": "0x179b6b1cb6755e31",
+            "allowStoringFollowers": "true",
+            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+            "createdAt": "find",
+            "description": "",
+            "findName": "user1",
+            "followers": null,
+            "following": null,
+            "gender": "",
+            "links": {},
+            "name": "user1",
+            "tags": null,
+            "wallets": [
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+                    "balance": "40.00000000",
+                    "name": "FIND",
+                    "tags": [
+                        "FIND"
+                    ]
+                },
+                {
+                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "balance": "201.75100000",
+                    "name": "Flow",
+                    "tags": [
+                        "flow"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "balance": "30.00000000",
+                    "name": "FUSD",
+                    "tags": [
+                        "fusd",
+                        "stablecoin"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+                    "balance": "100.00000000",
+                    "name": "USDC",
+                    "tags": [
+                        "usdc",
+                        "stablecoin"
+                    ]
+                }
+            ]
+        },
+        "relatedAccounts": {}
+    },
+    "NameReport": {
+        "cost": "5.00000000",
+        "status": "TAKEN"
+    }
+}`

@@ -3,13 +3,13 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
@@ -24,17 +24,16 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 // import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
+transaction(leaseName: String, amount: UFix64) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
+	let saleItemsCap: Capability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}> 
 	let walletReference : &FungibleToken.Vault
-	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
+	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let balanceBeforeBid: UFix64
-	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
 
 	prepare(account: AuthAccount) {
-		
+
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
 		//Add exising FUSD or create a new one and add it
@@ -162,6 +161,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 
 		let tenant = tenantCapability.borrow()!
@@ -342,34 +342,26 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		// }
 		//SYNC with register
 
-		let resolveAddress = FIND.resolve(user)
-		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+		let resolveAddress = FIND.resolve(leaseName)
+		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}
 		let address = resolveAddress!
 
-		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
+		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+		let leaseTenant = leaseTenantCapability.borrow()!
+		self.saleItemsCap= FindLeaseMarketAuctionSoft.getSaleItemCapability(marketplace:leaseMarketplace, user:address) ?? panic("cannot find sale item cap")
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>())
 
+		let item = FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)
+
+		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
+		
+		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))
 		self.ftVaultType = ft.type
 
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		let bidStoragePath=leaseTenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
-		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())!
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: bidStoragePath)
+		self.bidsReference= account.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
 		self.balanceBeforeBid=self.walletReference.balance
-		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
-
-		/* Check for nftCapability */
-		if !self.targetCapability.check() {
-			let cd = self.pointer.getNFTCollectionData()
-			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
-			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-		}
 	}
 
 	pre {
@@ -378,6 +370,6 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 	}
 
 	execute {
-		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
+		self.bidsReference!.bid(name:leaseName, amount: amount, vaultType: self.ftVaultType, bidExtraField: {})
 	}
 }
