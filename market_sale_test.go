@@ -616,7 +616,7 @@ func TestMarketSale(t *testing.T) {
 				Account("account").
 				StringArray("user1", "user1", "user1").
 				UInt64Array(ids[0], ids[1], ids[2]).
-				UFix64(price * 3)).
+				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": fmt.Sprintf("%.8f", price),
@@ -663,14 +663,14 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.O.TransactionFromFile("buyNFTForSaleDUC").
+		otu.O.TransactionFromFile("buyMultipleNFTForSaleDUC").
 			SignProposeAndPayAs("user2").PayloadSigner("account").
 			Args(otu.O.Arguments().
 				Account("account").
 				Account("account").
-				String("user1").
-				UInt64(saleItemID[0]).
-				UFix64(price)).
+				StringArray("user1").
+				UInt64Array(saleItemID[0]).
+				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": fmt.Sprintf("%.8f", price),

@@ -17,10 +17,10 @@ import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
-transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64) {
+transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix64]) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
-	var walletReference : &FungibleToken.Vault? 
+	var walletReference : [&FungibleToken.Vault]
 
 	let saleItemsCap: [Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> ]
 	var totalPrice : UFix64
@@ -248,7 +248,7 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64)
 		//SYNC with register
 
 		var counter = 0
-		self.walletReference = nil
+		self.walletReference= []
 		self.targetCapability = []
 
 		self.saleItemsCap = []
@@ -303,12 +303,10 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64)
 				fts[ftIdentifier] = ft 
 			}
 
-			if self.walletReference == nil {
-				self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
-				vaultType = ft!.type
-			} else {
-				assert(vaultType! == ft!.type , message: "All items should be in sale for same currency")
-			}
+
+			let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+			self.walletReference.append(walletReference)
+
 
 			let targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
 			/* Check for nftCapability */
@@ -328,15 +326,12 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64)
 
 	}
 
-	pre {
-		self.walletReference!.balance > amount : "Your wallet does not have enough funds to pay for this item"
-		amount == self.totalPrice : "Please pass in the correct total sum of the buy items. Required : ".concat(self.totalPrice.toString())
-	}
-
 	execute {
 		var counter = 0
 		while counter < users.length {
-			let vault <- self.walletReference!.withdraw(amount: self.prices[counter]) 
+			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			assert(self.walletReference[counter].balance > amounts[counter], message: "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
 			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
 			counter = counter + 1
 		}

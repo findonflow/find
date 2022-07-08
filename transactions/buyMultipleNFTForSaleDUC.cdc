@@ -17,7 +17,7 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
-transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [UInt64], amount: UFix64) {
+transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix64]) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	var walletReference : &FungibleToken.Vault
@@ -271,6 +271,9 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 
 			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
 
+			self.prices.append(item.getBalance())
+			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct amount for item. saleID : ".concat(ids[counter].toString()).concat(" . Required : ".concat(self.prices[counter].toString())))
+
 			var nft : NFTRegistry.NFTInfo? = nil
 			let nftIdentifier = item.getItemType().identifier
 			let ftType = item.getFtType()
@@ -303,14 +306,10 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 		}
 	}
 
-	pre {
-		self.walletReference!.balance > amount : "Your wallet does not have enough funds to pay for this item"
-		amount == self.totalPrice : "Please pass in the correct total sum of the buy items. Required : ".concat(self.totalPrice.toString())
-	}
-
 	execute {
 		var counter = 0 
 		while counter < ids.length {
+			assert(self.walletReference!.balance > amounts[counter] , message : "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.totalPrice.toString()))
 			let vault <- self.walletReference!.withdraw(amount: self.prices[counter]) 
 			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
 			counter = counter + 1
