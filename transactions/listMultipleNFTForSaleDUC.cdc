@@ -4,49 +4,42 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FindViews from "../contracts/FindViews.cdc"
+import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
-transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64) {
-
-	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
-	var walletReference : &FungibleToken.Vault? 
-
-	let saleItemsCap: [Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> ]
-	var totalPrice : UFix64
-	let prices : [UFix64]
+transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64], directSellPrices:[UFix64], validUntil: UFix64?) {
+	
+	let saleItems : &FindMarketSale.SaleItemCollection?
+	let pointers : [FindViews.AuthNFTPointer]
+	
 	prepare(account: AuthAccount) {
 
-		assert(users.length == ids.length, message: "The array length of users and ids should be the same")
+		assert(nftAliasOrIdentifiers.length == ids.length , message: "The length of arrays passed in has to be the same")
+		assert(nftAliasOrIdentifiers.length == directSellPrices.length , message: "The length of arrays passed in has to be the same")
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
 		//Add exising FUSD or create a new one and add it
 		let name = account.address.toString()
-		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
-			account.save(<- fusd, to: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-		}
-
-		let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-		if !usdcCap.check() {
-				account.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
-				account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		if !ducReceiver.check() {
+			let dapper = getAccount(dapperAddress)
+			// Create a new Forwarder resource for DUC and store it in the new account's storage
+			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
+			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
+			// Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
+			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinReceiver)
 		}
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
@@ -57,7 +50,7 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64)
 
 		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
-			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
+			account.save(<- FIND.createEmptyBidCollection(receiver: ducReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
 			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 
@@ -138,19 +131,14 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64)
 			profile.addWallet(flowWallet)
 			updated=true
 		}
-		if !profile.hasWallet("FUSD") {
-			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"]))
-			updated=true
-		}
-
-		if !profile.hasWallet("USDC") {
-			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), names: ["usdc", "stablecoin"]))
+		if !profile.hasWallet("DUC") {
+			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:getAccount(dapperAddress).getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), names: ["duc", "dapperUtilityCoin","dapper"]))
 			updated=true
 		}
 
 		if created {
 			profile.emitCreatedEvent()
-		} else if updated {
+		} else {
 			profile.emitUpdatedEvent()
 		}
 
@@ -247,98 +235,50 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amount: UFix64)
 		}
 		//SYNC with register
 
-		var counter = 0
-		self.walletReference = nil
-		self.targetCapability = []
+		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.pointers= []
 
-		self.saleItemsCap = []
-		let addresses : {String : Address} = {}
 		let nfts : {String : NFTRegistry.NFTInfo} = {}
-		let fts : {String : FTRegistry.FTInfo} = {}
 
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
-		var vaultType : Type? = nil
-
-		self.totalPrice = 0.0
-		self.prices = []
-
-		while counter < users.length {
-			var resolveAddress : Address? = nil
-			if addresses[users[counter]] != nil {
-				resolveAddress = addresses[users[counter]]!
-			} else {
-				let address = FIND.resolve(users[counter])
-				if address == nil {
-					panic("The address input is not a valid name nor address. Input : ".concat(users[counter]))
-				}
-				addresses[users[counter]] = address!
-				resolveAddress = address!
-			}
-
-			let address = resolveAddress!
-
-			let saleItemCap = FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
-			self.saleItemsCap.append(saleItemCap)
-
-			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
-			self.prices.append(item.getBalance())
-			self.totalPrice = self.totalPrice + self.prices[counter]
-			
+		var counter = 0
+		while counter < ids.length {
+			// Get supported NFT and FT Information from Registries from input alias
 			var nft : NFTRegistry.NFTInfo? = nil
 			var ft : FTRegistry.FTInfo? = nil
-			let nftIdentifier = item.getItemType().identifier
-			let ftIdentifier = item.getFtType().identifier
 
-			if nfts[nftIdentifier] != nil {
-				nft = nfts[nftIdentifier]
+			if nfts[nftAliasOrIdentifiers[counter]] != nil {
+				nft = nfts[nftAliasOrIdentifiers[counter]]
 			} else {
-				nft = NFTRegistry.getNFTInfo(nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftIdentifier))
-				nfts[nftIdentifier] = nft
+				nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifiers[counter]) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifiers[counter]))
+				nfts[nftAliasOrIdentifiers[counter]] = nft
 			}
 
-			if fts[ftIdentifier] != nil {
-				ft = fts[ftIdentifier]
-			} else {
-				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
-				fts[ftIdentifier] = ft 
-			}
+			let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.providerPath)
 
-			if self.walletReference == nil {
-				self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
-				vaultType = ft!.type
-			} else {
-				assert(vaultType! == ft!.type , message: "All items should be in sale for same currency")
+			/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
+			if !providerCap.check() {
+					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+						nft!.providerPath,
+						target: nft!.storagePath
+				)
 			}
-
-			let targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
-			/* Check for nftCapability */
-			if !targetCapability.check() {
-				let cd = item.getNFTCollectionData()
-				// should use account.type here instead
-				if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-					panic("This collection public link is not set up properly.")
-				}
-				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-			}
-			self.targetCapability.append(targetCapability)
+			// Get the salesItemRef from tenant
+			self.pointers.append(FindViews.AuthNFTPointer(cap: providerCap, id: ids[counter]))
 			counter = counter + 1
 		}
 
 	}
 
-	pre {
-		self.walletReference!.balance > amount : "Your wallet does not have enough funds to pay for this item"
-		amount == self.totalPrice : "Please pass in the correct total sum of the buy items. Required : ".concat(self.totalPrice.toString())
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
 	}
 
-	execute {
+	execute{
 		var counter = 0
-		while counter < users.length {
-			let vault <- self.walletReference!.withdraw(amount: self.prices[counter]) 
-			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
+		while counter < ids.length {
+			self.saleItems!.listForSale(pointer: self.pointers[counter], vaultType: Type<@DapperUtilityCoin.Vault>(), directSellPrice: directSellPrices[counter], validUntil: validUntil, extraField: {})
 			counter = counter + 1
 		}
 	}
 }
+
