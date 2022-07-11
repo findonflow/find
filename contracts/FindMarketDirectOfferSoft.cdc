@@ -543,7 +543,7 @@ pub contract FindMarketDirectOfferSoft {
 
 		pub fun fulfillDirectOffer(id:UInt64, vault: @FungibleToken.Vault) {
 			pre {
-				self.bids[id] != nil : "You need to have a bid here already"
+				self.bids[id] != nil : "You need to have a bid here already".concat(id.toString())
 			}
 
 			let bid =self.borrowBid(id)

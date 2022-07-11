@@ -23,7 +23,6 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 	let walletReference : &FungibleToken.Vault
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> 
-	let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
 	let balanceBeforeTransfer: UFix64
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
@@ -252,8 +251,6 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 			panic("This item is not listed for Dapper Wallets. Please buy in with other wallets.")
 		}
 
-		self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
-		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		/* Check for nftCapability */
@@ -269,6 +266,7 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 		}
 
 		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.balanceBeforeTransfer = self.walletReference.balance
 	}
 
 	pre {
@@ -282,6 +280,6 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 
 	// Check that all dapperUtilityCoin was routed back to Dapper
 	post {
-		self.mainDapperUtilityCoinVault.balance == self.balanceBeforeTransfer: "DapperUtilityCoin leakage"
+		self.walletReference.balance == self.balanceBeforeTransfer: "DapperUtilityCoin leakage"
 	}
 }
