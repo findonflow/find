@@ -136,10 +136,10 @@ pub contract CollectionFactory {
             case "Alchemy-shard2": 
                 return self.fetchAlchemyShard2(user: user, maxItems: maxItems, targetCollections:collections)
             case "Alchemy-shard3": 
-                return self.fetchAlchemyShard3(user: user, maxItems: maxItems)
+                return self.fetchAlchemyShard3(user: user, maxItems: maxItems, targetCollections:collections)
 								
     //        case "Alchemy-shard4": 
-    //           return self.fetchAlchemyShard4(user: user, maxItems: maxItems)
+    //           return self.fetchAlchemyShard4(user: user, maxItems: maxItems, targetCollections:collections)
             case "NFTRegistry": 
                 return self.fetchNFTRegistry(user: user, maxItems: maxItems, targetCollections:collections)
         }
