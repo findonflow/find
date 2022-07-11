@@ -585,4 +585,103 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to list multiple dandies for sale and buy them in one go", func(t *testing.T) {
+
+		ids := otu.mintThreeExampleDandies()
+
+		// list multiple NFT for sale
+		otu.O.TransactionFromFile("listMultipleNFTForSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray("Dandy", "Dandy", "Dandy").
+				UInt64Array(ids[0], ids[1], ids[2]).
+				StringArray("FUSD", "FUSD", "FUSD").
+				UFix64Array(price, price, price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 3, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[1].SaleType)
+		assert.Equal(t, "active_listed", itemsForSale[2].SaleType)
+
+		seller := "user1"
+		name := "user2"
+		// otu.buyNFTForMarketSale("user2", "user1", id, price)
+		otu.O.TransactionFromFile("buyMultipleNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray("user1", "user1", "user1").
+				UInt64Array(ids[0], ids[1], ids[2]).
+				UFix64Array(price, price, price)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[0]),
+				"seller": otu.accountAddress(seller),
+				"buyer":  otu.accountAddress(name),
+				"status": "sold",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[1]),
+				"seller": otu.accountAddress(seller),
+				"buyer":  otu.accountAddress(name),
+				"status": "sold",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[2]),
+				"seller": otu.accountAddress(seller),
+				"buyer":  otu.accountAddress(name),
+				"status": "sold",
+			}))
+
+	})
+
+	t.Run("Should be able to list ExampleNFT for sale and buy it with DUC using MultipleNFT transaction", func(t *testing.T) {
+
+		res := otu.O.TransactionFromFile("listMultipleNFTForSaleDUC").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				Account("account").
+				StringArray("ExampleNFT").
+				UInt64Array(0).
+				UFix64Array(price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		saleItemID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
+
+		otu.checkRoyalty("user1", 0, "minter", "ExampleNFT", 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.O.TransactionFromFile("buyMultipleNFTForSaleDUC").
+			SignProposeAndPayAs("user2").PayloadSigner("account").
+			Args(otu.O.Arguments().
+				Account("account").
+				Account("account").
+				StringArray("user1").
+				UInt64Array(saleItemID[0]).
+				UFix64Array(price)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", saleItemID[0]),
+				"seller": otu.accountAddress("user1"),
+				"buyer":  otu.accountAddress("user2"),
+				"status": "sold",
+			}))
+
+		otu.sendExampleNFT("user1", "user2")
+
+	})
+
 }

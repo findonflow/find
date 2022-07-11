@@ -620,7 +620,77 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 		otu.acceptDirectOfferMarketEscrowed("user1", saleItem[0], "user2", price)
+		otu.cancelAllDirectOfferMarketEscrowed("user1")
 
+	})
+
+	t.Run("Should be able to direct offer and fulfill multiple NFT in one go", func(t *testing.T) {
+
+		otu.directOfferMarketEscrowed("user2", "user1", id, price)
+
+		ids := otu.mintThreeExampleDandies()
+
+		seller := "user1"
+		name := "user2"
+		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(seller, seller, seller).
+				StringArray("Dandy", "Dandy", "Dandy").
+				UInt64Array(ids...).
+				StringArray("Flow", "Flow", "Flow").
+				UFix64Array(price, price, price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[0]),
+				"buyer":  otu.accountAddress(name),
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[1]),
+				"buyer":  otu.accountAddress(name),
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[2]),
+				"buyer":  otu.accountAddress(name),
+			}))
+
+		name = "user1"
+		buyer := "user2"
+
+		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids...)).
+			Test(otu.T).AssertSuccess(). 
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[0]),
+				"seller": otu.accountAddress(name),
+				"buyer":  otu.accountAddress(buyer),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[1]),
+				"seller": otu.accountAddress(name),
+				"buyer":  otu.accountAddress(buyer),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[2]),
+				"seller": otu.accountAddress(name),
+				"buyer":  otu.accountAddress(buyer),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			}))
+
+		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
 }

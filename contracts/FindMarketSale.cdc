@@ -226,6 +226,8 @@ pub contract FindMarketSale {
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
+				// let message = "vault : ".concat(vaultType.identifier).concat(" . NFT Type : ".concat(saleItem.getItemType().identifier))
+				// panic(message)
 			}
 
 			let owner=self.owner!.address

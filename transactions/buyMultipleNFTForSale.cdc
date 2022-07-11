@@ -4,28 +4,30 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FIND from "../contracts/FIND.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FIND from "../contracts/FIND.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
+transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix64]) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
-	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
-	let pointer: FindViews.ViewReadPointer
+	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
+	var walletReference : [&FungibleToken.Vault]
 
+	let saleItemsCap: [Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> ]
+	var totalPrice : UFix64
+	let prices : [UFix64]
 	prepare(account: AuthAccount) {
+
+		assert(users.length == ids.length, message: "The array length of users and ids should be the same")
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -245,42 +247,93 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		}
 		//SYNC with register
 
-		let resolveAddress = FIND.resolve(user)
-		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
-		let address = resolveAddress!
+		var counter = 0
+		self.walletReference= []
+		self.targetCapability = []
 
-		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.saleItemsCap = []
+		let addresses : {String : Address} = {}
+		let nfts : {String : NFTRegistry.NFTInfo} = {}
+		let fts : {String : FTRegistry.FTInfo} = {}
 
-		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
+		var vaultType : Type? = nil
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: bidStoragePath)
-		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
+		self.totalPrice = 0.0
+		self.prices = []
 
-		/* Check for nftCapability */
-		if !self.targetCapability.check() {
-			let cd = self.pointer.getNFTCollectionData()
-			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
+		while counter < users.length {
+			var resolveAddress : Address? = nil
+			if addresses[users[counter]] != nil {
+				resolveAddress = addresses[users[counter]]!
+			} else {
+				let address = FIND.resolve(users[counter])
+				if address == nil {
+					panic("The address input is not a valid name nor address. Input : ".concat(users[counter]))
+				}
+				addresses[users[counter]] = address!
+				resolveAddress = address!
 			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-		}
-	}
 
-	pre {
-		self.bidsReference != nil : "This account does not have a bid collection"
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+			let address = resolveAddress!
+
+			let saleItemCap = FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
+			self.saleItemsCap.append(saleItemCap)
+
+			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
+			self.prices.append(item.getBalance())
+			self.totalPrice = self.totalPrice + self.prices[counter]
+			
+			var nft : NFTRegistry.NFTInfo? = nil
+			var ft : FTRegistry.FTInfo? = nil
+			let nftIdentifier = item.getItemType().identifier
+			let ftIdentifier = item.getFtType().identifier
+
+			if nfts[nftIdentifier] != nil {
+				nft = nfts[nftIdentifier]
+			} else {
+				nft = NFTRegistry.getNFTInfo(nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftIdentifier))
+				nfts[nftIdentifier] = nft
+			}
+
+			if fts[ftIdentifier] != nil {
+				ft = fts[ftIdentifier]
+			} else {
+				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
+				fts[ftIdentifier] = ft 
+			}
+
+
+			let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+			self.walletReference.append(walletReference)
+
+
+			let targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
+			/* Check for nftCapability */
+			if !targetCapability.check() {
+				let cd = item.getNFTCollectionData()
+				// should use account.type here instead
+				if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
+					panic("This collection public link is not set up properly.")
+				}
+				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+			}
+			self.targetCapability.append(targetCapability)
+			counter = counter + 1
+		}
+
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
-		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
+		var counter = 0
+		while counter < users.length {
+			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			assert(self.walletReference[counter].balance > amounts[counter], message: "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
+			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
+			counter = counter + 1
+		}
 	}
-
 }

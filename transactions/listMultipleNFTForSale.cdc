@@ -5,27 +5,30 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FiatToken from "../contracts/standard/FiatToken.cdc"
+import FIND from "../contracts/FIND.cdc"
+import Dandy from "../contracts/Dandy.cdc"
+import Profile from "../contracts/Profile.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import Profile from "../contracts/Profile.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
-
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
-	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
-	let pointer: FindViews.ViewReadPointer
+transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
+	
+	let saleItems : &FindMarketSale.SaleItemCollection?
+	let pointers : [FindViews.AuthNFTPointer]
+	let vaultTypes : [Type]
 
 	prepare(account: AuthAccount) {
+
+		assert(nftAliasOrIdentifiers.length == ids.length , message: "The length of arrays passed in has to be the same")
+		assert(nftAliasOrIdentifiers.length == ftAliasOrIdentifiers.length , message: "The length of arrays passed in has to be the same")
+		assert(nftAliasOrIdentifiers.length == directSellPrices.length , message: "The length of arrays passed in has to be the same")
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -245,42 +248,60 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		}
 		//SYNC with register
 
-		let resolveAddress = FIND.resolve(user)
-		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
-		let address = resolveAddress!
+		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.vaultTypes= []
+		self.pointers= []
 
-		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		var counter = 0
 
-		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
+		let nfts : {String : NFTRegistry.NFTInfo} = {}
+		let fts : {String : FTRegistry.FTInfo} = {}
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: bidStoragePath)
-		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
+		while counter < ids.length {
+			// Get supported NFT and FT Information from Registries from input alias
+			var nft : NFTRegistry.NFTInfo? = nil
+			var ft : FTRegistry.FTInfo? = nil
 
-		/* Check for nftCapability */
-		if !self.targetCapability.check() {
-			let cd = self.pointer.getNFTCollectionData()
-			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
+			if nfts[nftAliasOrIdentifiers[counter]] != nil {
+				nft = nfts[nftAliasOrIdentifiers[counter]]
+			} else {
+				nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifiers[counter]) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifiers[counter]))
+				nfts[nftAliasOrIdentifiers[counter]] = nft
 			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+
+			if fts[ftAliasOrIdentifiers[counter]] != nil {
+				ft = fts[ftAliasOrIdentifiers[counter]]
+			} else {
+				ft = FTRegistry.getFTInfo(ftAliasOrIdentifiers[counter]) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifiers[counter]))
+				fts[ftAliasOrIdentifiers[counter]] = ft 
+			}
+
+			let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.providerPath)
+
+			/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
+			if !providerCap.check() {
+					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+						nft!.providerPath,
+						target: nft!.storagePath
+				)
+			}
+			// Get the salesItemRef from tenant
+			self.pointers.append(FindViews.AuthNFTPointer(cap: providerCap, id: ids[counter]))
+			self.vaultTypes.append(ft!.type)
+			counter = counter + 1
 		}
 	}
 
-	pre {
-		self.bidsReference != nil : "This account does not have a bid collection"
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
 	}
 
-	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
-		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
+	execute{
+		var counter = 0
+		while counter < ids.length {
+			self.saleItems!.listForSale(pointer: self.pointers[counter], vaultType: self.vaultTypes[counter], directSellPrice: directSellPrices[counter], validUntil: validUntil, extraField: {})
+			counter = counter + 1
+		}
 	}
-
 }
+
