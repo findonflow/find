@@ -4,34 +4,30 @@ import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
-import FIND from "../contracts/FIND.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FIND from "../contracts/FIND.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindRewardToken from "../contracts/FindRewardToken.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
-// import FindLeaseMarketAuctionEscrow from "../contracts/FindLeaseMarketAuctionEscrow.cdc"
-import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
-// import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
+transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix64]) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
-	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
-	let pointer: FindViews.ViewReadPointer
+	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
+	var walletReference : [&FungibleToken.Vault]
 
+	let saleItemsCap: [Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> ]
+	var totalPrice : UFix64
+	let prices : [UFix64]
 	prepare(account: AuthAccount) {
+
+		assert(users.length == ids.length, message: "The array length of users and ids should be the same")
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -249,133 +245,95 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 			account.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
 		}
-
-		let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
-
-		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
-		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
-		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
-		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
-		if !leaseSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
-		}
-
-		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
-		let leaseASPublicPath=FindMarket.getPublicPath(leaseASSaleItemType, name: "findLease")
-		let leaseASStoragePath= FindMarket.getStoragePath(leaseASSaleItemType, name:"findLease")
-		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath) 
-		if !leaseASSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
-			account.link<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
-		}
-
-
-		let leaseASBidType= Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>()
-		let leaseASBidPublicPath=FindMarket.getPublicPath(leaseASBidType, name: "findLease")
-		let leaseASBidStoragePath= FindMarket.getStoragePath(leaseASBidType, name: "findLease")
-		let leaseASBidCap= account.getCapability<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath) 
-		if !leaseASBidCap.check() {
-			account.save<@FindLeaseMarketAuctionSoft.MarketBidCollection>(<- FindLeaseMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseASBidStoragePath)
-			account.link<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath, target: leaseASBidStoragePath)
-		}
-
-		// let leaseAESaleItemType= Type<@FindLeaseMarketAuctionEscrow.SaleItemCollection>()
-		// let leaseAEPublicPath=FindMarket.getPublicPath(leaseAESaleItemType, name: "findLease")
-		// let leaseAEStoragePath= FindMarket.getStoragePath(leaseAESaleItemType, name:"findLease")
-		// let leaseAESaleItemCap= account.getCapability<&FindLeaseMarketAuctionEscrow.SaleItemCollection{FindLeaseMarketAuctionEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseAEPublicPath) 
-		// if !leaseAESaleItemCap.check() {
-		// 	//The link here has to be a capability not a tenant, because it can change.
-		// 	account.save<@FindLeaseMarketAuctionEscrow.SaleItemCollection>(<- FindLeaseMarketAuctionEscrow.createEmptySaleItemCollection(leaseTenantCapability), to: leaseAEStoragePath)
-		// 	account.link<&FindLeaseMarketAuctionEscrow.SaleItemCollection{FindLeaseMarketAuctionEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseAEPublicPath, target: leaseAEStoragePath)
-		// }
-
-		// let leaseAEBidType= Type<@FindLeaseMarketAuctionEscrow.MarketBidCollection>()
-		// let leaseAEBidPublicPath=FindMarket.getPublicPath(leaseAEBidType, name: "findLease")
-		// let leaseAEBidStoragePath= FindMarket.getStoragePath(leaseAEBidType, name: "findLease")
-		// let leaseAEBidCap= account.getCapability<&FindLeaseMarketAuctionEscrow.MarketBidCollection{FindLeaseMarketAuctionEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseAEBidPublicPath) 
-		// if !leaseAEBidCap.check() {
-		// 	account.save<@FindLeaseMarketAuctionEscrow.MarketBidCollection>(<- FindLeaseMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseAEBidStoragePath)
-		// 	account.link<&FindLeaseMarketAuctionEscrow.MarketBidCollection{FindLeaseMarketAuctionEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseAEBidPublicPath, target: leaseAEBidStoragePath)
-		// }
-
-		let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
-		let leaseDOSPublicPath=FindMarket.getPublicPath(leaseDOSSaleItemType, name: "findLease")
-		let leaseDOSStoragePath= FindMarket.getStoragePath(leaseDOSSaleItemType, name:"findLease")
-		let leaseDOSSaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath) 
-		if !leaseDOSSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseDOSStoragePath)
-			account.link<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath, target: leaseDOSStoragePath)
-		}
-
-		let leaseDOSBidType= Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>()
-		let leaseDOSBidPublicPath=FindMarket.getPublicPath(leaseDOSBidType, name: "findLease")
-		let leaseDOSBidStoragePath= FindMarket.getStoragePath(leaseDOSBidType, name: "findLease")
-		let leaseDOSBidCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.MarketBidCollection{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidPublicPath) 
-		if !leaseDOSBidCap.check() {
-			account.save<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOSBidStoragePath)
-			account.link<&FindLeaseMarketDirectOfferSoft.MarketBidCollection{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidPublicPath, target: leaseDOSBidStoragePath)
-		}
-
-		// let leaseDOESaleItemType= Type<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>()
-		// let leaseDOEPublicPath=FindMarket.getPublicPath(leaseDOESaleItemType, name: "findLease")
-		// let leaseDOEStoragePath= FindMarket.getStoragePath(leaseDOESaleItemType, name:"findLease")
-		// let leaseDOESaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOEPublicPath) 
-		// if !leaseDOESaleItemCap.check() {
-		// 	//The link here has to be a capability not a tenant, because it can change.
-		// 	account.save<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptySaleItemCollection(leaseTenantCapability), to: leaseDOEStoragePath)
-		// 	account.link<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOEPublicPath, target: leaseDOEStoragePath)
-		// }
-
-		// let leaseDOEBidType= Type<@FindLeaseMarketDirectOfferEscrow.MarketBidCollection>()
-		// let leaseDOEBidPublicPath=FindMarket.getPublicPath(leaseDOEBidType, name: "findLease")
-		// let leaseDOEBidStoragePath= FindMarket.getStoragePath(leaseDOEBidType, name: "findLease")
-		// let leaseDOEBidCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.MarketBidCollection{FindLeaseMarketDirectOfferEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOEBidPublicPath) 
-		// if !leaseDOEBidCap.check() {
-		// 	account.save<@FindLeaseMarketDirectOfferEscrow.MarketBidCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOEBidStoragePath)
-		// 	account.link<&FindLeaseMarketDirectOfferEscrow.MarketBidCollection{FindLeaseMarketDirectOfferEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOEBidPublicPath, target: leaseDOEBidStoragePath)
-		// }
 		//SYNC with register
 
-		let resolveAddress = FIND.resolve(user)
-		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
-		let address = resolveAddress!
+		var counter = 0
+		self.walletReference= []
+		self.targetCapability = []
 
-		let nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifier))
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.saleItemsCap = []
+		let addresses : {String : Address} = {}
+		let nfts : {String : NFTRegistry.NFTInfo} = {}
+		let fts : {String : FTRegistry.FTInfo} = {}
 
-		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())!
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
+		var vaultType : Type? = nil
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: bidStoragePath)
-		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
+		self.totalPrice = 0.0
+		self.prices = []
 
-		/* Check for nftCapability */
-		if !self.targetCapability.check() {
-			let cd = self.pointer.getNFTCollectionData()
-			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
+		while counter < users.length {
+			var resolveAddress : Address? = nil
+			if addresses[users[counter]] != nil {
+				resolveAddress = addresses[users[counter]]!
+			} else {
+				let address = FIND.resolve(users[counter])
+				if address == nil {
+					panic("The address input is not a valid name nor address. Input : ".concat(users[counter]))
+				}
+				addresses[users[counter]] = address!
+				resolveAddress = address!
 			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-		}
-	}
 
-	pre {
-		self.bidsReference != nil : "This account does not have a bid collection"
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+			let address = resolveAddress!
+
+			let saleItemCap = FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
+			self.saleItemsCap.append(saleItemCap)
+
+			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
+			self.prices.append(item.getBalance())
+			self.totalPrice = self.totalPrice + self.prices[counter]
+			
+			var nft : NFTRegistry.NFTInfo? = nil
+			var ft : FTRegistry.FTInfo? = nil
+			let nftIdentifier = item.getItemType().identifier
+			let ftIdentifier = item.getFtType().identifier
+
+			if nfts[nftIdentifier] != nil {
+				nft = nfts[nftIdentifier]
+			} else {
+				nft = NFTRegistry.getNFTInfo(nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftIdentifier))
+				nfts[nftIdentifier] = nft
+			}
+
+			if fts[ftIdentifier] != nil {
+				ft = fts[ftIdentifier]
+			} else {
+				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
+				fts[ftIdentifier] = ft 
+			}
+
+
+			let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+			self.walletReference.append(walletReference)
+
+
+			let targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
+			/* Check for nftCapability */
+			if !targetCapability.check() {
+				let cd = item.getNFTCollectionData()
+				// should use account.type here instead
+				if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
+					panic("This collection public link is not set up properly.")
+				}
+				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+			}
+			self.targetCapability.append(targetCapability)
+			counter = counter + 1
+		}
+
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
-		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
+		var counter = 0
+		while counter < users.length {
+			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			assert(self.walletReference[counter].balance > amounts[counter], message: "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
+			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
+			counter = counter + 1
+		}
 	}
-
 }

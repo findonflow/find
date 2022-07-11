@@ -676,4 +676,146 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.sendExampleNFT("user1", "user2")
 	})
+
+	t.Run("Should be able to multiple offer and fulfill", func(t *testing.T) {
+
+		ids := otu.mintThreeExampleDandies()
+
+		// otu.directOfferMarketSoft("user2", "user1", id, price).
+
+		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray("user1", "user1", "user1").
+				StringArray("Dandy", "Dandy", "Dandy").
+				UInt64Array(ids...).
+				StringArray("Flow", "Flow", "Flow").
+				UFix64Array(price, price, price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[0]),
+				"buyer":  otu.accountAddress("user2"),
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[1]),
+				"buyer":  otu.accountAddress("user2"),
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"amount": fmt.Sprintf("%.8f", price),
+				"id":     fmt.Sprintf("%d", ids[2]),
+				"buyer":  otu.accountAddress("user2"),
+			}))
+
+		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids...)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[0]),
+				"seller": otu.accountAddress("user1"),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "active_accepted",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[1]),
+				"seller": otu.accountAddress("user1"),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "active_accepted",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[2]),
+				"seller": otu.accountAddress("user1"),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "active_accepted",
+			}))
+
+		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids...).
+				UFix64Array(price, price, price)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[0]),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[1]),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			})).
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", ids[2]),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			}))
+
+		otu.sendFT("user1", "user2", "Flow", price*3)
+	})
+
+	t.Run("Should be able to list an NFT for sale and buy it with DUC with multiple direct offer transaction", func(t *testing.T) {
+
+		// saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)
+
+		res := otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoftDUC").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				Account("account").
+				StringArray("user1").
+				StringArray("ExampleNFT").
+				UInt64Array(0).
+				UFix64Array(price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		saleItemID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
+
+		// otu.acceptDirectOfferMarketSoftDUC("user1", saleItemID[0], "user2", price).
+
+		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoftDUC").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				Account("account").
+				UInt64Array(saleItemID[0])).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", saleItemID[0]),
+				"seller": otu.accountAddress("user1"),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "active_accepted",
+			}))
+
+		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferSoftDUC").
+			SignProposeAndPayAs("user2").PayloadSigner("account").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(saleItemID[0]).
+				UFix64Array(price)).
+			Test(otu.T).AssertSuccess().
+			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     fmt.Sprintf("%d", saleItemID[0]),
+				"buyer":  otu.accountAddress("user2"),
+				"amount": fmt.Sprintf("%.8f", price),
+				"status": "sold",
+			}))
+
+	})
+
 }
