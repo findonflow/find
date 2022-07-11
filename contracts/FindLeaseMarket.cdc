@@ -14,8 +14,6 @@ pub contract FindLeaseMarket {
 	access(contract) let  marketBidTypes : [Type]
 	access(contract) let  marketBidCollectionTypes : [Type]
 
-	access(contract) let network: Capability<&FIND.Network{FIND.NetworkPublic}>
-
 	pub event RoyaltyPaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo)
 	pub event RoyaltyCouldNotBePaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo, residualAddress: Address)
 	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
@@ -713,8 +711,8 @@ pub contract FindLeaseMarket {
 		}
 	}
 
-	access(contract) fun getNetwork() : &FIND.Network{FIND.NetworkPublic} {
-		return FindLeaseMarket.network.borrow() ?? panic("Network is not up")
+	access(contract) fun getNetwork() : &FIND.Network {
+		return FindLeaseMarket.account.borrow<&FIND.Network>(from : FIND.NetworkStoragePath) ?? panic("Network is not up")
 	}
 
 	/* Admin Function */
@@ -783,7 +781,6 @@ pub contract FindLeaseMarket {
 	}
 
 	init() {
-		self.network =  FindLeaseMarket.account.getCapability<&FIND.Network{FIND.NetworkPublic}>(FIND.NetworkPrivatePath)
 		
 		self.saleItemTypes = []
 		self.saleItemCollectionTypes = []
