@@ -5,11 +5,11 @@
 // import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 // /* Alchemy Testnet Wrapper */
-/*
+
 import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
-*/
+
 
 /* NFTRegistry */
 /* In order to deploy this contract on testnet/mainet you have to comment out the code above for the relevant network */
@@ -130,14 +130,14 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     pub fun getCollections(user: String, maxItems: Int, collections: [String], shard: String) : CollectionReport? {
         switch shard {
-					/*
+					
             case "Alchemy-shard1": 
                 return self.fetchAlchemyShard1(user: user, maxItems: maxItems, targetCollections:collections)
             case "Alchemy-shard2": 
                 return self.fetchAlchemyShard2(user: user, maxItems: maxItems, targetCollections:collections)
             case "Alchemy-shard3": 
                 return self.fetchAlchemyShard3(user: user, maxItems: maxItems)
-								*/
+								
     //        case "Alchemy-shard4": 
     //           return self.fetchAlchemyShard4(user: user, maxItems: maxItems)
             case "NFTRegistry": 
@@ -151,14 +151,14 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     pub fun getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : {String : [MetadataCollectionItem]} {
         switch shard {
-					/*
+					
             case "Alchemy-shard1": 
                 return self.fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
             case "Alchemy-shard2": 
                 return self.fetchAlchemyCollectionShard2(user: user, collectionIDs: collectionIDs)
             case "Alchemy-shard3": 
                 return self.fetchAlchemyCollectionShard3(user: user, collectionIDs: collectionIDs)
-								*/
+								
      //       case "Alchemy-shard4": 
      //           return self.fetchAlchemyCollectionShard4(user: user, collectionIDs: collectionIDs)
             case "NFTRegistry": 
@@ -296,7 +296,7 @@ pub contract CollectionFactory {
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
 
-		/*
+		
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 1
     //////////////////////////////////////////////////////////////
@@ -584,7 +584,7 @@ pub contract CollectionFactory {
         }
         return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
     }
-		*/
+		
 
 		/*
     //////////////////////////////////////////////////////////////
@@ -765,7 +765,7 @@ pub contract CollectionFactory {
         return items
     }
 
-		/*
+		
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
@@ -942,7 +942,7 @@ pub contract CollectionFactory {
         }
         return items
     }
-		*/
+		
 
 		/*
     //////////////////////////////////////////////////////////////
