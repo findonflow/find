@@ -767,6 +767,110 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.sendFT("user1", "user2", "Flow", price*3)
 	})
 
+	t.Run("Should be able to multiple offer to 10 items in one go", func(t *testing.T) {
+
+		number := 10
+
+		ids := otu.mintThreeExampleDandies()
+
+		seller := "user1"
+
+		sellers := []string{seller}
+		dandy := []string{"Dandy"}
+		flow := []string{"Flow"}
+		prices := []float64{price}
+
+		for len(ids) < number {
+			id := otu.mintThreeExampleDandies()
+			ids = append(ids, id...)
+		}
+
+		ids = ids[:number]
+
+		for len(sellers) < len(ids) {
+			sellers = append(sellers, sellers[0])
+			dandy = append(dandy, dandy[0])
+			flow = append(flow, flow[0])
+			prices = append(prices, prices[0])
+		}
+
+		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(sellers...).
+				StringArray(dandy...).
+				UInt64Array(ids...).
+				StringArray(flow...).
+				UFix64Array(prices...).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+	})
+
+	t.Run("Should be able to multiple offer to and fulfill 4 items in one go", func(t *testing.T) {
+
+		otu.O.TransactionFromFile("testMintFusd").
+			SignProposeAndPayAsService().
+			Args(otu.O.Arguments().
+				Account("user2").
+				UFix64(1000.0)).
+			Test(otu.T).
+			AssertSuccess()
+
+		number := 4
+
+		ids := otu.mintThreeExampleDandies()
+
+		seller := "user1"
+
+		sellers := []string{seller}
+		dandy := []string{"Dandy"}
+		flow := []string{"Flow"}
+		prices := []float64{price}
+
+		for len(ids) < number {
+			id := otu.mintThreeExampleDandies()
+			ids = append(ids, id...)
+		}
+
+		ids = ids[:number]
+
+		for len(sellers) < len(ids) {
+			sellers = append(sellers, sellers[0])
+			dandy = append(dandy, dandy[0])
+			flow = append(flow, flow[0])
+			prices = append(prices, prices[0])
+		}
+
+		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(sellers...).
+				StringArray(dandy...).
+				UInt64Array(ids...).
+				StringArray(flow...).
+				UFix64Array(prices...).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoft").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids...)).
+			Test(otu.T).AssertSuccess()
+
+		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferSoft").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids...).
+				UFix64Array(prices...)).
+			Test(otu.T).AssertSuccess()
+
+	})
+
 	t.Run("Should be able to list an NFT for sale and buy it with DUC with multiple direct offer transaction", func(t *testing.T) {
 
 		// saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)

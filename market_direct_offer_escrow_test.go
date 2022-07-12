@@ -667,7 +667,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				UInt64Array(ids...)).
-			Test(otu.T).AssertSuccess(). 
+			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"id":     fmt.Sprintf("%d", ids[0]),
 				"seller": otu.accountAddress(name),
@@ -689,6 +689,99 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				"amount": fmt.Sprintf("%.8f", price),
 				"status": "sold",
 			}))
+
+		otu.cancelAllDirectOfferMarketEscrowed("user1")
+	})
+
+	t.Run("Should be able to direct offer to 9 items at max in one go", func(t *testing.T) {
+
+		number := 9
+
+		ids := otu.mintThreeExampleDandies()
+
+		seller := "user1"
+		name := "user2"
+
+		sellers := []string{seller}
+		dandy := []string{"Dandy"}
+		flow := []string{"Flow"}
+		prices := []float64{price}
+
+		for len(ids) < number {
+			id := otu.mintThreeExampleDandies()
+			ids = append(ids, id...)
+		}
+
+		for len(sellers) < len(ids) {
+			sellers = append(sellers, sellers[0])
+			dandy = append(dandy, dandy[0])
+			flow = append(flow, flow[0])
+			prices = append(prices, prices[0])
+		}
+
+		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(sellers...).
+				StringArray(dandy...).
+				UInt64Array(ids...).
+				StringArray(flow...).
+				UFix64Array(prices...).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		otu.cancelAllDirectOfferMarketEscrowed("user1")
+	})
+
+	t.Run("Should be able to fulfill 4 items at max in one go", func(t *testing.T) {
+
+		number := 4
+
+		ids := otu.mintThreeExampleDandies()
+
+		seller := "user1"
+		name := "user2"
+
+		sellers := []string{seller}
+		dandy := []string{"Dandy"}
+		flow := []string{"Flow"}
+		prices := []float64{price}
+
+		for len(ids) < number {
+			id := otu.mintThreeExampleDandies()
+			ids = append(ids, id...)
+		}
+
+		ids = ids[:number]
+
+		for len(sellers) < len(ids) {
+			sellers = append(sellers, sellers[0])
+			dandy = append(dandy, dandy[0])
+			flow = append(flow, flow[0])
+			prices = append(prices, prices[0])
+		}
+
+		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(sellers...).
+				StringArray(dandy...).
+				UInt64Array(ids...).
+				StringArray(flow...).
+				UFix64Array(prices...).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		name = "user1"
+
+		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferEscrowed").
+			SignProposeAndPayAs(name).
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(ids...)).
+			Test(otu.T).AssertSuccess()
 
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})

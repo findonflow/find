@@ -644,6 +644,8 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list 15 dandies in one go", func(t *testing.T) {
 
+		number := 15
+
 		otu.O.TransactionFromFile("testMintFusd").
 			SignProposeAndPayAsService().
 			Args(otu.O.Arguments().
@@ -657,14 +659,17 @@ func TestMarketSale(t *testing.T) {
 		fusd := []string{"FUSD", "FUSD", "FUSD"}
 		prices := []float64{price, price, price}
 
-		i := 1
-		for i < 5 {
+		for len(ids) < number {
 			id := otu.mintThreeExampleDandies()
 			ids = append(ids, id...)
-			dandy = append(dandy, []string{"Dandy", "Dandy", "Dandy"}...)
-			fusd = append(fusd, []string{"FUSD", "FUSD", "FUSD"}...)
-			prices = append(prices, []float64{price, price, price}...)
-			i++
+		}
+
+		ids = ids[:number]
+
+		for len(dandy) < number {
+			dandy = append(dandy, dandy[0])
+			fusd = append(fusd, fusd[0])
+			prices = append(prices, prices[0])
 		}
 
 		// list multiple NFT for sale

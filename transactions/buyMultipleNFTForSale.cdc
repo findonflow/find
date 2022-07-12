@@ -279,7 +279,6 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 
 			let saleItemCap = FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 			self.saleItemsCap.append(saleItemCap)
-
 			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
 			self.prices.append(item.getBalance())
 			self.totalPrice = self.totalPrice + self.prices[counter]
