@@ -660,7 +660,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
-			assert.Equal(otu.T, fmt.Sprintf("%.8f", expectedPlatformRoyalty), item.Cut)
+			assert.Equal(otu.T, expectedPlatformRoyalty, item.Cut)
 			return otu
 		}
 	}
@@ -1065,9 +1065,9 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 
 type Royalty struct {
 	Items []struct {
-		Cut         string `json:"cut"`
-		Description string `json:"description"`
-		Receiver    string `json:"receiver"`
+		Cut         float64 `json:"cut"`
+		Description string  `json:"description"`
+		Receiver    string  `json:"receiver"`
 	} `json:"cutInfos"`
 }
 
@@ -1682,7 +1682,7 @@ type SaleItemInformation struct {
 	NftId                 uint64       `json:"nftId"`
 	Seller                string       `json:"seller"`
 	SellerName            string       `json:"sellerName"`
-	Amount                string       `json:"amount"`
+	Amount                float64      `json:"amount"`
 	Bidder                string       `json:"bidder"`
 	BidderName            string       `json:"bidderName"`
 	ListingId             uint64       `json:"listingId"`

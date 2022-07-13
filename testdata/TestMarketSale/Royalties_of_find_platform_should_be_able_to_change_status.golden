@@ -1,127 +1,106 @@
 `{
-    "FINDReport": {
-        "bids": null,
-        "itemsForSale": {
-            "FindMarketSale": {
-                "ghosts": null,
-                "items": [
-                    {
-                        "amount": "10.00000000",
-                        "auction": "",
-                        "bidder": "",
-                        "bidderName": "",
-                        "ftAlias": "Flow",
-                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": "ID0",
-                        "listingStatus": "active",
-                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-                        "listingValidUntil": "301.00000000",
-                        "nft": {
-                            "collectionDescription": "Neo Collectibles FIND",
-                            "collectionName": "user1",
-                            "editionNumber": "1",
-                            "id": "ID0",
-                            "name": "Neo Motorcycle 1 of 3",
-                            "rarity": "",
-                            "scalars": {
-                                "Speed": "100.00000000",
-                                "edition_set_max": "3.00000000",
-                                "edition_set_number": "1.00000000"
-                            },
-                            "tags": {
-                                "NeoMotorCycleTag": "Tag1"
-                            },
-                            "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-                            "totalInEdition": "3",
-                            "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
-                        },
-                        "nftId": "ID0",
-                        "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-                        "saleItemExtraField": {},
-                        "saleType": "active_listed",
-                        "seller": "0x179b6b1cb6755e31",
-                        "sellerName": "user1"
-                    }
-                ]
-            }
-        },
-        "leases": [
-            {
-                "addons": [
-                    "forge"
-                ],
-                "address": "0x179b6b1cb6755e31",
-                "auctionEnds": "",
-                "auctionReservePrice": "",
-                "auctionStartPrice": "",
-                "cost": "5.00000000",
-                "currentTime": "201.00000000",
-                "extensionOnLateBid": "300.00000000",
-                "latestBid": "",
-                "latestBidBy": "",
-                "lockedUntil": "39312001.00000000",
-                "name": "user1",
-                "salePrice": "",
-                "status": "TAKEN",
-                "validUntil": "31536001.00000000"
-            }
-        ],
-        "marketBids": {},
-        "privateMode": "false",
-        "profile": {
-            "address": "0x179b6b1cb6755e31",
-            "allowStoringFollowers": "true",
-            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-            "createdAt": "find",
-            "description": "",
-            "findName": "user1",
-            "followers": null,
-            "following": null,
-            "gender": "",
-            "links": {},
-            "name": "user1",
-            "tags": null,
-            "wallets": [
-                {
-                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-                    "balance": "60.00000000",
-                    "name": "FIND",
-                    "tags": [
-                        "FIND"
-                    ]
-                },
-                {
-                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "147.50100000",
-                    "name": "Flow",
-                    "tags": [
-                        "flow"
-                    ]
-                },
-                {
-                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-                    "balance": "45.00000000",
-                    "name": "FUSD",
-                    "tags": [
-                        "fusd",
-                        "stablecoin"
-                    ]
-                },
-                {
-                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-                    "balance": "100.00000000",
-                    "name": "USDC",
-                    "tags": [
-                        "usdc",
-                        "stablecoin"
-                    ]
-                }
-            ]
-        },
-        "relatedAccounts": {}
+  "FINDReport": {
+    "itemsForSale": {
+      "FindMarketSale": {
+        "items": [
+          {
+            "amount": 10,
+            "ftAlias": "Flow",
+            "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+            "listingId": 217,
+            "listingStatus": "active",
+            "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
+            "listingValidUntil": 301,
+            "nft": {
+              "collectionDescription": "Neo Collectibles FIND",
+              "collectionName": "user1",
+              "editionNumber": 1,
+              "id": 217,
+              "name": "Neo Motorcycle 1 of 3",
+              "scalars": {
+                "Speed": 100,
+                "edition_set_max": 3,
+                "edition_set_number": 1
+              },
+              "tags": {
+                "NeoMotorCycleTag": "Tag1"
+              },
+              "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+              "totalInEdition": 3,
+              "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
+            },
+            "nftId": 217,
+            "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+            "saleType": "active_listed",
+            "seller": "0x179b6b1cb6755e31",
+            "sellerName": "user1"
+          }
+        ]
+      }
     },
-    "NameReport": {
-        "cost": "5.00000000",
-        "status": "TAKEN"
+    "leases": [
+      {
+        "addons": [
+          "forge"
+        ],
+        "address": "0x179b6b1cb6755e31",
+        "cost": 5,
+        "currentTime": 201,
+        "extensionOnLateBid": 300,
+        "lockedUntil": 39312001,
+        "name": "user1",
+        "status": "TAKEN",
+        "validUntil": 31536001
+      }
+    ],
+    "privateMode": false,
+    "profile": {
+      "address": "0x179b6b1cb6755e31",
+      "allowStoringFollowers": true,
+      "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+      "createdAt": "find",
+      "findName": "user1",
+      "name": "user1",
+      "wallets": [
+        {
+          "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+          "balance": 60,
+          "name": "FIND",
+          "tags": [
+            "FIND"
+          ]
+        },
+        {
+          "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+          "balance": 147.501,
+          "name": "Flow",
+          "tags": [
+            "flow"
+          ]
+        },
+        {
+          "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+          "balance": 45,
+          "name": "FUSD",
+          "tags": [
+            "fusd",
+            "stablecoin"
+          ]
+        },
+        {
+          "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+          "balance": 100,
+          "name": "USDC",
+          "tags": [
+            "usdc",
+            "stablecoin"
+          ]
+        }
+      ]
     }
+  },
+  "NameReport": {
+    "cost": 5,
+    "status": "TAKEN"
+  }
 }`

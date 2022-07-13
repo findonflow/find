@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -77,7 +76,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", id, newPrice)
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, fmt.Sprintf("%.8f", newPrice), itemsForSale[0].Amount)
+		assert.Equal(t, newPrice, itemsForSale[0].Amount)
 
 		otu.cancelAllNFTForSale("user1")
 
@@ -190,7 +189,7 @@ func TestMarketSale(t *testing.T) {
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		assert.Equal(t, price, itemsForSale[0].Amount)
 
 		otu.alterMarketOption("Sale", "deprecate")
 
@@ -242,7 +241,7 @@ func TestMarketSale(t *testing.T) {
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		assert.Equal(t, price, itemsForSale[0].Amount)
 
 		otu.alterMarketOption("Sale", "stop")
 
@@ -288,7 +287,7 @@ func TestMarketSale(t *testing.T) {
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		assert.Equal(t, price, itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("listNFTForSale").
 			SignProposeAndPayAs("user1").
