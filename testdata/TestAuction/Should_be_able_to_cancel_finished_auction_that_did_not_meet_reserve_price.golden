@@ -2,21 +2,19 @@
   "name": "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
   "time": "1970-01-01T00:00:00Z",
   "fields": {
-    "amount": "15.00000000",
-    "auctionReservePrice": "20.00000000",
+    "amount": 15,
+    "auctionReservePrice": 20,
     "buyer": "0xf3fcd2c1a78f5eee",
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user2",
-    "endsAt": "86401.00000000",
-    "lockedUntil": "39312001.00000000",
+    "endsAt": 86401,
+    "lockedUntil": 39312001,
     "name": "user1",
-    "previousBuyer": "",
-    "previousBuyerName": "",
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
     "status": "cancel_reserved_not_met",
-    "uuid": "ID0",
-    "validUntil": "31536001.00000000",
+    "uuid": 121,
+    "validUntil": 31536001,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }`
