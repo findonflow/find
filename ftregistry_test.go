@@ -82,18 +82,18 @@ func TestFTRegistry(t *testing.T) {
 				String("This is a message")).
 			Test(t).AssertSuccess().
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FiatToken.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
+				"amount": 5.0,
 				"to":     "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FiatToken.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
+				"amount": 5.0,
 				"from":   "0xf3fcd2c1a78f5eee",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
 				"from":      "0xf3fcd2c1a78f5eee",
 				"fromName":  "user2",
 				"toAddress": "0x179b6b1cb6755e31",
-				"amount":    "5.00000000",
+				"amount":    5.0,
 				"name":      "user1",
 				"tag":       "test",
 				"message":   "This is a message",
@@ -112,18 +112,18 @@ func TestFTRegistry(t *testing.T) {
 				String("This is a message")).
 			Test(t).AssertSuccess().
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
+				"amount": 5.0,
 				"to":     "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
+				"amount": 5.0,
 				"from":   "0xf3fcd2c1a78f5eee",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
 				"from":      "0xf3fcd2c1a78f5eee",
 				"fromName":  "user2",
 				"toAddress": "0x179b6b1cb6755e31",
-				"amount":    "5.00000000",
+				"amount":    5.0,
 				"name":      "user1",
 				"tag":       "test",
 				"message":   "This is a message",
@@ -142,18 +142,18 @@ func TestFTRegistry(t *testing.T) {
 				String("This is a message")).
 			Test(t).AssertSuccess().
 			AssertEmitEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
-				"amount": "5.00000000",
+				"amount": 5.0,
 				"to":     "0x179b6b1cb6755e31",
 			})).
 			AssertEmitEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn", map[string]interface{}{
-				"amount": "5.00000000",
+				"amount": 5.0,
 				"from":   "0xf3fcd2c1a78f5eee",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
 				"from":      "0xf3fcd2c1a78f5eee",
 				"fromName":  "user2",
 				"toAddress": "0x179b6b1cb6755e31",
-				"amount":    "5.00000000",
+				"amount":    5.0,
 				"name":      "user1",
 				"tag":       "test",
 				"message":   "This is a message",
