@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -424,25 +423,23 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", id),
+				"amount":      0.25,
+				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
-				"amount":      "0.50000000",
+				"amount":      0.5,
 				"findName":    "user1",
-				"id":          fmt.Sprintf("%d", id),
+				"id":          id,
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", id),
+				"amount":      0.25,
+				"id":          id,
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
@@ -480,25 +477,23 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.35000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", id),
+				"amount":      0.35,
+				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
-				"amount":      "0.50000000",
+				"amount":      0.5,
 				"findName":    "user1",
-				"id":          fmt.Sprintf("%d", id),
+				"id":          id,
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", id),
+				"amount":      0.25,
+				"id":          id,
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
@@ -637,8 +632,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"amount":        fmt.Sprintf("%.8f", newPrice),
-				"id":            fmt.Sprintf("%d", id),
+				"amount":        newPrice,
+				"id":            id,
 				"buyer":         otu.accountAddress("user3"),
 				"previousBuyer": otu.accountAddress("user2"),
 				"status":        "active_offered",
@@ -695,18 +690,18 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[0]),
+				"amount": price,
+				"id":     ids[0],
 				"buyer":  otu.accountAddress("user2"),
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[1]),
+				"amount": price,
+				"id":     ids[1],
 				"buyer":  otu.accountAddress("user2"),
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[2]),
+				"amount": price,
+				"id":     ids[2],
 				"buyer":  otu.accountAddress("user2"),
 			}))
 
@@ -717,24 +712,24 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64Array(ids...)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", ids[0]),
+				"id":     ids[0],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "active_accepted",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", ids[1]),
+				"id":     ids[1],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "active_accepted",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", ids[2]),
+				"id":     ids[2],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "active_accepted",
 			}))
 
@@ -746,21 +741,21 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", ids[0]),
+				"id":     ids[0],
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "sold",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", ids[1]),
+				"id":     ids[1],
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "sold",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", ids[2]),
+				"id":     ids[2],
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "sold",
 			}))
 
@@ -795,10 +790,10 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64Array(saleItemID[0])).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", saleItemID[0]),
+				"id":     saleItemID[0],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "active_accepted",
 			}))
 
@@ -810,9 +805,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     fmt.Sprintf("%d", saleItemID[0]),
+				"id":     saleItemID[0],
 				"buyer":  otu.accountAddress("user2"),
-				"amount": fmt.Sprintf("%.8f", price),
+				"amount": price,
 				"status": "sold",
 			}))
 
