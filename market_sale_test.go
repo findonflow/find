@@ -355,25 +355,23 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", ids[0]),
+				"amount":      0.25,
+				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
-				"amount":      "0.50000000",
+				"amount":      0.5,
 				"findName":    "user1",
-				"id":          fmt.Sprintf("%d", ids[0]),
+				"id":          ids[0],
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", ids[0]),
+				"amount":      0.25,
+				"id":          ids[0],
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
@@ -407,25 +405,23 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.35000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", ids[0]),
+				"amount":      0.35,
+				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
-				"amount":      "0.50000000",
+				"amount":      0.5,
 				"findName":    "user1",
-				"id":          fmt.Sprintf("%d", ids[0]),
+				"id":          ids[0],
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
-				"id":          fmt.Sprintf("%d", ids[0]),
+				"amount":      0.25,
+				"id":          ids[0],
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
@@ -619,22 +615,22 @@ func TestMarketSale(t *testing.T) {
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[0]),
+				"amount": price,
+				"id":     ids[0],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[1]),
+				"amount": price,
+				"id":     ids[1],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[2]),
+				"amount": price,
+				"id":     ids[2],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
@@ -673,8 +669,8 @@ func TestMarketSale(t *testing.T) {
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", saleItemID[0]),
+				"amount": price,
+				"id":     saleItemID[0],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
 				"status": "sold",

@@ -1065,9 +1065,9 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 
 type Royalty struct {
 	Items []struct {
-		Cut         float64 `json:"cut"`
-		Description string  `json:"description"`
-		Receiver    string  `json:"receiver"`
+		Cut         string `json:"cut"`
+		Description string `json:"description"`
+		Receiver    string `json:"receiver"`
 	} `json:"cutInfos"`
 }
 
@@ -1682,7 +1682,7 @@ type SaleItemInformation struct {
 	NftId                 uint64       `json:"nftId"`
 	Seller                string       `json:"seller"`
 	SellerName            string       `json:"sellerName"`
-	Amount                float64      `json:"amount"`
+	Amount                string       `json:"amount"`
 	Bidder                string       `json:"bidder"`
 	BidderName            string       `json:"bidderName"`
 	ListingId             uint64       `json:"listingId"`
