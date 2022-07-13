@@ -11,8 +11,8 @@ a different kind of metadata, such as a creator biography
 or a JPEG image file.
 */
 
-import FungibleToken from "../../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../../contracts/standard/NonFungibleToken.cdc"
+import FungibleToken from "./FungibleToken.cdc"
+import NonFungibleToken from "./NonFungibleToken.cdc"
 
 pub contract MetadataViews {
 
@@ -31,6 +31,39 @@ pub contract MetadataViews {
     pub resource interface ResolverCollection {
         pub fun borrowViewResolver(id: UInt64): &{Resolver}
         pub fun getIDs(): [UInt64]
+    }
+
+    /// NFTView is a group of views used to give a complete picture of an NFT
+    ///
+    pub struct NFTView {
+        pub let id: UInt64
+        pub let uuid: UInt64
+        pub let display: Display?
+        pub let externalURL: ExternalURL?
+        pub let collectionData: NFTCollectionData?
+        pub let collectionDisplay: NFTCollectionDisplay?
+        pub let royalties: Royalties?
+        pub let traits: Traits?
+
+        init(
+            id : UInt64,
+            uuid : UInt64,
+            display : Display?,
+            externalURL : ExternalURL?,
+            collectionData : NFTCollectionData?,
+            collectionDisplay : NFTCollectionDisplay?,
+            royalties : Royalties?,
+            traits: Traits?
+        ) {
+            self.id = id
+            self.uuid = uuid
+            self.display = display
+            self.externalURL = externalURL
+            self.collectionData = collectionData
+            self.collectionDisplay = collectionDisplay
+            self.royalties = royalties
+            self.traits = traits
+        }
     }
 
     /// Display is a basic view that includes the name, description and
@@ -292,11 +325,11 @@ pub contract MetadataViews {
         /// the relationship between the `wallet` and the NFT, or anything else that the owner might want to specify
         pub let description: String
 
-        init(recepient: Capability<&AnyResource{FungibleToken.Receiver}>, cut: UFix64, description: String) {
+        init(receiver: Capability<&AnyResource{FungibleToken.Receiver}>, cut: UFix64, description: String) {
             pre {
                 cut >= 0.0 && cut <= 1.0 : "Cut value should be in valid range i.e [0,1]"
             }
-            self.receiver = recepient
+            self.receiver = receiver
             self.cut = cut
             self.description = description
         }
@@ -617,6 +650,19 @@ pub contract MetadataViews {
             }
         }
         return nil
+    }
+
+    pub fun getNFTView(id: UInt64, viewResolver: &{Resolver}) : NFTView {
+        return NFTView(
+            id : id,
+            uuid: viewResolver.uuid,
+            display: self.getDisplay(viewResolver),
+            externalURL : self.getExternalURL(viewResolver),
+            collectionData : self.getNFTCollectionData(viewResolver),
+            collectionDisplay : self.getNFTCollectionDisplay(viewResolver),
+            royalties : self.getRoyalties(viewResolver),
+            traits : self.getTraits(viewResolver)
+        )
     }
 
 }

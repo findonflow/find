@@ -3,13 +3,14 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220615085807-e4685bb67e59
+	github.com/bjartek/overflow v0.0.0-20220713101144-94c0bbbd977e
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
-	github.com/onflow/cadence v0.24.1
-	github.com/stretchr/testify v1.7.1
+	//Need this until flow-go-sdk and cadence is released propper
+	github.com/onflow/cadence v0.24.2-0.20220627202951-5a06fec82b4a
+	github.com/stretchr/testify v1.7.5
 )
 
 require (
@@ -19,6 +20,7 @@ require (
 	cloud.google.com/go/kms v1.4.0 // indirect
 	github.com/a8m/envsubst v1.3.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
+	github.com/bits-and-blooms/bitset v1.2.2 // indirect
 	github.com/btcsuite/btcd v0.22.0-beta // indirect
 	github.com/bwmarrin/discordgo v0.23.2 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
@@ -38,8 +40,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
-	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/gosuri/uilive v0.0.4 // indirect
@@ -47,15 +48,11 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hexops/valast v1.4.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/ipfs/go-block-format v0.0.3 // indirect
 	github.com/ipfs/go-cid v0.1.0 // indirect
-	github.com/ipfs/go-datastore v0.5.1 // indirect
-	github.com/ipfs/go-ipfs-util v0.0.2 // indirect
-	github.com/jbenet/goprocess v0.1.4 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/kevinburke/go-bindata v3.22.0+incompatible // indirect
 	github.com/klauspost/compress v1.15.1 // indirect
-	github.com/klauspost/cpuid/v2 v2.0.12 // indirect
+	github.com/klauspost/cpuid/v2 v2.0.14 // indirect
 	github.com/libp2p/go-buffer-pool v0.0.2 // indirect
 	github.com/libp2p/go-libp2p-core v0.15.1 // indirect
 	github.com/libp2p/go-libp2p-tls v0.4.1 // indirect
@@ -76,14 +73,14 @@ require (
 	github.com/multiformats/go-multihash v0.1.0 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/nightlyone/lockfile v1.0.0 // indirect
-	github.com/onflow/atree v0.3.1-0.20220531231935-525fbc26f40a // indirect
-	github.com/onflow/flow-cli v0.36.0 // indirect
-	github.com/onflow/flow-core-contracts/lib/go/contracts v0.11.2-0.20220513155751-c4c1f8d59f83 // indirect
+	github.com/onflow/atree v0.4.0 // indirect
+	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20220708202053-3b2866146b5f // indirect
+	github.com/onflow/flow-core-contracts/lib/go/contracts v0.11.2-0.20220620142725-49b5accb2a84 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.11.2-0.20220513155751-c4c1f8d59f83 // indirect
-	github.com/onflow/flow-emulator v0.33.1 // indirect
+	github.com/onflow/flow-emulator v0.33.4-0.20220705151023-2cc6a4f25a20 // indirect
 	github.com/onflow/flow-ft/lib/go/contracts v0.5.0 // indirect
-	github.com/onflow/flow-go v0.26.3 // indirect
-	github.com/onflow/flow-go-sdk v0.26.1 // indirect
+	github.com/onflow/flow-go v0.25.13-0.20220706165514-abf4535fe946 // indirect
+	github.com/onflow/flow-go-sdk v0.26.6-0.20220712195924-6920f8f55b88 // indirect
 	github.com/onflow/flow-go/crypto v0.24.3 // indirect
 	github.com/onflow/flow/protobuf/go/flow v0.3.1 // indirect
 	github.com/onflow/sdks v0.4.4 // indirect
@@ -107,7 +104,7 @@ require (
 	github.com/spf13/viper v1.10.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/thoas/go-funk v0.9.2 // indirect
-	github.com/turbolent/prettier v0.0.0-20210613180524-3a3f5a5b49ba // indirect
+	github.com/turbolent/prettier v0.0.0-20220320183459-661cc755135d // indirect
 	github.com/uber/jaeger-client-go v2.29.1+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
@@ -118,6 +115,7 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
+	golang.org/x/exp v0.0.0-20220706164943-b4a6d9510983 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220418201149-a630d4f3e7a2 // indirect
 	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b // indirect
@@ -133,7 +131,9 @@ require (
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
 	mvdan.cc/gofumpt v0.1.0 // indirect
 )
+
+replace github.com/bjartek/overflow => ../overflow

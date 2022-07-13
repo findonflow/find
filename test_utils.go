@@ -13,7 +13,7 @@ import (
 
 type OverflowTestUtils struct {
 	T *testing.T
-	O *overflow.Overflow
+	O *overflow.OverflowState
 }
 
 func NewOverflowTest(t *testing.T) *OverflowTestUtils {
@@ -60,7 +60,7 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 }
 
 func (otu *OverflowTestUtils) assertLookupAddress(user, expected string) {
-	value := otu.O.Script(`import FIND from "../contracts/FIND.cdc"
+	value := otu.O.InlineScript(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {
     return FIND.lookupAddress(name)
 }
@@ -248,7 +248,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 }
 
 func (out *OverflowTestUtils) currentTime() float64 {
-	value, err := out.O.Script(`import Clock from "../contracts/Clock.cdc"
+	value, err := out.O.InlineScript(`import Clock from "../contracts/Clock.cdc"
 pub fun main() :  UFix64 {
     return Clock.time()
 }`).RunReturns()
@@ -260,7 +260,11 @@ pub fun main() :  UFix64 {
 }
 
 func (otu *OverflowTestUtils) accountAddress(name string) string {
-	address := otu.O.Account(name).Address().String()
+	account, err := otu.O.AccountE(name)
+	if err != nil {
+		panic(err)
+	}
+	address := account.Address().String()
 	return fmt.Sprintf("0x%s", address)
 }
 

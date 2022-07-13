@@ -83,7 +83,7 @@ func main() {
 
 }
 
-func registerUserWithNameAndForge(o *overflow.Overflow, name, minter string) {
+func registerUserWithNameAndForge(o *overflow.OverflowState, name, minter string) {
 
 	o.TransactionFromFile("register").
 		SignProposeAndPayAs(name).
@@ -97,7 +97,7 @@ func registerUserWithNameAndForge(o *overflow.Overflow, name, minter string) {
 		RunPrintEventsFull()
 }
 
-func createProfileAndGiftName(o *overflow.Overflow, name string) {
+func createProfileAndGiftName(o *overflow.OverflowState, name string) {
 	o.TransactionFromFile("createProfile").
 		SignProposeAndPayAs(name).
 		Args(o.Arguments().String(name)).

@@ -21,7 +21,8 @@ func main() {
 
 	contracts := res.Networks[g.Network].Contracts
 
-	accountOnMainnet, err := g.Services.Accounts.Get(g.Account("find").Address())
+	account, _ := g.AccountE("find")
+	accountOnMainnet, err := g.Services.Accounts.Get(account.Address())
 	if err != nil {
 		panic(err)
 	}
