@@ -36,7 +36,7 @@ transaction(owner: Address, name: String) {
 		if !profileCap.check() {
 			let profile <-Profile.createUser(name:name, createdAt: "find")
 
-			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), names: ["fusd", "stablecoin"])
+			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), tags: ["fusd", "stablecoin"])
 
 			profile.addWallet(fusdWallet)
 
@@ -51,7 +51,7 @@ transaction(owner: Address, name: String) {
 					let userTokenCap = acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
 					if userTokenCap.check() {
 						if !profile.hasWallet(v.tokenAlias) {
-							let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+							let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 							profile.addWallet(tokenWallet)
 						}
 						continue
@@ -60,7 +60,7 @@ transaction(owner: Address, name: String) {
 					acct.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
 					acct.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
 					if !profile.hasWallet(v.tokenAlias) {
-						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 						profile.addWallet(tokenWallet)
 					}
 				}

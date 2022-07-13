@@ -81,8 +81,8 @@
             "Speed": "200.00000000",
             "edition_nft_max": "1.00000000",
             "edition_nft_number": "1.00000000",
-            "rarity_max": "50.00000000",
-            "rarity_score": "100.00000000"
+            "rarity_max": "100.00000000",
+            "rarity_score": "50.00000000"
         },
         "tags": {
             "Color": "Pearl"

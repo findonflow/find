@@ -25,11 +25,13 @@ const lockDurationFloat = 7776000.0
 const auctionDurationFloat = 86400.0
 
 func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
+	otu.T.Helper()
 	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
 	return otu
 }
 
 func (otu *OverflowTestUtils) AutoGoldRename(fullname string, value interface{}) *OverflowTestUtils {
+	otu.T.Helper()
 	fullname = strings.Replace(fullname, " ", "_", -1)
 	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"/"+fullname))
 	return otu
