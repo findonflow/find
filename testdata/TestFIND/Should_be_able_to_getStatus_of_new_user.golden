@@ -1,14 +1,5 @@
 `{
     "FINDReport": {
-        "bids": null,
-        "itemsForSale": {},
-        "leases": null,
-        "leasesBids": {},
-        "leasesForSale": {},
-        "marketBids": {},
-        "privateMode": "false",
-        "profile": "",
-        "relatedAccounts": {}
-    },
-    "NameReport": ""
+        "privateMode": false
+    }
 }`

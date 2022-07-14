@@ -2,21 +2,17 @@
   "name": "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
   "time": "1970-01-01T00:00:00Z",
   "fields": {
-    "amount": "20.00000000",
-    "auctionReservePrice": "20.00000000",
+    "amount": 20,
+    "auctionReservePrice": 20,
     "buyer": "0xf3fcd2c1a78f5eee",
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-    "buyerName": "",
-    "endsAt": "31622401.00000000",
-    "lockedUntil": "39312001.00000000",
+    "endsAt": 31622401,
+    "lockedUntil": 39312001,
     "name": "user1",
-    "previousBuyer": "",
-    "previousBuyerName": "",
     "seller": "0x179b6b1cb6755e31",
-    "sellerName": "",
     "status": "sold",
-    "uuid": "ID0",
-    "validUntil": "31536001.00000000",
+    "uuid": 121,
+    "validUntil": 31536001,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }{
@@ -24,12 +20,11 @@
   "time": "1970-01-01T00:00:00Z",
   "fields": {
     "address": "0x01cf0e2f2f715450",
-    "amount": "1.00000000",
-    "findName": "",
+    "amount": 1,
     "name": "user1",
     "royaltyName": "Network",
     "saleType": "EnglishAuction",
-    "uuid": "ID0",
+    "uuid": 121,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }`

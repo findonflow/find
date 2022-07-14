@@ -292,10 +292,10 @@ pub contract ExampleNFT: NonFungibleToken {
 
         // Deposit exampleNFTs for testing
         let dapper = getAccount(ExampleNFT.account.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        let minterCut = MetadataViews.Royalty(recepient:dapper , cut: 0.01, description: "minter")
+        let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "minter")
         let royalties : [MetadataViews.Royalty] = []
         royalties.append(minterCut)
-        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", royalties: MetadataViews.Royalties(cutInfos:royalties))
+        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", royalties: MetadataViews.Royalties(royalties))
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft)
     }
 }

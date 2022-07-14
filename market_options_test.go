@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -100,8 +99,8 @@ func TestMarketOptions(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[1]),
+				"amount": price,
+				"id":     ids[1],
 				"seller": otu.accountAddress("user1"),
 			}))
 
@@ -158,8 +157,8 @@ func TestMarketOptions(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
-				"amount": fmt.Sprintf("%.8f", price),
-				"id":     fmt.Sprintf("%d", ids[1]),
+				"amount": price,
+				"id":     ids[1],
 				"seller": otu.accountAddress("user1"),
 			}))
 

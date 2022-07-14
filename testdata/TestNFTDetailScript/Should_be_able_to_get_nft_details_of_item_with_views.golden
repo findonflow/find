@@ -13,20 +13,15 @@
     },
     "findMarket": {
         "FindMarketSale": {
-            "amount": "10.00000000",
-            "auction": "",
-            "bidder": "",
-            "bidderName": "",
+            "amount": 10,
             "ftAlias": "Flow",
             "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-            "listingId": "ID1",
+            "listingId": 152,
             "listingStatus": "active",
             "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-            "listingValidUntil": "101.00000000",
-            "nft": "",
-            "nftId": "ID1",
+            "listingValidUntil": 101,
+            "nftId": 152,
             "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "saleItemExtraField": {},
             "saleType": "active_listed",
             "seller": "0x179b6b1cb6755e31",
             "sellerName": "user1"
@@ -43,7 +38,7 @@
                 "type": "image"
             },
             "A.f8d6e0586b0a20c7.FindViews.Nounce": {
-                "nounce": "1"
+                "nounce": 1
             },
             "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": {
                 "url": "https://find.xyz/collection/user1/dandy/ID1"
@@ -51,12 +46,12 @@
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties": {
                 "cutInfos": [
                     {
-                        "cut": "0.05000000",
+                        "cut": 0.05,
                         "description": "minter",
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"
                     },
                     {
-                        "cut": "0.02500000",
+                        "cut": 0.025,
                         "description": "platform",
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0xf8d6e0586b0a20c7, path: /public/findProfileReceiver)"
                     }
@@ -67,54 +62,49 @@
                     {
                         "displayType": "String",
                         "name": "NeoMotorCycleTag",
-                        "rarity": "",
                         "value": "Tag1"
                     },
                     {
                         "displayType": "Numeric",
                         "name": "Speed",
-                        "rarity": "",
-                        "value": "100.00000000"
+                        "value": 100
                     }
                 ]
             }
         },
-        "editionNumber": "2",
-        "id": "ID1",
+        "editionNumber": 2,
+        "id": 152,
         "media": {
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
         "name": "Neo Motorcycle 2 of 3",
-        "rarity": "",
         "royalties": [
             {
                 "address": "0x179b6b1cb6755e31",
-                "cut": "0.05000000",
+                "cut": 0.05,
                 "findName": "user1",
                 "royaltyName": "minter"
             },
             {
                 "address": "0xf8d6e0586b0a20c7",
-                "cut": "0.02500000",
-                "findName": "",
+                "cut": 0.025,
                 "royaltyName": "platform"
             }
         ],
         "scalars": {
-            "Speed": "100.00000000",
-            "edition_set_max": "3.00000000",
-            "edition_set_number": "2.00000000"
+            "Speed": 100,
+            "edition_set_max": 3,
+            "edition_set_number": 2
         },
         "tags": {
             "NeoMotorCycleTag": "Tag1"
         },
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        "totalInEdition": "3",
+        "totalInEdition": 3,
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "ID1",
+        "uuid": 152,
         "views": [
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData"
         ]
-    },
-    "storefront": ""
+    }
 }`

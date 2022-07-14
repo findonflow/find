@@ -1,33 +1,26 @@
 `{
     "FINDReport": {
-        "bids": null,
         "itemsForSale": {
             "FindMarketAuctionEscrow": {
-                "ghosts": null,
                 "items": [
                     {
-                        "amount": "10.00000000",
+                        "amount": 10,
                         "auction": {
-                            "auctionEndsAt": "",
-                            "currentPrice": "10.00000000",
-                            "extentionOnLateBid": "60.00000000",
-                            "minimumBidIncrement": "1.00000000",
-                            "reservePrice": "15.00000000",
-                            "startPrice": "10.00000000",
-                            "timestamp": "1.00000000"
+                            "currentPrice": 10,
+                            "extentionOnLateBid": 60,
+                            "minimumBidIncrement": 1,
+                            "reservePrice": 15,
+                            "startPrice": 10,
+                            "timestamp": 1
                         },
-                        "bidder": "",
-                        "bidderName": "",
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": "ID1",
+                        "listingId": 152,
                         "listingStatus": "stopped",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-                        "listingValidUntil": "11.00000000",
-                        "nft": "",
-                        "nftId": "ID1",
+                        "listingValidUntil": 11,
+                        "nftId": 152,
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-                        "saleItemExtraField": {},
                         "saleType": "active_listed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -35,31 +28,25 @@
                 ]
             },
             "FindMarketAuctionSoft": {
-                "ghosts": null,
                 "items": [
                     {
-                        "amount": "10.00000000",
+                        "amount": 10,
                         "auction": {
-                            "auctionEndsAt": "",
-                            "currentPrice": "10.00000000",
-                            "extentionOnLateBid": "60.00000000",
-                            "minimumBidIncrement": "1.00000000",
-                            "reservePrice": "15.00000000",
-                            "startPrice": "10.00000000",
-                            "timestamp": "1.00000000"
+                            "currentPrice": 10,
+                            "extentionOnLateBid": 60,
+                            "minimumBidIncrement": 1,
+                            "reservePrice": 15,
+                            "startPrice": 10,
+                            "timestamp": 1
                         },
-                        "bidder": "",
-                        "bidderName": "",
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": "ID1",
+                        "listingId": 152,
                         "listingStatus": "stopped",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-                        "listingValidUntil": "11.00000000",
-                        "nft": "",
-                        "nftId": "ID1",
+                        "listingValidUntil": 11,
+                        "nftId": 152,
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-                        "saleItemExtraField": {},
                         "saleType": "active_listed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -67,23 +54,19 @@
                 ]
             },
             "FindMarketDirectOfferSoft": {
-                "ghosts": null,
                 "items": [
                     {
-                        "amount": "10.00000000",
-                        "auction": "",
+                        "amount": 10,
                         "bidder": "0xf3fcd2c1a78f5eee",
                         "bidderName": "user2",
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": "ID0",
+                        "listingId": 151,
                         "listingStatus": "stopped",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-                        "listingValidUntil": "101.00000000",
-                        "nft": "",
-                        "nftId": "ID0",
+                        "listingValidUntil": 101,
+                        "nftId": 151,
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-                        "saleItemExtraField": {},
                         "saleType": "active_ongoing",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -91,23 +74,17 @@
                 ]
             },
             "FindMarketSale": {
-                "ghosts": null,
                 "items": [
                     {
-                        "amount": "10.00000000",
-                        "auction": "",
-                        "bidder": "",
-                        "bidderName": "",
+                        "amount": 10,
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": "ID1",
+                        "listingId": 152,
                         "listingStatus": "stopped",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-                        "listingValidUntil": "101.00000000",
-                        "nft": "",
-                        "nftId": "ID1",
+                        "listingValidUntil": 101,
+                        "nftId": 152,
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-                        "saleItemExtraField": {},
                         "saleType": "active_listed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -121,42 +98,27 @@
                     "forge"
                 ],
                 "address": "0x179b6b1cb6755e31",
-                "auctionEnds": "",
-                "auctionReservePrice": "",
-                "auctionStartPrice": "",
-                "cost": "5.00000000",
-                "currentTime": "1.00000000",
-                "extensionOnLateBid": "300.00000000",
-                "latestBid": "",
-                "latestBidBy": "",
-                "lockedUntil": "39312001.00000000",
+                "cost": 5,
+                "currentTime": 1,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
                 "name": "user1",
-                "salePrice": "",
                 "status": "TAKEN",
-                "validUntil": "31536001.00000000"
+                "validUntil": 31536001
             }
         ],
-        "leasesBids": {},
-        "leasesForSale": {},
-        "marketBids": {},
-        "privateMode": "false",
+        "privateMode": false,
         "profile": {
             "address": "0x179b6b1cb6755e31",
-            "allowStoringFollowers": "true",
+            "allowStoringFollowers": true,
             "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
             "createdAt": "find",
-            "description": "",
             "findName": "user1",
-            "followers": null,
-            "following": null,
-            "gender": "",
-            "links": {},
             "name": "user1",
-            "tags": null,
             "wallets": [
                 {
                     "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-                    "balance": "10.00000000",
+                    "balance": 10,
                     "name": "FIND",
                     "tags": [
                         "FIND"
@@ -164,7 +126,7 @@
                 },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "100.00100000",
+                    "balance": 100.001,
                     "name": "Flow",
                     "tags": [
                         "flow"
@@ -172,7 +134,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-                    "balance": "45.00000000",
+                    "balance": 45,
                     "name": "FUSD",
                     "tags": [
                         "fusd",
@@ -181,7 +143,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-                    "balance": "100.00000000",
+                    "balance": 100,
                     "name": "USDC",
                     "tags": [
                         "usdc",
@@ -189,11 +151,10 @@
                     ]
                 }
             ]
-        },
-        "relatedAccounts": {}
+        }
     },
     "NameReport": {
-        "cost": "5.00000000",
+        "cost": 5,
         "status": "TAKEN"
     }
 }`

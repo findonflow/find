@@ -6,9 +6,9 @@
 
 // /* Alchemy Testnet Wrapper */
 
-import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
-import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
-import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
+// import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
+// import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
+// import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
 
 /* NFTRegistry */
@@ -16,7 +16,6 @@ import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 /* Note that if this is changed there are code in tasks/collectionFactoryTest that also must be changed */
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 pub contract CollectionFactory {
@@ -131,12 +130,12 @@ pub contract CollectionFactory {
     pub fun getCollections(user: String, maxItems: Int, collections: [String], shard: String) : CollectionReport? {
         switch shard {
 					
-            case "Alchemy-shard1": 
-                return self.fetchAlchemyShard1(user: user, maxItems: maxItems, targetCollections:collections)
-            case "Alchemy-shard2": 
-                return self.fetchAlchemyShard2(user: user, maxItems: maxItems, targetCollections:collections)
-            case "Alchemy-shard3": 
-                return self.fetchAlchemyShard3(user: user, maxItems: maxItems, targetCollections:collections)
+            // case "Alchemy-shard1": 
+            //     return self.fetchAlchemyShard1(user: user, maxItems: maxItems, targetCollections:collections)
+            // case "Alchemy-shard2": 
+            //     return self.fetchAlchemyShard2(user: user, maxItems: maxItems, targetCollections:collections)
+            // case "Alchemy-shard3": 
+            //     return self.fetchAlchemyShard3(user: user, maxItems: maxItems, targetCollections:collections)
 								
     //        case "Alchemy-shard4": 
     //           return self.fetchAlchemyShard4(user: user, maxItems: maxItems, targetCollections:collections)
@@ -152,12 +151,12 @@ pub contract CollectionFactory {
     pub fun getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : {String : [MetadataCollectionItem]} {
         switch shard {
 					
-            case "Alchemy-shard1": 
-                return self.fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
-            case "Alchemy-shard2": 
-                return self.fetchAlchemyCollectionShard2(user: user, collectionIDs: collectionIDs)
-            case "Alchemy-shard3": 
-                return self.fetchAlchemyCollectionShard3(user: user, collectionIDs: collectionIDs)
+            // case "Alchemy-shard1": 
+            //     return self.fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
+            // case "Alchemy-shard2": 
+            //     return self.fetchAlchemyCollectionShard2(user: user, collectionIDs: collectionIDs)
+            // case "Alchemy-shard3": 
+            //     return self.fetchAlchemyCollectionShard3(user: user, collectionIDs: collectionIDs)
 								
      //       case "Alchemy-shard4": 
      //           return self.fetchAlchemyCollectionShard4(user: user, collectionIDs: collectionIDs)
@@ -301,290 +300,290 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard1(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
-        let source = "Alchemy-shard1"
-        let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+    // pub fun fetchAlchemyShard1(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    //     let source = "Alchemy-shard1"
+    //     let account = self.resolveAddress(user: user)
+    //     if account == nil { return nil }
 
-        let items : {String : [MetadataCollectionItem]} = {}
+    //     let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperTestnetShard1.getNFTIDs(ownerAddress: account!.address)
+    //     let extraIDs = AlchemyMetadataWrapperTestnetShard1.getNFTIDs(ownerAddress: account!.address)
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-        }
+    //     for project in extraIDs.keys {
+    //         if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
+    //             extraIDs.remove(key: project)
+    //         }
+    //     }
 
-        for project in extraIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
-            }
+    //     for project in extraIDs.keys {
+    //         // For passing bugs
+    //         if project == "Xtingles_NFT" {
+    //             extraIDs["Xtingles"] = extraIDs.remove(key: project)
+    //         }
 
-            if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
-            }
-        }
+    //         if project == "RCRDSHPNFT" {
+    //             extraIDs.remove(key: project)
+    //         }
+    //     }
 
-        let collections : {String : Int} = {}
-        for key in extraIDs.keys {
-            collections[key] = extraIDs[key]!.length
-        }
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
+    //     let collections : {String : Int} = {}
+    //     for key in extraIDs.keys {
+    //         collections[key] = extraIDs[key]!.length
+    //     }
+    //     let fetchingIDs : {String : [UInt64]} = {}
+    //     var fetchedCount : Int = 0
+    //     for project in extraIDs.keys {
 
-            // by pass if this is not the target collection
-            if targetCollections.length > 0 && !targetCollections.contains(project) {
-                continue
-            }
+    //         // by pass if this is not the target collection
+    //         if targetCollections.length > 0 && !targetCollections.contains(project) {
+    //             continue
+    //         }
 
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
+    //         if extraIDs[project]!.length + fetchedCount > maxItems {
+    //             let array : [UInt64] = []
+    //             while fetchedCount < maxItems {
+    //                 array.append(extraIDs[project]!.remove(at: 0))
+    //                 fetchedCount = fetchedCount + 1
+    //             }
+    //             if array.length > 0 {
+    //                 fetchingIDs[project] = array
+    //             }
+    //             break
+    //         }
 
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
+    //         let array = extraIDs.remove(key: project)! 
+    //         fetchedCount = fetchedCount + array.length
+    //         fetchingIDs[project] = array
+    //     }
 
 
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+    //     for project in fetchingIDs.keys {
+    //         let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            var collectionItems : [MetadataCollectionItem] = []
-            for nft in returnedNFTs {
-                if nft == nil {
-                    continue
-                }
+    //         var collectionItems : [MetadataCollectionItem] = []
+    //         for nft in returnedNFTs {
+    //             if nft == nil {
+    //                 continue
+    //             }
 
-                var media = ""
-                var mediaType = ""
-                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
-                    let m = nft!.media[0]!
-                    mediaType = m.mimetype ?? ""
-                    media = m.uri!
-                }
+    //             var media = ""
+    //             var mediaType = ""
+    //             if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+    //                 let m = nft!.media[0]!
+    //                 mediaType = m.mimetype ?? ""
+    //                 media = m.uri!
+    //             }
 
-                let item = MetadataCollectionItem(
-                    id: nft!.id,
-                    name: nft!.title ?? "",
-                    collection: nft!.contract.name,
-                    subCollection: "", 
-                    media: media,
-                    mediaType: mediaType,
-                    source: source
-                )
-                collectionItems.append(item)
-            }
+    //             let item = MetadataCollectionItem(
+    //                 id: nft!.id,
+    //                 name: nft!.title ?? "",
+    //                 collection: nft!.contract.name,
+    //                 subCollection: "", 
+    //                 media: media,
+    //                 mediaType: mediaType,
+    //                 source: source
+    //             )
+    //             collectionItems.append(item)
+    //         }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
-            }
-        }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
-    }
+    //         if collectionItems.length > 0 {
+    //             items[project] = collectionItems
+    //         }
+    //     }
+    //     return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+    // }
 
-    //////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 2
-    //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard2(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
-        let source = "Alchemy-shard2"
-        let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+    // ////////////////////////////////////////////////////////////
+    // pub fun fetchAlchemyShard2(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    //     let source = "Alchemy-shard2"
+    //     let account = self.resolveAddress(user: user)
+    //     if account == nil { return nil }
 
-        let items : {String : [MetadataCollectionItem]} = {}
+    //     let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperTestnetShard2.getNFTIDs(ownerAddress: account!.address)
+    //     let extraIDs = AlchemyMetadataWrapperTestnetShard2.getNFTIDs(ownerAddress: account!.address)
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-        }
+    //     for project in extraIDs.keys {
+    //         if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
+    //             extraIDs.remove(key: project)
+    //         }
+    //     }
 
-        for project in extraIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
-            }
+    //     for project in extraIDs.keys {
+    //         // For passing bugs
+    //         if project == "Xtingles_NFT" {
+    //             extraIDs["Xtingles"] = extraIDs.remove(key: project)
+    //         }
 
-            if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
-            }
-        }
+    //         if project == "RCRDSHPNFT" {
+    //             extraIDs.remove(key: project)
+    //         }
+    //     }
 
-        let collections : {String : Int} = {}
-        for key in extraIDs.keys {
-            collections[key] = extraIDs[key]!.length
-        }
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
+    //     let collections : {String : Int} = {}
+    //     for key in extraIDs.keys {
+    //         collections[key] = extraIDs[key]!.length
+    //     }
+    //     let fetchingIDs : {String : [UInt64]} = {}
+    //     var fetchedCount : Int = 0
+    //     for project in extraIDs.keys {
 
-            // by pass if this is not the target collection
-            if targetCollections.length > 0 && !targetCollections.contains(project) {
-                continue
-            }
+    //         // by pass if this is not the target collection
+    //         if targetCollections.length > 0 && !targetCollections.contains(project) {
+    //             continue
+    //         }
 
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
+    //         if extraIDs[project]!.length + fetchedCount > maxItems {
+    //             let array : [UInt64] = []
+    //             while fetchedCount < maxItems {
+    //                 array.append(extraIDs[project]!.remove(at: 0))
+    //                 fetchedCount = fetchedCount + 1
+    //             }
+    //             if array.length > 0 {
+    //                 fetchingIDs[project] = array
+    //             }
+    //             break
+    //         }
 
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
+    //         let array = extraIDs.remove(key: project)! 
+    //         fetchedCount = fetchedCount + array.length
+    //         fetchingIDs[project] = array
+    //     }
 
 
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperTestnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+    //     for project in fetchingIDs.keys {
+    //         let returnedNFTs = AlchemyMetadataWrapperTestnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            var collectionItems : [MetadataCollectionItem] = []
-            for nft in returnedNFTs {
-                if nft == nil {
-                    continue
-                }
+    //         var collectionItems : [MetadataCollectionItem] = []
+    //         for nft in returnedNFTs {
+    //             if nft == nil {
+    //                 continue
+    //             }
 
-                var media = ""
-                var mediaType = ""
-                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
-                    let m = nft!.media[0]!
-                    mediaType = m.mimetype ?? ""
-                    media = m.uri!
-                }
+    //             var media = ""
+    //             var mediaType = ""
+    //             if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+    //                 let m = nft!.media[0]!
+    //                 mediaType = m.mimetype ?? ""
+    //                 media = m.uri!
+    //             }
 
-                let item = MetadataCollectionItem(
-                    id: nft!.id,
-                    name: nft!.title ?? "",
-                    collection: nft!.contract.name,
-                    subCollection: "", 
-                    media: media,
-                    mediaType: mediaType,
-                    source: source
-                )
-                collectionItems.append(item)
-            }
+    //             let item = MetadataCollectionItem(
+    //                 id: nft!.id,
+    //                 name: nft!.title ?? "",
+    //                 collection: nft!.contract.name,
+    //                 subCollection: "", 
+    //                 media: media,
+    //                 mediaType: mediaType,
+    //                 source: source
+    //             )
+    //             collectionItems.append(item)
+    //         }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
-            }
-        }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
-    }
+    //         if collectionItems.length > 0 {
+    //             items[project] = collectionItems
+    //         }
+    //     }
+    //     return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+    // }
 
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard3(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
-        let source = "Alchemy-shard3"
-        let account = self.resolveAddress(user: user)
-        if account == nil { return nil }
+    // pub fun fetchAlchemyShard3(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    //     let source = "Alchemy-shard3"
+    //     let account = self.resolveAddress(user: user)
+    //     if account == nil { return nil }
 
-        let items : {String : [MetadataCollectionItem]} = {}
+    //     let items : {String : [MetadataCollectionItem]} = {}
         
-        let extraIDs = AlchemyMetadataWrapperTestnetShard3.getNFTIDs(ownerAddress: account!.address)
+    //     let extraIDs = AlchemyMetadataWrapperTestnetShard3.getNFTIDs(ownerAddress: account!.address)
 
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
-            }
-        }
+    //     for project in extraIDs.keys {
+    //         if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
+    //             extraIDs.remove(key: project)
+    //         }
+    //     }
 
-        for project in extraIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
-            }
+    //     for project in extraIDs.keys {
+    //         // For passing bugs
+    //         if project == "Xtingles_NFT" {
+    //             extraIDs["Xtingles"] = extraIDs.remove(key: project)
+    //         }
 
-            if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
-            }
-        }
+    //         if project == "RCRDSHPNFT" {
+    //             extraIDs.remove(key: project)
+    //         }
+    //     }
 
-        let collections : {String : Int} = {}
-        for key in extraIDs.keys {
-            collections[key] = extraIDs[key]!.length
-        }
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
+    //     let collections : {String : Int} = {}
+    //     for key in extraIDs.keys {
+    //         collections[key] = extraIDs[key]!.length
+    //     }
+    //     let fetchingIDs : {String : [UInt64]} = {}
+    //     var fetchedCount : Int = 0
+    //     for project in extraIDs.keys {
 
-            // by pass if this is not the target collection
-            if targetCollections.length > 0 && !targetCollections.contains(project) {
-                continue
-            }
+    //         // by pass if this is not the target collection
+    //         if targetCollections.length > 0 && !targetCollections.contains(project) {
+    //             continue
+    //         }
 
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
-            }
+    //         if extraIDs[project]!.length + fetchedCount > maxItems {
+    //             let array : [UInt64] = []
+    //             while fetchedCount < maxItems {
+    //                 array.append(extraIDs[project]!.remove(at: 0))
+    //                 fetchedCount = fetchedCount + 1
+    //             }
+    //             if array.length > 0 {
+    //                 fetchingIDs[project] = array
+    //             }
+    //             break
+    //         }
 
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
+    //         let array = extraIDs.remove(key: project)! 
+    //         fetchedCount = fetchedCount + array.length
+    //         fetchingIDs[project] = array
+    //     }
 
 
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperTestnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+    //     for project in fetchingIDs.keys {
+    //         let returnedNFTs = AlchemyMetadataWrapperTestnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            var collectionItems : [MetadataCollectionItem] = []
-            for nft in returnedNFTs {
-                if nft == nil {
-                    continue
-                }
+    //         var collectionItems : [MetadataCollectionItem] = []
+    //         for nft in returnedNFTs {
+    //             if nft == nil {
+    //                 continue
+    //             }
 
-                var media = ""
-                var mediaType = ""
-                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
-                    let m = nft!.media[0]!
-                    mediaType = m.mimetype ?? ""
-                    media = m.uri!
-                }
+    //             var media = ""
+    //             var mediaType = ""
+    //             if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+    //                 let m = nft!.media[0]!
+    //                 mediaType = m.mimetype ?? ""
+    //                 media = m.uri!
+    //             }
 
-                let item = MetadataCollectionItem(
-                    id: nft!.id,
-                    name: nft!.title ?? "",
-                    collection: nft!.contract.name,
-                    subCollection: "", 
-                    media: media,
-                    mediaType: mediaType,
-                    source: source
-                )
-                collectionItems.append(item)
-            }
+    //             let item = MetadataCollectionItem(
+    //                 id: nft!.id,
+    //                 name: nft!.title ?? "",
+    //                 collection: nft!.contract.name,
+    //                 subCollection: "", 
+    //                 media: media,
+    //                 mediaType: mediaType,
+    //                 source: source
+    //             )
+    //             collectionItems.append(item)
+    //         }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
-            }
-        }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
-    }
+    //         if collectionItems.length > 0 {
+    //             items[project] = collectionItems
+    //         }
+    //     }
+    //     return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+    // }
 		
 
 		/*
@@ -770,179 +769,179 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "Alchemy-shard1"
-        let account = self.resolveAddress(user: user)
-        if account == nil { return {} }
+    // pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    //     let source = "Alchemy-shard1"
+    //     let account = self.resolveAddress(user: user)
+    //     if account == nil { return {} }
 
-        let items : {String : [MetadataCollectionItem]} = {}
+    //     let items : {String : [MetadataCollectionItem]} = {}
         
-        let fetchingIDs = collectionIDs
+    //     let fetchingIDs = collectionIDs
 
-        for project in fetchingIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
-            }
+    //     for project in fetchingIDs.keys {
+    //         // For passing bugs
+    //         if project == "Xtingles_NFT" {
+    //             fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
+    //         }
 
-            if project == "RCRDSHPNFT" {
-                fetchingIDs.remove(key: project)
-            }
-        }
+    //         if project == "RCRDSHPNFT" {
+    //             fetchingIDs.remove(key: project)
+    //         }
+    //     }
 
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+    //     for project in fetchingIDs.keys {
+    //         let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            var collectionItems : [MetadataCollectionItem] = []
-            for nft in returnedNFTs {
-                if nft == nil {
-                    continue
-                }
+    //         var collectionItems : [MetadataCollectionItem] = []
+    //         for nft in returnedNFTs {
+    //             if nft == nil {
+    //                 continue
+    //             }
 
-                var media = ""
-                var mediaType = ""
-                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
-                    let m = nft!.media[0]!
-                    mediaType = m.mimetype ?? ""
-                    media = m.uri!
-                }
+    //             var media = ""
+    //             var mediaType = ""
+    //             if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+    //                 let m = nft!.media[0]!
+    //                 mediaType = m.mimetype ?? ""
+    //                 media = m.uri!
+    //             }
 
-                let item = MetadataCollectionItem(
-                    id: nft!.id,
-                    name: nft!.title ?? "",
-                    collection: nft!.contract.name,
-                    subCollection: "", 
-                    media: media,
-                    mediaType: mediaType,
-                    source: source
-                )
-                collectionItems.append(item)
-            }
+    //             let item = MetadataCollectionItem(
+    //                 id: nft!.id,
+    //                 name: nft!.title ?? "",
+    //                 collection: nft!.contract.name,
+    //                 subCollection: "", 
+    //                 media: media,
+    //                 mediaType: mediaType,
+    //                 source: source
+    //             )
+    //             collectionItems.append(item)
+    //         }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
-            }
-        }
-        return items
-    }
+    //         if collectionItems.length > 0 {
+    //             items[project] = collectionItems
+    //         }
+    //     }
+    //     return items
+    // }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 2
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "Alchemy-shard2"
-        let account = self.resolveAddress(user: user)
-        if account == nil { return {} }
+    // pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    //     let source = "Alchemy-shard2"
+    //     let account = self.resolveAddress(user: user)
+    //     if account == nil { return {} }
 
-        let items : {String : [MetadataCollectionItem]} = {}
+    //     let items : {String : [MetadataCollectionItem]} = {}
         
-        let fetchingIDs = collectionIDs
+    //     let fetchingIDs = collectionIDs
 
-        for project in fetchingIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
-            }
+    //     for project in fetchingIDs.keys {
+    //         // For passing bugs
+    //         if project == "Xtingles_NFT" {
+    //             fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
+    //         }
 
-            if project == "RCRDSHPNFT" {
-                fetchingIDs.remove(key: project)
-            }
-        }
+    //         if project == "RCRDSHPNFT" {
+    //             fetchingIDs.remove(key: project)
+    //         }
+    //     }
 
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperTestnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+    //     for project in fetchingIDs.keys {
+    //         let returnedNFTs = AlchemyMetadataWrapperTestnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            var collectionItems : [MetadataCollectionItem] = []
-            for nft in returnedNFTs {
-                if nft == nil {
-                    continue
-                }
+    //         var collectionItems : [MetadataCollectionItem] = []
+    //         for nft in returnedNFTs {
+    //             if nft == nil {
+    //                 continue
+    //             }
 
-                var media = ""
-                var mediaType = ""
-                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
-                    let m = nft!.media[0]!
-                    mediaType = m.mimetype ?? ""
-                    media = m.uri!
-                }
+    //             var media = ""
+    //             var mediaType = ""
+    //             if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+    //                 let m = nft!.media[0]!
+    //                 mediaType = m.mimetype ?? ""
+    //                 media = m.uri!
+    //             }
 
-                let item = MetadataCollectionItem(
-                    id: nft!.id,
-                    name: nft!.title ?? "",
-                    collection: nft!.contract.name,
-                    subCollection: "", 
-                    media: media,
-                    mediaType: mediaType,
-                    source: source
-                )
-                collectionItems.append(item)
-            }
+    //             let item = MetadataCollectionItem(
+    //                 id: nft!.id,
+    //                 name: nft!.title ?? "",
+    //                 collection: nft!.contract.name,
+    //                 subCollection: "", 
+    //                 media: media,
+    //                 mediaType: mediaType,
+    //                 source: source
+    //             )
+    //             collectionItems.append(item)
+    //         }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
-            }
-        }
-        return items
-    }
+    //         if collectionItems.length > 0 {
+    //             items[project] = collectionItems
+    //         }
+    //     }
+    //     return items
+    // }
 
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "Alchemy-shard3"
-        let account = self.resolveAddress(user: user)
-        if account == nil { return {} }
+    // pub fun fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    //     let source = "Alchemy-shard3"
+    //     let account = self.resolveAddress(user: user)
+    //     if account == nil { return {} }
 
-        let items : {String : [MetadataCollectionItem]} = {}
+    //     let items : {String : [MetadataCollectionItem]} = {}
         
-        let fetchingIDs = collectionIDs
+    //     let fetchingIDs = collectionIDs
 
-        for project in fetchingIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
-            }
+    //     for project in fetchingIDs.keys {
+    //         // For passing bugs
+    //         if project == "Xtingles_NFT" {
+    //             fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
+    //         }
 
-            if project == "RCRDSHPNFT" {
-                fetchingIDs.remove(key: project)
-            }
-        }
+    //         if project == "RCRDSHPNFT" {
+    //             fetchingIDs.remove(key: project)
+    //         }
+    //     }
 
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperTestnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+    //     for project in fetchingIDs.keys {
+    //         let returnedNFTs = AlchemyMetadataWrapperTestnetShard3.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            var collectionItems : [MetadataCollectionItem] = []
-            for nft in returnedNFTs {
-                if nft == nil {
-                    continue
-                }
+    //         var collectionItems : [MetadataCollectionItem] = []
+    //         for nft in returnedNFTs {
+    //             if nft == nil {
+    //                 continue
+    //             }
 
-                var media = ""
-                var mediaType = ""
-                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
-                    let m = nft!.media[0]!
-                    mediaType = m.mimetype ?? ""
-                    media = m.uri!
-                }
+    //             var media = ""
+    //             var mediaType = ""
+    //             if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+    //                 let m = nft!.media[0]!
+    //                 mediaType = m.mimetype ?? ""
+    //                 media = m.uri!
+    //             }
 
-                let item = MetadataCollectionItem(
-                    id: nft!.id,
-                    name: nft!.title ?? "",
-                    collection: nft!.contract.name,
-                    subCollection: "", 
-                    media: media,
-                    mediaType: mediaType,
-                    source: source
-                )
-                collectionItems.append(item)
-            }
+    //             let item = MetadataCollectionItem(
+    //                 id: nft!.id,
+    //                 name: nft!.title ?? "",
+    //                 collection: nft!.contract.name,
+    //                 subCollection: "", 
+    //                 media: media,
+    //                 mediaType: mediaType,
+    //                 source: source
+    //             )
+    //             collectionItems.append(item)
+    //         }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
-            }
-        }
-        return items
-    }
+    //         if collectionItems.length > 0 {
+    //             items[project] = collectionItems
+    //         }
+    //     }
+    //     return items
+    // }
 		
 
 		/*

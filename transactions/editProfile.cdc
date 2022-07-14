@@ -24,7 +24,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 				let userTokenCap = acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
 				if userTokenCap.check() {
 					if !self.profile.hasWallet(v.tokenAlias) {
-						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 						self.profile.addWallet(tokenWallet)
 					}
 					continue
@@ -33,7 +33,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 				acct.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
 				acct.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
 				if !self.profile.hasWallet(v.tokenAlias) {
-					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 					self.profile.addWallet(tokenWallet)
 				}
 			}
@@ -68,7 +68,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
 				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
 				accept: Type<@FlowToken.Vault>(),
-				names: ["flow"]
+				tags: ["flow"]
 			)
 			self.profile.addWallet(flowWallet)
 		}
@@ -79,7 +79,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
 				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
 				accept: Type<@FUSD.Vault>(),
-				names: ["fusd", "stablecoin"]
+				tags: ["fusd", "stablecoin"]
 			)
 			self.profile.addWallet(fusdWallet)
 		}

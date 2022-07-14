@@ -1,86 +1,70 @@
 `{
-    "cost": "5.00000000",
+    "cost": 5,
     "leaseStatus": {
-        "addons": null,
         "address": "0x179b6b1cb6755e31",
-        "auctionEnds": "",
-        "auctionReservePrice": "",
-        "auctionStartPrice": "",
-        "cost": "5.00000000",
-        "currentTime": "1.00000000",
-        "extensionOnLateBid": "300.00000000",
-        "latestBid": "4.00000000",
+        "cost": 5,
+        "currentTime": 1,
+        "extensionOnLateBid": 300,
+        "latestBid": 4,
         "latestBidBy": "0xf3fcd2c1a78f5eee",
-        "lockedUntil": "39312001.00000000",
+        "lockedUntil": 39312001,
         "name": "user1",
-        "salePrice": "10.00000000",
+        "salePrice": 10,
         "status": "TAKEN",
-        "validUntil": "31536001.00000000"
+        "validUntil": 31536001
     },
     "status": "TAKEN",
     "userReport": {
         "bids": [
             {
-                "amount": "8.00000000",
+                "amount": 8,
                 "lease": {
-                    "addons": null,
                     "address": "0xf3fcd2c1a78f5eee",
-                    "auctionEnds": "86401.00000000",
-                    "auctionReservePrice": "20.00000000",
-                    "auctionStartPrice": "5.00000000",
-                    "cost": "5.00000000",
-                    "currentTime": "1.00000000",
-                    "extensionOnLateBid": "300.00000000",
-                    "latestBid": "8.00000000",
+                    "auctionEnds": 86401,
+                    "auctionReservePrice": 20,
+                    "auctionStartPrice": 5,
+                    "cost": 5,
+                    "currentTime": 1,
+                    "extensionOnLateBid": 300,
+                    "latestBid": 8,
                     "latestBidBy": "0x179b6b1cb6755e31",
-                    "lockedUntil": "39312001.00000000",
+                    "lockedUntil": 39312001,
                     "name": "user2",
-                    "salePrice": "",
                     "status": "TAKEN",
-                    "validUntil": "31536001.00000000"
+                    "validUntil": 31536001
                 },
                 "name": "user2",
-                "timestamp": "1.00000000",
+                "timestamp": 1,
                 "type": "auction"
             }
         ],
         "leases": [
             {
-                "addons": null,
                 "address": "0x179b6b1cb6755e31",
-                "auctionEnds": "",
-                "auctionReservePrice": "",
-                "auctionStartPrice": "",
-                "cost": "5.00000000",
-                "currentTime": "1.00000000",
-                "extensionOnLateBid": "300.00000000",
-                "latestBid": "4.00000000",
+                "cost": 5,
+                "currentTime": 1,
+                "extensionOnLateBid": 300,
+                "latestBid": 4,
                 "latestBidBy": "0xf3fcd2c1a78f5eee",
-                "lockedUntil": "39312001.00000000",
+                "lockedUntil": 39312001,
                 "name": "user1",
-                "salePrice": "10.00000000",
+                "salePrice": 10,
                 "status": "TAKEN",
-                "validUntil": "31536001.00000000"
+                "validUntil": 31536001
             }
         ],
-        "privateMode": "false",
+        "privateMode": false,
         "profile": {
             "address": "0x179b6b1cb6755e31",
-            "allowStoringFollowers": "true",
+            "allowStoringFollowers": true,
             "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
             "createdAt": "find",
-            "description": "",
             "findName": "user1",
-            "followers": null,
-            "following": null,
-            "gender": "",
-            "links": {},
             "name": "user1",
-            "tags": null,
             "wallets": [
                 {
                     "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-                    "balance": "10.00000000",
+                    "balance": 10,
                     "name": "FIND",
                     "tags": [
                         "FIND"
@@ -88,7 +72,7 @@
                 },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "100.00100000",
+                    "balance": 100.001,
                     "name": "Flow",
                     "tags": [
                         "flow"
@@ -96,7 +80,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-                    "balance": "87.00000000",
+                    "balance": 87,
                     "name": "FUSD",
                     "tags": [
                         "fusd",
@@ -105,7 +89,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-                    "balance": "100.00000000",
+                    "balance": 100,
                     "name": "USDC",
                     "tags": [
                         "usdc",

@@ -1,51 +1,47 @@
 `{
     "FINDReport": {
-        "bids": null,
         "itemsForSale": {
             "FindMarketAuctionEscrow": {
-                "ghosts": null,
                 "items": [
                     {
-                        "amount": "10.00000000",
+                        "amount": 10,
                         "auction": {
-                            "auctionEndsAt": "4003.00000000",
-                            "currentPrice": "10.00000000",
-                            "extentionOnLateBid": "60.00000000",
-                            "minimumBidIncrement": "1.00000000",
-                            "reservePrice": "10.00000000",
-                            "startPrice": "5.00000000",
-                            "timestamp": "4203.00000000"
+                            "auctionEndsAt": 4003,
+                            "currentPrice": 10,
+                            "extentionOnLateBid": 60,
+                            "minimumBidIncrement": 1,
+                            "reservePrice": 10,
+                            "startPrice": 5,
+                            "timestamp": 4203
                         },
                         "bidder": "0xf3fcd2c1a78f5eee",
                         "bidderName": "user2",
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": "ID0",
+                        "listingId": 151,
                         "listingStatus": "ended",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-                        "listingValidUntil": "4003.00000000",
+                        "listingValidUntil": 4003,
                         "nft": {
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
-                            "editionNumber": "1",
-                            "id": "ID0",
+                            "editionNumber": 1,
+                            "id": 151,
                             "name": "Neo Motorcycle 1 of 3",
-                            "rarity": "",
                             "scalars": {
-                                "Speed": "100.00000000",
-                                "edition_set_max": "3.00000000",
-                                "edition_set_number": "1.00000000"
+                                "Speed": 100,
+                                "edition_set_max": 3,
+                                "edition_set_number": 1
                             },
                             "tags": {
                                 "NeoMotorCycleTag": "Tag1"
                             },
                             "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-                            "totalInEdition": "3",
+                            "totalInEdition": 3,
                             "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
                         },
-                        "nftId": "ID0",
+                        "nftId": 151,
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-                        "saleItemExtraField": {},
                         "saleType": "finished_completed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -59,42 +55,27 @@
                     "forge"
                 ],
                 "address": "0x179b6b1cb6755e31",
-                "auctionEnds": "",
-                "auctionReservePrice": "",
-                "auctionStartPrice": "",
-                "cost": "5.00000000",
-                "currentTime": "4203.00000000",
-                "extensionOnLateBid": "300.00000000",
-                "latestBid": "",
-                "latestBidBy": "",
-                "lockedUntil": "39312001.00000000",
+                "cost": 5,
+                "currentTime": 4203,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
                 "name": "user1",
-                "salePrice": "",
                 "status": "TAKEN",
-                "validUntil": "31536001.00000000"
+                "validUntil": 31536001
             }
         ],
-        "leasesBids": {},
-        "leasesForSale": {},
-        "marketBids": {},
-        "privateMode": "false",
+        "privateMode": false,
         "profile": {
             "address": "0x179b6b1cb6755e31",
-            "allowStoringFollowers": "true",
+            "allowStoringFollowers": true,
             "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
             "createdAt": "find",
-            "description": "",
             "findName": "user1",
-            "followers": null,
-            "following": null,
-            "gender": "",
-            "links": {},
             "name": "user1",
-            "tags": null,
             "wallets": [
                 {
                     "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-                    "balance": "80.00000000",
+                    "balance": 80,
                     "name": "FIND",
                     "tags": [
                         "FIND"
@@ -102,7 +83,7 @@
                 },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": "209.25100000",
+                    "balance": 209.251,
                     "name": "Flow",
                     "tags": [
                         "flow"
@@ -110,7 +91,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-                    "balance": "45.00000000",
+                    "balance": 45,
                     "name": "FUSD",
                     "tags": [
                         "fusd",
@@ -119,7 +100,7 @@
                 },
                 {
                     "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-                    "balance": "100.00000000",
+                    "balance": 100,
                     "name": "USDC",
                     "tags": [
                         "usdc",
@@ -127,11 +108,10 @@
                     ]
                 }
             ]
-        },
-        "relatedAccounts": {}
+        }
     },
     "NameReport": {
-        "cost": "5.00000000",
+        "cost": 5,
         "status": "TAKEN"
     }
 }`
