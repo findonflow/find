@@ -96,16 +96,21 @@ pub contract FindMarket {
 	pub fun assertOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
 
 		let tenantRef=self.getTenant(tenant)
+		/* 559 */	/* 719 for 3 purchase */
+
 		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+		/* 581 */	/* 785 for 3 purchase */
 		let optRef = collectionCap.borrow() 
 		if optRef == nil {
 			panic("Account not properly set up, cannot borrow sale item collection")
 		}
 		let ref=optRef!
 		let item=ref.borrowSaleItem(id)
+		/* 590 */	/* 812 for 3 purchase */
 		if !item.checkPointer() {
 			panic("this is a ghost listing")
 		} 
+		/* 622 */	/* 908 for 3 purchase */
 
 		return item
 	}
@@ -1043,15 +1048,18 @@ pub contract FindMarket {
 
 
 	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?), rewardFN: ((Address, String?, Address, String) : Void )) {
+		/* 1366 */	/* 3096 for 3 purchase */
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
+		/* 1378 */	/* 3132 for 3 purchase */
 		let soldFor=vault.balance
 		let ftType=vault.getType()
 
 		/* Residual Royalty */
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
 		let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		/* 1412 */	/* 3234 for 3 purchase */
 
 		/* Check the total royalty to prevent changing of royalties */
 		let royalties = royalty.getRoyalties()
@@ -1067,6 +1075,7 @@ pub contract FindMarket {
 				let cutAmount= soldFor * royaltyItem.cut
 				let receiver = royaltyItem.receiver.address
 				let name = resolver(royaltyItem.receiver.address)
+		/* 1510 */	/* 3528 for 3 purchase */
 
 				var walletCheck = true 
 				if !royaltyItem.receiver.check() { 
@@ -1080,6 +1089,7 @@ pub contract FindMarket {
 					// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
 					walletCheck = false 
 				}
+		/* 1550 */	/* 3648 for 3 purchase */
 
 				/* If the royalty receiver check failed */
 				if !walletCheck {
@@ -1090,7 +1100,9 @@ pub contract FindMarket {
 
 				/* If the royalty receiver check succeed */
 				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+		/* 1556 */	/* 3666 for 3 purchase */
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+		/* 1636 */	/* 3906 for 3 purchase */
 			}
 		}
 
@@ -1099,7 +1111,9 @@ pub contract FindMarket {
 			let name = resolver(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
+		/* 1670 */	/* 4008 for 3 purchase */
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
+		/* 1709 */	/* 4125 for 3 purchase */
 		}
 
 		if let tenantCut =cuts.tenantCut {
@@ -1113,8 +1127,10 @@ pub contract FindMarket {
 		oldProfile.deposit(from: <- vault)
 
 		let tenantAddress = FindMarket.tenantNameAddress[tenant]!
+		/* 1711 */	/* 4131 for 3 purchase */
 		rewardFN(tenant: tenantAddress, findName: resolver(buyer!), receiver: buyer!, task: "findMarket_fulfill_buyer")
 		rewardFN(tenant: tenantAddress, findName: resolver(seller), receiver: seller, task: "findMarket_fulfill_seller")
+		/* 1963 */	/* 4887 for 3 purchase */
 	}
 
 	pub struct NFTInfo {

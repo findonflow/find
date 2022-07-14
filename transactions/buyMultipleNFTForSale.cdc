@@ -247,6 +247,8 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 		}
 		//SYNC with register
 
+		/* 365 */
+
 		var counter = 0
 		self.walletReference= []
 		self.targetCapability = []
@@ -261,6 +263,8 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 
 		self.totalPrice = 0.0
 		self.prices = []
+
+		/* 379 */
 
 		while counter < users.length {
 			var resolveAddress : Address? = nil
@@ -277,10 +281,16 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 
 			let address = resolveAddress!
 
+		/* 485 */
+
 			let saleItemCap = FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 			self.saleItemsCap.append(saleItemCap)
 
+		/* 537 */    /* 653 for 3 purchase */
+
 			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
+
+		/* 623 */	/* 911 for 3 purchase */
 			self.prices.append(item.getBalance())
 			self.totalPrice = self.totalPrice + self.prices[counter]
 			
@@ -303,6 +313,7 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 				fts[ftIdentifier] = ft 
 			}
 
+		/* 662 */	/* 988 for 3 purchase */
 
 			let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
 			self.walletReference.append(walletReference)
@@ -324,6 +335,8 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 			counter = counter + 1
 		}
 
+		/* 672 */	/* 1018 for 3 purchase */
+
 	}
 
 	execute {
@@ -331,9 +344,11 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 		while counter < users.length {
 			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
 			assert(self.walletReference[counter].balance > amounts[counter], message: "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+		/* 690 */	/* 1068 for 3 purchase */
 			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
 			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
 			counter = counter + 1
 		}
 	}
 }
+		/* 2188 */	/* 5562 for 3 purchase */

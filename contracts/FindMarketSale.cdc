@@ -174,7 +174,7 @@ pub contract FindMarketSale {
 			}
 
 			let saleItem=self.borrow(id)
-
+		/* 716 */	/* 1146 for 3 purchase */
 			if saleItem.salePrice != vault.balance {
 				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
 			}
@@ -195,26 +195,35 @@ pub contract FindMarketSale {
 
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
+		/* 836 */	/* 1506 for 3 purchase */
 
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
 			let nftInfo= saleItem.toNFTInfo()
+		/* 1123 */	/* 2367 for 3 purchase */
 
 			let royalty=saleItem.getRoyalty()
+		/* 1188 */	/* 2562 for 3 purchase */
 
 			let soldFor=saleItem.getBalance()
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
+		/* 1195 */	/* 2583 for 3 purchase */
 			let buyerName=FIND.reverseLookup(buyer)
+		/* 1240 */	/* 2718 for 3 purchase */
 			let profile = FIND.lookup(buyer.toString())
+		/* 1304 */	/* 2910 for 3 purchase */
 
 			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
 
+		/* 1357 */	/* 3069 for 3 purchase */
 			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
+		/* 1963 */	/* 4887 for 3 purchase */
 			
-			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+		// 	nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+		// /* 2186 */	/* 5556 for 3 purchase */
 
-			destroy <- self.items.remove(key: id)
+		// 	destroy <- self.items.remove(key: id)
 		}
 
 		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
