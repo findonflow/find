@@ -61,6 +61,17 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 	return ids
 }
 
+func (otu *OverflowTestUtils) assertNilLookupAddress(user string) {
+	value := otu.O.InlineScript(`import FIND from "../contracts/FIND.cdc"
+pub fun main(name: String) :  Address? {
+    return FIND.lookupAddress(name)
+}
+		`).
+		Args(otu.O.Arguments().String(user)).RunReturnsInterface()
+
+	assert.Equal(otu.T, nil, value)
+}
+
 func (otu *OverflowTestUtils) assertLookupAddress(user, expected string) {
 	value := otu.O.InlineScript(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {

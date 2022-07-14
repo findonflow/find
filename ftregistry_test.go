@@ -176,12 +176,12 @@ func TestFTRegistry(t *testing.T) {
 		aliasResult := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.FUSD.Vault")).
 			RunReturnsInterface()
-		assert.Equal(t, "", aliasResult)
+		assert.Equal(t, nil, aliasResult)
 
 		infoResult := o.ScriptFromFile("getFTInfo").
 			Args(o.Arguments().String("Flow")).
 			RunReturnsInterface()
-		assert.Equal(t, "", infoResult)
+		assert.Equal(t, nil, infoResult)
 
 	})
 }

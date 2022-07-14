@@ -8,7 +8,7 @@
     "tag": [
         "stablecoin"
     ],
-    "type": "Type\u003cA.f8d6e0586b0a20c7.FiatToken.Vault\u003e()",
+    "type": "A.f8d6e0586b0a20c7.FiatToken.Vault",
     "typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
     "vaultPath": "/storage/USDCVault",
     "vaultPathIdentifier": "USDCVault"
