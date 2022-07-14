@@ -220,10 +220,10 @@ pub contract FindMarketSale {
 			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
 		/* 1963 */	/* 4887 for 3 purchase */
 			
-		// 	nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 		// /* 2186 */	/* 5556 for 3 purchase */
 
-		// 	destroy <- self.items.remove(key: id)
+			destroy <- self.items.remove(key: id)
 		}
 
 		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
