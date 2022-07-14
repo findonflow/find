@@ -26,7 +26,7 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
-    "saleID": 257,
+    "saleID": 260,
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
     "status": "sold",
@@ -60,7 +60,7 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "minter",
-    "saleID": 257,
+    "saleID": 260,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
   }
@@ -90,7 +90,7 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
-    "saleID": 257,
+    "saleID": 260,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
   }
@@ -120,7 +120,7 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",
-    "saleID": 257,
+    "saleID": 260,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
   }

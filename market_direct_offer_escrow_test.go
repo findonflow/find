@@ -179,9 +179,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
-```suggestion
-```suggestion
-newPrice := 11.0
+		newPrice := 11.0
 		otu.O.TransactionFromFile("bidMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
@@ -194,7 +192,7 @@ newPrice := 11.0
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
-				"amount":    newPrice,
+				"amount":        newPrice,
 				"id":            id,
 				"previousBuyer": otu.accountAddress("user2"),
 			})).
