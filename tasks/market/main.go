@@ -234,7 +234,7 @@ func main() {
 
 }
 
-func buyName(o *overflow.Overflow, buyer, name string) {
+func buyName(o *overflow.OverflowState, buyer, name string) {
 	o.TransactionFromFile("register").
 		SignProposeAndPayAs(buyer).
 		Args(o.Arguments().

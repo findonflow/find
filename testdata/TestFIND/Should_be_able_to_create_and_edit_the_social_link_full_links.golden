@@ -1,13 +1,10 @@
 `{
     "address": "0x179b6b1cb6755e31",
-    "allowStoringFollowers": "true",
+    "allowStoringFollowers": true,
     "avatar": "This is avatar",
     "createdAt": "find",
     "description": "This is description",
     "findName": "user1",
-    "followers": null,
-    "following": null,
-    "gender": "",
     "links": {
         "CryptoTwitter": {
             "title": "0xBjartek",
@@ -27,7 +24,7 @@
     "wallets": [
         {
             "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-            "balance": "10.00000000",
+            "balance": 10,
             "name": "FIND",
             "tags": [
                 "FIND"
@@ -35,7 +32,7 @@
         },
         {
             "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-            "balance": "30.00100000",
+            "balance": 30.001,
             "name": "Flow",
             "tags": [
                 "flow"
@@ -43,7 +40,7 @@
         },
         {
             "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
-            "balance": "25.00000000",
+            "balance": 25,
             "name": "FUSD",
             "tags": [
                 "fusd",
@@ -52,7 +49,7 @@
         },
         {
             "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-            "balance": "30.00000000",
+            "balance": 30,
             "name": "USDC",
             "tags": [
                 "usdc",

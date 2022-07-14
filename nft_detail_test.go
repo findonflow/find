@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hexops/autogold"
+	"github.com/sanity-io/litter"
 )
 
 func TestNFTDetailScript(t *testing.T) {
@@ -133,22 +134,24 @@ func TestNFTDetailScript(t *testing.T) {
 				String("Dandy").
 				UInt64(ids[1]).
 				StringArray()).
-			RunReturnsJsonString()
+			RunReturnsInterface()
 
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
-		}
-		for _, item := range viewList {
-			actual = strings.Replace(actual, item, "checked", -1)
-		}
-		actual = otu.replaceID(actual, ids)
+			/*
+				viewList := []string{
+					"A.f8d6e0586b0a20c7.FindViews.Nounce",
+					"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+					"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+					"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+					"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+					"A.f8d6e0586b0a20c7.MetadataViews.Traits",
+				}
+				for _, item := range viewList {
+					actual = strings.Replace(actual, item, "checked", -1)
+				}
+				actual = otu.replaceID(actual, ids)
 
-		autogold.Equal(t, actual)
+			*/
+		autogold.Equal(t, litter.Sdump(actual))
 	})
 
 	t.Run("Should be able to get media with thumbnail", func(t *testing.T) {
