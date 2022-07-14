@@ -733,7 +733,7 @@ func (otu *OverflowTestUtils) saleItemListed(name string, saleType string, price
 
 	assert.Equal(t, 1, len(itemsForSale))
 	assert.Equal(t, saleType, itemsForSale[0].SaleType)
-	assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+	assert.Equal(t, price, itemsForSale[0].Amount)
 	return otu
 }
 
