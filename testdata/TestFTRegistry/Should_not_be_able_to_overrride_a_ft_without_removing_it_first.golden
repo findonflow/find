@@ -9,7 +9,7 @@
         "tag": [
             "utility coin"
         ],
-        "type": "Type\u003cA.0ae53cb6e3f42a79.FlowToken.Vault\u003e()",
+        "type": "A.0ae53cb6e3f42a79.FlowToken.Vault",
         "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
         "vaultPath": "/storage/flowTokenVault",
         "vaultPathIdentifier": "flowTokenVault"
@@ -24,7 +24,7 @@
         "tag": [
             "stablecoin"
         ],
-        "type": "Type\u003cA.f8d6e0586b0a20c7.FUSD.Vault\u003e()",
+        "type": "A.f8d6e0586b0a20c7.FUSD.Vault",
         "typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
         "vaultPath": "/storage/fusdVault",
         "vaultPathIdentifier": "fusdVault"
