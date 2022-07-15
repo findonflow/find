@@ -163,26 +163,26 @@ pub contract FindLeaseMarket {
 				}
 				continue
 			} 
-			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"), seller: address, buyer: nil)
+			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, name:"delist item for sale"), seller: address, buyer: nil)
 			var status="active"
 
 			if !stopped.allowed && stopped.message == "Seller banned by Tenant" {
 				status="banned"
-				info.append(FindLeaseMarket.SaleItemInformation(item, status, false))
+				info.append(FindLeaseMarket.SaleItemInformation(item: item, status: status, leaseInfo: false))
 				continue
 			}
 
 			if !stopped.allowed {
 				status="stopped"
-				info.append(FindLeaseMarket.SaleItemInformation(item, status, false))
+				info.append(FindLeaseMarket.SaleItemInformation(item: item, status: status, leaseInfo: false))
 				continue
 			}
 
-			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"), seller: address, buyer: nil)
+			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, name:"delist item for sale"), seller: address, buyer: nil)
 
 			if !deprecated.allowed {
 				status="deprecated"
-				info.append(FindLeaseMarket.SaleItemInformation(item, status, getLeaseInfo))
+				info.append(FindLeaseMarket.SaleItemInformation(item: item, status: status, leaseInfo: getLeaseInfo))
 				continue
 			}
 
@@ -191,7 +191,7 @@ pub contract FindLeaseMarket {
 					status="ended"
 				}
 			}
-			info.append(FindLeaseMarket.SaleItemInformation(item, status, getLeaseInfo))
+			info.append(FindLeaseMarket.SaleItemInformation(item: item, status: status, leaseInfo: getLeaseInfo))
 		}
 
 		return FindLeaseMarket.SaleItemCollectionReport(items: info, ghosts: ghost)

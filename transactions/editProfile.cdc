@@ -9,9 +9,9 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 	
 	let profile : &Profile.User
 
-	prepare(acct: AuthAccount) {
+	prepare(account: AuthAccount) {
 
-		self.profile =acct.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
+		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
 		/* Add Reward Tokens */
 		let rewardTokenCaps = FindRewardToken.getRewardVaultViews() 
@@ -21,31 +21,31 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 			}
 			if let VaultData = rewardTokenCap.borrow()!.resolveView(Type<FindRewardToken.FTVaultData>()) {
 				let v = VaultData as! FindRewardToken.FTVaultData
-				let userTokenCap = acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
+				let userTokenCap = account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
 				if userTokenCap.check() {
 					if !self.profile.hasWallet(v.tokenAlias) {
-						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
+						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 						self.profile.addWallet(tokenWallet)
 					}
 					continue
 				}
-				acct.save( <- v.createEmptyVault() , to: v.storagePath)
-				acct.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
-				acct.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
+				account.save( <- v.createEmptyVault() , to: v.storagePath)
+				account.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
+				account.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
 				if !self.profile.hasWallet(v.tokenAlias) {
-					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:acct.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:acct.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
+					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 					self.profile.addWallet(tokenWallet)
 				}
 			}
 		}
 
 		//Add exising FUSD or create a new one and add it
-		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		if !fusdReceiver.check() {
 			let fusd <- FUSD.createEmptyVault()
-			acct.save(<- fusd, to: /storage/fusdVault)
-			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+			account.save(<- fusd, to: /storage/fusdVault)
+			account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
+			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
 		}
 
 
@@ -65,8 +65,8 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		if !hasFlowWallet {
 			let flowWallet=Profile.Wallet(
 				name:"Flow", 
-				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
-				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
+				receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+				balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
 				accept: Type<@FlowToken.Vault>(),
 				tags: ["flow"]
 			)
@@ -76,25 +76,25 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 		if !hasFusdWallet {
 			let fusdWallet=Profile.Wallet(
 				name:"FUSD", 
-				receiver:acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
-				balance:acct.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
+				receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
+				balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
 				accept: Type<@FUSD.Vault>(),
 				tags: ["fusd", "stablecoin"]
 			)
 			self.profile.addWallet(fusdWallet)
 		}
 
-		let leaseCollection = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
-			acct.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
-			acct.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
+			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
+			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 
 		}
 
-		let bidCollection = acct.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
+		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 		if !bidCollection.check() {
-			acct.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
-			acct.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
+			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
+			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
 		}
 	}
 

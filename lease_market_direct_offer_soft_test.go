@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -396,16 +395,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
+				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
-				"amount":      "0.50000000",
-				"findName":    "",
+				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
@@ -442,16 +439,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.35000000",
-				"findName":    "",
+				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
-				"amount":      "0.50000000",
-				"findName":    "",
+				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
@@ -573,7 +568,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				UFix64(100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"amount":        fmt.Sprintf("%.8f", newPrice),
+				"amount":        newPrice,
 				"leaseName":     "name1",
 				"buyer":         otu.accountAddress("user3"),
 				"previousBuyer": otu.accountAddress("user2"),

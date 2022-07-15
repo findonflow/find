@@ -275,7 +275,7 @@ pub contract FindLeaseMarketAuctionSoft {
 		access(self) fun addBid(name:String, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
 			let saleItem=self.borrow(name)
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "add bit in soft-auction"), seller: self.owner!.address ,buyer: newOffer.address)
+			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"add bit in soft-auction"), seller: self.owner!.address ,buyer: newOffer.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -356,7 +356,7 @@ pub contract FindLeaseMarketAuctionSoft {
 				return
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "bid item in soft-auction"), seller: self.owner!.address, buyer: callback.address)
+			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"bid item in soft-auction"), seller: self.owner!.address, buyer: callback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -400,7 +400,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			} else {
 				status="cancel_ghostlisting"
 			}
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item from soft-auction"), seller: nil, buyer: nil)
+			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"delist item from soft-auction"), seller: nil, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -439,7 +439,7 @@ pub contract FindLeaseMarketAuctionSoft {
 				panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "buy item for soft-auction"), seller: self.owner!.address,buyer: saleItem.offerCallback!.address)
+			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"buy item for soft-auction"), seller: self.owner!.address,buyer: saleItem.offerCallback!.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -463,7 +463,7 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "list item for soft-auction"), seller: self.owner!.address, buyer: nil)
+			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name:"list item for soft-auction"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)

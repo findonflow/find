@@ -167,7 +167,7 @@ pub contract FindLeaseMarketSale {
 				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "buy lease for sale"), seller: self.owner!.address, buyer: to)
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"buy lease for sale"), seller: self.owner!.address, buyer: to)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -199,7 +199,7 @@ pub contract FindLeaseMarketSale {
 			// What happends if we relist  
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, "list lease for sale"), seller: self.owner!.address, buyer: nil)
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name:"list lease for sale"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -220,7 +220,7 @@ pub contract FindLeaseMarketSale {
 			let saleItem <- self.items.remove(key: name)!
 
 			if saleItem.checkPointer() {
-				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "delist lease for sale"), seller: nil, buyer: nil)
+				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"delist lease for sale"), seller: nil, buyer: nil)
 
 				if !actionResult.allowed {
 					panic(actionResult.message)

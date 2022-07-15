@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
@@ -70,7 +69,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.listLeaseForSale("user1", "name1", newPrice)
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, fmt.Sprintf("%.8f", newPrice), itemsForSale[0].Amount)
+		assert.Equal(t, newPrice, itemsForSale[0].Amount)
 
 		otu.cancelAllLeaseForSale("user1")
 
@@ -169,7 +168,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		assert.Equal(t, price, itemsForSale[0].Amount)
 
 		otu.alterLeaseMarketOption("Sale", "deprecate")
 
@@ -218,7 +217,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		assert.Equal(t, price, itemsForSale[0].Amount)
 
 		otu.alterLeaseMarketOption("Sale", "stop")
 
@@ -258,7 +257,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-		assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+		assert.Equal(t, price, itemsForSale[0].Amount)
 
 		otu.O.TransactionFromFile("listLeaseForSale").
 			SignProposeAndPayAs("user1").
@@ -316,16 +315,14 @@ func TestLeaseMarketSale(t *testing.T) {
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.25000000",
-				"findName":    "",
+				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
-				"amount":      "0.50000000",
-				"findName":    "",
+				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
@@ -358,16 +355,14 @@ func TestLeaseMarketSale(t *testing.T) {
 			AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
-				"amount":      "0.35000000",
-				"findName":    "",
+				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
-				"amount":      "0.50000000",
-				"findName":    "",
+				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
@@ -460,7 +455,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 					"address":     otu.accountAddress("account"),
 					"amount":      "0.25000000",
-					"id":          fmt.Sprintf("%d", ids[0]),
+					"id":          ids[0],
 					"royaltyName": "find",
 				})).
 				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
@@ -468,7 +463,7 @@ func TestLeaseMarketSale(t *testing.T) {
 					"amount":          "0.50000000",
 					"findName":        "user1",
 					"residualAddress": otu.accountAddrss("find"),
-						"id":              fmt.Sprintf("%d", ids[0]),
+						"id":          ids[0],
 					"royaltyName":     "minter",
 					"tenant":          "find",
 				})).
@@ -476,7 +471,7 @@ func TestLeaseMarketSale(t *testing.T) {
 					"address":     otu.accountAddress("account"),
 					"amount":      "0.25000000",
 					"findName":    "",
-					"id":          fmt.Sprintf("%d", ids[0]),
+					"id":          ids[0],
 					"royaltyName": "platform",
 					"tenant":      "find",
 				}))

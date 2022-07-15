@@ -113,7 +113,7 @@ transaction(dapperAddress: Address, leaseName: String, price:UFix64, auctionRese
 				let userTokenCap = account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
 				if userTokenCap.check() {
 					if !profile.hasWallet(v.tokenAlias) {
-						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 						profile.addWallet(tokenWallet)
 					}
 					continue
@@ -122,7 +122,7 @@ transaction(dapperAddress: Address, leaseName: String, price:UFix64, auctionRese
 				account.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
 				account.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
 				if !profile.hasWallet(v.tokenAlias) {
-					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, names: [v.tokenAlias])
+					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
 					profile.addWallet(tokenWallet)
 				}
 			}
@@ -130,13 +130,13 @@ transaction(dapperAddress: Address, leaseName: String, price:UFix64, auctionRese
 		}
 
 		if !profile.hasWallet("Flow") {
-			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), names: ["flow"])
+			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), tags: ["flow"])
 	
 			profile.addWallet(flowWallet)
 			updated=true
 		}
 		if !profile.hasWallet("DUC") {
-			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:getAccount(dapperAddress).getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), names: ["duc", "dapperUtilityCoin","dapper"]))
+			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:getAccount(dapperAddress).getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
 			updated=true
 		}
 

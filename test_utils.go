@@ -586,7 +586,7 @@ func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price f
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
 			"status":    "active_listed",
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"leaseName": name,
 			"seller":    otu.accountAddress(user),
 		}))
@@ -706,8 +706,8 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuction(user string, name string, 
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"status":              "active_listed",
-			"amount":              fmt.Sprintf("%.8f", price),
-			"auctionReservePrice": fmt.Sprintf("%.8f", price+5.0),
+			"amount":              price,
+			"auctionReservePrice": price + 5.0,
 			"leaseName":           name,
 			"seller":              otu.accountAddress(user),
 		}))
@@ -795,7 +795,7 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSale(buyer string, seller string,
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"leaseName": name,
 			"seller":    otu.accountAddress(seller),
 			"buyer":     otu.accountAddress(buyer),
@@ -849,7 +849,7 @@ func (otu *OverflowTestUtils) increaseAuctionBidLeaseMarketSoft(buyer string, na
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", totalPrice),
+			"amount":    totalPrice,
 			"leaseName": name,
 			"buyer":     otu.accountAddress(buyer),
 			"status":    "active_ongoing",
@@ -875,7 +875,7 @@ func (otu *OverflowTestUtils) saleLeaseListed(name string, saleType string, pric
 
 	assert.Equal(t, 1, len(itemsForSale))
 	assert.Equal(t, saleType, itemsForSale[0].SaleType)
-	assert.Equal(t, fmt.Sprintf("%.8f", price), itemsForSale[0].Amount)
+	assert.Equal(t, price, itemsForSale[0].Amount)
 	return otu
 }
 
@@ -926,7 +926,7 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoft(buyer string, name strin
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"leaseName": name,
 			"buyer":     otu.accountAddress(buyer),
 			"status":    "active_ongoing",
@@ -979,7 +979,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferLeaseMarketSoft(user, name stri
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", totalPrice),
+			"amount":    totalPrice,
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
 			"status":    "active_offered",
@@ -1066,7 +1066,7 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoft(user string, name strin
 			UFix64(otu.currentTime() + 100.0)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
 		}))
@@ -1138,7 +1138,7 @@ func (otu *OverflowTestUtils) acceptLeaseDirectOfferMarketSoft(buyer, seller str
 			"leaseName": name,
 			"seller":    otu.accountAddress(seller),
 			"buyer":     otu.accountAddress(buyer),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"status":    "active_accepted",
 		}))
 	return otu
@@ -1205,7 +1205,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferLeaseSoft(user, name string, pric
 			"status":    "cancel_rejected",
 			"leaseName": name,
 			"seller":    otu.accountAddress(user),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 		}))
 	return otu
 }
@@ -1306,7 +1306,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name st
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"status":    "sold",
 		}))
 	return otu
@@ -1341,7 +1341,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name strin
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"status":    "sold",
 		}))
 	return otu
@@ -1881,7 +1881,7 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"leaseName": name,
 			"seller":    otu.accountAddress(seller),
 			"buyer":     otu.accountAddress(buyer),
@@ -1989,7 +1989,7 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name str
 			UFix64(price)).
 		Test(otu.T).AssertSuccess().
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
 			"status":    "active_ongoing",
@@ -2008,7 +2008,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"status":    "sold",
 		}))
 	return otu
@@ -2111,7 +2111,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller 
 			"leaseName": name,
 			"seller":    otu.accountAddress(seller),
 			"buyer":     otu.accountAddress(buyer),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"status":    "active_accepted",
 		}))
 	return otu
@@ -2146,7 +2146,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name st
 		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 			"leaseName": name,
 			"buyer":     otu.accountAddress(user),
-			"amount":    fmt.Sprintf("%.8f", price),
+			"amount":    price,
 			"status":    "sold",
 		}))
 	return otu
