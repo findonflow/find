@@ -18,8 +18,9 @@ func main() {
 	// 	"views":                `["A.631e88ae7f1d7c20.MetadataViews.NFTCollectionData"]`,
 	// }).RunReturnsJsonString()
 
-	res3 := o2.ScriptFromFile("mainnetGetFactoryCollectionsShard4").NamedArguments(map[string]string{
-		"user": "bjartek",
+	res3 := o2.ScriptFromFile("mainnetGetFactoryCollectionsShard1").NamedArguments(map[string]string{
+		"user":     "bjartek",
+		"maxItems": "1",
 	}).RunReturnsJsonString()
 
 	fmt.Println(res3)

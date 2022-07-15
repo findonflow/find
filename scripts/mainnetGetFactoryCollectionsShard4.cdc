@@ -15,8 +15,8 @@ import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 
 
-pub fun main(user: String) : CollectionReport? {
-    return fetchAlchemyShard4(user: user, maxItems: Int(UInt64.max), targetCollections:[])
+pub fun main(user: String, maxItems: Int) : CollectionReport? {
+    return fetchAlchemyShard4(user: user, maxItems: maxItems, targetCollections:[])
 }
 
 
