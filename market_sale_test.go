@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -163,8 +164,16 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[1], price)
 		otu.listNFTForSale("user1", ids[2], price)
 
+		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResult.AssertWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
+		scriptResult.AssertLengthWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items", 3)
+
+		//		assert.Equal(t, "active_listed", scriptResult.GetWithPointer("/FINDReport/itemsForSale/FindMarketSale/items/0/saleType"))
+		//		assert.Equal(t, 3, scriptResult.GetWithPointer("/FINDReport/itemsForSale/FindMarketSale/items/0/saleType"))
+
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 3, len(itemsForSale))
+
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
 		res := otu.O.TransactionFromFile("delistAllNFTSale").
