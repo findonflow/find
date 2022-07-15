@@ -13,8 +13,10 @@ import (
 )
 
 var (
-	findSigner = SignProposeAndPayAs("find")
-	saSigner   = SignProposeAndPayAsServiceAccount()
+	findSigner  = SignProposeAndPayAs("find")
+	saSigner    = SignProposeAndPayAsServiceAccount()
+	user1Signer = SignProposeAndPayAs("user1")
+	user2Signer = SignProposeAndPayAs("user2")
 )
 
 type OverflowTestUtils struct {
@@ -414,34 +416,29 @@ func (otu *OverflowTestUtils) mintCharity(name, image, thumbnail, originUrl, des
 }
 
 func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
-	result := otu.O.TransactionFromFile("mintDandy").
-		SignProposeAndPayAs("user1").
-		Args(otu.O.Arguments().
-			String("user1").
-			UInt64(3).
-			String("Neo").
-			String("Neo Motorcycle").
-			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
-			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-			String("Neo Collectibles FIND").
-			String("https://neomotorcycles.co.uk/index.html").
-			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-			String("https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1")).
-		Test(otu.T).
-		AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Dandy.Minted", map[string]interface{}{
+
+	result := otu.O.Tx("mintDandy",
+		user1Signer,
+		Arg("name", "user1"),
+		Arg("maxEdition", 3),
+		Arg("artist", "Neo"),
+		Arg("nftName", "Neo Motorcycle"),
+		Arg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
+
+		Arg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		Arg("collectionDescription", "Neo Collectibles FIND"),
+		Arg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
+		Arg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		Arg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "Dandy.Minted", map[string]interface{}{
 			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 			"minter":      "user1",
 			"name":        "Neo Motorcycle 3 of 3",
-		}))
-	dandyIds := []uint64{}
-	for _, event := range result.Events {
-		if event.Name == "A.f8d6e0586b0a20c7.Dandy.Deposit" {
-			dandyIds = append(dandyIds, event.GetFieldAsUInt64("id"))
-		}
-	}
+		})
 
-	return dandyIds
+	return result.GetIdsFromEvent("Dandy.Deposit", "id")
 }
 
 func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
