@@ -7,8 +7,14 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	. "github.com/bjartek/overflow/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	findSigner = SignProposeAndPayAs("find")
+	saSigner   = SignProposeAndPayAsServiceAccount()
 )
 
 type OverflowTestUtils struct {
@@ -17,7 +23,11 @@ type OverflowTestUtils struct {
 }
 
 func NewOverflowTest(t *testing.T) *OverflowTestUtils {
-	return &OverflowTestUtils{T: t, O: overflow.NewTestingEmulator().Start()}
+	o := Overflow(WithNetwork("testing"))
+	return &OverflowTestUtils{
+		T: t,
+		O: o,
+	}
 }
 
 const leaseDurationFloat = 31536000.0
@@ -61,121 +71,96 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 	return ids
 }
 
-func (otu *OverflowTestUtils) assertNilLookupAddress(user string) {
-	value := otu.O.InlineScript(`import FIND from "../contracts/FIND.cdc"
+func (otu *OverflowTestUtils) assertLookupAddress(user, expected interface{}) *OverflowTestUtils {
+	otu.O.Script(`import FIND from "../contracts/FIND.cdc"
 pub fun main(name: String) :  Address? {
-    return FIND.lookupAddress(name)
-}
-		`).
-		Args(otu.O.Arguments().String(user)).RunReturnsInterface()
+    return FIND.lookupAddress(name) } `,
+		Arg("name", user),
+	).AssertWant(otu.T, autogold.Want(fmt.Sprintf("lookupAddress-%s", user), expected))
+	return otu
 
-	assert.Equal(otu.T, nil, value)
-}
-
-func (otu *OverflowTestUtils) assertLookupAddress(user, expected string) {
-	value := otu.O.InlineScript(`import FIND from "../contracts/FIND.cdc"
-pub fun main(name: String) :  Address? {
-    return FIND.lookupAddress(name)
-}
-		`).
-		Args(otu.O.Arguments().String(user)).RunReturnsInterface()
-
-	assert.Equal(otu.T, expected, value)
 }
 
 func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	//first step create the adminClient as the fin user
 
-	otu.O.TransactionFromFile("setup_fin_1_create_client").
-		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+	otu.O.Tx("setup_fin_1_create_client", findSigner).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the versus client
-	otu.O.TransactionFromFile("setup_fin_2_register_client").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().Account("find")).
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+	otu.O.Tx("setup_fin_2_register_client",
+		saSigner,
+		Arg("ownerAddress", "find"),
+	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//set up fin network as the fin user
-	otu.O.TransactionFromFile("setup_fin_3_create_network").
-		SignProposeAndPayAs("find").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+	otu.O.Tx("setup_fin_3_create_network", findSigner).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	otu.O.TransactionFromFile("setup_find_market_1").
-		SignProposeAndPayAsService().
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+	otu.O.Tx("setup_find_market_1", saSigner).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the versus client
-	otu.O.TransactionFromFile("setup_find_market_2").
-		SignProposeAndPayAs("find").
-		Args(otu.O.Arguments().Account("account")).
-		Test(otu.T).AssertSuccess()
+	otu.O.Tx("setup_find_market_2",
+		findSigner,
+		Arg("tenantAddress", "account"),
+	).AssertSuccess(otu.T)
 
 	otu.createUser(100.0, "account")
 
 	//link in the server in the versus client
-	otu.O.TransactionFromFile("testSetResidualAddress").
-		SignProposeAndPayAs("find").
-		Args(otu.O.Arguments().Account("find")).
-		Test(otu.T).AssertSuccess()
+	otu.O.Tx("testSetResidualAddress",
+		findSigner,
+		Arg("address", "find"),
+	).AssertSuccess(otu.T)
 
-	otu.O.TransactionFromFile("adminInitDUC").
-		SignProposeAndPayAs("find").
-		Args(otu.O.Arguments().Account("account")).
-		Test(otu.T).AssertSuccess()
+	otu.O.Tx("adminInitDUC",
+		findSigner,
+		Arg("dapperAddress", "account"),
+	).AssertSuccess(otu.T)
 
 	return otu.tickClock(1.0)
 }
 
 func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
-	otu.O.TransactionFromFile("testClock").SignProposeAndPayAs("find").
-		Args(otu.O.Arguments().
-			UFix64(time)).
-		Test(otu.T).AssertSuccess()
+	otu.O.Tx("testClock",
+		findSigner,
+		Arg("clock", time),
+	).AssertSuccess(otu.T)
 	return otu
 }
 
 func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTestUtils {
 
+	nameSigner := SignProposeAndPayAs(name)
+	nameArg := Arg("name", name)
+
 	nameAddress := otu.accountAddress(name)
 
-	otu.O.TransactionFromFile("createProfile").
-		SignProposeAndPayAs(name).
-		Args(otu.O.Arguments().String(name)).
-		Test(otu.T).
-		AssertSuccess().
-		AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.Profile.Created", map[string]interface{}{
+	otu.O.Tx("createProfile", nameSigner, nameArg).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
 			"account":   nameAddress,
 			"userName":  name,
 			"createdAt": "find",
-		}))
+		})
 
-	otu.O.TransactionFromFile("testMintFusd").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().
-			Account(name).
-			UFix64(fusd)).
-		Test(otu.T).
-		AssertSuccess().
-		AssertEventCount(3)
+	mintFn := otu.O.TxFN(saSigner,
+		Arg("recipient", name),
+		Arg("amount", fusd),
+	)
 
-	otu.O.TransactionFromFile("testMintFlow").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().
-			Account(name).
-			UFix64(fusd)).
-		Test(otu.T).
-		AssertSuccess().
-		AssertEventCount(3)
-
-	otu.O.TransactionFromFile("testMintUsdc").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().
-			Account(name).
-			UFix64(fusd)).
-		Test(otu.T).
-		AssertSuccess().
-		AssertEventCount(3)
+	for _, mintName := range []string{
+		"testMintFusd",
+		"testMintFlow",
+		"testMintUsdc",
+	} {
+		mintFn(mintName).AssertSuccess(otu.T).
+			AssertEvent(otu.T, "Desposited", map[string]interface{}{
+				"ammount": fusd,
+				"to":      nameAddress,
+			})
+	}
 
 	return otu
 }
