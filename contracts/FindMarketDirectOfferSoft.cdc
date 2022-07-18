@@ -374,19 +374,29 @@ pub contract FindMarketDirectOfferSoft {
 			if vault.getType() != saleItem.getFtType() {
 				panic("The FT vault sent in to fulfill does not match the required type. Required Type : ".concat(saleItem.getFtType().identifier).concat(" . Sent-in vault type : ".concat(vault.getType().identifier)))
 			}
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "fulfill directOffer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
+
+			let tenant=self.getTenant()
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "fulfill directOffer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
 			
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			let nftInfo=saleItem.toNFTInfo()
 			let royalty=saleItem.getRoyalty()
 			saleItem.acceptNonEscrowedBid()
-			FindMarket.pay(tenant: self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo: nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
+
+			let resolved : {Address : String} = {}
+			// resolved[buyer] = buyerName
+			// resolved[seller] = sellerName
+			resolved[FindMarketDirectOfferSoft.account.address] =  "find" 
+			// Have to make sure the tenant always have the valid find name 
+			resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
+
+			FindMarket.pay(tenant: tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo: nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved,rewardFN: FIND.rewardFN())
 
 			destroy <- self.items.remove(key: id)
 		}

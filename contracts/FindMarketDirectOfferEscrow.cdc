@@ -325,13 +325,14 @@ pub contract FindMarketDirectOfferEscrow {
 				panic("This direct offer is already expired")
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "fulfill directOffer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
+			let tenant=self.getTenant()
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "fulfill directOffer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			//Set the auth pointer in the saleItem so that it now can be fulfilled
 			saleItem.setPointer(pointer)
@@ -341,7 +342,15 @@ pub contract FindMarketDirectOfferEscrow {
 
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			let vault <- saleItem.acceptEscrowedBid()
-			FindMarket.pay(tenant: self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
+
+			let resolved : {Address : String} = {}
+			// resolved[buyer] = buyerName
+			// resolved[seller] = sellerName
+			resolved[FindMarketDirectOfferEscrow.account.address] =  "find" 
+			// Have to make sure the tenant always have the valid find name 
+			resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
+
+			FindMarket.pay(tenant: self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved,rewardFN: FIND.rewardFN())
 			destroy <- self.items.remove(key: id)
 		}
 

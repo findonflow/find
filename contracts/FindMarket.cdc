@@ -1051,7 +1051,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?), rewardFN: ((Address, String?, Address, String) : Void )) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindMarket.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}, rewardFN: ((Address, String?, Address, String) : Void )) {
 		/* 1366 */	/* 3096 for 3 purchase */
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
