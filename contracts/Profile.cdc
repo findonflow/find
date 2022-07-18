@@ -606,6 +606,7 @@ pub contract Profile {
 		.borrow()!
 	}
 
+
 	pub fun createUser(name: String, createdAt:String) : @Profile.User {
 		pre {
 			name.length <= 64: "Name must be 64 or less characters"

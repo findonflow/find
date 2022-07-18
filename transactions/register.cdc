@@ -67,18 +67,8 @@ transaction(name: String, amount: UFix64) {
 			)
 		}
 
-	  let dandyCapPub= acct.getCapability<&{Dandy.CollectionPublic}>(Dandy.CollectionPublicPath)
-		if !dandyCapPub.check() {
-			acct.unlink(Dandy.CollectionPublicPath)
-			acct.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
-				Dandy.CollectionPublicPath,
-				target: Dandy.CollectionStoragePath
-			)
-		}
-
 		let dandyCapPrivate= acct.getCapability<&{Dandy.CollectionPublic}>(Dandy.CollectionPrivatePath)
-		if !dandyCapPub.check() {
-			acct.unlink(Dandy.CollectionPrivatePath)
+		if !dandyCapPrivate.check() {
 			acct.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPrivatePath,
 				target: Dandy.CollectionStoragePath

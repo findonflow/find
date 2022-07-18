@@ -4,6 +4,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
+import Profile from "./Profile.cdc"
 import FindMarket from "./FindMarket.cdc"
 
 /*
@@ -140,6 +141,7 @@ pub contract FindMarketSale {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} //TODO: look if this is safe
 		pub fun containsId(_ id: UInt64): Bool
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
@@ -173,11 +175,14 @@ pub contract FindMarketSale {
 				nftCap.check() : "The nft receiver capability passed in is invalid."
 			}
 
+			//TOOD: method on saleItems that returns a cacheKey listingType-nftType-ftType
+
 			let saleItem=self.borrow(id)
-		/* 716 */	/* 1146 for 3 purchase */
+			//149
 			if saleItem.salePrice != vault.balance {
 				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
 			}
+			//152
 
 			if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {
 				panic("This sale item listing is already expired")
@@ -186,42 +191,65 @@ pub contract FindMarketSale {
 			if saleItem.vaultType != vault.getType() {
 				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
 			}
+			//158
+			let tenant=self.getTenant()
+			//164
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "buy item for sale"), seller: self.owner!.address, buyer: nftCap.address)
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, "buy item for sale"), seller: self.owner!.address, buyer: nftCap.address)
+			//234 -30
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
 
 			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-
-		/* 836 */	/* 1506 for 3 purchase */
+			//272 -40
 
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
+			//278
+
+
+			/*
+			let item=saleItem.pointer.getViewResolver()
+			//286
+
+			let ncd = MetadataViews.getNFTCollectionData(item) 
+			//314
+
+			let ncd2 = MetadataViews.getNFTCollectionDisplay(item) 
+			//450 //a lot of this is minter
+			*/
+    
 			let nftInfo= saleItem.toNFTInfo()
-		/* 1123 */	/* 2367 for 3 purchase */
+			//559
+
 
 			let royalty=saleItem.getRoyalty()
-		/* 1188 */	/* 2562 for 3 purchase */
+			//624
 
 			let soldFor=saleItem.getBalance()
+			//627
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
-		/* 1195 */	/* 2583 for 3 purchase */
+			//631
 			let buyerName=FIND.reverseLookup(buyer)
-		/* 1240 */	/* 2718 for 3 purchase */
-			let profile = FIND.lookup(buyer.toString())
-		/* 1304 */	/* 2910 for 3 purchase */
+			//676
 
-			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
+			let profile= Profile.find(nftCap.address)
+			//682
 
-		/* 1357 */	/* 3069 for 3 purchase */
+			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar() ,endsAt:saleItem.validUntil)
+			//735
+
+
+			//TODO: make the resolver a little bit smarter, preresolve things like tenants and find?
+			//Add seller/buyer/find/tenant to map and lookup in that before calling reverseLookup
 			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
-		/* 1963 */	/* 4887 for 3 purchase */
+			//1351
 			
-			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
-		// /* 2186 */	/* 5556 for 3 purchase */
+				nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+			//1564
 
 			destroy <- self.items.remove(key: id)
 		}
@@ -304,10 +332,8 @@ pub contract FindMarketSale {
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
-		}
-		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
+		if let  tenantCap=FindMarket.getTenantCapability(marketplace) {
+			let tenant=tenantCap.borrow() ?? panic("Invalid tenant")
 			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 		}
 		return nil
