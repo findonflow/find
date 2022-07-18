@@ -48,9 +48,11 @@ pub contract FindMarketAuctionSoft {
 
 		//Here we do not get a vault back, it is sent in to the method itself
 		pub fun acceptNonEscrowedBid() { 
-			pre{
-				self.offerCallback != nil : "There is no bid offer to the item."
-				self.offerCallback!.check() : "Bidder unlinked bid collection capability."
+			if self.offerCallback == nil  {
+				panic("There is no bid offer to the item.")
+			}
+			if !self.offerCallback!.check()  {
+				panic("Bidder unlinked bid collection capability.")
 			}
 			self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 		}
@@ -251,8 +253,8 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check()  {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
@@ -506,15 +508,15 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun borrow(_ id: UInt64): &SaleItem {
-			pre{
-				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.items.containsKey(id)  {
+				panic( "This id does not exist.".concat(id.toString()))
 			}
 			return (&self.items[id] as &SaleItem?)!
 		}
 
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
-			pre{
-				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.items.containsKey(id)  {
+				panic( "This id does not exist.".concat(id.toString()))
 			}
 			return (&self.items[id] as &SaleItem{FindMarket.SaleItem}?)!
 		}
@@ -587,18 +589,17 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check()  {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
 
 		//called from lease when auction is ended
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) {
-			pre {
-				self.bids[nft.uuid] != nil : "You need to have a bid here already"
+			if self.bids[nft.uuid] == nil  {
+				panic("You need to have a bid here already")
 			}
-
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			if !bid.nftCap.check() {
 				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
@@ -673,15 +674,15 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun borrowBid(_ id: UInt64): &Bid {
-			pre{
-				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.bids.containsKey(id) {
+				panic("This id does not exist.".concat(id.toString()))
 			}
 			return (&self.bids[id] as &Bid?)!
 		}
 
 		pub fun borrowBidItem(_ id: UInt64): &{FindMarket.Bid} {
-			pre{
-				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.bids.containsKey(id) {
+				panic("This id does not exist.".concat(id.toString()))
 			}
 			return (&self.bids[id] as &Bid{FindMarket.Bid}?)!
 		}
@@ -709,8 +710,8 @@ pub contract FindMarketAuctionSoft {
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		if FindMarket.getTenantCapability(marketplace) == nil {
+			panic("Invalid tenant")
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
@@ -719,8 +720,8 @@ pub contract FindMarketAuctionSoft {
 	}
 
 	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		if FindMarket.getTenantCapability(marketplace) == nil {
+			panic("Invalid tenant")
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))

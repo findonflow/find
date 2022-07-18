@@ -617,16 +617,16 @@ pub contract FindMarket {
 		}
 
 		access(account) fun alterMarketOption(name: String, status: String) {
-			pre{
-				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
+			if self.tenantSaleItems[name] == nil  {
+				panic("This saleItem does not exist. Item : ".concat(name))
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
 			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
 		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
-			pre{
-				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
+			if self.tenantSaleItems[optionName] == nil  {
+				panic("This tenant does not exist. Tenant ".concat(optionName))
 			}
 			/* 
 			let rules = self.tenantSaleItems[optionName]!.rules
@@ -639,8 +639,8 @@ pub contract FindMarket {
 		}
 
 		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
-			pre{
-				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
+			if self.tenantSaleItems[optionName] == nil  {
+				panic("This Market Option does not exist. Option :".concat(optionName))
 			}
 			let rules : [TenantRule] = self.tenantSaleItems[optionName]!.rules
 			var counter = 0

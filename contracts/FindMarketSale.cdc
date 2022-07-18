@@ -158,8 +158,8 @@ pub contract FindMarketSale {
 		}
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check() {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
@@ -314,8 +314,8 @@ pub contract FindMarketSale {
 		}
 
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
-			pre{
-				self.items.containsKey(id) : "This id does not exist : ".concat(id.toString())
+			if !self.items.containsKey(id) {
+				panic("This id does not exist : ".concat(id.toString()))
 			}
 			return (&self.items[id] as &SaleItem{FindMarket.SaleItem}?)!
 		}

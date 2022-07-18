@@ -275,8 +275,8 @@ pub contract Admin {
 		}
 
 		pub fun addFindCut(tenant: Address, FindCutName: String, rayalty: MetadataViews.Royalty, rules: [FindMarket.TenantRule], status: String) {
-			pre{
-				rules.length > 0 : "Rules cannot be empty array"
+			if !(rules.length > 0) {
+				panic("Rules cannot be empty array")
 			}
 			let tenant = self.getTenantRef(tenant)
 

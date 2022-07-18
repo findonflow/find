@@ -1470,8 +1470,8 @@ pub contract FIND {
 		//called from lease when auction is ended
 		//if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
 		access(contract) fun fulfillLease(_ token: @FIND.Lease) : @FungibleToken.Vault{
-			pre{
-				self.leases.check() : "The lease collection capability is invalid."
+			if !self.leases.check() {
+				panic("The lease collection capability is invalid.")
 			}
 			let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
@@ -1490,8 +1490,8 @@ pub contract FIND {
 		//called from lease when things are canceled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancel(_ name: String) {
-			pre{
-				self.receiver.check() : "This user does not have receiving vault set up. User: ".concat(self.owner!.address.toString())
+			if !self.receiver.check() {
+				panic("This user does not have receiving vault set up. User: ".concat(self.owner!.address.toString()))
 			}
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault

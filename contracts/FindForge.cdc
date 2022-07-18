@@ -89,8 +89,8 @@ pub contract FindForge {
 	}
 
 	pub fun setMinterPlatform(lease: &FIND.Lease, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
-		pre{
-			FindForge.minterPlatforms.containsKey(forgeType) : "This forge type is not supported."
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			panic("This forge type is not supported.")
 		}
 		let name = lease.getName() 
 		if FindForge.minterPlatforms[forgeType]![name] == nil {
@@ -108,8 +108,8 @@ pub contract FindForge {
 	}
 
 	pub fun removeMinterPlatform(lease: &FIND.Lease, forgeType: Type) {
-		pre{
-			FindForge.minterPlatforms[forgeType] != nil : "This minter platform does not exist. Forge Type : ".concat(forgeType.identifier)
+		if FindForge.minterPlatforms[forgeType] == nil {
+			panic("This minter platform does not exist. Forge Type : ".concat(forgeType.identifier))
 		}
 		let name = lease.getName() 
 
@@ -121,8 +121,8 @@ pub contract FindForge {
 	}
 
 	pub fun mint (lease: &FIND.Lease, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
-		pre{
-			FindForge.minterPlatforms.containsKey(forgeType) : "The minter platform is not set. Please set up properly before mint."
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			panic("The minter platform is not set. Please set up properly before mint.")
 		}
 		let leaseName = lease.getName()
 
@@ -158,8 +158,8 @@ pub contract FindForge {
 	}
 
 	access(account) fun addPublicForgeType(forge: @{Forge}) {
-		pre{
-			!FindForge.publicForges.contains(forge.getType()) : "This type is already registered to the registry as public. "
+		if FindForge.publicForges.contains(forge.getType()) {
+			panic("This type is already registered to the registry as public. ")
 		}
 		FindForge.publicForges.append(forge.getType())
 		if !FindForge.minterPlatforms.containsKey(forge.getType()) {
@@ -169,8 +169,8 @@ pub contract FindForge {
 	}
 
 	access(account) fun addPrivateForgeType(name: String, forge: @{Forge}) {
-		pre{
-			!FindForge.publicForges.contains(forge.getType()) : "This type is already registered to the registry as public. "
+		if FindForge.publicForges.contains(forge.getType()) {
+			panic("This type is already registered to the registry as public. ")
 		}
 		if !FindForge.minterPlatforms.containsKey(forge.getType()) {
 			FindForge.minterPlatforms[forge.getType()] = {}
@@ -183,16 +183,18 @@ pub contract FindForge {
 	}
 
 	access(account) fun adminRemoveMinterPlatform(name: String, forgeType: Type) {
-		pre{
-			FindForge.minterPlatforms.containsKey(forgeType) : "This type is not registered as minterPlatform. ".concat(forgeType.identifier)
-			FindForge.minterPlatforms[forgeType]!.containsKey(name) : "This name is not registered as minterPlatform under this input type. ".concat(name)
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			panic("This type is not registered as minterPlatform. ".concat(forgeType.identifier))
+		}
+		if !FindForge.minterPlatforms[forgeType]!.containsKey(name) {
+			panic("This name is not registered as minterPlatform under this input type. ".concat(name))
 		}
 		FindForge.minterPlatforms[forgeType]!.remove(key: name)
 	}
 
 	access(account) fun removeForgeType(type: Type) {
-		pre{
-			!FindForge.forgeTypes.containsKey(type) : "This type is not registered to the registry. "
+		if FindForge.forgeTypes.containsKey(type) {
+			panic( "This type is not registered to the registry. ")
 		}
 		destroy FindForge.forgeTypes.remove(key: type)
 
