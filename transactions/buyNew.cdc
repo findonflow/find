@@ -19,12 +19,14 @@ import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix64]) {
 
+	/*
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	var walletReference : [&FungibleToken.Vault]
 
 	let saleItems: [&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}]
 	var totalPrice : UFix64
 	let prices : [UFix64]
+	*/
 
 	prepare(account: AuthAccount) {
 
@@ -35,6 +37,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		//6
+		/*
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		//8
@@ -127,9 +130,11 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			//206 with 3 items
 			counter = counter + 1
 		}
+		*/
 	}
 
 
+	/*
 	execute {
 		var counter = 0
 		while counter < users.length {
@@ -145,4 +150,5 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			counter = counter + 1
 		}
 	}
+	*/
 }

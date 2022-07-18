@@ -1,9 +1,9 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
+	"github.com/bjartek/overflow/overflow"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -52,7 +52,7 @@ func TestBulkMarketSale(t *testing.T) {
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess()
 
-		fmt.Println(result.Result.ComputationUsed)
+		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
 		assert.Fail(t, "failed")
 
 	})
