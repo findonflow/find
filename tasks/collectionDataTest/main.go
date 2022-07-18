@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	o2 := overflow.NewOverflowTestnet().Start()
+	o2 := overflow.NewOverflowMainnet().Start()
 
 	//pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	// res3 := o2.ScriptFromFile("getNFTDetails").NamedArguments(map[string]string{
@@ -18,11 +18,9 @@ func main() {
 	// 	"views":                `["A.631e88ae7f1d7c20.MetadataViews.NFTCollectionData"]`,
 	// }).RunReturnsJsonString()
 
-	res3 := o2.ScriptFromFile("getFactoryCollections").NamedArguments(map[string]string{
-		"user":        "0xe409a7e8a52812a9",
-		"maxItems":    "1000",
-		"collections": `[]`,
-		"shard":       "NFTRegistry",
+	res3 := o2.ScriptFromFile("mainnetGetFactoryCollectionsShard1").NamedArguments(map[string]string{
+		"user":     "bjartek",
+		"maxItems": "1",
 	}).RunReturnsJsonString()
 
 	fmt.Println(res3)
