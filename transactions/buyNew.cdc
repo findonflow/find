@@ -30,9 +30,13 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 
 	prepare(account: AuthAccount) {
 
-		assert(users.length == ids.length, message: "The array length of users and ids should be the same")
+		if users.length != ids.length {
+			panic("The array length of users and ids should be the same")
+		}
 		//2
-		assert(amounts.length == ids.length, message: "The array length of amounts and ids should be the same")
+		if amounts.length != ids.length {
+			panic("The array length of users and ids should be the same")
+		}
 		//4
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)

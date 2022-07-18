@@ -720,8 +720,9 @@ pub contract FIND {
 			let lease = self.borrow(name)
 			let timestamp=Clock.time()
 
-			assert(balance >= lease.auctionMinBidIncrement, message: "Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
-
+			if balance < lease.auctionMinBidIncrement {
+				panic("Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
+			}
 			if self.auctions.containsKey(name) {
 				let auction = self.borrowAuction(name)
 				if auction.endsAt < timestamp {

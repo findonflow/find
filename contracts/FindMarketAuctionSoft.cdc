@@ -387,7 +387,9 @@ pub contract FindMarketAuctionSoft {
 			}
 
 			if let valid = saleItem.getValidUntil() {
-				assert( valid >= Clock.time(), message: "This auction listing is already expired")
+				if valid < Clock.time() {
+					panic("This auction listing is already expired")
+				}
 			}
 
 			saleItem.setCallback(callback)
@@ -489,7 +491,9 @@ pub contract FindMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
+			if self.items[pointer.getUUID()] != nil {
+				panic("Auction listing for this item is already created.")
+			}
 
 			saleItem.setAuctionDuration(auctionDuration)
 			saleItem.setExtentionOnLateBid(auctionExtensionOnLateBid)

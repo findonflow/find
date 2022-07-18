@@ -82,8 +82,8 @@ pub contract FTRegistry {
 
     /* setters */
     access(account) fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
-        pre{
-            !FTRegistry.fungibleTokenList.containsKey(type.identifier) : "This FungibleToken Register already exist"
+        if FTRegistry.fungibleTokenList.containsKey(type.identifier) {
+            panic("This FungibleToken Register already exist")
         }
         let typeIdentifier : String = type.identifier
         FTRegistry.fungibleTokenList[typeIdentifier] = FTInfo(alias: alias,

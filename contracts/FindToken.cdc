@@ -147,8 +147,8 @@ pub contract FindToken : FungibleToken {
         }
 
         pub fun setRewardMultiplier(_ multiplier: UFix64) {
-            pre{
-                multiplier > 0.0 : "Multiplier cannot be less than 0.0"
+            if multiplier != 0.0 {
+                panic("Multiplier must be greater than 0.0")
             }
             FindToken.taskRewardsMultiplier = multiplier
             emit TokenRewardMultiplier(multiplier: multiplier)

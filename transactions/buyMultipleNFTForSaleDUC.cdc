@@ -30,7 +30,9 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
 
-		assert(users.length == ids.length, message: "The array length of users and ids should be the same")
+		if users.length != ids.length {
+			panic("The array length of users and ids should be the same")
+		}
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -272,7 +274,9 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 			let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: ids[counter])
 
 			self.prices.append(item.getBalance())
-			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct amount for item. saleID : ".concat(ids[counter].toString()).concat(" . Required : ".concat(self.prices[counter].toString())))
+			if self.prices[counter] != amounts[counter] {
+				panic("Please pass in the correct amount for item. saleID : ".concat(ids[counter].toString()).concat(" . Required : ".concat(self.prices[counter].toString())))
+			}
 
 			var nft : NFTRegistry.NFTInfo? = nil
 			let nftIdentifier = item.getItemType().identifier
@@ -309,7 +313,9 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 	execute {
 		var counter = 0 
 		while counter < ids.length {
-			assert(self.walletReference!.balance > amounts[counter] , message : "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.totalPrice.toString()))
+			if self.walletReference!.balance < amounts[counter] {
+				panic("Your wallet does not have enough funds to pay for this item. Required : ".concat(self.totalPrice.toString()))
+			}
 			let vault <- self.walletReference!.withdraw(amount: self.prices[counter]) 
 			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
 			counter = counter + 1

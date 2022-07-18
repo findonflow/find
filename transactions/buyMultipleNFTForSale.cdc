@@ -27,7 +27,9 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 	let prices : [UFix64]
 	prepare(account: AuthAccount) {
 
-		assert(users.length == ids.length, message: "The array length of users and ids should be the same")
+		if users.length != ids.length {
+			panic("The array length of users and ids should be the same")
+		}
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -342,8 +344,13 @@ transaction(marketplace:Address, users: [String], ids: [UInt64], amounts: [UFix6
 	execute {
 		var counter = 0
 		while counter < users.length {
-			assert(self.prices[counter] == amounts[counter], message: "Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
-			assert(self.walletReference[counter].balance > amounts[counter], message: "Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			if self.prices[counter] != amounts[counter] {
+				panic("Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			}
+			if self.walletReference[counter].balance < amounts[counter] {
+				panic("Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
+			}
+		
 		/* 690 */	/* 1068 for 3 purchase */
 			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
 			self.saleItemsCap[counter].borrow()!.buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])

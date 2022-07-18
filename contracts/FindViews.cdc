@@ -268,9 +268,6 @@ pub contract FindViews {
 		}
 
 		pub fun deposit(_ nft: @NonFungibleToken.NFT){
-			pre{
-				self.cap.check() : "The pointer capablity is invalid."
-			}
             if !self.cap.check(){
                 panic("The pointer capablity is invalid.")
             }

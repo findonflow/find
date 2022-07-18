@@ -393,7 +393,9 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			if let valid = saleItem.getValidUntil() {
-				assert( valid >= Clock.time(), message: "This auction listing is already expired")
+				if valid < Clock.time() {
+					panic("This auction listing is already expired")
+				}
 			}
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
@@ -495,7 +497,9 @@ pub contract FindMarketAuctionEscrow {
 				panic(actionResult.message)
 			}
 
-			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
+			if self.items[pointer.getUUID()] != nil {
+				panic("Auction listing for this item is already created.")
+			}
 
 			self.items[pointer.getUUID()] <-! saleItem
 			let saleItemRef = self.borrow(pointer.getUUID())

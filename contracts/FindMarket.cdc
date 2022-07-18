@@ -631,7 +631,9 @@ pub contract FindMarket {
 			/* 
 			let rules = self.tenantSaleItems[optionName]!.rules
 			for rule in rules {
-				assert(rule.name == tenantRule.name, message: "Rule with same name already exist. Name: ".concat(rule.name))
+				if rule.name != tenantRule.name {
+					panic("Rule with same name already exist. Name: ".concat(rule.name)))
+				}
 			}
 			*/
 			self.tenantSaleItems[optionName]!.addRules(tenantRule)
@@ -649,7 +651,9 @@ pub contract FindMarket {
 					break
 				}
 				counter = counter + 1
-				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
+				if counter >= rules.length {
+					panic("This tenant rule does not exist. Rule :".concat(optionName))
+				}
 			}
 			self.tenantSaleItems[optionName]!.removeRules(counter)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
@@ -1068,7 +1072,9 @@ pub contract FindMarket {
 			for royaltyItem in royalties {
 				totalRoyalties = totalRoyalties + royaltyItem.cut
 			}
-			assert(totalRoyalties == saleItem.getTotalRoyalties(), message: "The total Royalties to be paid is changed after listing.")
+			if totalRoyalties != saleItem.getTotalRoyalties() {
+				panic("The total Royalties to be paid is changed after listing.")
+			}
 
 			for royaltyItem in royalties {
 				let description=royaltyItem.description

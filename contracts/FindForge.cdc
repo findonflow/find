@@ -94,7 +94,9 @@ pub contract FindForge {
 		}
 		let name = lease.getName() 
 		if FindForge.minterPlatforms[forgeType]![name] == nil {
-			assert(FindForge.publicForges.contains(forgeType) , message: "This forge is not supported publicly. Forge Type : ".concat(forgeType.identifier))
+			if !FindForge.publicForges.contains(forgeType) {
+				panic("This forge is not supported publicly. Forge Type : ".concat(forgeType.identifier))
+			}
 		}
 
 		if !lease.checkAddon(addon: "forge") {

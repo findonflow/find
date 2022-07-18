@@ -50,8 +50,12 @@ transaction(marketplace:Address, ids: [UInt64], amounts:[UFix64]) {
 	execute {
 		var counter = 0
 		while counter < ids.length {
-			assert(self.walletReference[counter].balance > self.requiredAmount[counter], message: "Your wallet does not have enough funds to pay for this item. Item ID: ".concat(ids[counter].toString()))
-			assert(self.requiredAmount[counter] == amounts[counter], message: "Amount needed to fulfill is ".concat(amounts[counter].toString()))
+			if self.walletReference[counter].balance < self.requiredAmount[counter] {
+				panic("Your wallet does not have enough funds to pay for this item. Item ID: ".concat(ids[counter].toString()))
+			}
+			if self.requiredAmount[counter] != amounts[counter] {
+				panic("Amount needed to fulfill is ".concat(amounts[counter].toString()))
+			}
 			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
 			self.bidsReference.fulfillDirectOffer(id: ids[counter], vault: <- vault)
 			counter = counter + 1
