@@ -295,4 +295,14 @@ pub contract FindViews {
 			self.nounce=nounce
 		}
 	}
+
+	pub struct SoulBound {
+
+		pub let message: String
+
+		init(_ message:String) {
+			self.message=message
+
+		}
+	}
 }
