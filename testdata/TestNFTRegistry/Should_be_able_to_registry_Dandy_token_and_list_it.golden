@@ -2,16 +2,14 @@
     "A.f8d6e0586b0a20c7.Dandy.NFT": {
         "address": "0xf8d6e0586b0a20c7",
         "alias": "Dandy",
-        "allowedFTTypes": "",
         "externalFixedUrl": "find.xyz",
-        "icon": "",
         "providerPath": "/private/findDandy",
         "providerPathIdentifier": "findDandy",
         "publicPath": "/public/findDandy",
         "publicPathIdentifier": "findDandy",
         "storagePath": "/storage/findDandy",
         "storagePathIdentifier": "findDandy",
-        "type": "Type\u003cA.f8d6e0586b0a20c7.Dandy.NFT\u003e()",
+        "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT"
     }
 }`

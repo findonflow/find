@@ -145,7 +145,7 @@ pub contract Dandy: NonFungibleToken {
 			let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "platform")
 			royalties.append(royalty)
 
-			return MetadataViews.Royalties(cutInfos:royalties)
+			return MetadataViews.Royalties(royalties)
 		}
 
 		pub fun resolveDisplay() : MetadataViews.Display {

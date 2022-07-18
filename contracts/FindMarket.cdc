@@ -196,26 +196,26 @@ pub contract FindMarket {
 				}
 				continue
 			} 
-			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, "delist item for sale"), seller: address, buyer: nil)
+			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, name: "delist item for sale"), seller: address, buyer: nil)
 			var status="active"
 
 			if !stopped.allowed && stopped.message == "Seller banned by Tenant" {
 				status="banned"
-				info.append(FindMarket.SaleItemInformation(item, status, false))
+				info.append(FindMarket.SaleItemInformation(item:item, status:status, nftInfo:false))
 				continue
 			}
 
 			if !stopped.allowed {
 				status="stopped"
-				info.append(FindMarket.SaleItemInformation(item, status, false))
+				info.append(FindMarket.SaleItemInformation(item:item, status:status, nftInfo:false))
 				continue
 			}
 
-			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, "delist item for sale"), seller: address, buyer: nil)
+			let deprecated=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:true, name: "delist item for sale"), seller: address, buyer: nil)
 
 			if !deprecated.allowed {
 				status="deprecated"
-				info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
+				info.append(FindMarket.SaleItemInformation(item:item, status:status, nftInfo:false))
 				continue
 			}
 
@@ -224,7 +224,7 @@ pub contract FindMarket {
 					status="ended"
 				}
 			}
-			info.append(FindMarket.SaleItemInformation(item, status, getNFTInfo))
+			info.append(FindMarket.SaleItemInformation(item:item, status:status, nftInfo:getNFTInfo))
 		}
 
 		return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)

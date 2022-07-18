@@ -3,6 +3,7 @@ package test_main
 import (
 	"testing"
 
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,10 +15,8 @@ func TestNFTRegistry(t *testing.T) {
 
 	o := otu.O
 
-	expected := map[string]interface{}{
+	danyTokenWant := autogold.Want("dandy_token", map[string]interface{}{
 		"address":                "0xf8d6e0586b0a20c7",
-		"allowedFTTypes":         "",
-		"icon":                   "",
 		"externalFixedUrl":       "find.xyz",
 		"alias":                  "Dandy",
 		"providerPath":           "/private/findDandy",
@@ -26,9 +25,9 @@ func TestNFTRegistry(t *testing.T) {
 		"publicPathIdentifier":   "findDandy",
 		"storagePath":            "/storage/findDandy",
 		"storagePathIdentifier":  "findDandy",
-		"type":                   "Type<A.f8d6e0586b0a20c7.Dandy.NFT>()",
+		"type":                   "A.f8d6e0586b0a20c7.Dandy.NFT",
 		"typeIdentifier":         "A.f8d6e0586b0a20c7.Dandy.NFT",
-	}
+	})
 
 	t.Run("Should be able to registry Dandy Token and get it", func(t *testing.T) {
 
@@ -36,14 +35,14 @@ func TestNFTRegistry(t *testing.T) {
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 			RunReturnsInterface()
 
-		assert.Equal(t, expected, result)
+		danyTokenWant.Equal(t, result)
 	})
 	t.Run("Should be able to registry Dandy token and list it", func(t *testing.T) {
 		result := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
 
-		assert.Equal(t, expected, result)
+		danyTokenWant.Equal(t, result)
 
 		result = otu.O.ScriptFromFile("getNFTInfoAll").RunReturnsJsonString()
 		otu.AutoGoldRename("Should be able to registry Dandy token and list it", result)
@@ -65,12 +64,12 @@ func TestNFTRegistry(t *testing.T) {
 		aliasResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
-		assert.Equal(t, "", aliasResult)
+		assert.Equal(t, nil, aliasResult)
 
 		infoResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
-		assert.Equal(t, "", infoResult)
+		assert.Equal(t, nil, infoResult)
 	})
 
 	t.Run("Should be able to registry and remove Dandy token by Type Identifier, as well as return nil on scripts", func(t *testing.T) {
@@ -81,12 +80,12 @@ func TestNFTRegistry(t *testing.T) {
 		aliasResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 			RunReturnsInterface()
-		assert.Equal(t, "", aliasResult)
+		assert.Equal(t, nil, aliasResult)
 
 		infoResult := o.ScriptFromFile("getNFTInfo").
 			Args(o.Arguments().String("Dandy")).
 			RunReturnsInterface()
-		assert.Equal(t, "", infoResult)
+		assert.Equal(t, nil, infoResult)
 
 	})
 

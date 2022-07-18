@@ -6,7 +6,7 @@ import (
 
 func main() {
 
-	o := overflow.NewOverflowEmulator().Start()
+	o := overflow.NewOverflowInMemoryEmulator().Start()
 	/*
 		o := overflow.NewOverflowMainnet().Start()
 	*/

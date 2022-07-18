@@ -9,14 +9,13 @@
             "DandyID"
         ]
     },
-    "curatedCollections": {},
     "items": {
         "DandyID0": {
             "collection": "Dandy",
             "contentTypes": [
                 "image/png"
             ],
-            "id": "ID0",
+            "id": 133,
             "image": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
             "medias": [
                 {
@@ -29,26 +28,24 @@
             "name": "Neo Motorcycle 1 of 1",
             "rarity": {
                 "description": "rare",
-                "max": "50.00000000",
-                "score": "100.00000000"
+                "max": 100,
+                "score": 50
             },
             "traits": [
                 {
                     "displayType": "String",
                     "name": "Color",
-                    "rarity": "",
                     "value": "Pearl"
                 },
                 {
                     "displayType": "Numeric",
                     "name": "Speed",
-                    "rarity": "",
-                    "value": "200.00000000"
+                    "value": 200
                 }
             ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://find.xyz/collection/user1/dandy/ID0",
-            "uuid": "ID0"
+            "uuid": 133
         },
         "DandyID1": {
             "collection": "Dandy",
@@ -56,7 +53,7 @@
                 "video/mp4",
                 "image/png;display=thumbnail"
             ],
-            "id": "ID1",
+            "id": 134,
             "image": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
             "medias": [
                 {
@@ -75,26 +72,24 @@
             "name": "xtingle 1 of 1",
             "rarity": {
                 "description": "rare",
-                "max": "50.00000000",
-                "score": "100.00000000"
+                "max": 100,
+                "score": 50
             },
             "traits": [
                 {
                     "displayType": "String",
                     "name": "Author",
-                    "rarity": "",
                     "value": "Xtingels"
                 },
                 {
                     "displayType": "Numeric",
                     "name": "video_length",
-                    "rarity": "",
-                    "value": "27.00000000"
+                    "value": 27
                 }
             ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://nft.blocto.app/xtingles//ID1",
-            "uuid": "ID1"
+            "uuid": 134
         },
         "DandyID2": {
             "collection": "Dandy",
@@ -102,20 +97,18 @@
                 "video/mp4",
                 "image;display=thumbnail"
             ],
-            "id": "ID2",
+            "id": 135,
             "image": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
             "medias": [
                 {
                     "file": {
-                        "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U",
-                        "path": ""
+                        "cid": "QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U"
                     },
                     "mediaType": "video/mp4"
                 },
                 {
                     "file": {
-                        "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
-                        "path": ""
+                        "cid": "QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR"
                     },
                     "mediaType": "image;display=thumbnail"
                 }
@@ -123,26 +116,24 @@
             "name": "ufcstrike 1 of 1",
             "rarity": {
                 "description": "rare",
-                "max": "50.00000000",
-                "score": "100.00000000"
+                "max": 100,
+                "score": 50
             },
             "traits": [
                 {
                     "displayType": "String",
                     "name": "Signature_move",
-                    "rarity": "",
                     "value": "Rare naked choke"
                 },
                 {
                     "displayType": "Numeric",
                     "name": "Reach",
-                    "rarity": "",
-                    "value": "120.00000000"
+                    "value": 120
                 }
             ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://www.ufcstrike.com/ID2",
-            "uuid": "ID2"
+            "uuid": 135
         },
         "DandyID3": {
             "collection": "Dandy",
@@ -150,13 +141,12 @@
                 "video/mp4",
                 "image/jpg;display=thumbnail"
             ],
-            "id": "ID3",
+            "id": 136,
             "image": "https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg",
             "medias": [
                 {
                     "file": {
-                        "cid": "QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr",
-                        "path": ""
+                        "cid": "QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr"
                     },
                     "mediaType": "video/mp4"
                 },
@@ -170,39 +160,36 @@
             "name": "jambb 1 of 1",
             "rarity": {
                 "description": "rare",
-                "max": "50.00000000",
-                "score": "100.00000000"
+                "max": 100,
+                "score": 50
             },
             "traits": [
                 {
                     "displayType": "String",
                     "name": "Author",
-                    "rarity": "",
                     "value": "Jack Black"
                 },
                 {
                     "displayType": "Numeric",
                     "name": "video_length",
-                    "rarity": "",
-                    "value": "45.00000000"
+                    "value": 45
                 }
             ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://www.jambb.com/ID3",
-            "uuid": "ID3"
+            "uuid": 136
         },
         "DandyID4": {
             "collection": "Dandy",
             "contentTypes": [
                 "image"
             ],
-            "id": "ID4",
+            "id": 137,
             "image": "ipfs://QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a",
             "medias": [
                 {
                     "file": {
-                        "cid": "QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a",
-                        "path": ""
+                        "cid": "QmSj3vVwPPzq4UxUnrR7HvUCCFDJGvwBV2ShP7ycTtD73a"
                     },
                     "mediaType": "image"
                 }
@@ -210,33 +197,31 @@
             "name": "goatedgoats 1 of 1",
             "rarity": {
                 "description": "rare",
-                "max": "50.00000000",
-                "score": "100.00000000"
+                "max": 100,
+                "score": 50
             },
             "traits": [
                 {
                     "displayType": "String",
                     "name": "Color",
-                    "rarity": "",
                     "value": "Black"
                 },
                 {
                     "displayType": "Numeric",
                     "name": "trait-slots",
-                    "rarity": "",
-                    "value": "5.00000000"
+                    "value": 5
                 }
             ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://goatedgoats.com//ID4",
-            "uuid": "ID4"
+            "uuid": 137
         },
         "DandyID5": {
             "collection": "Dandy",
             "contentTypes": [
                 "video/mp4"
             ],
-            "id": "ID5",
+            "id": 138,
             "image": "https://helloeddi.files.wordpress.com/2020/11/kevin1.jpg?w=982\u0026h=1360?w=650",
             "medias": [
                 {
@@ -249,26 +234,24 @@
             "name": "klktn 1 of 1",
             "rarity": {
                 "description": "rare",
-                "max": "50.00000000",
-                "score": "100.00000000"
+                "max": 100,
+                "score": 50
             },
             "traits": [
                 {
                     "displayType": "String",
                     "name": "Author",
-                    "rarity": "",
                     "value": "Kevin Woo"
                 },
                 {
                     "displayType": "Numeric",
                     "name": "id",
-                    "rarity": "",
-                    "value": "0.00000000"
+                    "value": 0
                 }
             ],
             "typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "url": "https://klktn.com//ID5",
-            "uuid": "ID5"
+            "uuid": 138
         }
     }
 }`

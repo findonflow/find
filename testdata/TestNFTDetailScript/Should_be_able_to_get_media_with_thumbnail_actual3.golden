@@ -51,13 +51,10 @@
             "status": "active"
         }
     },
-    "findMarket": {},
     "nftDetail": {
         "collectionDescription": "ufc strike FIND",
         "collectionName": "ufcstrike",
-        "data": {},
-        "editionNumber": "",
-        "id": "ID2",
+        "id": 189,
         "media": {
             "ipfs://QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U": "video/mp4",
             "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR": "image;display=thumbnail"
@@ -67,31 +64,29 @@
         "royalties": [
             {
                 "address": "0x179b6b1cb6755e31",
-                "cut": "0.05000000",
+                "cut": 0.05,
                 "findName": "user1",
                 "royaltyName": "minter"
             },
             {
                 "address": "0xf8d6e0586b0a20c7",
-                "cut": "0.02500000",
-                "findName": "",
+                "cut": 0.025,
                 "royaltyName": "platform"
             }
         ],
         "scalars": {
-            "Reach": "120.00000000",
-            "edition_nft_max": "1.00000000",
-            "edition_nft_number": "1.00000000",
-            "rarity_max": "50.00000000",
-            "rarity_score": "100.00000000"
+            "Reach": 120,
+            "edition_nft_max": 1,
+            "edition_nft_number": 1,
+            "rarity_max": 100,
+            "rarity_score": 50
         },
         "tags": {
             "Signature_move": "Rare naked choke"
         },
         "thumbnail": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
-        "totalInEdition": "",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": "ID2",
+        "uuid": 189,
         "views": [
             "checked",
             "checked",
@@ -101,6 +96,5 @@
             "checked",
             "checked"
         ]
-    },
-    "storefront": ""
+    }
 }`

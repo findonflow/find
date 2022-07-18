@@ -24,11 +24,10 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let httpFile=MetadataViews.HTTPFile(url:nftUrl)
 		let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
-		let rarity = MetadataViews.Rarity(max: 100.0, score: rarityNum, description:rarity)
+		let rarity = MetadataViews.Rarity(score:rarityNum, max: 100.0, description:rarity)
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let nftReceiver=getAccount(to).getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
-
 
 		let traits = MetadataViews.Traits([])
 		traits.addTrait(MetadataViews.Trait(name: "Color", value: "Pearl", displayType:"String", rarity:nil))
@@ -269,7 +268,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			let description=artCreativeWork.description.concat( " edition ").concat(i.toString()).concat( " of ").concat(maxEdition.toString())
 			let artHttpFile=MetadataViews.HTTPFile(url:"https://ipfs.io/ipfs/bafybeif3banecjnrz7afp54tb332f3zzigzbdcgmjk3k3dwp4iqlrwsbju/73ceab33cf76c2cf48a9a587119c87d21d4ec92b5748e743113c4ce8a1568b53.mp4")
 			let artMedia=MetadataViews.Media(file: artHttpFile, mediaType: "video/mp4")
-			let thumbnailMedia=MetadataViews.Media(file: MetadataViews.HTTPFile("https://helloeddi.files.wordpress.com/2020/11/kevin1.jpg?w=982&h=1360?w=650"), mediaType: "image/jpeg")
+			let thumbnailMedia=MetadataViews.Media(file: MetadataViews.HTTPFile(url:"https://helloeddi.files.wordpress.com/2020/11/kevin1.jpg?w=982&h=1360?w=650"), mediaType: "image/jpeg")
 
 
 		let traits = MetadataViews.Traits([])

@@ -97,7 +97,7 @@ func TestFIND(t *testing.T) {
 			tickClock(2.0)
 
 		value := otu.O.ScriptFromFile("getNameStatus").Args(otu.O.Arguments().String("user1")).RunReturnsInterface()
-		assert.Equal(t, "", value)
+		assert.Equal(t, nil, value)
 
 	})
 
@@ -138,7 +138,7 @@ func TestFIND(t *testing.T) {
 
 		value := otu.O.ScriptFromFile("getName").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
 		fmt.Println(value)
-		assert.Equal(t, `""`, value)
+		assert.Equal(t, "", value)
 
 		otu.moveNameTo("user2", "user1", "user1")
 
@@ -204,15 +204,17 @@ func TestFIND(t *testing.T) {
 			Test(t).AssertSuccess()
 
 		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		assert.Contains(t, value, `"privateMode": "true"`)
+
+		assert.Contains(t, value, `"privateMode": true`)
 
 		otu.O.TransactionFromFile("setPrivateMode").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Boolean(false)).
 			Test(t).AssertSuccess()
 
+		//TEST: fix this later, to brittle
 		value = otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		assert.Contains(t, value, `"privateMode": "false"`)
+		assert.Contains(t, value, `"privateMode": false`)
 
 	})
 
