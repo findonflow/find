@@ -28,12 +28,12 @@ pub contract FindForge {
 		//todo: do we need name here?
 
 		//a user should be able to change these 6?
-		pub let description: String 
-		pub let externalURL: String 
-		pub let squareImage: String 
-		pub let bannerImage: String 
+		pub var description: String 
+		pub var externalURL: String 
+		pub var squareImage: String 
+		pub var bannerImage: String 
 		pub let minterCut: UFix64?
-		pub let socials: {String : String}
+		pub var socials: {String : String}
 
 		init(name: String, platform:Capability<&{FungibleToken.Receiver}>, platformPercentCut: UFix64, minterCut: UFix64? ,description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 			self.name=name
@@ -50,6 +50,26 @@ pub contract FindForge {
 
 		pub fun getMinterFTReceiver() : Capability<&{FungibleToken.Receiver}> {
 			return getAccount(self.minter).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		}
+
+		pub fun updateExternalURL(_ d: String) {
+			self.externalURL = d
+		}
+
+		pub fun updateDesription(_ d: String) {
+			self.description = d
+		}
+
+		pub fun updateSquareImagen(_ d: String) {
+			self.squareImage = d
+		}
+
+		pub fun updateBannerImage(_ d: String) {
+			self.bannerImage = d
+		}
+
+		pub fun updateSocials(_ d: {String : String}) {
+			self.socials = d
 		}
 
 	}

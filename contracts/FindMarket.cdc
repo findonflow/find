@@ -28,8 +28,8 @@ pub contract FindMarket {
 
 	access(contract) let tenantPathPrefix :String
 
-	access(contract) let tenantNameAddress : {String:Address}
-	access(contract) let tenantAddressName : {Address:String}
+	access(account) let tenantNameAddress : {String:Address}
+	access(account) let tenantAddressName : {Address:String}
 
 
 

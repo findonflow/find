@@ -222,8 +222,8 @@ pub contract FindMarketSale {
 			//Add seller/buyer/find/tenant to map and lookup in that before calling reverseLookup
 			let resolved : {Address : String} = {}
 
-			resolved[buyer] = buyerName
-			resolved[self.owner!.address] = sellerName
+			resolved[buyer] = buyerName ?? ""
+			resolved[self.owner!.address] = sellerName ?? ""
 			resolved[FindMarketSale.account.address] = "find"
 			// Have to make sure the tenant always have the valid find name 
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] = tenant.name
