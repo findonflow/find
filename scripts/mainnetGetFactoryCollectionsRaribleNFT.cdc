@@ -52,45 +52,6 @@ pub fun resolveAddress(user: String) : PublicAccount? {
 	return getAccount(address!)
 }
 
-// pub fun getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTView] {
-
-// 	let account = getAuthAccount(ownerAddress)
-// 	let results : [MetadataViews.NFTView] = []
-// 	let tempPathStr = "RaribleNFT"
-// 	let tempPublicPath = PublicPath(identifier: tempPathStr)!
-// 	account.link<&RaribleNFT.Collection>(tempPublicPath, target: RaribleNFT.collectionStoragePath)
-// 	let cap= account.getCapability<&RaribleNFT.Collection>(tempPublicPath)
-// 	if cap.check(){
-// 		let collection = cap.borrow()!
-// 		for id in ids {
-
-// 			let authNFT = (&collection.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-// 			let nft = authNFT as! &RaribleNFT.NFT
-
-// 			let md = nft.getMetadata()
-
-// 			let display = MetadataViews.Display(
-// 				name: md["name"] ?? "",
-// 				description: md["description"] ?? "",
-// 				thumbnail: MetadataViews.HTTPFile(url: md["metaURI"] ?? ""),
-// 			)
-
-// 			let view =  MetadataViews.NFTView(
-// 				id : id,
-// 				uuid: nft.uuid,
-// 				display: display,
-// 				externalURL : nil,
-// 				collectionData : nil,
-// 				collectionDisplay : nil,
-// 				royalties : nil,
-// 				traits : nil
-// 			)
-// 			results.append(view)
-// 		}
-// 	}
-	
-// 	return results
-// }
 
 pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 
