@@ -52,45 +52,45 @@ pub fun resolveAddress(user: String) : PublicAccount? {
 	return getAccount(address!)
 }
 
-pub fun getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTView] {
+// pub fun getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTView] {
 
-	let account = getAuthAccount(ownerAddress)
-	let results : [MetadataViews.NFTView] = []
-	let tempPathStr = "RaribleNFT"
-	let tempPublicPath = PublicPath(identifier: tempPathStr)!
-	account.link<&RaribleNFT.Collection>(tempPublicPath, target: RaribleNFT.collectionStoragePath)
-	let cap= account.getCapability<&RaribleNFT.Collection>(tempPublicPath)
-	if cap.check(){
-		let collection = cap.borrow()!
-		for id in ids {
+// 	let account = getAuthAccount(ownerAddress)
+// 	let results : [MetadataViews.NFTView] = []
+// 	let tempPathStr = "RaribleNFT"
+// 	let tempPublicPath = PublicPath(identifier: tempPathStr)!
+// 	account.link<&RaribleNFT.Collection>(tempPublicPath, target: RaribleNFT.collectionStoragePath)
+// 	let cap= account.getCapability<&RaribleNFT.Collection>(tempPublicPath)
+// 	if cap.check(){
+// 		let collection = cap.borrow()!
+// 		for id in ids {
 
-			let authNFT = (&collection.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-			let nft = authNFT as! &RaribleNFT.NFT
+// 			let authNFT = (&collection.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+// 			let nft = authNFT as! &RaribleNFT.NFT
 
-			let md = nft.getMetadata()
+// 			let md = nft.getMetadata()
 
-			let display = MetadataViews.Display(
-				name: md["name"] ?? "",
-				description: md["description"] ?? "",
-				thumbnail: MetadataViews.HTTPFile(url: md["metaURI"] ?? ""),
-			)
+// 			let display = MetadataViews.Display(
+// 				name: md["name"] ?? "",
+// 				description: md["description"] ?? "",
+// 				thumbnail: MetadataViews.HTTPFile(url: md["metaURI"] ?? ""),
+// 			)
 
-			let view =  MetadataViews.NFTView(
-				id : id,
-				uuid: nft.uuid,
-				display: display,
-				externalURL : nil,
-				collectionData : nil,
-				collectionDisplay : nil,
-				royalties : nil,
-				traits : nil
-			)
-			results.append(view)
-		}
-	}
+// 			let view =  MetadataViews.NFTView(
+// 				id : id,
+// 				uuid: nft.uuid,
+// 				display: display,
+// 				externalURL : nil,
+// 				collectionData : nil,
+// 				collectionDisplay : nil,
+// 				royalties : nil,
+// 				traits : nil
+// 			)
+// 			results.append(view)
+// 		}
+// 	}
 	
-	return results
-}
+// 	return results
+// }
 
 pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 
@@ -103,17 +103,17 @@ pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 	account.link<&RaribleNFT.Collection>(tempPublicPath, target: RaribleNFT.collectionStoragePath)
 	let cap= account.getCapability<&RaribleNFT.Collection>(tempPublicPath)
 	if cap.check(){
-			let rarible : [UInt64] = []
+			// let rarible : [UInt64] = []
 			let socks : [UInt64] = []
 		for id in cap.borrow()!.getIDs() {
 			if FlowverseSocksIds.contains(id) {
 				socks.append(id)
-			} else {
-				rarible.append(id)
+			// } else {
+			// 	rarible.append(id)
 			}
 		}
 
-		inventory["RaribleNFT"] = rarible
+		// inventory["RaribleNFT"] = rarible
 		inventory["FlowverseSocks"] = socks
 
 	}
@@ -167,21 +167,22 @@ pub fun fetchRaribleNFT(user: String, maxItems: Int, targetCollections: [String]
 
 
 	for project in fetchingIDs.keys {
-		let returnedNFTs = getNFTs(ownerAddress: account!.address, ids: fetchingIDs[project]!)
 
 		var collectionItems : [MetadataCollectionItem] = []
-		for nft in returnedNFTs {
-			if nft == nil {
+		for id in fetchingIDs[project]! {
+
+			if !FlowverseSocksIds.contains(id) {
 				continue
 			}
-			
+            
+			let image = "https://img.rarible.com/prod/video/upload/t_video_big/prod-itemAnimations/FLOW-A.01ab36aaf654a13e.RaribleNFT:15029/b1cedf3"
 			let item = MetadataCollectionItem(
-				id: nft!.id,
-				name: nft!.display!.name,
-				collection: project,
-				subCollection: nil, 
-				media: nft!.display!.thumbnail.uri(),
-				mediaType: "image/png",
+				id: id,
+				name: "Flowverse socks",
+				collection: "Rarible",
+				subCollection: "Flowverse socks", 
+				media: image,
+				mediaType: "video",
 				source: source
 			)
 			collectionItems.append(item)
