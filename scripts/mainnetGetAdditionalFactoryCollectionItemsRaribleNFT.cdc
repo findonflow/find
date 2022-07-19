@@ -114,8 +114,8 @@ pub fun fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {St
 			let item = MetadataCollectionItem(
 				id: id,
 				name: "Flowverse socks",
-				collection: "Rarible",
-				subCollection: "Flowverse socks", 
+				collection: "Flowverse socks",
+				subCollection: nil, 
 				media: image,
 				mediaType: "video",
 				source: source
