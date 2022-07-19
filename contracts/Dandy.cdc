@@ -291,16 +291,16 @@ pub contract Dandy: NonFungibleToken {
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
 			}
 
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
 			}
 
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
@@ -308,8 +308,8 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun borrow(_ id: UInt64): &NFT {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
 			}
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			return nft as! &Dandy.NFT

@@ -501,8 +501,8 @@ pub contract FindMarket {
 
 		init(name:String, types:[Type], ruleType:String, allow:Bool){
 
-			pre {
-				ruleType == "nft" || ruleType == "ft" || ruleType == "listing" : "Must be nft/ft/listing"
+			if !(ruleType == "nft" || ruleType == "ft" || ruleType == "listing") {
+				panic("Must be nft/ft/listing")
 			}
 			self.name=name
 			self.types=types
@@ -932,9 +932,12 @@ pub contract FindMarket {
 		access(self) var capability: Capability<&Tenant>?
 
 		pub fun addCapability(_ cap: Capability<&Tenant>) {
-			pre {
-				cap.check() : "Invalid tenant"
-				self.capability == nil : "Server already set"
+
+			if !cap.check() {
+				panic("Invalid tenant")
+			}
+			if self.capability != nil {
+				panic("Server already set")
 			}
 			self.capability = cap
 		}
@@ -984,9 +987,11 @@ pub contract FindMarket {
 		}
 
 		pub fun getTenantRef() : &Tenant {
-			pre {
-				self.capability != nil: "TenantClient is not present"
-				self.capability!.check()  : "Tenant client is not linked anymore"
+			if self.capability == nil {
+				panic("TenantClient is not present")
+			}
+			if !self.capability!.check() {
+				panic("Tenant client is not linked anymore")
 			}
 
 			return self.capability!.borrow()!
@@ -1027,24 +1032,25 @@ pub contract FindMarket {
 	}
 
 	pub fun getTenantPathForName(_ name:String) : String {
-		pre {
-			self.tenantNameAddress.containsKey(name) : "tenant is not registered in registry"
+		if !self.tenantNameAddress.containsKey(name) {
+			panic("tenant is not registered in registry")
 		}
 
 		return self.tenantPathPrefix.concat("_").concat(name)
 	}
 
 	pub fun getTenantPathForAddress(_ address:Address) : String {
-		pre {
-			self.tenantAddressName.containsKey(address) : "tenant is not registered in registry"
+		if !self.tenantAddressName.containsKey(address) {
+			panic("tenant is not registered in registry")
 		}
 
 		return self.getTenantPathForName(self.tenantAddressName[address]!)
 	}
 
 	pub fun getTenantCapability(_ marketplace:Address) : Capability<&Tenant{TenantPublic}>? {
-		pre {
-			self.tenantAddressName.containsKey(marketplace) : "tenant is not registered in registry"
+
+		if !self.tenantAddressName.containsKey(marketplace)  {
+			"tenant is not registered in registry"
 		}
 
 		return FindMarket.account.getCapability<&Tenant{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
@@ -1152,93 +1158,96 @@ pub contract FindMarket {
 		pub var collectionName: String? 
 		pub var collectionDescription: String? 
 
-		init(_ item: &{MetadataViews.Resolver}, id: UInt64){
+		init(_ item: &{MetadataViews.Resolver}, id: UInt64, detail: Bool){
 
 			self.tags = {}
 
 			self.collectionName=nil
 			self.collectionDescription=nil
-
-			if let ncd = MetadataViews.getNFTCollectionDisplay(item) {
-				self.collectionName=ncd.name
-				self.collectionDescription=ncd.description
-			}
-
 			self.scalars = {}
 			self.rarity= nil 
-			if let rarity = MetadataViews.getRarity(item) {
-				if rarity.description != nil {
-					self.rarity=rarity.description!
-				}
-
-				if rarity.score != nil {
-					self.scalars["rarity_score"] = rarity.score!
-				}
-				if rarity.max != nil {
-					self.scalars["rarity_max"] = rarity.max!
-				}
-			}
-
-			let numericValues  = {"Date" : true, "Numeric":true, "Number":true, "date":true, "numeric":true, "number":true}
-
-			if let traits =  MetadataViews.getTraits(item) {
-				for trait in traits.traits {
-
-					let name = trait.name
-					let display = trait.displayType ?? "String"
-
-					let traitName = name
-
-					if numericValues[display] != nil {
-						if let value = trait.value as? Number {
-							self.scalars[traitName]  = UFix64(value)
-						}
-					} else {
-						if let value = trait.value as? String {
-							self.tags[traitName]  = value
-						}
-						if let value = trait.value as? Bool {
-							if value {
-								self.tags[traitName]  = "true"
-							}else {
-								self.tags[traitName]  = "false"
-							}
-						}
-
-					}
-					if let rarity = trait.rarity {
-						if rarity.description != nil {
-							self.tags[traitName.concat("_rarity")] = rarity.description!
-						}
-
-						if rarity.score != nil {
-							self.scalars[traitName.concat("_rarity_score")] = rarity.score!
-						}
-						if rarity.max != nil {
-							self.scalars[traitName.concat("_rarity_max")] = rarity.max!
-						}
-					}
-				}
-			}
-
+			self.editionNumber=nil
+			self.totalInEdition=nil
 			let display = MetadataViews.getDisplay(item) ?? panic("cannot get MetadataViews.Display View")
 			self.name=display.name
 			self.thumbnail=display.thumbnail.uri()
 			self.type=item.getType().identifier
 			self.id=id
 
-			self.editionNumber=nil
-			self.totalInEdition=nil
+			if detail {
+				if let ncd = MetadataViews.getNFTCollectionDisplay(item) {
+					self.collectionName=ncd.name
+					self.collectionDescription=ncd.description
+				}
 
-			if let editions = MetadataViews.getEditions(item) {
-				for edition in editions.infoList {
-					if edition.name == nil {
-						self.editionNumber=edition.number
-						self.totalInEdition=edition.max
-					} else {
-						self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
-						if edition.max != nil {
-							self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
+				if let rarity = MetadataViews.getRarity(item) {
+					if rarity.description != nil {
+						self.rarity=rarity.description!
+					}
+
+					if rarity.score != nil {
+						self.scalars["rarity_score"] = rarity.score!
+					}
+					if rarity.max != nil {
+						self.scalars["rarity_max"] = rarity.max!
+					}
+				}
+
+				let numericValues  = {"Date" : true, "Numeric":true, "Number":true, "date":true, "numeric":true, "number":true}
+
+				if let traits =  MetadataViews.getTraits(item) {
+					for trait in traits.traits {
+
+						let name = trait.name
+						let display = trait.displayType ?? "String"
+
+						let traitName = name
+
+						if numericValues[display] != nil {
+							if let value = trait.value as? Number {
+								self.scalars[traitName]  = UFix64(value)
+							}
+						} else {
+							if let value = trait.value as? String {
+								self.tags[traitName]  = value
+							}
+							if let value = trait.value as? Bool {
+								if value {
+									self.tags[traitName]  = "true"
+								}else {
+									self.tags[traitName]  = "false"
+								}
+							}
+
+						}
+						if let rarity = trait.rarity {
+							if rarity.description != nil {
+								self.tags[traitName.concat("_rarity")] = rarity.description!
+							}
+
+							if rarity.score != nil {
+								self.scalars[traitName.concat("_rarity_score")] = rarity.score!
+							}
+							if rarity.max != nil {
+								self.scalars[traitName.concat("_rarity_max")] = rarity.max!
+							}
+						}
+					}
+				}
+
+
+
+
+				if let editions = MetadataViews.getEditions(item) {
+					for edition in editions.infoList {
+						if edition.name == nil {
+							self.editionNumber=edition.number
+							self.totalInEdition=edition.max
+						} else {
+							self.scalars["edition_".concat(edition.name!).concat("_number")] = UFix64(edition.number)
+							if edition.max != nil {
+								self.scalars["edition_".concat(edition.name!).concat("_max")] = UFix64(edition.max!)
+							}
 						}
 					}
 				}
@@ -1333,7 +1342,7 @@ pub contract FindMarket {
 		pub fun getSellerName() : String?
 		pub fun getBuyerName() : String?
 
-		pub fun toNFTInfo() : FindMarket.NFTInfo
+		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo
 		pub fun checkPointer() : Bool 
 		pub fun getListingType() : Type 
 

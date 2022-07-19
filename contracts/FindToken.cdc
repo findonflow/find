@@ -138,8 +138,8 @@ pub contract FindToken : FungibleToken {
 
     pub resource Minter {
         pub fun mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
-            pre {
-                amount > 0.0: "Amount minted must be greater than zero"
+            if amount == 0.0 {
+                panic("Amount minted must be greater than zero")
             }
             FindToken.totalSupply = FindToken.totalSupply + amount 
             emit TokensMinted(amount: amount)

@@ -75,8 +75,8 @@ pub contract FindMarketDirectOfferEscrow {
 			return nil
 		}
 
-		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
+		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
 		}
 
 		pub fun getSaleType() : String {
@@ -189,8 +189,8 @@ pub contract FindMarketDirectOfferEscrow {
 
 		//this is called when a buyer cancel a direct offer
 		access(contract) fun cancelBid(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 			let saleItem=self.borrow(id)
 
@@ -213,7 +213,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo()
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
@@ -223,8 +223,9 @@ pub contract FindMarketDirectOfferEscrow {
 
 		//The only thing we do here is basically register an event
 		access(contract) fun registerIncreasedBid(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 			let saleItem=self.borrow(id)
 
@@ -245,7 +246,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = Profile.find(buyer)
 
-			let nftInfo=saleItem.toNFTInfo()
+			let nftInfo=saleItem.toNFTInfo(true)
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
@@ -281,7 +282,7 @@ pub contract FindMarketDirectOfferEscrow {
 				let buyerName=FIND.reverseLookup(buyer)
 				let profile = Profile.find(buyer)
 
-				let nftInfo=saleItemRef.toNFTInfo()
+				let nftInfo=saleItemRef.toNFTInfo(true)
 
 				emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItemRef.validUntil, previousBuyer:nil, previousBuyerName:nil)
 	
@@ -324,7 +325,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = Profile.find(buyer)
 
-			let nftInfo=saleItem.toNFTInfo()
+			let nftInfo=saleItem.toNFTInfo(true)
 
 			let previousBuyerName = FIND.reverseLookup(previousBuyer)
 
@@ -335,8 +336,9 @@ pub contract FindMarketDirectOfferEscrow {
 
 		//cancel will reject a direct offer
 		pub fun cancel(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 
 			let saleItem=self.borrow(id)
@@ -360,7 +362,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo()
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
@@ -370,11 +372,11 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun acceptDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
-			pre {
-				self.items.containsKey(pointer.getUUID()) : "Invalid id=".concat(pointer.getUUID().toString())
-			}
-
+			
 			let id = pointer.getUUID()
+			if self.items.containsKey(id) {
+				panic("Invalid id=".concat(pointer.getUUID().toString()))
+			}
 			let saleItem = self.borrow(id)
 
 			if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {
@@ -397,7 +399,7 @@ pub contract FindMarketDirectOfferEscrow {
 			saleItem.setPointer(pointer)
 
 			let royalty=saleItem.getRoyalty()
-			let nftInfo=saleItem.toNFTInfo()
+			let nftInfo=saleItem.toNFTInfo(true)
 
 			let status="sold"
 			let owner=saleItem.getSeller()
@@ -547,12 +549,15 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
-			pre {
-				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
-				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
+			if self.owner!.address == item.owner() {
+				panic("You cannot bid on your own resource")
 			}
 
 			let uuid=item.getUUID()
+
+			if self.bids[uuid] != nil {
+				panic("You already have an bid for this item, use increaseBid on that bid")
+			}
 			let tenant=self.getTenant()
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 

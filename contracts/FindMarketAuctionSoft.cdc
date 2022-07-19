@@ -92,8 +92,8 @@ pub contract FindMarketAuctionSoft {
 			return nil
 		}
 
-		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
+		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
 		}
 
 		pub fun setAuctionStarted(_ startedAt: UFix64) {
@@ -311,7 +311,7 @@ pub contract FindMarketAuctionSoft {
 			let status = "active_ongoing"
 			let seller=self.owner!.address
 
-			let nftInfo=saleItem.toNFTInfo()
+			let nftInfo=saleItem.toNFTInfo(true)
 			
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
@@ -325,8 +325,8 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+			if !self.items.containsKey(id) {
+				panic( "Invalid id=".concat(id.toString()))
 			}
 
 			let saleItem=self.borrow(id)
@@ -396,7 +396,7 @@ pub contract FindMarketAuctionSoft {
 
 			let status= "active_ongoing"
 
-			let nftInfo=saleItem.toNFTInfo()
+			let nftInfo=saleItem.toNFTInfo(true)
 
 			let buyerName=FIND.reverseLookup(callback.address)
 			let profile = Profile.find(callback.address)
@@ -405,8 +405,9 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun cancel(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 
 			let saleItem=self.borrow(id)
@@ -438,7 +439,7 @@ pub contract FindMarketAuctionSoft {
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo()
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 			
 			if buyer != nil {
@@ -458,8 +459,9 @@ pub contract FindMarketAuctionSoft {
 
 
 		access(contract) fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 
 			let saleItem = self.borrow(id)
@@ -491,7 +493,7 @@ pub contract FindMarketAuctionSoft {
 
 			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType)
 
-			let nftInfo=saleItem.toNFTInfo()
+			let nftInfo=saleItem.toNFTInfo(false)
 			let royalty=saleItem.getRoyalty()
 
 			let balance=saleItem.getBalance()
@@ -547,7 +549,7 @@ pub contract FindMarketAuctionSoft {
 			self.items[id] <-! saleItem
 			let saleItemRef = self.borrow(id)
 
-			let nftInfo=saleItemRef.toNFTInfo()
+			let nftInfo=saleItemRef.toNFTInfo(true)
 
 			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: auctionStartPrice, auctionReservePrice: saleItemRef.auctionReservePrice,  status: "active_listed", vaultType:vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar: nil, endsAt: saleItemRef.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
 
@@ -675,16 +677,20 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, amount:UFix64, vaultType:Type, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
-			pre {
-				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
-				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
+
+			if self.owner!.address == item.owner() {
+				panic("You cannot bid on your own resource")
 			}
 
 			let uuid=item.getUUID()	
+
+			if self.bids[uuid] != nil {
+				panic("You already have an bid for this item, use increaseBid on that bid")
+			}
 			let tenant=self.getTenant()
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 
-			let bid <- create Bid(from: from, itemUUID:item.getUUID(), nftCap: nftCap, vaultType: vaultType, balance:amount, bidExtraField: bidExtraField)
+			let bid <- create Bid(from: from, itemUUID:uuid, nftCap: nftCap, vaultType: vaultType, balance:amount, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
@@ -694,8 +700,9 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun fulfillAuction(id:UInt64, vault: @FungibleToken.Vault) {
-			pre {
-				self.bids[id] != nil : "You need to have a bid here already"
+
+			if self.bids[id] == nil  {
+				panic("You need to have a bid here already")
 			}
 			let bid =self.borrowBid(id)
 			let saleItem=bid.from.borrow()!
@@ -704,8 +711,8 @@ pub contract FindMarketAuctionSoft {
 
 		//increase a bid, will not work if the auction has already started
 		pub fun increaseBid(id: UInt64, increaseBy: UFix64) {
-			pre {
-				self.bids[id] != nil : "You need to have a bid here already"
+			if self.bids[id] == nil  {
+				panic("You need to have a bid here already")
 			}
 			let bid =self.borrowBid(id)
 
@@ -742,8 +749,8 @@ pub contract FindMarketAuctionSoft {
 		}
 
 		pub fun getBalance(_ id: UInt64) : UFix64 {
-			pre {
-				self.bids[id] != nil : "You need to have a bid here already"
+			if self.bids[id] == nil  {
+				panic("You need to have a bid here already")
 			}
 			let bid= self.borrowBid(id)
 			return bid.balance
