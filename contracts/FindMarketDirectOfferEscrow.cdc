@@ -374,7 +374,7 @@ pub contract FindMarketDirectOfferEscrow {
 		pub fun acceptDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
 			
 			let id = pointer.getUUID()
-			if self.items.containsKey(id) {
+			if !self.items.containsKey(id) {
 				panic("Invalid id=".concat(pointer.getUUID().toString()))
 			}
 			let saleItem = self.borrow(id)

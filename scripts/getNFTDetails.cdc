@@ -57,7 +57,7 @@ pub struct NFTDetail {
 
 		let item = pointer.getViewResolver()
 
-		let nftInfo = FindMarket.NFTInfo(item, id:pointer.id)
+		let nftInfo = FindMarket.NFTInfo(item, id:pointer.id, detail: true)
 
 		self.scalars=nftInfo.scalars
 		self.tags=nftInfo.tags

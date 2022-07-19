@@ -83,8 +83,8 @@ pub contract Dandy: NonFungibleToken {
 			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, forgeType: Dandy.getForgeType()) {
 				
 				let platform = &self.platform as &FindForge.MinterPlatform
-				platform.updateExternalURL(fetch.description)
-				platform.updateDesription(fetch.externalURL)
+				platform.updateExternalURL(fetch.externalURL)
+				platform.updateDesription(fetch.description)
 				platform.updateSquareImagen(fetch.squareImage)
 				platform.updateBannerImage(fetch.bannerImage)
 				platform.updateSocials(fetch.socials)

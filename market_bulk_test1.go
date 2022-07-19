@@ -40,17 +40,18 @@ func TestBulkMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", id5, price)
 		otu.listNFTForSale("user1", id6, price)
 
-		result := otu.O.TransactionFromFile("buyNew").
+		result := otu.O.TransactionFromFile("buyMultipleNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
 				AccountArray("user1", "user1", "user1").
-				//				AccountArray("user1").
-				//				UInt64Array(id).
 				UInt64Array(id, id2, id3).
-				//				UFix64Array(price)).
 				UFix64Array(price, price, price)).
-			Test(otu.T).AssertSuccess()
+			// AccountArray("user1").
+			// UInt64Array(id).
+			// UFix64Array(price)).
+			Test(otu.T).AssertSuccess().
+			AssertComputationLessThenOrEqual(0)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
 		assert.Fail(t, "failed")

@@ -431,7 +431,7 @@ pub contract FindMarketDirectOfferSoft {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = Profile.find(buyer)
 
-			let nftInfo=saleItem.toNFTInfo(true))
+			let nftInfo=saleItem.toNFTInfo(true)
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 		
@@ -633,13 +633,13 @@ pub contract FindMarketDirectOfferSoft {
 
 			let uuid=item.getUUID()
 
-			if self.bids[id] == nil {
+			if self.bids[uuid] != nil {
 				panic("You already have an bid for this item, use increaseBid on that bid")
 			}
 			let tenant=self.getTenant()
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 
-			let bid <- create Bid(from: from, itemUUID:item.getUUID(), nftCap: nftCap, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)
+			let bid <- create Bid(from: from, itemUUID:uuid, nftCap: nftCap, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 
