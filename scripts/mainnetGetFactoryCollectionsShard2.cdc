@@ -71,13 +71,6 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
         let inventory : {String : ItemReport} = {}
         var fetchedCount : Int = 0
 
-        // For by-passing bugs
-
-        if extraIDs["MintStoreItem.NBA ALL STAR "] != nil { // who the hell put a space at the end of the string
-            extraIDs["MintStoreItem"] = extraIDs.remove(key: "MintStoreItem.NBA ALL STAR ")
-        }
-
-
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
                 extraIDs.remove(key: project)
@@ -109,7 +102,7 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
                 fetchedCount = fetchedCount + fetchArray.length
             }
 
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!, ids: {project : fetchArray})
+            let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!, ids: {rename(project) : fetchArray})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -145,4 +138,9 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
 
     }
 
-
+    pub fun rename(_ name: String) : String {
+        if name == "MintStoreItem.NBA ALL STAR " {
+            return "MintStoreItem"
+        }
+        return name
+    }
