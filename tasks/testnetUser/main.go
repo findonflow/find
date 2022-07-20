@@ -8,26 +8,36 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
-	user := "0xe409a7e8a52812a9"
+	// user := "0x49d14b03d7411f53"
 
 	// o.ScriptFromFile("getCollections").Args(o.Arguments().String(user)).Run()
 	//user := "0xfbd6c52b7e6fe7be"
 
-	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(300.0))
+	// o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(10.0))
 
-	o.TransactionFromFile("testMintDandyTO").
-		SignProposeAndPayAs("user1").
-		Args(o.Arguments().
-			String("user1").
-			UInt64(10).
-			String("Neo").
-			String("Neo Motorcycle").
-			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
-			String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-			String("rare").
-			UFix64(50.0).
-			RawAddress(user)).
+	// o.TransactionFromFile("setup_find_market_1").
+	// 	SignProposeAndPayAs("findLease").
+	// 	RunPrintEventsFull()
+
+	//link in the server in the versus client
+	o.TransactionFromFile("setup_find_lease_market_2").
+		SignProposeAndPayAs("find-admin").
+		Args(o.Arguments().Account("findLease")).
 		RunPrintEventsFull()
+
+	// o.TransactionFromFile("testMintDandyTO").
+	// 	SignProposeAndPayAs("user1").
+	// 	Args(o.Arguments().
+	// 		String("user1").
+	// 		UInt64(10).
+	// 		String("Neo").
+	// 		String("Neo Motorcycle").
+	// 		String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
+	// 		String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
+	// 		String("rare").
+	// 		UFix64(50.0).
+	// 		RawAddress(user)).
+	// 	RunPrintEventsFull()
 	/*
 		// transaction(nftAlias: String, id: UInt64, ftAlias: String, directSellPrice:UFix64) {
 

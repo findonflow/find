@@ -172,6 +172,10 @@
       "address": "35717efbbce11c74",
       "key": "${TESTNET_ACCOUNT}"
     },
+    "testnet-findLease": {
+      "address": "49d14b03d7411f53",
+      "key": "${TESTNET_ACCOUNT}"
+    },
     "testnet-find-admin": {
       "address": "d116c726ad1b1cab",
       "key": "${TESTNET_ACCOUNT}"
