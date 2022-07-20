@@ -8,12 +8,10 @@ require (
 	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
-	//Need this until flow-go-sdk and cadence is released propper
 	github.com/onflow/cadence v0.24.2-0.20220627202951-5a06fec82b4a
+	github.com/sanity-io/litter v1.5.5
 	github.com/stretchr/testify v1.7.5
 )
-
-require github.com/sanity-io/litter v1.5.5
 
 require (
 	cloud.google.com/go v0.100.2 // indirect

@@ -1566,7 +1566,6 @@ pub contract FIND {
 				panic("cannot increaseBid on name that is free")
 			}
 			let seller=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-
 			let balance = vault.balance
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
