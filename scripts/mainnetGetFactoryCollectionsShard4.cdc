@@ -63,7 +63,7 @@ import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 
     pub fun fetchAlchemyShard4(user: String, maxItems: Int, targetCollections: [String]) : {String : ItemReport} {
-        let source = "Alchemy-shard4"
+        let source = "Shard4"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
 

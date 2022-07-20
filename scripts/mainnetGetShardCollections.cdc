@@ -73,7 +73,7 @@ pub fun getNFTIDs_Shard1(ownerAddress: Address, cacheCollections: {String:Collec
 		if length == 0 {
 			continue
 		}
-		cacheCollections[nft] = CollectionLength(shard: "Alchemy-shard1", length: length)
+		cacheCollections[nft] = CollectionLength(shard: "Shard1", length: length)
 	} 
 	return cacheCollections
 }
@@ -85,7 +85,7 @@ pub fun getNFTIDs_Shard2(ownerAddress: Address, cacheCollections: {String:Collec
 		if length == 0 {
 			continue
 		}
-		cacheCollections[nft] = CollectionLength(shard: "Alchemy-shard2", length: length)
+		cacheCollections[nft] = CollectionLength(shard: "Shard2", length: length)
 	} 
 	return cacheCollections
 }
@@ -97,7 +97,7 @@ pub fun getNFTIDs_Shard3(ownerAddress: Address, cacheCollections: {String:Collec
 		if length == 0 {
 			continue
 		}
-		cacheCollections[nft] = CollectionLength(shard: "Alchemy-shard3", length: length)
+		cacheCollections[nft] = CollectionLength(shard: "Shard3", length: length)
 	} 
 	return cacheCollections
 }
@@ -109,7 +109,7 @@ pub fun getNFTIDs_Shard4(ownerAddress: Address, cacheCollections: {String:Collec
 		if length == 0 {
 			continue
 		}
-		cacheCollections[nft] = CollectionLength(shard: "Alchemy-shard4", length: length)
+		cacheCollections[nft] = CollectionLength(shard: "Shard4", length: length)
 	} 
 	return cacheCollections
 }

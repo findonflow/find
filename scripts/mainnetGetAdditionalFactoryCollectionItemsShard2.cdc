@@ -65,7 +65,7 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
     // Fetch Specific Collections in Shard 2
     ////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "Alchemy-shard2"
+        let source = "Shard2"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
 
