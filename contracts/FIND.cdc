@@ -87,6 +87,14 @@ pub contract FIND {
 		panic("Network is not set up")
 	}
 
+	pub fun getLeases() : [NetworkLease] {
+		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+			return network.profiles.values
+		}
+		panic("Network is not set up")
+	}
+
+
 	//These methods are basically just here for convenience
 
 	/// Calculate the cost of an name
@@ -1541,7 +1549,6 @@ pub contract FIND {
 				panic("cannot increaseBid on name that is free")
 			}
 			let seller=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
-
 			let balance = vault.balance
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
