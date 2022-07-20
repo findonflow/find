@@ -638,6 +638,94 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to list 15 dandies in one go", func(t *testing.T) {
+
+		number := 15
+
+		otu.O.TransactionFromFile("testMintFusd").
+			SignProposeAndPayAsService().
+			Args(otu.O.Arguments().
+				Account("user2").
+				UFix64(1000.0)).
+			Test(otu.T).
+			AssertSuccess()
+
+		ids := otu.mintThreeExampleDandies()
+		dandy := []string{"Dandy", "Dandy", "Dandy"}
+		fusd := []string{"FUSD", "FUSD", "FUSD"}
+		prices := []float64{price, price, price}
+
+		for len(ids) < number {
+			id := otu.mintThreeExampleDandies()
+			ids = append(ids, id...)
+		}
+
+		ids = ids[:number]
+
+		for len(dandy) < number {
+			dandy = append(dandy, dandy[0])
+			fusd = append(fusd, fusd[0])
+			prices = append(prices, prices[0])
+		}
+
+		// list multiple NFT for sale
+		//1024 for 1 buy, 634 each increment, max 15 items
+		otu.O.TransactionFromFile("listMultipleNFTForSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(dandy...).
+				UInt64Array(ids...).
+				StringArray(fusd...).
+				UFix64Array(prices...).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		otu.cancelAllNFTForSale("user1")
+
+	})
+
+	t.Run("Should be able to buy at max 5 dandies", func(t *testing.T) {
+
+		ids := otu.mintThreeExampleDandies()
+		dandy := []string{"Dandy", "Dandy", "Dandy"}
+		fusd := []string{"FUSD", "FUSD", "FUSD"}
+		prices := []float64{price, price, price}
+		buyers := []string{"user1", "user1", "user1"}
+
+		id := otu.mintThreeExampleDandies()
+		ids = append(ids, id[0], id[1])
+		dandy = append(dandy, []string{"Dandy", "Dandy"}...)
+		fusd = append(fusd, []string{"FUSD", "FUSD"}...)
+		prices = append(prices, []float64{price, price}...)
+		buyers = append(buyers, []string{"user1", "user1"}...)
+
+		// list multiple NFT for sale
+		//1024 for 1 buy, 634 each increment, max 15 items
+		otu.O.TransactionFromFile("listMultipleNFTForSale").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(dandy...).
+				UInt64Array(ids...).
+				StringArray(fusd...).
+				UFix64Array(prices...).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+
+		otu.O.TransactionFromFile("buyMultipleNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				StringArray(buyers...).
+				UInt64Array(ids...).
+				UFix64Array(prices...)).
+			Test(otu.T).AssertSuccess()
+
+		otu.cancelAllNFTForSale("user1")
+
+	})
+
 	t.Run("Should be able to list ExampleNFT for sale and buy it with DUC using MultipleNFT transaction", func(t *testing.T) {
 
 		res := otu.O.TransactionFromFile("listMultipleNFTForSaleDUC").

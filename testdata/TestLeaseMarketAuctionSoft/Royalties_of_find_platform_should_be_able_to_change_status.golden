@@ -1,0 +1,137 @@
+`{
+    "FINDReport": {
+        "leases": [
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 8201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "name1",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 8201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "name3",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 8201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "name2",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "addons": [
+                    "forge"
+                ],
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 8201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "user1",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            }
+        ],
+        "leasesForSale": {
+            "FindLeaseMarketAuctionSoft": {
+                "items": [
+                    {
+                        "amount": 10,
+                        "auction": {
+                            "auctionEndsAt": 8001,
+                            "currentPrice": 10,
+                            "extentionOnLateBid": 60,
+                            "minimumBidIncrement": 1,
+                            "reservePrice": 10,
+                            "startPrice": 5,
+                            "timestamp": 8201
+                        },
+                        "bidder": "0xf3fcd2c1a78f5eee",
+                        "bidderName": "user2",
+                        "ftAlias": "Flow",
+                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                        "lease": {
+                            "address": "0x179b6b1cb6755e31",
+                            "cost": 5,
+                            "lockedUntil": 39312001,
+                            "name": "name1",
+                            "status": "TAKEN",
+                            "validUntil": 31536001
+                        },
+                        "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
+                        "leaseName": "name1",
+                        "listingId": 214,
+                        "listingStatus": "ended",
+                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.SaleItem",
+                        "listingValidUntil": 8001,
+                        "saleType": "finished_completed",
+                        "seller": "0x179b6b1cb6755e31",
+                        "sellerName": "user1"
+                    }
+                ]
+            }
+        },
+        "privateMode": false,
+        "profile": {
+            "address": "0x179b6b1cb6755e31",
+            "allowStoringFollowers": true,
+            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+            "createdAt": "find",
+            "findName": "user1",
+            "name": "user1",
+            "wallets": [
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+                    "balance": 40,
+                    "name": "FIND",
+                    "tags": [
+                        "FIND"
+                    ]
+                },
+                {
+                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "balance": 211.001,
+                    "name": "Flow",
+                    "tags": [
+                        "flow"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "balance": 30,
+                    "name": "FUSD",
+                    "tags": [
+                        "fusd",
+                        "stablecoin"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+                    "balance": 100,
+                    "name": "USDC",
+                    "tags": [
+                        "usdc",
+                        "stablecoin"
+                    ]
+                }
+            ]
+        }
+    },
+    "NameReport": {
+        "cost": 5,
+        "status": "TAKEN"
+    }
+}`
