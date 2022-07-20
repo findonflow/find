@@ -15,20 +15,22 @@ import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
 
 
-pub fun main(user: String, maxItems: Int) : CollectionReport? {
-    return fetchAlchemyShard4(user: user, maxItems: maxItems, targetCollections:[])
-}
+    pub fun main(user: String, maxItems: Int, collections: [String]) : {String : ItemReport}  {
+        return fetchAlchemyShard4(user: user, maxItems: maxItems, targetCollections:collections)
+    }
 
 
-    pub struct CollectionReport {
-        pub let items : {String : [MetadataCollectionItem]} 
-        pub let collections : {String : Int} // mapping of collection to no. of ids 
-        pub let extraIDs : {String : [UInt64]} 
+    pub struct ItemReport {
+        pub let items : [MetadataCollectionItem]
+        pub let length : Int // mapping of collection to no. of ids 
+        pub let extraIDs : [UInt64]
+        pub let shard : String 
 
-        init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
+        init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String) {
             self.items=items 
-            self.collections=collections 
+            self.length=length 
             self.extraIDs=extraIDs
+            self.shard=shard
         }
     }
 
@@ -55,76 +57,60 @@ pub fun main(user: String, maxItems: Int) : CollectionReport? {
 
     // Helper function 
 
-    pub fun resolveAddress(user: String) : PublicAccount? {
-	    let address = FIND.resolve(user)
-	    if address == nil {
-	    	return nil
-	    }
-        return getAccount(address!)
+    pub fun resolveAddress(user: String) : Address? {
+	    return FIND.resolve(user)
     }
 
-    //////////////////////////////////////////////////////////////
-    // Fetch All Collections in Shard 4
-    //////////////////////////////////////////////////////////////
-    pub fun fetchAlchemyShard4(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+
+    pub fun fetchAlchemyShard4(user: String, maxItems: Int, targetCollections: [String]) : {String : ItemReport} {
         let source = "Alchemy-shard4"
         let account = resolveAddress(user: user)
-        if account == nil { return nil }
+        if account == nil { return {} }
 
-        let items : {String : [MetadataCollectionItem]} = {}
-        
-        let extraIDs = AlchemyMetadataWrapperMainnetShard4.getNFTIDs(ownerAddress: account!.address)
+
+        let extraIDs = AlchemyMetadataWrapperMainnetShard4.getNFTIDs(ownerAddress: account!)
+        let inventory : {String : ItemReport} = {}
+        var fetchedCount : Int = 0
+
+        // For by-passing bugs
+
+        if extraIDs["MintStoreItem.NBA ALL STAR "] != nil { // who the hell put a space at the end of the string
+            extraIDs["MintStoreItem"] = extraIDs.remove(key: "MintStoreItem.NBA ALL STAR ")
+        }
+
 
         for project in extraIDs.keys {
             if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
                 extraIDs.remove(key: project)
+                continue
             }
-        }
-
-        for project in extraIDs.keys {
-            // For passing bugs
-            if project == "Xtingles_NFT" {
-                extraIDs["Xtingles"] = extraIDs.remove(key: project)
-            }
-
-            if project == "RCRDSHPNFT" {
-                extraIDs.remove(key: project)
-            }
-        }
-
-        let collections : {String : Int} = {}
-        for key in extraIDs.keys {
-            collections[key] = extraIDs[key]!.length
-        }
-        let fetchingIDs : {String : [UInt64]} = {}
-        var fetchedCount : Int = 0
-        for project in extraIDs.keys {
+            
+            let collectionLength = extraIDs[project]!.length
 
             // by pass if this is not the target collection
             if targetCollections.length > 0 && !targetCollections.contains(project) {
+                // inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
                 continue
             }
 
-            if extraIDs[project]!.length + fetchedCount > maxItems {
-                let array : [UInt64] = []
-                while fetchedCount < maxItems {
-                    array.append(extraIDs[project]!.remove(at: 0))
-                    fetchedCount = fetchedCount + 1
-                }
-                if array.length > 0 {
-                    fetchingIDs[project] = array
-                }
-                break
+            
+            if fetchedCount >= maxItems {
+                inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
+                continue
             }
 
-            let array = extraIDs.remove(key: project)! 
-            fetchedCount = fetchedCount + array.length
-            fetchingIDs[project] = array
-        }
+            var fetchArray : [UInt64] = []
+            if extraIDs[project]!.length + fetchedCount > maxItems {
+                while fetchedCount < maxItems {
+                    fetchArray.append(extraIDs[project]!.remove(at: 0))
+                    fetchedCount = fetchedCount + 1
+                }
+            }else {
+                fetchArray = extraIDs.remove(key: project)! 
+                fetchedCount = fetchedCount + fetchArray.length
+            }
 
-
-        for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard4.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperMainnetShard4.getNFTs(ownerAddress: account!, ids: {project : fetchArray})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -150,11 +136,13 @@ pub fun main(user: String, maxItems: Int) : CollectionReport? {
                     source: source
                 )
                 collectionItems.append(item)
-            }
 
-            if collectionItems.length > 0 {
-                items[project] = collectionItems
             }
+            inventory[project] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source)
+
         }
-        return CollectionReport(items: items,  collections : collections, extraIDs : extraIDs)
+
+        return inventory
+
     }
+

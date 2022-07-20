@@ -85,7 +85,7 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
         }
 
         for project in fetchingIDs.keys {
-            let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
+            let returnedNFTs = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!.address, ids: {rename(project) : fetchingIDs[project]!})
 
             var collectionItems : [MetadataCollectionItem] = []
             for nft in returnedNFTs {
@@ -118,4 +118,11 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
             }
         }
         return items
+    }
+
+    pub fun rename(_ name: String) : String {
+        if name == "MintStoreItem.NBA ALL STAR " {
+            return "MintStoreItem"
+        }
+        return name
     }
