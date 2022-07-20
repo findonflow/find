@@ -16,7 +16,8 @@ var (
 	findSigner  = SignProposeAndPayAs("find")
 	saSigner    = SignProposeAndPayAsServiceAccount()
 	user1Signer = SignProposeAndPayAs("user1")
-	user2Signer = SignProposeAndPayAs("user2")
+
+//	user2Signer = SignProposeAndPayAs("user2")
 )
 
 type OverflowTestUtils struct {
