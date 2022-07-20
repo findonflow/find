@@ -18,7 +18,7 @@ func main() {
 	// 	"views":                `["A.631e88ae7f1d7c20.MetadataViews.NFTCollectionData"]`,
 	// }).RunReturnsJsonString()
 
-	res3 := o2.ScriptFromFile("mainnetGetFactoryCollectionsRaribleNFT").NamedArguments(map[string]string{
+	res3 := o2.ScriptFromFile("mainnetgetFactoryCollectionsRaribleNFT").NamedArguments(map[string]string{
 		"user":        "alxo",
 		"maxItems":    "0",
 		"collections": `[]`,
@@ -26,7 +26,7 @@ func main() {
 
 	fmt.Println(res3)
 
-	res4 := o2.ScriptFromFile("mainnetGetAdditionalFactoryCollectionItemsRaribleNFT").NamedArguments(map[string]string{
+	res4 := o2.ScriptFromFile("mainnetgetAdditionalFactoryCollectionItemsRaribleNFT").NamedArguments(map[string]string{
 		"user": "alxo",
 		"collectionIDs": `{
 			"FlowverseSocks": [
