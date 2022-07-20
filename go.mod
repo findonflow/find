@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v0.0.0-20220715104550-b3da38a20fe4
+	github.com/bjartek/overflow v1.0.0-rc1.0.20220720130033-18d4968caece
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/autogold v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
@@ -33,6 +33,7 @@ require (
 	github.com/ef-ds/deque v1.0.4 // indirect
 	github.com/enescakir/emoji v1.0.0 // indirect
 	github.com/ethereum/go-ethereum v1.9.13 // indirect
+	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.4.1-0.20220515183430-ad2eae63303f // indirect
 	github.com/fxamacker/circlehash v0.3.0 // indirect
@@ -60,6 +61,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
@@ -74,10 +76,10 @@ require (
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/onflow/atree v0.4.0 // indirect
-	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20220708202053-3b2866146b5f // indirect
+	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20220718134737-1fe6aa4e9635 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v0.11.2-0.20220620142725-49b5accb2a84 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.11.2-0.20220513155751-c4c1f8d59f83 // indirect
-	github.com/onflow/flow-emulator v0.33.4-0.20220705151023-2cc6a4f25a20 // indirect
+	github.com/onflow/flow-emulator v0.33.4-0.20220708173546-d2a99600c3fa // indirect
 	github.com/onflow/flow-ft/lib/go/contracts v0.5.0 // indirect
 	github.com/onflow/flow-go v0.25.13-0.20220706165514-abf4535fe946 // indirect
 	github.com/onflow/flow-go-sdk v0.26.6-0.20220712195924-6920f8f55b88 // indirect
