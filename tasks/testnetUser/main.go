@@ -8,18 +8,18 @@ func main() {
 
 	o := overflow.NewOverflowTestnet().Start()
 
-	user := "0xad372a7095a0d983"
+	user := "0xe409a7e8a52812a9"
 
 	// o.ScriptFromFile("getCollections").Args(o.Arguments().String(user)).Run()
 	//user := "0xfbd6c52b7e6fe7be"
 
-	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(1000.0))
+	o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(300.0))
 
 	o.TransactionFromFile("testMintDandyTO").
 		SignProposeAndPayAs("user1").
 		Args(o.Arguments().
 			String("user1").
-			UInt64(5).
+			UInt64(10).
 			String("Neo").
 			String("Neo Motorcycle").
 			String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).

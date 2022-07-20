@@ -35,6 +35,17 @@ func main() {
 		Args(o.Arguments().Account("account")).
 		RunPrintEventsFull()
 
+	// // Setup Lease Market
+	// o.TransactionFromFile("setup_find_market_1").
+	// 	SignProposeAndPayAs("findLease").
+	// 	RunPrintEventsFull()
+
+	// //link in the server in the client
+	// o.TransactionFromFile("setup_find_lease_market_2").
+	// 	SignProposeAndPayAs("find").
+	// 	Args(o.Arguments().Account("findLease")).
+	// 	RunPrintEventsFull()
+
 	o.SimpleTxArgs("adminSetFTInfo_flow", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetNFTInfo_Dandy", "find", o.Arguments())
 	o.SimpleTxArgs("adminSetSellDandyRules", "find", o.Arguments().Account("account"))

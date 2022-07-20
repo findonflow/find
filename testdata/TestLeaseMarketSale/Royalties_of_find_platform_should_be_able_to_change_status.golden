@@ -1,0 +1,123 @@
+`{
+    "FINDReport": {
+        "leases": [
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "name1",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "name3",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "name2",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 201,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
+                "name": "user1",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            }
+        ],
+        "leasesForSale": {
+            "FindLeaseMarketSale": {
+                "items": [
+                    {
+                        "amount": 10,
+                        "ftAlias": "Flow",
+                        "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                        "lease": {
+                            "address": "0x179b6b1cb6755e31",
+                            "cost": 5,
+                            "lockedUntil": 39312001,
+                            "name": "name1",
+                            "status": "TAKEN",
+                            "validUntil": 31536001
+                        },
+                        "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
+                        "leaseName": "name1",
+                        "listingId": 204,
+                        "listingStatus": "active",
+                        "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketSale.SaleItem",
+                        "listingValidUntil": 301,
+                        "saleType": "active_listed",
+                        "seller": "0x179b6b1cb6755e31",
+                        "sellerName": "user1"
+                    }
+                ]
+            }
+        },
+        "privateMode": false,
+        "profile": {
+            "address": "0x179b6b1cb6755e31",
+            "allowStoringFollowers": true,
+            "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+            "createdAt": "find",
+            "findName": "user1",
+            "name": "user1",
+            "wallets": [
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
+                    "balance": 40,
+                    "name": "FIND",
+                    "tags": [
+                        "FIND"
+                    ]
+                },
+                {
+                    "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "balance": 146.251,
+                    "name": "Flow",
+                    "tags": [
+                        "flow"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "balance": 80,
+                    "name": "FUSD",
+                    "tags": [
+                        "fusd",
+                        "stablecoin"
+                    ]
+                },
+                {
+                    "accept": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+                    "balance": 100,
+                    "name": "USDC",
+                    "tags": [
+                        "usdc",
+                        "stablecoin"
+                    ]
+                }
+            ]
+        }
+    },
+    "NameReport": {
+        "cost": 5,
+        "status": "TAKEN"
+    }
+}`
