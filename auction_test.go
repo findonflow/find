@@ -457,7 +457,7 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0).
 			expireLease()
 
-		otu.assertNilLookupAddress("user2")
+		otu.assertLookupAddress("user2", nil)
 
 		otu.O.TransactionFromFile("cancelNameBid").
 			SignProposeAndPayAs("user2").

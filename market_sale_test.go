@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -163,22 +164,18 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[1], price)
 		otu.listNFTForSale("user1", ids[2], price)
 
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 3, len(itemsForSale))
-		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResult.AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
+		scriptResult.AssertLengthWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items", 3)
 
-		res := otu.O.TransactionFromFile("delistAllNFTSale").
+		otu.O.TransactionFromFile("delistAllNFTSale").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().Account("account")).
 			Test(otu.T).AssertSuccess()
+		//TODO: assert on events
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
-		result = otu.replaceID(result, ids)
-		result = otu.replaceID(result, saleIDs)
-		o := *otu
-		o.AutoGoldRename("Should be able cancel all listing events", result)
+		scriptResultAfter := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResultAfter.AssertWithPointerError(t, "/FINDReport/itemsForSale", "Object has no key 'itemsForSale'")
 	})
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {
@@ -596,7 +593,11 @@ func TestMarketSale(t *testing.T) {
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess()
 
-		itemsForSale := otu.getItemsForSale("user1")
+		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+
+		var itemsForSale []SaleItemInformation
+		err := scriptResult.MarshalPointerAs("/FINDReport/itemsForSale/FindMarketSale/items", &itemsForSale)
+		assert.NoError(t, err)
 		assert.Equal(t, 3, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, "active_listed", itemsForSale[1].SaleType)
