@@ -242,7 +242,11 @@
         "CollectionFactory",
         "FindForge",
         "FindRewardToken",
-        "FindToken"
+        "FindToken",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft"
       ]
     },
     "emulator": {
