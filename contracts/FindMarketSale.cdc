@@ -89,8 +89,7 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getSellerName() : String? {
-			let address = self.pointer.owner()
-			return FIND.reverseLookup(address)
+			return FIND.reverseLookup(self.pointer.owner())
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -181,7 +180,6 @@ pub contract FindMarketSale {
 				panic("The nft receiver capability passed in is invalid.")
 			}
 
-			//TOOD: method on saleItems that returns a cacheKey listingType-nftType-ftType
 
 			let saleItem=self.borrow(id)
 
@@ -194,12 +192,13 @@ pub contract FindMarketSale {
 			}
 
 			if saleItem.vaultType != vault.getType() {
-				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
+				panic("This item can be bought using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
 			}
 			let tenant=self.getTenant()
 			let ftType=saleItem.vaultType
 			let nftType=saleItem.getItemType()
 
+			//TOOD: method on saleItems that returns a cacheKey listingType-nftType-ftType
 			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "buy item for sale"), seller: self.owner!.address, buyer: nftCap.address)
 
 			if !actionResult.allowed {
@@ -214,7 +213,6 @@ pub contract FindMarketSale {
 			let buyer=nftCap.address
 			let buyerName=FIND.reverseLookup(buyer)
 			let sellerName=FIND.reverseLookup(self.owner!.address)
-
 
 			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
 
