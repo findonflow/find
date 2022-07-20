@@ -210,18 +210,13 @@ pub contract FindMarketSale {
 
 
 			let nftInfo= saleItem.toNFTInfo(false)
-
-			let royalty=saleItem.getRoyalty()
-
-			let soldFor=saleItem.getBalance()
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
 			let buyerName=FIND.reverseLookup(buyer)
 			let sellerName=FIND.reverseLookup(self.owner!.address)
 
-			let profile= Profile.find(nftCap.address)
 
-			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar() ,endsAt:saleItem.validUntil)
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
 
 
 			//TODO: make the resolver a little bit smarter, preresolve things like tenants and find?
@@ -234,7 +229,7 @@ pub contract FindMarketSale {
 			// Have to make sure the tenant always have the valid find name 
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] = tenant.name
 
-			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved ,rewardFN: FIND.rewardFN())
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved ,rewardFN: FIND.rewardFN())
 			
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 

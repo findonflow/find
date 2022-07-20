@@ -33,7 +33,6 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 
-
 		var counter = 0
 		self.walletReference= []
 		self.targetCapability = []
@@ -71,7 +70,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 
 			self.prices.append(item.getBalance())
 			self.totalPrice = self.totalPrice + self.prices[counter]
-			
+
 			var nft : NFTRegistry.NFTInfo? = nil
 			var ft : FTRegistry.FTInfo? = nil
 			let nftIdentifier = item.getItemType().identifier
@@ -91,10 +90,9 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 				fts[ftIdentifier] = ft 
 			}
 
-
-			let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
-			self.walletReference.append(walletReference)
-
+			self.walletReference.append(
+				account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+			)
 
 			let targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
 			/* Check for nftCapability */
@@ -124,9 +122,9 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			if self.walletReference[counter].balance < amounts[counter] {
 				panic("Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
 			}
-		
-			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
-			self.saleItems[counter].buy(id:ids[counter], vault: <- vault, nftCap: self.targetCapability[counter])
+
+			self.saleItems[counter].buy(id:ids[counter], vault: <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
+			, nftCap: self.targetCapability[counter])
 			counter = counter + 1
 		}
 	}
