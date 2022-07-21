@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bjartek/overflow/overflow"
+	"github.com/bjartek/overflow"
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"

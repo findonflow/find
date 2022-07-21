@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow/overflow"
+	"github.com/bjartek/overflow"
 )
 
 func TestMarketDirectOfferSoft(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/bjartek/overflow/overflow"
+	"github.com/bjartek/overflow"
 	"github.com/meirf/gopart"
 )
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bjartek/overflow/overflow"
+	"github.com/bjartek/overflow"
 	"github.com/davecgh/go-spew/spew"
 )
 

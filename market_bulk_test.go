@@ -3,8 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow/overflow"
-	"github.com/stretchr/testify/assert"
+	"github.com/bjartek/overflow"
 )
 
 func TestBulkMarketSale(t *testing.T) {
@@ -71,10 +70,9 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id2).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(0)
+			AssertComputationLessThenOrEqual(9999)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
-		assert.Fail(t, "failed")
 
 	})
 
@@ -87,10 +85,9 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
 				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(0)
+			AssertComputationLessThenOrEqual(10000)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
-		assert.Fail(t, "failed")
 
 	})
 

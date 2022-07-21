@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow/overflow"
+	"github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -717,7 +717,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				StringArray(buyers...).
+				AccountArray(buyers...).
 				UInt64Array(ids...).
 				UFix64Array(prices...)).
 			Test(otu.T).AssertSuccess()

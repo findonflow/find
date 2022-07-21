@@ -221,7 +221,8 @@
         "NFTRegistry",
         "FindForge",
         "FindRewardToken",
-        "FindToken"
+        "FindToken",
+				"FindRulesCache"
       ]
     },
     "testnet": {
@@ -251,7 +252,8 @@
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft"
+        "FindLeaseMarketDirectOfferSoft",
+				"FindRulesCache"
       ]
     },
     "emulator": {

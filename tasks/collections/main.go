@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/bjartek/overflow/overflow"
+	"github.com/bjartek/overflow"
 )
 
 func main() {
