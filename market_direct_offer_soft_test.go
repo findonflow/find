@@ -40,6 +40,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		Test(otu.T).
 		AssertSuccess()
 
+	otu.setUUID(300)
+
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
@@ -76,6 +78,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			sendDandy("user2", "user1", id)
 
+		otu.setUUID(300)
+
 		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
@@ -95,6 +99,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			sendDandy("user2", "user1", id)
+
+		otu.setUUID(300)
 
 		otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").

@@ -106,7 +106,7 @@ func TestAuction(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.accountAddress("user1"),
-				"sellerName":  "name2",
+				"sellerName":  "name1",
 				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
 				"buyerName":   "user2",
 				"status":      "sold",
@@ -146,7 +146,7 @@ func TestAuction(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.accountAddress("user1"),
-				"sellerName":  "name2",
+				"sellerName":  "name1",
 				"amount":      20.0,
 				"status":      "sold",
 				"buyer":       otu.accountAddress("user3"),

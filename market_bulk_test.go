@@ -24,6 +24,8 @@ func TestBulkMarketSale(t *testing.T) {
 	items2 := otu.mintThreeExampleDandies()
 	items3 := otu.mintThreeExampleDandies()
 	items4 := otu.mintThreeExampleDandies()
+	items5 := otu.mintThreeExampleDandies()
+	items6 := otu.mintThreeExampleDandies()
 
 	id := items[0]
 	id2 := items[1]
@@ -37,6 +39,11 @@ func TestBulkMarketSale(t *testing.T) {
 	id10 := items4[0]
 	id11 := items4[1]
 	id12 := items4[2]
+	id13 := items5[0]
+	id14 := items5[1]
+	id15 := items5[2]
+	id16 := items6[0]
+	id17 := items6[1]
 
 	otu.listNFTForSale("user1", id, price)
 	otu.listNFTForSale("user1", id2, price)
@@ -50,6 +57,11 @@ func TestBulkMarketSale(t *testing.T) {
 	otu.listNFTForSale("user1", id10, price)
 	otu.listNFTForSale("user1", id11, price)
 	otu.listNFTForSale("user1", id12, price)
+	otu.listNFTForSale("user1", id13, price)
+	otu.listNFTForSale("user1", id14, price)
+	otu.listNFTForSale("user1", id15, price)
+	otu.listNFTForSale("user1", id16, price)
+	otu.listNFTForSale("user1", id17, price)
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
 
@@ -70,12 +82,13 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id2).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(1)
+			AssertComputationLessThenOrEqual(1000)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
 
 	})
 
+	// Max is 15 for now
 	t.Run("Should be able to list multiple dandy for sale and buy it", func(t *testing.T) {
 		result := otu.O.TransactionFromFile("buyMultipleNFTForSale").
 			SignProposeAndPayAs("user2").
@@ -85,7 +98,7 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
 				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(1)
+			AssertComputationLessThenOrEqual(10000)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
 

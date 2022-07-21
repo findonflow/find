@@ -39,6 +39,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		Test(otu.T).
 		AssertSuccess()
 
+	otu.setUUID(300)
+
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
@@ -76,6 +78,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			sendDandy("user2", "user1", id)
 
+		otu.setUUID(300)
+
 		otu.O.TransactionFromFile("cancelMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
@@ -95,6 +99,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			destroyDandyCollection("user2").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			sendDandy("user2", "user1", id)
+
+		otu.setUUID(300)
 
 		otu.O.TransactionFromFile("retractOfferMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user2").

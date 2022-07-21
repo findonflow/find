@@ -22,6 +22,9 @@ func TestMarketSale(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 	price := 10.0
+
+	otu.setUUID(300)
+
 	id := otu.mintThreeExampleDandies()[0]
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
@@ -54,6 +57,8 @@ func TestMarketSale(t *testing.T) {
 			registerUser("user2").
 			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
+
+		otu.setUUID(300)
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]

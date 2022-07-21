@@ -42,6 +42,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		Test(otu.T).
 		AssertSuccess()
 
+	otu.setUUID(300)
+
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 
 		otu.listNFTForEscrowedAuction("user1", id, price).
@@ -103,6 +105,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
 			sendDandy("user2", "user1", id)
+
+		otu.setUUID(300)
 
 		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
 			SignProposeAndPayAs("user1").

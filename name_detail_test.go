@@ -25,6 +25,8 @@ func TestNameDetailScript(t *testing.T) {
 			listForAuction("user2").
 			bid("user1", "user2", 8.0)
 
+		otu.setUUID(300)
+
 		otu.O.TransactionFromFile("setRelatedAccount").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("dapper").String("user2")).

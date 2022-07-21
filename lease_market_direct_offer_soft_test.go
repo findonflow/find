@@ -44,6 +44,8 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
+	otu.setUUID(300)
+
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
