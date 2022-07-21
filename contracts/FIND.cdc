@@ -209,7 +209,7 @@ pub contract FIND {
 					}
 				}
 			}
-			ProfileCache.setAddressLeaseNameCache(address: address, leaseName: "", validUntil: UFix64.max)
+			ProfileCache.setAddressLeaseNameCache(address: address, leaseName: nil, validUntil: UFix64.max)
 			return nil
 		} else if leaseNameCache! == "" {
 			// If empty string, return no find Name

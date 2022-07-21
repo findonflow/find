@@ -70,7 +70,7 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id2).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(9999)
+			AssertComputationLessThenOrEqual(1)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
 
@@ -85,7 +85,7 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
 				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(10000)
+			AssertComputationLessThenOrEqual(1)
 
 		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
 

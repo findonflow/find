@@ -23,9 +23,15 @@ pub contract ProfileCache {
 
 	access(account) fun setAddressLeaseNameCache(address: Address, leaseName: String?, validUntil: UFix64) {
 		if self.addressLeaseName[address] == nil {
-			self.addressLeaseName[address] = LeaseCache(leaseName: leaseName ?? "", validUntil: validUntil, address: address)
+			if leaseName == nil {
+				self.addressLeaseName[address] = LeaseCache(leaseName: "", validUntil: validUntil, address: address)
+				return
+			}
+			self.addressLeaseName[address] = LeaseCache(leaseName: leaseName!, validUntil: validUntil, address: address)
+			return
 		} 
-		panic("There is already a cache for this address. Address : ".concat(address.toString()))
+		// panic("There is already a cache for this address. Address : ".concat(address.toString()))
+		// We cannot panic here, because imagine someone has expired lease. 
  	}
 
 	pub fun getAddressLeaseName(_ address: Address) : String? {
@@ -41,6 +47,7 @@ pub contract ProfileCache {
 	access(account) fun setNameAddressCache(address: Address?, leaseName: String, validUntil: UFix64) {
 		if self.nameAddress[leaseName] == nil {
 			self.nameAddress[leaseName] = LeaseCache(leaseName: leaseName, validUntil: validUntil, address: address)
+			return
 		} 
 		panic("There is already a cache for this name. Name : ".concat(leaseName))
  	}
@@ -63,8 +70,10 @@ pub contract ProfileCache {
 		if self.profileWalletIndex[address] == nil {
 			self.profileWalletIndex[address] = {}
 			self.profileWalletIndex[address]!.insert(key: walletType, index)
+			return
 		} else if self.profileWalletIndex[address]![walletType] == nil{
 			self.profileWalletIndex[address]!.insert(key: walletType, index)
+			return
 		}
 		panic("There is already a cache for this wallet. User : ".concat(address.toString()).concat(". Wallet : ").concat(walletType.identifier))
  	}
