@@ -129,7 +129,11 @@
     "FindForge": "./contracts/FindForge.cdc",
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
-    "FindToken": "./contracts/FindToken.cdc"
+    "FindToken": "./contracts/FindToken.cdc",
+    "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
+    "FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
+    "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
+    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -157,12 +161,20 @@
       "address": "e03daebed8ca0615",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
+    "emulator-user4": {
+      "address": "045a1763c93006ca",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
     "testnet-account": {
       "address": "0x1ff7e32d71183db0",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find": {
       "address": "35717efbbce11c74",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-findLease": {
+      "address": "49d14b03d7411f53",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-admin": {
@@ -235,7 +247,11 @@
         "CollectionFactory",
         "FindForge",
         "FindRewardToken",
-        "FindToken"
+        "FindToken",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft"
       ]
     },
     "emulator": {
@@ -269,12 +285,17 @@
         "NFTStorefront",
         "DapperUtilityCoin",
         "TokenForwarding",
-        "ExampleNFT"
+        "ExampleNFT",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft"
       ],
       "emulator-find": [],
       "emulator-user1": [],
       "emulator-user2": [],
-      "emulator-user3": []
+      "emulator-user3": [],
+      "emulator-user4": []
     }
   }
 }

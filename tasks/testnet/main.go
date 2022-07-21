@@ -46,6 +46,16 @@ func main() {
 		Args(o.Arguments().Account("find")).
 		RunPrintEventsFull()
 
+	o.TransactionFromFile("setup_find_market_1").
+		SignProposeAndPayAs("findLease").
+		RunPrintEventsFull()
+
+	//link in the server in the versus client
+	o.TransactionFromFile("setup_find_lease_market_2").
+		SignProposeAndPayAs("find-admin").
+		Args(o.Arguments().Account("findLease")).
+		RunPrintEventsFull()
+
 	o.SimpleTxArgs("adminSetFTInfo_flow", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetFTInfo_usdc", "find-admin", o.Arguments())
 	o.SimpleTxArgs("adminSetFTInfo_fusd", "find-admin", o.Arguments())

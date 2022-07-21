@@ -18,7 +18,7 @@
                         "bidderName": "user2",
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                        "listingId": 151,
+                        "listingId": 203,
                         "listingStatus": "ended",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
                         "listingValidUntil": 7501,
@@ -26,7 +26,7 @@
                             "collectionDescription": "Neo Collectibles FIND",
                             "collectionName": "user1",
                             "editionNumber": 1,
-                            "id": 151,
+                            "id": 203,
                             "name": "Neo Motorcycle 1 of 3",
                             "scalars": {
                                 "Speed": 100,
@@ -40,7 +40,7 @@
                             "totalInEdition": 3,
                             "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
                         },
-                        "nftId": 151,
+                        "nftId": 203,
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
                         "saleType": "finished_completed",
                         "seller": "0x179b6b1cb6755e31",

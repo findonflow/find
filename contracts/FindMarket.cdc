@@ -6,8 +6,8 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
 
 pub contract FindMarket {
-	access(contract) let  pathMap : {String: String}
-	access(contract) let  listingName : {String: String}
+	access(account) let  pathMap : {String: String}
+	access(account) let  listingName : {String: String}
 	access(contract) let  saleItemTypes : [Type]
 	access(contract) let  saleItemCollectionTypes : [Type]
 	access(contract) let  marketBidTypes : [Type]
@@ -374,6 +374,22 @@ pub contract FindMarket {
 	}
 
 	/* Admin Function */
+	access(account) fun addPathMap(_ type: Type) {
+		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
+	}
+
+	access(account) fun addListingName(_ type: Type) {
+		self.listingName[type.identifier] =self.typeToListingName(type)
+	}
+
+	access(account) fun removePathMap(_ type: Type) {
+		self.pathMap.remove(key: type.identifier)
+	}
+
+	access(account) fun removeListingName(_ type: Type) {
+		self.listingName.remove(key: type.identifier)
+	}
+
 	access(account) fun addSaleItemType(_ type: Type) {
 		self.saleItemTypes.append(type)
 		self.pathMap[type.identifier]= self.typeToPathIdentifier(type)
@@ -1465,6 +1481,10 @@ pub contract FindMarket {
 			self.timestamp=timestamp
 			self.item=item
 		}
+	}
+
+	pub fun getTenantAddress(_ name: String) : Address? {
+		return FindMarket.tenantNameAddress[name]
 	}
 
 	access(account) fun setResidualAddress(_ address: Address) {

@@ -200,26 +200,28 @@ pub contract CollectionFactory {
             
             let collectionRef = resolverCollectionCap.borrow()!
 
+            let collectionID = collectionRef.getIDs()
+
             // by pass if this is not the target collection
             if targetCollections.length >0 && !targetCollections.contains(nftInfo.alias) {
-                collections.insert(key: nftInfo.alias, collectionRef.getIDs().length)
-                extraIDs[nftInfo.alias] = collectionRef.getIDs()
+                collections.insert(key: nftInfo.alias, collectionID.length)
+                extraIDs[nftInfo.alias] = collectionID
                 continue
             }
 
             // insert collection
-            collections.insert(key: nftInfo.alias, collectionRef.getIDs().length)
+            collections.insert(key: nftInfo.alias, collectionID.length)
 
             // if max items reached, will not fetch more items 
             if !fetchItem {
-                extraIDs[nftInfo.alias] = collectionRef.getIDs()
+                extraIDs[nftInfo.alias] = collectionID
                 continue
             }
 
             let collectionItems : [MetadataCollectionItem] = []
             let collectionExtraIDs : [UInt64] = []
 
-            for id in collectionRef.getIDs() { 
+            for id in collectionID { 
 
                 if !fetchItem {
                     collectionExtraIDs.append(id)
@@ -231,9 +233,8 @@ pub contract CollectionFactory {
                     if CollectionFactory.FlowverseSocksIds.contains(id) {
                         if !collections.containsKey("Flowverse Socks"){
                             var j = 0
-                            let raribleIDs = collectionRef.getIDs()
                             for sockID in CollectionFactory.FlowverseSocksIds {
-                                if raribleIDs.contains(sockID) {
+                                if collectionID.contains(sockID) {
                                     j = j + 1
                                 }
                             }

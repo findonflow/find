@@ -2,6 +2,7 @@ import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
+import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 pub struct FINDReport{
 	pub let profile:Profile.UserReport?
@@ -9,16 +10,20 @@ pub struct FINDReport{
 	pub let relatedAccounts: { String: Address}
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
+	pub let leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}
+	pub let leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}
 	pub let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
 	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
 
 
-	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}) {
+	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}, leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
 		self.relatedAccounts=relatedAccounts
 		self.privateMode=privateMode
+		self.leasesForSale=leasesForSale
+		self.leasesBids=leasesBids
 		self.itemsForSale=itemsForSale
 		self.marketBids=marketBids
 	}
@@ -54,9 +59,14 @@ pub fun main(user: String) : Report? {
 		let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
 		let find= FindMarket.getFindTenantAddress()
+		let findLease= FindMarket.getTenantAddress("findLease")!
 		let items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
 		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
+
+		let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:findLease, address: address, getLeaseInfo:true)
+
+		let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:findLease, address: address, getLeaseInfo:true)
 
 		var profileReport = profile?.asReport() 
 		if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
@@ -83,6 +93,8 @@ pub fun main(user: String) : Report? {
 			bids: bidCap.borrow()?.getBids() ?? [],
 			leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 			privateMode: profile?.isPrivateModeEnabled() ?? false,
+			leasesForSale: leasesSale, 
+			leasesBids: leasesBids,
 			itemsForSale: items,
 			marketBids: marketBids
 		)
