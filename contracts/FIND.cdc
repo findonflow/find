@@ -1,5 +1,3 @@
-import MetadataViews from "./standard/MetadataViews.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
 import Profile from "./Profile.cdc"
@@ -7,6 +5,7 @@ import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import Sender from "./Sender.cdc"
 import FindRewardToken from "./FindRewardToken.cdc"
+import ProfileCache from "./ProfileCache.cdc"
 /*
 
 ///FIND
@@ -172,39 +171,51 @@ pub contract FIND {
 
 	/// lookup if an address has a .find name, if it does pick either the default one or the first registered
 	pub fun reverseLookup(_ address:Address): String? {
-		let account=getAccount(address)
-		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-		if !leaseCap.check() {
+		let leaseNameCache = ProfileCache.getAddressLeaseName(address)
+
+		if leaseNameCache == nil {
+			let account=getAccount(address)
+			let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+
+			if !leaseCap.check() {
+				return nil
+			}
+			
+			let profileFindName= Profile.find(address).getFindName()
+
+			let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
+
+			if profileFindName != "" {
+				let status = network.readStatus(profileFindName)
+				if status.owner != nil && status.owner! == address {
+					if status.status == FIND.LeaseStatus.TAKEN {
+						ProfileCache.setAddressLeaseNameCache(address: address, leaseName: profileFindName, validUntil: network.getLeaseExpireTime(profileFindName))
+						return profileFindName
+					}
+				}
+			}
+
+			let leaseCol = leaseCap.borrow()!
+			let nameLeases = leaseCol.getNames() 
+			for nameLease in nameLeases {
+
+				//filter out all leases that are FREE or LOCKED since they are not actice
+				let status = network.readStatus(nameLease)
+				if status.owner != nil && status.owner! == address {
+					if status.status == FIND.LeaseStatus.TAKEN {
+						ProfileCache.setAddressLeaseNameCache(address: address, leaseName: nameLease, validUntil: network.getLeaseExpireTime(nameLease))
+						return nameLease
+					}
+				}
+			}
+			ProfileCache.setAddressLeaseNameCache(address: address, leaseName: "", validUntil: UFix64.max)
+			return nil
+		} else if leaseNameCache! == "" {
+			// If empty string, return no find Name
 			return nil
 		}
-		
-		let profileFindName= Profile.find(address).getFindName()
-
-		let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
-
-		if profileFindName != "" {
-			let status = network.readStatus(profileFindName)
-			if status.owner != nil && status.owner! == address {
-				if status.status == FIND.LeaseStatus.TAKEN {
-					return profileFindName
-				}
-			}
-		}
-
-		let leaseCol = leaseCap.borrow()!
-		let nameLeases = leaseCol.getNames() 
-		for nameLease in nameLeases {
-
-			//filter out all leases that are FREE or LOCKED since they are not actice
-			let status = network.readStatus(nameLease)
-			if status.owner != nil && status.owner! == address {
-				if status.status == FIND.LeaseStatus.TAKEN {
-					return nameLease
-				}
-			}
-		}
-		return nil
+		return leaseNameCache!
 	}
 
 	/// Deposit FT to name

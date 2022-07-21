@@ -106,10 +106,11 @@
         "testnet": "0x51ea0e37c27a1f1a"
       }
     },
+    "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
     "CollectionFactory": "./contracts/CollectionFactory.cdc",
     "Dandy": "./contracts/Dandy.cdc",
-    "FindRulesCache": "./contracts/FindRulesCache.cdc",
+    "FindCache": "./contracts/FindCache.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
     "FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
     "FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
@@ -258,6 +259,7 @@
       "emulator-account": [
         "FindRewardToken",
         "FindToken",
+        "ProfileCache",
         "FIND",
         "FindForge",
         "NonFungibleToken",
@@ -271,7 +273,7 @@
         "FindViews",
         "MetadataViews",
         "Dandy",
-        "FindRulesCache",
+        "FindCache",
         "FindMarket",
         "FindMarketSale",
         "FindMarketDirectOfferEscrow",

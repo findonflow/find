@@ -3,7 +3,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindRulesCache from "../contracts/FindRulesCache.cdc"
+import FindCache from "../contracts/FindCache.cdc"
 
 pub contract FindMarket {
 	access(account) let  pathMap : {String: String}
@@ -575,8 +575,8 @@ pub contract FindMarket {
 	pub resource interface TenantPublic {
 		pub fun getStoragePath(_ type: Type) : StoragePath 
 		pub fun getPublicPath(_ type: Type) : PublicPath
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindRulesCache.ActionResult
-		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts 
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindCache.ActionResult
+		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindCache.TenantCuts 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
 		pub fun getBlockedNFT(marketType: Type) : [Type] 
 		pub let name:String
@@ -615,7 +615,7 @@ pub contract FindMarket {
 				self.tenantSaleItems[name] != nil : "This saleItem does not exist. Item : ".concat(name)
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindCache.resetTenantTenantRulesCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
@@ -630,7 +630,7 @@ pub contract FindMarket {
 			}
 			*/
 			self.tenantSaleItems[optionName]!.addRules(tenantRule)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindCache.resetTenantTenantRulesCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
@@ -648,15 +648,15 @@ pub contract FindMarket {
 				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
 			}
 			self.tenantSaleItems[optionName]!.removeRules(counter)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindCache.resetTenantTenantRulesCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
-		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts {
+		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindCache.TenantCuts {
 
 			let ruleId = listingType.identifier.concat(nftType.identifier).concat(ftType.identifier)
 
-			let tenantCutCache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: ruleId)
+			let tenantCutCache = FindCache.getTenantCut(tenant: self.name, ruleId: ruleId)
 
 			if tenantCutCache == nil {
 			let item = self.tenantSaleItems[name]!
@@ -664,13 +664,13 @@ pub contract FindMarket {
 				for findCut in self.findCuts.values {
 					let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 					if valid{
-						let result = FindRulesCache.TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
-						FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
+						let result = FindCache.TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
+						FindCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
 						return result
 					}
 				}
-				let result = FindRulesCache.TenantCuts(findCut:nil, tenantCut: item.cut)
-				FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
+				let result = FindCache.TenantCuts(findCut:nil, tenantCut: item.cut)
+				FindCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
 				return result
 			} 
 			return tenantCutCache!
@@ -680,15 +680,15 @@ pub contract FindMarket {
 		access(account) fun addSaleItem(_ item: TenantSaleItem, type:String) {
 			if type=="find" {
 				self.findSaleItems[item.name]=item
-				FindRulesCache.resetTenantFindRulesCache(self.name)
+				FindCache.resetTenantFindCache(self.name)
 				self.emitRulesEvent(item: item, type: "find", status: nil)
 			} else if type=="tenant" {
 				self.tenantSaleItems[item.name]=item
-				FindRulesCache.resetTenantTenantRulesCache(self.name)
+				FindCache.resetTenantTenantRulesCache(self.name)
 				self.emitRulesEvent(item: item, type: "tenant", status: nil)
 			} else if type=="cut" {
 				self.findCuts[item.name]=item
-				FindRulesCache.resetTenantCutCache(self.name)
+				FindCache.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "cut", status: nil)
 			} else{
 				panic("Not valid type to add sale item for")
@@ -698,17 +698,17 @@ pub contract FindMarket {
 		access(account) fun removeSaleItem(_ name:String, type:String) : TenantSaleItem {
 			if type=="find" {
 				let item = self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
-				FindRulesCache.resetTenantFindRulesCache(self.name)
+				FindCache.resetTenantFindCache(self.name)
 				self.emitRulesEvent(item: item, type: "find", status: "remove")
 				return item
 			} else if type=="tenant" {
 				let item = self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
-				FindRulesCache.resetTenantTenantRulesCache(self.name)
+				FindCache.resetTenantTenantRulesCache(self.name)
 				self.emitRulesEvent(item: item, type: "tenant", status: "remove")
 				return item
 			} else if type=="cut" {
 				let item = self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
-				FindRulesCache.resetTenantCutCache(self.name)
+				FindCache.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "cut", status: "remove")
 				return item
 			}
@@ -754,18 +754,18 @@ pub contract FindMarket {
 			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
 		}
 
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : FindRulesCache.ActionResult{
+		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : FindCache.ActionResult{
 			/* Check for Honour Banning */
 			let profile = getAccount(FindMarket.tenantNameAddress[self.name]!).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() ?? panic("Cannot get reference to Profile to check honour banning. Tenant Name : ".concat(self.name))
 			if seller != nil && profile.isBanned(seller!) {
-				return FindRulesCache.ActionResult(allowed:false, message: "Seller banned by Tenant", name: "Profile Ban")
+				return FindCache.ActionResult(allowed:false, message: "Seller banned by Tenant", name: "Profile Ban")
 			}
 			if buyer != nil && profile.isBanned(buyer!) {
-				return FindRulesCache.ActionResult(allowed:false, message: "Buyer banned by Tenant", name: "Profile Ban")
+				return FindCache.ActionResult(allowed:false, message: "Buyer banned by Tenant", name: "Profile Ban")
 			}
 
 			let ruleId = listingType.identifier.concat(nftType.identifier).concat(ftType.identifier)
-			let findRulesCache = FindRulesCache.getTenantFindRules(tenant: self.name, ruleId: ruleId)
+			let findRulesCache = FindCache.getTenantFindRules(tenant: self.name, ruleId: ruleId)
 
 			if findRulesCache == nil {
 				// if the cache returns nil, go thru the logic once to save the result to the cache
@@ -781,30 +781,30 @@ pub contract FindMarket {
 						if rule.accept(relevantType) {
 							continue
 						}
-						let result = FindRulesCache.ActionResult(allowed:false, message: rule.name, name: item.name)
-						FindRulesCache.setTenantFindRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+						let result = FindCache.ActionResult(allowed:false, message: rule.name, name: item.name)
+						FindCache.setTenantFindCache(tenant: self.name, ruleId: ruleId, result: result)
 						return result
 					}
 					if item.status=="stopped" {
-						let result = FindRulesCache.ActionResult(allowed:false, message: "Find has stopped this item", name:item.name)
-						FindRulesCache.setTenantFindRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+						let result = FindCache.ActionResult(allowed:false, message: "Find has stopped this item", name:item.name)
+						FindCache.setTenantFindCache(tenant: self.name, ruleId: ruleId, result: result)
 						return result
 					}
 
 					if item.status=="deprecated" && action.listing{
-						let result = FindRulesCache.ActionResult(allowed:false, message: "Find has deprected mutation options on this item", name:item.name)
-						FindRulesCache.setTenantFindRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+						let result = FindCache.ActionResult(allowed:false, message: "Find has deprected mutation options on this item", name:item.name)
+						FindCache.setTenantFindCache(tenant: self.name, ruleId: ruleId, result: result)
 						return result
 					}
 				}
-				FindRulesCache.setTenantFindRulesCache(tenant: self.name, ruleId: ruleId, result: FindRulesCache.ActionResult(allowed:true, message: "No Find deny rules hit", name:""))
+				FindCache.setTenantFindCache(tenant: self.name, ruleId: ruleId, result: FindCache.ActionResult(allowed:true, message: "No Find deny rules hit", name:""))
 			
 			} else if !findRulesCache!.allowed {
 				return findRulesCache!
 			}
 
 
-			let tenantRulesCache = FindRulesCache.getTenantTenantRules(tenant: self.name, ruleId: ruleId)
+			let tenantRulesCache = FindCache.getTenantTenantRules(tenant: self.name, ruleId: ruleId)
 
 			if tenantRulesCache == nil {
 				// if the cache returns nil, go thru the logic once to save the result to the cache
@@ -816,23 +816,23 @@ pub contract FindMarket {
 					}
 
 					if item.status=="stopped" {
-						let result = FindRulesCache.ActionResult(allowed:false, message: "Tenant has stopped this item", name:item.name)
-						FindRulesCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+						let result = FindCache.ActionResult(allowed:false, message: "Tenant has stopped this item", name:item.name)
+						FindCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
 						return result
 					}
 
 					if item.status=="deprecated" && action.listing{
-						let result = FindRulesCache.ActionResult(allowed:false, message: "Tenant has deprected mutation options on this item", name:item.name)
-						FindRulesCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+						let result = FindCache.ActionResult(allowed:false, message: "Tenant has deprected mutation options on this item", name:item.name)
+						FindCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
 						return result
 					}
-					let result = FindRulesCache.ActionResult(allowed:true, message:"OK!", name:item.name)
-					FindRulesCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+					let result = FindCache.ActionResult(allowed:true, message:"OK!", name:item.name)
+					FindCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
 					return result
 				}
 
-				let result = FindRulesCache.ActionResult(allowed:false, message:"Nothing matches", name:"")
-				FindRulesCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
+				let result = FindCache.ActionResult(allowed:false, message:"Nothing matches", name:"")
+				FindCache.setTenantTenantRulesCache(tenant: self.name, ruleId: ruleId, result: result)
 				return result
 			
 			} 
@@ -1098,7 +1098,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}, rewardFN: ((Address, String?, Address, String) : Void )) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}, rewardFN: ((Address, String?, Address, String) : Void )) {
 		let resolved : {Address : String} = resolvedAddress
 
 		fun resolveName(_ addr: Address ) : String? {

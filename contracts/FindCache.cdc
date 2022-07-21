@@ -1,11 +1,12 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-pub contract FindRulesCache {
+pub contract FindCache {
 
 	access(contract) let tenantFindRules : {String : {String : ActionResult}}
 	access(contract) let tenantTenantRules : {String : {String : ActionResult}}
 	access(contract) let tenantCuts : {String : {String : TenantCuts}}
 
+	// Tenant Rules 
 	pub struct ActionResult {
 		pub let allowed:Bool
 		pub let message:String
@@ -29,7 +30,7 @@ pub contract FindRulesCache {
 	}
 
 	// Tenant Find Rules
-	access(account) fun setTenantFindRulesCache(tenant: String, ruleId: String, result: ActionResult) {
+	access(account) fun setTenantFindCache(tenant: String, ruleId: String, result: ActionResult) {
 		if self.tenantFindRules[tenant] == nil {
 			self.tenantFindRules[tenant] = {} 
 			self.tenantFindRules[tenant]!.insert(key: ruleId, result)
@@ -51,7 +52,7 @@ pub contract FindRulesCache {
 		return self.tenantFindRules[tenant]![ruleId]
 	}
 
-	access(account) fun resetTenantFindRulesCache(_ tenant: String) {
+	access(account) fun resetTenantFindCache(_ tenant: String) {
 		self.tenantFindRules.remove(key: tenant)
 	}
 
