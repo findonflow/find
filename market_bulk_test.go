@@ -54,12 +54,21 @@ func TestBulkMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
 
-		result := otu.O.TransactionFromFile("buyMultipleNFTForSale").
+		otu.O.TransactionFromFile("buyMultipleNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
 				AccountArray("user1").
 				UInt64Array(id).
+				UFix64Array(price)).
+			Test(otu.T).AssertSuccess()
+
+		result := otu.O.TransactionFromFile("buyMultipleNFTForSale").
+			SignProposeAndPayAs("user2").
+			Args(otu.O.Arguments().
+				Account("account").
+				AccountArray("user1").
+				UInt64Array(id2).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
 			AssertComputationLessThenOrEqual(0)
@@ -74,9 +83,9 @@ func TestBulkMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				AccountArray("user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1").
-				UInt64Array(id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
-				UFix64Array(price, price, price, price, price, price, price, price, price, price, price)).
+				AccountArray("user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1").
+				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
+				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
 			AssertComputationLessThenOrEqual(0)
 
