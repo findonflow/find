@@ -15,7 +15,6 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix64]) {
 

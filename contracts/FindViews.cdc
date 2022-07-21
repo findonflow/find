@@ -1,4 +1,5 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub contract FindViews {
@@ -42,6 +43,55 @@ pub contract FindViews {
 			return (media as! OnChainFile).uri()
 		}
 	}
+
+	pub resource interface VaultViews {
+        pub var balance: UFix64 
+
+        pub fun getViews() : [Type]
+        pub fun resolveView(_ view: Type): AnyStruct?
+    }
+
+    pub struct FTVaultData {
+        pub let tokenAlias: String
+        pub let storagePath: StoragePath
+        pub let receiverPath: PublicPath
+        pub let balancePath: PublicPath
+        pub let providerPath: PrivatePath
+        pub let vaultType: Type
+        pub let receiverType: Type
+        pub let balanceType: Type
+        pub let providerType: Type
+        pub let createEmptyVault: ((): @FungibleToken.Vault)
+
+        init(
+            tokenAlias: String, 
+            storagePath: StoragePath,
+            receiverPath: PublicPath,
+            balancePath: PublicPath,
+            providerPath: PrivatePath,
+            vaultType: Type,
+            receiverType: Type,
+            balanceType: Type,
+            providerType: Type,
+            createEmptyVault: ((): @FungibleToken.Vault)
+        ) {
+            pre {
+                receiverType.isSubtype(of: Type<&{FungibleToken.Receiver}>()): "Receiver type must include FungibleToken.Receiver interfaces."
+                balanceType.isSubtype(of: Type<&{FungibleToken.Balance}>()): "Balance type must include FungibleToken.Balance interfaces."
+                providerType.isSubtype(of: Type<&{FungibleToken.Provider}>()): "Provider type must include FungibleToken.Provider interface."
+            }
+            self.tokenAlias=tokenAlias
+            self.storagePath=storagePath
+            self.receiverPath=receiverPath
+            self.balancePath=balancePath
+            self.providerPath = providerPath
+            self.vaultType=vaultType
+            self.receiverType=receiverType
+            self.balanceType=balanceType
+            self.providerType = providerType
+            self.createEmptyVault=createEmptyVault
+        }
+    }
 
 	// This is an example taken from Versus
 	pub struct CreativeWork {

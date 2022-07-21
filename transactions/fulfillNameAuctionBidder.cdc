@@ -2,7 +2,6 @@ import FIND from "../contracts/FIND.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(owner: Address, name: String) {
 
@@ -39,32 +38,6 @@ transaction(owner: Address, name: String) {
 			let fusdWallet=Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), tags: ["fusd", "stablecoin"])
 
 			profile.addWallet(fusdWallet)
-
-			/* Add Reward Tokens */
-			let rewardTokenCaps = FindRewardToken.getRewardVaultViews() 
-			for rewardTokenCap in rewardTokenCaps {
-				if !rewardTokenCap.check() {
-					continue
-				}
-				if let VaultData = rewardTokenCap.borrow()!.resolveView(Type<FindRewardToken.FTVaultData>()) {
-					let v = VaultData as! FindRewardToken.FTVaultData
-					let userTokenCap = account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
-					if userTokenCap.check() {
-						if !profile.hasWallet(v.tokenAlias) {
-							let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
-							profile.addWallet(tokenWallet)
-						}
-						continue
-					}
-					account.save( <- v.createEmptyVault() , to: v.storagePath)
-					account.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
-					account.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
-					if !profile.hasWallet(v.tokenAlias) {
-						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
-						profile.addWallet(tokenWallet)
-					}
-				}
-			}
 
 			account.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)

@@ -54,7 +54,7 @@
     "nftDetail": {
         "collectionDescription": "Neo Collectibles FIND",
         "collectionName": "neomotorcycle",
-        "id": 239,
+        "id": 224,
         "media": {
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
@@ -85,7 +85,7 @@
         },
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 239,
+        "uuid": 224,
         "views": [
             "checked",
             "checked",

@@ -227,7 +227,7 @@ pub contract FindMarketSale {
 			// Have to make sure the tenant always have the valid find name 
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] = tenant.name
 
-			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved ,rewardFN: FIND.rewardFN())
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
 			
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 
