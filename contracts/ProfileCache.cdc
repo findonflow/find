@@ -1,4 +1,3 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Clock from "../contracts/Clock.cdc"
 
 pub contract ProfileCache {
