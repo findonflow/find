@@ -1,5 +1,5 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FindRewardToken from "../contracts/FindRewardToken.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 import Clock from "../contracts/Clock.cdc"
 
 pub contract FindToken : FungibleToken {
@@ -10,7 +10,6 @@ pub contract FindToken : FungibleToken {
 
     pub event TokensMinted(amount: UFix64)
     pub event TokensBurned(amount: UFix64)
-    pub event TokenRewardMultiplier(multiplier: UFix64)
 
     pub let tokenAlias: String
     pub var totalSupply: UFix64
@@ -22,22 +21,8 @@ pub contract FindToken : FungibleToken {
     pub let balancePublicPath: PublicPath 
     pub let providerPath: PrivatePath 
     pub let minterPath: StoragePath 
-    pub let findRewardPath: PrivatePath 
 
-
-    /***********************************************************
-    Implementation on Token Contract for being reward token
-    ***********************************************************/
-    // Map tenantToken to custom task rewards 
-    access(contract) let taskRewards: {String : UFix64}
-
-    // Multiplier 
-    pub var taskRewardsMultiplier: UFix64
-
-    // Map address : {Task : Latest Claim TimeStamp}
-    access(contract) let claimRecords: {Address : {String : UFix64}}
-
-    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindRewardToken.VaultViews , FindRewardToken.FindReward {
+    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews {
 
         pub var balance: UFix64 
         
@@ -66,28 +51,26 @@ pub contract FindToken : FungibleToken {
 
         pub fun getViews() : [Type] {
             return [
-                Type<FindRewardToken.FTVaultData>() , 
+                Type<FindViews.FTVaultData>() , 
                 Type<&FindToken.Vault{FungibleToken.Receiver}>() ,
                 Type<&FindToken.Vault{FungibleToken.Balance}>() , 
-                Type<&FindToken.Vault{FindRewardToken.VaultViews}>() 
+                Type<&FindToken.Vault{FindViews.VaultViews}>() 
             ]
         }
 
         pub fun resolveView(_ view: Type) : AnyStruct? {
             switch view {
-                case Type<FindRewardToken.FTVaultData>() :
-                    return FindRewardToken.FTVaultData(
+                case Type<FindViews.FTVaultData>() :
+                    return FindViews.FTVaultData(
                             tokenAlias: FindToken.tokenAlias,
                             storagePath: FindToken.vaultStoragePath,
                             receiverPath: FindToken.receiverPublicPath,
                             balancePath: FindToken.balancePublicPath,
                             providerPath: FindToken.providerPath,
-                            findRewardPath: FindToken.findRewardPath,
                             vaultType: FindToken.getVaultType(),
-                            receiverType: Type<&FindToken.Vault{FungibleToken.Receiver, FindRewardToken.VaultViews}>(),
-                            balanceType: Type<&FindToken.Vault{FungibleToken.Balance, FindRewardToken.VaultViews}>(),
-                            providerType: Type<&FindToken.Vault{FungibleToken.Provider, FindRewardToken.VaultViews}>(),
-                            findRewardType: Type<&FindToken.Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews}>(),
+                            receiverType: Type<&FindToken.Vault{FungibleToken.Receiver, FindViews.VaultViews}>(),
+                            balanceType: Type<&FindToken.Vault{FungibleToken.Balance, FindViews.VaultViews}>(),
+                            providerType: Type<&FindToken.Vault{FungibleToken.Provider, FindViews.VaultViews}>(),
                             createEmptyVault: FindToken.createEmptyVaultFN()
                         )
                 
@@ -100,28 +83,6 @@ pub contract FindToken : FungibleToken {
                 default : 
                     return nil 
             }
-        }
-
-        /***********************************************************
-        Implementation on Token Contract for being reward token
-        ***********************************************************/
-        // The name here is just for emitting events for token contract
-        pub fun reward(receiver: Address, task: String) : UFix64? {
-            if FindToken.taskRewards[task] == nil {
-                return nil
-            }
-
-            let amount = FindToken.taskRewards[task]! * FindToken.taskRewardsMultiplier
-
-            if amount == 0.0 {
-                return nil
-            }
-
-            if !FindToken.claimRecords.containsKey(receiver) {
-                FindToken.claimRecords[receiver] = {}
-            }
-            FindToken.claimRecords[receiver]!.insert(key: task, Clock.time())
-            return amount
         }
 
     }
@@ -144,14 +105,6 @@ pub contract FindToken : FungibleToken {
             FindToken.totalSupply = FindToken.totalSupply + amount 
             emit TokensMinted(amount: amount)
             return <-create Vault(balance: amount)
-        }
-
-        pub fun setRewardMultiplier(_ multiplier: UFix64) {
-            if multiplier != 0.0 {
-                panic("Multiplier must be greater than 0.0")
-            }
-            FindToken.taskRewardsMultiplier = multiplier
-            emit TokenRewardMultiplier(multiplier: multiplier)
         }
     }
 
@@ -177,30 +130,19 @@ pub contract FindToken : FungibleToken {
         self.balancePublicPath = /public/findTokenBalance 
         self.providerPath = /private/findTokenProvider 
         self.minterPath = /storage/findTokenMinter
-        self.claimRecords = {}
 
         let minter <- create Minter()
         let vault <- create Vault(balance: 0.0)
 
-        /***********************************************************
-        Implementation on Token Contract for being reward token
-        ***********************************************************/
-        self.taskRewardsMultiplier = 1.0
-        emit TokenRewardMultiplier(multiplier: 1.0)
-        self.findRewardPath = /private/findTokenReward
-        self.taskRewards = FindRewardToken.getDefaultTaskRewards()
-
         vault.deposit(from: <- minter.mintTokens(self.initialSupply))
 
         self.account.save(<- vault, to: self.vaultStoragePath)
-        self.account.link<&Vault{FungibleToken.Receiver, FindRewardToken.VaultViews}>(self.receiverPublicPath, target: self.vaultStoragePath)
-        self.account.link<&Vault{FungibleToken.Balance, FindRewardToken.VaultViews}>(self.balancePublicPath, target: self.vaultStoragePath)
-        self.account.link<&Vault{FungibleToken.Provider, FindRewardToken.VaultViews}>(self.providerPath, target: self.vaultStoragePath)
-        self.account.link<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews, FungibleToken.Provider}>(self.findRewardPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FungibleToken.Receiver, FindViews.VaultViews}>(self.receiverPublicPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FungibleToken.Balance, FindViews.VaultViews}>(self.balancePublicPath, target: self.vaultStoragePath)
+        self.account.link<&Vault{FungibleToken.Provider, FindViews.VaultViews}>(self.providerPath, target: self.vaultStoragePath)
         
         self.account.save(<- minter, to: self.minterPath)
 
-        FindRewardToken.addTenantRewardToken(tenant: FindToken.account.address, cap: FindToken.account.getCapability<&Vault{FindRewardToken.FindReward, FindRewardToken.VaultViews, FungibleToken.Provider}>(self.findRewardPath))
         emit TokensInitialized(initialSupply: self.initialSupply)
     }
 

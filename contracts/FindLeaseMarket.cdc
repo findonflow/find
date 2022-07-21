@@ -437,7 +437,7 @@ pub contract FindLeaseMarket {
 
 	}
 
-	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindRulesCache.TenantCuts, rewardFN: ((Address, String?, Address, String) : Void )) {
+	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindRulesCache.TenantCuts) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -501,10 +501,6 @@ pub contract FindLeaseMarket {
 		}
 
 		oldProfile.deposit(from: <- vault)
-
-		let tenantAddress = FindMarket.tenantNameAddress[tenant]!
-		rewardFN(tenant: tenantAddress, findName: FIND.reverseLookup(buyer!), receiver: buyer!, task: "findMarket_fulfill_buyer")
-		rewardFN(tenant: tenantAddress, findName: FIND.reverseLookup(seller), receiver: seller, task: "findMarket_fulfill_seller")
 	}
 
 	//struct to expose information about leases

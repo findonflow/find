@@ -7,14 +7,6 @@
     "name": "user1",
     "wallets": [
         {
-            "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-            "balance": 40,
-            "name": "FIND",
-            "tags": [
-                "FIND"
-            ]
-        },
-        {
             "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
             "balance": 100.001,
             "name": "Flow",

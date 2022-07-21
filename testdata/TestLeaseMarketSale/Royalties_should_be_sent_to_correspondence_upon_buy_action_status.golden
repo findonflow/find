@@ -7,7 +7,7 @@
                 "currentTime": 201,
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
-                "name": "name2",
+                "name": "name1",
                 "status": "TAKEN",
                 "validUntil": 31536001
             },
@@ -18,16 +18,6 @@
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
                 "name": "name3",
-                "status": "TAKEN",
-                "validUntil": 31536001
-            },
-            {
-                "address": "0x179b6b1cb6755e31",
-                "cost": 5,
-                "currentTime": 201,
-                "extensionOnLateBid": 300,
-                "lockedUntil": 39312001,
-                "name": "name1",
                 "status": "TAKEN",
                 "validUntil": 31536001
             },
@@ -59,7 +49,7 @@
                         },
                         "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
                         "leaseName": "name1",
-                        "listingId": 204,
+                        "listingId": 196,
                         "listingStatus": "active",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketSale.SaleItem",
                         "listingValidUntil": 301,
@@ -79,14 +69,6 @@
             "findName": "user1",
             "name": "user1",
             "wallets": [
-                {
-                    "accept": "A.f8d6e0586b0a20c7.FindToken.Vault",
-                    "balance": 40,
-                    "name": "FIND",
-                    "tags": [
-                        "FIND"
-                    ]
-                },
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "balance": 137.001,

@@ -519,7 +519,7 @@ pub contract FindMarketAuctionSoft {
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
 
-			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: FIND.reverseLookupFN(), resolvedAddress: resolved,rewardFN: FIND.rewardFN())
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: FIND.reverseLookupFN(), resolvedAddress: resolved)
 
 			destroy <- self.items.remove(key: id)
 
