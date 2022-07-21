@@ -27,6 +27,8 @@ func TestLeaseMarketSale(t *testing.T) {
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
+	otu.setUUID(300)
+
 	t.Run("Should be able to list a lease for sale and buy it", func(t *testing.T) {
 
 		otu.listLeaseForSale("user1", "name1", price)

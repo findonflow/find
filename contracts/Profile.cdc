@@ -3,6 +3,7 @@
 */
 
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import ProfileCache from "../contracts/ProfileCache.cdc"
 
 pub contract Profile {
 	pub let publicPath: PublicPath
@@ -484,8 +485,18 @@ pub contract Profile {
 		}
 
 		pub fun deposit(from: @FungibleToken.Vault) {
-			for w in self.wallets {
+
+			let walletIndexCache = ProfileCache.getWalletIndex(address: self.owner!.address, walletType: from.getType())
+
+			if walletIndexCache != nil {
+				let ref = self.wallets[walletIndexCache!].receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
+				ref.deposit(from: <- from)
+				return
+			}
+
+			for i , w in self.wallets {
 				if from.isInstance(w.accept) {
+					ProfileCache.setWalletIndexCache(address: self.owner!.address, walletType: from.getType(), index: i)
 					let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
 					ref.deposit(from: <- from)
 					return
@@ -524,13 +535,17 @@ pub contract Profile {
 			while(i < numWallets) {
 				if self.wallets[i].name== val {
 					self.wallets.remove(at: i)
+					ProfileCache.resetWalletIndexCache(address: self.owner!.address)
 					return
 				}
 				i=i+1
 			}
 		}
 
-		pub fun setWallets(_ val: [Wallet]) { self.wallets=val }
+		pub fun setWallets(_ val: [Wallet]) { 
+			self.wallets=val 
+			ProfileCache.resetWalletIndexCache(address: self.owner!.address)
+			}
 
 		pub fun removeFollower(_ val: Address) {
 			self.followers.remove(key:val)
@@ -553,6 +568,7 @@ pub contract Profile {
 		pub fun setName(_ val: String) { self.name = val }
 		pub fun setFindName(_ val: String) { 
 			emit Updated(account:self.owner!.address, userName:self.name, findName:val, thumbnail:self.avatar)
+			ProfileCache.resetLeaseCache(address: self.owner!.address, leaseName: self.findName)
 			self.findName = val 
 		}
 		pub fun setGender(_ val: String) { self.gender = val }

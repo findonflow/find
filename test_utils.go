@@ -69,7 +69,7 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-
+	otu.setUUID(300)
 	ids := otu.mintThreeExampleDandies()
 	return ids
 }
@@ -2132,6 +2132,16 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name st
 			"amount":    price,
 			"status":    "sold",
 		}))
+	return otu
+}
+
+func (otu *OverflowTestUtils) setUUID(uuid uint64) *OverflowTestUtils {
+
+	otu.O.TransactionFromFile("testSetUUID").
+		SignProposeAndPayAs("user1").
+		Args(otu.O.Arguments().
+			UInt64(uuid)).
+		Test(otu.T).AssertSuccess()
 	return otu
 }
 

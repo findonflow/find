@@ -47,6 +47,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		Test(otu.T).
 		AssertSuccess()
 
+	otu.setUUID(300)
+
 	/* MarketSale */
 	t.Run("Should not be able to fullfill sale if item was already sold on direct offer", func(t *testing.T) {
 
@@ -320,6 +322,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("DirectOfferSoft").
 			directOfferMarketEscrowed("user2", "user1", id, price)
+
+		otu.setUUID(300)
 
 		otu.directOfferMarketSoft("user2", "user1", id, price)
 

@@ -20,6 +20,8 @@ func TestMarketOptions(t *testing.T) {
 	price := 10.0
 	ids := otu.mintThreeExampleDandies()
 
+	otu.setUUID(300)
+
 	/* Test on TenantRules removal and setting */
 	t.Run("Should be able to list if the rules are set for MarketSale, regardless of the others.", func(t *testing.T) {
 

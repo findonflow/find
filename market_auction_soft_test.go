@@ -42,6 +42,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 		Test(otu.T).
 		AssertSuccess()
 
+	otu.setUUID(300)
+
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 
 		otu.listNFTForSoftAuction("user1", id, price).
@@ -104,6 +106,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
 			sendDandy("user2", "user1", id)
+
+		otu.setUUID(300)
 
 		otu.O.TransactionFromFile("cancelMarketAuctionSoft").
 			SignProposeAndPayAs("user1").
@@ -218,6 +222,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
+
+		otu.setUUID(300)
 
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
 

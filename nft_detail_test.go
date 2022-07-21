@@ -35,7 +35,6 @@ func TestNFTDetailScript(t *testing.T) {
 
 	t.Run("Should be able to get nft details of item if listed in rule with no listing type", func(t *testing.T) {
 		otu := NewOverflowTest(t)
-
 		ids := otu.setupMarketAndMintDandys()
 		otu.registerFtInRegistry()
 		otu.O.TransactionFromFile("adminSetSellDandyRules").
@@ -61,7 +60,6 @@ func TestNFTDetailScript(t *testing.T) {
 
 	t.Run("Should be able to get nft details of item with views", func(t *testing.T) {
 		otu := NewOverflowTest(t)
-
 		ids := otu.setupMarketAndMintDandys()
 		otu.registerFtInRegistry().
 			setFlowDandyMarketOption("Sale").
@@ -165,7 +163,7 @@ func TestNFTDetailScript(t *testing.T) {
 			createUser(100.0, "user3").
 			registerUser("user2").
 			registerUser("user3")
-
+		otu.setUUID(300)
 		ids := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry().
 			registerUserWithNameAndForge("user1", "neomotorcycle").
