@@ -6,7 +6,6 @@ pub contract FindRulesCache {
 	access(contract) let tenantTenantRules : {String : {String : ActionResult}}
 	access(contract) let tenantCuts : {String : {String : TenantCuts}}
 
-	// Tenant Rules 
 	pub struct ActionResult {
 		pub let allowed:Bool
 		pub let message:String

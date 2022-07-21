@@ -8,6 +8,28 @@
       "address": "0x179b6b1cb6755e31",
       "cost": 5,
       "lockedUntil": 39312001,
+      "name": "name1",
+      "status": "TAKEN",
+      "validUntil": 31536001
+    },
+    "leaseName": "name1",
+    "saleID": 226,
+    "seller": "0x179b6b1cb6755e31",
+    "sellerName": "user1",
+    "status": "cancel",
+    "tenant": "findLease",
+    "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
+  }
+}{
+  "name": "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale",
+  "time": "1970-01-01T00:00:00Z",
+  "fields": {
+    "amount": 10,
+    "endsAt": 301,
+    "leaseInfo": {
+      "address": "0x179b6b1cb6755e31",
+      "cost": 5,
+      "lockedUntil": 39312001,
       "name": "name3",
       "status": "TAKEN",
       "validUntil": 31536001
@@ -36,28 +58,6 @@
     },
     "leaseName": "name2",
     "saleID": 227,
-    "seller": "0x179b6b1cb6755e31",
-    "sellerName": "user1",
-    "status": "cancel",
-    "tenant": "findLease",
-    "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
-  }
-}{
-  "name": "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale",
-  "time": "1970-01-01T00:00:00Z",
-  "fields": {
-    "amount": 10,
-    "endsAt": 301,
-    "leaseInfo": {
-      "address": "0x179b6b1cb6755e31",
-      "cost": 5,
-      "lockedUntil": 39312001,
-      "name": "name1",
-      "status": "TAKEN",
-      "validUntil": 31536001
-    },
-    "leaseName": "name1",
-    "saleID": 226,
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
     "status": "cancel",
