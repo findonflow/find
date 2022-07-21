@@ -1134,14 +1134,9 @@ pub contract FindMarket {
 		let royalties = royalty.getRoyalties()
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
-			for royaltyItem in royalties {
-				totalRoyalties = totalRoyalties + royaltyItem.cut
-			}
-			if totalRoyalties != saleItem.getTotalRoyalties() {
-				panic("The total Royalties to be paid is changed after listing.")
-			}
 
 			for royaltyItem in royalties {
+				totalRoyalties = totalRoyalties + royaltyItem.cut
 				let description=royaltyItem.description
 				let cutAmount= soldFor * royaltyItem.cut
 				let receiver = royaltyItem.receiver.address
@@ -1170,6 +1165,9 @@ pub contract FindMarket {
 				/* If the royalty receiver check succeed */
 				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+			}
+			if totalRoyalties != saleItem.getTotalRoyalties() {
+				panic("The total Royalties to be paid is changed after listing.")
 			}
 		}
 
