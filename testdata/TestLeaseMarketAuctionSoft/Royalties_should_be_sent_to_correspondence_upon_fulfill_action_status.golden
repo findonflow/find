@@ -7,6 +7,16 @@
                 "currentTime": 7701,
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
+                "name": "name2",
+                "status": "TAKEN",
+                "validUntil": 31536001
+            },
+            {
+                "address": "0x179b6b1cb6755e31",
+                "cost": 5,
+                "currentTime": 7701,
+                "extensionOnLateBid": 300,
+                "lockedUntil": 39312001,
                 "name": "name3",
                 "status": "TAKEN",
                 "validUntil": 31536001
@@ -18,16 +28,6 @@
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
                 "name": "name1",
-                "status": "TAKEN",
-                "validUntil": 31536001
-            },
-            {
-                "address": "0x179b6b1cb6755e31",
-                "cost": 5,
-                "currentTime": 7701,
-                "extensionOnLateBid": 300,
-                "lockedUntil": 39312001,
-                "name": "name2",
                 "status": "TAKEN",
                 "validUntil": 31536001
             },

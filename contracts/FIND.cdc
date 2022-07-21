@@ -1357,6 +1357,9 @@ pub contract FIND {
 			if !leases.check() {
 				panic("The lease collection capability is invalid.")
 			}
+			if !profile.check() {
+				panic("The profile capability is invalid")
+			}
 
 			let nameStatus=self.readStatus(name)
 			if nameStatus.status == LeaseStatus.TAKEN {
@@ -1380,6 +1383,13 @@ pub contract FIND {
 
 			emit Register(name: name, owner:profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 			emit Name(name: name)
+			
+			let profileRef = profile.borrow()! 
+
+			if profileRef.getFindName() == "" {
+				profileRef.setFindName(name)
+			}
+
 			self.profiles[name] =  lease
 
 			leases.borrow()!.deposit(token: <- create Lease(name: name, networkCap: FIND.account.getCapability<&Network>(FIND.NetworkPrivatePath)))

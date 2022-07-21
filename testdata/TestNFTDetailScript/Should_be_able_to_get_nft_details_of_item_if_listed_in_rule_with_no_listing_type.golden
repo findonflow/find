@@ -2,50 +2,50 @@
     "allowedListingActions": {
         "FindMarketAuctionEscrow": {
             "ftAlias": [
-                "Flow"
+                "FUSD"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.f8d6e0586b0a20c7.FUSD.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
             "status": "active"
         },
         "FindMarketAuctionSoft": {
             "ftAlias": [
-                "Flow"
+                "FUSD"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.f8d6e0586b0a20c7.FUSD.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
             "status": "active"
         },
         "FindMarketDirectOfferEscrow": {
             "ftAlias": [
-                "Flow"
+                "FUSD"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.f8d6e0586b0a20c7.FUSD.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
             "status": "active"
         },
         "FindMarketDirectOfferSoft": {
             "ftAlias": [
-                "Flow"
+                "FUSD"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.f8d6e0586b0a20c7.FUSD.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
             "status": "active"
         },
         "FindMarketSale": {
             "ftAlias": [
-                "Flow"
+                "FUSD"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.f8d6e0586b0a20c7.FUSD.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
             "status": "active"
@@ -105,9 +105,9 @@
             "A.f8d6e0586b0a20c7.FindViews.Nounce",
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+            "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
             "A.f8d6e0586b0a20c7.MetadataViews.Traits",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork"
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
         ]
     }
 }`
