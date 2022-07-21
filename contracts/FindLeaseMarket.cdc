@@ -6,7 +6,7 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
-import FindCache from "../contracts/FindCache.cdc"
+import FindRulesCache from "../contracts/FindRulesCache.cdc"
 
 pub contract FindLeaseMarket {
 
@@ -437,7 +437,7 @@ pub contract FindLeaseMarket {
 
 	}
 
-	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindCache.TenantCuts, rewardFN: ((Address, String?, Address, String) : Void )) {
+	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindRulesCache.TenantCuts, rewardFN: ((Address, String?, Address, String) : Void )) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
