@@ -37,6 +37,7 @@ func TestBulkMarketSale(t *testing.T) {
 	id9 := items3[2]
 	id10 := items4[0]
 	id11 := items4[1]
+	id12 := items4[2]
 
 	otu.listNFTForSale("user1", id, price)
 	otu.listNFTForSale("user1", id2, price)
@@ -49,6 +50,7 @@ func TestBulkMarketSale(t *testing.T) {
 	otu.listNFTForSale("user1", id9, price)
 	otu.listNFTForSale("user1", id10, price)
 	otu.listNFTForSale("user1", id11, price)
+	otu.listNFTForSale("user1", id12, price)
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
 
@@ -72,9 +74,9 @@ func TestBulkMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				AccountArray("user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1").
-				UInt64Array(id2, id3, id4, id5, id6, id7, id8, id9, id10, id11).
-				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
+				AccountArray("user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1").
+				UInt64Array(id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
+				UFix64Array(price, price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
 			AssertComputationLessThenOrEqual(0)
 

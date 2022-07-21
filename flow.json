@@ -109,6 +109,7 @@
     "FIND": "./contracts/FIND.cdc",
     "CollectionFactory": "./contracts/CollectionFactory.cdc",
     "Dandy": "./contracts/Dandy.cdc",
+    "FindRulesCache": "./contracts/FindRulesCache.cdc",
     "FindMarket": "./contracts/FindMarket.cdc",
     "FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
     "FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
@@ -207,8 +208,8 @@
         "FTRegistry",
         "NFTRegistry",
         "FindForge",
-				"FindRewardToken",
-				"FindToken"
+        "FindRewardToken",
+        "FindToken"
       ]
     },
     "testnet": {
@@ -233,8 +234,8 @@
         "NFTRegistry",
         "CollectionFactory",
         "FindForge",
-				"FindRewardToken",
-				"FindToken"
+        "FindRewardToken",
+        "FindToken"
       ]
     },
     "emulator": {
@@ -254,6 +255,7 @@
         "FindViews",
         "MetadataViews",
         "Dandy",
+        "FindRulesCache",
         "FindMarket",
         "FindMarketSale",
         "FindMarketDirectOfferEscrow",
