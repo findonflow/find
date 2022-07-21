@@ -187,7 +187,7 @@ pub contract FindLeaseMarketSale {
 
 			saleItem.pointer.move(to: to)
 
-			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts, rewardFN: FIND.rewardFN())
+			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
 
 			emit Sale(tenant:self.getTenant().name, leaseName: name, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, leaseInfo:leaseInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
 

@@ -3,7 +3,6 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import FindRewardToken from "../contracts/FindRewardToken.cdc"
 
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitles : {String: String}, linkTypes: {String:String}, linkUrls : {String:String}, removeLinks : [String]) {
 	
@@ -12,32 +11,6 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 	prepare(account: AuthAccount) {
 
 		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
-
-		/* Add Reward Tokens */
-		let rewardTokenCaps = FindRewardToken.getRewardVaultViews() 
-		for rewardTokenCap in rewardTokenCaps {
-			if !rewardTokenCap.check() {
-				continue
-			}
-			if let VaultData = rewardTokenCap.borrow()!.resolveView(Type<FindRewardToken.FTVaultData>()) {
-				let v = VaultData as! FindRewardToken.FTVaultData
-				let userTokenCap = account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath)
-				if userTokenCap.check() {
-					if !self.profile.hasWallet(v.tokenAlias) {
-						let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
-						self.profile.addWallet(tokenWallet)
-					}
-					continue
-				}
-				account.save( <- v.createEmptyVault() , to: v.storagePath)
-				account.link<&{FungibleToken.Receiver}>(v.receiverPath, target: v.storagePath)
-				account.link<&{FungibleToken.Balance}>(v.balancePath, target: v.storagePath)
-				if !self.profile.hasWallet(v.tokenAlias) {
-					let tokenWallet=Profile.Wallet( name:v.tokenAlias, receiver:account.getCapability<&{FungibleToken.Receiver}>(v.receiverPath), balance:account.getCapability<&{FungibleToken.Balance}>(v.balancePath), accept: v.vaultType, tags: [v.tokenAlias])
-					self.profile.addWallet(tokenWallet)
-				}
-			}
-		}
 
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
