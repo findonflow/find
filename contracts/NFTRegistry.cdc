@@ -92,9 +92,9 @@ pub contract NFTRegistry {
 
 	/* setters */
 	access(account) fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String ) {
-		pre{
-			!NFTRegistry.nonFungibleTokenList.containsKey(type.identifier) : "This NonFungibleToken Register already exist"
-		}
+        if NFTRegistry.nonFungibleTokenList.containsKey(type.identifier) {
+            panic("This NonFungibleToken Register already exist")
+        }
 		let typeIdentifier : String = type.identifier
 		NFTRegistry.nonFungibleTokenList[typeIdentifier] = NFTInfo(alias: alias,
 		type: type,

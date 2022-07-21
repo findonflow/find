@@ -4,6 +4,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
+import Profile from "./Profile.cdc"
 import FindMarket from "./FindMarket.cdc"
 
 /*
@@ -88,8 +89,7 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getSellerName() : String? {
-			let address = self.pointer.owner()
-			return FIND.reverseLookup(address)
+			return FIND.reverseLookup(self.pointer.owner())
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -112,8 +112,8 @@ pub contract FindMarketSale {
 			return self.validUntil 
 		}
 
-		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
+		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
 		}
 
 		pub fun checkPointer() : Bool {
@@ -140,6 +140,7 @@ pub contract FindMarketSale {
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} //TODO: look if this is safe
 		pub fun containsId(_ id: UInt64): Bool
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
 	}
@@ -156,8 +157,8 @@ pub contract FindMarketSale {
 		}
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check() {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
@@ -167,11 +168,18 @@ pub contract FindMarketSale {
 		}
 
 		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-				self.owner!.address != nftCap.address : "You cannot buy your own listing"
-				nftCap.check() : "The nft receiver capability passed in is invalid."
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
+
+			if self.owner!.address == nftCap.address {
+				panic("You cannot buy your own listing")
+			}
+
+			if !nftCap.check() {
+				panic("The nft receiver capability passed in is invalid.")
+			}
+
 
 			let saleItem=self.borrow(id)
 
@@ -184,33 +192,42 @@ pub contract FindMarketSale {
 			}
 
 			if saleItem.vaultType != vault.getType() {
-				panic("This item can be baught using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
+				panic("This item can be bought using ".concat(saleItem.vaultType.identifier).concat(" you have sent in ").concat(vault.getType().identifier))
 			}
+			let tenant=self.getTenant()
+			let ftType=saleItem.vaultType
+			let nftType=saleItem.getItemType()
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "buy item for sale"), seller: self.owner!.address, buyer: nftCap.address)
+			//TOOD: method on saleItems that returns a cacheKey listingType-nftType-ftType
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "buy item for sale"), seller: self.owner!.address, buyer: nftCap.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType)
 
 
-			let ftType=saleItem.vaultType
-			let owner=saleItem.getSeller()
-			let nftInfo= saleItem.toNFTInfo()
-
-			let royalty=saleItem.getRoyalty()
-
-			let soldFor=saleItem.getBalance()
+			let nftInfo= saleItem.toNFTInfo(false)
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
 			let buyerName=FIND.reverseLookup(buyer)
-			let profile = FIND.lookup(buyer.toString())
+			let sellerName=FIND.reverseLookup(self.owner!.address)
 
-			emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
 
-			FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
+
+			//TODO: make the resolver a little bit smarter, preresolve things like tenants and find?
+			//Add seller/buyer/find/tenant to map and lookup in that before calling reverseLookup
+			let resolved : {Address : String} = {}
+
+			resolved[buyer] = buyerName ?? ""
+			resolved[self.owner!.address] = sellerName ?? ""
+			resolved[FindMarketSale.account.address] = "find"
+			// Have to make sure the tenant always have the valid find name 
+			resolved[FindMarket.tenantNameAddress[tenant.name]!] = tenant.name
+
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved ,rewardFN: FIND.rewardFN())
 			
 			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
 
@@ -222,7 +239,11 @@ pub contract FindMarketSale {
 			// What happends if we relist  
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name: "list item for sale"), seller: self.owner!.address, buyer: nil)
+			let tenant=self.getTenant()
+			let nftType=saleItem.getItemType()
+			let ftType=saleItem.getFtType()
+
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:true, name: "list item for sale"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -231,37 +252,36 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant: self.getTenant().name, id: pointer.getUUID(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, nft:FindMarket.NFTInfo(pointer.getViewResolver(), id: pointer.id), buyer: nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			emit Sale(tenant: tenant.name, id: pointer.getUUID(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, nft:saleItem.toNFTInfo(true), buyer: nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			let old <- self.items[pointer.getUUID()] <- saleItem
 			destroy old
 
 		}
 
 		pub fun delist(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Unknown item with id=".concat(id.toString())
+			if !self.items.containsKey(id) {
+				panic("Unknown item with id=".concat(id.toString()))
 			}
 
 			let saleItem <- self.items.remove(key: id)!
 
-			if saleItem.checkPointer() {
-				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "delist item for sale"), seller: nil, buyer: nil)
+			let tenant=self.getTenant()
+			let nftType= saleItem.getItemType()
+			let ftType= saleItem.getFtType()
 
-				if !actionResult.allowed {
-					panic(actionResult.message)
-				}
-				let owner=self.owner!.address
-				emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
-				destroy saleItem
-				return
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "delist item for sale"), seller: nil, buyer: nil)
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
+			var nftInfo:FindMarket.NFTInfo?=nil
+			if saleItem.checkPointer() {
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			let owner=self.owner!.address
-			if !saleItem.checkPointer() {
-				emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: nil, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
-			} else {
-				emit Sale(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: FindMarket.NFTInfo(saleItem.pointer.getViewResolver(), id:saleItem.pointer.id), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
-			}
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: nftInfo, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			destroy saleItem
 		}
 
@@ -278,8 +298,8 @@ pub contract FindMarketSale {
 		}
 
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
-			pre{
-				self.items.containsKey(id) : "This id does not exist : ".concat(id.toString())
+			if !self.items.containsKey(id) {
+				panic("This id does not exist : ".concat(id.toString()))
 			}
 			return (&self.items[id] as &SaleItem{FindMarket.SaleItem}?)!
 		}
@@ -295,10 +315,8 @@ pub contract FindMarketSale {
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
-		}
-		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
+		if let  tenantCap=FindMarket.getTenantCapability(marketplace) {
+			let tenant=tenantCap.borrow() ?? panic("Invalid tenant")
 			return getAccount(user).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 		}
 		return nil

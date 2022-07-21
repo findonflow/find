@@ -610,7 +610,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				StringArray("user1", "user1", "user1").
+				AccountArray("user1", "user1", "user1").
 				UInt64Array(ids[0], ids[1], ids[2]).
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().

@@ -70,7 +70,8 @@
   "fields": {
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
-    "id": 203,
+    "findName": "find",
+    "id": 151,
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
@@ -100,7 +101,8 @@
   "fields": {
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
-    "id": 203,
+    "findName": "find",
+    "id": 151,
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",

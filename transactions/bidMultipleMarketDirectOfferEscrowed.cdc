@@ -27,10 +27,15 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 
 	prepare(account: AuthAccount) {
 
-		assert(nftAliasOrIdentifiers.length == users.length , message: "The length of arrays passed in has to be the same")
-		assert(nftAliasOrIdentifiers.length == ids.length , message: "The length of arrays passed in has to be the same")
-		assert(nftAliasOrIdentifiers.length == ftAliasOrIdentifiers.length , message: "The length of arrays passed in has to be the same")
-		assert(nftAliasOrIdentifiers.length == amounts.length , message: "The length of arrays passed in has to be the same")
+		if nftAliasOrIdentifiers.length != users.length {
+			panic("The length of arrays passed in has to be the same")
+		} else if nftAliasOrIdentifiers.length != ids.length {
+			panic("The length of arrays passed in has to be the same")
+		} else if nftAliasOrIdentifiers.length != ftAliasOrIdentifiers.length {
+			panic("The length of arrays passed in has to be the same")
+		} else if nftAliasOrIdentifiers.length != amounts.length {
+			panic("The length of arrays passed in has to be the same")
+		}
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -333,7 +338,9 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 	execute {
 		var counter = 0
 		while counter < ids.length {
-			assert(self.walletReference[counter].balance > amounts[counter], message: "Your wallet does not have enough funds to pay for this item. Fund Type : ".concat(ftAliasOrIdentifiers[counter]).concat("Required Amount : ").concat(amounts[counter].toString()) )
+			if self.walletReference[counter].balance < amounts[counter] {
+				panic("Your wallet does not have enough funds to pay for this item. Fund Type : ".concat(ftAliasOrIdentifiers[counter]).concat("Required Amount : ").concat(amounts[counter].toString()))
+			}
 			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
 			self.bidsReference!.bid(item:self.pointer[counter], vault: <- vault, nftCap: self.targetCapability[counter], validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
 			counter = counter + 1

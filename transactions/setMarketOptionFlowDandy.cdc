@@ -9,8 +9,7 @@ transaction(){
 
         tenantRef.setMarketOption(name:"FlowDandy", cut: nil, rules:[
             FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
-            FindMarket.TenantRule(name:"Dandy", types:[ Type<@Dandy.NFT>()],
-						ruleType: "nft", allow: true)
+            FindMarket.TenantRule(name:"Dandy", types:[ Type<@Dandy.NFT>()], ruleType: "nft", allow: true)
             ]
         )
     }

@@ -82,17 +82,13 @@ pub contract Dandy: NonFungibleToken {
 		pub fun getMinterPlatform() : FindForge.MinterPlatform {
 			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, forgeType: Dandy.getForgeType()) {
 				
-				let name = self.platform.name
-				let platform = self.platform.platform
-				let platformPercentCut = self.platform.platformPercentCut
-				let minterCut = self.platform.minterCut
+				let platform = &self.platform as &FindForge.MinterPlatform
+				platform.updateExternalURL(fetch.externalURL)
+				platform.updateDesription(fetch.description)
+				platform.updateSquareImagen(fetch.squareImage)
+				platform.updateBannerImage(fetch.bannerImage)
+				platform.updateSocials(fetch.socials)
 
-				let description = fetch.description
-				let externalURL = fetch.externalURL
-				let squareImage = fetch.squareImage
-				let bannerImage = fetch.bannerImage
-				let socials = fetch.socials
-				return FindForge.MinterPlatform(name: name, platform:platform, platformPercentCut: platformPercentCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
 			}
 
 			return self.platform
@@ -295,16 +291,16 @@ pub contract Dandy: NonFungibleToken {
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
 			}
 
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
 			}
 
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
@@ -312,8 +308,8 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		pub fun borrow(_ id: UInt64): &NFT {
-			pre {
-				self.ownedNFTs[id] != nil : "NFT does not exist"
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
 			}
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			return nft as! &Dandy.NFT

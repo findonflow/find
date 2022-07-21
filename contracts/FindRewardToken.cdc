@@ -67,15 +67,15 @@ pub contract FindRewardToken {
     } 
 
     access(account) fun addTenantRewardToken(tenant: Address, cap: Capability<&{FindReward, VaultViews, FungibleToken.Provider}>) {
-        pre{
-            self.tenantTokenCapabilities[tenant] == nil : "This tenant token has already registered."
+        if self.tenantTokenCapabilities[tenant] != nil {
+            panic("This tenant token has already registered.")
         }
         self.tenantTokenCapabilities[tenant] = cap
     }
 
     access(account) fun removeTenantRewardToken(tenant: Address) {
-        pre{
-            self.tenantTokenCapabilities[tenant] != nil : "This tenant token has not yet registered."
+        if self.tenantTokenCapabilities[tenant] == nil {
+            panic("This tenant token has not yet registered.")
         }
         self.tenantTokenCapabilities.remove(key: tenant)
     }

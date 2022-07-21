@@ -5,6 +5,7 @@ import FindViews from "./FindViews.cdc"
 import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
+import Profile from "./Profile.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionEscrow {
@@ -48,8 +49,8 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
-			pre{
-				self.offerCallback!.check() : "bidder unlinked the bid collection capability."
+			if !self.offerCallback!.check()  {
+				panic("bidder unlinked the bid collection capability. bidder address : ".concat(self.offerCallback!.address.toString()))
 			}
 			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
 			return <- vault
@@ -92,8 +93,8 @@ pub contract FindMarketAuctionEscrow {
 			return nil
 		}
 
-		pub fun toNFTInfo() : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id)
+		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
+			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
 		}
 
 		pub fun setAuctionStarted(_ startedAt: UFix64) {
@@ -257,37 +258,10 @@ pub contract FindMarketAuctionEscrow {
 
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check()  {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
-		}
-
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?) {
-			let owner=saleItem.getSeller()
-			let ftType=saleItem.getFtType()
-			let balance=saleItem.getBalance()
-			let seller=saleItem.getSeller()
-			let id=saleItem.getId()
-
-			var nftInfo:FindMarket.NFTInfo?=nil 
-			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo()
-			}
-
-			var previousBuyerName : String?=nil
-			if let pb= previousBuyer {
-				previousBuyerName = FIND.reverseLookup(pb)
-			}
-
-			let buyer=saleItem.getBuyer()
-			if buyer != nil {
-				let buyerName=FIND.reverseLookup(buyer!)
-				let profile = FIND.lookup(buyer!.toString())
-				emit EnglishAuction(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: previousBuyer, previousBuyerName:previousBuyerName)
-			} else {
-				emit EnglishAuction(tenant:self.getTenant().name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-			}
 		}
 
 		pub fun getListingType() : Type {
@@ -297,7 +271,12 @@ pub contract FindMarketAuctionEscrow {
 		access(self) fun addBid(id:UInt64, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance:UFix64) {
 			let saleItem=self.borrow(id)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"add bid in auction"), seller: self.owner!.address, buyer: newOffer.address)
+
+			let tenant=self.getTenant()
+			let nftType=saleItem.getItemType()
+			let ftType=saleItem.getFtType()
+
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name:"add bid in auction"), seller: self.owner!.address, buyer: newOffer.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -334,13 +313,31 @@ pub contract FindMarketAuctionEscrow {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer)
+
+			let status="active_ongoing"
+
+			let seller=self.owner!.address
+
+			let nftInfo=saleItem.toNFTInfo(true)
+
+			var previousBuyerName : String?=nil
+			if let pb= previousBuyer {
+				previousBuyerName = FIND.reverseLookup(pb)
+			}
+
+			let buyer=newOffer.address
+
+			let buyerName=FIND.reverseLookup(buyer!)
+			let profile = Profile.find(buyer!)
+			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: newOfferBalance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: previousBuyer, previousBuyerName:previousBuyerName)
+
 
 		}
 
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 
 			let saleItem=self.borrow(id)
@@ -380,7 +377,11 @@ pub contract FindMarketAuctionEscrow {
 				return
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "bid in auction"), seller: self.owner!.address, buyer: callback.address)
+			let tenant=self.getTenant()
+			let nftType= saleItem.getItemType()
+			let ftType= saleItem.getFtType()
+
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "bid in auction"), seller: self.owner!.address, buyer: callback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -393,7 +394,9 @@ pub contract FindMarketAuctionEscrow {
 			}
 
 			if let valid = saleItem.getValidUntil() {
-				assert( valid >= Clock.time(), message: "This auction listing is already expired")
+				if valid < Clock.time() {
+					panic("This auction listing is already expired")
+				}
 			}
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
@@ -401,12 +404,22 @@ pub contract FindMarketAuctionEscrow {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil)
+			let status="active_ongoing"
+			let seller=self.owner!.address
+			let buyer=callback.address
+
+			let nftInfo=saleItem.toNFTInfo(true)
+
+			let buyerName=FIND.reverseLookup(buyer!)
+			let profile = Profile.find(buyer!)
+			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
+
 		}
 
 		pub fun cancel(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
 			}
 
 			let saleItem=self.borrow(id)
@@ -422,20 +435,42 @@ pub contract FindMarketAuctionEscrow {
 			} else {
 				status = "cancel_ghostlisting"
 			}
-
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "delist item for auction"), seller: nil, buyer: nil)
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
 			
 			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
 
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
-			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil)
+
+			let status=status
+			let ftType=saleItem.getFtType()
+			let nftType=saleItem.getItemType()
+			let balance=saleItem.getBalance()
+			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
+
+			let tenant=self.getTenant()
+
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "delist item for auction"), seller: nil, buyer: nil)
+
+			if !actionResult.allowed {
+				panic(actionResult.message)
+			}
+
+			var nftInfo:FindMarket.NFTInfo?=nil 
+			if saleItem.checkPointer() {
+				nftInfo=saleItem.toNFTInfo(false)
+			}
+
+			let buyer=saleItem.getBuyer()
+			if buyer != nil {
+				let buyerName=FIND.reverseLookup(buyer!)
+				let profile = Profile.find(buyer!)
+				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
+			} else {
+				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, endsAt: saleItem.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
+			}
+
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(id)
 			}
@@ -445,9 +480,12 @@ pub contract FindMarketAuctionEscrow {
 
 		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
 		pub fun fulfillAuction(_ id: UInt64) {
-			pre {
-				self.items.containsKey(id) : "Invalid id=".concat(id.toString())
-				self.borrow(id).auctionStartPrice != nil : "Cannot fulfill sale that is not an auction=".concat(id.toString())
+
+			if !self.items.containsKey(id) {
+				panic("Invalid id=".concat(id.toString()))
+			}
+			if self.borrow(id).auctionStartPrice == nil {
+				panic("Cannot fulfill sale that is not an auction=".concat(id.toString()))
 			}
 
 			let saleItem = self.borrow(id)
@@ -457,26 +495,47 @@ pub contract FindMarketAuctionEscrow {
 					panic("Auction has not ended yet")
 				}
 
-				let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name: "fulfill auction"), seller: self.owner!.address, buyer: saleItem.offerCallback!.address)
+				let tenant=self.getTenant()
+				let nftType= saleItem.getItemType()
+				let ftType= saleItem.getFtType()
+
+				let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "fulfill auction"), seller: self.owner!.address, buyer: saleItem.offerCallback!.address)
 
 				if !actionResult.allowed {
 					panic(actionResult.message)
 				}
 
-				let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+				let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType)
 
 				if !saleItem.hasAuctionMetReservePrice() {
 					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
 					return
 				}
 
-				let nftInfo= saleItem.toNFTInfo()
+				let nftInfo= saleItem.toNFTInfo(false)
 				let royalty=saleItem.getRoyalty()
 
-				self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
+				let status="sold"
+				let balance=saleItem.getBalance()
+				let seller=self.owner!.address
+
+				let buyer=saleItem.getBuyer()!
+
+				let buyerName=FIND.reverseLookup(buyer)
+				let sellerName = FIND.reverseLookup(seller)
+				let profile = Profile.find(buyer!)
+				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: sellerName, amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 				let vault <- saleItem.acceptEscrowedBid()
-				FindMarket.pay(tenant:self.getTenant().name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, rewardFN: FIND.rewardFN())
+
+				let resolved : {Address : String} = {}
+				resolved[buyer] = buyerName ?? ""
+				resolved[seller] = sellerName ?? ""
+				resolved[FindMarketAuctionEscrow.account.address] =  "find" 
+				// Have to make sure the tenant always have the valid find name 
+				resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
+
+				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved,rewardFN: FIND.rewardFN())
 
 				destroy <- self.items.remove(key: id)
 				return 
@@ -489,17 +548,31 @@ pub contract FindMarketAuctionEscrow {
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
-			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name: "list item for auction"), seller: self.owner!.address, buyer: nil)
+			let tenant=self.getTenant()
+			let nftType= saleItem.getItemType()
+			let ftType= saleItem.getFtType()
+
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:true, name: "list item for auction"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
+			let id=pointer.getUUID()
 
-			assert(self.items[pointer.getUUID()] == nil , message: "Auction listing for this item is already created.")
+			if self.items[id] != nil {
+				panic("Auction listing for this item is already created.")
+			}
 
-			self.items[pointer.getUUID()] <-! saleItem
-			let saleItemRef = self.borrow(pointer.getUUID())
-			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil)
+			self.items[id] <-! saleItem
+			let saleItemRef = self.borrow(id)
+
+			let status = "active_listed"
+			let balance=auctionStartPrice
+			let seller=self.owner!.address
+
+			let nftInfo=saleItemRef.toNFTInfo(true)
+
+			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItemRef.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, endsAt: saleItemRef.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
 
 		}
 
@@ -512,15 +585,15 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun borrow(_ id: UInt64): &SaleItem {
-			pre{
-				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.items.containsKey(id)  {
+				panic("This id does not exist.".concat(id.toString()))
 			}
 			return (&self.items[id] as &SaleItem?)!
 		}
 
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} {
-			pre{
-				self.items.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.items.containsKey(id)  {
+				panic("This id does not exist.".concat(id.toString()))
 			}
 			return (&self.items[id] as &SaleItem{FindMarket.SaleItem}?)!
 		}
@@ -594,8 +667,8 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check()  {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
@@ -627,28 +700,34 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
-			pre {
-				self.owner!.address != item.owner()  : "You cannot bid on your own resource"
-				self.bids[item.getUUID()] == nil : "You already have an bid for this item, use increaseBid on that bid"
+
+			if self.owner!.address == item.owner() {
+				panic("You cannot bid on your own resource")
 			}
 
 			let uuid=item.getUUID()
 
-			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
+			if self.bids[uuid] != nil {
+				panic("You already have an bid for this item, use increaseBid on that bid")
+			}
+
+			let tenant=self.getTenant()
+			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 			let vaultType=vault.getType()
 
-			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)
+			let bid <- create Bid(from: from, itemUUID:uuid, vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 
-			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[uuid] <- bid
 			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType) 
 			destroy oldToken
 		}
 
 		pub fun fulfillAuction(_ id:UInt64) {
-			pre {
-				self.bids[id] != nil : "You need to have a bid here already"
+
+			if self.bids[id] == nil {
+				panic("You need to have a bid here already")
 			}
 			let bid =self.borrowBid(id)
 			let saleItem=bid.from.borrow()!
@@ -656,8 +735,8 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun increaseBid(id: UInt64, vault: @FungibleToken.Vault) {
-			pre {
-				self.bids[id] != nil : "You need to have a bid here already"
+			if self.bids[id] == nil {
+				panic("You need to have a bid here already")
 			}
 			let bid =self.borrowBid(id)
 
@@ -684,15 +763,15 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun borrowBid(_ id: UInt64): &Bid {
-			pre{
-				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.bids.containsKey(id)  {
+				panic("This id does not exist.".concat(id.toString()))
 			}
 			return (&self.bids[id] as &Bid?)!
 		}
 
 		pub fun borrowBidItem(_ id: UInt64): &{FindMarket.Bid} {
-			pre{
-				self.bids.containsKey(id) : "This id does not exist.".concat(id.toString())
+			if !self.bids.containsKey(id)  {
+				panic("This id does not exist.".concat(id.toString()))
 			}
 			return (&self.bids[id] as &Bid{FindMarket.Bid}?)!
 		}
@@ -717,8 +796,8 @@ pub contract FindMarketAuctionEscrow {
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		if FindMarket.getTenantCapability(marketplace) == nil {
+			panic("Invalid tenant")
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
@@ -727,8 +806,8 @@ pub contract FindMarketAuctionEscrow {
 	}
 
 	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		if FindMarket.getTenantCapability(marketplace) == nil {
+			panic("Invalid tenant")
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))

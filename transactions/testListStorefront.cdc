@@ -32,9 +32,13 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
         let exampleNFTCollectionProviderPrivatePath = /private/exampleNFTCollectionProviderForNFTStorefront
 
         self.flowReceiver = acct.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-        assert(self.flowReceiver.borrow() != nil, message: "Missing or mis-typed FlowToken receiver")
+        if self.flowReceiver.borrow() == nil {
+            panic("Missing or mis-typed FlowToken receiver")
+        }
         self.exampleNFTProvider = acct.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(Dandy.CollectionPrivatePath)
-        assert(self.exampleNFTProvider.borrow() != nil, message: "Missing or mis-typed ExampleNFT.Collection provider")
+        if self.exampleNFTProvider.borrow() == nil {
+            panic("Missing or mis-typed ExampleNFT.Collection provider")
+        }
 
         self.storefront = acct.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath)
             ?? panic("Missing or mis-typed NFTStorefront Storefront")

@@ -25,8 +25,11 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifiers: 
 	
 	prepare(account: AuthAccount) {
 
-		assert(nftAliasOrIdentifiers.length == ids.length , message: "The length of arrays passed in has to be the same")
-		assert(nftAliasOrIdentifiers.length == directSellPrices.length , message: "The length of arrays passed in has to be the same")
+		if nftAliasOrIdentifiers.length != ids.length {
+			panic("The length of arrays passed in has to be the same")
+		} else if nftAliasOrIdentifiers.length != directSellPrices.length {
+			panic("The length of arrays passed in has to be the same")
+		}
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register

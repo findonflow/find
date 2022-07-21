@@ -138,8 +138,8 @@ pub contract FindToken : FungibleToken {
 
     pub resource Minter {
         pub fun mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
-            pre {
-                amount > 0.0: "Amount minted must be greater than zero"
+            if amount == 0.0 {
+                panic("Amount minted must be greater than zero")
             }
             FindToken.totalSupply = FindToken.totalSupply + amount 
             emit TokensMinted(amount: amount)
@@ -147,8 +147,8 @@ pub contract FindToken : FungibleToken {
         }
 
         pub fun setRewardMultiplier(_ multiplier: UFix64) {
-            pre{
-                multiplier > 0.0 : "Multiplier cannot be less than 0.0"
+            if multiplier != 0.0 {
+                panic("Multiplier must be greater than 0.0")
             }
             FindToken.taskRewardsMultiplier = multiplier
             emit TokenRewardMultiplier(multiplier: multiplier)

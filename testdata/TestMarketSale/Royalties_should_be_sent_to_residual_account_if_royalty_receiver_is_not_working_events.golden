@@ -9,21 +9,9 @@
     "endsAt": 301,
     "id": 281,
     "nft": {
-      "collectionDescription": "Neo Collectibles FIND",
-      "collectionName": "user1",
-      "editionNumber": 1,
-      "id": 281,
+      "id": 229,
       "name": "Neo Motorcycle 1 of 3",
-      "scalars": {
-        "Speed": 100,
-        "edition_set_max": 3,
-        "edition_set_number": 1
-      },
-      "tags": {
-        "NeoMotorCycleTag": "Tag1"
-      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "saleID": 284,
@@ -42,21 +30,9 @@
     "findName": "user1",
     "id": 281,
     "nft": {
-      "collectionDescription": "Neo Collectibles FIND",
-      "collectionName": "user1",
-      "editionNumber": 1,
-      "id": 281,
+      "id": 229,
       "name": "Neo Motorcycle 1 of 3",
-      "scalars": {
-        "Speed": 100,
-        "edition_set_max": 3,
-        "edition_set_number": 1
-      },
-      "tags": {
-        "NeoMotorCycleTag": "Tag1"
-      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "residualAddress": "0x01cf0e2f2f715450",
@@ -71,23 +47,12 @@
   "fields": {
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
-    "id": 281,
+    "findName": "find",
+    "id": 229,
     "nft": {
-      "collectionDescription": "Neo Collectibles FIND",
-      "collectionName": "user1",
-      "editionNumber": 1,
-      "id": 281,
+      "id": 229,
       "name": "Neo Motorcycle 1 of 3",
-      "scalars": {
-        "Speed": 100,
-        "edition_set_max": 3,
-        "edition_set_number": 1
-      },
-      "tags": {
-        "NeoMotorCycleTag": "Tag1"
-      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
@@ -101,23 +66,12 @@
   "fields": {
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.35,
-    "id": 281,
+    "findName": "find",
+    "id": 229,
     "nft": {
-      "collectionDescription": "Neo Collectibles FIND",
-      "collectionName": "user1",
-      "editionNumber": 1,
-      "id": 281,
+      "id": 229,
       "name": "Neo Motorcycle 1 of 3",
-      "scalars": {
-        "Speed": 100,
-        "edition_set_max": 3,
-        "edition_set_number": 1
-      },
-      "tags": {
-        "NeoMotorCycleTag": "Tag1"
-      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",

@@ -93,10 +93,9 @@ pub contract FIND {
 	/// Calculate the cost of an name
 	/// @param _ the name to calculate the cost for
 	pub fun calculateCost(_ name:String) : UFix64 {
-		pre {
-			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+		if !FIND.validateFindName(name) {
+			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 		}
-
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.calculateCost(name)
@@ -125,8 +124,8 @@ pub contract FIND {
 
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
-		pre {
-			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+		if !FIND.validateFindName(name) {
+			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -215,8 +214,9 @@ pub contract FIND {
 	/// @param vault: The vault to send too
 	/// @param from: The sender that sent the funds
 	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token) {
-		pre {
-			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+
+		if !FIND.validateFindName(to) {
+			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -233,8 +233,8 @@ pub contract FIND {
 	/// @param to: The name to send money too
 	/// @param from: The vault to send too
 	pub fun deposit(to:String, from: @FungibleToken.Vault) {
-		pre {
-			FIND.validateFindName(to) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+		if !FIND.validateFindName(to) {
+			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -248,8 +248,8 @@ pub contract FIND {
 	/// Return the status for a given name
 	/// @return The Name status of a name
 	pub fun status(_ name: String): NameStatus {
-		pre {
-			FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+		if !FIND.validateFindName(name) {
+			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
@@ -425,9 +425,12 @@ pub contract FIND {
 		access(contract) let name: String
 
 		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, name: String) {
-			pre {
-				startedAt < endsAt : "Cannot start before it will end"
-				extendOnLateBid != 0.0 : "Extends on late bid must be a non zero value"
+
+			if startedAt >= endsAt {
+				panic("Cannot start before it will end")
+			}
+			if extendOnLateBid == 0.0 {
+				panic("Extends on late bid must be a non zero value")
 			}
 			self.endsAt=endsAt
 			self.startedAt=startedAt
@@ -576,8 +579,8 @@ pub contract FIND {
 		}
 
 		pub fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
 			}
 
 			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
@@ -705,9 +708,13 @@ pub contract FIND {
 		}
 
 		access(contract) fun cancelUserBid(_ name: String) {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
-				!self.auctions.containsKey(name) : "Cannot cancel a bid that is in an auction=".concat(name)
+
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
+			}
+
+			if self.auctions.containsKey(name) {
+				panic("Cannot cancel a bid that is in an auction=".concat(name))
 			}
 
 			let lease= self.borrow(name)
@@ -731,15 +738,16 @@ pub contract FIND {
 		}
 
 		access(contract) fun increaseBid(_ name: String, balance: UFix64) {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
 			}
 
 			let lease = self.borrow(name)
 			let timestamp=Clock.time()
 
-			assert(balance >= lease.auctionMinBidIncrement, message: "Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
-
+			if balance < lease.auctionMinBidIncrement {
+				panic("Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
+			}
 			if self.auctions.containsKey(name) {
 				let auction = self.borrowAuction(name)
 				if auction.endsAt < timestamp {
@@ -777,8 +785,9 @@ pub contract FIND {
 		}
 
 		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
+
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
 			}
 
 			let timestamp=Clock.time()
@@ -851,8 +860,9 @@ pub contract FIND {
 
 		//cancel will cancel and auction or reject a bid if no auction has started
 		pub fun cancel(_ name: String) {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
+
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
 			}
 
 			let lease = self.borrow(name)
@@ -914,17 +924,20 @@ pub contract FIND {
 
 		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
 		pub fun fulfillAuction(_ name: String) {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
-				self.auctions.containsKey(name) : "Cannot fulfill sale that is not an auction=".concat(name)
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
+			}
+
+			if !self.auctions.containsKey(name) {
+				panic("Cannot fulfill sale that is not an auction=".concat(name))
 			}
 
 			return self.fulfill(name)
 		}
 
 		pub fun fulfill(_ name: String) {
-			pre {
-				self.leases.containsKey(name) : "Invalid name=".concat(name)
+			if !self.leases.containsKey(name) {
+				panic( "Invalid name=".concat(name))
 			}
 
 			let lease = self.borrow(name)
@@ -1016,8 +1029,9 @@ pub contract FIND {
 		}
 
 		pub fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
-			pre {
-				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+
+			if !self.leases.containsKey(name) {
+				panic("Cannot list name for sale that is not registered to you name=".concat(name))
 			}
 
 			let tokenRef = self.borrow(name)
@@ -1045,8 +1059,9 @@ pub contract FIND {
 		}
 
 		pub fun listForSale(name :String, directSellPrice:UFix64) {
-			pre {
-				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+
+			if !self.leases.containsKey(name) {
+				panic("Cannot list name for sale that is not registered to you name=".concat(name))
 			}
 
 			let tokenRef = self.borrow(name)
@@ -1056,8 +1071,9 @@ pub contract FIND {
 
 
 		pub fun delistAuction(_ name: String) {
-			pre {
-				self.leases.containsKey(name) : "Cannot delist name for sale that is not registered to you name=".concat(name)
+
+			if !self.leases.containsKey(name) {
+				panic("Cannot delist name for sale that is not registered to you name=".concat(name))
 			}
 
 			let tokenRef = self.borrow(name)
@@ -1068,8 +1084,8 @@ pub contract FIND {
 
 
 		pub fun delistSale(_ name: String) {
-			pre {
-				self.leases.containsKey(name) : "Cannot list name for sale that is not registered to you name=".concat(name)
+			if !self.leases.containsKey(name) {
+				panic("Cannot list name for sale that is not registered to you name=".concat(name))
 			}
 
 			let tokenRef = self.borrow(name)
@@ -1298,8 +1314,9 @@ pub contract FIND {
 
 		//everybody can call register, normally done through the convenience method in the contract
 		pub fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
-			pre {
-				name.length >= 3 : "A FIND name has to be minimum 3 letters long"
+
+			if name.length < 3 {
+				panic( "A FIND name has to be minimum 3 letters long")
 			}
 
 			let nameStatus=self.readStatus(name)
@@ -1322,9 +1339,12 @@ pub contract FIND {
 		}
 
 		access(account) fun internal_register(name: String, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
-			pre {
-				name.length >= 3 : "A FIND name has to be minimum 3 letters long"
-				leases.check() : "The lease collection capability is invalid."
+
+			if name.length < 3 {
+				panic("A FIND name has to be minimum 3 letters long")
+			}
+			if !leases.check() {
+				panic("The lease collection capability is invalid.")
 			}
 
 			let nameStatus=self.readStatus(name)
@@ -1496,8 +1516,8 @@ pub contract FIND {
 		//called from lease when auction is ended
 		//if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
 		access(contract) fun fulfillLease(_ token: @FIND.Lease) : @FungibleToken.Vault{
-			pre{
-				self.leases.check() : "The lease collection capability is invalid."
+			if !self.leases.check() {
+				panic("The lease collection capability is invalid.")
 			}
 			let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
@@ -1516,8 +1536,8 @@ pub contract FIND {
 		//called from lease when things are canceled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancel(_ name: String) {
-			pre{
-				self.receiver.check() : "This user does not have receiving vault set up. User: ".concat(self.owner!.address.toString())
+			if !self.receiver.check() {
+				panic("This user does not have receiving vault set up. User: ".concat(self.owner!.address.toString()))
 			}
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
