@@ -337,4 +337,43 @@ func TestFIND(t *testing.T) {
 			AssertFailure("This addon is not available.")
 
 	})
+
+	t.Run("Should be able to fund users with profile but without find name", func(t *testing.T) {
+
+		user := "user1"
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, user).
+			createUser(100.0, "user2").
+			setProfile(user).
+			setProfile("user2").
+			registerUser(user).
+			registerFtInRegistry()
+
+		user2 := otu.accountAddress("user2")
+
+		otu.O.Tx("sendFT",
+			overflow.SignProposeAndPayAs(user),
+			overflow.Arg("name", user2),
+			overflow.Arg("amount", 10.0),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("tag", `""`),
+			overflow.Arg("message", `""`),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FungibleTokenSent")
+
+		otu.O.Tx("sendFT",
+			overflow.SignProposeAndPayAs("user2"),
+			overflow.Arg("name", user),
+			overflow.Arg("amount", 10.0),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("tag", `""`),
+			overflow.Arg("message", `""`),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FungibleTokenSent")
+
+	})
+
 }
