@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"strconv"
+
 	. "github.com/bjartek/overflow"
 )
 
@@ -50,8 +53,9 @@ func main() {
 
 	number := 10
 	price := 1.0
-	nftIdentifier := "Dandy"
-	ftIdentifier := "Flow"
+	priceString := fmt.Sprintf("%.1f", price)
+	nftIdentifier := `"Dandy"`
+	ftIdentifier := `"Flow"`
 	seller := "user1"
 
 	o := Overflow(
@@ -66,10 +70,10 @@ func main() {
 	// 	Arg("amount", 50.0),
 	// )
 
-	o.Tx("createprofile",
-		SignProposeAndPayAs("user2"),
-		Arg("name", "user2"),
-	)
+	// o.Tx("createprofile",
+	// 	SignProposeAndPayAs("user2"),
+	// 	Arg("name", "user2"),
+	// )
 
 	ids := o.Tx("testMintDandyTO",
 		SignProposeAndPayAs("user1"),
@@ -81,22 +85,55 @@ func main() {
 		Arg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
 		Arg("rarity", "rare"),
 		Arg("rarityNum", 50.0),
-		Arg("to", "user2"),
+		Arg("to", "user1"),
 	).
-		GetIdsFromEvent("Sale", "id")
+		GetIdsFromEvent("Deposit", "id")
 
-	saleIds := ids[:number]
+	// ids := []uint64{
+	// 	100257850,
+	// 	100257851,
+	// 	100257852,
+	// 	100257853,
+	// 	100257854,
+	// 	100257855,
+	// 	100257856,
+	// 	100257857,
+	// 	100257858,
+	// 	100257859,
+	// }
 
-	var prices []float64
-	var nftIdentifiers []string
-	var ftIdentifiers []string
-	var sellers []string
-	for len(prices) < number {
-		prices = append(prices, price)
-		nftIdentifiers = append(nftIdentifiers, nftIdentifier)
-		ftIdentifiers = append(ftIdentifiers, ftIdentifier)
+	saleIds := fmt.Sprint(`[ `, ids[0])
+
+	prices := `[ ` + priceString
+	var nftIdentifiers string = `[ "Dandy" `
+	var ftIdentifiers string = ` [ "Flow" `
+
+	sellers := make([]string, 1)
+	sellers[0] = seller
+	i := 1
+	for i < number {
+		id := fmt.Sprint(ids[i])
+		saleIds = saleIds + ` , ` + id
+		prices = prices + ` , ` + priceString
+		nftIdentifiers = nftIdentifiers + ` , ` + nftIdentifier
+		ftIdentifiers = ftIdentifiers + ` , ` + ftIdentifier
 		sellers = append(sellers, seller)
+
+		i++
 	}
+	saleIds = saleIds + ` ]`
+	nftIdentifiers = nftIdentifiers + ` ]`
+	ftIdentifiers = ftIdentifiers + ` ]`
+	prices = prices + ` ]`
+
+	returnTime, _ := o.Script(`import Clock from "../contracts/Clock.cdc"
+	pub fun main() :  UFix64 {
+		return Clock.time()
+	}`).GetAsJson()
+
+	time, _ := strconv.ParseFloat(returnTime, 64)
+
+	fmt.Println(time + 1000000.0)
 
 	o.Tx("listMultipleNFTForSale",
 		SignProposeAndPayAs("user1"),
@@ -105,10 +142,10 @@ func main() {
 		Arg("ids", saleIds),
 		Arg("ftAliasOrIdentifiers", ftIdentifiers),
 		Arg("directSellPrices", prices),
-		Arg("validUntil", nil))
+		Arg("validUntil", time+100000.0))
 
 	o.Tx("buyMultipleNFTForSale",
-		SignProposeAndPayAs("user1"),
+		SignProposeAndPayAs("user2"),
 		Arg("marketplace", "find"),
 		Addresses("users", sellers...),
 		Arg("ids", saleIds),
