@@ -549,6 +549,17 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
+			
+			// ensure it is not a 0 dollar listing
+			if vault.balance <= 0.0 {
+				panic("Offer price should be greater than 0.")
+			}
+
+			// ensure validUntil is valid
+			if validUntil != nil && validUntil! < Clock.time() {
+				panic("Valid until is before current time. ")
+			}
+
 			if self.owner!.address == item.owner() {
 				panic("You cannot bid on your own resource")
 			}

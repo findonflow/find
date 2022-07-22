@@ -528,6 +528,21 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
+			// ensure it is not a 0 dollar listing
+			if auctionStartPrice <= 0.0 {
+				panic("Auction start price should be greater than 0")
+			}
+
+			// ensure it is not a 0 dollar listing
+			if auctionReservePrice < auctionStartPrice {
+				panic("Auction reserve price should be greater than Auction Start Price")
+			}
+
+			// ensure validUntil is valid
+			if auctionValidUntil != nil && auctionValidUntil! < Clock.time() {
+				panic("Valid until is before current time")
+			}
+
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
 			let tenant = self.getTenant()
