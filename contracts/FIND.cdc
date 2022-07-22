@@ -221,18 +221,10 @@ pub contract FIND {
 	/// @param from: The sender that sent the funds
 	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token) {
 
-		if !FIND.validateFindName(to) {
-			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
-		}
-
-		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-			let profile=network.lookup(to) ?? panic("could not find name")
-			let fromAddress= from.owner!.address
-			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
-			profile.deposit(from: <- vault)
-			return 
-		}
-		panic("Network is not set up")
+		let profile=FIND.lookup(to) ?? panic("Cannot borrow reference to user. Name : ".concat(to))
+		let fromAddress= from.owner!.address
+		emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
+		profile.deposit(from: <- vault)
 	}
 
 	/// Deposit FT to name
