@@ -7,12 +7,9 @@ pub contract FindRewardToken {
     access(contract) let tenantTokenCapabilities: {Address : Capability<&{FindReward , VaultViews, FungibleToken.Provider}>}
 
     pub resource interface VaultViews {
-        pub var balance: UFix64 
 
-        pub fun getViews() : [Type]
-        pub fun resolveView(_ view: Type): AnyStruct?
     }
-
+	// Deprecated in testnet
     pub struct FTVaultData {
         pub let tokenAlias: String
         pub let storagePath: StoragePath
@@ -63,7 +60,7 @@ pub contract FindRewardToken {
     }
 
     pub resource interface FindReward {
-        pub fun reward(receiver: Address, task: String) : UFix64?
+
     } 
 
     access(account) fun addTenantRewardToken(tenant: Address, cap: Capability<&{FindReward, VaultViews, FungibleToken.Provider}>) {

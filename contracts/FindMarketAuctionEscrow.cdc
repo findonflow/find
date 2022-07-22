@@ -459,7 +459,7 @@ pub contract FindMarketAuctionEscrow {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(false)
+				nftInfo=saleItem.toNFTInfo(true)
 			}
 
 			let buyer=saleItem.getBuyer()
@@ -512,7 +512,7 @@ pub contract FindMarketAuctionEscrow {
 					return
 				}
 
-				let nftInfo= saleItem.toNFTInfo(false)
+				let nftInfo= saleItem.toNFTInfo(true)
 				let royalty=saleItem.getRoyalty()
 
 				let status="sold"

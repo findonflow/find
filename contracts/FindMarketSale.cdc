@@ -207,8 +207,7 @@ pub contract FindMarketSale {
 
 			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType)
 
-
-			let nftInfo= saleItem.toNFTInfo(false)
+			let nftInfo= saleItem.toNFTInfo(true)
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
 			let buyerName=FIND.reverseLookup(buyer)
@@ -277,7 +276,7 @@ pub contract FindMarketSale {
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(false)
+				nftInfo=saleItem.toNFTInfo(true)
 			}
 
 			let owner=self.owner!.address
