@@ -142,13 +142,15 @@ func main() {
 		Arg("directSellPrices", prices),
 		Arg("validUntil", time+100000.0))
 
+	fmt.Println(saleIds)
+
 	o.Tx("buyMultipleNFTForSale",
 		SignProposeAndPayAs("user2"),
 		Arg("marketplace", "find"),
 		Addresses("users", sellers...),
 		Arg("ids", saleIds),
 		Arg("amounts", prices),
-		Gas(9999),
+		Gas(2300),
 	)
 
 }
