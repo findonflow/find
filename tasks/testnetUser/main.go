@@ -67,7 +67,7 @@ func main() {
 	// o.Tx("adminSendFlow",
 	// 	SignProposeAndPayAs("account"),
 	// 	Arg("receiver", "user2"),
-	// 	Arg("amount", 50.0),
+	// 	Arg("amount", 10.0),
 	// )
 
 	// o.Tx("createprofile",
@@ -78,7 +78,7 @@ func main() {
 	ids := o.Tx("testMintDandyTO",
 		SignProposeAndPayAs("user1"),
 		Arg("name", "user1"),
-		Arg("maxEdition", 3),
+		Arg("maxEdition", 12),
 		Arg("artist", "Neo"),
 		Arg("nftName", "Neo Motorcycle"),
 		Arg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
@@ -90,16 +90,16 @@ func main() {
 		GetIdsFromEvent("Deposit", "id")
 
 	// ids := []uint64{
-	// 	100257850,
-	// 	100257851,
-	// 	100257852,
-	// 	100257853,
-	// 	100257854,
-	// 	100257855,
-	// 	100257856,
-	// 	100257857,
-	// 	100257858,
-	// 	100257859,
+	// 	100293819,
+	// 	100293820,
+	// 	100293821,
+	// 	100293822,
+	// 	100293823,
+	// 	100293824,
+	// 	100293825,
+	// 	100293826,
+	// 	100293827,
+	// 	100293828,
 	// }
 
 	saleIds := fmt.Sprint(`[ `, ids[0])
@@ -133,8 +133,6 @@ func main() {
 
 	time, _ := strconv.ParseFloat(returnTime, 64)
 
-	fmt.Println(time + 1000000.0)
-
 	o.Tx("listMultipleNFTForSale",
 		SignProposeAndPayAs("user1"),
 		Arg("marketplace", "find"),
@@ -149,6 +147,8 @@ func main() {
 		Arg("marketplace", "find"),
 		Addresses("users", sellers...),
 		Arg("ids", saleIds),
-		Arg("amounts", prices))
+		Arg("amounts", prices),
+		Gas(9999),
+	)
 
 }
