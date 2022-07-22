@@ -509,6 +509,16 @@ pub contract FindLeaseMarketDirectOfferSoft {
 				self.bids[name] == nil : "You already have an bid for this item, use increaseBid on that bid"
 			}
 
+			// ensure it is not a 0 dollar listing
+			if amount <= 0.0 {
+				panic("Offer price should be greater than 0")
+			}
+
+			// ensure validUntil is valid
+			if validUntil != nil && validUntil! < Clock.time() {
+				panic("Valid until is before current time")
+			}
+
 			let from=getAccount(FIND.status(name).owner!).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
 			let bid <- create Bid(from: from, leaseName: name, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)

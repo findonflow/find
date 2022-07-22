@@ -119,6 +119,60 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.moveNameTo("user2", "user1", "name1")
 	})
 
+	t.Run("Should not be able to list with price 0", func(t *testing.T) {
+
+		otu.O.Tx(
+			"ListLeaseForAuctionSoft",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("price", 0.0),
+			overflow.Arg("auctionReservePrice", price+5.0),
+			overflow.Arg("auctionDuration", 300.0),
+			overflow.Arg("auctionExtensionOnLateBid", 60.0),
+			overflow.Arg("minimumBidIncrement", 1.0),
+			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+		).
+			AssertFailure(t, "Auction start price should be greater than 0")
+
+	})
+
+	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
+
+		otu.O.Tx(
+			"ListLeaseForAuctionSoft",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("price", price),
+			overflow.Arg("auctionReservePrice", price-5.0),
+			overflow.Arg("auctionDuration", 300.0),
+			overflow.Arg("auctionExtensionOnLateBid", 60.0),
+			overflow.Arg("minimumBidIncrement", 1.0),
+			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+		).
+			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
+
+	})
+
+	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
+
+		otu.O.Tx(
+			"ListLeaseForAuctionSoft",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("price", price),
+			overflow.Arg("auctionReservePrice", price+5.0),
+			overflow.Arg("auctionDuration", 300.0),
+			overflow.Arg("auctionExtensionOnLateBid", 60.0),
+			overflow.Arg("minimumBidIncrement", 1.0),
+			overflow.Arg("auctionValidUntil", 0.0),
+		).
+			AssertFailure(t, "Valid until is before current time")
+
+	})
+
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
 
 		otu.listLeaseForSoftAuction("user1", "name1", price).
@@ -277,7 +331,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -353,7 +407,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -542,7 +596,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).
 			AssertFailure("Seller banned by Tenant")
 		// Should not be able to bid

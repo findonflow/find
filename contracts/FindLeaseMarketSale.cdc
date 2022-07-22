@@ -196,6 +196,15 @@ pub contract FindLeaseMarketSale {
 
 		pub fun listForSale(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
 
+			// ensure it is not a 0 dollar listing
+			if directSellPrice <= 0.0 {
+				panic("Listing price should be greater than 0")
+			}
+
+			if validUntil != nil && validUntil! < Clock.time() {
+				panic("Valid until is before current time")
+			}
+
 			// What happends if we relist  
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
