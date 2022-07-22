@@ -535,7 +535,7 @@ pub contract FindMarketAuctionSoft {
 
 			// ensure it is not a 0 dollar listing
 			if auctionReservePrice < auctionStartPrice {
-				panic("Auction reserve price should be greater than Auction Start Price")
+				panic("Auction reserve price should be greater than Auction start price")
 			}
 
 			// ensure validUntil is valid

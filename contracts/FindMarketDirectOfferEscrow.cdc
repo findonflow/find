@@ -552,12 +552,12 @@ pub contract FindMarketDirectOfferEscrow {
 			
 			// ensure it is not a 0 dollar listing
 			if vault.balance <= 0.0 {
-				panic("Offer price should be greater than 0.")
+				panic("Offer price should be greater than 0")
 			}
 
 			// ensure validUntil is valid
 			if validUntil != nil && validUntil! < Clock.time() {
-				panic("Valid until is before current time. ")
+				panic("Valid until is before current time")
 			}
 
 			if self.owner!.address == item.owner() {

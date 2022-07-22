@@ -511,12 +511,12 @@ pub contract FindLeaseMarketDirectOfferSoft {
 
 			// ensure it is not a 0 dollar listing
 			if amount <= 0.0 {
-				panic("Offer price should be greater than 0.")
+				panic("Offer price should be greater than 0")
 			}
 
 			// ensure validUntil is valid
 			if validUntil != nil && validUntil! < Clock.time() {
-				panic("Valid until is before current time. ")
+				panic("Valid until is before current time")
 			}
 
 			let from=getAccount(FIND.status(name).owner!).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))

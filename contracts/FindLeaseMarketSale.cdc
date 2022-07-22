@@ -198,11 +198,11 @@ pub contract FindLeaseMarketSale {
 
 			// ensure it is not a 0 dollar listing
 			if directSellPrice <= 0.0 {
-				panic("Listing price should be greater than 0.")
+				panic("Listing price should be greater than 0")
 			}
 
 			if validUntil != nil && validUntil! < Clock.time() {
-				panic("Valid until is before current time. ")
+				panic("Valid until is before current time")
 			}
 
 			// What happends if we relist  

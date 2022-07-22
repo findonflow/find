@@ -548,17 +548,17 @@ pub contract FindMarketAuctionEscrow {
 
 			// ensure it is not a 0 dollar listing
 			if auctionStartPrice <= 0.0 {
-				panic("Auction start price should be greater than 0.")
+				panic("Auction start price should be greater than 0")
 			}
 
 			// ensure it is not a 0 dollar listing
-			if auctionReservePrice <= 0.0 {
-				panic("Auction reserve price should be greater than 0.")
+			if auctionReservePrice < auctionStartPrice {
+				panic("Auction reserve price should be greater than Auction start price")
 			}
 
 			// ensure validUntil is valid
 			if auctionValidUntil != nil && auctionValidUntil! < Clock.time() {
-				panic("Valid until is before current time. ")
+				panic("Valid until is before current time")
 			}
 			
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)

@@ -160,7 +160,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			overflow.Arg("minimumBidIncrement", 1.0),
 			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
 		).
-			AssertFailure(t, "Auction reserve price should be greater than Auction Start Price")
+			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
 
 	})
 
