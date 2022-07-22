@@ -1,5 +1,6 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FindRewardToken from "../contracts/FindRewardToken.cdc"
 import Clock from "../contracts/Clock.cdc"
 
 pub contract FindToken : FungibleToken {
@@ -10,6 +11,7 @@ pub contract FindToken : FungibleToken {
 
     pub event TokensMinted(amount: UFix64)
     pub event TokensBurned(amount: UFix64)
+    pub event TokenRewardMultiplier(multiplier: UFix64)
 
     pub let tokenAlias: String
     pub var totalSupply: UFix64
@@ -21,8 +23,9 @@ pub contract FindToken : FungibleToken {
     pub let balancePublicPath: PublicPath 
     pub let providerPath: PrivatePath 
     pub let minterPath: StoragePath 
+    pub let findRewardPath: PrivatePath 
 
-    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews {
+    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews, FindRewardToken.VaultViews , FindRewardToken.FindReward {
 
         pub var balance: UFix64 
         
@@ -144,6 +147,9 @@ pub contract FindToken : FungibleToken {
         self.account.save(<- minter, to: self.minterPath)
 
         emit TokensInitialized(initialSupply: self.initialSupply)
+
+        // Extra Field (to be deleted)
+        self.findRewardPath = /private/findTokenReward
     }
 
 }
