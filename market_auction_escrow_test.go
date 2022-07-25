@@ -61,7 +61,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).AssertFailure("Auction listing for this item is already created.")
 
 		otu.delistAllNFTForEscrowedAuction("user1")
@@ -121,6 +121,63 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
 			}))
+	})
+
+	t.Run("Should not be able to list with price 0", func(t *testing.T) {
+
+		otu.O.Tx(
+			"listNFTForAuctionSoft",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("marketplace", "account"),
+			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("id", id),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("price", 0.0),
+			overflow.Arg("auctionReservePrice", price+5.0),
+			overflow.Arg("auctionDuration", 300.0),
+			overflow.Arg("auctionExtensionOnLateBid", 60.0),
+			overflow.Arg("minimumBidIncrement", 1.0),
+			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+		).
+			AssertFailure(t, "Auction start price should be greater than 0")
+	})
+
+	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
+
+		otu.O.Tx(
+			"listNFTForAuctionSoft",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("marketplace", "account"),
+			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("id", id),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("price", price),
+			overflow.Arg("auctionReservePrice", price-5.0),
+			overflow.Arg("auctionDuration", 300.0),
+			overflow.Arg("auctionExtensionOnLateBid", 60.0),
+			overflow.Arg("minimumBidIncrement", 1.0),
+			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+		).
+			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
+	})
+
+	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
+
+		otu.O.Tx(
+			"listNFTForAuctionSoft",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("marketplace", "account"),
+			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("id", id),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("price", price),
+			overflow.Arg("auctionReservePrice", price+5.0),
+			overflow.Arg("auctionDuration", 300.0),
+			overflow.Arg("auctionExtensionOnLateBid", 60.0),
+			overflow.Arg("minimumBidIncrement", 1.0),
+			overflow.Arg("auctionValidUntil", otu.currentTime()-10.0),
+		).
+			AssertFailure(t, "Valid until is before current time")
 	})
 
 	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
@@ -356,7 +413,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -442,7 +499,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -684,7 +741,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UFix64(300.0).
 				UFix64(60.0).
 				UFix64(1.0).
-				UFix64(10.0)).
+				UFix64(otu.currentTime() + 10.0)).
 			Test(otu.T).
 			AssertFailure("Seller banned by Tenant")
 

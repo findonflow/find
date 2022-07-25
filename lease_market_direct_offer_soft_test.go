@@ -58,6 +58,34 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			sendFT("user1", "user2", "Flow", price)
 	})
 
+	t.Run("Should not be able to offer with price 0", func(t *testing.T) {
+
+		otu.O.Tx(
+			"bidLeaseMarketDirectOfferSoft",
+			overflow.SignProposeAndPayAs("user2"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("amount", 0.0),
+			overflow.Arg("validUntil", otu.currentTime()+10.0),
+		).
+			AssertFailure(t, "Offer price should be greater than 0")
+
+	})
+
+	t.Run("Should not be able to offer with invalid time", func(t *testing.T) {
+
+		otu.O.Tx(
+			"bidLeaseMarketDirectOfferSoft",
+			overflow.SignProposeAndPayAs("user2"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("amount", price),
+			overflow.Arg("validUntil", 0.0),
+		).
+			AssertFailure(t, "Valid until is before current time")
+
+	})
+
 	t.Run("Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
 
 		otu.destroyLeaseCollection("user2").
@@ -136,7 +164,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertFailure("You cannot bid on your own resource")
 
 	})
@@ -167,7 +195,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -218,7 +246,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -332,7 +360,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(price + 10.0).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -344,7 +372,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(price + 10.0).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -478,7 +506,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name3").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Seller banned by Tenant")
 
@@ -525,7 +553,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name3").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Buyer banned by Tenant")
 
@@ -567,7 +595,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(newPrice).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
