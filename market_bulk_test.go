@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestBulkMarketSale(t *testing.T) {
@@ -19,6 +19,12 @@ func TestBulkMarketSale(t *testing.T) {
 		setFlowDandyMarketOption("Sale").
 		setProfile("user1").
 		setProfile("user2")
+
+	otu.O.Tx("testMintFlow", saSigner,
+		WithArg("recipient", "user2"),
+		WithArg("amount", 1000.0),
+	).AssertSuccess(t)
+
 	price := 10.0
 	items := otu.mintThreeExampleDandies()
 	items2 := otu.mintThreeExampleDandies()
@@ -82,9 +88,9 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id2).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(1000)
+			AssertComputationLessThenOrEqual(700)
 
-		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
+		result.Result.Print(WithMeter(), WithoutEvents())
 
 	})
 
@@ -98,9 +104,9 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
 				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(10000)
+			AssertComputationLessThenOrEqual(2000)
 
-		result.Result.Print(overflow.WithMeter(), overflow.WithoutEvents())
+		result.Result.Print(WithMeter(), WithoutEvents())
 
 	})
 

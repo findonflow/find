@@ -448,10 +448,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			setFindLeaseCut(0.035)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
+		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
@@ -471,12 +468,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
-
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)

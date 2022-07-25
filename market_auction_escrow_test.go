@@ -620,11 +620,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		//TODO: why are we doing this?
-		//		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		//		status = otu.replaceID(status, []uint64{id})
-		//		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action status", status)
-
 		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
@@ -654,15 +649,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			}))
 
-			//TOOD: why are we doing this?
-			/*		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
-
-					result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
-					result = otu.replaceID(result, []uint64{id})
-					result = otu.replaceID(result, saleIDs)
-
-					otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action events", result)
-			*/
 		otu.sendDandy("user1", "user2", id)
 
 	})
@@ -676,12 +662,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			setFindCut(0.035)
 
 		otu.tickClock(500.0)
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, []uint64{id})
-
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -710,13 +691,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			}))
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
-		result = otu.replaceID(result, []uint64{id})
-		result = otu.replaceID(result, saleIDs)
-
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 		otu.sendDandy("user1", "user2", id)
 
 	})
