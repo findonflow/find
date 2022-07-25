@@ -122,7 +122,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with price 0", func(t *testing.T) {
 
 		otu.O.Tx(
-			"ListLeaseForAuctionSoft",
+			"listLeaseForAuctionSoft",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("ftAliasOrIdentifier", "Flow"),
@@ -140,7 +140,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
 
 		otu.O.Tx(
-			"ListLeaseForAuctionSoft",
+			"listLeaseForAuctionSoft",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("ftAliasOrIdentifier", "Flow"),
@@ -158,7 +158,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
 		otu.O.Tx(
-			"ListLeaseForAuctionSoft",
+			"listLeaseForAuctionSoft",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("ftAliasOrIdentifier", "Flow"),
