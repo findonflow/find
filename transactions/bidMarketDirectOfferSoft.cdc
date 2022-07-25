@@ -79,18 +79,8 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 			)
 		}
 
-	  let dandyCapPub= account.getCapability<&{Dandy.CollectionPublic}>(Dandy.CollectionPublicPath)
-		if !dandyCapPub.check() {
-			account.unlink(Dandy.CollectionPublicPath)
-			account.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
-				Dandy.CollectionPublicPath,
-				target: Dandy.CollectionStoragePath
-			)
-		}
-
 		let dandyCapPrivate= account.getCapability<&{Dandy.CollectionPublic}>(Dandy.CollectionPrivatePath)
-		if !dandyCapPub.check() {
-			account.unlink(Dandy.CollectionPrivatePath)
+		if !dandyCapPrivate.check() {
 			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPrivatePath,
 				target: Dandy.CollectionStoragePath
