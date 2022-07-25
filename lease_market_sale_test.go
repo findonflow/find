@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -52,11 +52,11 @@ func TestLeaseMarketSale(t *testing.T) {
 	t.Run("Should not be able to list with price $0", func(t *testing.T) {
 
 		otu.O.Tx("listLeaseForSale",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("directSellPrice", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+100.0),
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", 0.0),
+			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Listing price should be greater than 0")
 	})
@@ -64,11 +64,11 @@ func TestLeaseMarketSale(t *testing.T) {
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
 		otu.O.Tx("listLeaseForSale",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("directSellPrice", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 	})
@@ -339,14 +339,14 @@ func TestLeaseMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
@@ -379,14 +379,14 @@ func TestLeaseMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
@@ -476,32 +476,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess()
-		/*
-			  TODO maybe add back after overflow v3
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-					"address":     otu.accountAddress("account"),
-					"amount":      "0.25000000",
-					"id":          ids[0],
-					"royaltyName": "find",
-				})).
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
-					"address":         otu.accountAddress("user1"),
-					"amount":          "0.50000000",
-					"findName":        "user1",
-					"residualAddress": otu.accountAddrss("find"),
-						"id":          ids[0],
-					"royaltyName":     "minter",
-					"tenant":          "find",
-				})).
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-					"address":     otu.accountAddress("account"),
-					"amount":      "0.25000000",
-					"findName":    "",
-					"id":          ids[0],
-					"royaltyName": "platform",
-					"tenant":      "find",
-				}))
-		*/
+
 		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", "saleID")
 
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale"})

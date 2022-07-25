@@ -52,13 +52,13 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should not be able to list with price $0", func(t *testing.T) {
 
 		otu.O.Tx("listNFTForSale",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("directSellPrice", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+100.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", 0.0),
+			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Listing price should be greater than 0")
 	})
@@ -66,13 +66,13 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
 		otu.O.Tx("listNFTForSale",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("directSellPrice", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 	})

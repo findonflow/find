@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestMarketAuctionSoft(t *testing.T) {
@@ -128,17 +129,17 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", 0.0),
-			overflow.Arg("auctionReservePrice", price+5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", 0.0),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction start price should be greater than 0")
 
@@ -148,17 +149,17 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", price),
-			overflow.Arg("auctionReservePrice", price-5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price-5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
 
@@ -168,17 +169,17 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", price),
-			overflow.Arg("auctionReservePrice", price+5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", 10.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", 10.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 

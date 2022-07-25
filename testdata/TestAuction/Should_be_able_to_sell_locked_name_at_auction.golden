@@ -11,7 +11,7 @@
     "name": "user1",
     "seller": "0x179b6b1cb6755e31",
     "status": "sold",
-    "uuid": 164,
+    "uuid": 233,
     "validUntil": 31536001,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
@@ -24,7 +24,7 @@
     "name": "user1",
     "royaltyName": "Network",
     "saleType": "EnglishAuction",
-    "uuid": 164,
+    "uuid": 233,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }`

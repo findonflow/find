@@ -25,7 +25,7 @@ type OverflowTestUtils struct {
 }
 
 func NewOverflowTest(t *testing.T) *OverflowTestUtils {
-	o := Overflow(WithNetwork("testing"))
+	o := Overflow(WithNetwork("testing"), WithFlowForNewUsers(100.0))
 	return &OverflowTestUtils{
 		T: t,
 		O: o,
@@ -68,7 +68,7 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(300)
+	otu.setUUID(299)
 	ids := otu.mintThreeExampleDandies()
 	return ids
 }
@@ -109,9 +109,9 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	).AssertSuccess(otu.T)
 
 	// Setup Lease Market
-	otu.O.TransactionFromFile("setup_find_market_1").
-		SignProposeAndPayAs("user4").
-		Test(otu.T).AssertSuccess().AssertNoEvents()
+	otu.O.Tx("setup_find_market_1",
+		WithSigner("user4")).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the client
 	otu.O.TransactionFromFile("setup_find_lease_market_2").
@@ -165,7 +165,6 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 
 	for _, mintName := range []string{
 		"testMintFusd",
-		"testMintFlow",
 		"testMintUsdc",
 	} {
 		mintFn(mintName).AssertSuccess(otu.T).

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -110,7 +110,7 @@ func TestFIND(t *testing.T) {
 			Args(otu.O.Arguments().StringArray("find-admin").Account("find")).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"name": "find-admin",
 			}))
 
@@ -129,7 +129,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("user1").String("user2")).
 			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 				"name": "user1",
 			}))
 	})
@@ -171,7 +171,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("dapper").String("user2")).
 			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
@@ -185,7 +185,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().String("dapper")).
 			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
@@ -311,7 +311,7 @@ func TestFIND(t *testing.T) {
 				UFix64(50.0)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
 				"name":  user,
 				"addon": "forge",
 			}))
@@ -353,23 +353,23 @@ func TestFIND(t *testing.T) {
 		user2 := otu.accountAddress("user2")
 
 		otu.O.Tx("sendFT",
-			overflow.SignProposeAndPayAs(user),
-			overflow.Arg("name", user2),
-			overflow.Arg("amount", 10.0),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("tag", `""`),
-			overflow.Arg("message", `""`),
+			WithSigner(user),
+			WithArg("name", user2),
+			WithArg("amount", 10.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", `""`),
+			WithArg("message", `""`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
 
 		otu.O.Tx("sendFT",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("name", user),
-			overflow.Arg("amount", 10.0),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("tag", `""`),
-			overflow.Arg("message", `""`),
+			WithSigner("user2"),
+			WithArg("name", user),
+			WithArg("amount", 10.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", `""`),
+			WithArg("message", `""`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")

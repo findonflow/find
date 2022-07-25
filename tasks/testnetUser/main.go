@@ -60,8 +60,7 @@ func main() {
 
 	o := Overflow(
 		WithNetwork("testnet"),
-		StopOnError(),
-		PrintInteractionResults(),
+		WithGlobalPrintOptions(),
 	)
 
 	// o.Tx("adminSendFlow",
@@ -76,16 +75,16 @@ func main() {
 	// )
 
 	ids := o.Tx("testMintDandyTO",
-		SignProposeAndPayAs("user1"),
-		Arg("name", "user1"),
-		Arg("maxEdition", 12),
-		Arg("artist", "Neo"),
-		Arg("nftName", "Neo Motorcycle"),
-		Arg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
-		Arg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
-		Arg("rarity", "rare"),
-		Arg("rarityNum", 50.0),
-		Arg("to", "user1"),
+		WithSigner("user1"),
+		WithArg("name", "user1"),
+		WithArg("maxEdition", 12),
+		WithArg("artist", "Neo"),
+		WithArg("nftName", "Neo Motorcycle"),
+		WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
+		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("rarity", "rare"),
+		WithArg("rarityNum", 50.0),
+		WithArg("to", "user1"),
 	).
 		GetIdsFromEvent("Deposit", "id")
 
@@ -134,23 +133,23 @@ func main() {
 	time, _ := strconv.ParseFloat(returnTime, 64)
 
 	o.Tx("listMultipleNFTForSale",
-		SignProposeAndPayAs("user1"),
-		Arg("marketplace", "find"),
-		Arg("nftAliasOrIdentifiers", nftIdentifiers),
-		Arg("ids", saleIds),
-		Arg("ftAliasOrIdentifiers", ftIdentifiers),
-		Arg("directSellPrices", prices),
-		Arg("validUntil", time+100000.0))
+		WithSigner("user1"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifiers", nftIdentifiers),
+		WithArg("ids", saleIds),
+		WithArg("ftAliasOrIdentifiers", ftIdentifiers),
+		WithArg("directSellPrices", prices),
+		WithArg("validUntil", time+100000.0))
 
 	fmt.Println(saleIds)
 
 	o.Tx("buyMultipleNFTForSale",
-		SignProposeAndPayAs("user2"),
-		Arg("marketplace", "find"),
-		Addresses("users", sellers...),
-		Arg("ids", saleIds),
-		Arg("amounts", prices),
-		Gas(2300),
+		WithSigner("user2"),
+		WithArg("marketplace", "find"),
+		WithAddresses("users", sellers...),
+		WithArg("ids", saleIds),
+		WithArg("amounts", prices),
+		WithMaxGas(2300),
 	)
 
 }

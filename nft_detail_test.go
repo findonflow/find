@@ -163,7 +163,7 @@ func TestNFTDetailScript(t *testing.T) {
 			createUser(100.0, "user3").
 			registerUser("user2").
 			registerUser("user3")
-		otu.setUUID(300)
+		otu.setUUID(301)
 		ids := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry().
 			registerUserWithNameAndForge("user1", "neomotorcycle").

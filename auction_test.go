@@ -17,6 +17,8 @@ func TestAuction(t *testing.T) {
 		createUser(100.0, "user1").
 		registerUser("user1")
 
+	otu.setUUID(300)
+
 	t.Run("Should list a name for sale", func(t *testing.T) {
 
 		otu.listForSale("user1")
@@ -119,9 +121,6 @@ func TestAuction(t *testing.T) {
 				"amount": 0.2,
 				"to":     "0x01cf0e2f2f715450",
 			}))
-
-		json := otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("0x179b6b1cb6755e31")).RunReturnsJsonString()
-		autogold.Equal(t, json)
 
 	})
 

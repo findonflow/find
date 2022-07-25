@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestLeaseMarketDirectOfferSoft(t *testing.T) {
@@ -62,11 +62,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"bidLeaseMarketDirectOfferSoft",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+10.0),
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", 0.0),
+			WithArg("validUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Offer price should be greater than 0")
 
@@ -76,11 +76,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"bidLeaseMarketDirectOfferSoft",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 
@@ -423,14 +423,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
@@ -467,14 +467,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				String("name1").
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
@@ -597,7 +597,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				UFix64(newPrice).
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"leaseName":     "name1",
 				"buyer":         otu.accountAddress("user3"),
