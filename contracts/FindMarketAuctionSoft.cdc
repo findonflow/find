@@ -439,7 +439,7 @@ pub contract FindMarketAuctionSoft {
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(false)
+				nftInfo=saleItem.toNFTInfo(true)
 			}
 			
 			if buyer != nil {
@@ -493,7 +493,7 @@ pub contract FindMarketAuctionSoft {
 
 			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType)
 
-			let nftInfo=saleItem.toNFTInfo(false)
+			let nftInfo=saleItem.toNFTInfo(true)
 			let royalty=saleItem.getRoyalty()
 
 			let balance=saleItem.getBalance()

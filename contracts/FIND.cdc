@@ -62,6 +62,12 @@ pub contract FIND {
 
 	pub event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
 
+	// Deprecated in testnet
+    pub event TokensRewarded()
+
+	// Deprecated in testnet
+    pub event TokensCanNotBeRewarded()
+
 	//store bids made by a bidder to somebody elses leases
 	pub let BidPublicPath: PublicPath
 	pub let BidStoragePath: StoragePath
