@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - v2
+      - main
 
 name: ci
 jobs:
