@@ -7,14 +7,26 @@
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user2",
     "endsAt": 301,
-    "id": 367,
+    "id": 443,
     "nft": {
-      "id": 367,
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
+      "id": 443,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
-    "saleID": 370,
+    "saleID": 448,
     "seller": "0xe03daebed8ca0615",
     "sellerName": "user3",
     "status": "sold",
@@ -28,16 +40,28 @@
     "address": "0x179b6b1cb6755e31",
     "amount": 0.5,
     "findName": "user1",
-    "id": 367,
+    "id": 443,
     "nft": {
-      "id": 367,
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
+      "id": 443,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "residualAddress": "0x01cf0e2f2f715450",
     "royaltyName": "minter",
-    "saleID": 370,
+    "saleID": 448,
     "tenant": "find",
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
@@ -48,15 +72,27 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
     "findName": "find",
-    "id": 367,
+    "id": 443,
     "nft": {
-      "id": 367,
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
+      "id": 443,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
-    "saleID": 370,
+    "saleID": 448,
     "tenant": "find",
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
@@ -67,15 +103,27 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.35,
     "findName": "find",
-    "id": 367,
+    "id": 443,
     "nft": {
-      "id": 367,
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
+      "id": 443,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",
-    "saleID": 370,
+    "saleID": 448,
     "tenant": "find",
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
