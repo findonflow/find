@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -197,7 +197,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[1], price)
 		otu.listNFTForSale("user1", ids[2], price)
 
-		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
 		scriptResult.AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
 		scriptResult.AssertLengthWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items", 3)
 
@@ -207,7 +207,7 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).AssertSuccess()
 		//TODO: assert on events
 
-		scriptResultAfter := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResultAfter := otu.O.Script("getStatus", WithArg("user", "user1"))
 		scriptResultAfter.AssertWithPointerError(t, "/FINDReport/itemsForSale", "Object has no key 'itemsForSale'")
 	})
 
@@ -382,14 +382,14 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -397,7 +397,7 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          ids[0],
@@ -432,14 +432,14 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -447,7 +447,7 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          ids[0],
@@ -543,32 +543,7 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess()
-		/*
-			  TODO maybe add back after overflow v3
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-					"address":     otu.accountAddress("account"),
-					"amount":      "0.25000000",
-					"id":          fmt.Sprintf("%d", ids[0]),
-					"royaltyName": "find",
-				})).
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
-					"address":         otu.accountAddress("user1"),
-					"amount":          "0.50000000",
-					"findName":        "user1",
-					"residualAddress": otu.accountAddrss("find"),
-						"id":              fmt.Sprintf("%d", ids[0]),
-					"royaltyName":     "minter",
-					"tenant":          "find",
-				})).
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-					"address":     otu.accountAddress("account"),
-					"amount":      "0.25000000",
-					"findName":    "",
-					"id":          fmt.Sprintf("%d", ids[0]),
-					"royaltyName": "platform",
-					"tenant":      "find",
-				}))
-		*/
+
 		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
 
 		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
@@ -626,7 +601,7 @@ func TestMarketSale(t *testing.T) {
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess()
 
-		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
 
 		var itemsForSale []SaleItemInformation
 		err := scriptResult.MarshalPointerAs("/FINDReport/itemsForSale/FindMarketSale/items", &itemsForSale)
@@ -647,21 +622,21 @@ func TestMarketSale(t *testing.T) {
 				UInt64Array(ids[0], ids[1], ids[2]).
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
 				"seller": otu.accountAddress(seller),
@@ -789,7 +764,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64Array(saleItemID[0]).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     saleItemID[0],
 				"seller": otu.accountAddress("user1"),
