@@ -409,11 +409,7 @@ func TestMarketSale(t *testing.T) {
 		otu.setFindCut(0.035)
 		otu.listNFTForSale("user1", ids[0], price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, ids)
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("buyNFTForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -444,12 +440,6 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
-		result = otu.replaceID(result, ids)
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 
 	})
 
