@@ -329,10 +329,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.listLeaseForSale("user1", "name1", price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon buy action status", status)
-
-		res := otu.O.TransactionFromFile("buyLeaseForSale").
+		otu.O.TransactionFromFile("buyLeaseForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
@@ -353,12 +350,6 @@ func TestLeaseMarketSale(t *testing.T) {
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon buy action events", result)
-
 		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
 	})

@@ -73,7 +73,7 @@
                         },
                         "leaseIdentifier": "A.f8d6e0586b0a20c7.FIND.Lease",
                         "leaseName": "name1",
-                        "listingId": 206,
+                        "listingId": 291,
                         "listingStatus": "ended",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.SaleItem",
                         "listingValidUntil": 7501,
@@ -95,7 +95,7 @@
             "wallets": [
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": 201.751,
+                    "balance": 201.74994225,
                     "name": "Flow",
                     "tags": [
                         "flow"

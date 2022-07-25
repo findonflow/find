@@ -414,10 +414,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon accept offer action status", status)
-
-		res := otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
+		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
@@ -437,13 +434,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
-
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon accept offer action events", result)
-
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)
 
