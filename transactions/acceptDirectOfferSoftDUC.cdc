@@ -2,7 +2,7 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/NFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
@@ -41,9 +41,9 @@ transaction(dapperAddress: Address, marketplace:Address, id: UInt64) {
 		let nftIdentifier = item.getItemType().identifier
 
 		//If this is nil, there must be something wrong with FIND setup
-		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(nftIdentifier)!
+		let nft = getCollectionData(nftIdentifier)
 
-		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.providerPath)
+		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
 
 	}
@@ -52,4 +52,10 @@ transaction(dapperAddress: Address, marketplace:Address, id: UInt64) {
 		self.market.acceptOffer(self.pointer)
 	}
 	
+}
+
+pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
+	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData
 }

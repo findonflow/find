@@ -18,12 +18,13 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2").
-			registerFtInRegistry()
+			registerUser("user2")
+
 		dandyIds := otu.mintThreeExampleDandies()
+		otu.registerFtInRegistry()
 
 		id := dandyIds[0]
-		res := otu.O.ScriptFromFile("getNFTViews").Args(otu.O.Arguments().String("user1").String("Dandy").UInt64(id)).RunReturnsJsonString()
+		res := otu.O.ScriptFromFile("getNFTViews").Args(otu.O.Arguments().String("user1").String("A.f8d6e0586b0a20c7.Dandy.NFT").UInt64(id)).RunReturnsJsonString()
 
 		viewList := []string{
 			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
@@ -40,7 +41,7 @@ func TestDandy(t *testing.T) {
 		}
 		result := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
 			String("user1").
-			String("Dandy").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
 
@@ -62,9 +63,9 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2").
-			registerFtInRegistry()
+			registerUser("user2")
 		dandiesIDs := otu.mintThreeExampleDandies()
+		otu.registerFtInRegistry()
 
 		getDandiesIDsFor := otu.O.ScriptFromFile("getDandiesIDsFor").
 			Args(otu.O.Arguments().

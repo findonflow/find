@@ -134,7 +134,10 @@
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
     "FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
     "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
-    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc"
+    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
+    "NFTCatalog": "./contracts/NFTCatalog.cdc",
+    "NFTCatalogAdmin": "./contracts/NFTCatalogAdmin.cdc",
+    "NFTRetrieval": "./contracts/NFTRetrieval.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -223,7 +226,7 @@
         "FindForge",
         "FindRewardToken",
         "FindToken",
-				"FindRulesCache"
+        "FindRulesCache"
       ]
     },
     "testnet": {
@@ -254,7 +257,7 @@
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
-				"FindRulesCache"
+        "FindRulesCache"
       ]
     },
     "emulator": {
@@ -293,7 +296,10 @@
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft"
+        "FindLeaseMarketDirectOfferSoft",
+        "NFTCatalog",
+        "NFTCatalogAdmin",
+        "NFTRetrieval"
       ],
       "emulator-find": [],
       "emulator-user1": [],

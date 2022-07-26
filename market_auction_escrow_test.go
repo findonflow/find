@@ -53,7 +53,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -348,7 +348,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -400,7 +400,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -434,7 +434,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -676,7 +676,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[2]).
 				String("Flow").
 				UFix64(price).
@@ -804,8 +804,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "account").
-			setDUCExampleNFT()
+			setDUCExampleNFT().
+			sendExampleNFT("user1", "account")
 
 		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
 

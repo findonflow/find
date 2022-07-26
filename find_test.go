@@ -331,7 +331,7 @@ func TestFIND(t *testing.T) {
 			SignProposeAndPayAs(user).
 			Args(otu.O.Arguments().
 				String(user).
-				String("dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UFix64(10.0)).
 			Test(otu.T).
 			AssertFailure("This addon is not available.")

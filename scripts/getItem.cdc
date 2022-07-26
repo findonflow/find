@@ -1,6 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/NFTCatalog.cdc"
 
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
@@ -32,14 +32,13 @@ pub struct MetadataCollectionItem {
 
 pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
 
-	let nftInfo = NFTRegistry.getNFTInfo(aliasOrIdentifier) 
-	if nftInfo == nil {panic("This NFT is not registered in registry. input: ".concat(aliasOrIdentifier))}
+	let publicPath = getPublicPath(aliasOrIdentifier)
 
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return nil}
 	let address = resolveAddress!
 	let account=getAccount(address)
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo!.publicPath)
+	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
 	if !resolverCollectionCap.check() {
 		return nil
 	}
@@ -72,3 +71,8 @@ pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataColle
 	return nil
 }
 
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
+	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData.publicPath
+}

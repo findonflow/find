@@ -142,7 +142,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -177,7 +177,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -232,7 +232,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -354,7 +354,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price + 10.0).
@@ -369,7 +369,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price + 10.0).
@@ -529,7 +529,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[2]).
 				String("Flow").
 				UFix64(price).
@@ -584,7 +584,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[2]).
 				String("Flow").
 				UFix64(price).
@@ -631,7 +631,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(newPrice).
@@ -653,8 +653,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "account").
-			setDUCExampleNFT()
+			setDUCExampleNFT().
+			sendExampleNFT("user1", "account")
 
 		saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)
 
@@ -689,7 +689,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				StringArray("user1", "user1", "user1").
-				StringArray("Dandy", "Dandy", "Dandy").
+				StringArray("A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64Array(ids...).
 				StringArray("Flow", "Flow", "Flow").
 				UFix64Array(price, price, price).
@@ -777,7 +777,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		seller := "user1"
 
 		sellers := []string{seller}
-		dandy := []string{"Dandy"}
+		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
 		prices := []float64{price}
 
@@ -825,7 +825,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		seller := "user1"
 
 		sellers := []string{seller}
-		dandy := []string{"Dandy"}
+		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
 		prices := []float64{price}
 
@@ -882,7 +882,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				Account("account").
 				Account("account").
 				StringArray("user1").
-				StringArray("ExampleNFT").
+				StringArray("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 				UInt64Array(0).
 				UFix64Array(price).
 				UFix64(otu.currentTime() + 100.0)).

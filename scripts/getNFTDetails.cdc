@@ -3,7 +3,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc" 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 //import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/NFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub struct NFTDetailReport {
@@ -181,7 +181,7 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	let address = resolveAddress!
 
 	let account = getAccount(address) 
-	let publicPath = NFTRegistry.getNFTInfo(nftAliasOrIdentifier)?.publicPath ?? panic("This NFT is not supported by NFT Registry. Type : ".concat(nftAliasOrIdentifier))
+	let publicPath = getPublicPath(nftAliasOrIdentifier)
 	let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
 	let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
 
@@ -281,4 +281,10 @@ pub fun ignoreViews() : [Type] {
 	Type<MetadataViews.Media>()  
 
 	]
+}
+
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
+	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData.publicPath
 }

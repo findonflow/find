@@ -13,12 +13,12 @@ func TestMarketOptions(t *testing.T) {
 		setupDandy("user1").
 		createUser(100.0, "user2").
 		registerUser("user2").
-		registerFtInRegistry().
 		setFlowDandyMarketOption("Sale").
 		setFlowDandyMarketOption("AuctionEscrow")
 
 	price := 10.0
 	ids := otu.mintThreeExampleDandies()
+	otu.registerFtInRegistry()
 
 	otu.setUUID(300)
 
@@ -29,7 +29,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -54,7 +54,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -78,7 +78,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price).
@@ -93,7 +93,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price).
@@ -121,7 +121,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price).
@@ -136,7 +136,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price).
@@ -151,7 +151,7 @@ func TestMarketOptions(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("FUSD").
 				UFix64(price).
