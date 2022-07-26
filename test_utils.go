@@ -2188,7 +2188,7 @@ type BidInfo struct {
 }
 
 type SaleItemInformation struct {
-	NftIdentifier         uint64       `json:"nftIdentifier"`
+	NftIdentifier         string       `json:"nftIdentifier"`
 	NftId                 uint64       `json:"nftId"`
 	Seller                string       `json:"seller"`
 	SellerName            string       `json:"sellerName"`

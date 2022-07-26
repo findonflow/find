@@ -21,9 +21,19 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to register a name", func(t *testing.T) {
 
-		result := otu.O.ScriptFromFile("getLeases").RunReturnsJsonString()
-
-		autogold.Equal(t, result)
+		// Can fix this with pointerWant
+		otu.O.Script("getLeases").AssertWant(t,
+			autogold.Want("allLeases", `[]interface {}{
+  map[string]interface {}{
+    "address": "0x179b6b1cb6755e31",
+    "lockedUntil": 39312001.0,
+    "name": "user1",
+    "profile": "Capability<&AnyResource{A.f8d6e0586b0a20c7.Profile.Public}>(address: 0x179b6b1cb6755e31, path: /public/findProfile)",
+    "registeredTime": 1.0,
+    "validUntil": 31536001.0,
+  },
+}`),
+		)
 	})
 
 	t.Run("Should get error if you try to register a name and dont have enough money", func(t *testing.T) {
@@ -221,18 +231,24 @@ func TestFIND(t *testing.T) {
 	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
 
 		nameAddress := otu.accountAddress("user3")
-		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(nameAddress)).RunReturnsJsonString()
-		autogold.Equal(t, value)
-
+		otu.O.Script("getStatus",
+			WithArg("user", nameAddress),
+		).AssertWithPointerWant(t,
+			"/FINDReport",
+			autogold.Want("getStatus", map[string]interface{}{"privateMode": false}),
+		)
 	})
 
 	t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
 
 		nameAddress := otu.accountAddress("user2")
 		otu.moveNameTo("user2", "user1", "user2")
-		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String(nameAddress)).RunReturnsJsonString()
-		autogold.Equal(t, value)
-
+		otu.O.Script("getStatus",
+			WithArg("user", nameAddress),
+		).AssertWithPointerError(t,
+			"/FINDReport/profile/findName",
+			"Object has no key 'findName'",
+		)
 	})
 
 	//TODO: fix this test

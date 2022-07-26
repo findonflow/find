@@ -3,6 +3,7 @@ package test_main
 import (
 	"testing"
 
+	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
@@ -514,22 +515,23 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).AssertSuccess()
 		otu.destroyFUSDVault("user1")
 
-		res := otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user3").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("buyNFTForSale",
+			overflow.WithPayloadSigner("user2"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("user", "user3"),
+			overflow.WithArg("id", ids[0]),
+			overflow.WithArg("amount", price),
+		).AssertEvent(t,
+			"FindMarket.RoyaltyCouldNotBePaid",
+			overflow.OverflowEvent{
+				"address":         otu.accountAddress("user1"),
+				"amount":          0.5,
+				"findName":        "user1",
+				"residualAddress": otu.accountAddress("find"),
+				"royaltyName":     "minter",
+			},
+		)
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
-		result = otu.replaceID(result, ids)
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to residual account if royalty receiver is not working events", result)
 		otu.cancelAllNFTForSale("user1")
 	})
 

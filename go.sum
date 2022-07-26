@@ -107,6 +107,8 @@ github.com/bits-and-blooms/bitset v1.2.2 h1:J5gbX05GpMdBjCvQ9MteIg2KKDExr7DrgK+Y
 github.com/bits-and-blooms/bitset v1.2.2/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=
 github.com/bjartek/overflow v1.0.0-rc12 h1:XpCyGyqbEFKUAc/vIrrwgDA53mXWtzpTvBqYbwTE6ME=
 github.com/bjartek/overflow v1.0.0-rc12/go.mod h1:kuvxjmOuvqReU4U+h7+49ZcI4zAAdjm87KOLrmdARAk=
+github.com/bjartek/overflow v1.0.0-rc9.0.20220726122925-f8ec1c5028aa h1:5wdw0TdsQB4n8LoLz8cdaAALyDvonOEzD9/OV/XqwsU=
+github.com/bjartek/overflow v1.0.0-rc9.0.20220726122925-f8ec1c5028aa/go.mod h1:kuvxjmOuvqReU4U+h7+49ZcI4zAAdjm87KOLrmdARAk=
 github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJmJgSg28kpZDP6UIiPt0e0Oz0kqKNGyRaWEPv84=
 github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6/go.mod h1:Dmm/EzmjnCiweXmzRIAiUWCInVmPgjkzgv5k4tVyXiQ=
 github.com/btcsuite/btcd v0.20.1-beta/go.mod h1:wVuoA8VJLEcwgqHBwHmzLRazpKxTv13Px/pDuV7OomQ=
