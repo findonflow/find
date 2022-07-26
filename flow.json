@@ -226,6 +226,7 @@
         "FindForge",
         "FindRewardToken",
         "FindToken",
+        "ProfileCache",
         "FindRulesCache"
       ]
     },
@@ -257,6 +258,7 @@
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
+        "ProfileCache",
         "FindRulesCache"
       ]
     },
@@ -264,7 +266,6 @@
       "emulator-account": [
         "FindRewardToken",
         "FindToken",
-        "ProfileCache",
         "FIND",
         "FindForge",
         "NonFungibleToken",
@@ -278,6 +279,7 @@
         "FindViews",
         "MetadataViews",
         "Dandy",
+        "ProfileCache",
         "FindRulesCache",
         "FindMarket",
         "FindMarketSale",

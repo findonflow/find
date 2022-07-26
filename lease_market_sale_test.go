@@ -49,6 +49,30 @@ func TestLeaseMarketSale(t *testing.T) {
 			moveNameTo("user2", "user1", "name1")
 	})
 
+	t.Run("Should not be able to list with price $0", func(t *testing.T) {
+
+		otu.O.Tx("listLeaseForSale",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("directSellPrice", 0.0),
+			overflow.Arg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Listing price should be greater than 0")
+	})
+
+	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
+
+		otu.O.Tx("listLeaseForSale",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("leaseName", "name1"),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("directSellPrice", price),
+			overflow.Arg("validUntil", 0.0),
+		).
+			AssertFailure(t, "Valid until is before current time")
+	})
+
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
 
 		otu.listLeaseForSale("user1", "name1", price).
@@ -137,7 +161,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				String("name1").
 				String("FUSD").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 	})
@@ -180,7 +204,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				String("name2").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -229,7 +253,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				String("name2").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -267,7 +291,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				String("name2").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertSuccess()
 
@@ -285,7 +309,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				String("name1").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertSuccess()
 
@@ -390,7 +414,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				String("name2").
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Seller banned by Tenant")
 

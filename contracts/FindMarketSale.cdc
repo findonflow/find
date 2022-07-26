@@ -207,8 +207,7 @@ pub contract FindMarketSale {
 
 			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType)
 
-
-			let nftInfo= saleItem.toNFTInfo(false)
+			let nftInfo= saleItem.toNFTInfo(true)
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
 			let buyerName=FIND.reverseLookup(buyer)
@@ -235,6 +234,16 @@ pub contract FindMarketSale {
 		}
 
 		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
+
+
+			// ensure it is not a 0 dollar listing
+			if directSellPrice <= 0.0 {
+				panic("Listing price should be greater than 0")
+			}
+
+			if validUntil != nil && validUntil! < Clock.time() {
+				panic("Valid until is before current time")
+			}
 
 			// What happends if we relist  
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
@@ -277,7 +286,7 @@ pub contract FindMarketSale {
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(false)
+				nftInfo=saleItem.toNFTInfo(true)
 			}
 
 			let owner=self.owner!.address

@@ -49,6 +49,34 @@ func TestMarketSale(t *testing.T) {
 			sendDandy("user1", "user2", id)
 	})
 
+	t.Run("Should not be able to list with price $0", func(t *testing.T) {
+
+		otu.O.Tx("listNFTForSale",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("marketplace", "account"),
+			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("id", id),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("directSellPrice", 0.0),
+			overflow.Arg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Listing price should be greater than 0")
+	})
+
+	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
+
+		otu.O.Tx("listNFTForSale",
+			overflow.SignProposeAndPayAs("user1"),
+			overflow.Arg("marketplace", "account"),
+			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("id", id),
+			overflow.Arg("ftAliasOrIdentifier", "Flow"),
+			overflow.Arg("directSellPrice", price),
+			overflow.Arg("validUntil", 0.0),
+		).
+			AssertFailure(t, "Valid until is before current time")
+	})
+
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
 		otu := NewOverflowTest(t).
 			setupFIND().
@@ -156,7 +184,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64(id).
 				String("FUSD").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Nothing matches")
 	})
@@ -203,7 +231,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has deprected mutation options on this item")
 
@@ -255,7 +283,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Tenant has stopped this item")
 
@@ -299,7 +327,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertSuccess()
 
@@ -321,7 +349,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64(ids[0]).
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertSuccess()
 
@@ -448,7 +476,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
-				UFix64(100.0)).
+				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).
 			AssertFailure("Seller banned by Tenant")
 

@@ -233,7 +233,7 @@ pub contract FindMarketDirectOfferSoft {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(false)
+				nftInfo=saleItem.toNFTInfo(true)
 			} 
 
 			emit DirectOffer(tenant:tenant.name, id: saleItem.getId(), saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
@@ -384,7 +384,7 @@ pub contract FindMarketDirectOfferSoft {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(false)
+				nftInfo=saleItem.toNFTInfo(true)
 			} 
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
@@ -475,7 +475,7 @@ pub contract FindMarketDirectOfferSoft {
 			let sellerName=FIND.reverseLookup(owner)
 			let profile = Profile.find(buyer)
 
-			let nftInfo=saleItem.toNFTInfo(false)
+			let nftInfo=saleItem.toNFTInfo(true)
 
 			emit DirectOffer(tenant:tenant.name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: sellerName, amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
@@ -627,6 +627,17 @@ pub contract FindMarketDirectOfferSoft {
 
 
 		pub fun bid(item: FindViews.ViewReadPointer, amount:UFix64, vaultType:Type, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
+
+			// ensure it is not a 0 dollar listing
+			if amount <= 0.0 {
+				panic("Offer price should be greater than 0")
+			}
+
+			// ensure validUntil is valid
+			if validUntil != nil && validUntil! < Clock.time() {
+				panic("Valid until is before current time")
+			}
+
 			if self.owner!.address == item.owner() {
 				panic("You cannot bid on your own resource")
 			}
