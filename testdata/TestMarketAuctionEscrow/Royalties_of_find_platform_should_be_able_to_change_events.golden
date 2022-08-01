@@ -10,9 +10,21 @@
     "endsAt": 4003,
     "id": 197,
     "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
       "id": 197,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "saleID": 386,
@@ -31,9 +43,21 @@
     "findName": "user1",
     "id": 197,
     "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
       "id": 197,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "minter",
@@ -50,9 +74,21 @@
     "findName": "find",
     "id": 197,
     "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
       "id": 197,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
@@ -69,9 +105,21 @@
     "findName": "find",
     "id": 197,
     "nft": {
+      "collectionDescription": "Neo Collectibles FIND",
+      "collectionName": "user1",
+      "editionNumber": 1,
       "id": 197,
       "name": "Neo Motorcycle 1 of 3",
+      "scalars": {
+        "Speed": 100,
+        "edition_set_max": 3,
+        "edition_set_number": 1
+      },
+      "tags": {
+        "NeoMotorCycleTag": "Tag1"
+      },
       "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+      "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",
