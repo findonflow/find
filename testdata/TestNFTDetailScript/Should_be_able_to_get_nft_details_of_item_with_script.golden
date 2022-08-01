@@ -1,6 +1,30 @@
 `{
     "allowedListingActions": {
         "FindMarketSale": {
+            "ListingDetails": [
+                {
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "minter"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "platform"
+                        }
+                    ]
+                }
+            ],
             "ftAlias": [
                 "Flow"
             ],
@@ -36,19 +60,6 @@
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
         "name": "Neo Motorcycle 2 of 3",
-        "royalties": [
-            {
-                "address": "0x179b6b1cb6755e31",
-                "cut": 0.05,
-                "findName": "user1",
-                "royaltyName": "minter"
-            },
-            {
-                "address": "0xf8d6e0586b0a20c7",
-                "cut": 0.025,
-                "royaltyName": "platform"
-            }
-        ],
         "scalars": {
             "Speed": 100,
             "edition_set_max": 3,

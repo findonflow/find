@@ -22,16 +22,18 @@ pub struct NFTDetailReport {
 
 
 pub struct ListingTypeReport {
-	pub let listingType: String 
 	pub let ftAlias: [String] 
-	pub let ftIdentifiers: [String] 
+	pub let ftIdentifiers: [String]
+	pub let listingType: String 
 	pub let status: String 
+	pub let ListingDetails: [ListingRoyalties]
 
-	init(listingType: String, ftAlias: [String], ftIdentifiers: [String],  status: String ) {
+	init(listingType: String, ftAlias: [String], ftIdentifiers: [String],  status: String , ListingDetails: [ListingRoyalties]) {
 		self.listingType=listingType 
-		self.ftAlias=ftAlias 
-		self.ftIdentifiers=ftIdentifiers 
 		self.status=status
+		self.ListingDetails=ListingDetails
+		self.ftAlias=ftAlias 
+		self.ftIdentifiers=ftIdentifiers
 	}
 }
 
@@ -42,7 +44,7 @@ pub struct NFTDetail {
 	pub let thumbnail:String
 	pub let type: String
 	pub var rarity:String?
-	pub var royalties: [Royalties]
+	// pub var royalties: [Royalties]
 	pub var editionNumber: UInt64? 
 	pub var totalInEdition: UInt64?
 	pub var scalars : {String: UFix64}
@@ -92,7 +94,7 @@ pub struct NFTDetail {
 		self.totalInEdition=nftInfo.totalInEdition
 
 		/* Royalties */
-		self.royalties=resolveRoyalties(pointer)
+		// self.royalties=resolveRoyalties(pointer)
 
 		self.views=[]
 		for view in item.getViews() {
@@ -119,7 +121,20 @@ pub struct StoreFrontCut {
 	init(amount:UFix64, address:Address){
 		self.amount=amount
 		self.address=address
-		self.findName= FIND.reverseLookup(address)
+		self.findName= reverseLookup(address)
+	}
+}
+
+pub struct ListingRoyalties {
+
+	pub let ftAlias: String?
+	pub let ftIdentifier: String
+	pub let royalties: [Royalties]
+
+	init(ftAlias: String?, ftIdentifier: String, royalties: [Royalties]) {
+		self.ftAlias=ftAlias 
+		self.ftIdentifier=ftIdentifier
+		self.royalties=royalties 
 	}
 }
 
@@ -217,11 +232,34 @@ pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [Stri
 	var report : {String : ListingTypeReport} = {}
 	for marketType in marketTypes {
 		if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-			report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing)
+			report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
 		}
 	}
 
 	return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report)
+
+}
+
+pub let resolvedAddresses : {Address : String} = {}
+
+pub var nftRoyalties : [Royalties]? = nil
+
+pub fun reverseLookup(_ addr: Address) : String? {
+
+	if let name = resolvedAddresses[addr] {
+		if name == "" {
+			return nil
+		} else {
+			return name
+		}
+	}
+	let name = FIND.reverseLookup(addr) 
+	if name == nil {
+		resolvedAddresses[addr] = ""
+	} else {
+		resolvedAddresses[addr] = name
+	}
+	return name
 
 }
 
@@ -252,23 +290,55 @@ pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	let array : [Royalties] = []
 	for royalty in pointer.getRoyalty().getRoyalties() {
 		let address = royalty.receiver.address
-		array.append(Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut))
+		array.append(Royalties(royaltyName: royalty.description, address: address, findName: reverseLookup(address), cut: royalty.cut))
 	}
 
 	return array
 }
 
-pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing) : ListingTypeReport {
+pub fun resolveFindRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
+
+	let cuts = tenantRef.getTenantCut(name:"", listingType: listing, nftType:nft, ftType:ft)
+
+	let royalties :[Royalties] = []
+	if cuts.findCut != nil {
+		royalties.append(Royalties(royaltyName: cuts.findCut!.description, address: cuts.findCut!.receiver.address, findName: reverseLookup(cuts.findCut!.receiver.address), cut: cuts.findCut!.cut))
+	}
+
+	if cuts.tenantCut != nil {
+		royalties.append(Royalties(royaltyName: cuts.tenantCut!.description, address: cuts.tenantCut!.receiver.address, findName: reverseLookup(cuts.tenantCut!.receiver.address), cut: cuts.tenantCut!.cut))
+	}
+	
+	return royalties
+}
+
+pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, pointer: FindViews.ViewReadPointer, tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}) : ListingTypeReport {
 	let listingType = allowedListing.listingType.identifier
 	var ftAlias : [String] = []
 	var ftIdentifier : [String] = []
+	var listingDetails : [ListingRoyalties] = []
 	for ft in allowedListing.ftTypes {
 		ftIdentifier.append(ft.identifier)
+		var alias : String? = nil
 		if let ftInfo = FTRegistry.getFTInfo(ft.identifier) {
+			alias = ftInfo.alias
 			ftAlias.append(ftInfo.alias)
 		}
+
+		// getRoyalties 
+		var nftR = nftRoyalties 
+		if nftR == nil {
+			nftRoyalties = resolveRoyalties(pointer)
+			nftR = nftRoyalties
+		}
+
+		let findR = resolveFindRoyalties(tenantRef: tenantRef, listing: allowedListing.listingType , nft: pointer.getItemType(), ft: ft)
+		findR.appendAll(nftR!)
+
+		listingDetails.append(ListingRoyalties(ftAlias: alias, ftIdentifier: ft.identifier, royalties: findR))
 	}
-	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status )
+	
+	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status , ListingDetails: listingDetails)
 }
 
 pub fun ignoreViews() : [Type] {

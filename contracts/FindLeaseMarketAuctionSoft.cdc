@@ -445,7 +445,7 @@ pub contract FindLeaseMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTeantCut(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= self.getTenant().getTenantCut(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 
 			let leaseInfo=saleItem.toLeaseInfo()
