@@ -3,7 +3,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc" 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 //import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
-import NFTCatalog from "../contracts/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub struct NFTDetailReport {
@@ -284,7 +284,7 @@ pub fun ignoreViews() : [Type] {
 }
 
 pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
-	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData.publicPath
 }

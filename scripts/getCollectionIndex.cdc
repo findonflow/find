@@ -1,5 +1,5 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 pub fun main(user: String) : {String : [UInt64]} {
@@ -7,10 +7,10 @@ pub fun main(user: String) : {String : [UInt64]} {
 	if let address = FIND.resolve(user) {
 		var resultMap : {String : [UInt64]} = {}
 		let account = getAccount(address)
-		for nftInfo in NFTCatalog.getCatalog().values {
+		for nftInfo in FINDNFTCatalog.getCatalog().values {
 			let publicPath = nftInfo.collectionData.publicPath
 
-			if let subCollections = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftInfo.nftType.identifier) {
+			if let subCollections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftInfo.nftType.identifier) {
 				if subCollections.length < 1 {
 					continue
 				} else if subCollections.length == 1 {

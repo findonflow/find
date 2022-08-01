@@ -2,7 +2,7 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTCatalog from "../contracts/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(marketplace:Address, id: UInt64) {
@@ -31,7 +31,7 @@ transaction(marketplace:Address, id: UInt64) {
 }
 
 pub fun getPrivatePath(_ nftIdentifier: String) : PrivatePath {
-	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData.privatePath
 }

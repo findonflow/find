@@ -1,6 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import NFTCatalog from "../contracts/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
@@ -72,7 +72,7 @@ pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataColle
 }
 
 pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
-	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData.publicPath
 }

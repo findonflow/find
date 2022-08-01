@@ -1,4 +1,4 @@
-import MetadataViews from "./standard/MetadataViews.cdc"
+import MetadataViews from "./MetadataViews.cdc"
 import NFTCatalog from "./NFTCatalog.cdc"
 
 // NFTRetrieval

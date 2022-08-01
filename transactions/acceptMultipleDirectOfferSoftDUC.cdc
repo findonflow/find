@@ -2,7 +2,8 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTCatalog from "../contracts/NFTCatalog.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
@@ -73,7 +74,7 @@ transaction(dapperAddress: Address, marketplace:Address, ids: [UInt64]) {
 }
 
 pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
-	let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData
 }
