@@ -491,7 +491,7 @@ pub contract FindMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType)
+			let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType)
 
 			let nftInfo=saleItem.toNFTInfo(true)
 			let royalty=saleItem.getRoyalty()
