@@ -13,7 +13,11 @@
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
       "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -46,7 +50,11 @@
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
       "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -77,7 +85,11 @@
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
       "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -108,7 +120,11 @@
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
       "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,

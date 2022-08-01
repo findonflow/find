@@ -1,23 +1,18 @@
 `{
-  "name": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction",
+  "name": "A.f8d6e0586b0a20c7.FindMarketSale.Sale",
   "time": "1970-01-01T00:00:00Z",
   "fields": {
     "amount": 10,
-    "auctionReservePrice": 10,
     "buyer": "0xf3fcd2c1a78f5eee",
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user2",
-    "endsAt": 4003,
-    "id": 270,
+    "endsAt": 301,
+    "id": 367,
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
-<<<<<<< HEAD
-      "id": 270,
-=======
-      "id": 196,
->>>>>>> b403b27 (Add royalty (#172))
+      "id": 367,
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -31,30 +26,26 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
-    "saleID": 495,
-    "seller": "0x179b6b1cb6755e31",
-    "sellerName": "user1",
+    "saleID": 370,
+    "seller": "0xe03daebed8ca0615",
+    "sellerName": "user3",
     "status": "sold",
     "tenant": "find",
-    "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }{
-  "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
+  "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid",
   "time": "1970-01-01T00:00:00Z",
   "fields": {
     "address": "0x179b6b1cb6755e31",
     "amount": 0.5,
     "findName": "user1",
-    "id": 270,
+    "id": 367,
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
-<<<<<<< HEAD
-      "id": 270,
-=======
-      "id": 196,
->>>>>>> b403b27 (Add royalty (#172))
+      "id": 367,
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -68,10 +59,11 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
+    "residualAddress": "0x01cf0e2f2f715450",
     "royaltyName": "minter",
-    "saleID": 495,
+    "saleID": 370,
     "tenant": "find",
-    "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }{
   "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
@@ -80,16 +72,12 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
     "findName": "find",
-    "id": 270,
+    "id": 367,
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
-<<<<<<< HEAD
-      "id": 270,
-=======
-      "id": 196,
->>>>>>> b403b27 (Add royalty (#172))
+      "id": 367,
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -104,9 +92,9 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
-    "saleID": 495,
+    "saleID": 370,
     "tenant": "find",
-    "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }{
   "name": "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid",
@@ -115,16 +103,12 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.35,
     "findName": "find",
-    "id": 270,
+    "id": 367,
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
-<<<<<<< HEAD
-      "id": 270,
-=======
-      "id": 196,
->>>>>>> b403b27 (Add royalty (#172))
+      "id": 367,
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -139,8 +123,8 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",
-    "saleID": 495,
+    "saleID": 370,
     "tenant": "find",
-    "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
+    "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
 }`

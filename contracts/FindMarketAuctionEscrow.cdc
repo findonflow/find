@@ -505,7 +505,7 @@ pub contract FindMarketAuctionEscrow {
 					panic(actionResult.message)
 				}
 
-				let cuts= tenant.getTeantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType)
+				let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType)
 
 				if !saleItem.hasAuctionMetReservePrice() {
 					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")

@@ -1,6 +1,30 @@
 `{
     "allowedListingActions": {
         "FindMarketAuctionEscrow": {
+            "ListingDetails": [
+                {
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "minter"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "platform"
+                        }
+                    ]
+                }
+            ],
             "ftAlias": [
                 "Flow"
             ],
@@ -11,6 +35,30 @@
             "status": "active"
         },
         "FindMarketAuctionSoft": {
+            "ListingDetails": [
+                {
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "minter"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "platform"
+                        }
+                    ]
+                }
+            ],
             "ftAlias": [
                 "Flow"
             ],
@@ -21,6 +69,30 @@
             "status": "active"
         },
         "FindMarketDirectOfferEscrow": {
+            "ListingDetails": [
+                {
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "minter"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "platform"
+                        }
+                    ]
+                }
+            ],
             "ftAlias": [
                 "Flow"
             ],
@@ -31,6 +103,30 @@
             "status": "active"
         },
         "FindMarketDirectOfferSoft": {
+            "ListingDetails": [
+                {
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "minter"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "platform"
+                        }
+                    ]
+                }
+            ],
             "ftAlias": [
                 "Flow"
             ],
@@ -41,6 +137,30 @@
             "status": "active"
         },
         "FindMarketSale": {
+            "ListingDetails": [
+                {
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "minter"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "platform"
+                        }
+                    ]
+                }
+            ],
             "ftAlias": [
                 "Flow"
             ],
@@ -61,19 +181,6 @@
         },
         "name": "xtingle 1 of 1",
         "rarity": "rare",
-        "royalties": [
-            {
-                "address": "0x179b6b1cb6755e31",
-                "cut": 0.05,
-                "findName": "user1",
-                "royaltyName": "minter"
-            },
-            {
-                "address": "0xf8d6e0586b0a20c7",
-                "cut": 0.025,
-                "royaltyName": "platform"
-            }
-        ],
         "scalars": {
             "edition_nft_max": 1,
             "edition_nft_number": 1,

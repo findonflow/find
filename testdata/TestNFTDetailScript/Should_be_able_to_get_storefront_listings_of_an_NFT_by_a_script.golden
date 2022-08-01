@@ -1,6 +1,30 @@
 `map[string]interface {}{
   "allowedListingActions": map[string]interface {}{
     "FindMarketAuctionEscrow": map[string]interface {}{
+      "ListingDetails": []interface {}{
+        map[string]interface {}{
+          "ftAlias": "Flow",
+          "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+          "royalties": []interface {}{
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "find",
+            },
+            map[string]interface {}{
+              "address": "0x179b6b1cb6755e31",
+              "cut": 0.05,
+              "findName": "user1",
+              "royaltyName": "minter",
+            },
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "platform",
+            },
+          },
+        },
+      },
       "ftAlias": []interface {}{
         "Flow",
       },
@@ -11,6 +35,30 @@
       "status": "active",
     },
     "FindMarketAuctionSoft": map[string]interface {}{
+      "ListingDetails": []interface {}{
+        map[string]interface {}{
+          "ftAlias": "Flow",
+          "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+          "royalties": []interface {}{
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "find",
+            },
+            map[string]interface {}{
+              "address": "0x179b6b1cb6755e31",
+              "cut": 0.05,
+              "findName": "user1",
+              "royaltyName": "minter",
+            },
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "platform",
+            },
+          },
+        },
+      },
       "ftAlias": []interface {}{
         "Flow",
       },
@@ -21,6 +69,30 @@
       "status": "active",
     },
     "FindMarketDirectOfferEscrow": map[string]interface {}{
+      "ListingDetails": []interface {}{
+        map[string]interface {}{
+          "ftAlias": "Flow",
+          "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+          "royalties": []interface {}{
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "find",
+            },
+            map[string]interface {}{
+              "address": "0x179b6b1cb6755e31",
+              "cut": 0.05,
+              "findName": "user1",
+              "royaltyName": "minter",
+            },
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "platform",
+            },
+          },
+        },
+      },
       "ftAlias": []interface {}{
         "Flow",
       },
@@ -31,6 +103,30 @@
       "status": "active",
     },
     "FindMarketDirectOfferSoft": map[string]interface {}{
+      "ListingDetails": []interface {}{
+        map[string]interface {}{
+          "ftAlias": "Flow",
+          "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+          "royalties": []interface {}{
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "find",
+            },
+            map[string]interface {}{
+              "address": "0x179b6b1cb6755e31",
+              "cut": 0.05,
+              "findName": "user1",
+              "royaltyName": "minter",
+            },
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "platform",
+            },
+          },
+        },
+      },
       "ftAlias": []interface {}{
         "Flow",
       },
@@ -41,6 +137,30 @@
       "status": "active",
     },
     "FindMarketSale": map[string]interface {}{
+      "ListingDetails": []interface {}{
+        map[string]interface {}{
+          "ftAlias": "Flow",
+          "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+          "royalties": []interface {}{
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "find",
+            },
+            map[string]interface {}{
+              "address": "0x179b6b1cb6755e31",
+              "cut": 0.05,
+              "findName": "user1",
+              "royaltyName": "minter",
+            },
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "platform",
+            },
+          },
+        },
+      },
       "ftAlias": []interface {}{
         "Flow",
       },
@@ -76,19 +196,6 @@
       "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png",
     },
     "name": "Neo Motorcycle 2 of 3",
-    "royalties": []interface {}{
-      map[string]interface {}{
-        "address": "0x179b6b1cb6755e31",
-        "cut": 0.05,
-        "findName": "user1",
-        "royaltyName": "minter",
-      },
-      map[string]interface {}{
-        "address": "0xf8d6e0586b0a20c7",
-        "cut": 0.025,
-        "royaltyName": "platform",
-      },
-    },
     "scalars": map[string]interface {}{
       "Speed": 100.0,
       "edition_set_max": 3.0,

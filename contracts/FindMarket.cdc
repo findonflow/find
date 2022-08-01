@@ -600,7 +600,7 @@ pub contract FindMarket {
 		pub fun getStoragePath(_ type: Type) : StoragePath 
 		pub fun getPublicPath(_ type: Type) : PublicPath
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindRulesCache.ActionResult
-		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts 
+		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts 
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? 
 		pub fun getBlockedNFT(marketType: Type) : [Type] 
 		pub let name:String
@@ -676,26 +676,52 @@ pub contract FindMarket {
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
-		pub fun getTeantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts {
+		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts {
 
 			let ruleId = listingType.identifier.concat(nftType.identifier).concat(ftType.identifier)
 
 			let tenantCutCache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: ruleId)
 
 			if tenantCutCache == nil {
-			let item = self.tenantSaleItems[name]!
+				// If the tenantSaleItem name is known and if it exist
+				if let item = self.tenantSaleItems[name] {
 
-				for findCut in self.findCuts.values {
-					let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
-					if valid{
-						let result = FindRulesCache.TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
-						FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
-						return result
+					for findCut in self.findCuts.values {
+						let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
+						if valid{
+							let result = FindRulesCache.TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
+							FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
+							return result
+						}
 					}
+					let result = FindRulesCache.TenantCuts(findCut:nil, tenantCut: item.cut)
+					FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
+					return result
+				} else {
+					// Otherwise we loop thru the tenant sale item as well to get the cut (and record it in findRulesCache)
+
+					var tenantCut : MetadataViews.Royalty? = nil
+					for item in self.tenantSaleItems.values {
+						let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
+
+						if valid {
+							tenantCut = item.cut
+						}
+					}
+
+					for findCut in self.findCuts.values {
+						let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
+						if valid{
+							let result = FindRulesCache.TenantCuts(findCut:findCut.cut, tenantCut: tenantCut)
+							FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
+							return result
+						}
+					}
+					let result = FindRulesCache.TenantCuts(findCut:nil, tenantCut: tenantCut)
+					FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
+					return result
+
 				}
-				let result = FindRulesCache.TenantCuts(findCut:nil, tenantCut: item.cut)
-				FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
-				return result
 			} 
 			return tenantCutCache!
 
