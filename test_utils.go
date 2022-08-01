@@ -118,6 +118,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		SignProposeAndPayAs("find").
 		Args(otu.O.Arguments().Account("user4")).
 		Test(otu.T).AssertSuccess()
+
 	otu.createUser(100.0, "account")
 	otu.createUser(100.0, "user4")
 
@@ -168,9 +169,9 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 		"testMintUsdc",
 	} {
 		mintFn(mintName).AssertSuccess(otu.T).
-			AssertEvent(otu.T, "Desposited", map[string]interface{}{
-				"ammount": fusd,
-				"to":      nameAddress,
+			AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
+				"amount": fusd,
+				"to":     nameAddress,
 			})
 	}
 
