@@ -14,7 +14,8 @@ import Profile from "../contracts/Profile.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
@@ -220,18 +221,18 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 
 		var counter = 0
 
-		let nfts : {String : NFTRegistry.NFTInfo} = {}
+		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
 
 		while counter < ids.length {
 			// Get supported NFT and FT Information from Registries from input alias
-			var nft : NFTRegistry.NFTInfo? = nil
+			var nft : NFTCatalog.NFTCollectionData? = nil
 			var ft : FTRegistry.FTInfo? = nil
 
 			if nfts[nftAliasOrIdentifiers[counter]] != nil {
 				nft = nfts[nftAliasOrIdentifiers[counter]]
 			} else {
-				nft = NFTRegistry.getNFTInfo(nftAliasOrIdentifiers[counter]) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftAliasOrIdentifiers[counter]))
+				nft = getCollectionData(nftAliasOrIdentifiers[counter]) 
 				nfts[nftAliasOrIdentifiers[counter]] = nft
 			}
 
@@ -242,12 +243,12 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 				fts[ftAliasOrIdentifiers[counter]] = ft 
 			}
 
-			let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.providerPath)
+			let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
 
 			/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
 			if !providerCap.check() {
 					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-						nft!.providerPath,
+						nft!.privatePath,
 						target: nft!.storagePath
 				)
 			}
@@ -271,3 +272,8 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 	}
 }
 
+pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData
+}

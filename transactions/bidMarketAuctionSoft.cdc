@@ -8,7 +8,8 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
@@ -314,7 +315,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 		let item = FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 
-		let nft = NFTRegistry.getNFTInfoByTypeIdentifier(item.getItemType().identifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(item.getItemType().identifier))
+		let nft = getCollectionData(item.getItemType().identifier) 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 	
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
@@ -348,4 +349,10 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 	execute {
 		self.bidsReference!.bid(item:self.pointer, amount: amount, vaultType: self.ftVaultType, nftCap: self.targetCapability, bidExtraField: {})
 	}
+}
+
+pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData
 }

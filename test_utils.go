@@ -542,7 +542,7 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			String("Dandy").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -582,7 +582,7 @@ func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, pric
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -598,7 +598,7 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			String("Dandy").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -624,7 +624,7 @@ func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id u
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -653,7 +653,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			String("Dandy").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -977,7 +977,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 		Args(otu.O.Arguments().
 			Account("account").
 			String(seller).
-			String("Dandy").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -998,7 +998,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, s
 		Args(otu.O.Arguments().
 			Account("account").
 			String(seller).
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -1024,7 +1024,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 		Args(otu.O.Arguments().
 			Account("account").
 			String(seller).
-			String("Dandy").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -1406,6 +1406,43 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
+	result, _ := otu.O.Script("getDandiesIDsFor",
+		Arg("user", "user1"),
+		Arg("minter", "user1"),
+	).GetAsInterface()
+
+	var id uint64
+
+	if result == nil {
+		result, _ := otu.O.Script("getDandiesIDsFor",
+			Arg("user", "user1"),
+			Arg("minter", "neomotorcycle"),
+		).GetAsInterface()
+
+		if result == nil {
+			return otu
+		}
+
+		ids := result.([]interface{})
+		id = ids[0].(uint64)
+
+	} else {
+		ids := result.([]interface{})
+		id = ids[0].(uint64)
+	}
+
+	otu.O.TransactionFromFile("adminAddNFTCatalog").
+		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
+			String("A.f8d6e0586b0a20c7.Dandy.NFT").
+			Account("account").
+			Account("user1").
+			UInt64(id).
+			String("findDandy")).
+		Test(otu.T).
+		AssertSuccess()
+
 	return otu
 }
 
@@ -1420,6 +1457,13 @@ func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, a
 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 		}))
 
+	otu.O.TransactionFromFile("adminRemoveNFTCatalog").
+		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			String("A.f8d6e0586b0a20c7.Dandy.NFT")).
+		Test(otu.T).
+		AssertSuccess()
+
 	return otu
 }
 
@@ -1432,6 +1476,18 @@ func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUti
 			"alias":          "ExampleNFT",
 			"typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
 		}))
+
+	otu.O.TransactionFromFile("adminAddNFTCatalog").
+		SignProposeAndPayAs("account").
+		Args(otu.O.Arguments().
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
+			Account("account").
+			Account("account").
+			UInt64(0).
+			String("exampleNFTCollection")).
+		Test(otu.T).
+		AssertSuccess()
 
 	return otu
 }
@@ -1808,7 +1864,7 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 		Args(otu.O.Arguments().
 			Account("account").
 			Account("account").
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
@@ -1888,7 +1944,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 		Args(otu.O.Arguments().
 			Account("account").
 			Account("account").
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			UFix64(price).
 			UFix64(price + 5.0).
@@ -1927,7 +1983,7 @@ func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint6
 		SignProposeAndPayAs(name).
 		Args(otu.O.Arguments().
 			Account("account").
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).
@@ -2023,7 +2079,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 			Account("account").
 			Account("account").
 			String(seller).
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			UFix64(price).
 			UFix64(otu.currentTime() + 100.0)).
@@ -2053,7 +2109,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, selle
 		Args(otu.O.Arguments().
 			Account("account").
 			String(seller).
-			String("ExampleNFT").
+			String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 			UInt64(id).
 			String("Flow").
 			UFix64(price).

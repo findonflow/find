@@ -15,7 +15,6 @@ func TestCollectionScripts(t *testing.T) {
 			createUser(10000.0, "user1").
 			registerUser("user1").
 			buyForge("user1").
-			registerDandyInNFTRegistry().
 			registerUserWithNameAndForge("user1", "neomotorcycle").
 			registerUserWithNameAndForge("user1", "xtingles").
 			registerUserWithNameAndForge("user1", "flovatar").
@@ -46,6 +45,8 @@ func TestCollectionScripts(t *testing.T) {
 				dandyIds = append(dandyIds, event.GetFieldAsUInt64("id"))
 			}
 		}
+
+		otu.registerDandyInNFTRegistry()
 
 		result := otu.O.ScriptFromFile("getCollections").
 			Args(otu.O.Arguments().String("user1")).

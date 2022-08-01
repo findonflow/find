@@ -8,7 +8,8 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
@@ -204,7 +205,7 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], nftAli
 		//SYNC with register
 
 		let addresses : {String : Address} = {}
-		let nfts : {String : NFTRegistry.NFTInfo} = {}
+		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
 
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
@@ -232,13 +233,13 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], nftAli
 			}
 			let address = resolveAddress!
 
-			var nft : NFTRegistry.NFTInfo? = nil
+			var nft : NFTCatalog.NFTCollectionData? = nil
 			let nftIdentifier = nftAliasOrIdentifiers[counter]
 
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				nft = NFTRegistry.getNFTInfo(nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftIdentifier))
+				nft = getCollectionData(nftIdentifier) 
 				nfts[nftIdentifier] = nft
 			}
 
@@ -275,4 +276,10 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], nftAli
 			counter = counter + 1
 		}
 	}
+}
+
+pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData
 }

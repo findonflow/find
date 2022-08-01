@@ -6,7 +6,6 @@ import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscro
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
@@ -330,3 +329,4 @@ transaction(leaseName: String, amount: UFix64) {
 		self.saleItemsCap.borrow()!.buy(name:leaseName, vault: <- vault, to: self.buyer)
 	}
 }
+

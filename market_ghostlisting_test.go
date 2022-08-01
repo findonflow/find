@@ -157,7 +157,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(15.0).
@@ -260,7 +260,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(15.0).
@@ -301,7 +301,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -361,7 +361,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).

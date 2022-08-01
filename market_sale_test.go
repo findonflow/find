@@ -17,7 +17,6 @@ func TestMarketSale(t *testing.T) {
 		registerUser("user2").
 		createUser(100.0, "user3").
 		registerUser("user3").
-		registerFtInRegistry().
 		setFlowDandyMarketOption("Sale").
 		setProfile("user1").
 		setProfile("user2")
@@ -26,12 +25,13 @@ func TestMarketSale(t *testing.T) {
 	otu.setUUID(300)
 
 	id := otu.mintThreeExampleDandies()[0]
+	otu.registerFtInRegistry()
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
 
 		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", "Dandy", 0.025)
+		otu.checkRoyalty("user1", id, "platform", "A.f8d6e0586b0a20c7.Dandy.NFT", 0.025)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -54,7 +54,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.Tx("listNFTForSale",
 			overflow.SignProposeAndPayAs("user1"),
 			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			overflow.Arg("id", id),
 			overflow.Arg("ftAliasOrIdentifier", "Flow"),
 			overflow.Arg("directSellPrice", 0.0),
@@ -68,7 +68,7 @@ func TestMarketSale(t *testing.T) {
 		otu.O.Tx("listNFTForSale",
 			overflow.SignProposeAndPayAs("user1"),
 			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "Dandy"),
+			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			overflow.Arg("id", id),
 			overflow.Arg("ftAliasOrIdentifier", "Flow"),
 			overflow.Arg("directSellPrice", price),
@@ -83,13 +83,13 @@ func TestMarketSale(t *testing.T) {
 			setupDandy("user1").
 			createUser(100.0, "user2").
 			registerUser("user2").
-			registerFtInRegistry().
 			setFlowDandyMarketOption("Sale")
 
 		otu.setUUID(300)
 
 		price := 10.0
 		id := otu.mintThreeExampleDandies()[0]
+		otu.registerFtInRegistry()
 		otu.listNFTForSale("user1", id, price).
 			sendDandy("user2", "user1", id)
 
@@ -180,7 +180,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("FUSD").
 				UFix64(price).
@@ -227,7 +227,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -279,7 +279,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -323,7 +323,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -345,7 +345,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[0]).
 				String("Flow").
 				UFix64(price).
@@ -472,7 +472,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -526,7 +526,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user3").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[0]).
 				String("FUSD").
 				UFix64(price).
@@ -580,12 +580,12 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "account").
-			setDUCExampleNFT()
+			setDUCExampleNFT().
+			sendExampleNFT("user1", "account")
 
 		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
 
-		otu.checkRoyalty("user1", 0, "minter", "ExampleNFT", 0.01)
+		otu.checkRoyalty("user1", 0, "minter", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -599,7 +599,7 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should be able to list an NFT for sale and buy it. where id != uuid", func(t *testing.T) {
 		saleItem := otu.listExampleNFTForSale("user1", 0, price)
 
-		otu.checkRoyalty("user1", 0, "minter", "ExampleNFT", 0.01)
+		otu.checkRoyalty("user1", 0, "minter", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -619,7 +619,7 @@ func TestMarketSale(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				StringArray("Dandy", "Dandy", "Dandy").
+				StringArray("A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64Array(ids[0], ids[1], ids[2]).
 				StringArray("FUSD", "FUSD", "FUSD").
 				UFix64Array(price, price, price).
@@ -684,7 +684,7 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess()
 
 		ids := otu.mintThreeExampleDandies()
-		dandy := []string{"Dandy", "Dandy", "Dandy"}
+		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}
 		fusd := []string{"FUSD", "FUSD", "FUSD"}
 		prices := []float64{price, price, price}
 
@@ -721,14 +721,14 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should be able to buy at max 5 dandies", func(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
-		dandy := []string{"Dandy", "Dandy", "Dandy"}
+		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}
 		fusd := []string{"FUSD", "FUSD", "FUSD"}
 		prices := []float64{price, price, price}
 		buyers := []string{"user1", "user1", "user1"}
 
 		id := otu.mintThreeExampleDandies()
 		ids = append(ids, id[0], id[1])
-		dandy = append(dandy, []string{"Dandy", "Dandy"}...)
+		dandy = append(dandy, []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}...)
 		fusd = append(fusd, []string{"FUSD", "FUSD"}...)
 		prices = append(prices, []float64{price, price}...)
 		buyers = append(buyers, []string{"user1", "user1"}...)
@@ -766,7 +766,7 @@ func TestMarketSale(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				Account("account").
-				StringArray("ExampleNFT").
+				StringArray("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 				UInt64Array(0).
 				UFix64Array(price).
 				UFix64(otu.currentTime() + 100.0)).
@@ -774,7 +774,7 @@ func TestMarketSale(t *testing.T) {
 
 		saleItemID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
 
-		otu.checkRoyalty("user1", 0, "minter", "ExampleNFT", 0.01)
+		otu.checkRoyalty("user1", 0, "minter", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))

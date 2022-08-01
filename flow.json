@@ -106,6 +106,27 @@
         "testnet": "0x51ea0e37c27a1f1a"
       }
     },
+    "NFTCatalog": {
+      "source": "./contracts/standard/NFTCatalog.cdc",
+      "aliases": {
+        "mainnet": "0x49a7cda3a1eecc29",
+        "testnet": "0x324c34e1c517e4db"
+      }
+    },
+    "NFTCatalogAdmin": {
+      "source": "./contracts/standard/NFTCatalogAdmin.cdc",
+      "aliases": {
+        "mainnet": "0x49a7cda3a1eecc29",
+        "testnet": "0x324c34e1c517e4db"
+      }
+    },
+    "NFTRetrieval": {
+      "source": "./contracts/standard/NFTRetrieval.cdc",
+      "aliases": {
+        "mainnet": "0x49a7cda3a1eecc29",
+        "testnet": "0x324c34e1c517e4db"
+      }
+    },
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
     "CollectionFactory": "./contracts/CollectionFactory.cdc",
@@ -134,7 +155,9 @@
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
     "FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
     "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
-    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc"
+    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
+    "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
+    "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -295,7 +318,12 @@
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft"
+        "FindLeaseMarketDirectOfferSoft",
+        "NFTCatalog",
+        "FINDNFTCatalog",
+        "NFTCatalogAdmin",
+        "FINDNFTCatalogAdmin",
+        "NFTRetrieval"
       ],
       "emulator-find": [],
       "emulator-user1": [],

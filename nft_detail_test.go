@@ -23,7 +23,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				StringArray()).
 			RunReturnsJsonString()
@@ -48,7 +48,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				StringArray()).
 			RunReturnsJsonString()
@@ -68,7 +68,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				StringArray(
 					"A.f8d6e0586b0a20c7.FindViews.Nounce",
@@ -129,7 +129,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				StringArray()).
 			RunReturnsInterface()
@@ -205,7 +205,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual1 := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(dandyIds[0]).
 				StringArray()).
 			RunReturnsJsonString()
@@ -229,7 +229,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual2 := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(dandyIds[1]).
 				StringArray()).
 			RunReturnsJsonString()
@@ -244,7 +244,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual3 := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(dandyIds[2]).
 				StringArray()).
 			RunReturnsJsonString()
@@ -258,7 +258,7 @@ func TestNFTDetailScript(t *testing.T) {
 		actual4 := otu.O.ScriptFromFile("getNFTDetails").
 			Args(otu.O.Arguments().
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(dandyIds[3]).
 				StringArray()).
 			RunReturnsJsonString()

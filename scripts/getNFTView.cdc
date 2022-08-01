@@ -1,17 +1,16 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 //Fetch a single view from a nft on a given path
 pub fun main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: String) : AnyStruct? {
 
-	let nftInfo = NFTRegistry.getNFTInfo(aliasOrIdentifier) 
-	if nftInfo == nil {panic("This NFT is not registered in registry. input: ".concat(aliasOrIdentifier))}
+	let publicPath = getPublicPath(aliasOrIdentifier)
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return []}
 	let address = resolveAddress!
 
-	let pp = nftInfo!.publicPath
+	let pp = publicPath
 	let collection= getAccount(address).getCapability(pp).borrow<&{MetadataViews.ResolverCollection}>()!
 
 	let nft=collection.borrowViewResolver(id: id)
@@ -23,3 +22,8 @@ pub fun main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: Str
 	return nil
 }
 
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData.publicPath
+}
