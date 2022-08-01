@@ -46,7 +46,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
-	otu.setUUID(300)
+	otu.setUUID(350)
 
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 

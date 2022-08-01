@@ -9,7 +9,8 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
@@ -218,7 +219,7 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		//SYNC with register
 
 		let addresses : {String : Address} = {}
-		let nfts : {String : NFTRegistry.NFTInfo} = {}
+		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
 
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
@@ -246,7 +247,7 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			}
 			let address = resolveAddress!
 
-			var nft : NFTRegistry.NFTInfo? = nil
+			var nft : NFTCatalog.NFTCollectionData? = nil
 			var ft : FTRegistry.FTInfo? = nil
 			let nftIdentifier = nftAliasOrIdentifiers[counter]
 			let ftIdentifier = ftAliasOrIdentifiers[counter]
@@ -254,7 +255,7 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				nft = NFTRegistry.getNFTInfo(nftIdentifier) ?? panic("This NFT is not supported by the Find Market yet. Type : ".concat(nftIdentifier))
+				nft = getCollectionData(nftIdentifier) 
 				nfts[nftIdentifier] = nft
 			}
 
@@ -309,4 +310,10 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		}
 	}
 
+}
+
+pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
+	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+	return collection.collectionData
 }

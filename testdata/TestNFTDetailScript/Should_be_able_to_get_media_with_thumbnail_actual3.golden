@@ -174,7 +174,7 @@
     "nftDetail": {
         "collectionDescription": "ufc strike FIND",
         "collectionName": "ufcstrike",
-        "id": 360,
+        "id": 361,
         "media": {
             "ipfs://QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U": "video/mp4",
             "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR": "image;display=thumbnail"
@@ -193,7 +193,7 @@
         },
         "thumbnail": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 360,
+        "uuid": 361,
         "views": [
             "checked",
             "checked",

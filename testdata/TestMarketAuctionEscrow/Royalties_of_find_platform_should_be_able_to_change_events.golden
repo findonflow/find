@@ -8,16 +8,24 @@
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user2",
     "endsAt": 4003,
+<<<<<<< HEAD
     "id": 270,
+=======
+    "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": 270,
 =======
       "id": 196,
 >>>>>>> b403b27 (Add royalty (#172))
+=======
+      "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -45,16 +53,24 @@
     "address": "0x179b6b1cb6755e31",
     "amount": 0.5,
     "findName": "user1",
+<<<<<<< HEAD
     "id": 270,
+=======
+    "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": 270,
 =======
       "id": 196,
 >>>>>>> b403b27 (Add royalty (#172))
+=======
+      "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -80,16 +96,24 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
     "findName": "find",
+<<<<<<< HEAD
     "id": 270,
+=======
+    "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": 270,
 =======
       "id": 196,
 >>>>>>> b403b27 (Add royalty (#172))
+=======
+      "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -115,16 +139,24 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.35,
     "findName": "find",
+<<<<<<< HEAD
     "id": 270,
+=======
+    "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
       "id": 270,
 =======
       "id": 196,
 >>>>>>> b403b27 (Add royalty (#172))
+=======
+      "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,

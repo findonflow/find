@@ -1,7 +1,7 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-import NFTCatalog from 0x49a7cda3a1eecc29
+import FINDNFTCatalog from 0x49a7cda3a1eecc29
 
 pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 	return fetchNFTCatalog(user: user, collectionIDs: collectionIDs)
@@ -12,7 +12,7 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [MetadataView
 	let account = getAuthAccount(ownerAddress)
 	let results : [MetadataViews.NFTView] = []
 	for collectionKey in ids.keys {
-		let catalogEntry = NFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
+		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 		let tempPathStr = "catalog".concat(collectionKey)
 		let tempPublicPath = PublicPath(identifier: tempPathStr)!
 		account.link<&{MetadataViews.ResolverCollection}>(tempPublicPath, target: catalogEntry.collectionData.storagePath)

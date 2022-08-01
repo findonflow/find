@@ -17,9 +17,10 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2").
-			registerFtInRegistry()
+			registerUser("user2")
+
 		dandyIds := otu.mintThreeExampleDandies()
+		otu.registerFtInRegistry()
 
 		id := dandyIds[0]
 
@@ -41,7 +42,6 @@ func TestDandy(t *testing.T) {
   "A.f8d6e0586b0a20c7.MetadataViews.Medias",
 }`),
 		)
-
 		otu.O.Script("getNFTView",
 			overflow.WithArg("user", "user1"),
 			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
@@ -61,7 +61,7 @@ func TestDandy(t *testing.T) {
 			overflow.WithArg("id", id),
 			overflow.WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"),
 		).AssertWant(t,
-			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/244"}),
+			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/247"}),
 		)
 
 	})
@@ -72,15 +72,15 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2").
-			registerFtInRegistry()
+			registerUser("user2")
 		dandiesIDs := otu.mintThreeExampleDandies()
+		otu.registerFtInRegistry()
 
 		otu.O.Script("getDandiesIDsFor",
 			overflow.WithArg("user", "user1"),
 			overflow.WithArg("minter", "user1"),
 		).AssertWant(t,
-			autogold.Want("allDandies", "[]interface {}{\n  246,\n  244,\n  245,\n}"),
+			autogold.Want("allDandies", "[]interface {}{\n  247,\n  248,\n  249,\n}"),
 		)
 
 		otu.O.Script("getDandiesMinters",

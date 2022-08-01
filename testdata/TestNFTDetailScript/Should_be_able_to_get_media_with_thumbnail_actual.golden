@@ -174,7 +174,7 @@
     "nftDetail": {
         "collectionDescription": "jambb FIND",
         "collectionName": "jambb",
-        "id": 361,
+        "id": 362,
         "media": {
             "https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg": "image/jpg;display=thumbnail",
             "ipfs://QmVoKN72cEyQ87FkphUxuc2jMnsNUSB5zoSxEitGLBypPr": "video/mp4"
@@ -193,7 +193,7 @@
         },
         "thumbnail": "https://content-images.jambb.com/card-front/29849042-6fc8-4f13-8fa8-6a09501c6ea8.jpg",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 361,
+        "uuid": 362,
         "views": [
             "checked",
             "checked",

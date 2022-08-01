@@ -1,6 +1,6 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
-import NFTCatalog from 0x49a7cda3a1eecc29
+import FINDNFTCatalog from 0x49a7cda3a1eecc29
 import RaribleNFT from 0x01ab36aaf654a13e
 import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
@@ -44,12 +44,12 @@ pub fun getNFTIDs_Catalog(ownerAddress: Address, cacheCollections: {String:Colle
 
 	let account = getAuthAccount(ownerAddress)
 
-	let types = NFTCatalog.getCatalogTypeData()
+	let types = FINDNFTCatalog.getCatalogTypeData()
 	for nftType in types.keys {
 
 		let typeData=types[nftType]!
 		let collectionKey=typeData.keys[0]
-		let catalogEntry = NFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
+		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 		let tempPathStr = "catalog".concat(collectionKey)
 		let tempPublicPath = PublicPath(identifier: tempPathStr)!
 		account.link<&NonFungibleToken.Collection>(tempPublicPath, target: catalogEntry.collectionData.storagePath)

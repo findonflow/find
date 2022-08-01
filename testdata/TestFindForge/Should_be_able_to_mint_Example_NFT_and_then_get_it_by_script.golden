@@ -1,0 +1,18 @@
+`{
+    "collections": {
+        "ExampleNFT": [
+            "ExampleNFTID0"
+        ]
+    },
+    "items": {
+        "ExampleNFTID0": {
+            "collection": "ExampleNFT",
+            "id": 1,
+            "image": "This is an exampleNFT url",
+            "name": "Neo",
+            "typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+            "url": "https://example-nft.onflow.org/ID0",
+            "uuid": 143
+        }
+    }
+}`

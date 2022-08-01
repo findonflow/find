@@ -2,7 +2,6 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
@@ -27,3 +26,4 @@ transaction(leaseName: String) {
 		self.market.acceptOffer(self.pointer)
 	}
 }
+

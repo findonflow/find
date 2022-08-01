@@ -15,7 +15,6 @@ func TestBulkMarketSale(t *testing.T) {
 		registerUser("user2").
 		createUser(1000.0, "user3").
 		registerUser("user3").
-		registerFtInRegistry().
 		setFlowDandyMarketOption("Sale").
 		setProfile("user1").
 		setProfile("user2")
@@ -32,6 +31,8 @@ func TestBulkMarketSale(t *testing.T) {
 	items4 := otu.mintThreeExampleDandies()
 	items5 := otu.mintThreeExampleDandies()
 	items6 := otu.mintThreeExampleDandies()
+
+	otu.registerFtInRegistry()
 
 	id := items[0]
 	id2 := items[1]
@@ -104,7 +105,7 @@ func TestBulkMarketSale(t *testing.T) {
 				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
 				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(2000)
+			AssertComputationLessThenOrEqual(2050)
 
 		result.Result.Print(WithMeter(), WithoutEvents())
 

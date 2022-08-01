@@ -54,7 +54,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -132,6 +132,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", 0.0),
@@ -152,6 +153,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", price),
@@ -172,6 +174,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", price),
@@ -354,7 +357,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -406,7 +409,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -439,7 +442,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -660,7 +663,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[2]).
 				String("Flow").
 				UFix64(price).
@@ -790,8 +793,8 @@ func TestMarketAuctionSoft(t *testing.T) {
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "account").
-			setDUCExampleNFT()
+			setDUCExampleNFT().
+			sendExampleNFT("user1", "account")
 
 		saleItemID := otu.listNFTForSoftAuctionDUC("user1", 0, price)
 

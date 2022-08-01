@@ -77,6 +77,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("amount", 0.0),
@@ -94,6 +95,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("amount", price),
@@ -185,7 +187,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -226,7 +228,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(newPrice).
@@ -254,7 +256,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -310,7 +312,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price).
@@ -406,7 +408,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price + 10.0).
@@ -421,7 +423,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(id).
 				String("Flow").
 				UFix64(price + 10.0).
@@ -573,7 +575,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -617,7 +619,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				String("user1").
-				String("Dandy").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64(ids[1]).
 				String("Flow").
 				UFix64(price).
@@ -645,8 +647,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 	t.Run("Should be able to offer an NFT and fulfill it with id != uuid", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "account").
-			setDUCExampleNFT()
+			setDUCExampleNFT().
+			sendExampleNFT("user1", "account")
 
 		saleItem := otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
 
@@ -669,7 +671,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Args(otu.O.Arguments().
 				Account("account").
 				StringArray(seller, seller, seller).
-				StringArray("Dandy", "Dandy", "Dandy").
+				StringArray("A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT").
 				UInt64Array(ids...).
 				StringArray("Flow", "Flow", "Flow").
 				UFix64Array(price, price, price).
@@ -735,7 +737,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		name := "user2"
 
 		sellers := []string{seller}
-		dandy := []string{"Dandy"}
+		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
 		prices := []float64{price}
 
@@ -776,7 +778,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		name := "user2"
 
 		sellers := []string{seller}
-		dandy := []string{"Dandy"}
+		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
 		prices := []float64{price}
 
