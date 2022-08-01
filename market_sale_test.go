@@ -517,21 +517,23 @@ func TestMarketSale(t *testing.T) {
 		otu.destroyFUSDVault("user1")
 
 		otu.O.Tx("buyNFTForSale",
-			overflow.WithPayloadSigner("user2"),
+			overflow.WithSigner("user2"),
 			overflow.WithArg("marketplace", "account"),
 			overflow.WithArg("user", "user3"),
 			overflow.WithArg("id", ids[0]),
 			overflow.WithArg("amount", price),
-		).AssertEvent(t,
-			"FindMarket.RoyaltyCouldNotBePaid",
-			overflow.OverflowEvent{
-				"address":         otu.accountAddress("user1"),
-				"amount":          0.5,
-				"findName":        "user1",
-				"residualAddress": otu.accountAddress("find"),
-				"royaltyName":     "minter",
-			},
-		)
+		).
+			AssertSuccess(t).
+			AssertEvent(t,
+				"FindMarket.RoyaltyCouldNotBePaid",
+				overflow.OverflowEvent{
+					"address":         otu.accountAddress("user1"),
+					"amount":          0.5,
+					"findName":        "user1",
+					"residualAddress": otu.accountAddress("find"),
+					"royaltyName":     "minter",
+				},
+			)
 
 		otu.cancelAllNFTForSale("user1")
 	})

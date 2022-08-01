@@ -359,11 +359,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.setFindLeaseCut(0.035)
 		otu.listLeaseForSale("user1", "name1", price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("buyLeaseForSale").
+		otu.O.TransactionFromFile("buyLeaseForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
@@ -384,11 +380,6 @@ func TestLeaseMarketSale(t *testing.T) {
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 
 		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
@@ -460,19 +451,22 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.destroyFUSDVault("find")
 
-		res := otu.O.TransactionFromFile("buyLeaseForSale").
+		otu.O.TransactionFromFile("buyLeaseForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
 				UFix64(price)).
 			Test(otu.T).
-			AssertSuccess()
+			AssertSuccess().
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
+				"address":         otu.accountAddress("find"),
+				"amount":          0.5,
+				"leaseName":       "name1",
+				"royaltyName":     "network",
+				"tenant":          "findLease",
+				"residualAddress": otu.accountAddress("user3"),
+			}))
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to residual account if royalty receiver is not working events", result)
 		otu.cancelAllNFTForSale("user1").
 			moveNameTo("user2", "user1", "name1")
 		// createUser(100, "find")

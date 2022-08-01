@@ -711,7 +711,7 @@ func TestAuction(t *testing.T) {
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("amount", 10.0),
 		).AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer",
 				overflow.OverflowEvent{
 					"amount": 10.0,
 					"buyer":  otu.accountAddress("user3"),
