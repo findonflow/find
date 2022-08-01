@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow"
-	"github.com/hexops/autogold"
 )
 
 /*
@@ -16,6 +15,8 @@ func TestAuction(t *testing.T) {
 		setupFIND().
 		createUser(100.0, "user1").
 		registerUser("user1")
+
+	otu.setUUID(300)
 
 	t.Run("Should list a name for sale", func(t *testing.T) {
 
@@ -119,9 +120,6 @@ func TestAuction(t *testing.T) {
 				"amount": 0.2,
 				"to":     "0x01cf0e2f2f715450",
 			}))
-
-		json := otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("0x179b6b1cb6755e31")).RunReturnsJsonString()
-		autogold.Equal(t, json)
 
 	})
 
@@ -296,6 +294,7 @@ func TestAuction(t *testing.T) {
 				"status":    "active_ongoing",
 				"buyerName": "user2",
 			}))
+
 	})
 
 	t.Run("Should be able to sell locked name at auction", func(t *testing.T) {
@@ -312,18 +311,20 @@ func TestAuction(t *testing.T) {
 			expireAuction().
 			setProfile("user2")
 
-		res := otu.O.TransactionFromFile("fulfillNameAuction").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("user1").
-				String("user1")).
-			Test(t).
-			AssertSuccess()
+		otu.O.Tx("fulfillNameAuction",
+			overflow.WithSigner("user2"),
+			overflow.WithArg("owner", "user1"),
+			overflow.WithArg("name", "user1"),
+		).AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
+				overflow.OverflowEvent{
+					"amount":              20.0,
+					"auctionReservePrice": 20.0,
+					"buyer":               otu.accountAddress("user2"),
+					"seller":              otu.accountAddress("user1"),
+				},
+			)
 
-		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction", "A.f8d6e0586b0a20c7.FIND.RoyaltyPaid"})
-		result = otu.replaceID(result, uuid)
-		autogold.Equal(t, result)
 	})
 
 	t.Run("Should not allow double bid from same author", func(t *testing.T) {
@@ -604,16 +605,18 @@ func TestAuction(t *testing.T) {
 			expireAuction().tickClock(2.0).
 			setProfile("user2")
 
-		res := otu.O.TransactionFromFile("cancelNameAuction").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().StringArray("user1")).
-			Test(t).
-			AssertSuccess()
-
-		uuid := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", "uuid")
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.EnglishAuction"})
-		result = otu.replaceID(result, uuid)
-		autogold.Equal(t, result)
+		otu.O.Tx("cancelNameAuction",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("names", `[ "`+"user1"+`"]`),
+		).AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
+				overflow.OverflowEvent{
+					"amount":              15.0,
+					"auctionReservePrice": 20.0,
+					"buyer":               otu.accountAddress("user2"),
+					"seller":              otu.accountAddress("user1"),
+				},
+			)
 
 	})
 
@@ -703,17 +706,18 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0).
 			setProfile("user3")
 
-		res := otu.O.TransactionFromFile("bidName").SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				String("user1").
-				UFix64(10.0)).
-			Test(t).
-			AssertSuccess()
+		otu.O.Tx("bidName",
+			overflow.WithSigner("user3"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("amount", 10.0),
+		).AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer",
+				overflow.OverflowEvent{
+					"amount": 10.0,
+					"buyer":  otu.accountAddress("user3"),
+					"seller": otu.accountAddress("user1"),
+				},
+			)
 
-		uuids := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FIND.DirectOffer", "uuid")
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FIND.DirectOffer"})
-		result = otu.replaceID(result, uuids)
-
-		autogold.Equal(t, result)
 	})
 }

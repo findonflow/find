@@ -8,12 +8,32 @@
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user2",
     "endsAt": 4003,
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "id": 270,
+=======
     "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+    "id": 198,
+>>>>>>> main
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+      "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
+=======
       "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+      "id": 198,
+>>>>>>> main
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -27,7 +47,7 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
-    "saleID": 386,
+    "saleID": 495,
     "seller": "0x179b6b1cb6755e31",
     "sellerName": "user1",
     "status": "sold",
@@ -41,12 +61,32 @@
     "address": "0x179b6b1cb6755e31",
     "amount": 0.5,
     "findName": "user1",
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "id": 270,
+=======
     "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+    "id": 198,
+>>>>>>> main
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+      "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
+=======
       "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+      "id": 198,
+>>>>>>> main
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -61,7 +101,7 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "minter",
-    "saleID": 386,
+    "saleID": 495,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
   }
@@ -72,12 +112,32 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
     "findName": "find",
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "id": 270,
+=======
     "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+    "id": 198,
+>>>>>>> main
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+      "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
+=======
       "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+      "id": 198,
+>>>>>>> main
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -92,7 +152,7 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
-    "saleID": 386,
+    "saleID": 495,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
   }
@@ -103,12 +163,32 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.35,
     "findName": "find",
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "id": 270,
+=======
     "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+    "id": 198,
+>>>>>>> main
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+      "id": 270,
+=======
+      "id": 196,
+>>>>>>> b403b27 (Add royalty (#172))
+=======
       "id": 198,
+>>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+      "id": 198,
+>>>>>>> main
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -123,7 +203,7 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",
-    "saleID": 386,
+    "saleID": 495,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"
   }

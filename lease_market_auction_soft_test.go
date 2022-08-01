@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestLeaseMarketAuctionSoft(t *testing.T) {
@@ -46,7 +46,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
-	otu.setUUID(300)
+	otu.setUUID(350)
 
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 
@@ -108,7 +108,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				StringArray("name1")).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"leaseName": "name1",
 				"seller":    otu.accountAddress("user1"),
 				"buyer":     otu.accountAddress("user2"),
@@ -122,16 +122,16 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with price 0", func(t *testing.T) {
 
 		otu.O.Tx(
-			"ListLeaseForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", 0.0),
-			overflow.Arg("auctionReservePrice", price+5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+			"listLeaseForAuctionSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", 0.0),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction start price should be greater than 0")
 
@@ -140,16 +140,16 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
 
 		otu.O.Tx(
-			"ListLeaseForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", price),
-			overflow.Arg("auctionReservePrice", price-5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+			"listLeaseForAuctionSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price-5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
 
@@ -158,16 +158,16 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
 		otu.O.Tx(
-			"ListLeaseForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", price),
-			overflow.Arg("auctionReservePrice", price+5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", 0.0),
+			"listLeaseForAuctionSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 
@@ -228,7 +228,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				StringArray("name1")).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"leaseName": "name1",
 				"seller":    otu.accountAddress(name),
 				"amount":    10.0,
@@ -289,7 +289,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			Args(otu.O.Arguments().
 				StringArray("name1")).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"leaseName": "name1",
 				"seller":    otu.accountAddress(name),
 				"buyer":     otu.accountAddress(buyer),
@@ -510,31 +510,23 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action status", status)
-
-		res := otu.O.TransactionFromFile("fulfillLeaseMarketAuctionSoft").
+		otu.O.TransactionFromFile("fulfillLeaseMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
 				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"royaltyName": "network",
 			}))
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action events", result)
 		otu.moveNameTo("user2", "user1", "name1")
 	})
 
@@ -558,12 +550,12 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				String("name1").
 				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"royaltyName": "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"royaltyName": "network",
@@ -692,7 +684,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				String("name1").
 				UFix64(20.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"amount":        20.0,
 				"leaseName":     "name1",
 				"buyer":         otu.accountAddress("user3"),

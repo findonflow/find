@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestMarketAuctionEscrow(t *testing.T) {
@@ -114,7 +115,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				Account("account").
 				UInt64Array(id)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     id,
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
@@ -127,17 +128,18 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", 0.0),
-			overflow.Arg("auctionReservePrice", price+5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", 0.0),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction start price should be greater than 0")
 	})
@@ -146,17 +148,17 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", price),
-			overflow.Arg("auctionReservePrice", price-5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()+10.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price-5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
 	})
@@ -165,17 +167,18 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("price", price),
-			overflow.Arg("auctionReservePrice", price+5.0),
-			overflow.Arg("auctionDuration", 300.0),
-			overflow.Arg("auctionExtensionOnLateBid", 60.0),
-			overflow.Arg("minimumBidIncrement", 1.0),
-			overflow.Arg("auctionValidUntil", otu.currentTime()-10.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()-10.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 	})
@@ -619,11 +622,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, []uint64{id})
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action status", status)
-
-		res := otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -652,13 +651,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			}))
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
-		result = otu.replaceID(result, []uint64{id})
-		result = otu.replaceID(result, saleIDs)
-
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon fulfill action events", result)
 		otu.sendDandy("user1", "user2", id)
 
 	})
@@ -672,12 +664,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			setFindCut(0.035)
 
 		otu.tickClock(500.0)
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, []uint64{id})
-
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
+		otu.O.TransactionFromFile("fulfillMarketAuctionEscrowedFromBidder").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -706,13 +693,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			}))
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction"})
-		result = otu.replaceID(result, []uint64{id})
-		result = otu.replaceID(result, saleIDs)
-
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 		otu.sendDandy("user1", "user2", id)
 
 	})

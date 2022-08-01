@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -52,13 +53,14 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should not be able to list with price $0", func(t *testing.T) {
 
 		otu.O.Tx("listNFTForSale",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("directSellPrice", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+100.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", 0.0),
+			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Listing price should be greater than 0")
 	})
@@ -66,13 +68,13 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
 		otu.O.Tx("listNFTForSale",
-			overflow.SignProposeAndPayAs("user1"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("directSellPrice", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 	})
@@ -197,7 +199,7 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[1], price)
 		otu.listNFTForSale("user1", ids[2], price)
 
-		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
 		scriptResult.AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
 		scriptResult.AssertLengthWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items", 3)
 
@@ -207,7 +209,7 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).AssertSuccess()
 		//TODO: assert on events
 
-		scriptResultAfter := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResultAfter := otu.O.Script("getStatus", WithArg("user", "user1"))
 		scriptResultAfter.AssertWithPointerError(t, "/FINDReport/itemsForSale", "Object has no key 'itemsForSale'")
 	})
 
@@ -369,11 +371,7 @@ func TestMarketSale(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, ids)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon buy action status", status)
-
-		res := otu.O.TransactionFromFile("buyNFTForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -382,14 +380,14 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -397,19 +395,13 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
-		result = otu.replaceID(result, ids)
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon buy action events", result)
 
 	})
 
@@ -419,11 +411,7 @@ func TestMarketSale(t *testing.T) {
 		otu.setFindCut(0.035)
 		otu.listNFTForSale("user1", ids[0], price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, ids)
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("buyNFTForSale").
+		otu.O.TransactionFromFile("buyNFTForSale").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -432,14 +420,14 @@ func TestMarketSale(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).
 			AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -447,19 +435,13 @@ func TestMarketSale(t *testing.T) {
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
-		result = otu.replaceID(result, ids)
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 
 	})
 
@@ -534,47 +516,25 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).AssertSuccess()
 		otu.destroyFUSDVault("user1")
 
-		res := otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user3").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess()
-		/*
-			  TODO maybe add back after overflow v3
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-					"address":     otu.accountAddress("account"),
-					"amount":      "0.25000000",
-					"id":          fmt.Sprintf("%d", ids[0]),
-					"royaltyName": "find",
-				})).
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
+		otu.O.Tx("buyNFTForSale",
+			overflow.WithSigner("user2"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("user", "user3"),
+			overflow.WithArg("id", ids[0]),
+			overflow.WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t,
+				"FindMarket.RoyaltyCouldNotBePaid",
+				overflow.OverflowEvent{
 					"address":         otu.accountAddress("user1"),
-					"amount":          "0.50000000",
+					"amount":          0.5,
 					"findName":        "user1",
-					"residualAddress": otu.accountAddrss("find"),
-						"id":              fmt.Sprintf("%d", ids[0]),
+					"residualAddress": otu.accountAddress("find"),
 					"royaltyName":     "minter",
-					"tenant":          "find",
-				})).
-				AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-					"address":     otu.accountAddress("account"),
-					"amount":      "0.25000000",
-					"findName":    "",
-					"id":          fmt.Sprintf("%d", ids[0]),
-					"royaltyName": "platform",
-					"tenant":      "find",
-				}))
-		*/
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "saleID")
+				},
+			)
 
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketSale.Sale"})
-		result = otu.replaceID(result, ids)
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to residual account if royalty receiver is not working events", result)
 		otu.cancelAllNFTForSale("user1")
 	})
 
@@ -626,7 +586,7 @@ func TestMarketSale(t *testing.T) {
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess()
 
-		scriptResult := otu.O.Script("getStatus", overflow.Arg("user", "user1"))
+		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
 
 		var itemsForSale []SaleItemInformation
 		err := scriptResult.MarshalPointerAs("/FINDReport/itemsForSale/FindMarketSale/items", &itemsForSale)
@@ -647,21 +607,21 @@ func TestMarketSale(t *testing.T) {
 				UInt64Array(ids[0], ids[1], ids[2]).
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
 				"seller": otu.accountAddress(seller),
 				"buyer":  otu.accountAddress(name),
 				"status": "sold",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
 				"seller": otu.accountAddress(seller),
@@ -789,7 +749,7 @@ func TestMarketSale(t *testing.T) {
 				UInt64Array(saleItemID[0]).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     saleItemID[0],
 				"seller": otu.accountAddress("user1"),

@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestLeaseMarketDirectOfferSoft(t *testing.T) {
@@ -44,7 +44,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
-	otu.setUUID(300)
+	otu.setUUID(350)
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
@@ -62,11 +62,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"bidLeaseMarketDirectOfferSoft",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+10.0),
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", 0.0),
+			WithArg("validUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Offer price should be greater than 0")
 
@@ -76,11 +76,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"bidLeaseMarketDirectOfferSoft",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("leaseName", "name1"),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 
@@ -414,36 +414,26 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon accept offer action status", status)
-
-		res := otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
+		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
-
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon accept offer action events", result)
-
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)
 
@@ -458,35 +448,26 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			setFindLeaseCut(0.035)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
+		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
 			}))
-
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)
@@ -597,7 +578,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				UFix64(newPrice).
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"leaseName":     "name1",
 				"buyer":         otu.accountAddress("user3"),

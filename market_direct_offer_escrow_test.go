@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestMarketDirectOfferEscrow(t *testing.T) {
@@ -72,14 +73,15 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.O.Tx(
 			"bidMarketDirectOfferEscrowed",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("user", "user1"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+10.0),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", 0.0),
+			WithArg("validUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Offer price should be greater than 0")
 
@@ -89,14 +91,15 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.O.Tx(
 			"bidMarketDirectOfferEscrowed",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("user", "user1"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 

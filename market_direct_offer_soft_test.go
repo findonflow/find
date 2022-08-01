@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 func TestMarketDirectOfferSoft(t *testing.T) {
@@ -71,14 +71,15 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"bidMarketDirectOfferSoft",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("user", "user1"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", 0.0),
-			overflow.Arg("validUntil", otu.currentTime()+10.0),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("nftAliasOrIdentifier", "Dandy"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", 0.0),
+			WithArg("validUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Offer price should be greater than 0")
 
@@ -88,14 +89,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx(
 			"bidMarketDirectOfferSoft",
-			overflow.SignProposeAndPayAs("user2"),
-			overflow.Arg("marketplace", "account"),
-			overflow.Arg("user", "user1"),
-			overflow.Arg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			overflow.Arg("id", id),
-			overflow.Arg("ftAliasOrIdentifier", "Flow"),
-			overflow.Arg("amount", price),
-			overflow.Arg("validUntil", 0.0),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 
@@ -461,14 +462,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -476,7 +477,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          id,
@@ -515,14 +516,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64(id).
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.35,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -530,7 +531,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "minter",
 				"tenant":      "find",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.accountAddress("account"),
 				"amount":      0.25,
 				"id":          id,
@@ -671,7 +672,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(newPrice).
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"id":            id,
 				"buyer":         otu.accountAddress("user3"),
@@ -729,17 +730,17 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64Array(price, price, price).
 				UFix64(otu.currentTime() + 100.0)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
 				"buyer":  otu.accountAddress("user2"),
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
 				"buyer":  otu.accountAddress("user2"),
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
 				"buyer":  otu.accountAddress("user2"),
@@ -751,21 +752,21 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(ids...)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[0],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[1],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[2],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
@@ -780,19 +781,19 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64Array(ids...).
 				UFix64Array(price, price, price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[0],
 				"buyer":  otu.accountAddress("user2"),
 				"amount": price,
 				"status": "sold",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[1],
 				"buyer":  otu.accountAddress("user2"),
 				"amount": price,
 				"status": "sold",
 			})).
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[2],
 				"buyer":  otu.accountAddress("user2"),
 				"amount": price,
@@ -933,7 +934,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				Account("account").
 				UInt64Array(saleItemID[0])).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     saleItemID[0],
 				"seller": otu.accountAddress("user1"),
 				"buyer":  otu.accountAddress("user2"),
@@ -948,7 +949,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64Array(saleItemID[0]).
 				UFix64Array(price)).
 			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     saleItemID[0],
 				"buyer":  otu.accountAddress("user2"),
 				"amount": price,

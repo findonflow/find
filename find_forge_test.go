@@ -48,16 +48,21 @@ func TestFindForge(t *testing.T) {
 			}
 		}
 
-		uuids := otu.getIDFromEvent(events.Events, "A.f8d6e0586b0a20c7.FindForge.Minted", "uuid")
+		// result := otu.O.ScriptFromFile("getCollections").
+		// 	Args(otu.O.Arguments().String("user1")).
+		// 	RunReturnsJsonString()
 
-		result := otu.O.ScriptFromFile("getCollections").
-			Args(otu.O.Arguments().String("user1")).
-			RunReturnsJsonString()
+		// result = otu.replaceID(result, dandyIds)
+		// result = otu.replaceID(result, uuids)
 
-		result = otu.replaceID(result, dandyIds)
-		result = otu.replaceID(result, uuids)
+		// autogold.Equal(t, result)
 
-		autogold.Equal(t, result)
+		otu.O.Script("getCollections",
+			overflow.WithArg("user", "user1"),
+		).AssertWithPointerWant(t,
+			"/collections",
+			autogold.Want("collection", map[string]interface{}{"ExampleNFT": []interface{}{"ExampleNFT1"}}),
+		)
 
 	})
 

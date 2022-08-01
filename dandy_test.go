@@ -1,10 +1,9 @@
 package test_main
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 
+	"github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 )
 
@@ -24,36 +23,46 @@ func TestDandy(t *testing.T) {
 		otu.registerFtInRegistry()
 
 		id := dandyIds[0]
-		res := otu.O.ScriptFromFile("getNFTViews").Args(otu.O.Arguments().String("user1").String("A.f8d6e0586b0a20c7.Dandy.NFT").UInt64(id)).RunReturnsJsonString()
 
-		viewList := []string{
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
-			"A.f8d6e0586b0a20c7.MetadataViews.Display",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.MetadataViews.Editions",
-			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
-			"A.f8d6e0586b0a20c7.MetadataViews.Medias",
-		}
-		for _, item := range viewList {
-			res = strings.Replace(res, item, "checked", -1)
-		}
-		result := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
-			String("user1").
-			String("A.f8d6e0586b0a20c7.Dandy.NFT").
-			UInt64(id).
-			String("A.f8d6e0586b0a20c7.MetadataViews.Display")).RunReturnsJsonString()
+		otu.O.Script("getNFTViews",
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			overflow.WithArg("id", id),
+		).AssertWant(t,
+			autogold.Want("Views", `[]interface {}{
+  "A.f8d6e0586b0a20c7.FindViews.Nounce",
+  "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+  "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
+  "A.f8d6e0586b0a20c7.MetadataViews.Display",
+  "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+  "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+  "A.f8d6e0586b0a20c7.MetadataViews.Traits",
+  "A.f8d6e0586b0a20c7.MetadataViews.Editions",
+  "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+  "A.f8d6e0586b0a20c7.MetadataViews.Medias",
+}`),
+		)
+		otu.O.Script("getNFTView",
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			overflow.WithArg("id", id),
+			overflow.WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.Display"),
+		).AssertWant(t,
+			autogold.Want("Display", map[string]interface{}{
+				"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+				"name":        "Neo Motorcycle 1 of 3",
+				"thumbnail":   map[string]interface{}{"url": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"},
+			}),
+		)
 
-		urlResult := otu.O.ScriptFromFile("getNFTView").Args(otu.O.Arguments().
-			String("user1").
-			String("A.f8d6e0586b0a20c7.Dandy.NFT").
-			UInt64(id).
-			String("A.f8d6e0586b0a20c7.MetadataViews.ExternalURL")).RunReturnsJsonString()
-
-		overallResult := fmt.Sprintf("%s%s%s", res, result, urlResult)
-		overallResult = otu.replaceID(overallResult, dandyIds)
-		autogold.Equal(t, overallResult)
+		otu.O.Script("getNFTView",
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			overflow.WithArg("id", id),
+			overflow.WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"),
+		).AssertWant(t,
+			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/247"}),
+		)
 
 	})
 
@@ -67,26 +76,20 @@ func TestDandy(t *testing.T) {
 		dandiesIDs := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry()
 
-		getDandiesIDsFor := otu.O.ScriptFromFile("getDandiesIDsFor").
-			Args(otu.O.Arguments().
-				String("user1").
-				String("user1")).
-			RunReturnsJsonString()
+		otu.O.Script("getDandiesIDsFor",
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("minter", "user1"),
+		).AssertWant(t,
+			autogold.Want("allDandies", "[]interface {}{\n  247,\n  248,\n  249,\n}"),
+		)
 
-		for _, id := range dandiesIDs {
-			getDandiesIDsFor = strings.Replace(getDandiesIDsFor, fmt.Sprint(id)+`"`, `DandyID"`, -1)
-		}
-
-		otu.AutoGold("getDandiesIDsFor", getDandiesIDsFor)
-
-		getDandiesMinters := otu.O.ScriptFromFile("getDandiesMinters").
-			Args(otu.O.Arguments().
-				String("user1")).
-			RunReturnsJsonString()
-
-		getDandiesMinters = otu.replaceID(getDandiesMinters, dandiesIDs)
-
-		otu.AutoGold("getDandiesMinters", getDandiesMinters)
+		otu.O.Script("getDandiesMinters",
+			overflow.WithArg("user", "user1"),
+		).AssertWant(t,
+			autogold.Want("dandyMinters", `[]interface {}{
+  "user1",
+}`),
+		)
 
 		/* mint new dandies and withdraw all of them */
 		dandiesIDs = append(dandiesIDs, otu.mintThreeExampleDandies()...)
@@ -98,24 +101,18 @@ func TestDandy(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess()
 
-		getDandiesIDsFor2 := otu.O.ScriptFromFile("getDandiesIDsFor").
-			Args(otu.O.Arguments().
-				String("user1").
-				String("user1")).
-			RunReturnsJsonString()
+		otu.O.Script("getDandiesIDsFor",
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("minter", "user1"),
+		).AssertWant(t,
+			autogold.Want("noDandies", nil),
+		)
 
-		getDandiesIDsFor2 = otu.replaceID(getDandiesIDsFor2, dandiesIDs)
-
-		otu.AutoGold("getDandiesIDsFor2", getDandiesIDsFor2)
-
-		getDandiesMinters2 := otu.O.ScriptFromFile("getDandiesMinters").
-			Args(otu.O.Arguments().
-				String("user1")).
-			RunReturnsJsonString()
-
-		getDandiesMinters2 = otu.replaceID(getDandiesMinters2, dandiesIDs)
-
-		otu.AutoGold("getDandiesMinters2", getDandiesMinters2)
+		otu.O.Script("getDandiesMinters",
+			overflow.WithArg("user", "user1"),
+		).AssertWant(t,
+			autogold.Want("noDandyMinters", nil),
+		)
 
 	})
 }

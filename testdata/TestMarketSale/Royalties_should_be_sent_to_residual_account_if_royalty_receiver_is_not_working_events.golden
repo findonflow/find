@@ -7,12 +7,23 @@
     "buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
     "buyerName": "user2",
     "endsAt": 301,
+<<<<<<< HEAD
     "id": 367,
+=======
+    "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> main
       "id": 367,
+=======
+      "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -26,7 +37,11 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
+<<<<<<< HEAD
     "saleID": 370,
+=======
+    "saleID": 453,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "seller": "0xe03daebed8ca0615",
     "sellerName": "user3",
     "status": "sold",
@@ -40,12 +55,23 @@
     "address": "0x179b6b1cb6755e31",
     "amount": 0.5,
     "findName": "user1",
+<<<<<<< HEAD
     "id": 367,
+=======
+    "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> main
       "id": 367,
+=======
+      "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -59,9 +85,13 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
-    "residualAddress": "0x01cf0e2f2f715450",
+    "residualAddress": "0x01cf0e2f2f715ID2",
     "royaltyName": "minter",
+<<<<<<< HEAD
     "saleID": 370,
+=======
+    "saleID": 453,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "tenant": "find",
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
@@ -72,12 +102,23 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.25,
     "findName": "find",
+<<<<<<< HEAD
     "id": 367,
+=======
+    "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> main
       "id": 367,
+=======
+      "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -92,7 +133,11 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "platform",
+<<<<<<< HEAD
     "saleID": 370,
+=======
+    "saleID": 453,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "tenant": "find",
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
@@ -103,12 +148,23 @@
     "address": "0xf8d6e0586b0a20c7",
     "amount": 0.35,
     "findName": "find",
+<<<<<<< HEAD
     "id": 367,
+=======
+    "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "nft": {
       "collectionDescription": "Neo Collectibles FIND",
       "collectionName": "user1",
       "editionNumber": 1,
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> main
       "id": 367,
+=======
+      "id": 448,
+>>>>>>> 3bb4867 (fixed tests after merge)
       "name": "Neo Motorcycle 1 of 3",
       "scalars": {
         "Speed": 100,
@@ -123,7 +179,11 @@
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
     "royaltyName": "find",
+<<<<<<< HEAD
     "saleID": 370,
+=======
+    "saleID": 453,
+>>>>>>> 3bb4867 (fixed tests after merge)
     "tenant": "find",
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }
