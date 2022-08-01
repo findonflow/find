@@ -14,10 +14,14 @@
     "sellerName": "user1",
     "status": "cancel_reserved_not_met",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "uuid": 166,
 =======
     "uuid": 240,
 >>>>>>> 3bb4867 (fixed tests after merge)
+=======
+    "uuid": 166,
+>>>>>>> main
     "validUntil": 31536001,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }

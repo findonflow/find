@@ -13,10 +13,14 @@
             "typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
             "url": "https://example-nft.onflow.org/ID0",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "uuid": 143
 =======
             "uuid": 219
 >>>>>>> 3bb4867 (fixed tests after merge)
+=======
+            "uuid": 143
+>>>>>>> main
         }
     }
 }`

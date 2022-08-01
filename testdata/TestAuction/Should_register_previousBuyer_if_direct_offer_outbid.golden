@@ -14,10 +14,14 @@
     "sellerName": "user1",
     "status": "active_offered",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "uuid": 140,
 =======
     "uuid": 213,
 >>>>>>> 3bb4867 (fixed tests after merge)
+=======
+    "uuid": 140,
+>>>>>>> main
     "validUntil": 31536001,
     "vaultType": "A.f8d6e0586b0a20c7.FUSD.Vault"
   }

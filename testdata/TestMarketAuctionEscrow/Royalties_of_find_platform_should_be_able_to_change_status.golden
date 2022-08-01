@@ -19,10 +19,14 @@
                         "ftAlias": "Flow",
                         "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 <<<<<<< HEAD
+<<<<<<< HEAD
                         "listingId": 270,
 =======
                         "listingId": 198,
 >>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+                        "listingId": 198,
+>>>>>>> main
                         "listingStatus": "ended",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
                         "listingValidUntil": 4003,
@@ -31,10 +35,14 @@
                             "collectionName": "user1",
                             "editionNumber": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
                             "id": 270,
 =======
                             "id": 198,
 >>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+                            "id": 198,
+>>>>>>> main
                             "name": "Neo Motorcycle 1 of 3",
                             "scalars": {
                                 "Speed": 100,
@@ -49,10 +57,14 @@
                             "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
                         },
 <<<<<<< HEAD
+<<<<<<< HEAD
                         "nftId": 270,
 =======
                         "nftId": 198,
 >>>>>>> 8cff637 (Implement nft catalog (#173))
+=======
+                        "nftId": 198,
+>>>>>>> main
                         "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
                         "saleType": "finished_completed",
                         "seller": "0x179b6b1cb6755e31",
