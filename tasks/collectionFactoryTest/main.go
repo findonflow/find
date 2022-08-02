@@ -22,7 +22,7 @@ func main() {
 	}).RunReturnsJsonString()
 
 	//pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
-	// res3 := o2.ScriptFromFile("getNFTDetails").NamedArguments(map[string]string{
+	// res3 := o2.ScriptFromFile("getNFTDetailsNFTCatalog").NamedArguments(map[string]string{
 	// 	"user":                 "christian",
 	// 	"nftAliasOrIdentifier": "Dandy",
 	// 	"id":                   "97168801",
