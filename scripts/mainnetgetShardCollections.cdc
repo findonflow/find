@@ -1,6 +1,6 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from 0x49a7cda3a1eecc29
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import RaribleNFT from 0x01ab36aaf654a13e
 import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac

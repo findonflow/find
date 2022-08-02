@@ -1,6 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from 0x49a7cda3a1eecc29
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
 pub fun main(user: String, maxItems: Int, collections: [String]) : {String : ItemReport} {
 	return fetchNFTCatalog(user: user, maxItems: maxItems, targetCollections:collections)
