@@ -39,7 +39,7 @@ transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:Stri
 												description: nftDescription, 
 												thumbnail: media, 
 												schemas: schemas, 
-												externalUrlPrefix:"https://find.xyz/collection/".concat(name).concat("/dandy"))
+												externalUrlPrefix:"https://find.xyz/".concat(name).concat("/Catalog/Dandy"))
 			
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 		

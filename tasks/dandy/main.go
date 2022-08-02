@@ -26,9 +26,9 @@ func main() {
 		findSigner,
 		nameArg,
 		WithArg("maxEdition", 100),
-		WithArg("nftName", "nft"),
-		WithArg("nftDescription", "nft"),
-		WithArg("nftImage", "nft"),
+		WithArg("nftName", "Find OG Mint"),
+		WithArg("nftDescription", "A collection of 100 find mints to commemorate the first ever minted NFT on the .find platform"),
+		WithArg("nftImage", "https://cdn.discordapp.com/attachments/870316419521335356/1004130351020523560/find1500.jpg"),
 	)
 }
 
