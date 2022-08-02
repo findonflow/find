@@ -20,7 +20,7 @@ func TestNFTDetailScript(t *testing.T) {
 			setFlowDandyMarketOption("Sale").
 			listNFTForSale("user1", ids[1], price)
 
-		actual := otu.O.ScriptFromFile("getNFTDetails").
+		actual := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -45,7 +45,7 @@ func TestNFTDetailScript(t *testing.T) {
 			AssertSuccess()
 		otu.listNFTForSale("user1", ids[1], price)
 
-		actual := otu.O.ScriptFromFile("getNFTDetails").
+		actual := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -65,7 +65,7 @@ func TestNFTDetailScript(t *testing.T) {
 			setFlowDandyMarketOption("Sale").
 			listNFTForSale("user1", ids[1], price)
 
-		actual := otu.O.ScriptFromFile("getNFTDetails").
+		actual := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -126,7 +126,7 @@ func TestNFTDetailScript(t *testing.T) {
 			Args(otu.O.Arguments().UInt64(ids[1]).UFix64(10.0)).
 			Test(otu.T).AssertSuccess()
 
-		actual := otu.O.ScriptFromFile("getNFTDetails").
+		actual := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -202,7 +202,7 @@ func TestNFTDetailScript(t *testing.T) {
 			}
 		}
 
-		actual1 := otu.O.ScriptFromFile("getNFTDetails").
+		actual1 := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -226,7 +226,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		otu.AutoGold("actual1", actual1)
 
-		actual2 := otu.O.ScriptFromFile("getNFTDetails").
+		actual2 := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -241,7 +241,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		otu.AutoGold("actual2", actual2)
 
-		actual3 := otu.O.ScriptFromFile("getNFTDetails").
+		actual3 := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
@@ -255,7 +255,7 @@ func TestNFTDetailScript(t *testing.T) {
 		}
 		otu.AutoGold("actual3", actual3)
 
-		actual4 := otu.O.ScriptFromFile("getNFTDetails").
+		actual4 := otu.O.ScriptFromFile("getNFTDetailsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				String("A.f8d6e0586b0a20c7.Dandy.NFT").
