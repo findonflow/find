@@ -8,7 +8,6 @@ import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import CharityNFT from "./CharityNFT.cdc"
 import FTRegistry from "./FTRegistry.cdc"
-import NFTRegistry from "./NFTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 
 pub contract Admin {
@@ -175,25 +174,6 @@ pub contract Admin {
 		// Remove FungibleToken Information by alias
 		pub fun removeFTInfoByAlias(_ alias: String) {
 			FTRegistry.removeFTInfoByAlias(alias)
-		}
-
-		/// ===================================================================================
-		// NonFungibleToken Registry 
-		/// ===================================================================================
-		// Registry NonFungibleToken Information
-		pub fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
-			NFTRegistry.setNFTInfo(alias: alias, type: type, icon: icon, providerPath: providerPath, publicPath: publicPath, storagePath: storagePath, allowedFTTypes: allowedFTTypes, address: address, externalFixedUrl: externalFixedUrl)
-
-		}
-
-		// Remove NonFungibleToken Information by type identifier
-		pub fun removeNFTInfoByTypeIdentifier(_ typeIdentifier: String) {
-			NFTRegistry.removeNFTInfoByTypeIdentifier(typeIdentifier)
-		}
-
-		// Remove NonFungibleToken Information by alias
-		pub fun removeNFTInfoByAlias(_ alias: String) {
-			NFTRegistry.removeNFTInfoByAlias(alias)
 		}
 
 		/// ===================================================================================

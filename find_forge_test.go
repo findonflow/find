@@ -17,14 +17,17 @@ func TestFindForge(t *testing.T) {
 			registerUser("user1").
 			buyForge("user1")
 
-		otu.O.TransactionFromFile("adminSetNFTInfo_ExampleNFT").
-			SignProposeAndPayAs("find").
+		otu.O.TransactionFromFile("adminAddNFTCatalog").
+			SignProposeAndPayAs("account").
+			Args(otu.O.Arguments().
+				String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
+				String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
+				Account("account").
+				Account("account").
+				UInt64(0).
+				String("exampleNFTCollection")).
 			Test(otu.T).
-			AssertSuccess().
-			AssertEmitEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
-				"alias":          "ExampleNFT",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
-			}))
+			AssertSuccess()
 
 		events := otu.O.TransactionFromFile("testMintExampleNFT").
 			SignProposeAndPayAs("user1").
@@ -57,11 +60,16 @@ func TestFindForge(t *testing.T) {
 
 		// autogold.Equal(t, result)
 
-		otu.O.Script("getCollections",
+		otu.O.Script("mainnetgetFactoryCollectionsNFTCatalog",
 			overflow.WithArg("user", "user1"),
-		).AssertWithPointerWant(t,
-			"/collections",
-			autogold.Want("collection", map[string]interface{}{"ExampleNFT": []interface{}{"ExampleNFT1"}}),
+			overflow.WithArg("maxItems", 0),
+			overflow.WithArg("collections", `[]`),
+		).AssertWant(t,
+			autogold.Want("collection", map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": map[string]interface{}{
+				"extraIDs": []interface{}{1},
+				"length":   1,
+				"shard":    "NFTCatalog",
+			}}),
 		)
 
 	})

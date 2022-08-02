@@ -1,6 +1,5 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import FindRewardToken from "../contracts/FindRewardToken.cdc"
 import Clock from "../contracts/Clock.cdc"
 
 pub contract FindToken : FungibleToken {
@@ -25,7 +24,7 @@ pub contract FindToken : FungibleToken {
     pub let minterPath: StoragePath 
     pub let findRewardPath: PrivatePath 
 
-    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews, FindRewardToken.VaultViews , FindRewardToken.FindReward {
+    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews {
 
         pub var balance: UFix64 
         

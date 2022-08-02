@@ -90,7 +90,7 @@ func TestFIND(t *testing.T) {
 			Args(otu.O.Arguments().String("user1")).
 			Test(t).
 			AssertFailure("locked").
-			AssertComputationLessThenOrEqual(110)
+			AssertComputationLessThenOrEqual(1000)
 
 		otu.expireLease()
 		otu.registerUser("user1")

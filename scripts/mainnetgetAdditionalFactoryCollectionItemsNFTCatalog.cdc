@@ -13,7 +13,7 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [MetadataView
 	let results : [MetadataViews.NFTView] = []
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
-		let tempPathStr = "catalog".concat(collectionKey)
+		let tempPathStr = "findtest1234567890"
 		let tempPublicPath = PublicPath(identifier: tempPathStr)!
 		account.link<&{MetadataViews.ResolverCollection}>(tempPublicPath, target: catalogEntry.collectionData.storagePath)
 		let cap= account.getCapability<&{MetadataViews.ResolverCollection}>(tempPublicPath)
