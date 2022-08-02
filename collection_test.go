@@ -48,8 +48,11 @@ func TestCollectionScripts(t *testing.T) {
 
 		otu.registerDandyInNFTRegistry()
 
-		result := otu.O.ScriptFromFile("getCollections").
-			Args(otu.O.Arguments().String("user1")).
+		result := otu.O.ScriptFromFile("mainnetgetFactoryCollectionsNFTCatalog").
+			Args(otu.O.Arguments().
+				String("user1").
+				Int(100).
+				StringArray()).
 			RunReturnsJsonString()
 
 		result = otu.replaceDandyList(result, dandyIds)

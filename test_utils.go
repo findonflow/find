@@ -1396,14 +1396,6 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 }
 
 func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
-	otu.O.TransactionFromFile("adminSetNFTInfo_Dandy").
-		SignProposeAndPayAs("find").
-		Test(otu.T).
-		AssertSuccess().
-		AssertEmitEvent(NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
-			"alias":          "Dandy",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-		}))
 
 	result, _ := otu.O.Script("getDandiesIDsFor",
 		WithArg("user", "user1"),
@@ -1467,14 +1459,6 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 // }
 
 func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUtils {
-	otu.O.TransactionFromFile("adminSetNFTInfo_ExampleNFT").
-		SignProposeAndPayAs("find").
-		Test(otu.T).
-		AssertSuccess().
-		AssertEmitEvent(NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRegistered", map[string]interface{}{
-			"alias":          "ExampleNFT",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
-		}))
 
 	otu.O.TransactionFromFile("adminAddNFTCatalog").
 		SignProposeAndPayAs("account").

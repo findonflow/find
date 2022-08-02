@@ -174,7 +174,7 @@
     "nftDetail": {
         "collectionDescription": "xtingle FIND",
         "collectionName": "xtingles",
-        "id": 360,
+        "id": 359,
         "media": {
             "https://nft.blocto.app/xtingles/preview-xBloctopus.png": "image/png;display=thumbnail",
             "https://nft.blocto.app/xtingles/xBloctopus.mp4": "video/mp4"
@@ -193,7 +193,7 @@
         },
         "thumbnail": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 360,
+        "uuid": 359,
         "views": [
             "checked",
             "checked",

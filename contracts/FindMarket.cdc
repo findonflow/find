@@ -96,21 +96,17 @@ pub contract FindMarket {
 	pub fun assertOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
 
 		let tenantRef=self.getTenant(tenant)
-		/* 559 */	/* 719 for 3 purchase */
 
 		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-		/* 581 */	/* 785 for 3 purchase */
 		let optRef = collectionCap.borrow() 
 		if optRef == nil {
 			panic("Account not properly set up, cannot borrow sale item collection")
 		}
 		let ref=optRef!
 		let item=ref.borrowSaleItem(id)
-		/* 590 */	/* 812 for 3 purchase */
 		if !item.checkPointer() {
 			panic("this is a ghost listing")
 		} 
-		/* 622 */	/* 908 for 3 purchase */
 
 		return item
 	}
@@ -497,19 +493,6 @@ pub contract FindMarket {
 		}
 	}
 
-	// Deprecated in testnet
-	pub struct ActionResult {
-		pub let allowed:Bool
-		pub let message:String
-		pub let name:String
-
-		init(allowed:Bool, message:String, name:String) {
-			self.allowed=allowed
-			self.message=message
-			self.name =name
-		}
-	}
-
 	pub struct TenantRule{
 		pub let name:String
 		pub let types:[Type]
@@ -582,17 +565,6 @@ pub contract FindMarket {
 				}
 			}		
 			return true	
-		}
-	}
-
-	// Deprecated in testnet
-	pub struct TenantCuts {
-		pub let findCut:MetadataViews.Royalty?
-		pub let tenantCut:MetadataViews.Royalty?
-
-		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
-			self.findCut=findCut
-			self.tenantCut=tenantCut
 		}
 	}
 

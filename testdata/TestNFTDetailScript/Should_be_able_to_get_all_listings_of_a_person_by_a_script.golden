@@ -228,7 +228,7 @@
             "wallets": [
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": 100.0008077,
+                    "balance": 100.00080795,
                     "name": "Flow",
                     "tags": [
                         "flow"

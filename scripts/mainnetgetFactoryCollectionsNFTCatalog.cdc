@@ -1,6 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from 0x49a7cda3a1eecc29
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
 pub fun main(user: String, maxItems: Int, collections: [String]) : {String : ItemReport} {
 	return fetchNFTCatalog(user: user, maxItems: maxItems, targetCollections:collections)
@@ -53,7 +53,7 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [MetadataView
 	let results : [MetadataViews.NFTView] = []
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
-		let tempPathStr = "catalog".concat(collectionKey)
+		let tempPathStr = "findtest1234567890"
 		let tempPublicPath = PublicPath(identifier: tempPathStr)!
 		let cap= account.getCapability<&{MetadataViews.ResolverCollection}>(tempPublicPath)
 		if cap.check(){
@@ -77,7 +77,7 @@ pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 		let typeData=types[nftType]!
 		let collectionKey=typeData.keys[0]
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
-		let tempPathStr = "catalog".concat(collectionKey)
+		let tempPathStr = "findtest1234567890"
 		let tempPublicPath = PublicPath(identifier: tempPathStr)!
 		account.link<&{MetadataViews.ResolverCollection}>(tempPublicPath, target: catalogEntry.collectionData.storagePath)
 		let cap= account.getCapability<&{MetadataViews.ResolverCollection}>(tempPublicPath)
