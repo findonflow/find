@@ -279,7 +279,9 @@
         "FindLeaseMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
         "ProfileCache",
-        "FindRulesCache"
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin"
       ]
     },
     "emulator": {
