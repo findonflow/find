@@ -120,7 +120,7 @@ import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
                 let item = MetadataCollectionItem(
                     id: nft!.id,
                     name: nft!.title ?? "",
-                    collection: nft!.contract.name,
+                    collection: project,
                     subCollection: "", 
                     media: media,
                     mediaType: mediaType,
