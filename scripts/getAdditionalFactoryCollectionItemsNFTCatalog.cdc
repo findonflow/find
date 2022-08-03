@@ -13,14 +13,11 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [MetadataView
 	let results : [MetadataViews.NFTView] = []
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
-		let tempPathStr = "findtest1234567890"
-		let tempPublicPath = PublicPath(identifier: tempPathStr)!
-		account.link<&{MetadataViews.ResolverCollection}>(tempPublicPath, target: catalogEntry.collectionData.storagePath)
-		let cap= account.getCapability<&{MetadataViews.ResolverCollection}>(tempPublicPath)
-		if cap.check(){
-			let collection = cap.borrow()!
+		let storagePath = catalogEntry.collectionData.storagePath
+		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
+		if ref != nil{
 			for id in ids[collectionKey]! {
-				results.append(MetadataViews.getNFTView(id:id, viewResolver: collection.borrowViewResolver(id:id)!))
+				results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
 			}
 		}
 	}
