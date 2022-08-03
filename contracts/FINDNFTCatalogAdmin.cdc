@@ -117,5 +117,6 @@ pub contract FINDNFTCatalogAdmin {
 
         self.account.save(<-admin, to: self.AdminStoragePath)
         self.account.link<&Admin>(self.AdminPrivatePath, target: self.AdminStoragePath)
+
     }
 }
