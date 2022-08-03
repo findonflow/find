@@ -40,7 +40,7 @@ func main() {
 	// Add Dandy to FIND NFT Catalog
 	o.Tx("adminAddNFTCatalog",
 		findSigner,
-		WithArg("collectionIdentifier", "A.35717efbbce11c74.Dandy.NFT"),
+		WithArg("collectionIdentifier", "A.097bafa4e0b48eef.Dandy.NFT"),
 		WithArg("contractName", "Dandy"),
 		WithArg("contractAddress", "find"),
 		WithArg("addressWithNFT", "find"),
