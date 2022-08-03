@@ -1,9 +1,20 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import NFTRegistry from "../contracts/NFTRegistry.cdc"
+
+// /* Alchemy Mainnet Wrapper */
+// import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
+// import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
+// import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
+// import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
+
+// /* Alchemy Testnet Wrapper */
+
+import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
+// import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
+// import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
 pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-    return fetchNFTRegistryCollection(user: user, collectionIDs: collectionIDs)
+    return fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
 }
 
     pub struct CollectionReport {
@@ -49,62 +60,61 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
         return getAccount(address!)
     }
 
-
+		
     //////////////////////////////////////////////////////////////
-    // Fetch Specific Collections in NFTRegistry
+    // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    pub fun fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "NFTRegistry"
+    pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+        let source = "Shard1"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
 
         let items : {String : [MetadataCollectionItem]} = {}
+        
+        let fetchingIDs = collectionIDs
 
-	    for project in collectionIDs.keys {
-
-            let nftInfo = NFTRegistry.getNFTInfo(project)
-
-            if nftInfo == nil {
-                continue
+        for project in fetchingIDs.keys {
+            // For passing bugs
+            if project == "Xtingles_NFT" {
+                fetchingIDs["Xtingles"] = fetchingIDs.remove(key: project)
             }
 
-            let collectionItems : [MetadataCollectionItem] = []
+            if project == "RCRDSHPNFT" {
+                fetchingIDs.remove(key: project)
+            }
+        }
 
-	    	let resolverCollectionCap= account!.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo!.publicPath)
-            if !resolverCollectionCap.check() { continue }
-            
-            let collectionRef = resolverCollectionCap.borrow()!
+        for project in fetchingIDs.keys {
+            let returnedNFTs = AlchemyMetadataWrapperTestnetShard1.getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
-            for id in collectionRef.getIDs() { 
-
-                if !collectionIDs[project]!.contains(id) {
+            var collectionItems : [MetadataCollectionItem] = []
+            for nft in returnedNFTs {
+                if nft == nil {
                     continue
                 }
 
-                let nft = collectionRef.borrowViewResolver(id: id) 
-                let display= MetadataViews.getDisplay(nft) 
-                if display == nil { continue }
-
-                var subCollection : String? = nil
-                if let sc= MetadataViews.getNFTCollectionDisplay(nft) {
-                    subCollection=sc.name
-                }	
+                var media = ""
+                var mediaType = ""
+                if nft!.media.length > 0 && nft!.media[0]?.uri != nil {
+                    let m = nft!.media[0]!
+                    mediaType = m.mimetype ?? ""
+                    media = m.uri!
+                }
 
                 let item = MetadataCollectionItem(
-                    id: id,
-                    name: display!.name,
-                    collection: nftInfo!.alias,
-                    subCollection: subCollection, 
-                    media: display!.thumbnail.uri(),
-                    mediaType: "image",
+                    id: nft!.id,
+                    name: nft!.title ?? "",
+                    collection: nft!.contract.name,
+                    subCollection: "", 
+                    media: media,
+                    mediaType: mediaType,
                     source: source
                 )
                 collectionItems.append(item)
-
             }
 
             if collectionItems.length > 0 {
-                items[nftInfo!.alias] = collectionItems 
+                items[project] = collectionItems
             }
         }
         return items
