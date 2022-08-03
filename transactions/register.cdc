@@ -3,7 +3,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+
 transaction(name: String, amount: UFix64) {
 
 	let vaultRef : &FUSD.Vault?
