@@ -220,7 +220,7 @@
     "mainnet-find-admin": {
       "address": "0x09a86f2493ce2e9d",
       "key": "${MAINNET_FIND_ADMIN}"
-    }, 
+    },
     "mainnet-findLease": {
       "address": "0x8f8767d488332ac7",
       "key": "${MAINNET_FIND_ADMIN}"
@@ -252,7 +252,9 @@
         "FTRegistry",
         "FindForge",
         "ProfileCache",
-        "FindRulesCache"
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin"
       ]
     },
     "testnet": {
@@ -282,7 +284,9 @@
         "FindLeaseMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
         "ProfileCache",
-        "FindRulesCache"
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin"
       ]
     },
     "emulator": {
