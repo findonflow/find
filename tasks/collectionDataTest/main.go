@@ -24,7 +24,7 @@ func main() {
 
 	// fmt.Println(res3)
 
-	network := "mainnet"
+	network := "testnet"
 
 	o := Overflow(
 		WithNetwork(network),
