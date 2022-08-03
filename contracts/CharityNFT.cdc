@@ -59,16 +59,19 @@ pub contract CharityNFT: NonFungibleToken {
 					return MetadataViews.Royalties([])
 
 				case Type<MetadataViews.ExternalURL>() : 
-					return MetadataViews.ExternalURL(url: "http://find.xyz/neoCharity")
+					return MetadataViews.ExternalURL("http://find.xyz/neoCharity")
 
 				case Type<MetadataViews.NFTCollectionDisplay>() : 
 					return MetadataViews.NFTCollectionDisplay(
 						name: "Neo Charity 2021",
 						description: "This collection is to show participation in the Neo Collectibles x Flowverse Charity Auction in 2021.",
-						externalURL: MetadataViews.ExternalURL(url: "http://find.xyz/neoCharity"),
-						squareImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg") , mimeType: "image"),
-						bannerImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500") , mimeType: "image"),
-						socials: { "Twitter" : MetadataViews.ExternalURL(url: "https://twitter.com/findonflow") , "Discord" : MetadataViews.ExternalURL(url: "https://discord.gg/95P274mayM") }
+						externalURL: MetadataViews.ExternalURL("http://find.xyz/neoCharity"),
+						squareImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg") , mediaType: "image"),
+						bannerImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500") , mediaType: "image"),
+						socials: { 
+							"Twitter" : MetadataViews.ExternalURL("https://twitter.com/findonflow") , 
+							"Discord" : MetadataViews.ExternalURL("https://discord.gg/95P274mayM") 
+						}
 					)
 
 				case Type<MetadataViews.NFTCollectionData>() : 
@@ -107,30 +110,30 @@ pub contract CharityNFT: NonFungibleToken {
 		}
 
 		pub fun parseUInt64(_ string: String) : UInt64? {
-				let chars : {Character : UInt64} = {
-					"0" : 0 , 
-					"1" : 1 , 
-					"2" : 2 , 
-					"3" : 3 , 
-					"4" : 4 , 
-					"5" : 5 , 
-					"6" : 6 , 
-					"7" : 7 , 
-					"8" : 8 , 
-					"9" : 9 
-				}
-				var number : UInt64 = 0
-				var i = 0
-				while i < string.length {
-					if let n = chars[string[i]] {
-							number = number * 10 + n
-					} else {
-						return nil 
-					}
-					i = i + 1
-				}
-				return number 
+			let chars : {Character : UInt64} = {
+				"0" : 0 , 
+				"1" : 1 , 
+				"2" : 2 , 
+				"3" : 3 , 
+				"4" : 4 , 
+				"5" : 5 , 
+				"6" : 6 , 
+				"7" : 7 , 
+				"8" : 8 , 
+				"9" : 9 
 			}
+			var number : UInt64 = 0
+			var i = 0
+			while i < string.length {
+				if let n = chars[string[i]] {
+						number = number * 10 + n
+				} else {
+					return nil 
+				}
+				i = i + 1
+			}
+			return number 
+		}
 
 	}
 
@@ -205,8 +208,12 @@ pub contract CharityNFT: NonFungibleToken {
 
 		//borrow view resolver
         pub fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
-			let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-			return ref as! &NFT
+			if self.ownedNFTs[id] == nil {
+				panic("NFT does not exist")
+			}
+
+		let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+			return nft as! &CharityNFT.NFT
 		}
 
 		destroy() {
