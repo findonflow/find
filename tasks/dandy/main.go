@@ -22,14 +22,32 @@ func main() {
 		WithArg("socials", `{ "Twitter" : "https://twitter.com/findonflow" , "Discord" : "https://discord.gg/95P274mayM" }`),
 	)
 
-	o.Tx("adminMintFindDandy",
+	id, err := o.Tx("adminMintFindDandy",
 		findSigner,
 		nameArg,
 		WithArg("maxEdition", 100),
 		WithArg("nftName", "Find OG Mint"),
 		WithArg("nftDescription", "A collection of 100 find mints to commemorate the first ever minted NFT on the .find platform"),
 		WithArg("nftImage", "https://cdn.discordapp.com/attachments/870316419521335356/1004130351020523560/find1500.jpg"),
+	).GetIdFromEvent(
+		"Minted", "id",
 	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// Add Dandy to FIND NFT Catalog
+	o.Tx("adminAddNFTCatalog",
+		findSigner,
+		WithArg("collectionIdentifier", "A.35717efbbce11c74.Dandy.NFT"),
+		WithArg("contractName", "Dandy"),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "find"),
+		WithArg("nftID", id),
+		WithArg("publicPathIdentifier", "findDandy"),
+	)
+
 }
 
 /*
