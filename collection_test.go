@@ -48,7 +48,7 @@ func TestCollectionScripts(t *testing.T) {
 
 		otu.registerDandyInNFTRegistry()
 
-		result := otu.O.ScriptFromFile("mainnetgetFactoryCollectionsNFTCatalog").
+		result := otu.O.ScriptFromFile("getFactoryCollectionsNFTCatalog").
 			Args(otu.O.Arguments().
 				String("user1").
 				Int(100).

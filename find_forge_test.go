@@ -60,7 +60,7 @@ func TestFindForge(t *testing.T) {
 
 		// autogold.Equal(t, result)
 
-		otu.O.Script("mainnetgetFactoryCollectionsNFTCatalog",
+		otu.O.Script("getFactoryCollectionsNFTCatalog",
 			overflow.WithArg("user", "user1"),
 			overflow.WithArg("maxItems", 0),
 			overflow.WithArg("collections", `[]`),
