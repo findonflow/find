@@ -354,7 +354,13 @@ pub fun ignoreViews() : [Type] {
 }
 
 pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
-	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
-	return collection.collectionData.publicPath
+	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		return collection.collectionData.publicPath
+	}
+
+	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
+		return collection.collectionData.publicPath
+	}
+	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 }
