@@ -46,7 +46,7 @@
                "spec": null
             },
             "getCheckRoyalty": {
-               "code": "import MetadataViews from 0xf8d6e0586b0a20c7\nimport FIND from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\n\npub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {\n\n    let address =FIND.lookupAddress(name)!\n\n    // Get collection public path from NFT Registry\n    let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)\n    let collection= getAccount(address).getCapability(collectionPublicPath).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n    let nft=collection.borrowViewResolver(id: id)\n    for v in nft.getViews() {\n        if v.identifier== viewIdentifier {\n            return nft.resolveView(v)\n        }\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : PublicPath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.publicPath\n}",
+               "code": "import MetadataViews from 0xf8d6e0586b0a20c7\nimport FIND from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\n\npub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {\n\n    let address =FIND.resolve(name)!\n\n    // Get collection public path from NFT Registry\n    let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)\n    let collection= getAuthAccount(address).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e(from: collectionPublicPath)!\n\n    // let nft=collection.borrowViewResolver(id: id)\n    let nft=collection.borrowViewResolver(id: collection.getIDs()[0])\n    for v in nft.getViews() {\n        if v.identifier== viewIdentifier {\n            return nft.resolveView(v)\n        }\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : StoragePath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.storagePath\n}",
                "spec": {
                   "order": [
                      "name",
@@ -465,39 +465,6 @@
                   }
                }
             },
-            "adminTestnetAddBeam": {
-               "code": "import Admin from 0xf8d6e0586b0a20c7\n// import Beam from 0x6085ae87e78e1433\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        let nftType = CompositeType(\"A.6085ae87e78e1433.Beam.NFT\")!\n        self.adminRef.setNFTInfo(alias: \"Beam\", type: nftType, icon: \"https://frightclub.niftory.com/fc_black_logo_round.svg\", providerPath: /private/BeamCollection001, publicPath: /public/BeamCollection001, storagePath: /storage/BeamCollection001, allowedFTTypes: nil, address: 0x6085ae87e78e1433, externalFixedUrl: \"frightclub.niftory.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Beam\", types:[nftType], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBeam\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
-            "adminTestnetAddBl0x": {
-               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport Bl0x from 0xe8124d8428980aa6\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Bl0x\", \n            type: Type\u003c@Bl0x.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg\", \n            providerPath: Bl0x.CollectionPrivatePath, \n            publicPath: Bl0x.CollectionPublicPath, \n            storagePath: Bl0x.CollectionStoragePath, \n            allowedFTTypes: nil, \n            address:0xe8124d8428980aa6, externalFixedUrl: \"bl0x-5ccsb92pb-findonflow.vercel.app\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Bl0x\", types:[Type\u003c@Bl0x.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBl0x\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
-            "adminTestnetAddFlovatar": {
-               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport Flovatar from 0x9392a4a7c3f49a0b\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        self.adminRef.setNFTInfo(alias: \"Flovatar\", type: Type\u003c@Flovatar.NFT\u003e(), icon: \"https://styles.redditmedia.com/t5_5ikf79/styles/communityIcon_fraplt3tgk681.jpg\", providerPath: /private/FlovatarCollection, publicPath: Flovatar.CollectionPublicPath, storagePath: Flovatar.CollectionStoragePath, allowedFTTypes: nil, address: 0x9392a4a7c3f49a0b, externalFixedUrl: \"flovatar.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Flovatar\", types:[Type\u003c@Flovatar.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowFLovatar\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
             "adminAddNFTCatalog": {
                "code": "import MetadataViews from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\nimport NFTCatalog from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalogAdmin from 0xf8d6e0586b0a20c7\n\ntransaction(\n    collectionIdentifier : String,\n    contractName: String,\n    contractAddress: Address,\n    addressWithNFT: Address,\n    nftID: UInt64,\n    publicPathIdentifier: String\n) {\n    \n    let adminResource: \u0026FINDNFTCatalogAdmin.Admin\n    \n    prepare(acct: AuthAccount) {\n        self.adminResource = acct.borrow\u003c\u0026FINDNFTCatalogAdmin.Admin\u003e(from: FINDNFTCatalogAdmin.AdminStoragePath)!\n    }\n    \n    execute {\n        let nftAccount = getAccount(addressWithNFT)\n        let pubPath = PublicPath(identifier: publicPathIdentifier)!\n        let collectionCap = nftAccount.getCapability\u003c\u0026AnyResource{MetadataViews.ResolverCollection}\u003e(pubPath)\n        assert(collectionCap.check(), message: \"MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.\")\n        let collectionRef = collectionCap.borrow()!\n        assert(collectionRef.getIDs().length \u003e 0, message: \"No NFTs exist in this collection.\")\n        let nftResolver = collectionRef.borrowViewResolver(id: nftID)\n        \n        let metadataCollectionData = MetadataViews.getNFTCollectionData(nftResolver)!\n        \n        let collectionData = NFTCatalog.NFTCollectionData(\n            storagePath: metadataCollectionData.storagePath,\n            publicPath: metadataCollectionData.publicPath,\n            privatePath: metadataCollectionData.providerPath,\n            publicLinkedType : metadataCollectionData.publicLinkedType,\n            privateLinkedType : metadataCollectionData.providerLinkedType\n        )\n\n        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(nftResolver)!\n\n        let catalogData = NFTCatalog.NFTCatalogMetadata(\n            contractName: contractName,\n            contractAddress: contractAddress,\n            nftType: nftResolver.getType(),\n            collectionData: collectionData,\n            collectionDisplay : collectionDisplay\n        )\n\n        self.adminResource.addCatalogEntry(collectionIdentifier : collectionIdentifier, metadata : catalogData)\n    }\n}",
                "spec": {
@@ -519,17 +486,6 @@
                   }
                }
             },
-            "adminTestnetAddVersus": {
-               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport Art from 0x99ca04281098b33d\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Versus\", \n            type: Type\u003c@Art.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg\",\n            providerPath: /private/versusArtCollection,\n            publicPath: Art.CollectionPublicPath, \n            storagePath: Art.CollectionStoragePath, \n            allowedFTTypes: nil, \n                        address:0x99ca04281098b33d, externalFixedUrl: \"https://versus.auction\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Versus\", types:[Type\u003c@Art.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowVersus\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
             "adminInitDUC": {
                "code": "import FungibleToken from 0xee82856bf20e2aa6\nimport DapperUtilityCoin from 0xf8d6e0586b0a20c7\nimport TokenForwarding from 0xf8d6e0586b0a20c7\n\n\ntransaction(dapperAddress:Address) {\n\n    prepare(acct: AuthAccount) {\n        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC\n        let dapper = getAccount(dapperAddress)\n      let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)\n\n      // Create a new Forwarder resource for DUC and store it in the new account's storage\n      let ducForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)\n      acct.save(\u003c-ducForwarder, to: /storage/dapperUtilityCoinReceiver)\n\n      // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder\n      acct.link\u003c\u0026{FungibleToken.Receiver}\u003e(\n      /public/dapperUtilityCoinReceiver,\n      target: /storage/dapperUtilityCoinReceiver\n      )\n    }\n}",
                "spec": {
@@ -538,6 +494,25 @@
                   ],
                   "parameters": {
                      "dapperAddress": "Address"
+                  }
+               }
+            },
+            "adminMainnetAddItem": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String]) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        let ft : [Type] = []\n        for type in ftTypes {\n            ft.append(CompositeType(type)!)\n        }\n\n        let nft : [Type] = []\n        for type in nftTypes {\n            nft.append(CompositeType(type)!)\n        }\n\n        let rules = [\n            FindMarket.TenantRule(name:ftName, types:ft, ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:nftName, types:nft, ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: ftName.concat(nftName), \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant",
+                     "ftName",
+                     "ftTypes",
+                     "nftName",
+                     "nftTypes"
+                  ],
+                  "parameters": {
+                     "ftName": "String",
+                     "ftTypes": "[String]",
+                     "nftName": "String",
+                     "nftTypes": "[String]",
+                     "tenant": "Address"
                   }
                }
             },
@@ -814,6 +789,50 @@
                   ],
                   "parameters": {
                      "market": "String",
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddBeam": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\n// import Beam from 0x6085ae87e78e1433\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        let nftType = CompositeType(\"A.6085ae87e78e1433.Beam.NFT\")!\n        self.adminRef.setNFTInfo(alias: \"Beam\", type: nftType, icon: \"https://frightclub.niftory.com/fc_black_logo_round.svg\", providerPath: /private/BeamCollection001, publicPath: /public/BeamCollection001, storagePath: /storage/BeamCollection001, allowedFTTypes: nil, address: 0x6085ae87e78e1433, externalFixedUrl: \"frightclub.niftory.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Beam\", types:[nftType], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBeam\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddBl0x": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport Bl0x from 0xe8124d8428980aa6\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Bl0x\", \n            type: Type\u003c@Bl0x.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg\", \n            providerPath: Bl0x.CollectionPrivatePath, \n            publicPath: Bl0x.CollectionPublicPath, \n            storagePath: Bl0x.CollectionStoragePath, \n            allowedFTTypes: nil, \n            address:0xe8124d8428980aa6, externalFixedUrl: \"bl0x-5ccsb92pb-findonflow.vercel.app\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Bl0x\", types:[Type\u003c@Bl0x.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBl0x\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddFlovatar": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport Flovatar from 0x9392a4a7c3f49a0b\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        self.adminRef.setNFTInfo(alias: \"Flovatar\", type: Type\u003c@Flovatar.NFT\u003e(), icon: \"https://styles.redditmedia.com/t5_5ikf79/styles/communityIcon_fraplt3tgk681.jpg\", providerPath: /private/FlovatarCollection, publicPath: Flovatar.CollectionPublicPath, storagePath: Flovatar.CollectionStoragePath, allowedFTTypes: nil, address: 0x9392a4a7c3f49a0b, externalFixedUrl: \"flovatar.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Flovatar\", types:[Type\u003c@Flovatar.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowFLovatar\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddVersus": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\nimport Art from 0x99ca04281098b33d\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Versus\", \n            type: Type\u003c@Art.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg\",\n            providerPath: /private/versusArtCollection,\n            publicPath: Art.CollectionPublicPath, \n            storagePath: Art.CollectionStoragePath, \n            allowedFTTypes: nil, \n                        address:0x99ca04281098b33d, externalFixedUrl: \"https://versus.auction\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Versus\", types:[Type\u003c@Art.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowVersus\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
                      "tenant": "Address"
                   }
                }
@@ -2395,7 +2414,7 @@
                "spec": null
             },
             "getCheckRoyalty": {
-               "code": "import MetadataViews from 0x1d7e57aa55817448\nimport FIND from 0x097bafa4e0b48eef\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\n\npub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {\n\n    let address =FIND.lookupAddress(name)!\n\n    // Get collection public path from NFT Registry\n    let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)\n    let collection= getAccount(address).getCapability(collectionPublicPath).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n    let nft=collection.borrowViewResolver(id: id)\n    for v in nft.getViews() {\n        if v.identifier== viewIdentifier {\n            return nft.resolveView(v)\n        }\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : PublicPath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.publicPath\n}",
+               "code": "import MetadataViews from 0x1d7e57aa55817448\nimport FIND from 0x097bafa4e0b48eef\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\n\npub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {\n\n    let address =FIND.resolve(name)!\n\n    // Get collection public path from NFT Registry\n    let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)\n    let collection= getAuthAccount(address).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e(from: collectionPublicPath)!\n\n    // let nft=collection.borrowViewResolver(id: id)\n    let nft=collection.borrowViewResolver(id: collection.getIDs()[0])\n    for v in nft.getViews() {\n        if v.identifier== viewIdentifier {\n            return nft.resolveView(v)\n        }\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : StoragePath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.storagePath\n}",
                "spec": {
                   "order": [
                      "name",
@@ -3009,39 +3028,6 @@
                   }
                }
             },
-            "adminTestnetAddBeam": {
-               "code": "import Admin from 0x097bafa4e0b48eef\n// import Beam from 0x6085ae87e78e1433\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        let nftType = CompositeType(\"A.6085ae87e78e1433.Beam.NFT\")!\n        self.adminRef.setNFTInfo(alias: \"Beam\", type: nftType, icon: \"https://frightclub.niftory.com/fc_black_logo_round.svg\", providerPath: /private/BeamCollection001, publicPath: /public/BeamCollection001, storagePath: /storage/BeamCollection001, allowedFTTypes: nil, address: 0x6085ae87e78e1433, externalFixedUrl: \"frightclub.niftory.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Beam\", types:[nftType], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBeam\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
-            "adminTestnetAddBl0x": {
-               "code": "import Admin from 0x097bafa4e0b48eef\nimport Bl0x from 0xe8124d8428980aa6\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Bl0x\", \n            type: Type\u003c@Bl0x.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg\", \n            providerPath: Bl0x.CollectionPrivatePath, \n            publicPath: Bl0x.CollectionPublicPath, \n            storagePath: Bl0x.CollectionStoragePath, \n            allowedFTTypes: nil, \n            address:0xe8124d8428980aa6, externalFixedUrl: \"bl0x-5ccsb92pb-findonflow.vercel.app\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Bl0x\", types:[Type\u003c@Bl0x.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBl0x\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
-            "adminTestnetAddFlovatar": {
-               "code": "import Admin from 0x097bafa4e0b48eef\nimport Flovatar from 0x9392a4a7c3f49a0b\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        self.adminRef.setNFTInfo(alias: \"Flovatar\", type: Type\u003c@Flovatar.NFT\u003e(), icon: \"https://styles.redditmedia.com/t5_5ikf79/styles/communityIcon_fraplt3tgk681.jpg\", providerPath: /private/FlovatarCollection, publicPath: Flovatar.CollectionPublicPath, storagePath: Flovatar.CollectionStoragePath, allowedFTTypes: nil, address: 0x9392a4a7c3f49a0b, externalFixedUrl: \"flovatar.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Flovatar\", types:[Type\u003c@Flovatar.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowFLovatar\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
             "adminAddNFTCatalog": {
                "code": "import MetadataViews from 0x1d7e57aa55817448\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\nimport NFTCatalog from 0x49a7cda3a1eecc29\nimport FINDNFTCatalogAdmin from 0x097bafa4e0b48eef\n\ntransaction(\n    collectionIdentifier : String,\n    contractName: String,\n    contractAddress: Address,\n    addressWithNFT: Address,\n    nftID: UInt64,\n    publicPathIdentifier: String\n) {\n    \n    let adminResource: \u0026FINDNFTCatalogAdmin.Admin\n    \n    prepare(acct: AuthAccount) {\n        self.adminResource = acct.borrow\u003c\u0026FINDNFTCatalogAdmin.Admin\u003e(from: FINDNFTCatalogAdmin.AdminStoragePath)!\n    }\n    \n    execute {\n        let nftAccount = getAccount(addressWithNFT)\n        let pubPath = PublicPath(identifier: publicPathIdentifier)!\n        let collectionCap = nftAccount.getCapability\u003c\u0026AnyResource{MetadataViews.ResolverCollection}\u003e(pubPath)\n        assert(collectionCap.check(), message: \"MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.\")\n        let collectionRef = collectionCap.borrow()!\n        assert(collectionRef.getIDs().length \u003e 0, message: \"No NFTs exist in this collection.\")\n        let nftResolver = collectionRef.borrowViewResolver(id: nftID)\n        \n        let metadataCollectionData = MetadataViews.getNFTCollectionData(nftResolver)!\n        \n        let collectionData = NFTCatalog.NFTCollectionData(\n            storagePath: metadataCollectionData.storagePath,\n            publicPath: metadataCollectionData.publicPath,\n            privatePath: metadataCollectionData.providerPath,\n            publicLinkedType : metadataCollectionData.publicLinkedType,\n            privateLinkedType : metadataCollectionData.providerLinkedType\n        )\n\n        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(nftResolver)!\n\n        let catalogData = NFTCatalog.NFTCatalogMetadata(\n            contractName: contractName,\n            contractAddress: contractAddress,\n            nftType: nftResolver.getType(),\n            collectionData: collectionData,\n            collectionDisplay : collectionDisplay\n        )\n\n        self.adminResource.addCatalogEntry(collectionIdentifier : collectionIdentifier, metadata : catalogData)\n    }\n}",
                "spec": {
@@ -3063,17 +3049,6 @@
                   }
                }
             },
-            "adminTestnetAddVersus": {
-               "code": "import Admin from 0x097bafa4e0b48eef\nimport Art from 0x99ca04281098b33d\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Versus\", \n            type: Type\u003c@Art.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg\",\n            providerPath: /private/versusArtCollection,\n            publicPath: Art.CollectionPublicPath, \n            storagePath: Art.CollectionStoragePath, \n            allowedFTTypes: nil, \n                        address:0x99ca04281098b33d, externalFixedUrl: \"https://versus.auction\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Versus\", types:[Type\u003c@Art.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowVersus\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
             "adminInitDUC": {
                "code": "import FungibleToken from 0xf233dcee88fe0abe\nimport DapperUtilityCoin from 0xead892083b3e2c6c\nimport TokenForwarding from 0xe544175ee0461c4b\n\n\ntransaction(dapperAddress:Address) {\n\n    prepare(acct: AuthAccount) {\n        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC\n        let dapper = getAccount(dapperAddress)\n      let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)\n\n      // Create a new Forwarder resource for DUC and store it in the new account's storage\n      let ducForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)\n      acct.save(\u003c-ducForwarder, to: /storage/dapperUtilityCoinReceiver)\n\n      // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder\n      acct.link\u003c\u0026{FungibleToken.Receiver}\u003e(\n      /public/dapperUtilityCoinReceiver,\n      target: /storage/dapperUtilityCoinReceiver\n      )\n    }\n}",
                "spec": {
@@ -3082,6 +3057,25 @@
                   ],
                   "parameters": {
                      "dapperAddress": "Address"
+                  }
+               }
+            },
+            "adminMainnetAddItem": {
+               "code": "import Admin from 0x097bafa4e0b48eef\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String]) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        let ft : [Type] = []\n        for type in ftTypes {\n            ft.append(CompositeType(type)!)\n        }\n\n        let nft : [Type] = []\n        for type in nftTypes {\n            nft.append(CompositeType(type)!)\n        }\n\n        let rules = [\n            FindMarket.TenantRule(name:ftName, types:ft, ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:nftName, types:nft, ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: ftName.concat(nftName), \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant",
+                     "ftName",
+                     "ftTypes",
+                     "nftName",
+                     "nftTypes"
+                  ],
+                  "parameters": {
+                     "ftName": "String",
+                     "ftTypes": "[String]",
+                     "nftName": "String",
+                     "nftTypes": "[String]",
+                     "tenant": "Address"
                   }
                }
             },
@@ -3343,6 +3337,50 @@
                   ],
                   "parameters": {
                      "market": "String",
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddBeam": {
+               "code": "import Admin from 0x097bafa4e0b48eef\n// import Beam from 0x6085ae87e78e1433\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        let nftType = CompositeType(\"A.6085ae87e78e1433.Beam.NFT\")!\n        self.adminRef.setNFTInfo(alias: \"Beam\", type: nftType, icon: \"https://frightclub.niftory.com/fc_black_logo_round.svg\", providerPath: /private/BeamCollection001, publicPath: /public/BeamCollection001, storagePath: /storage/BeamCollection001, allowedFTTypes: nil, address: 0x6085ae87e78e1433, externalFixedUrl: \"frightclub.niftory.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Beam\", types:[nftType], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBeam\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddBl0x": {
+               "code": "import Admin from 0x097bafa4e0b48eef\nimport Bl0x from 0xe8124d8428980aa6\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Bl0x\", \n            type: Type\u003c@Bl0x.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg\", \n            providerPath: Bl0x.CollectionPrivatePath, \n            publicPath: Bl0x.CollectionPublicPath, \n            storagePath: Bl0x.CollectionStoragePath, \n            allowedFTTypes: nil, \n            address:0xe8124d8428980aa6, externalFixedUrl: \"bl0x-5ccsb92pb-findonflow.vercel.app\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Bl0x\", types:[Type\u003c@Bl0x.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBl0x\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddFlovatar": {
+               "code": "import Admin from 0x097bafa4e0b48eef\nimport Flovatar from 0x9392a4a7c3f49a0b\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        self.adminRef.setNFTInfo(alias: \"Flovatar\", type: Type\u003c@Flovatar.NFT\u003e(), icon: \"https://styles.redditmedia.com/t5_5ikf79/styles/communityIcon_fraplt3tgk681.jpg\", providerPath: /private/FlovatarCollection, publicPath: Flovatar.CollectionPublicPath, storagePath: Flovatar.CollectionStoragePath, allowedFTTypes: nil, address: 0x9392a4a7c3f49a0b, externalFixedUrl: \"flovatar.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Flovatar\", types:[Type\u003c@Flovatar.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowFLovatar\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddVersus": {
+               "code": "import Admin from 0x097bafa4e0b48eef\nimport Art from 0x99ca04281098b33d\nimport FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Versus\", \n            type: Type\u003c@Art.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg\",\n            providerPath: /private/versusArtCollection,\n            publicPath: Art.CollectionPublicPath, \n            storagePath: Art.CollectionStoragePath, \n            allowedFTTypes: nil, \n                        address:0x99ca04281098b33d, externalFixedUrl: \"https://versus.auction\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Versus\", types:[Type\u003c@Art.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowVersus\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
                      "tenant": "Address"
                   }
                }
@@ -4880,7 +4918,7 @@
                "spec": null
             },
             "getCheckRoyalty": {
-               "code": "import MetadataViews from 0x631e88ae7f1d7c20\nimport FIND from 0x35717efbbce11c74\nimport FINDNFTCatalog from 0x35717efbbce11c74\n\npub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {\n\n    let address =FIND.lookupAddress(name)!\n\n    // Get collection public path from NFT Registry\n    let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)\n    let collection= getAccount(address).getCapability(collectionPublicPath).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e()!\n\n    let nft=collection.borrowViewResolver(id: id)\n    for v in nft.getViews() {\n        if v.identifier== viewIdentifier {\n            return nft.resolveView(v)\n        }\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : PublicPath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.publicPath\n}",
+               "code": "import MetadataViews from 0x631e88ae7f1d7c20\nimport FIND from 0x35717efbbce11c74\nimport FINDNFTCatalog from 0x35717efbbce11c74\n\npub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {\n\n    let address =FIND.resolve(name)!\n\n    // Get collection public path from NFT Registry\n    let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)\n    let collection= getAuthAccount(address).borrow\u003c\u0026{MetadataViews.ResolverCollection}\u003e(from: collectionPublicPath)!\n\n    // let nft=collection.borrowViewResolver(id: id)\n    let nft=collection.borrowViewResolver(id: collection.getIDs()[0])\n    for v in nft.getViews() {\n        if v.identifier== viewIdentifier {\n            return nft.resolveView(v)\n        }\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : StoragePath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.storagePath\n}",
                "spec": {
                   "order": [
                      "name",
@@ -5459,39 +5497,6 @@
                   }
                }
             },
-            "adminTestnetAddBeam": {
-               "code": "import Admin from 0x35717efbbce11c74\n// import Beam from 0x6085ae87e78e1433\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        let nftType = CompositeType(\"A.6085ae87e78e1433.Beam.NFT\")!\n        self.adminRef.setNFTInfo(alias: \"Beam\", type: nftType, icon: \"https://frightclub.niftory.com/fc_black_logo_round.svg\", providerPath: /private/BeamCollection001, publicPath: /public/BeamCollection001, storagePath: /storage/BeamCollection001, allowedFTTypes: nil, address: 0x6085ae87e78e1433, externalFixedUrl: \"frightclub.niftory.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Beam\", types:[nftType], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBeam\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
-            "adminTestnetAddBl0x": {
-               "code": "import Admin from 0x35717efbbce11c74\nimport Bl0x from 0xe8124d8428980aa6\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Bl0x\", \n            type: Type\u003c@Bl0x.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg\", \n            providerPath: Bl0x.CollectionPrivatePath, \n            publicPath: Bl0x.CollectionPublicPath, \n            storagePath: Bl0x.CollectionStoragePath, \n            allowedFTTypes: nil, \n            address:0xe8124d8428980aa6, externalFixedUrl: \"bl0x-5ccsb92pb-findonflow.vercel.app\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Bl0x\", types:[Type\u003c@Bl0x.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBl0x\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
-            "adminTestnetAddFlovatar": {
-               "code": "import Admin from 0x35717efbbce11c74\nimport Flovatar from 0x9392a4a7c3f49a0b\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        self.adminRef.setNFTInfo(alias: \"Flovatar\", type: Type\u003c@Flovatar.NFT\u003e(), icon: \"https://styles.redditmedia.com/t5_5ikf79/styles/communityIcon_fraplt3tgk681.jpg\", providerPath: /private/FlovatarCollection, publicPath: Flovatar.CollectionPublicPath, storagePath: Flovatar.CollectionStoragePath, allowedFTTypes: nil, address: 0x9392a4a7c3f49a0b, externalFixedUrl: \"flovatar.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Flovatar\", types:[Type\u003c@Flovatar.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowFLovatar\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
             "adminAddNFTCatalog": {
                "code": "import MetadataViews from 0x631e88ae7f1d7c20\nimport FINDNFTCatalog from 0x35717efbbce11c74\nimport NFTCatalog from 0x324c34e1c517e4db\nimport FINDNFTCatalogAdmin from 0x35717efbbce11c74\n\ntransaction(\n    collectionIdentifier : String,\n    contractName: String,\n    contractAddress: Address,\n    addressWithNFT: Address,\n    nftID: UInt64,\n    publicPathIdentifier: String\n) {\n    \n    let adminResource: \u0026FINDNFTCatalogAdmin.Admin\n    \n    prepare(acct: AuthAccount) {\n        self.adminResource = acct.borrow\u003c\u0026FINDNFTCatalogAdmin.Admin\u003e(from: FINDNFTCatalogAdmin.AdminStoragePath)!\n    }\n    \n    execute {\n        let nftAccount = getAccount(addressWithNFT)\n        let pubPath = PublicPath(identifier: publicPathIdentifier)!\n        let collectionCap = nftAccount.getCapability\u003c\u0026AnyResource{MetadataViews.ResolverCollection}\u003e(pubPath)\n        assert(collectionCap.check(), message: \"MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.\")\n        let collectionRef = collectionCap.borrow()!\n        assert(collectionRef.getIDs().length \u003e 0, message: \"No NFTs exist in this collection.\")\n        let nftResolver = collectionRef.borrowViewResolver(id: nftID)\n        \n        let metadataCollectionData = MetadataViews.getNFTCollectionData(nftResolver)!\n        \n        let collectionData = NFTCatalog.NFTCollectionData(\n            storagePath: metadataCollectionData.storagePath,\n            publicPath: metadataCollectionData.publicPath,\n            privatePath: metadataCollectionData.providerPath,\n            publicLinkedType : metadataCollectionData.publicLinkedType,\n            privateLinkedType : metadataCollectionData.providerLinkedType\n        )\n\n        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(nftResolver)!\n\n        let catalogData = NFTCatalog.NFTCatalogMetadata(\n            contractName: contractName,\n            contractAddress: contractAddress,\n            nftType: nftResolver.getType(),\n            collectionData: collectionData,\n            collectionDisplay : collectionDisplay\n        )\n\n        self.adminResource.addCatalogEntry(collectionIdentifier : collectionIdentifier, metadata : catalogData)\n    }\n}",
                "spec": {
@@ -5513,17 +5518,6 @@
                   }
                }
             },
-            "adminTestnetAddVersus": {
-               "code": "import Admin from 0x35717efbbce11c74\nimport Art from 0x99ca04281098b33d\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Versus\", \n            type: Type\u003c@Art.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg\",\n            providerPath: /private/versusArtCollection,\n            publicPath: Art.CollectionPublicPath, \n            storagePath: Art.CollectionStoragePath, \n            allowedFTTypes: nil, \n                        address:0x99ca04281098b33d, externalFixedUrl: \"https://versus.auction\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Versus\", types:[Type\u003c@Art.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowVersus\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n    }\n}",
-               "spec": {
-                  "order": [
-                     "tenant"
-                  ],
-                  "parameters": {
-                     "tenant": "Address"
-                  }
-               }
-            },
             "adminInitDUC": {
                "code": "import FungibleToken from 0x9a0766d93b6608b7\nimport DapperUtilityCoin from 0x82ec283f88a62e65\nimport TokenForwarding from 0x51ea0e37c27a1f1a\n\n\ntransaction(dapperAddress:Address) {\n\n    prepare(acct: AuthAccount) {\n        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC\n        let dapper = getAccount(dapperAddress)\n      let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)\n\n      // Create a new Forwarder resource for DUC and store it in the new account's storage\n      let ducForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)\n      acct.save(\u003c-ducForwarder, to: /storage/dapperUtilityCoinReceiver)\n\n      // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder\n      acct.link\u003c\u0026{FungibleToken.Receiver}\u003e(\n      /public/dapperUtilityCoinReceiver,\n      target: /storage/dapperUtilityCoinReceiver\n      )\n    }\n}",
                "spec": {
@@ -5532,6 +5526,25 @@
                   ],
                   "parameters": {
                      "dapperAddress": "Address"
+                  }
+               }
+            },
+            "adminMainnetAddItem": {
+               "code": "import Admin from 0x35717efbbce11c74\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String]) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        let ft : [Type] = []\n        for type in ftTypes {\n            ft.append(CompositeType(type)!)\n        }\n\n        let nft : [Type] = []\n        for type in nftTypes {\n            nft.append(CompositeType(type)!)\n        }\n\n        let rules = [\n            FindMarket.TenantRule(name:ftName, types:ft, ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:nftName, types:nft, ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: ftName.concat(nftName), \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant",
+                     "ftName",
+                     "ftTypes",
+                     "nftName",
+                     "nftTypes"
+                  ],
+                  "parameters": {
+                     "ftName": "String",
+                     "ftTypes": "[String]",
+                     "nftName": "String",
+                     "nftTypes": "[String]",
+                     "tenant": "Address"
                   }
                }
             },
@@ -5793,6 +5806,50 @@
                   ],
                   "parameters": {
                      "market": "String",
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddBeam": {
+               "code": "import Admin from 0x35717efbbce11c74\n// import Beam from 0x6085ae87e78e1433\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        let nftType = CompositeType(\"A.6085ae87e78e1433.Beam.NFT\")!\n        self.adminRef.setNFTInfo(alias: \"Beam\", type: nftType, icon: \"https://frightclub.niftory.com/fc_black_logo_round.svg\", providerPath: /private/BeamCollection001, publicPath: /public/BeamCollection001, storagePath: /storage/BeamCollection001, allowedFTTypes: nil, address: 0x6085ae87e78e1433, externalFixedUrl: \"frightclub.niftory.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Beam\", types:[nftType], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBeam\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddBl0x": {
+               "code": "import Admin from 0x35717efbbce11c74\nimport Bl0x from 0xe8124d8428980aa6\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Bl0x\", \n            type: Type\u003c@Bl0x.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/626e4af22f80f09e2783df44_blox.jpg\", \n            providerPath: Bl0x.CollectionPrivatePath, \n            publicPath: Bl0x.CollectionPublicPath, \n            storagePath: Bl0x.CollectionStoragePath, \n            allowedFTTypes: nil, \n            address:0xe8124d8428980aa6, externalFixedUrl: \"bl0x-5ccsb92pb-findonflow.vercel.app\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Bl0x\", types:[Type\u003c@Bl0x.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowBl0x\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n        \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddFlovatar": {
+               "code": "import Admin from 0x35717efbbce11c74\nimport Flovatar from 0x9392a4a7c3f49a0b\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant:Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n\n        self.adminRef.setNFTInfo(alias: \"Flovatar\", type: Type\u003c@Flovatar.NFT\u003e(), icon: \"https://styles.redditmedia.com/t5_5ikf79/styles/communityIcon_fraplt3tgk681.jpg\", providerPath: /private/FlovatarCollection, publicPath: Flovatar.CollectionPublicPath, storagePath: Flovatar.CollectionStoragePath, allowedFTTypes: nil, address: 0x9392a4a7c3f49a0b, externalFixedUrl: \"flovatar.com\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Flovatar\", types:[Type\u003c@Flovatar.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowFLovatar\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n \n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
+                     "tenant": "Address"
+                  }
+               }
+            },
+            "adminTestnetAddVersus": {
+               "code": "import Admin from 0x35717efbbce11c74\nimport Art from 0x99ca04281098b33d\nimport FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\n\ntransaction(tenant: Address) {\n\n    let adminRef : \u0026Admin.AdminProxy\n\n    prepare(account: AuthAccount){\n        self.adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n        \n    }\n    execute{\n        self.adminRef.setNFTInfo(\n            alias: \"Versus\", \n            type: Type\u003c@Art.NFT\u003e(), \n            icon: \"https://global-uploads.webflow.com/60f008ba9757da0940af288e/60f02cad72175a774926125f_flow%20versus%20twitter%20lgoo.jpg\",\n            providerPath: /private/versusArtCollection,\n            publicPath: Art.CollectionPublicPath, \n            storagePath: Art.CollectionStoragePath, \n            allowedFTTypes: nil, \n                        address:0x99ca04281098b33d, externalFixedUrl: \"https://versus.auction\")\n\n        let rules = [\n            FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n            FindMarket.TenantRule(name:\"Versus\", types:[Type\u003c@Art.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n\n        let tenantSaleItem = FindMarket.TenantSaleItem(\n            name: \"FlowVersus\", \n            cut: nil, \n            rules: rules, \n            status:\"active\"\n        )\n\n        self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "tenant"
+                  ],
+                  "parameters": {
                      "tenant": "Address"
                   }
                }
