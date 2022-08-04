@@ -67,12 +67,13 @@ pub struct MetadataCollectionItem {
 	pub let name: String
 	pub let collection: String // <- This will be Alias unless they want something else
 	pub let subCollection: String? // <- This will be Alias unless they want something else
+	pub let nftDetailIdentifier: String
 
 	pub let media  : String
 	pub let mediaType : String 
 	pub let source : String 
 
-	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String) {
+	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
 		self.id=id
 		self.name=name 
 		self.collection=collection 
@@ -80,6 +81,7 @@ pub struct MetadataCollectionItem {
 		self.media=media 
 		self.mediaType=mediaType 
 		self.source=source
+		self.nftDetailIdentifier=nftDetailIdentifier
 	}
 }
 
@@ -118,7 +120,8 @@ pub fun fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {St
 				subCollection: nil, 
 				media: image,
 				mediaType: "video",
-				source: source
+				source: source, 
+				nftDetailIdentifier: project 
 			)
 			collectionItems.append(item)
 		}

@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: String , project: String, id: UInt64) : NFTData? {
+pub fun main(user: String , project: String, id: UInt64, views: [String]) : NFTData? {
 
 	return nil
 }

@@ -25,12 +25,13 @@ pub struct MetadataCollectionItem {
 	pub let name: String
 	pub let collection: String // <- This will be Alias unless they want something else
 	pub let subCollection: String? // <- This will be Alias unless they want something else
+	pub let nftDetailIdentifier: String
 
 	pub let media  : String
 	pub let mediaType : String 
 	pub let source : String 
 
-	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String) {
+	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
 		self.id=id
 		self.name=name 
 		self.collection=collection 
@@ -38,8 +39,43 @@ pub struct MetadataCollectionItem {
 		self.media=media 
 		self.mediaType=mediaType 
 		self.source=source
+		self.nftDetailIdentifier=nftDetailIdentifier
 	}
 }
+
+    pub struct NFTView {
+        pub let id: UInt64
+        pub let uuid: UInt64
+        pub let display: MetadataViews.Display?
+        pub let externalURL: MetadataViews.ExternalURL?
+        pub let collectionData: MetadataViews.NFTCollectionData?
+        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
+        pub let royalties: MetadataViews.Royalties?
+        pub let traits: MetadataViews.Traits?
+		pub let nftType: Type
+
+        init(
+            id : UInt64,
+            uuid : UInt64,
+            display : MetadataViews.Display?,
+            externalURL : MetadataViews.ExternalURL?,
+            collectionData : MetadataViews.NFTCollectionData?,
+            collectionDisplay : MetadataViews.NFTCollectionDisplay?,
+            royalties : MetadataViews.Royalties?,
+            traits: MetadataViews.Traits? ,
+			nftType: Type
+        ) {
+            self.id = id
+            self.uuid = uuid
+            self.display = display
+            self.externalURL = externalURL
+            self.collectionData = collectionData
+            self.collectionDisplay = collectionDisplay
+            self.royalties = royalties
+            self.traits = traits
+			self.nftType = nftType
+        }
+    }
 
 // Helper function 
 
@@ -47,17 +83,31 @@ pub fun resolveAddress(user: String) : Address? {
 	return FIND.resolve(user)
 }
 
-pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [MetadataViews.NFTView] {
+pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 
 	let account = getAuthAccount(ownerAddress)
-	let results : [MetadataViews.NFTView] = []
+	let results : [NFTView] = []
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 		let storagePath = catalogEntry.collectionData.storagePath
 		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
 		if ref != nil{
 			for id in ids[collectionKey]! {
-				results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
+				// results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
+				let viewResolver = ref!.borrowViewResolver(id:id)!
+				results.append(
+					NFTView(
+						id : id,
+						uuid: viewResolver.uuid,
+						display: MetadataViews.getDisplay(viewResolver),
+						externalURL : MetadataViews.getExternalURL(viewResolver),
+						collectionData : MetadataViews.getNFTCollectionData(viewResolver),
+						collectionDisplay : MetadataViews.getNFTCollectionDisplay(viewResolver),
+						royalties : MetadataViews.getRoyalties(viewResolver),
+						traits : MetadataViews.getTraits(viewResolver), 
+						nftType : viewResolver.getType()
+					)
+				)
 			}
 		}
 	}
@@ -150,7 +200,8 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 				subCollection: subCollection, 
 				media: nft!.display!.thumbnail.uri(),
 				mediaType: "image/png",
-				source: source
+				source: source, 
+				nftDetailIdentifier: nft!.nftType.identifier
 			)
 			collectionItems.append(item)
 		}

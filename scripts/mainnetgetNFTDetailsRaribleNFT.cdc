@@ -1,7 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
 import RaribleNFT from 0x01ab36aaf654a13e
 
-pub fun main(user: String , project: String, id: UInt64) : NFTData? {
+pub fun main(user: String , project: String, id: UInt64, views: [String]) : NFTData? {
 
 	if let address = FIND.resolve(user) {
 		if let uuid = getSocks(ownerAddress: address, id: id) {

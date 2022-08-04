@@ -24,7 +24,7 @@ func main() {
 
 	// fmt.Println(res3)
 
-	network := "testnet"
+	network := "mainnet"
 
 	o := Overflow(
 		WithNetwork(network),
@@ -36,44 +36,95 @@ func main() {
 
 	prefix := "RaribleNFT"
 	o.Script(suffix+script+prefix,
-		WithArg("user", "christian"),
-		WithArg("maxItems", "0"),
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
 	prefix = "Shard1"
 	o.Script(suffix+script+prefix,
-		WithArg("user", "christian"),
-		WithArg("maxItems", "0"),
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
 	prefix = "Shard2"
 	o.Script(suffix+script+prefix,
-		WithArg("user", "christian"),
-		WithArg("maxItems", "0"),
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
 	prefix = "Shard3"
 	o.Script(suffix+script+prefix,
-		WithArg("user", "christian"),
-		WithArg("maxItems", "0"),
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
 	prefix = "Shard4"
 	o.Script(suffix+script+prefix,
-		WithArg("user", "christian"),
-		WithArg("maxItems", "0"),
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "10"),
 		WithArg("collections", "[]"),
 	)
 
 	prefix = "NFTCatalog"
 	o.Script(script+prefix,
-		WithArg("user", "christian"),
-		WithArg("maxItems", "0"),
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
+	)
+
+	// get NFTDetail script
+	script = "getNFTDetails"
+
+	prefix = "RaribleNFT"
+	o.Script(suffix+script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "Flowverse Socks"),
+		WithArg("id", 14939),
+		WithArg("views", "[]"),
+	)
+
+	prefix = "Shard1"
+	o.Script(suffix+script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "TuneGO"),
+		WithArg("id", 382),
+		WithArg("views", "[]"),
+	)
+
+	prefix = "Shard2"
+	o.Script(suffix+script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "GeniaceNFT"),
+		WithArg("id", 2083),
+		WithArg("views", "[]"),
+	)
+
+	prefix = "Shard3"
+	o.Script(suffix+script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "BlindBoxRedeemVoucher"),
+		WithArg("id", 38477),
+		WithArg("views", "[]"),
+	)
+
+	prefix = "Shard4"
+	o.Script(suffix+script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "PartyMansionDrinksContract"),
+		WithArg("id", 4034),
+		WithArg("views", "[]"),
+	)
+
+	prefix = "NFTCatalog"
+	o.Script(script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "A.921ea449dffec68a.Flovatar.NFT"),
+		WithArg("id", 2271),
+		WithArg("views", "[]"),
 	)
 
 }
