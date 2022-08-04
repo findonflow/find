@@ -29,7 +29,7 @@ transaction(
         assert(collectionRef.getIDs().length > 0, message: "No NFTs exist in this collection.")
         let nftResolver = collectionRef.borrowViewResolver(id: nftID)
         
-        let metadataCollectionData = nftResolver.resolveView(Type<MetadataViews.NFTCollectionData>())! as! MetadataViews.NFTCollectionData
+        let metadataCollectionData = MetadataViews.getNFTCollectionData(nftResolver)!
         
         let collectionData = NFTCatalog.NFTCollectionData(
             storagePath: metadataCollectionData.storagePath,
@@ -39,7 +39,7 @@ transaction(
             privateLinkedType : metadataCollectionData.providerLinkedType
         )
 
-        let collectionDisplay = nftResolver.resolveView(Type<MetadataViews.NFTCollectionDisplay>())! as! MetadataViews.NFTCollectionDisplay
+        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(nftResolver)!
 
         let catalogData = NFTCatalog.NFTCatalogMetadata(
             contractName: contractName,
