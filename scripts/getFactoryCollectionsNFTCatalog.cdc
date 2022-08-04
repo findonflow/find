@@ -96,6 +96,10 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 	var fetchedCount : Int = 0
 
 	for project in extraIDs.keys {
+
+		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:project)!
+		let projectName = catalogEntry.contractName
+
 		if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
 			extraIDs.remove(key: project)
 			continue
@@ -142,7 +146,7 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 			let item = MetadataCollectionItem(
 				id: nft!.id,
 				name: nft!.display!.name,
-				collection: project,
+				collection: projectName,
 				subCollection: subCollection, 
 				media: nft!.display!.thumbnail.uri(),
 				mediaType: "image/png",
@@ -150,7 +154,8 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 			)
 			collectionItems.append(item)
 		}
-		inventory[project] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source)
+
+		inventory[catalogEntry.contractName] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source)
 
 	}
 
