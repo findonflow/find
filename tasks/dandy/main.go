@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	. "github.com/bjartek/overflow"
 )
 
@@ -19,7 +21,7 @@ func main() {
 		WithArg("externalURL", "http://find.xyz/find"),
 		WithArg("squareImage", "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"),
 		WithArg("bannerImage", "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500"),
-		WithArg("socials", `{ "Twitter" : "https://twitter.com/findonflow" , "Discord" : "https://discord.gg/95P274mayM" }`),
+		WithArg("socials", `{ "Twitter" : "https://twitter.com/findonflow" , "Discord" : "https://discord.gg/findonflow" }`),
 	)
 
 	id, err := o.Tx("adminMintFindDandy",
@@ -30,7 +32,7 @@ func main() {
 		WithArg("nftDescription", "A collection of 100 find mints to commemorate the first ever minted NFT on the .find platform"),
 		WithArg("folderHash", "QmanniNEwbfEd4eA4CiiWZR9dQkZ5wJ5WokvUfYGpTd73"),
 	).GetIdFromEvent(
-		"Minted", "id",
+		"FindForge.Minted", "id",
 	)
 
 	if err != nil {
@@ -48,4 +50,5 @@ func main() {
 		WithArg("publicPathIdentifier", "findDandy"),
 	)
 
+	fmt.Println("Minted dandy with id", id)
 }

@@ -20,7 +20,7 @@ transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:Stri
 		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
 		let traits = MetadataViews.Traits([])
-		traits.addTrait(MetadataViews.Trait(name: "forger", value: "Find", displayType:"String", rarity:nil))
+		traits.addTrait(MetadataViews.Trait(name: "Creator", value: ".find", displayType:"Author", rarity:nil))
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1
@@ -37,7 +37,7 @@ transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:Stri
 												description: nftDescription, 
 												thumbnail: mediaThumbnail, 
 												schemas: schemas, 
-												externalUrlPrefix:"https://find.xyz/".concat(name).concat("/NFTCatalog/Dandy"))
+												externalUrlPrefix:"https://find.xyz/".concat(name).concat("/collection/Dandy"))
 			
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 		
