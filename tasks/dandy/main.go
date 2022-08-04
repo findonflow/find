@@ -47,7 +47,15 @@ func main() {
 		}
 	*/
 	// Remove old Dandy from FIND NFT Catalog
+	//panic: the interaction 'adminRemoveNFTCatalog' has the following extra arguments [addressWithNFT nftID publicPathIdentifier contractName contractAddress]
+
+	// Add Dandy to FIND NFT Catalog
 	o.Tx("adminRemoveNFTCatalog",
+		findSigner,
+		WithArg("collectionIdentifier", "A.097bafa4e0b48eef.Dandy.NFT"),
+	)
+
+	o.Tx("adminAddNFTCatalog",
 		findSigner,
 		WithArg("collectionIdentifier", "A.097bafa4e0b48eef.Dandy.NFT"),
 		WithArg("contractName", "Dandy"),
@@ -55,12 +63,6 @@ func main() {
 		WithArg("addressWithNFT", "find"),
 		WithArg("nftID", 412333931),
 		WithArg("publicPathIdentifier", "findDandy"),
-	)
-
-	// Add Dandy to FIND NFT Catalog
-	o.Tx("adminAddNFTCatalog",
-		findSigner,
-		WithArg("collectionIdentifier", "A.097bafa4e0b48eef.Dandy.NFT"),
 	)
 
 	fmt.Println("Added to NFTCatalog")
