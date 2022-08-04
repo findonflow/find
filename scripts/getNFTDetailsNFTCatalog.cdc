@@ -188,16 +188,24 @@ pub struct StorefrontListing {
 }
 */
 
-pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
+pub var counter = 0
+
+pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {
 		return nil
 	}
 	let address = resolveAddress!
 
-	let account = getAccount(address) 
-	let publicPath = getPublicPath(nftAliasOrIdentifier)
+	let account = getAuthAccount(address) 
+	let storagePath = getStoragePath(project)
+	let publicPath = PublicPath(identifier: "find_temp_path_".concat(counter.toString()))!
+	counter = counter + 1
+	account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
 	let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+	if !cap.check() {
+		panic("The user does not set up collection correctly.")
+	}
 	let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
 
 	let nftDetail = getNFTDetail(pointer:pointer, views: views)
@@ -353,14 +361,15 @@ pub fun ignoreViews() : [Type] {
 	]
 }
 
-pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
+pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
-		return collection.collectionData.publicPath
+		return collection.collectionData.storagePath
 	}
 
 	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
-		return collection.collectionData.publicPath
+		return collection.collectionData.storagePath
 	}
 	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 }
+
