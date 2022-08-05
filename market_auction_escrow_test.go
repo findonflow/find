@@ -117,8 +117,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     id,
-				"seller": otu.accountAddress("user1"),
-				"buyer":  otu.accountAddress("user2"),
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
 			}))
@@ -250,8 +250,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     id,
-				"seller": otu.accountAddress(name),
-				"buyer":  otu.accountAddress(buyer),
+				"seller": otu.O.Address(name),
+				"buyer":  otu.O.Address(buyer),
 				"amount": 11.0,
 				"status": "cancel_reserved_not_met",
 			}))
@@ -273,7 +273,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     id,
-				"seller": otu.accountAddress(name),
+				"seller": otu.O.Address(name),
 				"amount": 10.0,
 				"status": "cancel_listing",
 			}))
@@ -358,8 +358,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"id":     id,
-				"seller": otu.accountAddress(name),
-				"buyer":  otu.accountAddress(buyer),
+				"seller": otu.O.Address(name),
+				"buyer":  otu.O.Address(buyer),
 				"amount": 11.0,
 				"status": "cancel_listing",
 			}))
@@ -629,14 +629,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
@@ -644,7 +644,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "platform",
@@ -671,14 +671,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
@@ -686,7 +686,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "platform",
@@ -831,8 +831,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 				"amount":        20.0,
 				"id":            id,
-				"buyer":         otu.accountAddress("user3"),
-				"previousBuyer": otu.accountAddress("user2"),
+				"buyer":         otu.O.Address("user3"),
+				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_ongoing",
 			}))
 		otu.delistAllNFTForEscrowedAuction("user1")

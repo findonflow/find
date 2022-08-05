@@ -421,14 +421,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("find"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
@@ -455,14 +455,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("find"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
@@ -581,8 +581,8 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"leaseName":     "name1",
-				"buyer":         otu.accountAddress("user3"),
-				"previousBuyer": otu.accountAddress("user2"),
+				"buyer":         otu.O.Address("user3"),
+				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_offered",
 			}))
 

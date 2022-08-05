@@ -110,8 +110,8 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"leaseName": "name1",
-				"seller":    otu.accountAddress("user1"),
-				"buyer":     otu.accountAddress("user2"),
+				"seller":    otu.O.Address("user1"),
+				"buyer":     otu.O.Address("user2"),
 				"amount":    15.0,
 				"status":    "cancel_ghostlisting",
 			}))
@@ -230,7 +230,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"leaseName": "name1",
-				"seller":    otu.accountAddress(name),
+				"seller":    otu.O.Address(name),
 				"amount":    10.0,
 				"status":    "cancel",
 			}))
@@ -291,8 +291,8 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"leaseName": "name1",
-				"seller":    otu.accountAddress(name),
-				"buyer":     otu.accountAddress(buyer),
+				"seller":    otu.O.Address(name),
+				"buyer":     otu.O.Address(buyer),
 				"amount":    11.0,
 				"status":    "cancel_reserved_not_met",
 			}))
@@ -517,12 +517,12 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("find"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.5,
 				"royaltyName": "network",
 			}))
@@ -551,12 +551,12 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				UFix64(10.0)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"royaltyName": "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("find"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.5,
 				"royaltyName": "network",
 			}))
@@ -687,8 +687,8 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 				"amount":        20.0,
 				"leaseName":     "name1",
-				"buyer":         otu.accountAddress("user3"),
-				"previousBuyer": otu.accountAddress("user2"),
+				"buyer":         otu.O.Address("user3"),
+				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_ongoing",
 			}))
 

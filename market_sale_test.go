@@ -381,14 +381,14 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          ids[0],
@@ -396,7 +396,7 @@ func TestMarketSale(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "platform",
@@ -421,14 +421,14 @@ func TestMarketSale(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          ids[0],
@@ -436,7 +436,7 @@ func TestMarketSale(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "platform",
@@ -527,10 +527,10 @@ func TestMarketSale(t *testing.T) {
 			AssertEvent(t,
 				"FindMarket.RoyaltyCouldNotBePaid",
 				overflow.OverflowEvent{
-					"address":         otu.accountAddress("user1"),
+					"address":         otu.O.Address("user1"),
 					"amount":          0.5,
 					"findName":        "user1",
-					"residualAddress": otu.accountAddress("find"),
+					"residualAddress": otu.O.Address("find"),
 					"royaltyName":     "minter",
 				},
 			)
@@ -610,22 +610,22 @@ func TestMarketSale(t *testing.T) {
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
-				"seller": otu.accountAddress(seller),
-				"buyer":  otu.accountAddress(name),
+				"seller": otu.O.Address(seller),
+				"buyer":  otu.O.Address(name),
 				"status": "sold",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
-				"seller": otu.accountAddress(seller),
-				"buyer":  otu.accountAddress(name),
+				"seller": otu.O.Address(seller),
+				"buyer":  otu.O.Address(name),
 				"status": "sold",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
-				"seller": otu.accountAddress(seller),
-				"buyer":  otu.accountAddress(name),
+				"seller": otu.O.Address(seller),
+				"buyer":  otu.O.Address(name),
 				"status": "sold",
 			}))
 
@@ -752,8 +752,8 @@ func TestMarketSale(t *testing.T) {
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     saleItemID[0],
-				"seller": otu.accountAddress("user1"),
-				"buyer":  otu.accountAddress("user2"),
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
 				"status": "sold",
 			}))
 

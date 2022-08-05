@@ -103,7 +103,7 @@ func TestMarketOptions(t *testing.T) {
 				"status": "active_listed",
 				"amount": price,
 				"id":     ids[1],
-				"seller": otu.accountAddress("user1"),
+				"seller": otu.O.Address("user1"),
 			}))
 
 		/* Reset */
@@ -161,7 +161,7 @@ func TestMarketOptions(t *testing.T) {
 				"status": "active_listed",
 				"amount": price,
 				"id":     ids[1],
-				"seller": otu.accountAddress("user1"),
+				"seller": otu.O.Address("user1"),
 			}))
 
 		/* Reset */
