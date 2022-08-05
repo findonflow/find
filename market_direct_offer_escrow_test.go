@@ -237,11 +237,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"id":            id,
-				"previousBuyer": otu.accountAddress("user2"),
+				"previousBuyer": otu.O.Address("user2"),
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
 				"amount": price,
-				"to":     otu.accountAddress("user2"),
+				"to":     otu.O.Address("user2"),
 			}))
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
@@ -479,14 +479,14 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
@@ -494,7 +494,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "platform",
@@ -529,14 +529,14 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				UInt64(id)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
@@ -544,7 +544,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "platform",
@@ -680,17 +680,17 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
-				"buyer":  otu.accountAddress(name),
+				"buyer":  otu.O.Address(name),
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
-				"buyer":  otu.accountAddress(name),
+				"buyer":  otu.O.Address(name),
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
-				"buyer":  otu.accountAddress(name),
+				"buyer":  otu.O.Address(name),
 			}))
 
 		name = "user1"
@@ -704,22 +704,22 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"id":     ids[0],
-				"seller": otu.accountAddress(name),
-				"buyer":  otu.accountAddress(buyer),
+				"seller": otu.O.Address(name),
+				"buyer":  otu.O.Address(buyer),
 				"amount": price,
 				"status": "sold",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"id":     ids[1],
-				"seller": otu.accountAddress(name),
-				"buyer":  otu.accountAddress(buyer),
+				"seller": otu.O.Address(name),
+				"buyer":  otu.O.Address(buyer),
 				"amount": price,
 				"status": "sold",
 			})).
 			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 				"id":     ids[2],
-				"seller": otu.accountAddress(name),
-				"buyer":  otu.accountAddress(buyer),
+				"seller": otu.O.Address(name),
+				"buyer":  otu.O.Address(buyer),
 				"amount": price,
 				"status": "sold",
 			}))

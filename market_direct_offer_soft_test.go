@@ -463,14 +463,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
@@ -478,7 +478,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "platform",
@@ -517,14 +517,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UFix64(price)).
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("user1"),
+				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
@@ -532,7 +532,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.accountAddress("account"),
+				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "platform",
@@ -675,8 +675,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"id":            id,
-				"buyer":         otu.accountAddress("user3"),
-				"previousBuyer": otu.accountAddress("user2"),
+				"buyer":         otu.O.Address("user3"),
+				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_offered",
 			}))
 
@@ -733,17 +733,17 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 			}))
 
 		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoft").
@@ -754,22 +754,22 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[0],
-				"seller": otu.accountAddress("user1"),
-				"buyer":  otu.accountAddress("user2"),
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[1],
-				"seller": otu.accountAddress("user1"),
-				"buyer":  otu.accountAddress("user2"),
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[2],
-				"seller": otu.accountAddress("user1"),
-				"buyer":  otu.accountAddress("user2"),
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			}))
@@ -783,19 +783,19 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[0],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[1],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     ids[2],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
 			}))
@@ -936,8 +936,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     saleItemID[0],
-				"seller": otu.accountAddress("user1"),
-				"buyer":  otu.accountAddress("user2"),
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			}))
@@ -951,7 +951,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			Test(otu.T).AssertSuccess().
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"id":     saleItemID[0],
-				"buyer":  otu.accountAddress("user2"),
+				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
 			}))

@@ -230,7 +230,7 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
 
-		nameAddress := otu.accountAddress("user3")
+		nameAddress := otu.O.Address("user3")
 		otu.O.Script("getStatus",
 			WithArg("user", nameAddress),
 		).AssertWithPointerWant(t,
@@ -241,7 +241,7 @@ func TestFIND(t *testing.T) {
 
 	t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
 
-		nameAddress := otu.accountAddress("user2")
+		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
 		otu.O.Script("getStatus",
 			WithArg("user", nameAddress),
@@ -372,7 +372,7 @@ func TestFIND(t *testing.T) {
 			registerUser(user).
 			registerFtInRegistry()
 
-		user2 := otu.accountAddress("user2")
+		user2 := otu.O.Address("user2")
 
 		otu.O.Tx("sendFT",
 			WithSigner(user),
