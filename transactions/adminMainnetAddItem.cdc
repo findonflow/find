@@ -2,7 +2,7 @@ import Admin from "../contracts/Admin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 
-transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String]) {
+transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String], listingName: String, listingTypes: [String]) {
 
     let adminRef : &Admin.AdminProxy
 
@@ -22,13 +22,19 @@ transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String
             nft.append(CompositeType(type)!)
         }
 
+        let listing : [Type] = []
+        for type in listingTypes {
+            listing.append(CompositeType(type)!)
+        }
+
         let rules = [
+            FindMarket.TenantRule(name:listingName, types:listing, ruleType: "listing", allow: true), 
             FindMarket.TenantRule(name:ftName, types:ft, ruleType: "ft", allow: true),
             FindMarket.TenantRule(name:nftName, types:nft, ruleType: "nft", allow: true)
         ]
 
         let tenantSaleItem = FindMarket.TenantSaleItem(
-            name: ftName.concat(nftName), 
+            name: listingName.concat(ftName).concat(nftName), 
             cut: nil, 
             rules: rules, 
             status:"active"
