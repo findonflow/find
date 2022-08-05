@@ -86,10 +86,10 @@ func main() {
 	fmt.Println("Press enter when bl0x is updated")
 	fmt.Scanln()
 
-	o.SimpleTxArgs("adminAddBl0xTestnet", "find-admin", o.Arguments().Account("find"))
-	o.SimpleTxArgs("adminAddFlovatarTestnet", "find-admin", o.Arguments().Account("find"))
-	o.SimpleTxArgs("adminAddVersusTestnet", "find-admin", o.Arguments().Account("find"))
-	o.SimpleTxArgs("adminAddBeamTestnet", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminTestnetAddBl0x", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminTestnetAddFlovatar", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminTestnetAddVersus", "find-admin", o.Arguments().Account("find"))
+	o.SimpleTxArgs("adminTestnetAddBeam", "find-admin", o.Arguments().Account("find"))
 
 }
 
