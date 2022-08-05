@@ -96,7 +96,7 @@ func main() {
 		tenant,
 		ftName,
 		ft,
-		WithArg("nftName", "neoCharity"),
+		WithArg("nftName", "starly"),
 		WithArg("nftTypes", `["A.5b82f21c0edf76e3.StarlyCard.NFT"]`),
 		listingName,
 		listing,
