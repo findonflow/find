@@ -150,6 +150,7 @@
     "NFTRegistry": "./contracts/NFTRegistry.cdc",
     "FindForge": "./contracts/FindForge.cdc",
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
+		"NonFunGerbilsNFT": "./contracts/NonFunGerbilsNFT.cdc",
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
     "FindToken": "./contracts/FindToken.cdc",
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
@@ -329,7 +330,8 @@
         "FINDNFTCatalog",
         "NFTCatalogAdmin",
         "FINDNFTCatalogAdmin",
-        "NFTRetrieval"
+        "NFTRetrieval",
+				"NonFunGerbilsNFT" 
       ],
       "emulator-find": [],
       "emulator-user1": [],
