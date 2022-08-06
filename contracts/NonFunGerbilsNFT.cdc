@@ -3,7 +3,6 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
 
-//LUKE: do we want the contract to be called NFG, NonFunGerbils or NonFunGerbilsNFT, or something else?
 pub contract NonFunGerbilsNFT: NonFungibleToken {
 
 	pub var totalSupply: UInt64
@@ -68,18 +67,12 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 				return MetadataViews.Display(
 					name: self.name,
 					description: self.description,
-					//LUKE: do we want to use IPFS or HTTP url? arweave can be HTTP URL
 					thumbnail: MetadataViews.HTTPFile(
 						url: self.thumbnail
 					)
 				)
 			case Type<MetadataViews.Editions>():
-				// There is no max number of NFTs that can be minted from this contract
-				// so the max edition field value is set to nil
-				//LUKE: do you want to have max editions in the NFT?
-				//LUKE:  do you have a preference for edition name
-
-				let editionInfo = MetadataViews.Edition(name: "set", number: self.id, max: nil)
+			  let editionInfo = MetadataViews.Edition(name: "set", number: self.id, max: nil)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
 					editionList
@@ -92,8 +85,8 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 				return self.royalties
 
 			case Type<MetadataViews.ExternalURL>():
-				//LUKE: What url to a gerbil do you have on your site?
 				return MetadataViews.ExternalURL("https://nfg-nft.onflow.org/".concat(self.id.toString()))
+
 			case Type<MetadataViews.NFTCollectionData>():
 				return MetadataViews.NFTCollectionData(
 					storagePath: NonFunGerbilsNFT.CollectionStoragePath,
@@ -107,24 +100,29 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 					})
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
-				let media = MetadataViews.Media(
+
+				let square = MetadataViews.Media(
 					file: MetadataViews.HTTPFile(
-						//LUKE: need a banner image nad a square image 
-						url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+						url : "https://pbs.twimg.com/profile_images/1526321825910771720/BJ-lFPse_400x400.jpg"
 					),
-					mediaType: "image/svg+xml"
+					mediaType: "image/jpg"
 				)
+
+				let banner = MetadataViews.Media(
+					file: MetadataViews.HTTPFile(
+						url: "https://pbs.twimg.com/profile_banners/1069889959014907904/1654779649/1500x500"
+					),
+					mediaType: "image/jpg"
+				)
+
 				return MetadataViews.NFTCollectionDisplay(
 					name: "NonFunGerbils",
-					//LUKE: Need description of NFG
-					description: "This collection is used as an nfg to help you develop your next Flow NFT.",
-					//LUKE: need external url to all of NFT, I assume this is same as website currently?
-					externalURL: MetadataViews.ExternalURL("https://nfg-nft.onflow.org"),
-					squareImage: media,
-					bannerImage: media,
+					description: "The NonFunGerbils are digitally scarce gerbils - non-fungible NonFunGerbil tokens on the Ethereum blockchain. They are a collaboration between us and our audience and we give them away to everyone who gets involved in the creation process.",
+					externalURL: MetadataViews.ExternalURL("https://nonfungerbils.com"),
+					squareImage: square,
+					bannerImage: banner,
 					socials: {
-						//LUKE: add socials here
-						"twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+						"twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
 					}
 				)
 			}

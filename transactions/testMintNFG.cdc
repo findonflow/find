@@ -6,7 +6,8 @@ import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
-transaction(name: String, artist:String, nftName:String, nftDescription:String, nftUrl:String) {
+
+transaction(name: String, nftName:String, nftDescription:String, nftUrl:String, externalURL: String, traits: {String: String}, birthday: UFix64?, values: {String: UFix64}) {
 	prepare(account: AuthAccount) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(NonFunGerbilsNFT.CollectionPublicPath)
@@ -29,6 +30,7 @@ transaction(name: String, artist:String, nftName:String, nftDescription:String, 
 		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(NonFunGerbilsNFT.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to NonFunGerbilsNFT collection.")
 
 		let collection=collectionCap.borrow()!
+		//TOOD: fix adding all data from transaction
 		let mintData = NonFunGerbilsNFT.NonFunGerbilsNFTInfo(name: "Neo", description: "Non Fun Gerbil", thumbnail: nftUrl)
 		
 		FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)

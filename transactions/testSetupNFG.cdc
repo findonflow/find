@@ -7,7 +7,7 @@ import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
-transaction(name: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
+transaction(name: String, minterCut: UFix64, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String, socials: {String: String}) {
 	prepare(account: AuthAccount) {
 
 
@@ -18,17 +18,14 @@ transaction(name: String, collectionDescription: String, collectionExternalURL: 
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
 										forgeType: forgeType, 
-										//LUKE: how much royalty do you want to take on secondaries? 
-										minterCut: 0.025, 
+										minterCut: minterCut, 
 										//these values will be replaced with what we have from NFG contract
 										description: collectionDescription, 
 										externalURL: collectionExternalURL, 
 										squareImage: collectionSquareImage, 
 										bannerImage: collectionBannerImage, 
-										socials: {
-											"Twitter" : "https://twitter.com/home" ,
-											"Discord" : "discord.gg/"
-										})
+										socials: socials
+									)
 		}
 	}
 }
