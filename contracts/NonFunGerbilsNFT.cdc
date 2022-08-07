@@ -3,7 +3,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
 
-pub contract NonFunGerbilsNFT: NonFungibleToken {
+pub contract NFGv3: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 
@@ -16,7 +16,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 	pub let CollectionPublicPath: PublicPath
 	pub let MinterStoragePath: StoragePath
 
-	pub struct NonFunGerbilsNFTInfo {
+	pub struct NFGv3Info {
 		pub let name: String
 		pub let description: String
 		pub let thumbnail: String
@@ -89,14 +89,14 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 
 			case Type<MetadataViews.NFTCollectionData>():
 				return MetadataViews.NFTCollectionData(
-					storagePath: NonFunGerbilsNFT.CollectionStoragePath,
-					publicPath: NonFunGerbilsNFT.CollectionPublicPath,
+					storagePath: NFGv3.CollectionStoragePath,
+					publicPath: NFGv3.CollectionPublicPath,
 					providerPath: /private/nfgNFTCollection,
-					publicCollection: Type<&NonFunGerbilsNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					publicLinkedType: Type<&NonFunGerbilsNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					providerLinkedType: Type<&NonFunGerbilsNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+					publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+					publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+					providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
 					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-						return <-NonFunGerbilsNFT.createEmptyCollection()
+						return <-NFGv3.createEmptyCollection()
 					})
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
@@ -151,7 +151,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
 		pub fun deposit(token: @NonFungibleToken.NFT) {
-			let token <- token as! @NonFunGerbilsNFT.NFT
+			let token <- token as! @NFGv3.NFT
 
 			let id: UInt64 = token.id
 
@@ -176,7 +176,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-			let nfgNFT = nft as! &NonFunGerbilsNFT.NFT
+			let nfgNFT = nft as! &NFGv3.NFT
 			return nfgNFT as &AnyResource{MetadataViews.Resolver}
 		}
 
@@ -192,7 +192,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 
 	pub resource Forge: FindForge.Forge {
 		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
-			let info = data as? NonFunGerbilsNFTInfo ?? panic("The data passed in is not in form of NonFunGerbilsNFTInfo.")
+			let info = data as? NFGv3Info ?? panic("The data passed in is not in form of NFGv3Info.")
 			let royalties : [MetadataViews.Royalty] = []
 			royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))
 			if platform.minterCut != nil {
@@ -207,7 +207,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 				royalties: MetadataViews.Royalties(royalties)
 			)
 
-			NonFunGerbilsNFT.totalSupply = NonFunGerbilsNFT.totalSupply + UInt64(1)
+			NFGv3.totalSupply = NFGv3.totalSupply + UInt64(1)
 			return <- newNFT
 		}
 	}
@@ -235,7 +235,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 		self.account.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
-		self.account.link<&NonFunGerbilsNFT.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+		self.account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)

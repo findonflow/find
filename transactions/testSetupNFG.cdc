@@ -2,7 +2,7 @@
 import FIND from "../contracts/FIND.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFunGerbilsNFT from "../contracts/NonFunGerbilsNFT.cdc"
+import NFGv3 from "../contracts/NFGv3.cdc"
 import Profile from "../contracts/Profile.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
@@ -13,7 +13,7 @@ transaction(name: String, minterCut: UFix64, collectionDescription: String, coll
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
-		let forgeType = NonFunGerbilsNFT.getForgeType()
+		let forgeType = NFGv3.getForgeType()
 		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {
 			/* set up minterPlatform */
 			FindForge.setMinterPlatform(lease: lease, 
