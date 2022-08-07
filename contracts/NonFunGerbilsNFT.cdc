@@ -117,7 +117,7 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 
 				return MetadataViews.NFTCollectionDisplay(
 					name: "NonFunGerbils",
-					description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes famous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
+					description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes fabolous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
 					externalURL: MetadataViews.ExternalURL("https://nonfungerbils.com"),
 					squareImage: square,
 					bannerImage: banner,
