@@ -91,7 +91,7 @@ pub contract NFGv3: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(
 					storagePath: NFGv3.CollectionStoragePath,
 					publicPath: NFGv3.CollectionPublicPath,
-					providerPath: /private/nfgNFTCollection,
+					providerPath: NFGv3.CollectionPrivatePath,
 					publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
 					publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
 					providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
@@ -102,17 +102,19 @@ pub contract NFGv3: NonFungibleToken {
 			case Type<MetadataViews.NFTCollectionDisplay>():
 
 				let square = MetadataViews.Media(
-					file: MetadataViews.HTTPFile(
-						url: "https://lukus.cc/index.php/s/TbMc5Z4qQxjoG8s"
+					file: MetadataViews.IPFSFile(
+						cid: "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c",
+						path: nil
 					),
-					mediaType: "image/jpg"
+					mediaType: "image/png"
 				)
 
 				let banner = MetadataViews.Media(
-					file: MetadataViews.HTTPFile(
-						url: "https://lukus.cc/index.php/s/GaAo2HLscfFrNwy"
+					file: MetadataViews.IPFSFile(
+						cid: "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1",
+						path: nil
 					),
-					mediaType: "image/jpg"
+					mediaType: "image/png"
 				)
 
 				return MetadataViews.NFTCollectionDisplay(
