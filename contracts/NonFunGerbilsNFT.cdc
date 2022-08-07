@@ -103,21 +103,21 @@ pub contract NonFunGerbilsNFT: NonFungibleToken {
 
 				let square = MetadataViews.Media(
 					file: MetadataViews.HTTPFile(
-						url : "https://pbs.twimg.com/profile_images/1526321825910771720/BJ-lFPse_400x400.jpg"
+						url: "https://lukus.cc/index.php/s/TbMc5Z4qQxjoG8s"
 					),
 					mediaType: "image/jpg"
 				)
 
 				let banner = MetadataViews.Media(
 					file: MetadataViews.HTTPFile(
-						url: "https://pbs.twimg.com/profile_banners/1069889959014907904/1654779649/1500x500"
+						url: "https://lukus.cc/index.php/s/GaAo2HLscfFrNwy"
 					),
 					mediaType: "image/jpg"
 				)
 
 				return MetadataViews.NFTCollectionDisplay(
 					name: "NonFunGerbils",
-					description: "The NonFunGerbils are digitally scarce gerbils - non-fungible NonFunGerbil tokens on the Ethereum blockchain. They are a collaboration between us and our audience and we give them away to everyone who gets involved in the creation process.",
+					description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes famous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
 					externalURL: MetadataViews.ExternalURL("https://nonfungerbils.com"),
 					squareImage: square,
 					bannerImage: banner,

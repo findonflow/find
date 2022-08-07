@@ -31,8 +31,8 @@ func main() {
 		WithArg("minterCut", 0.025),
 		WithArg("description", "NFG"),
 		WithArg("externalUrl", "http://nonfungerbils.com"),
-		WithArg("squareImage", "https://pbs.twimg.com/profile_images/1526321825910771720/BJ-lFPse_400x400.jpg"),
-		WithArg("bannerImage", "https://pbs.twimg.com/profile_banners/1069889959014907904/1654779649/1500x500"),
+		WithArg("squareImage", "https://lukus.cc/index.php/s/TbMc5Z4qQxjoG8s"),
+		WithArg("bannerImage", "https://lukus.cc/index.php/s/GaAo2HLscfFrNwy"),
 		WithArg("socials", `{ "Twitter" : "https://twitter.com/NonFunGerbils" }`),
 	)
 
