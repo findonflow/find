@@ -638,6 +638,11 @@ pub contract FindMarketDirectOfferSoft {
 				panic("Valid until is before current time")
 			}
 
+			// check soul bound 
+			if item.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
+			}
+
 			if self.owner!.address == item.owner() {
 				panic("You cannot bid on your own resource")
 			}

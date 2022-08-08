@@ -543,6 +543,11 @@ pub contract FindMarketAuctionSoft {
 				panic("Valid until is before current time")
 			}
 
+			// check soul bound 
+			if pointer.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
+			}
+
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
 			let tenant = self.getTenant()

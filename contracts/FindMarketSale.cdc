@@ -245,6 +245,11 @@ pub contract FindMarketSale {
 				panic("Valid until is before current time")
 			}
 
+			// check soul bound 
+			if pointer.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
+			}
+
 			// What happends if we relist  
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 

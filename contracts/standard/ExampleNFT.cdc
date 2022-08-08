@@ -12,6 +12,7 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
 import FungibleToken from "./FungibleToken.cdc"
 import MetadataViews from "./MetadataViews.cdc"
+import FindViews from "../FindViews.cdc"
 import FindForge from "../FindForge.cdc"
 import DapperUtilityCoin from "./DapperUtilityCoin.cdc"
 
@@ -31,12 +32,14 @@ pub contract ExampleNFT: NonFungibleToken {
     pub struct ExampleNFTInfo {
         pub let name: String
         pub let description: String
+        pub let soulBound: Bool 
         pub let thumbnail: String
 
-        init(name: String, description: String, thumbnail: String) {
+        init(name: String, description: String, soulBound: Bool, thumbnail: String) {
             self.name=name 
             self.description=description 
             self.thumbnail=thumbnail 
+            self.soulBound=soulBound
         }
     }
 
@@ -46,6 +49,7 @@ pub contract ExampleNFT: NonFungibleToken {
         pub let name: String
         pub let description: String
         pub let thumbnail: String
+        pub let soulBound: Bool
         access(self) let royalties: MetadataViews.Royalties
 
         init(
@@ -53,17 +57,19 @@ pub contract ExampleNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
+            soulBound: Bool, 
             royalties: MetadataViews.Royalties
         ) {
             self.id = id
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
+            self.soulBound = soulBound
             self.royalties = royalties
         }
     
         pub fun getViews(): [Type] {
-            return [
+            let views = [
                 Type<MetadataViews.Display>(),
                 Type<MetadataViews.Royalties>(),
                 Type<MetadataViews.Editions>(),
@@ -72,6 +78,12 @@ pub contract ExampleNFT: NonFungibleToken {
                 Type<MetadataViews.NFTCollectionDisplay>(),
                 Type<MetadataViews.Serial>()
             ]
+
+            if self.soulBound {
+                views.append(Type<FindViews.SoulBound>())
+            }
+
+            return views
         }
 
         pub fun resolveView(_ view: Type): AnyStruct? {
@@ -130,6 +142,15 @@ pub contract ExampleNFT: NonFungibleToken {
                             "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
                         }
                     )
+
+                case Type<FindViews.SoulBound>() :
+                    if !self.soulBound {
+                        return nil
+                    }
+                    return FindViews.SoulBound(
+                         "This NFT is soulbound."
+                    )
+
             }
             return nil
         }
@@ -225,6 +246,7 @@ pub contract ExampleNFT: NonFungibleToken {
         name: String,
         description: String,
         thumbnail: String,
+        soulBound: Bool ,
         royalties: MetadataViews.Royalties
     ) : @NonFungibleToken.NFT
     {
@@ -235,6 +257,7 @@ pub contract ExampleNFT: NonFungibleToken {
             name: name,
             description: description,
             thumbnail: thumbnail,
+            soulBound: soulBound, 
             royalties: royalties
         )
 
@@ -253,6 +276,7 @@ pub contract ExampleNFT: NonFungibleToken {
 			return <- ExampleNFT.mintNFT(name: info.name,
                                         description: info.description,
                                         thumbnail: info.thumbnail,
+                                        soulBound: info.soulBound,
                                         royalties: MetadataViews.Royalties(royalties))
 		}
 	}
@@ -295,7 +319,10 @@ pub contract ExampleNFT: NonFungibleToken {
         let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "minter")
         let royalties : [MetadataViews.Royalty] = []
         royalties.append(minterCut)
-        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", royalties: MetadataViews.Royalties(royalties))
+        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false, royalties: MetadataViews.Royalties(royalties))
+        let nft2 <- ExampleNFT.mintNFT(name: "SoulBoundNFT", description: "This is soulBound", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: true, royalties: MetadataViews.Royalties(royalties))
+
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft)
+        ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft2)
     }
 }

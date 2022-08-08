@@ -560,6 +560,11 @@ pub contract FindMarketAuctionEscrow {
 			if auctionValidUntil != nil && auctionValidUntil! < Clock.time() {
 				panic("Valid until is before current time")
 			}
+
+			// check soul bound 
+			if pointer.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
+			}
 			
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 

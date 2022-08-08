@@ -128,6 +128,8 @@ pub contract FindViews {
 		pub fun getDisplay() : MetadataViews.Display
 		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 
+		pub fun checkSoulBound() : Bool 
+
 	}
 
 	//An interface to say that this pointer can withdraw
@@ -213,6 +215,10 @@ pub contract FindViews {
 				return v
 			}
 			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+		}
+
+		pub fun checkSoulBound() : Bool {
+			return FindViews.checkSoulBound(self.getViewResolver())
 		}
 	}
 
@@ -327,8 +333,13 @@ pub contract FindViews {
 		pub fun owner() : Address {
 			return self.cap.address
 		}
+		
 		pub fun getItemType() : Type {
 			return self.itemType
+		}
+
+		pub fun checkSoulBound() : Bool {
+			return FindViews.checkSoulBound(self.getViewResolver())
 		}
 	}
 
@@ -354,5 +365,14 @@ pub contract FindViews {
 			self.message=message
 
 		}
+	}
+
+	pub fun checkSoulBound(_ viewResolver: &{MetadataViews.Resolver}) : Bool {
+		if let soulBound = viewResolver.resolveView(Type<FindViews.SoulBound>()) {
+			if let v = soulBound as? FindViews.SoulBound {
+				return true
+			}
+		}
+		return false
 	}
 }
