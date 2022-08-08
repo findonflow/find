@@ -8,19 +8,21 @@ pub fun main(user: String, maxItems: Int, collections: [String]) : {String : Ite
 }
 
 
-pub struct ItemReport {
-	pub let items : [MetadataCollectionItem]
-	pub let length : Int // mapping of collection to no. of ids 
-	pub let extraIDs : [UInt64]
-	pub let shard : String 
+    pub struct ItemReport {
+        pub let items : [MetadataCollectionItem]
+        pub let length : Int // mapping of collection to no. of ids 
+        pub let extraIDs : [UInt64]
+        pub let shard : String 
+        pub let extraIDsIdentifier : String 
 
-	init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String) {
-		self.items=items 
-		self.length=length 
-		self.extraIDs=extraIDs
-		self.shard=shard
-	}
-}
+        init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) {
+            self.items=items 
+            self.length=length 
+            self.extraIDs=extraIDs
+            self.shard=shard
+            self.extraIDsIdentifier=extraIDsIdentifier
+        }
+    }
 
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
