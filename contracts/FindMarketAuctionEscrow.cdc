@@ -214,6 +214,10 @@ pub contract FindMarketAuctionEscrow {
 			return self.pointer.valid()
 		}
 
+		pub fun checkSoulBound() : Bool {
+			return self.pointer.checkSoulBound()
+		}
+
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
@@ -559,6 +563,11 @@ pub contract FindMarketAuctionEscrow {
 			// ensure validUntil is valid
 			if auctionValidUntil != nil && auctionValidUntil! < Clock.time() {
 				panic("Valid until is before current time")
+			}
+
+			// check soul bound 
+			if pointer.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
 			}
 			
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)

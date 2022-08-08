@@ -712,7 +712,7 @@ func TestAuction(t *testing.T) {
 			overflow.WithArg("amount", 10.0),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer",
-			map[string]interface{}{
+				map[string]interface{}{
 					"amount": 10.0,
 					"buyer":  otu.O.Address("user3"),
 					"seller": otu.O.Address("user1"),

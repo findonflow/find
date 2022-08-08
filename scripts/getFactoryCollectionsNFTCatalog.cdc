@@ -11,12 +11,14 @@ pub struct ItemReport {
 	pub let length : Int // mapping of collection to no. of ids 
 	pub let extraIDs : [UInt64]
 	pub let shard : String 
+	pub let extraIDsIdentifier : String 
 
-	init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String) {
+	init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) {
 		self.items=items 
 		self.length=length 
 		self.extraIDs=extraIDs
 		self.shard=shard
+		self.extraIDsIdentifier=extraIDsIdentifier
 	}
 }
 
@@ -45,34 +47,22 @@ pub struct MetadataCollectionItem {
 
     pub struct NFTView {
         pub let id: UInt64
-        pub let uuid: UInt64
         pub let display: MetadataViews.Display?
-        pub let externalURL: MetadataViews.ExternalURL?
-        pub let collectionData: MetadataViews.NFTCollectionData?
-        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
-        pub let royalties: MetadataViews.Royalties?
-        pub let traits: MetadataViews.Traits?
+		pub let editions: MetadataViews.Editions?
+		pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
 		pub let nftType: Type
 
         init(
             id : UInt64,
-            uuid : UInt64,
             display : MetadataViews.Display?,
-            externalURL : MetadataViews.ExternalURL?,
-            collectionData : MetadataViews.NFTCollectionData?,
-            collectionDisplay : MetadataViews.NFTCollectionDisplay?,
-            royalties : MetadataViews.Royalties?,
-            traits: MetadataViews.Traits? ,
+            editions : MetadataViews.Editions?,
+			collectionDisplay: MetadataViews.NFTCollectionDisplay?,
 			nftType: Type
         ) {
             self.id = id
-            self.uuid = uuid
             self.display = display
-            self.externalURL = externalURL
-            self.collectionData = collectionData
-            self.collectionDisplay = collectionDisplay
-            self.royalties = royalties
-            self.traits = traits
+			self.editions = editions
+			self.collectionDisplay = collectionDisplay
 			self.nftType = nftType
         }
     }
@@ -98,13 +88,9 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 				results.append(
 					NFTView(
 						id : id,
-						uuid: viewResolver.uuid,
 						display: MetadataViews.getDisplay(viewResolver),
-						externalURL : MetadataViews.getExternalURL(viewResolver),
-						collectionData : MetadataViews.getNFTCollectionData(viewResolver),
+						editions : MetadataViews.getEditions(viewResolver),
 						collectionDisplay : MetadataViews.getNFTCollectionDisplay(viewResolver),
-						royalties : MetadataViews.getRoyalties(viewResolver),
-						traits : MetadataViews.getTraits(viewResolver), 
 						nftType : viewResolver.getType()
 					)
 				)
@@ -165,7 +151,7 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 
 		
 		if fetchedCount >= maxItems {
-			inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
+			inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source, extraIDsIdentifier: project)
 			continue
 		}
 
@@ -192,10 +178,19 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 			if project != nft!.collectionDisplay!.name {
 			 subCollection = nft!.collectionDisplay!.name
 			}
+
+			var name = nft!.display!.name 
+			if name == "" {
+				name = projectName
+			}
+
+			if nft.editions != nil && nft.editions!.infoList.length > 0 {
+				name = name.concat("#").concat(nft.editions!.infoList[0].number.toString())
+			}
 			
 			let item = MetadataCollectionItem(
 				id: nft!.id,
-				name: nft!.display!.name,
+				name: name,
 				collection: projectName,
 				subCollection: subCollection, 
 				media: nft!.display!.thumbnail.uri(),
@@ -206,7 +201,7 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 			collectionItems.append(item)
 		}
 
-		inventory[catalogEntry.contractName] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source)
+		inventory[catalogEntry.contractName] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project)
 
 	}
 

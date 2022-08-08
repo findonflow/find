@@ -800,4 +800,28 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.sendExampleNFT("user1", "user2")
 	})
 
+	t.Run("Should not be able to list soul bound items", func(t *testing.T) {
+		otu.sendSoulBoundNFT("user1", "account")
+		// set market rules
+		otu.O.Tx("adminSetSellExampleNFTForFlow",
+			overflow.WithSigner("find"),
+			overflow.WithArg("tenant", "account"),
+		)
+
+		otu.O.Tx("listNFTForAuctionSoft",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			overflow.WithArg("id", 1),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("price", price),
+			overflow.WithArg("auctionReservePrice", price+5.0),
+			overflow.WithArg("auctionDuration", 300.0),
+			overflow.WithArg("auctionExtensionOnLateBid", 60.0),
+			overflow.WithArg("minimumBidIncrement", 1.0),
+			overflow.WithArg("auctionValidUntil", otu.currentTime()+100.0),
+		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+
+	})
+
 }

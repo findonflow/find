@@ -130,6 +130,10 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.pointer.valid()
 		}
 
+		pub fun checkSoulBound() : Bool {
+			return self.pointer.checkSoulBound()
+		}
+
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
@@ -558,6 +562,11 @@ pub contract FindMarketDirectOfferEscrow {
 			// ensure validUntil is valid
 			if validUntil != nil && validUntil! < Clock.time() {
 				panic("Valid until is before current time")
+			}
+
+			// check soul bound 
+			if item.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
 			}
 
 			if self.owner!.address == item.owner() {

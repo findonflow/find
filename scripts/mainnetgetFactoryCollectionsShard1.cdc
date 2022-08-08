@@ -25,13 +25,14 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
         pub let length : Int // mapping of collection to no. of ids 
         pub let extraIDs : [UInt64]
         pub let shard : String 
+        pub let extraIDsIdentifier : String 
 
-
-        init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String) {
+        init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) {
             self.items=items 
             self.length=length 
             self.extraIDs=extraIDs
             self.shard=shard
+            self.extraIDsIdentifier=extraIDsIdentifier
         }
     }
 
@@ -96,7 +97,7 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 
             
             if fetchedCount >= maxItems {
-                inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
+                inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source, extraIDsIdentifier: project)
                 continue
             }
 
@@ -140,7 +141,7 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
                 collectionItems.append(item)
 
             }
-            inventory[project] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source)
+            inventory[project] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project)
 
         }
 

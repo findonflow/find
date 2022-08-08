@@ -479,4 +479,80 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.sendDandy("user1", "user2", ids[0]).
 			delistAllNFT("user1")
 	})
+
+	t.Run("SoulBound items should be ghostListings", func(t *testing.T) {
+		otu.sendSoulBoundNFT("user1", "account").
+			registerExampleNFTInNFTRegistry()
+		// set market rules
+		otu.O.Tx("adminSetSellExampleNFTForFlow",
+			overflow.WithSigner("find"),
+			overflow.WithArg("tenant", "account"),
+		).AssertSuccess(t)
+
+		// make it non-soulBound before listing
+		otu.O.Tx("testtoggleSoulBoundExampleNFT",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("id", 1),
+			overflow.WithArg("soulBound", false),
+		).AssertSuccess(t)
+
+		saleId, err := otu.O.Tx("listNFTForAuctionEscrowed",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			overflow.WithArg("id", 1),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("price", price),
+			overflow.WithArg("auctionReservePrice", price+5.0),
+			overflow.WithArg("auctionDuration", 300.0),
+			overflow.WithArg("auctionExtensionOnLateBid", 60.0),
+			overflow.WithArg("minimumBidIncrement", 1.0),
+			overflow.WithArg("auctionValidUntil", otu.currentTime()+100.0),
+		).AssertSuccess(t).GetIdFromEvent("EnglishAuction", "id")
+
+		if err != nil {
+			panic(err)
+		}
+
+		// make it soulBound before listing
+		otu.O.Tx("testtoggleSoulBoundExampleNFT",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("id", 1),
+			overflow.WithArg("soulBound", true),
+		).AssertSuccess(t)
+
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).
+			AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/ghosts",
+				autogold.Want("soulBoundGhost", `[]interface {}{
+  map[string]interface {}{
+    "id": 101,
+    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
+  },
+}`),
+			)
+
+		// Bids will also show as ghost
+		otu.O.Tx("bidMarketAuctionEscrowed",
+			overflow.WithSigner("user2"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("id", saleId),
+			overflow.WithArg("amount", price+5.0),
+		).AssertSuccess(t)
+
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user2"),
+		).Print().
+			AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow/ghosts",
+				autogold.Want("soulBoundGhostBid", `[]interface {}{
+  map[string]interface {}{
+    "id": 101,
+    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid",
+  },
+}`),
+			)
+	})
+
 }

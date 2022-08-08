@@ -1782,6 +1782,22 @@ func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowT
 	return otu
 }
 
+func (otu *OverflowTestUtils) sendSoulBoundNFT(receiver, sender string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("setUpExampleNFT").
+		SignProposeAndPayAs(receiver).
+		Test(otu.T).
+		AssertSuccess()
+
+	otu.O.TransactionFromFile("sendExampleNFT").
+		SignProposeAndPayAs(sender).
+		Args(otu.O.Arguments().
+			String(receiver).
+			UInt64(1)).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 	otu.O.TransactionFromFile("adminSetSellExampleNFTRules").
 		SignProposeAndPayAs("find").

@@ -192,6 +192,13 @@ pub contract FindMarket {
 				}
 				continue
 			} 
+
+			// check soulBound Items 
+			if item.checkSoulBound() {
+				ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
+				continue
+			}
+
 			let stopped=tenantRef.allowedAction(listingType: listingType, nftType: item.getItemType(), ftType: item.getFtType(), action: FindMarket.MarketAction(listing:false, name: "delist item for sale"), seller: address, buyer: nil)
 			var status="active"
 
@@ -1411,6 +1418,7 @@ pub contract FindMarket {
 
 		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo
 		pub fun checkPointer() : Bool 
+		pub fun checkSoulBound() : Bool 
 		pub fun getListingType() : Type 
 
 		// pub fun getFtAlias(): String 

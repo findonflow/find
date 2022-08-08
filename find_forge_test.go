@@ -66,9 +66,10 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("collections", `[]`),
 		).AssertWant(t,
 			autogold.Want("collection", map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": map[string]interface{}{
-				"extraIDs": []interface{}{1},
-				"length":   1,
-				"shard":    "NFTCatalog",
+				"extraIDs":           []interface{}{2},
+				"extraIDsIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+				"length":             1,
+				"shard":              "NFTCatalog",
 			}}),
 		)
 
