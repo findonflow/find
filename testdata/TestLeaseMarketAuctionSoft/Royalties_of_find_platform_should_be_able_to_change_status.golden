@@ -4,7 +4,7 @@
             {
                 "address": "0x179b6b1cb6755e31",
                 "cost": 5,
-                "currentTime": 8201,
+                "currentTime": 501,
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
                 "name": "name3",
@@ -14,7 +14,7 @@
             {
                 "address": "0x179b6b1cb6755e31",
                 "cost": 5,
-                "currentTime": 8201,
+                "currentTime": 501,
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
                 "name": "name1",
@@ -24,7 +24,7 @@
             {
                 "address": "0x179b6b1cb6755e31",
                 "cost": 5,
-                "currentTime": 8201,
+                "currentTime": 501,
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
                 "name": "name2",
@@ -37,7 +37,7 @@
                 ],
                 "address": "0x179b6b1cb6755e31",
                 "cost": 5,
-                "currentTime": 8201,
+                "currentTime": 501,
                 "extensionOnLateBid": 300,
                 "lockedUntil": 39312001,
                 "name": "user1",
@@ -51,13 +51,13 @@
                     {
                         "amount": 10,
                         "auction": {
-                            "auctionEndsAt": 8001,
+                            "auctionEndsAt": 301,
                             "currentPrice": 10,
                             "extentionOnLateBid": 60,
                             "minimumBidIncrement": 1,
                             "reservePrice": 10,
                             "startPrice": 5,
-                            "timestamp": 8201
+                            "timestamp": 501
                         },
                         "bidder": "0xf3fcd2c1a78f5eee",
                         "bidderName": "user2",
@@ -76,7 +76,7 @@
                         "listingId": 298,
                         "listingStatus": "ended",
                         "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.SaleItem",
-                        "listingValidUntil": 8001,
+                        "listingValidUntil": 301,
                         "saleType": "finished_completed",
                         "seller": "0x179b6b1cb6755e31",
                         "sellerName": "user1"
@@ -95,7 +95,7 @@
             "wallets": [
                 {
                     "accept": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "balance": 210.99989941,
+                    "balance": 100.00081279,
                     "name": "Flow",
                     "tags": [
                         "flow"
