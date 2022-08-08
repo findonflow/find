@@ -20,15 +20,25 @@ pub contract NFGv3: NonFungibleToken {
 		pub let name: String
 		pub let description: String
 		pub let thumbnail: String
+		pub let externalURL: String
 		pub let edition: UInt64
 		pub let maxEdition: UInt64
+		pub let levels: {String: UFix64}
+		pub let scalars: {String: UFix64}
+		pub let traits: {String: String}
+		pub let birthday: UFix64
 
-		init(name: String, description: String, thumbnail: String, edition:UInt64, maxEdition:UInt64) {
+		init(name: String, description: String, thumbnail: String, edition:UInt64, maxEdition:UInt64, externalURL:String, traits: {String: String}, levels: {String: UFix64}, scalars: {String:UFix64}, birthday: UFix64) {
 			self.name=name 
 			self.description=description 
 			self.thumbnail=thumbnail 
 			self.edition=edition
 			self.maxEdition=maxEdition
+			self.traits = traits
+			self.levels=levels
+			self.scalars=scalars
+			self.birthday=birthday
+			self.externalURL=externalURL
 		}
 	}
 
@@ -52,15 +62,27 @@ pub contract NFGv3: NonFungibleToken {
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Royalties>(),
 			Type<MetadataViews.Editions>(),
+			Type<MetadataViews.Traits>(),
 			Type<MetadataViews.ExternalURL>(),
 			Type<MetadataViews.NFTCollectionData>(),
-			Type<MetadataViews.NFTCollectionDisplay>(),
-			Type<MetadataViews.Serial>()
+			Type<MetadataViews.NFTCollectionDisplay>()
 			]
 		}
 
 		pub fun resolveView(_ view: Type): AnyStruct? {
 			switch view {
+			case Type<MetadataViews.Traits>():
+				let traits = MetadataViews.Traits([MetadataViews.Trait(name: "Birthday", value: self.info.birthday, displayType: "date", rarity: nil)])
+				for value in self.info.traits.keys {
+					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.traits[value], displayType: "String", rarity: nil))
+				}
+				for value in self.info.scalars.keys {
+					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.traits[value], displayType: "Number", rarity: nil))
+				}
+				for value in self.info.levels.keys {
+					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.traits[value], displayType: "Number", rarity: MetadataViews.Rarity(score: nil, max: 100.0, description:nil)))
+				}
+				return traits
 			case Type<MetadataViews.Display>():
 				return MetadataViews.Display(
 					name: self.info.name,
@@ -75,15 +97,11 @@ pub contract NFGv3: NonFungibleToken {
 				return MetadataViews.Editions(
 					editionList
 				)
-			case Type<MetadataViews.Serial>():
-				return MetadataViews.Serial(
-					self.id
-				)
 			case Type<MetadataViews.Royalties>():
 				return self.royalties
 
 			case Type<MetadataViews.ExternalURL>():
-				return MetadataViews.ExternalURL(self.info.externalUrl)
+				return MetadataViews.ExternalURL(self.info.externalURL)
 
 			case Type<MetadataViews.NFTCollectionData>():
 				return MetadataViews.NFTCollectionData(

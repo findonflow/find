@@ -18,21 +18,26 @@ func main() {
 	o.Tx("setup_fin_1_create_client", findSigner)
 	o.Tx("setup_fin_2_register_client", saSigner, WithArg("ownerAddress", "find"))
 	o.Tx("setup_fin_3_create_network", findSigner)
+	o.Tx("setup_find_market_1", saSigner)
+	o.Tx("setup_find_market_2", findSigner, WithArg("tenantAddress", "account"))
+	o.Tx("setup_find_market_1", WithSigner("user4"))
+	o.Tx("setup_find_lease_market_2", WithSigner("find"), WithArg("tenantAddress", "user4"))
 
 	//setnup NFG
 	o.Tx("createProfile", nameSigner, nameArg)
-	o.Tx("testMintFusd", WithSignerServiceAccount(), WithArg("recipient", name), WithArg("amount", 1000))
+	o.Tx("testMintFusd", WithSignerServiceAccount(), WithArg("recipient", "user1"), WithArg("amount", 1000.0))
 	o.Tx("register", nameSigner, nameArg, WithArg("amount", 500.0))
 	o.Tx("buyAddon", nameSigner, nameArg, WithArg("addon", "forge"), WithArg("amount", 50.0))
 
 	//setup NFG forge
 	//LUKE: please QA this data
-	o.Tx("testSetupNFG", findSigner, nameArg,
-		WithArg("minterCut", 0.025),
-		WithArg("description", "NFG"),
-		WithArg("externalUrl", "http://nonfungerbils.com"),
-		WithArg("squareImage", "https://find.mypinata.cloud/ipfs/QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c"),
-		WithArg("bannerImage", "https://find.mypinata.cloud/ipfs/QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"),
+
+	o.Tx("testSetupNFG", nameSigner, nameArg,
+		WithArg("minterCut", 0.075),
+		WithArg("collectionDescription", "NonFunGerbils"),
+		WithArg("collectionExternalURL", "http://nonfungerbils.com"),
+		WithArg("collectionSquareImage", "https://find.mypinata.cloud/ipfs/QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c"),
+		WithArg("collectionBannerImage", "https://find.mypinata.cloud/ipfs/QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"),
 		WithArg("socials", `{ "Twitter" : "https://twitter.com/NonFunGerbils" }`),
 	)
 
@@ -55,7 +60,7 @@ func main() {
 			"Story Author":  "@Small_Time_Bets",
 		}),
 		WithArg("birthday", 1653427403.0),
-		WithArg("values", map[string]float64{
+		WithArg("levels", map[string]float64{
 			"Cuddles":         66,
 			"Top Wheel Speed": 31,
 			"Battle Squak":    19,
