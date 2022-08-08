@@ -7,27 +7,21 @@ import Profile from "../contracts/Profile.cdc"
 
 pub contract FindForge {
 
-	//TODO: deposit into collection, borrow back viewResolver. Emit a good event
-	//nftType (identifier), id, uuid, name, thumbnail, to, toName
 	pub event Minted(nftType: String, id: UInt64, uuid: UInt64, nftName: String, nftThumbnail: String, from: Address, fromName: String, to: Address, toName: String?)
 
 	access(contract) let minterPlatforms : {Type : {String: MinterPlatform}}
 	access(contract) let verifier : @Verifier
 
-	//TODO: make this {Type: @{Forge}}
 	access(contract) let forgeTypes : @{Type : {Forge}}
 	access(contract) let publicForges : [Type]
 	access(contract) var platformCut: UFix64 
 
-	// PlatformMinter is a compulsory element for minters 
 	pub struct MinterPlatform {
 		pub let platform: Capability<&{FungibleToken.Receiver}>
 		pub let platformPercentCut: UFix64
 		pub let name: String 
 		pub let minter: Address
-		//todo: do we need name here?
 
-		//a user should be able to change these 6?
 		pub var description: String 
 		pub var externalURL: String 
 		pub var squareImage: String 
@@ -74,6 +68,7 @@ pub contract FindForge {
 
 	}
 
+	// This is an empty resource that is created and passed into mint methods to verify that it comes from .find
 	pub resource Verifier {
 
 	}
