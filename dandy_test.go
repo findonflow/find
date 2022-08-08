@@ -61,7 +61,7 @@ func TestDandy(t *testing.T) {
 			overflow.WithArg("id", id),
 			overflow.WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"),
 		).AssertWant(t,
-			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/246"}),
+			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/247"}),
 		)
 
 	})
@@ -80,7 +80,7 @@ func TestDandy(t *testing.T) {
 			overflow.WithArg("user", "user1"),
 			overflow.WithArg("minter", "user1"),
 		).AssertWant(t,
-			autogold.Want("allDandies", "[]interface {}{\n  246,\n  247,\n  248,\n}"),
+			autogold.Want("allDandies", "[]interface {}{\n  247,\n  248,\n  249,\n}"),
 		)
 
 		otu.O.Script("getDandiesMinters",

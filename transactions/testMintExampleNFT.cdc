@@ -51,7 +51,7 @@ transaction(name: String, artist:String, nftName:String, nftDescription:String, 
 		let collection=collectionCap.borrow()!
 		let description=creativeWork.description.concat( " edition ").concat("1 of 1")
 		
-		let mintData = ExampleNFT.ExampleNFTInfo(name: "Neo", description: description, thumbnail: nftUrl)
+		let mintData = ExampleNFT.ExampleNFTInfo(name: "Neo", description: description, soulBound: false, thumbnail: nftUrl)
 		
 		FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 

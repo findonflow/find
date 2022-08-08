@@ -49,7 +49,7 @@ pub contract ExampleNFT: NonFungibleToken {
         pub let name: String
         pub let description: String
         pub let thumbnail: String
-        pub let soulBound: Bool
+        pub var soulBound: Bool
         access(self) let royalties: MetadataViews.Royalties
 
         init(
@@ -66,6 +66,10 @@ pub contract ExampleNFT: NonFungibleToken {
             self.thumbnail = thumbnail
             self.soulBound = soulBound
             self.royalties = royalties
+        }
+
+        pub fun toggleSoulBound(_ status: Bool) {
+            self.soulBound = status
         }
     
         pub fun getViews(): [Type] {
