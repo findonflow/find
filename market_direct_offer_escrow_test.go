@@ -820,4 +820,25 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
+	t.Run("Should not be able to make offer on soul bound items", func(t *testing.T) {
+		otu.sendSoulBoundNFT("user1", "account")
+		// set market rules
+		otu.O.Tx("adminSetSellExampleNFTForFlow",
+			overflow.WithSigner("find"),
+			overflow.WithArg("tenant", "account"),
+		)
+
+		otu.O.Tx("bidMarketDirectOfferEscrowed",
+			overflow.WithSigner("user2"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			overflow.WithArg("id", 1),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("amount", price),
+			overflow.WithArg("validUntil", otu.currentTime()+100.0),
+		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+
+	})
+
 }

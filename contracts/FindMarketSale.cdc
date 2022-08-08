@@ -120,6 +120,10 @@ pub contract FindMarketSale {
 			return self.pointer.valid()
 		}
 
+		pub fun checkSoulBound() : Bool {
+			return self.pointer.checkSoulBound()
+		}
+
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
@@ -243,6 +247,11 @@ pub contract FindMarketSale {
 
 			if validUntil != nil && validUntil! < Clock.time() {
 				panic("Valid until is before current time")
+			}
+
+			// check soul bound 
+			if pointer.checkSoulBound() {
+				panic("This item is soul bounded and cannot be traded")
 			}
 
 			// What happends if we relist  

@@ -317,7 +317,7 @@ func TestAuction(t *testing.T) {
 			overflow.WithArg("name", "user1"),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
-				overflow.OverflowEvent{
+				map[string]interface{}{
 					"amount":              20.0,
 					"auctionReservePrice": 20.0,
 					"buyer":               otu.O.Address("user2"),
@@ -610,7 +610,7 @@ func TestAuction(t *testing.T) {
 			overflow.WithArg("names", `[ "`+"user1"+`"]`),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
-				overflow.OverflowEvent{
+			map[string]interface{}{
 					"amount":              15.0,
 					"auctionReservePrice": 20.0,
 					"buyer":               otu.O.Address("user2"),
@@ -712,7 +712,7 @@ func TestAuction(t *testing.T) {
 			overflow.WithArg("amount", 10.0),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer",
-				overflow.OverflowEvent{
+			map[string]interface{}{
 					"amount": 10.0,
 					"buyer":  otu.O.Address("user3"),
 					"seller": otu.O.Address("user1"),
