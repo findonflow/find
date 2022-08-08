@@ -541,10 +541,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("fulfillLeaseMarketAuctionSoft").
+		otu.O.TransactionFromFile("fulfillLeaseMarketAuctionSoft").
 			SignProposeAndPayAs("user2").
 			Args(otu.O.Arguments().
 				String("name1").
@@ -561,12 +558,8 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 				"royaltyName": "network",
 			}))
 
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction"})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 		otu.moveNameTo("user2", "user1", "name1")
+
 	})
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {

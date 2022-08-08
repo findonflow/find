@@ -526,7 +526,7 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess(t).
 			AssertEvent(t,
 				"FindMarket.RoyaltyCouldNotBePaid",
-				overflow.OverflowEvent{
+				map[string]interface{}{
 					"address":         otu.O.Address("user1"),
 					"amount":          0.5,
 					"findName":        "user1",
