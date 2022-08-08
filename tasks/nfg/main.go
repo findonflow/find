@@ -44,11 +44,12 @@ func main() {
 		WithArg("nftDescription", `Gary the gerbil loved collecting, Mommy said that was the gerbil way, In the metaverse Gary started connecting, To many other gerbils who did this all day. First punks, then apes, then a fuckin' troll, Before long, his collection was out of control. He remembered his mommy and those words she had said, 'Don't spill your seed for anyone, lose them and you're dead'. Gary thought he knew better, he was a degen after all, He'd stored his seeds somewhere, he knew where, he was sure, Then winter came and when it had thawed, He looked for his seeds where he thought they were stored. Oh no, they were gone. He did not know why, Other gerbils knew Gary was NGMI.`),
 		WithArg("externalURL", "https://nonfungerbils.com/ngmigerbil"),
 		WithArg("nftUrl", "https://24msu6bcjhfoi4fztsmgfa4thctgmjo262jhkm3x3ciqpjv2.arweave.net/_1xkqeCJJyuRwuZyYYoOTOKZmJdr2knUzd9iRB6a-6A"),
-
+		WithArg("maxEditions", 14),
+		WithArg("scalars", map[string]float64{
+			"Gerbil Number": 28.0, //this could be stored as a numeric trait and not text so you can compare on it
+		}),
 		//LUKE: Gerbil number can be a numeric trait here easily that way in our market you could filter on them using a slider.
 		WithArg("traits", map[string]string{
-			"Gerbil Number": "28",              //this could be stored as a numeric trait and not text so you can compare on it
-			"Scarcity":      "14",              //is this max number mitned? if it is we should not have it as trait but exposed as a Edition
 			"Released":      "14 January 2022", //we could have this as a unix timestamp and mark it as a date so you can compare on it?
 			"Collaboration": "@songadaymann",   //we could do a twitter display type here maybe
 			"Story Author":  "@Small_Time_Bets",

@@ -16,36 +16,34 @@ pub contract NFGv3: NonFungibleToken {
 	pub let CollectionPublicPath: PublicPath
 	pub let MinterStoragePath: StoragePath
 
-	pub struct NFGv3Info {
+	pub struct Info {
 		pub let name: String
 		pub let description: String
 		pub let thumbnail: String
+		pub let edition: UInt64
+		pub let maxEdition: UInt64
 
-		init(name: String, description: String, thumbnail: String) {
+		init(name: String, description: String, thumbnail: String, edition:UInt64, maxEdition:UInt64) {
 			self.name=name 
 			self.description=description 
 			self.thumbnail=thumbnail 
+			self.edition=edition
+			self.maxEdition=maxEdition
 		}
 	}
 
 	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
 		pub let id: UInt64
 
-		pub let name: String
-		pub let description: String
-		pub let thumbnail: String
+		pub let info: Info
 		access(self) let royalties: MetadataViews.Royalties
 
 		init(
-			name: String,
-			description: String,
-			thumbnail: String,
+			info: Info,
 			royalties: MetadataViews.Royalties
 		) {
 			self.id = self.uuid
-			self.name = name
-			self.description = description
-			self.thumbnail = thumbnail
+			self.info=info
 			self.royalties = royalties
 		}
 
@@ -65,14 +63,14 @@ pub contract NFGv3: NonFungibleToken {
 			switch view {
 			case Type<MetadataViews.Display>():
 				return MetadataViews.Display(
-					name: self.name,
-					description: self.description,
+					name: self.info.name,
+					description: self.info.description,
 					thumbnail: MetadataViews.HTTPFile(
-						url: self.thumbnail
+						url: self.info.thumbnail
 					)
 				)
 			case Type<MetadataViews.Editions>():
-			  let editionInfo = MetadataViews.Edition(name: "set", number: self.id, max: nil)
+			  let editionInfo = MetadataViews.Edition(name: "set", number: self.info.edition, max: self.info.maxEdition)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
 					editionList
@@ -85,7 +83,7 @@ pub contract NFGv3: NonFungibleToken {
 				return self.royalties
 
 			case Type<MetadataViews.ExternalURL>():
-				return MetadataViews.ExternalURL("https://nfg-nft.onflow.org/".concat(self.id.toString()))
+				return MetadataViews.ExternalURL(self.info.externalUrl)
 
 			case Type<MetadataViews.NFTCollectionData>():
 				return MetadataViews.NFTCollectionData(
@@ -194,7 +192,7 @@ pub contract NFGv3: NonFungibleToken {
 
 	pub resource Forge: FindForge.Forge {
 		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
-			let info = data as? NFGv3Info ?? panic("The data passed in is not in form of NFGv3Info.")
+			let info = data as? Info ?? panic("The data passed in is not in form of NFGv3Info.")
 			let royalties : [MetadataViews.Royalty] = []
 			royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))
 			if platform.minterCut != nil {
@@ -203,9 +201,7 @@ pub contract NFGv3: NonFungibleToken {
 
 			// create a new NFT
 			var newNFT <- create NFT(
-				name: info.name,
-				description: info.description,
-				thumbnail: info.thumbnail,
+				info: info,
 				royalties: MetadataViews.Royalties(royalties)
 			)
 
