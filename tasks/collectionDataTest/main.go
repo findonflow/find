@@ -32,12 +32,12 @@ func main() {
 
 	// name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String
 
-	o.Script("getCheckRoyalty",
-		WithArg("name", "alxo"),
-		WithArg("id", "2"),
-		WithArg("nftAliasOrIdentifier", "A.d796ff17107bbff6.Art.NFT"),
-		WithArg("viewIdentifier", "A.1d7e57aa55817448.MetadataViews.Royalties"),
-	)
+	// o.Script("getCheckRoyalty",
+	// 	WithArg("name", "alxo"),
+	// 	WithArg("id", "2"),
+	// 	WithArg("nftAliasOrIdentifier", "A.d796ff17107bbff6.Art.NFT"),
+	// 	WithArg("viewIdentifier", "A.1d7e57aa55817448.MetadataViews.Royalties"),
+	// )
 
 	// Starly flow
 	// Momentables flow
@@ -59,9 +59,9 @@ func main() {
 
 	// suffix := network
 
-	// script := "getFactoryCollections"
+	script := "getFactoryCollections"
 
-	// prefix := "RaribleNFT"
+	prefix := "RaribleNFT"
 	// o.Script(suffix+script+prefix,
 	// 	WithArg("user", "bjartek"),
 	// 	WithArg("maxItems", "2"),
@@ -96,12 +96,17 @@ func main() {
 	// 	WithArg("collections", "[]"),
 	// )
 
-	// prefix = "NFTCatalog"
-	// o.Script(script+prefix,
-	// 	WithArg("user", "bjartek"),
-	// 	WithArg("maxItems", "2"),
-	// 	WithArg("collections", "[]"),
-	// )
+	prefix = "NFTCatalog"
+	o.Script(script+prefix,
+		WithArg("user", "bjartek"),
+		WithArg("maxItems", "10000"),
+		WithArg("collections", `[]`),
+	)
+	prefix = "NFTCatalog"
+	o.Script("getAdditionalFactoryCollectionItemsNFTCatalog",
+		WithArg("user", "bjartek"),
+		WithArg("collectionIDs", `{"schmoes_prelaunch_token" : [9]}`),
+	)
 
 	// // get NFTDetail script
 	// script = "getNFTDetails"

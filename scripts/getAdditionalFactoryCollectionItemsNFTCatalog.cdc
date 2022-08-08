@@ -7,17 +7,49 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 	return fetchNFTCatalog(user: user, collectionIDs: collectionIDs)
 }
 
-pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [MetadataViews.NFTView] {
+pub struct NFTView {
+	pub let id: UInt64
+	pub let display: MetadataViews.Display?
+	pub let editions: MetadataViews.Editions?
+	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
+	pub let nftType: Type
+
+	init(
+		id : UInt64,
+		display : MetadataViews.Display?,
+		editions : MetadataViews.Editions?,
+		collectionDisplay: MetadataViews.NFTCollectionDisplay?,
+		nftType: Type
+	) {
+		self.id = id
+		self.display = display
+		self.editions = editions
+		self.collectionDisplay = collectionDisplay
+		self.nftType = nftType
+	}
+}
+
+pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 
 	let account = getAuthAccount(ownerAddress)
-	let results : [MetadataViews.NFTView] = []
+	let results : [NFTView] = []
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 		let storagePath = catalogEntry.collectionData.storagePath
 		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
 		if ref != nil{
 			for id in ids[collectionKey]! {
-				results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
+				// results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
+				let viewResolver = ref!.borrowViewResolver(id:id)!
+				results.append(
+					NFTView(
+						id : id,
+						display: MetadataViews.getDisplay(viewResolver),
+						editions : MetadataViews.getEditions(viewResolver),
+						collectionDisplay : MetadataViews.getNFTCollectionDisplay(viewResolver),
+						nftType : viewResolver.getType()
+					)
+				)
 			}
 		}
 	}
@@ -84,6 +116,10 @@ pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {Str
 
 
 	for project in fetchingIDs.keys {
+
+		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:project)!
+		let projectName = catalogEntry.contractName
+
 		let returnedNFTs = getNFTs(ownerAddress: account!.address, ids: {project : fetchingIDs[project]!})
 
 		var collectionItems : [MetadataCollectionItem] = []
@@ -96,16 +132,25 @@ pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {Str
 			if project != nft!.collectionDisplay!.name {
 			 subCollection = nft!.collectionDisplay!.name
 			}
+
+			var name = nft!.display!.name 
+			if name == "" {
+				name = projectName
+			}
+
+			if nft.editions != nil && nft.editions!.infoList.length > 0 {
+				name = name.concat("#").concat(nft.editions!.infoList[0].number.toString())
+			}
 			
 			let item = MetadataCollectionItem(
 				id: nft!.id,
-				name: nft!.display!.name,
-				collection: project,
+				name: name,
+				collection: projectName,
 				subCollection: subCollection, 
 				media: nft!.display!.thumbnail.uri(),
 				mediaType: "image/png",
 				source: source, 
-				nftDetailIdentifier: nft!.getType().identifier
+				nftDetailIdentifier: nft!.nftType.identifier
 			)
 			collectionItems.append(item)
 		}
