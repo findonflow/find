@@ -20,9 +20,7 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 	let balanceBeforeTransfer: UFix64
 	prepare(dapper: AuthAccount, account: AuthAccount) {
 
-		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
-		//SYNC with register
-		//Add exising FUSD or create a new one and add it
+		// This is initialization code that we could remove if that is OK and we know the state is like this before this action takes place
 		let name = account.address.toString()
 		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		
@@ -60,11 +58,11 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
 		if !saleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
 			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
-	
+		//end initialization
+
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {
 			panic("The address input is not a valid name nor address. Input : ".concat(user))

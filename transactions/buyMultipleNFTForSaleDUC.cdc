@@ -30,6 +30,7 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 			panic("The array length of users and ids should be the same")
 		}
 
+		// This is initialization code that we could remove if that is OK and we know the state is like this before this action takes place
 		let name = account.address.toString()
 		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 	
@@ -70,6 +71,7 @@ transaction(dapperAddress: Address, marketplace:Address, users: [String], ids: [
 			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
+		//End initalization code
 
 		var counter = 0
 		self.targetCapability = []

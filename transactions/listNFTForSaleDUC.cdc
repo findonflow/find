@@ -21,9 +21,7 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier: S
 	
 	prepare(account: AuthAccount) {
 
-		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
-		//SYNC with register
-		//Add exising FUSD or create a new one and add it
+		// This is initialization code that we could remove if that is OK and we know the state is like this before this action takes place
 		let name = account.address.toString()
 		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 
@@ -64,6 +62,7 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier: S
 			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
+		//end initializtion
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let nft = getCollectionData(nftAliasOrIdentifier) 
