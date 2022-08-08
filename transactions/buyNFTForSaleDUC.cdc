@@ -63,14 +63,18 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 		}
 		//end initialization
 
+		//We resolve the string that could be an address or a find name into an address, this is not expensive at all and _if_ we can get .find names of dapper wallet later it makes sense. On the other hand we can also just remove this and send in address to the tx if that is preferred
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {
 			panic("The address input is not a valid name nor address. Input : ".concat(user))
 		}
 		let address = resolveAddress!
+
+
 		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
-
+    
+		//we do some security check to verify that this tenant can do this operation. This will ensure that the onefootball tenant can only sell using DUC and not some other token. But we can change this with transactions later and not have to modify code/transactions
 		let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 
 		let nft = getCollectionData(item.getItemType().identifier) 
@@ -82,10 +86,10 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		/* Check for nftCapability */
+
+		//This is also initialization logic that we might get rid of on dapper wallet transactions depending on how it works
 		if !self.targetCapability.check() {
 			let cd = item.getNFTCollectionData()
-			// should use account.type here instead
 			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
 				panic("This collection public link is not set up properly.")
 			}
