@@ -260,7 +260,7 @@ pub contract Admin {
 			let tenant = self.getTenantRef(tenant)
 
 			if tenant.checkFindCuts(FindCutName) {
-				panic("This find cut already exist")
+				panic("This find cut already exist. FindCut rule Name : ".concat(FindCutName))
 			}
 
 			let newSaleItem = FindMarket.TenantSaleItem(

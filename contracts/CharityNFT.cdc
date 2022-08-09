@@ -163,7 +163,7 @@ pub contract CharityNFT: NonFungibleToken {
 
 		// withdraw removes an NFT from the collection and moves it to the caller
 		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
-			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
+			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. WithdrawID : ".concat(withdrawID.toString()))
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
 
@@ -209,7 +209,7 @@ pub contract CharityNFT: NonFungibleToken {
 		//borrow view resolver
         pub fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
 			if self.ownedNFTs[id] == nil {
-				panic("NFT does not exist")
+				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
 
 		let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
