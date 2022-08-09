@@ -42,7 +42,10 @@ transaction(dapperAddress: Address, marketplace:Address, id: UInt64) {
 		let nftIdentifier = item.getItemType().identifier
 
 		//If this is nil, there must be something wrong with FIND setup
-		let nft = getCollectionData(nftIdentifier)
+		// let nft = getCollectionData(nftIdentifier)
+		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		let nft = collection.collectionData
 
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
@@ -53,10 +56,4 @@ transaction(dapperAddress: Address, marketplace:Address, id: UInt64) {
 		self.market.acceptOffer(self.pointer)
 	}
 	
-}
-
-pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
-	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
-	return collection.collectionData
 }

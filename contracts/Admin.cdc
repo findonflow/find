@@ -5,9 +5,9 @@ import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
-import CharityNFT from "./CharityNFT.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
+import FindForge from "./FindForge.cdc"
 
 pub contract Admin {
 
@@ -52,6 +52,14 @@ pub contract Admin {
 
 		}
 		*/
+		pub fun addPrivateForgeType(name: String, forge : @{FindForge.Forge}) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForge.addPrivateForgeType(name: name, forge: <- forge)
+		}
+
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule]) : Capability<&FindMarket.Tenant> {
 			pre {
@@ -117,14 +125,6 @@ pub contract Admin {
 
 			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.internal_register(name:name, profile: profile, leases: leases)
-		}
-
-		pub fun mintCharity(metadata : {String: String}, recipient: Capability<&{NonFungibleToken.CollectionPublic}>){
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			CharityNFT.mintCharity(metadata: metadata, recipient: recipient)
 		}
 
 		pub fun advanceClock(_ time: UFix64) {
@@ -260,7 +260,7 @@ pub contract Admin {
 			let tenant = self.getTenantRef(tenant)
 
 			if tenant.checkFindCuts(FindCutName) {
-				panic("This find cut already exist")
+				panic("This find cut already exist. FindCut rule Name : ".concat(FindCutName))
 			}
 
 			let newSaleItem = FindMarket.TenantSaleItem(

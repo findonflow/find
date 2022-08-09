@@ -5,6 +5,7 @@ import (
 
 	"github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
+	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -17,7 +18,8 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			setUUID(500)
 
 		dandyIds := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry()
@@ -61,7 +63,7 @@ func TestDandy(t *testing.T) {
 			overflow.WithArg("id", id),
 			overflow.WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"),
 		).AssertWant(t,
-			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/247"}),
+			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/502"}),
 		)
 
 	})
@@ -72,16 +74,22 @@ func TestDandy(t *testing.T) {
 			setupFIND().
 			setupDandy("user1").
 			createUser(100.0, "user2").
-			registerUser("user2")
+			registerUser("user2").
+			setUUID(500)
+
 		dandiesIDs := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry()
 
-		otu.O.Script("getDandiesIDsFor",
+		result, err := otu.O.Script("getDandiesIDsFor",
 			overflow.WithArg("user", "user1"),
 			overflow.WithArg("minter", "user1"),
-		).AssertWant(t,
-			autogold.Want("allDandies", "[]interface {}{\n  247,\n  248,\n  249,\n}"),
-		)
+		).GetAsInterface()
+
+		if err != nil {
+			panic(err)
+		}
+
+		assert.ElementsMatch(t, result, []interface{}{uint64(502), uint64(503), uint64(504)})
 
 		otu.O.Script("getDandiesMinters",
 			overflow.WithArg("user", "user1"),

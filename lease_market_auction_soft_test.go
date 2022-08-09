@@ -559,6 +559,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			}))
 
 		otu.moveNameTo("user2", "user1", "name1")
+
 	})
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {

@@ -37,7 +37,7 @@ func TestNameDetailScript(t *testing.T) {
 				"related": "0xf3fcd2c1a78f5eee",
 			}))
 
-			otu.O.Script("getNameDetails",
+		otu.O.Script("getNameDetails",
 			overflow.WithArg("user", "user1"),
 		).AssertWithPointerWant(t, "/userReport/bids/0",
 			autogold.Want("getNameDetailsBids", map[string]interface{}{

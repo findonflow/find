@@ -105,7 +105,7 @@ pub contract FindMarket {
 		let ref=optRef!
 		let item=ref.borrowSaleItem(id)
 		if !item.checkPointer() {
-			panic("this is a ghost listing")
+			panic("this is a ghost listing. SaleItem id : ".concat(id.toString()))
 		} 
 
 		return item
@@ -344,7 +344,7 @@ pub contract FindMarket {
 		let sale=saleRef!
 		let item=sale.borrowSaleItem(id)
 		if !item.checkPointer() {
-			panic("this is a ghost listing")
+			panic("this is a ghost listing. SaleItem id : ".concat(id.toString()))
 		} 
 
 		return item
