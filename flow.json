@@ -288,7 +288,10 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin"
-      ]
+      ], 
+			"testnet-user1": [
+				"NFGv3"
+			]
     },
     "emulator": {
       "emulator-account": [

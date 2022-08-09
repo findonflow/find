@@ -46,27 +46,26 @@ func main() {
 		nameSigner,
 		nameArg,
 		WithArg("nftName", "The Gerbil Who Lost His Seeds"),
-		WithArg("nftDescription", `Gary the gerbil loved collecting, Mommy said that was the gerbil way, In the metaverse Gary started connecting, To many other gerbils who did this all day. First punks, then apes, then a fuckin' troll, Before long, his collection was out of control. He remembered his mommy and those words she had said, 'Don't spill your seed for anyone, lose them and you're dead'. Gary thought he knew better, he was a degen after all, He'd stored his seeds somewhere, he knew where, he was sure, Then winter came and when it had thawed, He looked for his seeds where he thought they were stored. Oh no, they were gone. He did not know why, Other gerbils knew Gary was NGMI.`),
-		WithArg("externalURL", "https://nonfungerbils.com/ngmigerbil"),
-		WithArg("nftUrl", "https://24msu6bcjhfoi4fztsmgfa4thctgmjo262jhkm3x3ciqpjv2.arweave.net/_1xkqeCJJyuRwuZyYYoOTOKZmJdr2knUzd9iRB6a-6A"),
-		WithArg("maxEditions", 14),
+		WithArg("nftDescription", `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine. This NFT pairs with a physical painting of acrylic on canvas by Pepelangelo. Only the the owner of the physical can see what is uniquely precious.`),
+		WithArg("externalURL", "https://nonfungerbils.com/pepegerbil"),
+		WithArg("imageHash", "QmSaWfkeTdNbYcuU9sgG9SBsbqccVbvrX3Pd4omKgtdnUg"),
+		WithArg("maxEditions", 6),
 		WithArg("scalars", map[string]float64{
-			"Gerbil Number": 28.0, //this could be stored as a numeric trait and not text so you can compare on it
+			"Gerbil Number": 29.0,
 		}),
-		//LUKE: Gerbil number can be a numeric trait here easily that way in our market you could filter on them using a slider.
 		WithArg("traits", map[string]string{
-			"Released":      "14 January 2022", //we could have this as a unix timestamp and mark it as a date so you can compare on it?
-			"Collaboration": "@songadaymann",   //we could do a twitter display type here maybe
-			"Story Author":  "@Small_Time_Bets",
+			"Released":      "9 August 2022",
+			"Collaboration": "@Pepelangelo",
+			"Story Author":  "NonFunGerbils",
 		}),
 		WithArg("birthday", 1653427403.0),
 		WithArg("levels", map[string]float64{
-			"Cuddles":         66,
-			"Top Wheel Speed": 31,
-			"Battle Squak":    19,
-			"Degen":           80,
-			"Maximalism":      39,
-			"Funds are Safu":  1,
+			"Cuddles":         14,
+			"Top Wheel Speed": 21,
+			"Battle Squak":    78,
+			"Degen":           92,
+			"Maximalism":      64,
+			"Funds are Safu":  70,
 		}),
 	)
 }

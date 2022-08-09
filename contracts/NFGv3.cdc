@@ -19,7 +19,7 @@ pub contract NFGv3: NonFungibleToken {
 	pub struct Info {
 		pub let name: String
 		pub let description: String
-		pub let thumbnail: String
+		pub let thumbnailHash: String
 		pub let externalURL: String
 		pub let edition: UInt64
 		pub let maxEdition: UInt64
@@ -28,10 +28,10 @@ pub contract NFGv3: NonFungibleToken {
 		pub let traits: {String: String}
 		pub let birthday: UFix64
 
-		init(name: String, description: String, thumbnail: String, edition:UInt64, maxEdition:UInt64, externalURL:String, traits: {String: String}, levels: {String: UFix64}, scalars: {String:UFix64}, birthday: UFix64) {
+		init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, externalURL:String, traits: {String: String}, levels: {String: UFix64}, scalars: {String:UFix64}, birthday: UFix64) {
 			self.name=name 
 			self.description=description 
-			self.thumbnail=thumbnail 
+			self.thumbnailHash=thumbnailHash
 			self.edition=edition
 			self.maxEdition=maxEdition
 			self.traits = traits
@@ -87,8 +87,8 @@ pub contract NFGv3: NonFungibleToken {
 				return MetadataViews.Display(
 					name: self.info.name,
 					description: self.info.description,
-					thumbnail: MetadataViews.HTTPFile(
-						url: self.info.thumbnail
+					thumbnail: MetadataViews.IPFSFile(
+						cid: self.info.thumbnailHash, path: nil 
 					)
 				)
 			case Type<MetadataViews.Editions>():

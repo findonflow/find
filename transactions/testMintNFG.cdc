@@ -7,7 +7,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 
-transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:String, nftUrl:String, externalURL: String, traits: {String: String}, birthday: UFix64, levels: {String: UFix64}, scalars : {String:UFix64}) {
+transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, externalURL: String, traits: {String: String}, birthday: UFix64, levels: {String: UFix64}, scalars : {String:UFix64}) {
 	prepare(account: AuthAccount) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(NFGv3.CollectionPublicPath)
@@ -35,7 +35,7 @@ transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:Str
 			let mintData = NFGv3.Info(
 				name: nftName,
 				description: nftDescription, 
-				thumbnail: nftUrl,
+				thumbnailHash: imageHash,
 				edition: i, 
 				maxEdition: maxEditions,
 				externalURL: externalURL,
