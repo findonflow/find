@@ -28,6 +28,13 @@ func main() {
 	o.Tx("testMintFusd", WithSignerServiceAccount(), WithArg("recipient", "user1"), WithArg("amount", 1000.0))
 	o.Tx("register", nameSigner, nameArg, WithArg("amount", 5.0))
 
+	o.Tx("adminAddForge",
+		findSigner,
+		WithPayloadSigner("user4"),
+		WithArg("storagePath", "/storage/nfgforge"),
+		WithArg("name", name),
+	)
+
 	o.Tx("luke", nameSigner)
 	/*
 		o.Tx("buyAddon", nameSigner, nameArg, WithArg("addon", "forge"), WithArg("amount", 50.0))

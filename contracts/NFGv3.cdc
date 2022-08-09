@@ -230,10 +230,6 @@ pub contract NFGv3: NonFungibleToken {
 		}
 	}
 
-	access(account) fun createForge() : @{FindForge.Forge} {
-		return <- create Forge()
-	}
-
 	pub fun getForgeType() : Type {
 		return Type<@Forge>()
 	}
@@ -257,9 +253,7 @@ pub contract NFGv3: NonFungibleToken {
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)
-
-		FindForge.addPublicForgeType(forge: <- create Forge())
-
+		self.account.save(<- create Forge(), to: /storage/nfgforge)
 		emit ContractInitialized()
 	}
 }

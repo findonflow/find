@@ -339,14 +339,15 @@
         "NFTCatalog",
         "FINDNFTCatalog",
         "NFTCatalogAdmin",
-        "FINDNFTCatalogAdmin",
-        "NFGv3"
+        "FINDNFTCatalogAdmin"
       ],
       "emulator-find": [],
       "emulator-user1": [],
       "emulator-user2": [],
       "emulator-user3": [],
-      "emulator-user4": []
+      "emulator-user4": [
+				"NFGv3"
+			]
     }
   }
 }

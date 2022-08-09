@@ -171,7 +171,6 @@ pub contract FindForge {
 
 		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
 
-
 	}
 
 	access(account) fun addPublicForgeType(forge: @{Forge}) {
