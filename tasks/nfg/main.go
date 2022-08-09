@@ -2,14 +2,13 @@ package main
 
 import (
 	. "github.com/bjartek/overflow"
-	"github.com/onflow/cadence"
 )
 
 func main() {
 
 	o := Overflow(WithGlobalPrintOptions())
 
-	name := "nfg"
+	name := "nonfungerbils"
 	findSigner := WithSigner("find")
 	nameSigner := WithSigner("user1")
 	nameArg := WithArg("name", name)
@@ -27,51 +26,55 @@ func main() {
 	//setnup NFG
 	o.Tx("createProfile", nameSigner, nameArg)
 	o.Tx("testMintFusd", WithSignerServiceAccount(), WithArg("recipient", "user1"), WithArg("amount", 1000.0))
-	o.Tx("register", nameSigner, nameArg, WithArg("amount", 500.0))
-	o.Tx("buyAddon", nameSigner, nameArg, WithArg("addon", "forge"), WithArg("amount", 50.0))
+	o.Tx("register", nameSigner, nameArg, WithArg("amount", 5.0))
 
-	o.Tx("testSetupNFG", nameSigner, nameArg,
-		WithArg("minterCut", 0.075),
-		WithArg("collectionDescription", "NonFunGerbils"),
-		WithArg("collectionExternalURL", "http://nonfungerbils.com"),
-		WithArg("collectionSquareImage", "https://find.mypinata.cloud/ipfs/QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c"),
-		WithArg("collectionBannerImage", "https://find.mypinata.cloud/ipfs/QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"),
-		WithArg("socials", `{ "Twitter" : "https://twitter.com/NonFunGerbils" }`),
-	)
-	description := `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine.\n\nThis NFT pairs with a physical painting of mixed technique on canvas, size 24x30cm by Pepelangelo.\n\n Only the the owner of the physical can see what is uniquely precious.`
+	o.Tx("luke", nameSigner)
+	/*
+		o.Tx("buyAddon", nameSigner, nameArg, WithArg("addon", "forge"), WithArg("amount", 50.0))
 
-	desc, err := cadence.NewString(description)
-	if err != nil {
-		panic(err)
-	}
+		o.Tx("testSetupNFG", nameSigner, nameArg,
+			WithArg("minterCut", 0.075),
+			WithArg("collectionDescription", "NonFunGerbils"),
+			WithArg("collectionExternalURL", "http://nonfungerbils.com"),
+			WithArg("collectionSquareImage", "https://find.mypinata.cloud/ipfs/QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c"),
+			WithArg("collectionBannerImage", "https://find.mypinata.cloud/ipfs/QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"),
+			WithArg("socials", `{ "Twitter" : "https://twitter.com/NonFunGerbils" }`),
+		)
+		description := `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine.\n\nThis NFT pairs with a physical painting of mixed technique on canvas, size 24x30cm by Pepelangelo.\n\n Only the the owner of the physical can see what is uniquely precious.`
 
-	//mint NFG, this is example from the file you sent me
+		desc, err := cadence.NewString(description)
+		if err != nil {
+			panic(err)
+		}
 
-	o.Tx("testMintNFG",
-		nameSigner,
-		nameArg,
-		WithArg("nftName", "Pepe Gerbil"),
-		WithArg("nftDescription", desc),
-		WithArg("externalURL", "https://nonfungerbils.com/pepegerbil"),
-		WithArg("imageHash", "QmbGVd9281kdD65wdD8QRqLzXN56KCgvBB4HySQuv24rmC"),
-		WithArg("maxEditions", 6),
-		WithArg("scalars", map[string]float64{
-			"Gerbil Number": 29.0,
-		}),
-		WithArg("traits", map[string]string{
-			"Released":     "9 August 2022",
-			"Artist":       "@Pepelangelo",
-			"Story Author": "NonFunGerbils",
-		}),
-		WithArg("birthday", 1653427403.0),
-		WithArg("levels", map[string]float64{
-			"Cuddles":         14,
-			"Top Wheel Speed": 21,
-			"Battle Squak":    78,
-			"Degen":           92,
-			"Maximalism":      64,
-			"Funds are Safu":  70,
-		}),
-		WithArg("medias", "{}"),
-	)
+		//mint NFG, this is example from the file you sent me
+
+		o.Tx("testMintNFG",
+			nameSigner,
+			nameArg,
+			WithArg("nftName", "Pepe Gerbil"),
+			WithArg("nftDescription", desc),
+			WithArg("externalURL", "https://nonfungerbils.com/pepegerbil"),
+			WithArg("imageHash", "QmbGVd9281kdD65wdD8QRqLzXN56KCgvBB4HySQuv24rmC"),
+			WithArg("maxEditions", 6),
+			WithArg("scalars", map[string]float64{
+				"Gerbil Number": 29.0,
+			}),
+			WithArg("traits", map[string]string{
+				"Released":     "9 August 2022",
+				"Artist":       "@Pepelangelo",
+				"Story Author": "NonFunGerbils",
+			}),
+			WithArg("birthday", 1653427403.0),
+			WithArg("levels", map[string]float64{
+				"Cuddles":         14,
+				"Top Wheel Speed": 21,
+				"Battle Squak":    78,
+				"Degen":           92,
+				"Maximalism":      64,
+				"Funds are Safu":  70,
+			}),
+			WithArg("medias", "{}"),
+		)
+	*/
 }
