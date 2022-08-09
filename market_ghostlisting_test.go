@@ -424,7 +424,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 	})
 
 	t.Run("Should be able to return ghost listings with script getStatus", func(t *testing.T) {
-
+		otu.setUUID(1000)
 		ids := otu.mintThreeExampleDandies()
 		otu.directOfferMarketSoft("user2", "user1", ids[0], price).
 			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
@@ -438,11 +438,12 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
-		result := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-
-		result = otu.replaceID(result, ids)
-
-		otu.AutoGoldRename("Should be able to return ghost listings with script getStatus", result)
+		// result := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketDirectOfferSoft",
+			autogold.Want("getStatus", map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{"id": 1002, "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem"}}}),
+		)
 
 		otu.sendDandy("user1", "user2", ids[0]).
 			delistAllNFT("user1")
@@ -450,6 +451,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 	})
 
 	t.Run("Should be able to return ghost bids with script getStatus", func(t *testing.T) {
+		otu.setUUID(1500)
 		ids := otu.mintThreeExampleDandies()
 		otu.directOfferMarketSoft("user2", "user1", ids[0], price).
 			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
@@ -466,9 +468,11 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
-		result := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user2")).RunReturnsJsonString()
-		result = otu.replaceID(result, ids)
-		otu.AutoGoldRename("Should be able to return ghost bids with script getStatus", result)
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user2"),
+		).AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketDirectOfferSoft",
+			autogold.Want("getStatusBid", map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{"id": 1502, "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.Bid"}}}),
+		)
 
 		otu.sendDandy("user1", "user2", ids[0]).
 			delistAllNFT("user1")
