@@ -79,10 +79,10 @@ pub contract NFGv3: NonFungibleToken {
 					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.traits[value], displayType: "String", rarity: nil))
 				}
 				for value in self.info.scalars.keys {
-					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.traits[value], displayType: "Number", rarity: nil))
+					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.scalars[value], displayType: "Number", rarity: nil))
 				}
 				for value in self.info.levels.keys {
-					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.traits[value], displayType: "Number", rarity: MetadataViews.Rarity(score: nil, max: 100.0, description:nil)))
+					traits.addTrait(MetadataViews.Trait(name: value, value: self.info.levels[value], displayType: "Number", rarity: MetadataViews.Rarity(score: self.info.levels[value], max: 100.0, description:nil)))
 				}
 				return traits
 			case Type<MetadataViews.Display>():
