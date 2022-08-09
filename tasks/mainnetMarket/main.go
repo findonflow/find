@@ -37,16 +37,17 @@ func main() {
 	)
 
 	flowNfts := map[string]string{
-		"BYC'": `["A.28abb9f291cadaf2.BarterYardClubWerewolf.NFT"]`,
+		"ThingFund'": `["A.98c9c2e548b84d31.CaaPass.NFT"]`,
 		/*
-			"bl0x":       `["A.7620acf6d7f2468a.Bl0x.NFT"]`,
-			"pharaohs":   `["A.9d21537544d9123d.Momentables.NFT"]`,
-			"versus":     `["A.d796ff17107bbff6.Art.NFT"]`,
-			"flovatar":   `["A.921ea449dffec68a.Flovatar.NFT" , "A.921ea449dffec68a.FlovatarComponent.NFT"]`,
-			"neoCharity": `["A.097bafa4e0b48eef.CharityNFT.NFT"]`,
-			"starly":     `["A.5b82f21c0edf76e3.StarlyCard.NFT"]`,
-			"float":      `["A.2d4c3caffbeab845.FLOAT.NFT"]`,
-			"dayNFT":     `["A.1600b04bf033fb99.DayNFT.NFT"]`,
+			  "BYC'": `["A.28abb9f291cadaf2.BarterYardClubWerewolf.NFT"]`,
+				"bl0x":       `["A.7620acf6d7f2468a.Bl0x.NFT"]`,
+				"pharaohs":   `["A.9d21537544d9123d.Momentables.NFT"]`,
+				"versus":     `["A.d796ff17107bbff6.Art.NFT"]`,
+				"flovatar":   `["A.921ea449dffec68a.Flovatar.NFT" , "A.921ea449dffec68a.FlovatarComponent.NFT"]`,
+				"neoCharity": `["A.097bafa4e0b48eef.CharityNFT.NFT"]`,
+				"starly":     `["A.5b82f21c0edf76e3.StarlyCard.NFT"]`,
+				"float":      `["A.2d4c3caffbeab845.FLOAT.NFT"]`,
+				"dayNFT":     `["A.1600b04bf033fb99.DayNFT.NFT"]`,
 		*/
 	}
 
