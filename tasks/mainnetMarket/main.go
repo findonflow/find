@@ -13,19 +13,12 @@ func main() {
 		WithGlobalPrintOptions(),
 	)
 
-	/*
-		o.Tx("adminSetFTInfo_flow",
-			adminSigner,
-		)
-
-		o.Tx("adminSetFTInfo_usdc",
-			adminSigner,
-		)
-
-		o.Tx("adminSetFTInfo_fusd",
-			adminSigner,
-		)
-	*/
+	o.Tx("adminAddForge",
+		adminSigner,
+		WithPayloadSigner("find-forge"),
+		WithArg("storagePath", "/storage/nfgforge"),
+		WithArg("name", "nonfungerbils"),
+	)
 
 	upsertItem := o.TxFileNameFN("adminMainnetAddItem",
 		adminSigner,
@@ -37,7 +30,7 @@ func main() {
 	)
 
 	flowNfts := map[string]string{
-		"ThingFund'": `["A.98c9c2e548b84d31.CaaPass.NFT"]`,
+		"NFGv3'": `["A.123cb666996b8432.NFGv3.NFT"]`,
 		/*
 			  "BYC'": `["A.28abb9f291cadaf2.BarterYardClubWerewolf.NFT"]`,
 				"bl0x":       `["A.7620acf6d7f2468a.Bl0x.NFT"]`,
