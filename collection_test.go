@@ -3,6 +3,7 @@ package test_main
 import (
 	"testing"
 
+	"github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 )
 
@@ -24,7 +25,9 @@ func TestCollectionScripts(t *testing.T) {
 			registerUserWithNameAndForge("user1", "goatedgoats").
 			registerUserWithNameAndForge("user1", "klktn")
 
-		events := otu.O.TransactionFromFile("testMintDandyTO").
+		otu.setUUID(500)
+
+		otu.O.TransactionFromFile("testMintDandyTO").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				String("user1").
@@ -39,24 +42,17 @@ func TestCollectionScripts(t *testing.T) {
 			Test(t).
 			AssertSuccess()
 
-		dandyIds := []uint64{}
-		for _, event := range events.Events {
-			if event.Name == "A.f8d6e0586b0a20c7.Dandy.Deposit" {
-				dandyIds = append(dandyIds, event.GetFieldAsUInt64("id"))
-			}
-		}
-
 		otu.registerDandyInNFTRegistry()
 
-		result := otu.O.ScriptFromFile("getFactoryCollectionsNFTCatalog").
-			Args(otu.O.Arguments().
-				String("user1").
-				Int(100).
-				StringArray()).
-			RunReturnsJsonString()
+		result, err := otu.O.Script("getFactoryCollectionsNFTCatalog",
+			overflow.WithArg("user", "user1"),
+			overflow.WithArg("maxItems", 100),
+			overflow.WithArg("collections", "[]"),
+		).GetWithPointer("/A.f8d6e0586b0a20c7.Dandy.NFT/items")
 
-		result = otu.replaceDandyList(result, dandyIds)
-		result = otu.replaceID(result, dandyIds)
+		if err != nil {
+			panic(err)
+		}
 
 		autogold.Equal(t, result)
 
