@@ -2,6 +2,7 @@ package main
 
 import (
 	. "github.com/bjartek/overflow"
+	"github.com/onflow/cadence"
 )
 
 func main() {
@@ -29,9 +30,6 @@ func main() {
 	o.Tx("register", nameSigner, nameArg, WithArg("amount", 500.0))
 	o.Tx("buyAddon", nameSigner, nameArg, WithArg("addon", "forge"), WithArg("amount", 50.0))
 
-	//setup NFG forge
-	//LUKE: please QA this data
-
 	o.Tx("testSetupNFG", nameSigner, nameArg,
 		WithArg("minterCut", 0.075),
 		WithArg("collectionDescription", "NonFunGerbils"),
@@ -40,23 +38,34 @@ func main() {
 		WithArg("collectionBannerImage", "https://find.mypinata.cloud/ipfs/QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"),
 		WithArg("socials", `{ "Twitter" : "https://twitter.com/NonFunGerbils" }`),
 	)
+	description := `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine. 
+
+This NFT pairs with a physical painting of mixed technique on canvas, size 24x30cm by Pepelangelo. 
+
+Only the the owner of the physical can see what is uniquely precious.`
+
+	desc, err := cadence.NewString(description)
+	if err != nil {
+		panic(err)
+	}
 
 	//mint NFG, this is example from the file you sent me
+
 	o.Tx("testMintNFG",
 		nameSigner,
 		nameArg,
-		WithArg("nftName", "The Gerbil Who Lost His Seeds"),
-		WithArg("nftDescription", `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine. This NFT pairs with a physical painting of acrylic on canvas by Pepelangelo. Only the the owner of the physical can see what is uniquely precious.`),
+		WithArg("nftName", "Pepe Gerbil"),
+		WithArg("nftDescription", desc),
 		WithArg("externalURL", "https://nonfungerbils.com/pepegerbil"),
-		WithArg("imageHash", "QmSaWfkeTdNbYcuU9sgG9SBsbqccVbvrX3Pd4omKgtdnUg"),
+		WithArg("imageHash", "QmbGVd9281kdD65wdD8QRqLzXN56KCgvBB4HySQuv24rmC"),
 		WithArg("maxEditions", 6),
 		WithArg("scalars", map[string]float64{
 			"Gerbil Number": 29.0,
 		}),
 		WithArg("traits", map[string]string{
-			"Released":      "9 August 2022",
-			"Collaboration": "@Pepelangelo",
-			"Story Author":  "NonFunGerbils",
+			"Released":     "9 August 2022",
+			"Artist":       "@Pepelangelo",
+			"Story Author": "NonFunGerbils",
 		}),
 		WithArg("birthday", 1653427403.0),
 		WithArg("levels", map[string]float64{
@@ -67,5 +76,6 @@ func main() {
 			"Maximalism":      64,
 			"Funds are Safu":  70,
 		}),
+		WithArg("medias", "{}"),
 	)
 }

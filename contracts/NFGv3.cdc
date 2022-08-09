@@ -27,8 +27,9 @@ pub contract NFGv3: NonFungibleToken {
 		pub let scalars: {String: UFix64}
 		pub let traits: {String: String}
 		pub let birthday: UFix64
+		pub let medias: {String: String}
 
-		init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, externalURL:String, traits: {String: String}, levels: {String: UFix64}, scalars: {String:UFix64}, birthday: UFix64) {
+		init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, externalURL:String, traits: {String: String}, levels: {String: UFix64}, scalars: {String:UFix64}, birthday: UFix64, medias: {String: String}) {
 			self.name=name 
 			self.description=description 
 			self.thumbnailHash=thumbnailHash
@@ -39,6 +40,7 @@ pub contract NFGv3: NonFungibleToken {
 			self.scalars=scalars
 			self.birthday=birthday
 			self.externalURL=externalURL
+			self.medias=medias
 		}
 	}
 
