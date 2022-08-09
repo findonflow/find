@@ -524,7 +524,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/ghosts",
 				autogold.Want("soulBoundGhost", `[]interface {}{
   map[string]interface {}{
-    "id": 101,
+    "id": 104,
     "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
   },
 }`),
@@ -545,7 +545,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow/ghosts",
 				autogold.Want("soulBoundGhostBid", `[]interface {}{
   map[string]interface {}{
-    "id": 101,
+    "id": 104,
     "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid",
   },
 }`),
