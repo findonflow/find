@@ -255,7 +255,10 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				nft = getCollectionData(nftIdentifier) 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				nft =  collection.collectionData
+
 				nfts[nftIdentifier] = nft
 			}
 
@@ -310,10 +313,4 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		}
 	}
 
-}
-
-pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
-	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
-	return collection.collectionData
 }

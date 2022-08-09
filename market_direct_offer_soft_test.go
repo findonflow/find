@@ -482,7 +482,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"tenant":      "find",
 			}))
 
-
 		otu.sendDandy("user1", "user2", id).
 			sendFT("user1", "user2", "Flow", price)
 
@@ -496,7 +495,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
 			setFindCut(0.035)
-
 
 		otu.O.TransactionFromFile("fulfillMarketDirectOfferSoft").
 			SignProposeAndPayAs("user2").
