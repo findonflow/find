@@ -37,12 +37,29 @@ func TestNameDetailScript(t *testing.T) {
 				"related": "0xf3fcd2c1a78f5eee",
 			}))
 
-		actual := otu.O.ScriptFromFile("getNameDetails").
-			Args(otu.O.Arguments().
-				String("user1")).
-			RunReturnsJsonString()
-
-		autogold.Equal(t, actual)
+			otu.O.Script("getNameDetails",
+			overflow.WithArg("user", "user1"),
+		).AssertWithPointerWant(t, "/userReport/bids/0",
+			autogold.Want("getNameDetailsBids", map[string]interface{}{
+				"amount": 8, "lease": map[string]interface{}{
+					"address": "0xf3fcd2c1a78f5eee", "auctionEnds": 86401,
+					"auctionReservePrice": 20,
+					"auctionStartPrice":   5,
+					"cost":                5,
+					"currentTime":         1,
+					"extensionOnLateBid":  300,
+					"latestBid":           8,
+					"latestBidBy":         "0x179b6b1cb6755e31",
+					"lockedUntil":         3.9312001e+07,
+					"name":                "user2",
+					"status":              "TAKEN",
+					"validUntil":          3.1536001e+07,
+				},
+				"name":      "user2",
+				"timestamp": 1,
+				"type":      "auction",
+			}),
+		)
 	})
 
 }

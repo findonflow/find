@@ -468,11 +468,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, []uint64{id})
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon accept offer action status", status)
-
-		res := otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -500,12 +496,6 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer"})
-		result = otu.replaceID(result, []uint64{id})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties should be sent to correspondence upon accept offer action events", result)
 
 		otu.sendDandy("user1", "user2", id).
 			sendFT("user1", "user2", "Flow", price)
@@ -518,11 +508,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			setFindCut(0.035)
 
-		status := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		status = otu.replaceID(status, []uint64{id})
-		otu.AutoGoldRename("Royalties of find platform should be able to change status", status)
-
-		res := otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
+		otu.O.TransactionFromFile("fulfillMarketDirectOfferEscrowed").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				Account("account").
@@ -550,12 +536,6 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 				"royaltyName": "platform",
 				"tenant":      "find",
 			}))
-		saleIDs := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", "saleID")
-
-		result := otu.retrieveEvent(res.Events, []string{"A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", "A.f8d6e0586b0a20c7.FindMarket.RoyaltyCouldNotBePaid", "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer"})
-		result = otu.replaceID(result, []uint64{id})
-		result = otu.replaceID(result, saleIDs)
-		otu.AutoGoldRename("Royalties of find platform should be able to change events", result)
 
 		otu.sendDandy("user1", "user2", id).
 			sendFT("user1", "user2", "Flow", price)

@@ -171,87 +171,36 @@
             "status": "active"
         }
     },
-    "findMarket": {
-        "FindMarketSale": {
-            "amount": 10,
-            "ftAlias": "Flow",
-            "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-            "listingId": 303,
-            "listingStatus": "active",
-            "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
-            "listingValidUntil": 101,
-            "nftId": 303,
-            "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-            "saleType": "active_listed",
-            "seller": "0x179b6b1cb6755e31",
-            "sellerName": "user1"
-        }
-    },
     "nftDetail": {
         "collectionDescription": "Neo Collectibles FIND",
-        "collectionName": "user1",
-        "data": {
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork": {
-                "artist": "Neo",
-                "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
-                "name": "Neo Motorcycle",
-                "type": "image"
-            },
-            "A.f8d6e0586b0a20c7.FindViews.Nounce": {
-                "nounce": 1
-            },
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": {
-                "url": "https://find.xyz/collection/user1/dandy/ID1"
-            },
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties": {
-                "cutInfos": [
-                    {
-                        "cut": 0.05,
-                        "description": "minter",
-                        "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"
-                    },
-                    {
-                        "cut": 0.025,
-                        "description": "platform",
-                        "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0xf8d6e0586b0a20c7, path: /public/findProfileReceiver)"
-                    }
-                ]
-            },
-            "A.f8d6e0586b0a20c7.MetadataViews.Traits": {
-                "traits": [
-                    {
-                        "displayType": "String",
-                        "name": "NeoMotorCycleTag",
-                        "value": "Tag1"
-                    },
-                    {
-                        "displayType": "Numeric",
-                        "name": "Speed",
-                        "value": 100
-                    }
-                ]
-            }
-        },
-        "editionNumber": 2,
-        "id": 303,
+        "collectionName": "neomotorcycle",
+        "id": 953,
         "media": {
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
-        "name": "Neo Motorcycle 2 of 3",
+        "name": "Neo Motorcycle 1 of 1",
+        "rarity": "rare",
         "scalars": {
-            "Speed": 100,
-            "edition_set_max": 3,
-            "edition_set_number": 2
+            "Speed": 200,
+            "edition_nft_max": 1,
+            "edition_nft_number": 1,
+            "rarity_max": 100,
+            "rarity_score": 50
         },
         "tags": {
-            "NeoMotorCycleTag": "Tag1"
+            "Color": "Pearl"
         },
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        "totalInEdition": 3,
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 303,
+        "uuid": 953,
         "views": [
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData"
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked",
+            "checked"
         ]
     }
 }`
