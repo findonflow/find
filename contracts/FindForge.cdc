@@ -105,7 +105,7 @@ pub contract FindForge {
 
 	pub fun setMinterPlatform(lease: &FIND.Lease, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
-			panic("This forge type is not supported.")
+			panic("This forge type is not supported. type : ".concat(forgeType.identifier))
 		}
 		let name = lease.getName() 
 		if FindForge.minterPlatforms[forgeType]![name] == nil {
@@ -171,7 +171,6 @@ pub contract FindForge {
 
 		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
 
-
 	}
 
 	access(account) fun addPublicForgeType(forge: @{Forge}) {
@@ -201,7 +200,7 @@ pub contract FindForge {
 
 	access(account) fun adminRemoveMinterPlatform(name: String, forgeType: Type) {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
-			panic("This type is not registered as minterPlatform. ".concat(forgeType.identifier))
+			panic("This type is not registered as minterPlatform. Type : ".concat(forgeType.identifier))
 		}
 		if !FindForge.minterPlatforms[forgeType]!.containsKey(name) {
 			panic("This name is not registered as minterPlatform under this input type. ".concat(name))
@@ -211,7 +210,7 @@ pub contract FindForge {
 
 	access(account) fun removeForgeType(type: Type) {
 		if FindForge.forgeTypes.containsKey(type) {
-			panic( "This type is not registered to the registry. ")
+			panic( "This type is not registered to the registry. Type : ".concat(type.identifier))
 		}
 		destroy FindForge.forgeTypes.remove(key: type)
 

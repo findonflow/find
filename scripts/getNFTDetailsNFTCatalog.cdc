@@ -233,14 +233,19 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 	}
 	*/
 
-	let tenantCap = FindMarket.getTenantCapability(findAddress)!
-	let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
-
-	let marketTypes = FindMarket.getSaleItemTypes()
 	var report : {String : ListingTypeReport} = {}
-	for marketType in marketTypes {
-		if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-			report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
+
+	// check if that's soulBound, if yes, the report will be nil
+	if !pointer.checkSoulBound() {
+		let tenantCap = FindMarket.getTenantCapability(findAddress)!
+		let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
+
+		let marketTypes = FindMarket.getSaleItemTypes()
+
+		for marketType in marketTypes {
+			if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
+				report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
+			}
 		}
 	}
 

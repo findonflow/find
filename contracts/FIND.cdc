@@ -588,7 +588,7 @@ pub contract FIND {
 			}
 
 			if network.addonPrices[addon] == nil {
-				panic("This addon is not available.")
+				panic("This addon is not available. addon : ".concat(addon))
 			}
 			let addonPrice = network.addonPrices[addon]!
 

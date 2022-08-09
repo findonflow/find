@@ -1708,15 +1708,6 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 	return result
 }
 
-func (otu *OverflowTestUtils) replaceDandyList(result string, dandyIds []uint64) string {
-	counter := 0
-	for _, id := range dandyIds {
-		result = strings.Replace(result, `"Dandy`+fmt.Sprint(id)+`"`, `"DandyID"`, 1)
-		counter = counter + 1
-	}
-	return result
-}
-
 func (otu *OverflowTestUtils) retrieveEvent(events []*OverflowFormatedEvent, eventNames []string) string {
 	string := ""
 	for _, event := range events {
