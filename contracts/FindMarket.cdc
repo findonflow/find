@@ -1172,6 +1172,7 @@ pub contract FindMarket {
 				let name = resolveName(royaltyItem.receiver.address)
 
 				var walletCheck = true 
+				var royaltyReceiver : Capability<&{FungibleToken.Receiver}> = royaltyItem.receiver
 				if !royaltyItem.receiver.check() { 
 					// if the capability is not valid, royalty cannot be paid
 					walletCheck = false 
@@ -1184,6 +1185,12 @@ pub contract FindMarket {
 					walletCheck = false 
 				}
 
+				// if wallet check fails, try to borrow it the standard way 
+				if !walletCheck{
+					royaltyReceiver = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+					walletCheck = royaltyReceiver.check()
+				}
+
 				/* If the royalty receiver check failed */
 				if !walletCheck {
 					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: FindMarket.residualAddress)
@@ -1192,8 +1199,8 @@ pub contract FindMarket {
 				}
 
 				/* If the royalty receiver check succeed */
-				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				royaltyReceiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 			if totalRoyalties != saleItem.getTotalRoyalties() {
 				panic("The total Royalties to be paid is changed after listing.")
