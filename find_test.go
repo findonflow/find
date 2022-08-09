@@ -398,4 +398,43 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to fund users without profile wallet, but with vault proper set up", func(t *testing.T) {
+
+		user := "user1"
+		otu := NewOverflowTest(t).
+			setupFIND().
+			createUser(100.0, user).
+			createUser(100.0, "user2").
+			setProfile(user).
+			setProfile("user2").
+			registerUser(user).
+			registerFtInRegistry()
+
+		user2 := otu.O.Address("user2")
+		otu.removeProfileWallet("user2")
+
+		otu.O.Tx("sendFT",
+			WithSigner(user),
+			WithArg("name", user2),
+			WithArg("amount", 10.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", `""`),
+			WithArg("message", `""`),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FungibleTokenSent")
+
+		otu.O.Tx("sendFT",
+			WithSigner("user2"),
+			WithArg("name", user),
+			WithArg("amount", 10.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", `""`),
+			WithArg("message", `""`),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FungibleTokenSent")
+
+	})
+
 }
