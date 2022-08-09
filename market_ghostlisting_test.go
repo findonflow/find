@@ -424,9 +424,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 	})
 
 	t.Run("Should be able to return ghost listings with script getStatus", func(t *testing.T) {
-
 		otu.setUUID(1000)
-
 		ids := otu.mintThreeExampleDandies()
 		otu.directOfferMarketSoft("user2", "user1", ids[0], price).
 			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
@@ -440,7 +438,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
-		// result := otu.O.ScriptFromFile(getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
 		otu.O.Script("getStatus",
 			overflow.WithArg("user", "user1"),
 		).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketDirectOfferSoft",

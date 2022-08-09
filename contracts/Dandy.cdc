@@ -232,7 +232,7 @@ pub contract Dandy: NonFungibleToken {
 
 		// withdraw removes an NFT from the collection and moves it to the caller
 		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
-			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
+			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. withdrawID : ".concat(withdrawID.toString()))
 
 			let dandyToken <- token as! @NFT
 			let minterPlatform = dandyToken.getMinterPlatform()
@@ -292,7 +292,7 @@ pub contract Dandy: NonFungibleToken {
 		// so that the caller can read its metadata and call its methods
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			if self.ownedNFTs[id] == nil {
-				panic("NFT does not exist")
+				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
 
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
@@ -300,7 +300,7 @@ pub contract Dandy: NonFungibleToken {
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
 			if self.ownedNFTs[id] == nil {
-				panic("NFT does not exist")
+				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
 
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
@@ -309,7 +309,7 @@ pub contract Dandy: NonFungibleToken {
 
 		pub fun borrow(_ id: UInt64): &NFT {
 			if self.ownedNFTs[id] == nil {
-				panic("NFT does not exist")
+				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			return nft as! &Dandy.NFT

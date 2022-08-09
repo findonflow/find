@@ -32,74 +32,74 @@ func main() {
 		WithNetwork(network),
 	)
 
-	suffix := network
+	prefix := network
 
 	script := "getFactoryCollections"
 
-	prefix := "RaribleNFT"
-	o.Script(suffix+script+prefix,
+	suffix := "RaribleNFT"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(suffix+"getAdditionalFactoryCollectionItems"+prefix,
+	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"FlowverseSocks" : [14939]}`),
 	)
 
-	prefix = "Shard1"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard1"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(suffix+"getAdditionalFactoryCollectionItems"+prefix,
+	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"TuneGO" : [328]}`),
 	)
 
-	prefix = "Shard2"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard2"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(suffix+"getAdditionalFactoryCollectionItems"+prefix,
+	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"Xtingles" : [1281]}`),
 	)
 
-	prefix = "Shard3"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard3"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(suffix+"getAdditionalFactoryCollectionItems"+prefix,
+	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"SomePlaceCollectible" : [164769803]}`),
 	)
 
-	prefix = "Shard4"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard4"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("maxItems", "10"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(suffix+"getAdditionalFactoryCollectionItems"+prefix,
+	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"PartyMansionDrinksContract" : [836]}`),
 	)
 
-	prefix = "NFTCatalog"
-	o.Script(script+prefix,
+	suffix = "NFTCatalog"
+	o.Script(script+suffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "10000"),
+		WithArg("maxItems", "1"),
 		WithArg("collections", `[]`),
 	)
 
@@ -111,51 +111,59 @@ func main() {
 	// get NFTDetail script
 	script = "getNFTDetails"
 
-	prefix = "RaribleNFT"
-	o.Script(suffix+script+prefix,
+	suffix = "RaribleNFT"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "Flowverse Socks"),
 		WithArg("id", 14939),
 		WithArg("views", "[]"),
 	)
 
-	prefix = "Shard1"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard1"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "TuneGO"),
 		WithArg("id", 382),
 		WithArg("views", "[]"),
 	)
 
-	prefix = "Shard2"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard2"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "GeniaceNFT"),
 		WithArg("id", 2083),
 		WithArg("views", "[]"),
 	)
 
-	prefix = "Shard3"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard3"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "BlindBoxRedeemVoucher"),
 		WithArg("id", 38477),
 		WithArg("views", "[]"),
 	)
 
-	prefix = "Shard4"
-	o.Script(suffix+script+prefix,
+	suffix = "Shard4"
+	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "PartyMansionDrinksContract"),
 		WithArg("id", 4034),
 		WithArg("views", "[]"),
 	)
 
-	prefix = "NFTCatalog"
-	o.Script(script+prefix,
+	suffix = "NFTCatalog"
+	o.Script(script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "A.921ea449dffec68a.Flovatar.NFT"),
 		WithArg("id", 2271),
+		WithArg("views", "[]"),
+	)
+
+	// if that item is soul bounded , it will not show on allow listing
+	o.Script(script+suffix,
+		WithArg("user", "bjartek"),
+		WithArg("project", "FLOAT"),
+		WithArg("id", 277927096),
 		WithArg("views", "[]"),
 	)
 
