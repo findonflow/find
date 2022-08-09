@@ -236,7 +236,7 @@ pub contract Profile {
 		pub fun getFollowers(): [FriendStatus]
 		pub fun getFollowing(): [FriendStatus]
 		pub fun getWallets() : [Wallet]
-		pub fun checkWallet(_ name: String) : Bool 
+		pub fun hasWallet(_ name: String) : Bool 
 		pub fun getLinks() : [Link]
 		pub fun deposit(from: @FungibleToken.Vault)
 		pub fun supportedFungigleTokenTypes() : [Type]
@@ -295,7 +295,7 @@ pub contract Profile {
 		pub fun addWallet(_ val : Wallet) 
 		pub fun removeWallet(_ val: String)
 		pub fun setWallets(_ val: [Wallet])
-		pub fun checkWallet(_ name: String) : Bool 
+		pub fun hasWallet(_ name: String) : Bool 
 		pub fun addLink(_ val: Link)
 		pub fun addLinkWithName(name:String, link:Link)
 
@@ -503,22 +503,32 @@ pub contract Profile {
 				}
 			} 
 			let identifier=from.getType().identifier
+
+			// Try borrow that in a standard way. Only work for flow, usdc and fusd
+			// Check the vault type
+			var ref : &{FungibleToken.Receiver}? = nil
+			if identifier.slice(from: identifier.length - "FlowToken.Vault".length, upTo: identifier.length ) == "FlowToken.Vault" {
+				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow()
+			} else if identifier.slice(from: identifier.length - "FiatToken.Vault".length, upTo: identifier.length ) == "FiatToken.Vault" {
+				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/USDCVaultReceiver).borrow()
+			} else if identifier.slice(from: identifier.length - "FUSD.Vault".length, upTo: identifier.length ) == "FUSD.Vault" {
+				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver).borrow()
+			} 
+
+			if ref != nil {
+				ref!.deposit(from: <- from)
+				return
+			}
+
 			//I need to destroy here for this to compile, but WHY?
-			destroy from
-			panic("could not find a supported wallet for:".concat(identifier))
+			// oh we dont neet this anymore
+			// destroy from
+			// panic("could not find a supported wallet for:".concat(identifier))
+			panic(identifier.slice(from: identifier.length - "FlowToken.Vault".length, upTo: identifier.length ))
 		}
 
 
 		pub fun hasWallet(_ name: String) : Bool {
-			for wallet in self.wallets {
-				if wallet.name == name {
-					return true
-				}
-			}
-			return false
-		}
-
-		pub fun checkWallet(_ name: String) : Bool {
 			for wallet in self.wallets {
 				if wallet.name == name || wallet.accept.identifier == name {
 					return wallet.receiver.check()

@@ -60,7 +60,6 @@ func TestNameDetailScript(t *testing.T) {
 				"type":      "auction",
 			}),
 		)
-
 	})
 
 }

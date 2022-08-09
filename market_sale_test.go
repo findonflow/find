@@ -496,10 +496,87 @@ func TestMarketSale(t *testing.T) {
 			removeProfileBan("user2")
 	})
 
-	t.Run("Royalties should be sent to residual account if royalty receiver is not working", func(t *testing.T) {
-
+	t.Run("Royalties should try to borrow vault in standard way if profile wallet is unlinked", func(t *testing.T) {
 		otu.setTenantRuleFUSD("FlowDandySale").
 			removeTenantRule("FlowDandySale", "Flow")
+			
+		ids := otu.mintThreeExampleDandies()
+		otu.sendDandy("user3", "user1", ids[0])
+
+		otu.O.TransactionFromFile("listNFTForSale").
+			SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
+				UInt64(ids[0]).
+				String("FUSD").
+				UFix64(price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+		otu.unlinkProfileWallet("user1")
+
+		otu.O.Tx("buyNFTForSale",
+			overflow.WithSigner("user2"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("user", "user3"),
+			overflow.WithArg("id", ids[0]),
+			overflow.WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t,
+				"FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("user1"),
+					"amount":      0.5,
+					"findName":    "user1",
+					"royaltyName": "minter",
+				},
+			)
+
+		otu.cancelAllNFTForSale("user1")
+	})
+
+	t.Run("Royalties should try to borrow vault in standard way if profile wallet does not exist", func(t *testing.T) {
+
+		ids := otu.mintThreeExampleDandies()
+		otu.sendDandy("user3", "user1", ids[0])
+
+		otu.O.TransactionFromFile("listNFTForSale").
+			SignProposeAndPayAs("user3").
+			Args(otu.O.Arguments().
+				Account("account").
+				String("A.f8d6e0586b0a20c7.Dandy.NFT").
+				UInt64(ids[0]).
+				String("FUSD").
+				UFix64(price).
+				UFix64(otu.currentTime() + 100.0)).
+			Test(otu.T).AssertSuccess()
+		otu.removeProfileWallet("user1")
+
+		otu.O.Tx("buyNFTForSale",
+			overflow.WithSigner("user2"),
+			overflow.WithArg("marketplace", "account"),
+			overflow.WithArg("user", "user3"),
+			overflow.WithArg("id", ids[0]),
+			overflow.WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t,
+				"FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("user1"),
+					"amount":      0.5,
+					"findName":    "user1",
+					"royaltyName": "minter",
+				},
+			)
+
+		otu.cancelAllNFTForSale("user1")
+	})
+
+	t.Run("Royalties should be sent to residual account if royalty receiver is not working", func(t *testing.T) {
+
+
 
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])

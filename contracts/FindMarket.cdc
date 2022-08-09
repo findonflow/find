@@ -1172,16 +1172,23 @@ pub contract FindMarket {
 				let name = resolveName(royaltyItem.receiver.address)
 
 				var walletCheck = true 
+				var royaltyReceiver : Capability<&{FungibleToken.Receiver}> = royaltyItem.receiver
 				if !royaltyItem.receiver.check() { 
 					// if the capability is not valid, royalty cannot be paid
 					walletCheck = false 
 				} else if royaltyItem.receiver.borrow()!.isInstance(Type<@Profile.User>()){ 
 					// if the capability is valid -> it is a User resource -> check if the wallet is set up.
 					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
-					walletCheck = ref.checkWallet(ftType.identifier)
+					walletCheck = ref.hasWallet(ftType.identifier)
 				} else if !royaltyItem.receiver.borrow()!.isInstance(ftType){ 
 					// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
 					walletCheck = false 
+				}
+
+				// if wallet check fails, try to borrow it the standard way 
+				if !walletCheck{
+					royaltyReceiver = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+					walletCheck = royaltyReceiver.check()
 				}
 
 				/* If the royalty receiver check failed */
@@ -1192,8 +1199,8 @@ pub contract FindMarket {
 				}
 
 				/* If the royalty receiver check succeed */
-				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:royaltyItem.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-				royaltyItem.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				royaltyReceiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 			if totalRoyalties != saleItem.getTotalRoyalties() {
 				panic("The total Royalties to be paid is changed after listing.")

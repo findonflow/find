@@ -460,7 +460,7 @@ pub contract FindLeaseMarket {
 		} else if network.getWallet().borrow()!.isInstance(Type<@Profile.User>()){ 
 			// if the capability is valid -> it is a User resource -> check if the wallet is set up.
 			let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
-			walletCheck = ref.checkWallet(ftType.identifier)
+			walletCheck = ref.hasWallet(ftType.identifier)
 		} else if !network.getWallet().borrow()!.isInstance(ftType){ 
 			// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
 			walletCheck = false 

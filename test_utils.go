@@ -1600,6 +1600,22 @@ func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) removeProfileWallet(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testRemoveProfileWallet").
+		SignProposeAndPayAs(user).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) unlinkProfileWallet(user string) *OverflowTestUtils {
+	otu.O.TransactionFromFile("testUnlinkProfileWallet").
+		SignProposeAndPayAs(user).
+		Test(otu.T).
+		AssertSuccess()
+	return otu
+}
+
 func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 	otu.O.TransactionFromFile("testDestroyFUSDVault").
 		SignProposeAndPayAs(user).
