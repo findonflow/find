@@ -378,30 +378,6 @@ func (otu *OverflowTestUtils) expireLock() *OverflowTestUtils {
 	return otu.tickClock(lockDurationFloat)
 }
 
-func (otu *OverflowTestUtils) setupCharity(user string) *OverflowTestUtils {
-	otu.O.Tx("createCharity", WithSigner(user)).AssertSuccess(otu.T)
-	return otu
-}
-
-func (otu *OverflowTestUtils) mintCharity(name, image, thumbnail, originUrl, description, user string) *OverflowTestUtils {
-
-	otu.O.TransactionFromFile("adminMintCharity").SignProposeAndPayAs("find").
-		Args(otu.O.Arguments().
-			String(name).
-			String(image).
-			String(thumbnail).
-			String(description).
-			String(originUrl).
-			Account(user)).
-		Test(otu.T).
-		AssertSuccess().
-		AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.CharityNFT.Minted", map[string]interface{}{
-			"to": otu.O.Address(user),
-		}))
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 
 	result := otu.O.Tx("mintDandy",
