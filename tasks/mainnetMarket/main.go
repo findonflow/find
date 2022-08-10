@@ -13,24 +13,60 @@ func main() {
 		WithGlobalPrintOptions(),
 	)
 
-	o.Tx("adminAddNFTCatalog",
-		WithSigner("find"),
-		WithArg("collectionIdentifier", "A.9a57dfe5c8ce609c.SoulMadeMain"),
-		WithArg("contractName", "SoulMadeMain"),
-		WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
-		WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
-		WithArg("nftID", 7352),
-		WithArg("publicPathIdentifier", "SoulMadeMainCollection"),
-	)
+	/*
+		o.Tx("adminRemoveNFTCatalog",
+			WithSigner("find"),
+			WithArg("collectionIdentifier", "A.9a57dfe5c8ce609c.SoulMadeComponent"),
+		)
+
+		o.Tx("adminAddNFTCatalog",
+			WithSigner("find"),
+			WithArg("collectionIdentifier", "SoulMadeComponent"),
+			WithArg("contractName", "SoulMadeComponent"),
+			WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
+			WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
+			WithArg("nftID", 33029),
+			WithArg("publicPathIdentifier", "SoulMadeComponentCollection"),
+		)
+			o.Tx("adminAddNFTCatalog",
+				WithSigner("find"),
+				WithArg("collectionIdentifier", "SoulMade"),
+				WithArg("contractName", "SoulMadeMain"),
+				WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
+				WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
+				WithArg("nftID", 7352),
+				WithArg("publicPathIdentifier", "SoulMadeMainCollection"),
+			)
+
+			o.Tx("adminAddNFTCatalog",
+				WithSigner("find"),
+				WithArg("collectionIdentifier", "SoulMadeComponent"),
+				WithArg("contractName", "SoulMadeComponent"),
+				WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
+				WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
+				WithArg("nftID", 33029),
+				WithArg("publicPathIdentifier", "SoulMadeComponentCollection"),
+			)
+
+			o.Tx("adminAddNFTCatalog",
+				WithSigner("find"),
+				WithArg("collectionIdentifier", "Bitku"),
+				WithArg("contractName", "HaikuNFT"),
+				WithArg("contractAddress", "0xf61e40c19db2a9e2"),
+				WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
+				WithArg("nftID", 225),
+				WithArg("publicPathIdentifier", "BitkuCollection"),
+			)
+	*/
 
 	o.Tx("adminAddNFTCatalog",
 		WithSigner("find"),
-		WithArg("collectionIdentifier", "A.9a57dfe5c8ce609c.SoulMadeComponent"),
-		WithArg("contractName", "SoulMadeComponent"),
-		WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
-		WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
-		WithArg("nftID", 33029),
-		WithArg("publicPathIdentifier", "SoulMadeComponentCollection"),
+		WithArg("collectionIdentifier", "some.place"),
+		WithArg("contractName", "SomePlaceCollectible"),
+		WithArg("contractAddress", "0x667a16294a089ef"),
+		WithArg("addressWithNFT", "0x886f3aeaf848c535"),
+		WithArg("nftID", 164769803),
+		WithArg("publicPathIdentifier", "somePlaceCollectibleCollection"),
 	)
 
 	upsertItem := o.TxFileNameFN("adminMainnetAddItem",
@@ -43,7 +79,10 @@ func main() {
 	)
 
 	flowNfts := map[string]string{
-		"SoulMade": `["A.9a57dfe5c8ce609c.SoulMadeComponent", "A.9a57dfe5c8ce609c.SoulMadeMain"]`,
+		//	"SoulMade": `["A.9a57dfe5c8ce609c.SoulMadeComponent.NFT", "A.9a57dfe5c8ce609c.SoulMadeMain.NFT"]`,
+		//	"Bitku":    `["A.f61e40c19db2a9e2.HaikuNFT.NFT"]`,
+		//		"Dandy": `["A.097bafa4e0b48eef.Dandy.NFT"]`,
+		"some.place": `["A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
 	}
 
 	for name, contracts := range flowNfts {
