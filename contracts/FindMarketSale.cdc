@@ -180,12 +180,11 @@ pub contract FindMarketSale {
 				panic("You cannot buy your own listing")
 			}
 
-			if !nftCap.check() {
-				panic("The nft receiver capability passed in is invalid.")
-			}
-
-
+		
 			let saleItem=self.borrow(id)
+
+
+
 
 			if saleItem.salePrice != vault.balance {
 				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
@@ -220,8 +219,6 @@ pub contract FindMarketSale {
 			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
 
 
-			//TODO: make the resolver a little bit smarter, preresolve things like tenants and find?
-			//Add seller/buyer/find/tenant to map and lookup in that before calling reverseLookup
 			let resolved : {Address : String} = {}
 
 			resolved[buyer] = buyerName ?? ""
@@ -232,7 +229,17 @@ pub contract FindMarketSale {
 
 			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
 			
-			nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+
+			if !nftCap.check() {
+				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.CollectionPublic}>(saleItem.getNFTCollectionData().publicPath)
+				 if !cpCap.check() {
+					panic("The nft receiver capability passed in is invalid.")
+				} else {
+					cpCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+				}
+			} else {
+				nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+			}
 
 			destroy <- self.items.remove(key: id)
 		}
