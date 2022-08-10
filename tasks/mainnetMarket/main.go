@@ -19,7 +19,7 @@ func main() {
 		WithArg("contractName", "SoulMadeMain"),
 		WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
 		WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
-		WithArg("nftID", 4013),
+		WithArg("nftID", 7352),
 		WithArg("publicPathIdentifier", "SoulMadeMainCollection"),
 	)
 
@@ -29,7 +29,7 @@ func main() {
 		WithArg("contractName", "SoulMadeComponent"),
 		WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
 		WithArg("addressWithNFT", "0x92ba5cba77fc1e87"),
-		WithArg("nftID", 256),
+		WithArg("nftID", 33029),
 		WithArg("publicPathIdentifier", "SoulMadeComponentCollection"),
 	)
 
