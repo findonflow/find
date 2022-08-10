@@ -253,7 +253,7 @@ pub contract NFGv3: NonFungibleToken {
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)
-		self.account.save(<- create Forge(), to: /storage/nfgforge)
+		FindForge.addForgeType(<- create Forge())
 		emit ContractInitialized()
 	}
 }

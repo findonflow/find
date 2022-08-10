@@ -380,8 +380,10 @@ pub contract Dandy: NonFungibleToken {
 		self.CollectionStoragePath = /storage/findDandy
 		self.viewConverters={}
 
+		FindForge.addForgeType(<- create Forge())
+
 		//TODO: Add the Forge resource aswell
-		FindForge.addPublicForgeType(forge: <- create Forge())
+		FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
 		emit ContractInitialized()
 	}

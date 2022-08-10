@@ -30,8 +30,7 @@ func main() {
 
 	o.Tx("adminAddForge",
 		findSigner,
-		WithPayloadSigner("user4"),
-		WithArg("storagePath", "/storage/nfgforge"),
+		WithArg("type", "A.045a1763c93006ca.NFGv3.Forge"),
 		WithArg("name", name),
 	)
 

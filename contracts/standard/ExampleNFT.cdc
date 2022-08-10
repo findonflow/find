@@ -313,8 +313,10 @@ pub contract ExampleNFT: NonFungibleToken {
             target: self.CollectionStoragePath
         )
 
-        //TODO: Add the Forge resource aswell
-		FindForge.addPublicForgeType(forge: <- create Forge())
+		FindForge.addForgeType(<- create Forge())
+
+		//TODO: Add the Forge resource aswell
+		FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
         emit ContractInitialized()
 

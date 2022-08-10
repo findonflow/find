@@ -52,12 +52,21 @@ pub contract Admin {
 
 		}
 		*/
-		pub fun addPrivateForgeType(name: String, forge : @{FindForge.Forge}) {
+
+		pub fun addPublicForgeType(name: String, forgeType : Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.addPrivateForgeType(name: name, forge: <- forge)
+			FindForge.addPublicForgeType(forgeType: forgeType)
+		}
+
+		pub fun addPrivateForgeType(name: String, forgeType : Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForge.addPrivateForgeType(name: name, forgeType: forgeType)
 		}
 
 

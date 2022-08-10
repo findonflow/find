@@ -173,29 +173,38 @@ pub contract FindForge {
 
 	}
 
-	access(account) fun addPublicForgeType(forge: @{Forge}) {
-		if FindForge.publicForges.contains(forge.getType()) {
-			panic("This type is already registered to the registry as public. ")
+	pub fun addForgeType(_ forge: @{Forge}) {
+		if FindForge.forgeTypes.containsKey(forge.getType()) {
+			panic("This type is already registered to the registry. Type : ".concat(forge.getType().identifier))
 		}
-		FindForge.publicForges.append(forge.getType())
-		if !FindForge.minterPlatforms.containsKey(forge.getType()) {
-			FindForge.minterPlatforms[forge.getType()] = {}
-		}
+
 		FindForge.forgeTypes[forge.getType()] <-! forge
 	}
 
-	access(account) fun addPrivateForgeType(name: String, forge: @{Forge}) {
-		if FindForge.publicForges.contains(forge.getType()) {
-			panic("This type is already registered to the registry as public. ")
+	access(account) fun addPublicForgeType(forgeType: Type) {
+		if !FindForge.forgeTypes.containsKey(forgeType) {
+			panic("This type is not registered to the registry. Type : ".concat(forgeType.identifier))
 		}
-		if !FindForge.minterPlatforms.containsKey(forge.getType()) {
-			FindForge.minterPlatforms[forge.getType()] = {}
+		if FindForge.publicForges.contains(forgeType) {
+			panic("This type is already registered as public forge. Type : ".concat(forgeType.identifier))
+		}
+		FindForge.publicForges.append(forgeType)
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			FindForge.minterPlatforms[forgeType] = {}
+		}
+	}
+
+	access(account) fun addPrivateForgeType(name: String, forgeType: Type) {
+		if !FindForge.forgeTypes.containsKey(forgeType) {
+			panic("This type is not registered to the registry. Type : ".concat(forgeType.identifier))
+		}
+
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			FindForge.minterPlatforms[forgeType] = {}
 		}
 		let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: nil ,description: "", externalURL: "", squareImage: "", bannerImage: "", socials: {}) 
-		FindForge.minterPlatforms[forge.getType()]!.insert(key: name, minterPlatform)
-		let oldForge <- FindForge.forgeTypes[forge.getType()] <- forge
-		destroy oldForge
+		FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
 	}
 
 	access(account) fun adminRemoveMinterPlatform(name: String, forgeType: Type) {
