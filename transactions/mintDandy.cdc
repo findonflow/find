@@ -54,6 +54,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let traits = MetadataViews.Traits([])
 		traits.addTrait(MetadataViews.Trait(name: "NeoMotorCycleTag", value: "Tag1", displayType:"String", rarity:nil))
 		traits.addTrait(MetadataViews.Trait(name: "Speed", value: 100.0, displayType:"Numeric", rarity:nil))
+		traits.addTrait(MetadataViews.Trait(name: "Birthday", value: 1660145023.0, displayType:"Date", rarity:nil))
 
 		let collection=dandyCap.borrow()!
 		var i:UInt64=1

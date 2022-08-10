@@ -1282,9 +1282,14 @@ pub contract FindMarket {
 						let name = trait.name
 						let display = trait.displayType ?? "String"
 
-						let traitName = name
+						var traitName = name
 
 						if numericValues[display] != nil {
+
+							if display == "Date" || display == "date" {
+								traitName = "number.date.".concat(traitName)
+							}
+
 							if let value = trait.value as? Number {
 								self.scalars[traitName]  = UFix64(value)
 							}

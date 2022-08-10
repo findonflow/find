@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow"
@@ -63,9 +64,10 @@ func TestMarketOptionsContract(t *testing.T) {
 						"id":                    302,
 						"name":                  "Neo Motorcycle 2 of 3",
 						"scalars": map[string]interface{}{
-							"Speed":              100,
-							"edition_set_max":    3,
-							"edition_set_number": 2,
+							"Speed":                100,
+							"edition_set_max":      3,
+							"edition_set_number":   2,
+							"number.date.Birthday": 1.660145023e+09,
 						},
 						"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 						"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
@@ -103,7 +105,7 @@ func TestMarketOptionsContract(t *testing.T) {
 			directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
 		itemsForSale := otu.getItemsForSale("user1")
-
+		fmt.Println(itemsForSale)
 		assert.Equal(t, 4, len(itemsForSale))
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
@@ -144,9 +146,10 @@ func TestMarketOptionsContract(t *testing.T) {
 							"id":                    302,
 							"name":                  "Neo Motorcycle 2 of 3",
 							"scalars": map[string]interface{}{
-								"Speed":              100,
-								"edition_set_max":    3,
-								"edition_set_number": 2,
+								"Speed":                100,
+								"edition_set_max":      3,
+								"edition_set_number":   2,
+								"number.date.Birthday": 1.660145023e+09,
 							},
 							"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 							"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
