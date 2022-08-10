@@ -52,7 +52,8 @@ pub contract FindMarketAuctionEscrow {
 			if !self.offerCallback!.check()  {
 				panic("bidder unlinked the bid collection capability. bidder address : ".concat(self.offerCallback!.address.toString()))
 			}
-			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw())
+			let path = self.pointer.getNFTCollectionData().publicPath
+			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw(), path: path)
 			return <- vault
 		}
 
@@ -672,7 +673,7 @@ pub contract FindMarketAuctionEscrow {
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun containsId(_ id: UInt64): Bool
-		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault
+		access(contract) fun accept(_ nft: @NonFungibleToken.NFT, path:PublicPath) : @FungibleToken.Vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
 
@@ -698,14 +699,21 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		//called from lease when auction is ended
-		access(contract) fun accept(_ nft: @NonFungibleToken.NFT) : @FungibleToken.Vault {
+		access(contract) fun accept(_ nft: @NonFungibleToken.NFT, path:PublicPath) : @FungibleToken.Vault {
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
-			if !bid.nftCap.check() {
-				panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
+			let nftCap = bid.nftCap
+			if !nftCap.check() {
+				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.CollectionPublic}>(path)
+				 if !cpCap.check() {
+					panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
+				} else {
+					bid.nftCap.borrow()!.deposit(token: <- nft)
+				}
+			} else {
+				bid.nftCap.borrow()!.deposit(token: <- nft)
 			}
-			bid.nftCap.borrow()!.deposit(token: <- nft)
 			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
 			return <- vault
