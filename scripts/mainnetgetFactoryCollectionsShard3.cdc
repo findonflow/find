@@ -1,5 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 // /* Alchemy Mainnet Wrapper */
 // import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 // import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
@@ -18,6 +19,8 @@ import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
     pub fun main(user: String, maxItems: Int, collections: [String]) : {String : ItemReport} {
         return fetchAlchemyShard3(user: user, maxItems: maxItems, targetCollections:collections)
     }
+
+    pub let NFTCatalogContracts : [String] = getNFTCatalogContracts()
 
     pub struct ItemReport {
         pub let items : [MetadataCollectionItem]
@@ -63,6 +66,15 @@ import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
     pub fun resolveAddress(user: String) : Address? {
 	    return FIND.resolve(user)
     }
+
+    pub fun getNFTCatalogContracts() : [String] {
+        let catalogs = FINDNFTCatalog.getCatalog()
+        let names : [String] = []
+        for catalog in catalogs.values {
+            names.append(catalog.contractName)
+        }
+        return names
+    }
             
     pub fun fetchAlchemyShard3(user: String, maxItems: Int, targetCollections: [String]) : {String : ItemReport} {
         let source = "Shard3"
@@ -86,6 +98,13 @@ import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
             if targetCollections.length > 0 && !targetCollections.contains(project) {
                 // inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
                 continue
+            }
+
+            let contractItem = AlchemyMetadataWrapperMainnetShard3.getNFTs(ownerAddress: account!, ids: {project : [extraIDs[project]![0]]})
+            if contractItem.length > 0 && contractItem[0] != nil {
+                if NFTCatalogContracts.contains(contractItem[0]!.contract.name) {
+                    continue
+                }
             }
 
             
