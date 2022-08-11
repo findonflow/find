@@ -43,6 +43,20 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to list a dandy for sale if seller didn't link provider correctly", func(t *testing.T) {
+		otu.unlinkDandyProvider("user1").
+			listNFTForSale("user1", id, price). 
+			cancelAllNFTForSale("user1")
+
+	})
+
+	t.Run("Should be able to list a dandy for sale and buy it if buyer didn't receiver that correctly", func(t *testing.T) {
+		otu.listNFTForSale("user1", id, price).
+			unlinkDandyReceiver("user2").
+			buyNFTForMarketSale("user2", "user1", id, price).
+			sendDandy("user1", "user2", id)
+	})
+
 	t.Run("Should be able to list a dandy for sale and buy it without the collection", func(t *testing.T) {
 		otu.listNFTForSale("user1", id, price).
 			destroyDandyCollection("user2").
@@ -499,7 +513,7 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Royalties should try to borrow vault in standard way if profile wallet is unlinked", func(t *testing.T) {
 		otu.setTenantRuleFUSD("FlowDandySale").
 			removeTenantRule("FlowDandySale", "Flow")
-			
+
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
 
@@ -575,8 +589,6 @@ func TestMarketSale(t *testing.T) {
 	})
 
 	t.Run("Royalties should be sent to residual account if royalty receiver is not working", func(t *testing.T) {
-
-
 
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
