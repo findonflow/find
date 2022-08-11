@@ -133,13 +133,15 @@ pub contract Dandy: NonFungibleToken {
 				royalties.appendAll(multipleRoylaties.getRoyalties())
 			}
 
-			if self.platform.minterCut != nil {
+			if self.platform.minterCut != nil && self.platform.minterCut! != 0.0 {
 				let royalty = MetadataViews.Royalty(receiver: self.platform.getMinterFTReceiver(), cut: self.platform.minterCut!, description: "minter")
 				royalties.append(royalty)
 			}
 
-			let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "platform")
-			royalties.append(royalty)
+			if self.platform.platformPercentCut != 0.0 {
+				let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "platform")
+				royalties.append(royalty)
+			}
 
 			return MetadataViews.Royalties(royalties)
 		}
