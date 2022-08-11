@@ -55,6 +55,34 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
+	t.Run("Should be able to add direct offer and then sell even the seller didn't link provider correctly", func(t *testing.T) {
+
+		otu.directOfferMarketEscrowed("user2", "user1", id, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price).
+			unlinkDandyProvider("user1").
+			acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
+
+		otu.sendDandy("user1", "user2", id).
+			sendFT("user1", "user2", "Flow", price)
+
+		otu.cancelAllDirectOfferMarketEscrowed("user1")
+	})
+
+	t.Run("Should be able to add direct offer and then sell even the buyer didn't link receiver correctly", func(t *testing.T) {
+
+		otu.unlinkDandyReceiver("user2").
+			directOfferMarketEscrowed("user2", "user1", id, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price)
+		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
+
+		otu.sendDandy("user1", "user2", id).
+			sendFT("user1", "user2", "Flow", price)
+
+		otu.cancelAllDirectOfferMarketEscrowed("user1")
+	})
+
 	t.Run("Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
 
 		otu.destroyDandyCollection("user2").

@@ -200,6 +200,7 @@
       "Speed": 100.0,
       "edition_set_max": 3.0,
       "edition_set_number": 2.0,
+      "number.date.Birthday": 1660145023.0,
     },
     "tags": map[string]interface {}{
       "NeoMotorCycleTag": "Tag1",

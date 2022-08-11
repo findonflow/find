@@ -27,7 +27,7 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}> 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
+	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
 	let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection?
 	let balanceBeforeBid: UFix64
@@ -327,12 +327,20 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		if !self.targetCapability.check() {
 			let cd = item.getNFTCollectionData()
 			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
+			if account.type(at: cd.storagePath) != nil {
+				let pathIdentifier = nft.publicPath.toString()
+				let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					findPath,
+					target: nft.storagePath
+				)
+				self.targetCapability = account.getCapability<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+			} else {
+				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+
 		}
 		
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

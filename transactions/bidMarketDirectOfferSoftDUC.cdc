@@ -26,7 +26,7 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(dapperAddress: Address, marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, amount: UFix64, validUntil: UFix64?) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
+	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
 	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
@@ -314,12 +314,20 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, nftAliasO
 		if !self.targetCapability.check() {
 			let cd = self.pointer.getNFTCollectionData()
 			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
+			if account.type(at: cd.storagePath) != nil {
+				let pathIdentifier = nft.publicPath.toString()
+				let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					findPath,
+					target: nft.storagePath
+				)
+				self.targetCapability = account.getCapability<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+			} else {
+				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+
 		}
 	}
 

@@ -280,17 +280,25 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			let pointer= FindViews.createViewReadPointer(address: address, path:nft!.publicPath, id: ids[counter])
 			self.pointer.append(pointer)
 
-			let targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
+			var targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)
 			/* Check for nftCapability */
 			if !targetCapability.check() {
 				let cd = pointer.getNFTCollectionData()
 				// should use account.type here instead
-				if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-					panic("This collection public link is not set up properly.")
+				if account.type(at: cd.storagePath) != nil {
+					let pathIdentifier = nft!.publicPath.toString()
+					let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
+					account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+						findPath,
+						target: nft!.storagePath
+					)
+					targetCapability = account.getCapability<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+				} else {
+					account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+					account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 				}
-				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+
 			}
 			self.targetCapability.append(targetCapability)
 			counter = counter + 1

@@ -25,14 +25,24 @@ transaction(marketplace:Address, id: UInt64) {
 		let nft = collection.collectionData
 
 	
-		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
+		var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
 
 		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
 		if !providerCap.check() {
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
 					nft.privatePath,
 					target: nft.storagePath
 			)
+			if newCap == nil {
+				// If linking is not successful, we link it using finds custom link 
+				let pathIdentifier = nft.privatePath.toString()
+				let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					findPath,
+					target: nft.storagePath
+				)
+				providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+			}
 		}
 
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())

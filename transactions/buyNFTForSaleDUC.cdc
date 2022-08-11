@@ -25,7 +25,7 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
+	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}> 
@@ -318,12 +318,20 @@ transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt6
 		if !self.targetCapability.check() {
 			let cd = item.getNFTCollectionData()
 			// should use account.type here instead
-			if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-				panic("This collection public link is not set up properly.")
+			if account.type(at: cd.storagePath) != nil {
+				let pathIdentifier = nft.publicPath.toString()
+				let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					findPath,
+					target: nft.storagePath
+				)
+				self.targetCapability = account.getCapability<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+			} else {
+				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 			}
-			account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-			account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+
 		}
 
 		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
