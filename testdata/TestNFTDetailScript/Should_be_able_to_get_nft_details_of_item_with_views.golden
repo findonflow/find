@@ -228,6 +228,11 @@
                         "displayType": "Numeric",
                         "name": "Speed",
                         "value": 100
+                    },
+                    {
+                        "displayType": "Date",
+                        "name": "Birthday",
+                        "value": 1660145023
                     }
                 ]
             }
@@ -241,7 +246,8 @@
         "scalars": {
             "Speed": 100,
             "edition_set_max": 3,
-            "edition_set_number": 2
+            "edition_set_number": 2,
+            "number.date.Birthday": 1660145023
         },
         "tags": {
             "NeoMotorCycleTag": "Tag1"

@@ -63,7 +63,8 @@
         "scalars": {
             "Speed": 100,
             "edition_set_max": 3,
-            "edition_set_number": 2
+            "edition_set_number": 2,
+            "number.date.Birthday": 1660145023
         },
         "tags": {
             "NeoMotorCycleTag": "Tag1"
@@ -77,8 +78,8 @@
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
             "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
             "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-            "A.f8d6e0586b0a20c7.MetadataViews.Traits",
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"
+            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+            "A.f8d6e0586b0a20c7.MetadataViews.Traits"
         ]
     }
 }`

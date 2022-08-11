@@ -131,9 +131,10 @@ func TestNFTDetailScript(t *testing.T) {
 					"id":                    503,
 					"name":                  "Neo Motorcycle 2 of 3",
 					"scalars": map[string]interface{}{
-						"Speed":              100,
-						"edition_set_max":    3,
-						"edition_set_number": 2,
+						"Speed":                100,
+						"edition_set_max":      3,
+						"edition_set_number":   2,
+						"number.date.Birthday": 1.660145023e+09,
 					},
 					"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 					"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",

@@ -521,13 +521,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.Script("getStatus",
 			overflow.WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/ghosts",
-				autogold.Want("soulBoundGhost", `[]interface {}{
-  map[string]interface {}{
-    "id": 104,
-    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
-  },
-}`),
+			AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
+				autogold.Want("soulBoundGhost", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem"),
 			)
 
 		// Bids will also show as ghost
@@ -542,13 +537,8 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.Script("getStatus",
 			overflow.WithArg("user", "user2"),
 		).Print().
-			AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow/ghosts",
-				autogold.Want("soulBoundGhostBid", `[]interface {}{
-  map[string]interface {}{
-    "id": 104,
-    "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid",
-  },
-}`),
+			AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
+				autogold.Want("Bid", "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.Bid"),
 			)
 	})
 
