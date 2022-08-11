@@ -218,10 +218,9 @@ pub contract FindForge {
 	}
 
 	access(account) fun removeForgeType(type: Type) {
-		if FindForge.forgeTypes.containsKey(type) {
+		if !FindForge.forgeTypes.containsKey(type) {
 			panic( "This type is not registered to the registry. Type : ".concat(type.identifier))
 		}
-		destroy FindForge.forgeTypes.remove(key: type)
 
 		var i = 0
 		for forge in FindForge.publicForges {
@@ -231,6 +230,7 @@ pub contract FindForge {
 			}
 			i = i + 1
 		}
+		FindForge.minterPlatforms.remove(key: type)
 		
 	}
 
