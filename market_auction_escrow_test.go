@@ -68,6 +68,31 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
+	t.Run("Should be able to sell and buy at auction even the seller didn't link provider correctly", func(t *testing.T) {
+
+		otu.unlinkDandyProvider("user1").
+			listNFTForEscrowedAuction("user1", id, price)
+
+		otu.O.TransactionFromFile("cancelMarketAuctionEscrowed").
+			SignProposeAndPayAs("user1").
+			Args(otu.O.Arguments().
+				Account("account").
+				UInt64Array(id)).
+			Test(otu.T).AssertSuccess()
+	})
+
+	t.Run("Should be able to sell and buy at auction even the buyer didn't link receiver correctly", func(t *testing.T) {
+
+		otu.listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			unlinkDandyReceiver("user2").
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0).
+			sendDandy("user1", "user2", id)
+	})
+
 	t.Run("Should be able to sell at auction", func(t *testing.T) {
 
 		otu.listNFTForEscrowedAuction("user1", id, price).
@@ -878,6 +903,5 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
 
 	})
-
 
 }
