@@ -139,7 +139,12 @@ pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {Str
 			}
 
 			if nft.editions != nil && nft.editions!.infoList.length > 0 {
-				name = name.concat("#").concat(nft.editions!.infoList[0].number.toString())
+				let edition = nft.editions!.infoList[0].number.toString()
+				// check if the name ends with "editionNumber"
+				// If the name ends with "editionNumber", we do not concat the edition
+				if name.length > edition.length && name.slice(from: name.length - edition.length, upTo: name.length) != edition {
+					name = name.concat("#").concat(nft.editions!.infoList[0].number.toString())
+				}
 			}
 			
 			let item = MetadataCollectionItem(
