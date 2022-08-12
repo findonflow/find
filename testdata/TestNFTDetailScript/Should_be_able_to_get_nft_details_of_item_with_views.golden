@@ -20,7 +20,7 @@
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -54,7 +54,7 @@
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -88,7 +88,7 @@
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -122,7 +122,7 @@
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -156,7 +156,7 @@
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -212,7 +212,7 @@
                     },
                     {
                         "cut": 0.025,
-                        "description": "platform",
+                        "description": "find forge",
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0xf8d6e0586b0a20c7, path: /public/findProfileReceiver)"
                     }
                 ]

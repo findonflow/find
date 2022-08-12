@@ -139,7 +139,7 @@ pub contract Dandy: NonFungibleToken {
 			}
 
 			if self.platform.platformPercentCut != 0.0 {
-				let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "platform")
+				let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "find forge")
 				royalties.append(royalty)
 			}
 

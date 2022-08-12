@@ -32,7 +32,7 @@ func TestMarketSale(t *testing.T) {
 
 		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", "A.f8d6e0586b0a20c7.Dandy.NFT", 0.025)
+		otu.checkRoyalty("user1", id, "find forge", "A.f8d6e0586b0a20c7.Dandy.NFT", 0.025)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -45,7 +45,7 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list a dandy for sale if seller didn't link provider correctly", func(t *testing.T) {
 		otu.unlinkDandyProvider("user1").
-			listNFTForSale("user1", id, price). 
+			listNFTForSale("user1", id, price).
 			cancelAllNFTForSale("user1")
 
 	})
@@ -413,7 +413,7 @@ func TestMarketSale(t *testing.T) {
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 
@@ -453,7 +453,7 @@ func TestMarketSale(t *testing.T) {
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 

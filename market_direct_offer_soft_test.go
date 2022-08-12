@@ -478,7 +478,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 
@@ -522,7 +522,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 

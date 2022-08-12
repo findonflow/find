@@ -274,7 +274,7 @@ pub contract ExampleNFT: NonFungibleToken {
 			let info = data as? ExampleNFTInfo ?? panic("The data passed in is not in form of ExampleNFTInfo.")
             let royalties : [MetadataViews.Royalty] = []
             if platform.platformPercentCut! != 0.0 {
-                royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))
+                royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
             }
             if platform.minterCut != nil && platform.minterCut! != 0.0 {
                 royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "minter"))
