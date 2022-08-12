@@ -282,14 +282,13 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 		return nil
 	}
 
-	let viewTypes = pointer.getViews() 
 	var nftViews: {String : AnyStruct} = {}
 	var resolvedViews: [Type] = []
-	for viewType in viewTypes {
-		if views.contains(viewType.identifier) {
-			if let view = pointer.resolveView(viewType) {
-				nftViews[viewType.identifier] = view! 
-				resolvedViews.append(viewType)
+	for viewType in views {
+		if let runTimeType = CompositeType(viewType) {
+			if let view = pointer.resolveView(runTimeType) {
+				nftViews[runTimeType.identifier] = view! 
+				resolvedViews.append(runTimeType)
 			}
 		}
 	}
