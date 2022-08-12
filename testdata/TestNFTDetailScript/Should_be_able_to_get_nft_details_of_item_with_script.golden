@@ -15,7 +15,7 @@
                             "address": "0x179b6b1cb6755e31",
                             "cut": 0.05,
                             "findName": "user1",
-                            "royaltyName": "minter"
+                            "royaltyName": "creator"
                         },
                         {
                             "address": "0xf8d6e0586b0a20c7",

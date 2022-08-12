@@ -277,7 +277,7 @@ pub contract ExampleNFT: NonFungibleToken {
                 royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
             }
             if platform.minterCut != nil && platform.minterCut! != 0.0 {
-                royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "minter"))
+                royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "creator"))
             }
 			return <- ExampleNFT.mintNFT(name: info.name,
                                         description: info.description,
@@ -324,7 +324,7 @@ pub contract ExampleNFT: NonFungibleToken {
 
         // Deposit exampleNFTs for testing
         let dapper = getAccount(ExampleNFT.account.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "minter")
+        let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "creator")
         let royalties : [MetadataViews.Royalty] = []
         royalties.append(minterCut)
         let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false, royalties: MetadataViews.Royalties(royalties))

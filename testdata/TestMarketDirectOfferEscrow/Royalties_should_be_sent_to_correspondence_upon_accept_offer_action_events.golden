@@ -59,7 +59,7 @@
       "totalInEdition": 3,
       "type": "A.f8d6e0586b0a20c7.Dandy.NFT"
     },
-    "royaltyName": "minter",
+    "royaltyName": "creator",
     "saleID": 485,
     "tenant": "find",
     "vaultType": "A.0ae53cb6e3f42a79.FlowToken.Vault"

@@ -201,7 +201,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("id", id),
 			overflow.WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 		).AssertWant(t,
-			autogold.Want("royalty", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.05, "description": "minter", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"}}}),
+			autogold.Want("royalty", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.05, "description": "creator", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"}}}),
 		)
 
 	})
