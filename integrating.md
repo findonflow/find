@@ -25,7 +25,7 @@ It can be called either with a name or an address
 
 The contract addreses for .find is:
  - mainnet: 0x097bafa4e0b48eef
- - testnet: 0xa16ab1d0abde3625 
+ - testnet: 0x35717efbbce11c74
 
 
 We have tried to make it easy to use .find in cadence so most functions are oneliners. 
