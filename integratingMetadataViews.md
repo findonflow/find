@@ -98,3 +98,60 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 | squareImage      | A square image that represent the NFT Collection    |
 | bannerImage      | A 2 : 1 banner image that represent the NFT Collection  |
 | socials      | Social links to your media       |
+
+## Implementing `MetadataViews.Traits`
+
+Trait views can add a lot more attributes to the NFT display on .Find. 
+By returning trait views as recommended, you can fit the data in the places you want. 
+
+```cadence
+
+pub fun resolveView(_ type: Type): AnyStruct? {
+	switch type {
+
+		// Example for NFTCollectionDisplay 
+		case Type<MetadataViews.Traits>() : 
+
+			let trait = MetadataViews.Trait(
+				name: "Edition Stamp" ,      // Type<String>
+				value: "Grand Architect",    // Type<AnyStruct>
+				displayType: "String",       // Type<String?>
+				rarity: MetadataViews.Rarity(// Type<MetadataViews.Rarity?>
+					score: nil,              // Type<UFix64?>
+					max: nil,                // Type<UFix64?>
+					description: "Common"     // Type<String?>
+				)
+			)
+
+			let dateTrait = MetadataViews.Trait(
+				name: "BirthDay" ,      // Type<String>
+				value: "1546360800",    // Type<AnyStruct>
+				displayType: "Date",    // Type<String?>
+				rarity: nil             // Type<MetadataViews.Rarity?>
+			)
+
+			return MetadataViews.Traits(
+				[
+					trait, 
+					dateTrait
+				]
+			)
+
+	}
+}
+
+```
+
+## String Trait
+![MetadataViews.Traits](/images/traits_String.png "traits_String")
+
+
+## Date Trait (Under development)
+![MetadataViews.Traits](/images/traits_Date.png "traits_Date")
+
+| Param      | Description |
+| ----------- | ----------- |
+| name   | Name of the trait  |
+| value      | Value of the trait  |
+| displayType      | Value of the trait, can be "String", "Number", "Date" etc. |
+| rarity      | Additional rarity to this trait, description / numbder / maximum number of the rarity    |
