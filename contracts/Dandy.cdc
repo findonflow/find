@@ -133,13 +133,15 @@ pub contract Dandy: NonFungibleToken {
 				royalties.appendAll(multipleRoylaties.getRoyalties())
 			}
 
-			if self.platform.minterCut != nil {
-				let royalty = MetadataViews.Royalty(receiver: self.platform.getMinterFTReceiver(), cut: self.platform.minterCut!, description: "minter")
+			if self.platform.minterCut != nil && self.platform.minterCut! != 0.0 {
+				let royalty = MetadataViews.Royalty(receiver: self.platform.getMinterFTReceiver(), cut: self.platform.minterCut!, description: "creator")
 				royalties.append(royalty)
 			}
 
-			let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "platform")
-			royalties.append(royalty)
+			if self.platform.platformPercentCut != 0.0 {
+				let royalty = MetadataViews.Royalty(receiver: self.platform.platform, cut: self.platform.platformPercentCut, description: "find forge")
+				royalties.append(royalty)
+			}
 
 			return MetadataViews.Royalties(royalties)
 		}
@@ -380,8 +382,10 @@ pub contract Dandy: NonFungibleToken {
 		self.CollectionStoragePath = /storage/findDandy
 		self.viewConverters={}
 
+		FindForge.addForgeType(<- create Forge())
+
 		//TODO: Add the Forge resource aswell
-		FindForge.addPublicForgeType(forge: <- create Forge())
+		FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
 		emit ContractInitialized()
 	}

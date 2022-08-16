@@ -273,9 +273,11 @@ pub contract ExampleNFT: NonFungibleToken {
 		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? ExampleNFTInfo ?? panic("The data passed in is not in form of ExampleNFTInfo.")
             let royalties : [MetadataViews.Royalty] = []
-            royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))
-            if platform.minterCut != nil {
-                royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "minter"))
+            if platform.platformPercentCut! != 0.0 {
+                royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
+            }
+            if platform.minterCut != nil && platform.minterCut! != 0.0 {
+                royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "creator"))
             }
 			return <- ExampleNFT.mintNFT(name: info.name,
                                         description: info.description,
@@ -313,14 +315,16 @@ pub contract ExampleNFT: NonFungibleToken {
             target: self.CollectionStoragePath
         )
 
-        //TODO: Add the Forge resource aswell
-		FindForge.addPublicForgeType(forge: <- create Forge())
+		FindForge.addForgeType(<- create Forge())
+
+		//TODO: Add the Forge resource aswell
+		FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
         emit ContractInitialized()
 
         // Deposit exampleNFTs for testing
         let dapper = getAccount(ExampleNFT.account.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "minter")
+        let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "creator")
         let royalties : [MetadataViews.Royalty] = []
         royalties.append(minterCut)
         let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false, royalties: MetadataViews.Royalties(royalties))

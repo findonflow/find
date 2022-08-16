@@ -32,7 +32,7 @@ func TestMarketSale(t *testing.T) {
 
 		otu.listNFTForSale("user1", id, price)
 
-		otu.checkRoyalty("user1", id, "platform", "A.f8d6e0586b0a20c7.Dandy.NFT", 0.025)
+		otu.checkRoyalty("user1", id, "find forge", "A.f8d6e0586b0a20c7.Dandy.NFT", 0.025)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -45,7 +45,7 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list a dandy for sale if seller didn't link provider correctly", func(t *testing.T) {
 		otu.unlinkDandyProvider("user1").
-			listNFTForSale("user1", id, price). 
+			listNFTForSale("user1", id, price).
 			cancelAllNFTForSale("user1")
 
 	})
@@ -406,14 +406,14 @@ func TestMarketSale(t *testing.T) {
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          ids[0],
-				"royaltyName": "minter",
+				"royaltyName": "creator",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 
@@ -446,14 +446,14 @@ func TestMarketSale(t *testing.T) {
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          ids[0],
-				"royaltyName": "minter",
+				"royaltyName": "creator",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 
@@ -543,7 +543,7 @@ func TestMarketSale(t *testing.T) {
 					"address":     otu.O.Address("user1"),
 					"amount":      0.5,
 					"findName":    "user1",
-					"royaltyName": "minter",
+					"royaltyName": "creator",
 				},
 			)
 
@@ -581,7 +581,7 @@ func TestMarketSale(t *testing.T) {
 					"address":     otu.O.Address("user1"),
 					"amount":      0.5,
 					"findName":    "user1",
-					"royaltyName": "minter",
+					"royaltyName": "creator",
 				},
 			)
 
@@ -620,7 +620,7 @@ func TestMarketSale(t *testing.T) {
 					"amount":          0.5,
 					"findName":        "user1",
 					"residualAddress": otu.O.Address("find"),
-					"royaltyName":     "minter",
+					"royaltyName":     "creator",
 				},
 			)
 
@@ -634,7 +634,7 @@ func TestMarketSale(t *testing.T) {
 
 		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
 
-		otu.checkRoyalty("user1", 0, "minter", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
+		otu.checkRoyalty("user1", 0, "creator", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -648,7 +648,7 @@ func TestMarketSale(t *testing.T) {
 	t.Run("Should be able to list an NFT for sale and buy it. where id != uuid", func(t *testing.T) {
 		saleItem := otu.listExampleNFTForSale("user1", 0, price)
 
-		otu.checkRoyalty("user1", 0, "minter", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
+		otu.checkRoyalty("user1", 0, "creator", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -823,7 +823,7 @@ func TestMarketSale(t *testing.T) {
 
 		saleItemID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
 
-		otu.checkRoyalty("user1", 0, "minter", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
+		otu.checkRoyalty("user1", 0, "creator", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
