@@ -39,7 +39,7 @@ If the thumbnail is an IPFS resource
 //
 thumbnail : MetadataViews.IPFSFile(
 	cid: thumbnail cid, // Type <String>
-	path: ipfs path // Type <String?> if it is not a directory, please put *nil*
+	path: ipfs path // Type <String?> specify path if the cid is a folder hash, otherwise use nil here
 )
 ```
 
