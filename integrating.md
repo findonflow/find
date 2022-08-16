@@ -30,7 +30,7 @@ The contract addreses for .find is:
 
 We have tried to make it easy to use .find in cadence so most functions are oneliners. 
 
-```
+```cadence
 import FIND from 0x097bafa4e0b48eef
 
 pub fun main(name: String) : Address?  {
@@ -39,7 +39,7 @@ pub fun main(name: String) : Address?  {
 ```
 
 If you want the read-only profile of a user for displaying in your solution you can use the `lookup` function
-```
+```cadence
 import FIND, Profile from 0x097bafa4e0b48eef
 
 pub fun main(name: String) :  Profile.UserProfile? {
@@ -49,7 +49,7 @@ pub fun main(name: String) :  Profile.UserProfile? {
 
 ## Resolving address -> name
 
-```
+```cadence
 import FIND, Profile from 0x097bafa4e0b48eef
 
 pub fun main(address: Address) :  String? {
@@ -71,10 +71,16 @@ Please do not use any of these raw but as inspiration :)
  - [editProfile](transactions/editProfile) : edit the profile
  - [getProfile from address](scripts/profile.cdc) : to get from name, if you have .find name ise lookup as explained above
  
-
 ## Show your NFT in .find
 
-In order to show your nfts in .find we use this [script](scripts/collections.cdc)
+We support all NFTs that are on [NFT-Catalog](https://nft-catalog.vercel.app/catalog/mainnet) which is proposed and maintained by Dapper Team. 
+
+To register on NFT Catalog, please follow the [instructions](https://nft-catalog.vercel.app/v) provided by Dapper. 
+
+Implementing MetadataViews standards in the right way can help your NFTs display with a richer metadata. The doc to MetadataViews standard is linked [here](./integratingMetadataViews.md). 
+
+
+<!-- In order to show your nfts in .find we use this [script](scripts/collections.cdc)
 
 In essence what we need for each nft is the fields:
 ```
@@ -86,11 +92,11 @@ In essence what we need for each nft is the fields:
 	pub let listToken: String? : the string representation of the token used. Identifier of FT
 	pub let contentType:String : content type of image url, image or video works fine here
 	pub let rarity:String: rarity description for this NFT
-```
+``` -->
 
-There are lots of examples for how this is done in the collections script already. 
+<!-- There are lots of examples for how this is done in the collections script already. 
 
-Note that if your solution needs to lookup things in an API after the collections script we can accomodate that aswell.
+Note that if your solution needs to lookup things in an API after the collections script we can accomodate that aswell. -->
 
 ## Login using your .find name
 
