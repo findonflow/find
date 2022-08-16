@@ -12,14 +12,15 @@ import (
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
 func TestDandy(t *testing.T) {
+	otu := NewOverflowTest(t).
+		setupFIND().
+		setupDandy("user1").
+		createUser(100.0, "user2").
+		registerUser("user2")
 
 	t.Run("Should be able to mint 3 dandy nfts and display them", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2").
-			setUUID(500)
+
+		otu.setUUID(500)
 
 		dandyIds := otu.mintThreeExampleDandies()
 		otu.registerFtInRegistry()
@@ -66,19 +67,18 @@ func TestDandy(t *testing.T) {
 			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/502"}),
 		)
 
+		for _, dandy := range dandyIds {
+			otu.sendDandy("user2", "user1", dandy)
+		}
+
 	})
 
 	/* Test on dandy nft indexing {Mapping of minter} */
 	t.Run("Should be able to return the correct minter and dandies list", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2").
-			setUUID(500)
+
+		otu.setUUID(700)
 
 		dandiesIDs := otu.mintThreeExampleDandies()
-		otu.registerFtInRegistry()
 
 		result, err := otu.O.Script("getDandiesIDsFor",
 			overflow.WithArg("user", "user1"),
@@ -89,7 +89,7 @@ func TestDandy(t *testing.T) {
 			panic(err)
 		}
 
-		assert.ElementsMatch(t, result, []interface{}{uint64(502), uint64(503), uint64(504)})
+		assert.ElementsMatch(t, result, []interface{}{uint64(702), uint64(703), uint64(704)})
 
 		otu.O.Script("getDandiesMinters",
 			overflow.WithArg("user", "user1"),
@@ -102,12 +102,10 @@ func TestDandy(t *testing.T) {
 		/* mint new dandies and withdraw all of them */
 		dandiesIDs = append(dandiesIDs, otu.mintThreeExampleDandies()...)
 
-		otu.O.TransactionFromFile("testDestroyDandies").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				UInt64Array(dandiesIDs...)).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("testDestroyDandies" ,
+			overflow.WithSigner("user1") ,
+			overflow.WithArg("ids" , dandiesIDs) , 
+		).AssertSuccess(t)
 
 		otu.O.Script("getDandiesIDsFor",
 			overflow.WithArg("user", "user1"),
