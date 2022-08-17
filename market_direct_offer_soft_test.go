@@ -471,14 +471,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
-				"royaltyName": "minter",
+				"royaltyName": "creator",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 
@@ -515,14 +515,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
-				"royaltyName": "minter",
+				"royaltyName": "creator",
 				"tenant":      "find",
 			})).
 			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          id,
-				"royaltyName": "platform",
+				"royaltyName": "find forge",
 				"tenant":      "find",
 			}))
 

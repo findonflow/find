@@ -3,3 +3,4 @@ node_modules
 .find-testnet.events
 lib/find_tmp.json
 names.progress
+./vscode

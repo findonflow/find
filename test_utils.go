@@ -7,6 +7,7 @@ import (
 
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
+	"github.com/sanity-io/litter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -736,7 +737,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 	royalty := r.(Royalty)
 
 	assert.NoError(otu.T, err)
-
+	litter.Sdump(royalty)
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
 			assert.Equal(otu.T, expectedPlatformRoyalty, item.Cut)

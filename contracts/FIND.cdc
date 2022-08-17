@@ -1236,7 +1236,8 @@ pub contract FIND {
 		init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>, publicEnabled:Bool) {
 			self.leasePeriod=leasePeriod
 			self.addonPrices = { 
-				"forge" : 50.0     // will have to run transactions on this when update on mainnet.
+				"forge" : 50.0 ,    // will have to run transactions on this when update on mainnet.
+				"premiumForge" : 1000.0
 				}
 			self.lockPeriod=lockPeriod
 			self.secondaryCut=secondaryCut

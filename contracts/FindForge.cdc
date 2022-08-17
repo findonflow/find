@@ -99,6 +99,8 @@ pub contract FindForge {
 		}
 		if FindForge.minterPlatforms[forgeType]![name] == nil {
 			return false
+		} else if FindForge.minterPlatforms[forgeType]![name]!.description == "" {
+			return false
 		}
 		return true 
 	}
@@ -107,6 +109,11 @@ pub contract FindForge {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
 			panic("This forge type is not supported. type : ".concat(forgeType.identifier))
 		}
+
+		if description == "" {
+			panic("Description of collection cannot be empty")
+		}
+
 		let name = lease.getName() 
 		if FindForge.minterPlatforms[forgeType]![name] == nil {
 			if !FindForge.publicForges.contains(forgeType) {
@@ -114,14 +121,24 @@ pub contract FindForge {
 			}
 		}
 
-		if !lease.checkAddon(addon: "forge") {
-			panic("Please purchase forge addon to start forging. Name: ".concat(lease.getName()))
+		// If they have a premium forge, platform will not take any royalty
+		if lease.checkAddon(addon: "premiumForge") {
+			let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: 0.0, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
+
+			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			return
 		}
 
-		let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
+		if lease.checkAddon(addon: "forge") {
+			let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
-		FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			return
+		}
+
+		panic("Please purchase forge addon to start forging. Name: ".concat(lease.getName()))
 	}
 
 	pub fun removeMinterPlatform(lease: &FIND.Lease, forgeType: Type) {
@@ -143,11 +160,16 @@ pub contract FindForge {
 		}
 		let leaseName = lease.getName()
 
-		if !lease.checkAddon(addon: "forge") {
+		if !lease.checkAddon(addon: "forge") && !lease.checkAddon(addon: "premiumForge") {
 			panic("Please purchase forge addon to start forging. Name: ".concat(leaseName))
 		}
 
 		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
+
+		if minterPlatform.description == "" {
+			panic("Please set up minter platform before mint")
+		}
+
 		let verifier = self.borrowVerifier()
 
 		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
@@ -173,29 +195,38 @@ pub contract FindForge {
 
 	}
 
-	access(account) fun addPublicForgeType(forge: @{Forge}) {
-		if FindForge.publicForges.contains(forge.getType()) {
-			panic("This type is already registered to the registry as public. ")
+	pub fun addForgeType(_ forge: @{Forge}) {
+		if FindForge.forgeTypes.containsKey(forge.getType()) {
+			panic("This type is already registered to the registry. Type : ".concat(forge.getType().identifier))
 		}
-		FindForge.publicForges.append(forge.getType())
-		if !FindForge.minterPlatforms.containsKey(forge.getType()) {
-			FindForge.minterPlatforms[forge.getType()] = {}
-		}
+
 		FindForge.forgeTypes[forge.getType()] <-! forge
 	}
 
-	access(account) fun addPrivateForgeType(name: String, forge: @{Forge}) {
-		if FindForge.publicForges.contains(forge.getType()) {
-			panic("This type is already registered to the registry as public. ")
+	access(account) fun addPublicForgeType(forgeType: Type) {
+		if !FindForge.forgeTypes.containsKey(forgeType) {
+			panic("This type is not registered to the registry. Type : ".concat(forgeType.identifier))
 		}
-		if !FindForge.minterPlatforms.containsKey(forge.getType()) {
-			FindForge.minterPlatforms[forge.getType()] = {}
+		if FindForge.publicForges.contains(forgeType) {
+			panic("This type is already registered as public forge. Type : ".concat(forgeType.identifier))
+		}
+		FindForge.publicForges.append(forgeType)
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			FindForge.minterPlatforms[forgeType] = {}
+		}
+	}
+
+	access(account) fun addPrivateForgeType(name: String, forgeType: Type) {
+		if !FindForge.forgeTypes.containsKey(forgeType) {
+			panic("This type is not registered to the registry. Type : ".concat(forgeType.identifier))
+		}
+
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			FindForge.minterPlatforms[forgeType] = {}
 		}
 		let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: nil ,description: "", externalURL: "", squareImage: "", bannerImage: "", socials: {}) 
-		FindForge.minterPlatforms[forge.getType()]!.insert(key: name, minterPlatform)
-		let oldForge <- FindForge.forgeTypes[forge.getType()] <- forge
-		destroy oldForge
+		FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
 	}
 
 	access(account) fun adminRemoveMinterPlatform(name: String, forgeType: Type) {
@@ -209,10 +240,9 @@ pub contract FindForge {
 	}
 
 	access(account) fun removeForgeType(type: Type) {
-		if FindForge.forgeTypes.containsKey(type) {
+		if !FindForge.forgeTypes.containsKey(type) {
 			panic( "This type is not registered to the registry. Type : ".concat(type.identifier))
 		}
-		destroy FindForge.forgeTypes.remove(key: type)
 
 		var i = 0
 		for forge in FindForge.publicForges {
@@ -222,6 +252,7 @@ pub contract FindForge {
 			}
 			i = i + 1
 		}
+		FindForge.minterPlatforms.remove(key: type)
 		
 	}
 

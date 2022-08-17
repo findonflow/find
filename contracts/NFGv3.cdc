@@ -214,9 +214,9 @@ pub contract NFGv3: NonFungibleToken {
 		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? Info ?? panic("The data passed in is not in form of NFGv3Info.")
 			let royalties : [MetadataViews.Royalty] = []
-			royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "platform"))
+			royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
 			if platform.minterCut != nil {
-				royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "minter"))
+				royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "creator"))
 			}
 
 			// create a new NFT
@@ -253,7 +253,7 @@ pub contract NFGv3: NonFungibleToken {
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)
-		self.account.save(<- create Forge(), to: /storage/nfgforge)
+		FindForge.addForgeType(<- create Forge())
 		emit ContractInitialized()
 	}
 }

@@ -15,12 +15,12 @@
                             "address": "0x179b6b1cb6755e31",
                             "cut": 0.05,
                             "findName": "user1",
-                            "royaltyName": "minter"
+                            "royaltyName": "creator"
                         },
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -49,12 +49,12 @@
                             "address": "0x179b6b1cb6755e31",
                             "cut": 0.05,
                             "findName": "user1",
-                            "royaltyName": "minter"
+                            "royaltyName": "creator"
                         },
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -83,12 +83,12 @@
                             "address": "0x179b6b1cb6755e31",
                             "cut": 0.05,
                             "findName": "user1",
-                            "royaltyName": "minter"
+                            "royaltyName": "creator"
                         },
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -117,12 +117,12 @@
                             "address": "0x179b6b1cb6755e31",
                             "cut": 0.05,
                             "findName": "user1",
-                            "royaltyName": "minter"
+                            "royaltyName": "creator"
                         },
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -151,12 +151,12 @@
                             "address": "0x179b6b1cb6755e31",
                             "cut": 0.05,
                             "findName": "user1",
-                            "royaltyName": "minter"
+                            "royaltyName": "creator"
                         },
                         {
                             "address": "0xf8d6e0586b0a20c7",
                             "cut": 0.025,
-                            "royaltyName": "platform"
+                            "royaltyName": "find forge"
                         }
                     ]
                 }
@@ -207,12 +207,12 @@
                 "cutInfos": [
                     {
                         "cut": 0.05,
-                        "description": "minter",
+                        "description": "creator",
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"
                     },
                     {
                         "cut": 0.025,
-                        "description": "platform",
+                        "description": "find forge",
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0xf8d6e0586b0a20c7, path: /public/findProfileReceiver)"
                     }
                 ]
