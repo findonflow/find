@@ -1868,18 +1868,18 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 	return result
 }
 
-func (otu *OverflowTestUtils) retrieveEvent(events []*OverflowFormatedEvent, eventNames []string) string {
-	string := ""
-	for _, event := range events {
-		for _, eventName := range eventNames {
-			if event.Name == eventName {
-				string = fmt.Sprintf("%s%s", string, event.String())
-			}
-		}
-	}
+// func (otu *OverflowTestUtils) retrieveEvent(events []*OverflowFormatedEvent, eventNames []string) string {
+// 	string := ""
+// 	for _, event := range events {
+// 		for _, eventName := range eventNames {
+// 			if event.Name == eventName {
+// 				string = fmt.Sprintf("%s%s", string, event.String())
+// 			}
+// 		}
+// 	}
 
-	return string
-}
+// 	return string
+// }
 
 func (otu *OverflowTestUtils) getIDFromEvent(events []*OverflowFormatedEvent, eventName, field string) []uint64 {
 	Ids := []uint64{}
