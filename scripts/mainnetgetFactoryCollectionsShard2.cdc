@@ -161,8 +161,11 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
     }
 
     pub fun rename(_ name: String) : String {
-        if name == "MintStoreItem.NBA ALL STAR " {
-            return "MintStoreItem"
-        }
-        return name
+
+			let mslength = "MintStoreItem".length
+			
+			if name.length > mslength  && name.slice(from: 0, upTo: mslength) == "MintStoreItem" {
+        return "MintStoreItem"
+      }
+      return name
     }
