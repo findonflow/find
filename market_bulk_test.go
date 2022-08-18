@@ -72,42 +72,43 @@ func TestBulkMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("buyMultipleNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				AccountArray("user1").
-				UInt64Array(id).
-				UFix64Array(price)).
-			Test(otu.T).AssertSuccess()
+		otu.O.Tx("buyMultipleNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithAddresses("users", "user1"),
+			WithArg("ids", []uint64{id}),
+			WithArg("amounts", `[10.0]`),
+		).
+			AssertSuccess(t)
 
-		result := otu.O.TransactionFromFile("buyMultipleNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				AccountArray("user1").
-				UInt64Array(id2).
-				UFix64Array(price)).
-			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(700)
+		result := otu.O.Tx("buyMultipleNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithAddresses("users", "user1"),
+			WithArg("ids", []uint64{id2}),
+			WithArg("amounts", `[10.0]`),
+		).
+			AssertSuccess(t).
+			AssertComputationLessThenOrEqual(t, 700)
 
-		result.Result.Print(WithMeter(), WithoutEvents())
+		result.Print(WithMeter(), WithoutEvents())
 
 	})
 
 	// Max is 15 for now
 	t.Run("Should be able to list multiple dandy for sale and buy it", func(t *testing.T) {
-		result := otu.O.TransactionFromFile("buyMultipleNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				AccountArray("user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1").
-				UInt64Array(id3, id4, id5, id6, id7, id8, id9, id10, id11, id12).
-				UFix64Array(price, price, price, price, price, price, price, price, price, price)).
-			Test(otu.T).AssertSuccess().
-			AssertComputationLessThenOrEqual(2100)
 
-		result.Result.Print(WithMeter(), WithoutEvents())
+		result := otu.O.Tx("buyMultipleNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithAddresses("users", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1"),
+			WithArg("ids", []uint64{id3, id4, id5, id6, id7, id8, id9, id10, id11, id12}),
+			WithArg("amounts", `[10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]`),
+		).
+			AssertSuccess(t).
+			AssertComputationLessThenOrEqual(t, 2100)
+
+		result.Print(WithMeter(), WithoutEvents())
 
 	})
 

@@ -814,14 +814,14 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 
 func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
 
-	otu.O.Tx("increaseBidMarketAuctionEscrowed",
+	otu.O.Tx("increaseBidMarketAuctionSoft",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+		AssertEvent(otu.T, "FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
 			"amount": totalPrice,
 			"id":     id,
 			"buyer":  otu.O.Address(name),
@@ -1026,7 +1026,6 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, s
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"amount": price,
-			"id":     id,
 			"buyer":  otu.O.Address(name),
 		}).
 		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", "id")
@@ -1142,7 +1141,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 			"seller": otu.O.Address(name),
 			"buyer":  otu.O.Address(buyer),
 			"amount": price,
-			"status": "sold",
+			"status": "active_accepted",
 		})
 
 	return otu
@@ -2233,8 +2232,11 @@ func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, selle
 
 	res := otu.O.Tx("bidMarketDirectOfferSoft",
 		WithSigner(name),
-		WithArg("dapperAddress", "account"),
-		WithArg("leaseName", name),
+		WithArg("marketplace", "account"),
+		WithArg("user", seller),
+		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2285,7 +2287,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller 
 
 func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("acceptLeaseDirectOfferSoftDUC",
+	otu.O.Tx("fulfillMarketDirectOfferSoftDUC",
 		WithSigner(name),
 		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
