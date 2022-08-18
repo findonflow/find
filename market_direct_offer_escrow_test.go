@@ -664,6 +664,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", saleItem[0], "user2", price)
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 
+		otu.sendExampleNFT("user1", "user2")
+
 	})
 
 	t.Run("Should be able to direct offer and fulfill multiple NFT in one go", func(t *testing.T) {
@@ -847,6 +849,32 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			overflow.WithArg("validUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
 
+	})
+
+	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+
+		saleItem := otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price)
+
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		otu.O.Tx("fulfillMarketDirectOfferEscrowed",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("id", saleItem[0]),
+		).
+			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
+
+		otu.O.Tx("cancelMarketDirectOfferEscrowed",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", saleItem[0:1]),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+				"status": "cancel_royalties_changed",
+			})
 	})
 
 }

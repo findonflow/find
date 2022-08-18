@@ -657,6 +657,8 @@ func TestMarketSale(t *testing.T) {
 		otu.buyNFTForMarketSale("user2", "user1", saleItem[0], price).
 			sendExampleNFT("user1", "user2")
 
+		otu.cancelAllNFTForSale("user1")
+
 	})
 
 	t.Run("Should be able to list multiple dandies for sale and buy them in one go", func(t *testing.T) {
@@ -679,6 +681,7 @@ func TestMarketSale(t *testing.T) {
 
 		var itemsForSale []SaleItemInformation
 		err := scriptResult.MarshalPointerAs("/FINDReport/itemsForSale/FindMarketSale/items", &itemsForSale)
+
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
@@ -867,6 +870,38 @@ func TestMarketSale(t *testing.T) {
 			overflow.WithArg("directSellPrice", price),
 			overflow.WithArg("validUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+
+	})
+
+	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+		saleItem := otu.listExampleNFTForSale("user1", 0, price)
+
+		otu.checkRoyalty("user1", 0, "creator", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		otu.checkRoyalty("user1", 0, "cheater", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.99)
+
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", saleItem[0]),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
+
+		otu.O.Tx("delistNFTSale" , 
+			WithSigner("user1") ,
+			WithArg("marketplace" , "account") ,
+			WithArg("ids" , saleItem[0:1]) ,
+
+		). 
+			AssertSuccess(t)
 
 	})
 

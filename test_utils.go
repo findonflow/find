@@ -689,6 +689,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 		RunMarshalAs(&royalty)
 	assert.NoError(otu.T, err)
 	litter.Sdump(royalty)
+
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
 			assert.Equal(otu.T, expectedPlatformRoyalty, item.Cut)
@@ -2159,6 +2160,16 @@ func (otu *OverflowTestUtils) setUUID(uuid uint64) *OverflowTestUtils {
 		Args(otu.O.Arguments().
 			UInt64(uuid)).
 		Test(otu.T).AssertSuccess()
+	return otu
+}
+
+func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64) *OverflowTestUtils {
+
+	otu.O.Tx("testchangeRoyaltyExampleNFT",
+		WithSigner(user),
+		WithArg("id", id),
+	).
+		AssertSuccess(otu.T)
 	return otu
 }
 

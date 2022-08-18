@@ -132,6 +132,10 @@ pub contract FindMarketSale {
 			return self.totalRoyalties
 		}
 
+		pub fun validateRoyalties() : Bool {
+			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
+		}
+
 		pub fun getDisplay() : MetadataViews.Display {
 			return self.pointer.getDisplay()
 		}
@@ -300,18 +304,33 @@ pub contract FindMarketSale {
 				panic(actionResult.message)
 			}
 
+			var status = "cancel"
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(true)
+				if !saleItem.validateRoyalties() {
+					status = "cancel_royalties_changed"
+				}
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,nft: nftInfo, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: status, vaultType: saleItem.vaultType.identifier,nft: nftInfo, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			destroy saleItem
 		}
 
 		pub fun getIds(): [UInt64] {
 			return self.items.keys
+		}
+
+		pub fun getRoyaltyChangedIds(): [UInt64] {
+			let ids : [UInt64] = []
+			for id in self.getIds() {
+				let item = self.borrow(id)
+				if !item.validateRoyalties() {
+					ids.append(id)
+				}
+			}
+			return ids
 		}
 
 		pub fun containsId(_ id: UInt64): Bool {

@@ -224,6 +224,10 @@ pub contract FindMarketAuctionSoft {
 			return self.totalRoyalties
 		}
 
+		pub fun validateRoyalties() : Bool {
+			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
+		}
+
 		pub fun getDisplay() : MetadataViews.Display {
 			return self.pointer.getDisplay()
 		}
@@ -418,7 +422,9 @@ pub contract FindMarketAuctionSoft {
 
 			var status="cancel"
 			if saleItem.checkPointer() {
-				if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+				if !saleItem.validateRoyalties() {
+					status="cancel_royalties_changed"
+				} else if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
 					if saleItem.hasAuctionMetReservePrice() {
 						panic("Cannot cancel finished auction, fulfill it instead")
 					}
@@ -581,6 +587,17 @@ pub contract FindMarketAuctionSoft {
 
 		pub fun getIds(): [UInt64] {
 			return self.items.keys
+		}
+
+		pub fun getRoyaltyChangedIds(): [UInt64] {
+			let ids : [UInt64] = []
+			for id in self.getIds() {
+				let item = self.borrow(id)
+				if !item.validateRoyalties() {
+					ids.append(id)
+				}
+			}
+			return ids
 		}
 
 		pub fun containsId(_ id: UInt64): Bool {
