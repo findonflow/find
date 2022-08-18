@@ -112,21 +112,15 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	})
 
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionEscrow").
-			listNFTForEscrowedAuction("user1", id, price).
+		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
-			destroyDandyCollection("user2").
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
-			sendDandy("user2", "user1", id)
+			sendDandy("user3", "user1", id)
 
-		otu.setUUID(300)
+		otu.setUUID(600)
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user1"),
@@ -141,6 +135,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
 			})
+
+		otu.sendDandy("user1", "user3", id)
 
 	})
 

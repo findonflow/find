@@ -18,7 +18,7 @@ func TestFTRegistry(t *testing.T) {
 	o := otu.O
 	t.Run("Should be able to registry flow token and get it", func(t *testing.T) {
 
-		result, err := o.Script("getFTIfo",
+		result, err := o.Script("getFTInfo",
 			overflow.WithArg("aliasOrIdentifier", "Flow"),
 		).
 			GetAsJson()
@@ -29,7 +29,7 @@ func TestFTRegistry(t *testing.T) {
 
 		otu.AutoGoldRename("Should be able to registry flow token and get it by alias", result)
 
-		result, err = o.Script("getFTIfo",
+		result, err = o.Script("getFTInfo",
 			overflow.WithArg("aliasOrIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault"),
 		).
 			GetAsJson()
@@ -71,7 +71,7 @@ func TestFTRegistry(t *testing.T) {
 			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
 		})
 
-		result, err := o.Script("getFTIfo",
+		result, err := o.Script("getFTInfo",
 			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FiatToken.Vault"),
 		).
 			GetAsJson()
@@ -158,11 +158,11 @@ func TestFTRegistry(t *testing.T) {
 			overflow.WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FlowToken.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
 				"amount": 5.0,
 				"to":     "0x179b6b1cb6755e31",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FlowToken.TokensWithdrawn", map[string]interface{}{
+			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn", map[string]interface{}{
 				"amount": 5.0,
 				"from":   "0xf3fcd2c1a78f5eee",
 			}).
@@ -189,12 +189,12 @@ func TestFTRegistry(t *testing.T) {
 					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				})
 
-		o.Script("getFTIfo",
+		o.Script("getFTInfo",
 			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FUSD.Vault"),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))
 
-		o.Script("getFTIfo",
+		o.Script("getFTInfo",
 			overflow.WithArg("aliasOrIdentifier", "Flow"),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))

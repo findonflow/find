@@ -115,17 +115,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferSoft").
-			destroyDandyCollection("user2").
-			directOfferMarketSoft("user2", "user1", id, price).
+		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			sendDandy("user2", "user1", id)
 
-		otu.setUUID(300)
+		otu.setUUID(600)
 
 		// otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
 		// 	SignProposeAndPayAs("user1").
@@ -141,20 +136,17 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
+
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferSoft").
-			destroyDandyCollection("user2").
-			directOfferMarketSoft("user2", "user1", id, price).
+		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			sendDandy("user2", "user1", id)
 
-		otu.setUUID(300)
+		otu.setUUID(900)
 
 		// otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
 		// 	SignProposeAndPayAs("user2").
@@ -170,6 +162,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
+			otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should be able to increase offer", func(t *testing.T) {
@@ -210,9 +203,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		// 		UFix64(otu.currentTime() + 100.0)).
 		// 	Test(otu.T).AssertFailure("You cannot bid on your own resource")
 
-		bidTx("bidMarketDirectOfferSoft" ,
-		WithSigner("user1") ,
-		WithArg("validUntil", otu.currentTime()+10.0),
+		bidTx("bidMarketDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("validUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "You cannot bid on your own resource")
 
@@ -224,19 +217,19 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			tickClock(200.0)
 
-		// otu.O.TransactionFromFile("acceptDirectOfferSoft").
-		// 	SignProposeAndPayAs("user1").
-		// 	Args(otu.O.Arguments().
-		// 		Account("account").
-		// 		UInt64(id)).
-		// 	Test(otu.T).AssertFailure("This direct offer is already expired")
+			// otu.O.TransactionFromFile("acceptDirectOfferSoft").
+			// 	SignProposeAndPayAs("user1").
+			// 	Args(otu.O.Arguments().
+			// 		Account("account").
+			// 		UInt64(id)).
+			// 	Test(otu.T).AssertFailure("This direct offer is already expired")
 
-			otu.O.Tx("acceptDirectOfferSoft",
+		otu.O.Tx("acceptDirectOfferSoft",
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 		).
-		AssertFailure(t, "This direct offer is already expired")
+			AssertFailure(t, "This direct offer is already expired")
 
 		otu.cancelAllDirectOfferMarketSoft("user1")
 
@@ -259,10 +252,10 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		// 	Test(otu.T).
 		// 	AssertFailure("Tenant has deprected mutation options on this item")
 
-		bidTx("bidMarketDirectOfferSoft" ,
-			WithSigner("user2") ,
-			WithArg("validUntil" , otu.currentTime() + 100.0) ,
-		). 
+		bidTx("bidMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
 		otu.alterMarketOption("DirectOfferSoft", "enable")
@@ -283,12 +276,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		// 	Test(otu.T).
 		// 	AssertFailure("Tenant has deprected mutation options on this item")
 
-		otu.O.Tx("increaseBidMarketDirectOfferSoft" ,
-			WithSigner("user2") ,
-			WithArg("marketplace" , "account") ,
-			WithArg("id" , id) ,
-			WithArg("amount" , price) ,
-		). 
+		otu.O.Tx("increaseBidMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("id", id),
+			WithArg("amount", price),
+		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
 		otu.acceptDirectOfferMarketSoft("user1", id, "user2", price).

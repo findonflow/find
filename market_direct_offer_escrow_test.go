@@ -118,16 +118,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 	})
 
 	t.Run("Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			destroyDandyCollection("user2").
-			directOfferMarketEscrowed("user2", "user1", id, price).
-			sendDandy("user2", "user1", id)
+		otu.directOfferMarketEscrowed("user2", "user1", id, price).
+			sendDandy("user3", "user1", id)
 
-		otu.setUUID(300)
+		otu.setUUID(600)
 
 		otu.O.Tx("cancelMarketDirectOfferEscrowed",
 			WithSigner("user1"),
@@ -136,19 +131,16 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		).
 			AssertSuccess(t)
 
+		otu.sendDandy("user1", "user3", id)
+
 	})
 
 	t.Run("Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			destroyDandyCollection("user2").
-			directOfferMarketEscrowed("user2", "user1", id, price).
-			sendDandy("user2", "user1", id)
+		otu.directOfferMarketEscrowed("user2", "user1", id, price).
+			sendDandy("user3", "user1", id)
 
-		otu.setUUID(300)
+		otu.setUUID(900)
 
 		otu.O.Tx("retractOfferMarketDirectOfferEscrowed",
 			WithSigner("user2"),
@@ -156,6 +148,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
+
+		otu.sendDandy("user1", "user3", id)
 
 	})
 

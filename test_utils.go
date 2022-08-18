@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -555,11 +556,10 @@ func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price f
 
 func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("listLeaseForSale",
+	res := otu.O.Tx("listNFTForSale",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-		WithArg("leaseName", name),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("directSellPrice", price),
@@ -732,10 +732,18 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 		WithArg("nftAliasOrIdentifier", nftAlias),
 		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 	).
-		GetAsInterface()
+		GetAsJson()
+	// fmt.Println(r)
+	// royalty := r.(Royalty)
+	// panic("hi")
 
-	royalty := r.(Royalty)
+	var royalty Royalty
+	err = json.Unmarshal([]byte(r), &royalty)
+	if err != nil {
+		panic(err)
+	}
 
+	// royalty := Royalty{}
 	assert.NoError(otu.T, err)
 	litter.Sdump(royalty)
 	for _, item := range royalty.Items {
@@ -1646,7 +1654,7 @@ func (otu *OverflowTestUtils) removeLeaseTenantRule(optionName, tenantRuleName s
 func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTestUtils {
 
 	otu.O.Tx("setTenantRuleFUSD",
-		WithSigner("user4"),
+		WithSigner("account"),
 		WithArg("optionName", optionName),
 	).
 		AssertSuccess(otu.T)
@@ -1973,7 +1981,7 @@ func (otu *OverflowTestUtils) setDUCLease() *OverflowTestUtils {
 func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price float64) []uint64 {
 
 	res := otu.O.Tx("listNFTForSaleDUC",
-		WithSigner("find"),
+		WithSigner(name),
 		WithArg("dapperAddress", "account"),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),

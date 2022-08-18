@@ -160,12 +160,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			tickClock(200.0)
 
-		otu.O.Tx("bidMarketAuctionSoft" ,
-			WithSigner("user2") ,
-			WithArg("marketplace" , "account") ,
-			WithArg("user" , "user1") ,
-			WithArg("id" ,id) ,
-			WithArg("amount" ,price) ,
+		otu.O.Tx("bidMarketAuctionSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price),
 		).
 			AssertFailure(t, "This auction listing is already expired")
 
@@ -233,16 +233,11 @@ func TestMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Cannot fulfill a not yet ended auction", func(t *testing.T) {
-		otu := NewOverflowTest(t)
 
-		price := 10.0
-		id := otu.setupMarketAndDandy()
-		otu.registerFtInRegistry().
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSoftAuction("user1", id, price).
+		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.setUUID(300)
+		otu.setUUID(600)
 
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
 

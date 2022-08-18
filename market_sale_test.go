@@ -3,7 +3,6 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
@@ -25,7 +24,24 @@ func TestMarketSale(t *testing.T) {
 
 	otu.setUUID(300)
 
+	mintFund := otu.O.TxFN(
+		WithSigner("account"),
+		WithArg("amount", 10000.0),
+		WithArg("recipient", "user2"),
+	)
 	id := otu.mintThreeExampleDandies()[0]
+
+	listingTx := otu.O.TxFN(
+		WithSigner("user1"),
+		WithArg("marketplace", "account"),
+		WithArg("nftAliasOrIdentifier", "Dandy"),
+		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("directSellPrice", 0.0),
+		WithArg("validUntil", otu.currentTime()+100.0),
+	)
+
 	otu.registerFtInRegistry()
 
 	t.Run("Should be able to list a dandy for sale and buy it", func(t *testing.T) {
@@ -66,55 +82,38 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should not be able to list with price $0", func(t *testing.T) {
 
-		otu.O.Tx("listNFTForSale",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("nftAliasOrIdentifier", "Dandy"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+		listingTx("listNFTForSale",
 			WithArg("directSellPrice", 0.0),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Listing price should be greater than 0")
+
 	})
 
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
-		otu.O.Tx("listNFTForSale",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+		listingTx("listNFTForSale",
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 	})
 
-	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
-		otu := NewOverflowTest(t).
-			setupFIND().
-			setupDandy("user1").
-			createUser(100.0, "user2").
-			registerUser("user2").
-			setFlowDandyMarketOption("Sale")
+	t.Run("Should be ableto cancel listing if the pointer is no longer valid", func(t *testing.T) {
 
-		otu.setUUID(300)
+		otu.setUUID(800)
 
-		price := 10.0
-		id := otu.mintThreeExampleDandies()[0]
-		otu.registerFtInRegistry()
 		otu.listNFTForSale("user1", id, price).
-			sendDandy("user2", "user1", id)
+			sendDandy("user3", "user1", id)
 
-		otu.O.TransactionFromFile("delistNFTSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64Array(id)).
-			Test(otu.T).AssertSuccess()
+		otu.O.Tx("delistNFTSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", []uint64{id}),
+		).
+			AssertSuccess(t)
+
+		otu.sendDandy("user1", "user3", id)
 
 	})
 
@@ -136,30 +135,28 @@ func TestMarketSale(t *testing.T) {
 
 		otu.listNFTForSale("user1", id, price)
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("You cannot buy your own listing")
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "You cannot buy your own listing")
 	})
 
 	t.Run("Should not be able to buy expired listing", func(t *testing.T) {
 
 		otu.tickClock(200.0)
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("This sale item listing is already expired")
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "This sale item listing is already expired")
 
 		otu.cancelAllNFTForSale("user1")
 	})
@@ -177,32 +174,24 @@ func TestMarketSale(t *testing.T) {
 
 		otu.listNFTForSale("user1", id, price)
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(id).
-				UFix64(5.0)).
-			Test(otu.T).
-			AssertFailure("Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", 5.0),
+		).
+			AssertFailure(t, "Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
 
 		otu.cancelAllNFTForSale("user1")
 	})
 
 	t.Run("Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(id).
-				String("FUSD").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Nothing matches")
+		listingTx("listNFTForSale",
+			WithArg("ftAliasOrIdentifier", "FUSD"),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).AssertFailure(t, "Nothing matches")
 	})
 
 	t.Run("Should be able cancel all listing", func(t *testing.T) {
@@ -217,10 +206,10 @@ func TestMarketSale(t *testing.T) {
 		scriptResult.AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
 		scriptResult.AssertLengthWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items", 3)
 
-		otu.O.TransactionFromFile("delistAllNFTSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().Account("account")).
-			Test(otu.T).AssertSuccess()
+		otu.O.Tx("delistAllNFTSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+		).AssertSuccess(t)
 		//TODO: assert on events
 
 		scriptResultAfter := otu.O.Script("getStatus", WithArg("user", "user1"))
@@ -239,27 +228,21 @@ func TestMarketSale(t *testing.T) {
 
 		otu.alterMarketOption("Sale", "deprecate")
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[1]).
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Tenant has deprected mutation options on this item")
+		listingTx("listNFTForSale",
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("id", ids[1]),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t)
 
 		otu.alterMarketOption("Sale", "enable")
 
@@ -267,15 +250,20 @@ func TestMarketSale(t *testing.T) {
 
 		otu.alterMarketOption("Sale", "deprecate")
 
-		otu.O.TransactionFromFile("delistNFTSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64Array(ids[1])).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("delistNFTSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", ids[1:1]),
+		).
+			AssertSuccess(t)
 
 		otu.alterMarketOption("Sale", "enable")
+
+		otu.O.Tx("delistAllNFTSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+		).
+			AssertSuccess(t)
 
 	})
 
@@ -291,34 +279,27 @@ func TestMarketSale(t *testing.T) {
 
 		otu.alterMarketOption("Sale", "stop")
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[1]).
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		listingTx("listNFTForSale",
+			WithArg("id", ids[1]),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("delistNFTSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64Array(ids[0])).
-			Test(otu.T).AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("delistNFTSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", []uint64{ids[0]}),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterMarketOption("Sale", "enable")
 		otu.cancelAllNFTForSale("user1")
@@ -335,39 +316,27 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[1]).
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertSuccess()
+		listingTx("listNFTForSale",
+			WithArg("id", ids[1]),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t)
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[0]).
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertSuccess()
+		listingTx("listNFTForSale",
+			WithSigner("user2"),
+			WithArg("id", ids[0]),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
 
 		otu.cancelNFTForSale("user2", ids[0])
 		itemsForSale = otu.getItemsForSale("user2")
@@ -385,37 +354,36 @@ func TestMarketSale(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price)
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          ids[0],
 				"royaltyName": "creator",
 				"tenant":      "find",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "find forge",
 				"tenant":      "find",
-			}))
+			})
 
 	})
 
@@ -425,38 +393,36 @@ func TestMarketSale(t *testing.T) {
 		otu.setFindCut(0.035)
 		otu.listNFTForSale("user1", ids[0], price)
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(ids[0]).
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"id":          ids[0],
 				"royaltyName": "find",
 				"tenant":      "find",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
 				"id":          ids[0],
 				"royaltyName": "creator",
 				"tenant":      "find",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"id":          ids[0],
 				"royaltyName": "find forge",
 				"tenant":      "find",
-			}))
-
+			})
 	})
 
 	/* Honour Banning */
@@ -464,27 +430,23 @@ func TestMarketSale(t *testing.T) {
 
 		otu.listNFTForSale("user1", id, price)
 		otu.profileBan("user1")
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(id).
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Seller banned by Tenant")
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Seller banned by Tenant")
+		listingTx("listNFTForSale",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
+
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
 		otu.cancelNFTForSale("user1", id).
 			removeProfileBan("user1")
@@ -495,15 +457,14 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", id, price)
 		otu.profileBan("user2")
 
-		otu.O.TransactionFromFile("buyNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("user1").
-				UInt64(id).
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Buyer banned by Tenant")
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Buyer banned by Tenant")
 
 		otu.removeProfileBan("user2").
 			cancelNFTForSale("user1", id).
@@ -517,24 +478,22 @@ func TestMarketSale(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[0]).
-				String("FUSD").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		listingTx("listNFTForSale",
+			WithSigner("user3"),
+			WithArg("id", ids[0]),
+			WithArg("ftAliasOrIdentifier", "FUSD"),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
+
 		otu.unlinkProfileWallet("user1")
 
 		otu.O.Tx("buyNFTForSale",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("user", "user3"),
-			overflow.WithArg("id", ids[0]),
-			overflow.WithArg("amount", price),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user3"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t,
@@ -555,24 +514,21 @@ func TestMarketSale(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[0]).
-				String("FUSD").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		listingTx("listNFTForSale",
+			WithSigner("user3"),
+			WithArg("id", ids[0]),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
+
 		otu.removeProfileWallet("user1")
 
 		otu.O.Tx("buyNFTForSale",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("user", "user3"),
-			overflow.WithArg("id", ids[0]),
-			overflow.WithArg("amount", price),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user3"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t,
@@ -593,24 +549,22 @@ func TestMarketSale(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
 
-		otu.O.TransactionFromFile("listNFTForSale").
-			SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				Account("account").
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64(ids[0]).
-				String("FUSD").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		listingTx("listNFTForSale",
+			WithSigner("user3"),
+			WithArg("id", ids[0]),
+			WithArg("ftAliasOrIdentifier", "FUSD"),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
+
 		otu.destroyFUSDVault("user1")
 
 		otu.O.Tx("buyNFTForSale",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("user", "user3"),
-			overflow.WithArg("id", ids[0]),
-			overflow.WithArg("amount", price),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user3"),
+			WithArg("id", ids[0]),
+			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t,
@@ -656,6 +610,7 @@ func TestMarketSale(t *testing.T) {
 
 		otu.buyNFTForMarketSale("user2", "user1", saleItem[0], price).
 			sendExampleNFT("user1", "user2")
+		otu.cancelAllNFTForSale("user1")
 
 	})
 
@@ -663,17 +618,16 @@ func TestMarketSale(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 
-		// list multiple NFT for sale
-		otu.O.TransactionFromFile("listMultipleNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				StringArray("A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64Array(ids[0], ids[1], ids[2]).
-				StringArray("FUSD", "FUSD", "FUSD").
-				UFix64Array(price, price, price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		otu.O.Tx("listMultipleNFTForSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}),
+			WithArg("ids", ids),
+			WithArg("ftAliasOrIdentifiers", []string{"FUSD", "FUSD", "FUSD"}),
+			WithArg("directSellPrices", `[10.0 , 10.0, 10.0]`),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
 
 		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
 
@@ -687,36 +641,36 @@ func TestMarketSale(t *testing.T) {
 
 		seller := "user1"
 		name := "user2"
-		// otu.buyNFTForMarketSale("user2", "user1", id, price)
-		otu.O.TransactionFromFile("buyMultipleNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				AccountArray("user1", "user1", "user1").
-				UInt64Array(ids[0], ids[1], ids[2]).
-				UFix64Array(price, price, price)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+
+		otu.O.Tx("buyMultipleNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithAddresses("users", "user1", "user1", "user1"),
+			WithArg("ids", ids),
+			WithArg("amounts", `[10.0 , 10.0, 10.0]`),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
 				"seller": otu.O.Address(seller),
 				"buyer":  otu.O.Address(name),
 				"status": "sold",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
 				"seller": otu.O.Address(seller),
 				"buyer":  otu.O.Address(name),
 				"status": "sold",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
 				"seller": otu.O.Address(seller),
 				"buyer":  otu.O.Address(name),
 				"status": "sold",
-			}))
+			})
 
 	})
 
@@ -724,18 +678,12 @@ func TestMarketSale(t *testing.T) {
 
 		number := 15
 
-		otu.O.TransactionFromFile("testMintFusd").
-			SignProposeAndPayAsService().
-			Args(otu.O.Arguments().
-				Account("user2").
-				UFix64(1000.0)).
-			Test(otu.T).
-			AssertSuccess()
+		mintFund("testMintFusd").AssertSuccess(t)
 
 		ids := otu.mintThreeExampleDandies()
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}
 		fusd := []string{"FUSD", "FUSD", "FUSD"}
-		prices := []float64{price, price, price}
+		prices := "[ 15.0, 15.0, 15.0 "
 
 		for len(ids) < number {
 			id := otu.mintThreeExampleDandies()
@@ -747,21 +695,22 @@ func TestMarketSale(t *testing.T) {
 		for len(dandy) < number {
 			dandy = append(dandy, dandy[0])
 			fusd = append(fusd, fusd[0])
-			prices = append(prices, prices[0])
+			prices = prices + ", 15.0"
 		}
+		prices = prices + "]"
 
 		// list multiple NFT for sale
-		//1024 for 1 buy, 634 each increment, max 15 items
-		otu.O.TransactionFromFile("listMultipleNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				StringArray(dandy...).
-				UInt64Array(ids...).
-				StringArray(fusd...).
-				UFix64Array(prices...).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+
+		otu.O.Tx("listMultipleNFTForSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifiers", dandy),
+			WithArg("ids", ids),
+			WithArg("ftAliasOrIdentifiers", fusd),
+			WithArg("directSellPrices", prices),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
 
 		otu.cancelAllNFTForSale("user1")
 
@@ -772,37 +721,36 @@ func TestMarketSale(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}
 		fusd := []string{"FUSD", "FUSD", "FUSD"}
-		prices := []float64{price, price, price}
+		prices := "[ 10.0, 10.0, 10.0 , 10.0, 10.0]"
 		buyers := []string{"user1", "user1", "user1"}
 
 		id := otu.mintThreeExampleDandies()
 		ids = append(ids, id[0], id[1])
 		dandy = append(dandy, []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}...)
 		fusd = append(fusd, []string{"FUSD", "FUSD"}...)
-		prices = append(prices, []float64{price, price}...)
 		buyers = append(buyers, []string{"user1", "user1"}...)
 
 		// list multiple NFT for sale
-		//1024 for 1 buy, 634 each increment, max 15 items
-		otu.O.TransactionFromFile("listMultipleNFTForSale").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				StringArray(dandy...).
-				UInt64Array(ids...).
-				StringArray(fusd...).
-				UFix64Array(prices...).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
 
-		otu.O.TransactionFromFile("buyMultipleNFTForSale").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				AccountArray(buyers...).
-				UInt64Array(ids...).
-				UFix64Array(prices...)).
-			Test(otu.T).AssertSuccess()
+		otu.O.Tx("listMultipleNFTForSale",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifiers", dandy),
+			WithArg("ids", ids),
+			WithArg("ftAliasOrIdentifiers", fusd),
+			WithArg("directSellPrices", prices),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("buyMultipleNFTForSale",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithAddresses("users", buyers...),
+			WithArg("ids", ids),
+			WithArg("amounts", prices),
+		).
+			AssertSuccess(t)
 
 		otu.cancelAllNFTForSale("user1")
 
@@ -810,18 +758,17 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list ExampleNFT for sale and buy it with DUC using MultipleNFT transaction", func(t *testing.T) {
 
-		res := otu.O.TransactionFromFile("listMultipleNFTForSaleDUC").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				Account("account").
-				StringArray("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
-				UInt64Array(0).
-				UFix64Array(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
-
-		saleItemID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
+		saleItemID := otu.O.Tx("listMultipleNFTForSaleDUC",
+			WithSigner("user1"),
+			WithArg("dapperAddress", "account"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
+			WithArg("ids", []uint64{0}),
+			WithArg("directSellPrices", `[10.0]`),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t).
+			GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
 
 		otu.checkRoyalty("user1", 0, "creator", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.01)
 
@@ -829,22 +776,23 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.O.TransactionFromFile("buyMultipleNFTForSaleDUC").
-			SignProposeAndPayAs("user2").PayloadSigner("account").
-			Args(otu.O.Arguments().
-				Account("account").
-				Account("account").
-				StringArray("user1").
-				UInt64Array(saleItemID[0]).
-				UFix64Array(price)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+		otu.O.Tx("buyMultipleNFTForSaleDUC",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("dapperAddress", "account"),
+			WithArg("marketplace", "account"),
+			WithArg("users", `["user1"]`),
+			WithArg("ids", saleItemID[0:1]),
+			WithArg("amounts", `[10.0]`),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"amount": price,
 				"id":     saleItemID[0],
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
 				"status": "sold",
-			}))
+			})
 
 		otu.sendExampleNFT("user1", "user2")
 
@@ -854,19 +802,28 @@ func TestMarketSale(t *testing.T) {
 		otu.sendSoulBoundNFT("user1", "account")
 		// set market rules
 		otu.O.Tx("adminSetSellExampleNFTForFlow",
-			overflow.WithSigner("find"),
-			overflow.WithArg("tenant", "account"),
+			WithSigner("find"),
+			WithArg("tenant", "account"),
 		)
 
 		otu.O.Tx("listNFTForSale",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			overflow.WithArg("id", 1),
-			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-			overflow.WithArg("directSellPrice", price),
-			overflow.WithArg("validUntil", otu.currentTime()+100.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("id", 1),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+
+		listingTx("listNFTForSale",
+			WithSigner("user1"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("id", 1),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		)
 
 	})
 
