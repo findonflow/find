@@ -196,7 +196,7 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 			let item = MetadataCollectionItem(
 				id: nft!.id,
 				name: name,
-				collection: projectName,
+				collection: project,
 				subCollection: subCollection, 
 				media: nft!.display!.thumbnail.uri(),
 				mediaType: "image/png",
