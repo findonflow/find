@@ -936,7 +936,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount": price,
 				"status": "sold",
 			}))
-
+		otu.sendExampleNFT("user1", "user2")
 	})
 
 	t.Run("Should not be able to make offer on soul bound items", func(t *testing.T) {
@@ -957,6 +957,61 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			overflow.WithArg("amount", price),
 			overflow.WithArg("validUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+
+	})
+
+	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+
+		saleItemID := otu.directOfferMarketSoftExampleNFT("user2", "user1", 0, price)
+
+		otu.acceptDirectOfferMarketSoft("user1", saleItemID[0], "user2", price)
+
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		otu.O.Tx("fulfillMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("id", saleItemID[0]),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
+
+		otu.O.Tx("cancelMarketDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", saleItemID[0:1]),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"status": "cancel_royalties_changed",
+			})
+
+	})
+
+	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
+
+		saleItemID := otu.directOfferMarketSoftExampleNFT("user2", "user1", 0, price)
+
+		otu.acceptDirectOfferMarketSoft("user1", saleItemID[0], "user2", price)
+
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		ids, err := otu.O.Script("getRoyaltyChangedIds",
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+		).
+			GetAsJson()
+
+		if err != nil {
+			panic(err)
+		}
+
+		otu.O.Tx("cancelMarketListings",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", ids),
+		).
+			AssertSuccess(t)
 
 	})
 

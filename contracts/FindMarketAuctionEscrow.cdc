@@ -227,6 +227,10 @@ pub contract FindMarketAuctionEscrow {
 			return self.totalRoyalties
 		}
 
+		pub fun validateRoyalties() : Bool {
+			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
+		}
+
 		pub fun getDisplay() : MetadataViews.Display {
 			return self.pointer.getDisplay()
 		}
@@ -431,7 +435,9 @@ pub contract FindMarketAuctionEscrow {
 
 			var status = "cancel_listing"
 			if saleItem.checkPointer() {
-				if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
+				if !saleItem.validateRoyalties() {
+					status="cancel_royalties_changed"
+				} else if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
 					if saleItem.hasAuctionMetReservePrice() {
 						panic("Cannot cancel finished auction, fulfill it instead")
 					}
@@ -442,6 +448,26 @@ pub contract FindMarketAuctionEscrow {
 			}
 			
 			self.internalCancelAuction(saleItem: saleItem, status: status)
+
+		}
+
+		pub fun relist(_ id: UInt64) {
+			let saleItem = self.borrow(id)
+			let pointer= saleItem.pointer
+			let vaultType= saleItem.vaultType
+			let auctionStartPrice= saleItem.auctionStartPrice
+			let auctionReservePrice= saleItem.auctionReservePrice
+			let auctionDuration = saleItem.auctionDuration
+			let auctionExtensionOnLateBid = saleItem.auctionExtensionOnLateBid
+			let minimumBidIncrement = saleItem.auctionMinBidIncrement
+			var auctionValidUntil= saleItem.auctionValidUntil
+			if auctionValidUntil != nil && saleItem.auctionValidUntil! <= Clock.time() {
+				auctionValidUntil = nil
+			}
+			let saleItemExtraField= saleItem.saleItemExtraField
+
+			self.cancel(id)
+			self.listForAuction(pointer: pointer, vaultType: vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
 		}
 
@@ -603,6 +629,17 @@ pub contract FindMarketAuctionEscrow {
 
 		pub fun getIds(): [UInt64] {
 			return self.items.keys
+		}
+		
+		pub fun getRoyaltyChangedIds(): [UInt64] {
+			let ids : [UInt64] = []
+			for id in self.getIds() {
+				let item = self.borrow(id)
+				if !item.validateRoyalties() {
+					ids.append(id)
+				}
+			}
+			return ids
 		}
 
 		pub fun containsId(_ id: UInt64): Bool {

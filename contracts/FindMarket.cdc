@@ -111,11 +111,43 @@ pub contract FindMarket {
 		return item
 	}
 
+	// Get Royalties Changed Items 
+
+	pub fun getRoyaltiesChangedIds(tenant:Address, address: Address) : {String : [UInt64]} {
+		let tenantRef = self.getTenant(tenant)
+		var report : {String : [UInt64]} = {}
+		for type in self.getSaleItemCollectionTypes() {
+			let marketOption = self.getMarketOptionFromType(type)
+
+			let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
+			if let optRef = collectionCap.borrow() {
+				let ids = optRef.getRoyaltyChangedIds() 
+				if ids.length > 0 {
+					report[marketOption] = ids
+				}
+			}
+		}
+		return report
+	}
+
+	pub fun getRoyaltiesChangedItems(tenant:Address, address: Address) : {String : FindMarket.SaleItemCollectionReport} {
+		let tenantRef = self.getTenant(tenant)
+		var report : {String : FindMarket.SaleItemCollectionReport} = {}
+		for type in self.getSaleItemCollectionTypes() {
+			let marketOption = self.getMarketOptionFromType(type)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: nil, getGhost: true, getNFTInfo: true, getRoyaltyChanged: true )
+			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+				report[marketOption] = returnedReport
+			}
+		}
+		return report
+	}
+
 	/* Get Sale Reports and Sale Item */
 	pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
 
 		let tenantRef=self.getTenant(tenant)
-		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo)
+		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo, getRoyaltyChanged: false )
 		if info.items.length > 0 {
 			return info.items[0]
 		}
@@ -127,7 +159,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: nil, getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: nil, getGhost: true, getNFTInfo: getNFTInfo, getRoyaltyChanged: false )
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport
 			}
@@ -140,7 +172,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo, getRoyaltyChanged: false )
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport
 			}
@@ -153,7 +185,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemInformation} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo)
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo, getRoyaltyChanged: false )
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport.items[0]
 			}
@@ -161,7 +193,7 @@ pub contract FindMarket {
 		return report
 	}
 
-	access(contract) fun checkSaleInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, itemId: UInt64?, getGhost: Bool, getNFTInfo: Bool) : FindMarket.SaleItemCollectionReport {
+	access(contract) fun checkSaleInformation(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address, itemId: UInt64?, getGhost: Bool, getNFTInfo: Bool, getRoyaltyChanged: Bool ) : FindMarket.SaleItemCollectionReport {
 		let ghost: [FindMarket.GhostListing] =[]
 		let info: [FindMarket.SaleItemInformation] =[]
 		let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -195,6 +227,11 @@ pub contract FindMarket {
 
 			// check soulBound Items 
 			if item.checkSoulBound() {
+				ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
+				continue
+			}
+
+			if getRoyaltyChanged && !item.validateRoyalties() {
 				ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
 				continue
 			}
@@ -1378,6 +1415,7 @@ pub contract FindMarket {
 
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getIds(): [UInt64]
+		pub fun getRoyaltyChangedIds(): [UInt64]
 		pub fun containsId(_ id: UInt64): Bool
 		access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
 		pub fun getListingType() : Type 
@@ -1449,6 +1487,7 @@ pub contract FindMarket {
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 
 		pub fun getTotalRoyalties() : UFix64 
+		pub fun validateRoyalties() : Bool 
 		pub fun getDisplay() : MetadataViews.Display 
 		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 	}

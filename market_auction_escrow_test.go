@@ -904,4 +904,88 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	})
 
+	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+
+		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
+
+		otu.saleItemListed("user1", "active_listed", price).
+			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0)
+
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		otu.O.Tx("fulfillMarketAuctionEscrowed",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("owner", "user1"),
+			WithArg("id", saleItem[0]),
+		).
+			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
+
+		otu.O.Tx("cancelMarketAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", []uint64{saleItem[0]}),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+				"status": "cancel_royalties_changed",
+			})
+
+	})
+
+	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+
+		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
+
+		otu.saleItemListed("user1", "active_listed", price).
+			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0)
+
+			otu.changeRoyaltyExampleNFT("user1", 0)
+
+			ids, err := otu.O.Script("getRoyaltyChangedIds",
+				WithArg("marketplace", "account"),
+				WithArg("user", "user1"),
+			).
+				GetAsJson()
+	
+			if err != nil {
+				panic(err)
+			}
+	
+			otu.O.Tx("relistMarketListings",
+				WithSigner("user1"),
+				WithArg("marketplace", "account"),
+				WithArg("ids", ids),
+			).
+				AssertSuccess(t)
+
+	})
+
+	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		ids, err := otu.O.Script("getRoyaltyChangedIds",
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+		).
+			GetAsJson()
+
+		if err != nil {
+			panic(err)
+		}
+
+		otu.O.Tx("cancelMarketListings",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", ids),
+		).
+			AssertSuccess(t)
+
+	})
+
+
 }

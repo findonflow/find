@@ -147,6 +147,10 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.totalRoyalties
 		}
 
+		pub fun validateRoyalties() : Bool {
+			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
+		}
+
 		pub fun getDisplay() : MetadataViews.Display {
 			return self.pointer.getDisplay()
 		}
@@ -358,7 +362,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			let status="rejected"
+			var status="rejected"
 			let owner=self.owner!.address
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
@@ -368,6 +372,9 @@ pub contract FindMarketDirectOfferEscrow {
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(true)
+				if !saleItem.validateRoyalties() {
+					status = "cancel_royalties_changed"
+				}
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
@@ -431,6 +438,17 @@ pub contract FindMarketDirectOfferEscrow {
 
 		pub fun getIds(): [UInt64] {
 			return self.items.keys
+		}
+
+		pub fun getRoyaltyChangedIds(): [UInt64] {
+			let ids : [UInt64] = []
+			for id in self.getIds() {
+				let item = self.borrow(id)
+				if !item.validateRoyalties() {
+					ids.append(id)
+				}
+			}
+			return ids
 		}
 
 		pub fun containsId(_ id: UInt64): Bool {
