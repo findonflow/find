@@ -44,11 +44,8 @@ pub struct NFTDetail {
 	pub let thumbnail:String
 	pub let type: String
 	pub var rarity:String?
-	// pub var royalties: [Royalties]
 	pub var editionNumber: UInt64? 
 	pub var totalInEdition: UInt64?
-	pub var scalars : {String: UFix64}
-	pub var tags : {String: String}
 	pub var media : {String: String} //url to mediaType
 	pub var collectionName: String? 
 	pub var collectionDescription: String? 
@@ -57,48 +54,62 @@ pub struct NFTDetail {
 
 	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}, resolvedViews: [Type]){
 
-		let item = pointer.getViewResolver()
-
-		let nftInfo = FindMarket.NFTInfo(item, id:pointer.id, detail: true)
-
-		self.scalars=nftInfo.scalars
-		self.tags=nftInfo.tags
-		self.rarity=nftInfo.rarity
-		self.media={}
-		self.collectionName=nil
-		self.collectionDescription=nil
-
-		if let grouping=MetadataViews.getNFTCollectionDisplay(item) {
-			self.collectionName=grouping.name
-			self.collectionDescription=grouping.description
-		}
-
-		/* Medias */
-		if let medias=MetadataViews.getMedias(item) {
-			for m in medias.items {
-				let url = m.file.uri() 
-				let type = m.mediaType
-				self.media[url] = type
-			}
-		}
-
-		let display = MetadataViews.getDisplay(item) ?? panic("Could not find display")
-		self.name=display.name
-		self.thumbnail=display.thumbnail.uri()
-		self.type=item.getType().identifier
+		self.type=pointer.itemType.identifier
 		self.id=pointer.id
 		self.uuid=pointer.getUUID()
 
-		/* Edition */
-		self.editionNumber=nftInfo.editionNumber
-		self.totalInEdition=nftInfo.totalInEdition
+		// Display 
+		let display = views["Display"] ?? panic("Could not find display")
+		let d = display as! MetadataViews.Display
+		self.name=d.name
+		self.thumbnail=d.thumbnail.uri()
 
-		/* Royalties */
-		// self.royalties=resolveRoyalties(pointer)
+		// Edition
+		self.editionNumber=nil 
+		self.totalInEdition=nil
+		if let editions = views["Editions"] {
+			if let e = editions as? MetadataViews.Editions {
+				if e.infoList.length > 0 {
+					self.editionNumber=e.infoList[0].number
+					self.totalInEdition=e.infoList[0].max
+				}
+			}
+		}
+
+		// subCollection
+		self.collectionName=nil
+		self.collectionDescription=nil
+		if let grouping = views["NFTCollectionDisplay"] {
+			if let sc = grouping as? MetadataViews.NFTCollectionDisplay {
+				self.collectionName=sc.name
+				self.collectionDescription=sc.description
+			}
+		}
+
+		// Medias 
+		self.media={}
+		if let medias= views["Medias"] {
+			if let ms = medias as? MetadataViews.Medias {
+				for m in ms.items {
+					let url = m.file.uri() 
+					let type = m.mediaType
+					self.media[url] = type
+				}
+			}
+		}
+
+		// Rarity 
+		self.rarity=nil
+		if let rarity= views["Rarity"] {
+			if let r = rarity as? MetadataViews.Rarity {
+				self.rarity = r.description
+			}
+		}
 
 		self.views=[]
-		for view in item.getViews() {
-			if ignoreViews().contains(view) {
+
+		for view in pointer.getViews() {
+			if defaultViews().contains(view) {
 				continue
 			}
 			if resolvedViews.contains(view) {
@@ -284,17 +295,162 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 
 	var nftViews: {String : AnyStruct} = {}
 	var resolvedViews: [Type] = []
-	for viewType in views {
-		if let runTimeType = CompositeType(viewType) {
-			if let view = pointer.resolveView(runTimeType) {
-				nftViews[runTimeType.identifier] = view! 
-				resolvedViews.append(runTimeType)
+	let viewResolver = pointer.getViewResolver()
+
+	let defaultViews = defaultViews()
+	for view in views {
+		if let runTimeType = CompositeType(view) {
+			if !defaultViews.contains(runTimeType) {
+				defaultViews.append(runTimeType)
 			}
 		}
 	}
+
+
+	for runTimeType in defaultViews {
+		// Resolve arrayed views to ensure we didn't miss any stuff 
+		if runTimeType == Type<MetadataViews.Editions>() {
+			if let editions = MetadataViews.getEditions(viewResolver) {
+				if let edition = getEdition(viewResolver) {
+					var check = false
+					for item in editions.infoList {
+						if item.name == edition.name && item.number == edition.number && item.max == edition.max {
+							check = true
+							break
+						}
+					}
+					// If the edition does not exist in editions, add it in
+					if !check {
+						let array = editions.infoList 
+						array.append(edition)
+						nftViews["Editions"] = MetadataViews.Editions(array)
+						resolvedViews.append(runTimeType)
+						continue
+					}
+				} 
+				// If edition does not exist OR edition is already in editions , append it to views and continue
+				nftViews["Editions"] = editions
+				resolvedViews.append(runTimeType)
+				continue
+			}
+		}
+
+		if runTimeType == Type<MetadataViews.Edition>() {
+			// If the editions does not exist, check if there is edition, if there is, add it in as editions
+			if nftViews["Editions"] == nil {
+				if let edition = getEdition(viewResolver) {
+					nftViews["Editions"] = MetadataViews.Editions([edition])
+					resolvedViews.append(runTimeType)
+				}
+			} 
+			continue
+		}
+
+		if runTimeType == Type<MetadataViews.Medias>() {
+			if let medias = MetadataViews.getMedias(viewResolver) {
+				if let media = getMedia(viewResolver) {
+					var check = false 
+					let uri = media.file.uri()
+					for item in medias.items {
+						if item.file.uri() == uri {
+							check = true 
+							break
+						}
+						if !check {
+							let array = medias.items
+							array.append(media)
+							nftViews["Medias"] = MetadataViews.Medias(array)
+							resolvedViews.append(runTimeType)
+							continue
+						}
+					}
+				} 
+				nftViews["Medias"] = medias
+				resolvedViews.append(runTimeType)
+				continue
+			}
+		}
+
+		if runTimeType == Type<MetadataViews.Media>() {
+			if nftViews["Medias"] == nil {
+				if let media = getMedia(viewResolver) {
+					nftViews["Medias"] = MetadataViews.Medias([media])
+					resolvedViews.append(runTimeType)
+				}
+			}
+			continue
+		}
+
+		if runTimeType == Type<MetadataViews.Traits>() {
+			if let traits = MetadataViews.getTraits(viewResolver) {
+				if let trait = getTrait(viewResolver) {
+					var check = false 
+					for item in traits.traits {
+						if item.name == trait.name {
+							check = true 
+							break
+						}
+						if !check {
+							let array = traits.traits
+							array.append(trait)
+							nftViews["Traits"] = MetadataViews.Traits(array)
+							resolvedViews.append(runTimeType)
+							continue
+						}
+					}
+				} 
+				nftViews["Traits"] = traits
+				resolvedViews.append(runTimeType)
+				continue
+			}
+		}
+
+		if runTimeType == Type<MetadataViews.Trait>() {
+			if nftViews["Traits"] == nil {
+				if let trait = getTrait(viewResolver) {
+					nftViews["Traits"] = MetadataViews.Traits([trait])
+					resolvedViews.append(runTimeType)
+				}
+			} 
+			continue
+		}
+
+		if let view = pointer.resolveView(runTimeType) {
+			nftViews[runTimeType.identifier.slice(from: "A.1d7e57aa55817448.MetadataViews.".length, upTo: runTimeType.identifier.length)] = view
+			resolvedViews.append(runTimeType)
+		}
+	}
+	
 	return NFTDetail(pointer, views: nftViews, resolvedViews: resolvedViews)
 
 
+}
+
+pub fun getEdition(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Edition? {
+	if let view = viewResolver.resolveView(Type<MetadataViews.Edition>()) {
+		if let v = view as? MetadataViews.Edition {
+			return v
+		}
+	}
+	return nil
+}
+
+pub fun getMedia(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Media? {
+	if let view = viewResolver.resolveView(Type<MetadataViews.Media>()) {
+		if let v = view as? MetadataViews.Media {
+			return v
+		}
+	}
+	return nil
+}
+
+pub fun getTrait(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Trait? {
+	if let view = viewResolver.resolveView(Type<MetadataViews.Trait>()) {
+		if let v = view as? MetadataViews.Trait {
+			return v
+		}
+	}
+	return nil
 }
 
 /* Helper Function */
@@ -353,15 +509,20 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, poi
 	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status , ListingDetails: listingDetails)
 }
 
-pub fun ignoreViews() : [Type] {
+pub fun defaultViews() : [Type] {
 	return [
-	Type<MetadataViews.NFTCollectionDisplay>() , 
-	Type<MetadataViews.Medias>() ,
 	Type<MetadataViews.Display>() ,
-	Type<MetadataViews.Edition>() ,
 	Type<MetadataViews.Editions>() , 
-	Type<MetadataViews.Media>()  
-
+	Type<MetadataViews.Edition>() ,
+	Type<MetadataViews.Serial>() , 
+	Type<MetadataViews.Medias>() ,
+	Type<MetadataViews.Media>() ,
+	Type<MetadataViews.License>() , 
+	Type<MetadataViews.ExternalURL>() , 
+	Type<MetadataViews.NFTCollectionDisplay>() , 
+	Type<MetadataViews.Traits>() , 
+	Type<MetadataViews.Trait>() ,
+	Type<MetadataViews.Rarity>() 
 	]
 }
 
