@@ -877,4 +877,30 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			})
 	})
 
+	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
+
+		otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
+
+		otu.saleItemListed("user1", "active_ongoing", price)
+
+		otu.changeRoyaltyExampleNFT("user1", 0)
+
+		ids, err := otu.O.Script("getRoyaltyChangedIds",
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+		).
+			GetAsJson()
+
+		if err != nil {
+			panic(err)
+		}
+
+		otu.O.Tx("cancelMarketListings",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", ids),
+		).
+			AssertSuccess(t)
+	})
+
 }

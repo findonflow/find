@@ -318,6 +318,22 @@ pub contract FindMarketSale {
 			destroy saleItem
 		}
 
+		pub fun relist(_ id: UInt64) {
+			let saleItem = self.borrow(id)
+
+			let pointer = saleItem.pointer
+			let vaultType= saleItem.vaultType
+			let directSellPrice=saleItem.salePrice
+			var validUntil= saleItem.validUntil
+			if validUntil != nil && saleItem.validUntil! <= Clock.time() {
+				validUntil = nil
+			}
+			let extraField= saleItem.saleItemExtraField
+
+			self.delist(id)
+			self.listForSale(pointer: pointer, vaultType: vaultType, directSellPrice:directSellPrice, validUntil: validUntil, extraField: extraField)
+		}
+
 		pub fun getIds(): [UInt64] {
 			return self.items.keys
 		}

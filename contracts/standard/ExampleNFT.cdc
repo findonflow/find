@@ -76,7 +76,7 @@ pub contract ExampleNFT: NonFungibleToken {
         }
 
         pub fun changeRoyalties() {
-            self.changedRoyalties = true
+            self.changedRoyalties = !self.changedRoyalties
         }
     
         pub fun getViews(): [Type] {

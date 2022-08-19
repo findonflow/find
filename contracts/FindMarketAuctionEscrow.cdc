@@ -451,6 +451,26 @@ pub contract FindMarketAuctionEscrow {
 
 		}
 
+		pub fun relist(_ id: UInt64) {
+			let saleItem = self.borrow(id)
+			let pointer= saleItem.pointer
+			let vaultType= saleItem.vaultType
+			let auctionStartPrice= saleItem.auctionStartPrice
+			let auctionReservePrice= saleItem.auctionReservePrice
+			let auctionDuration = saleItem.auctionDuration
+			let auctionExtensionOnLateBid = saleItem.auctionExtensionOnLateBid
+			let minimumBidIncrement = saleItem.auctionMinBidIncrement
+			var auctionValidUntil= saleItem.auctionValidUntil
+			if auctionValidUntil != nil && saleItem.auctionValidUntil! <= Clock.time() {
+				auctionValidUntil = nil
+			}
+			let saleItemExtraField= saleItem.saleItemExtraField
+
+			self.cancel(id)
+			self.listForAuction(pointer: pointer, vaultType: vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
+
+		}
+
 		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
 
 			let status=status
