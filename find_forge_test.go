@@ -29,34 +29,18 @@ func TestFindForge(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess()
 
-		events := otu.O.TransactionFromFile("testMintExampleNFT").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("user1").
-				String("Bam").
-				String("ExampleNFT").
-				String("This is an ExampleNFT").
-				String("This is an exampleNFT url").
-				String("Example NFT FIND").
-				String("Example NFT external url").
-				String("Example NFT square image").
-				String("Example NFT banner image")).
-			Test(t).
-			AssertSuccess()
-
-		dandyIds := []uint64{}
-		for _, event := range events.Events {
-			if event.Name == "A.f8d6e0586b0a20c7.ExampleNFT.Deposit" {
-				dandyIds = append(dandyIds, event.GetFieldAsUInt64("id"))
-			}
-		}
-
-		// result := otu.O.ScriptFromFile("getCollections").
-		// 	Args(otu.O.Arguments().String("user1")).
-		// 	RunReturnsJsonString()
-
-		// result = otu.replaceID(result, dandyIds)
-		// result = otu.replaceID(result, uuids)
+		otu.O.Tx("testMintExampleNFT",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("artist", "Bam"),
+			overflow.WithArg("nftName", "ExampleNFT"),
+			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
+			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("collectionDescription", "Example NFT FIND"),
+			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
+			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
+			overflow.WithArg("collectionBannerImage", "Example NFT banner image"),
+		).AssertSuccess(t)
 
 		// autogold.Equal(t, result)
 

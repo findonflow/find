@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 )
 
@@ -27,18 +27,30 @@ func TestNameDetailScript(t *testing.T) {
 
 		otu.setUUID(300)
 
-		otu.O.TransactionFromFile("setRelatedAccount").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("dapper").String("user2")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+		// otu.O.TransactionFromFile("setRelatedAccount").
+		// 	SignProposeAndPayAs("user1").
+		// 	Args(otu.O.Arguments().String("dapper").String("user2")).
+		// 	Test(t).AssertSuccess().
+		// 	AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+		// 		"name":    "dapper",
+		// 		"address": "0x179b6b1cb6755e31",
+		// 		"related": "0xf3fcd2c1a78f5eee",
+		// 	}))
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user1"),
+			WithArg("name", "dapper"),
+			WithArg("target", "user2"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
-			}))
+			})
 
 		otu.O.Script("getNameDetails",
-			overflow.WithArg("user", "user1"),
+			WithArg("user", "user1"),
 		).AssertWithPointerWant(t, "/userReport/bids/0",
 			autogold.Want("getNameDetailsBids", map[string]interface{}{
 				"amount": 8, "lease": map[string]interface{}{

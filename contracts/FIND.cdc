@@ -917,7 +917,12 @@ pub contract FIND {
 				let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
 				cbRef.cancel(name)
 				destroy <- self.auctions.remove(key: name)!
+				return 
 			}
+			let owner=lease.owner!.address
+			let ownerName=lease.name
+			emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:ownerName, amount: 0.0, auctionReservePrice: lease.auctionReservePrice!, status: "cancel_listing", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, endsAt: nil, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
+
 		}
 
 		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody

@@ -9,6 +9,12 @@ import (
 func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 	otu := NewOverflowTest(t)
 
+	mintFund := otu.O.TxFN(
+		WithSigner("account"),
+		WithArg("amount", 10000.0),
+		WithArg("recipient", "user2"),
+	)
+
 	otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
 		setFlowLeaseMarketOption("DirectOfferSoft").
@@ -16,29 +22,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		setProfile("user2")
 	price := 10.0
 
-	otu.O.TransactionFromFile("testMintFusd").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().
-			Account("user2").
-			UFix64(1000.0)).
-		Test(otu.T).
-		AssertSuccess()
+	mintFund("testMintFusd").AssertSuccess(t)
 
-	otu.O.TransactionFromFile("testMintFlow").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().
-			Account("user2").
-			UFix64(1000.0)).
-		Test(otu.T).
-		AssertSuccess()
+	mintFund("testMintFlow").AssertSuccess(t)
 
-	otu.O.TransactionFromFile("testMintUsdc").
-		SignProposeAndPayAsService().
-		Args(otu.O.Arguments().
-			Account("user2").
-			UFix64(1000.0)).
-		Test(otu.T).
-		AssertSuccess()
+	mintFund("testMintUsdc").AssertSuccess(t)
 
 	otu.registerUserWithName("user1", "name1").
 		registerUserWithName("user1", "name2").
@@ -105,12 +93,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			moveNameTo("user1", "user2", "name1")
 
-		otu.O.TransactionFromFile("cancelLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				StringArray("name1")).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("cancelLeaseMarketDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseNames", `["name1"]`),
+		).
+			AssertSuccess(t)
 
 		otu.moveNameTo("user2", "user1", "name1")
 	})
@@ -121,12 +108,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			moveNameTo("user1", "user2", "name1")
 
-		otu.O.TransactionFromFile("retractOfferLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1")).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("retractOfferLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertSuccess(t)
 
 		otu.moveNameTo("user2", "user1", "name1")
 
@@ -158,14 +144,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should not be able to offer your own NFT", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("name1").
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertFailure("You cannot bid on your own resource")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "You cannot bid on your own resource")
 
 	})
 
@@ -175,11 +161,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			tickClock(200.0)
 
-		otu.O.TransactionFromFile("acceptLeaseDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("name1")).
-			Test(otu.T).AssertFailure("This direct offer is already expired")
+		otu.O.Tx("acceptLeaseDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertFailure(t, "This direct offer is already expired")
 
 		otu.cancelAllDirectOfferLeaseMarketSoft("user1")
 
@@ -189,15 +175,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "deprecate")
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Tenant has deprected mutation options on this item")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
 	})
@@ -208,13 +193,12 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			alterLeaseMarketOption("DirectOfferSoft", "deprecate")
 
-		otu.O.TransactionFromFile("increaseBidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Tenant has deprected mutation options on this item")
+		otu.O.Tx("increaseBidLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
 		otu.acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			saleLeaseListed("user1", "active_finished", price).
@@ -240,15 +224,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "stop")
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
 	})
@@ -259,20 +242,18 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			alterLeaseMarketOption("DirectOfferSoft", "stop")
 
-		otu.O.TransactionFromFile("increaseBidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("increaseBidLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.O.TransactionFromFile("acceptLeaseDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("name1")).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("acceptLeaseDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
@@ -286,23 +267,23 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_finished", price).
 			alterLeaseMarketOption("DirectOfferSoft", "stop")
 
-		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 			/* Reset */
 		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
-		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).
-			AssertSuccess()
+
+		otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t)
+
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)
 
@@ -314,12 +295,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			alterLeaseMarketOption("DirectOfferSoft", "stop")
 
-		otu.O.TransactionFromFile("cancelLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				StringArray("name1")).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("cancelLeaseMarketDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseNames", `["name1"]`),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
@@ -354,27 +334,25 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			alterLeaseMarketOption("DirectOfferSoft", "deprecate")
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				String("name1").
-				String("Flow").
-				UFix64(price + 10.0).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Tenant has deprected mutation options on this item")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user3"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price+10.0),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "stop")
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				String("name1").
-				String("Flow").
-				UFix64(price + 10.0).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user3"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price+10.0),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
@@ -387,11 +365,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "stop")
 
-		otu.O.TransactionFromFile("retractOfferLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1")).
-			Test(otu.T).AssertFailure("Tenant has stopped this item")
+		otu.O.Tx("retractOfferLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterLeaseMarketOption("DirectOfferSoft", "deprecate").
 			retractOfferDirectOfferLeaseSoft("user2", "user1", "name1")
@@ -414,26 +392,27 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price)
 
-		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+		otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
-			}))
+			})
+
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)
 
@@ -448,26 +427,26 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			setFindLeaseCut(0.035)
 
-		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+		otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("account"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("find"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
 				"tenant":      "findLease",
-			}))
+			})
 
 		otu.moveNameTo("user2", "user1", "name1").
 			sendFT("user1", "user2", "Flow", price)
@@ -481,40 +460,33 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			leaseProfileBan("user1")
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name3").
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Seller banned by Tenant")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name3"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
-		// Should not be able to accept offer
-		otu.O.TransactionFromFile("acceptLeaseDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("name2")).
-			Test(otu.T).
-			AssertFailure("Seller banned by Tenant")
+		otu.O.Tx("acceptLeaseDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name2"),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
-		// Should not be able to fulfill offer
-		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Seller banned by Tenant")
+		otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
-		//Should be able to cancel(reject) offer
-		otu.O.TransactionFromFile("cancelLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				StringArray("name2")).
-			Test(otu.T).
-			AssertSuccess()
+		otu.O.Tx("cancelLeaseMarketDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseNames", `["name2"]`),
+		).
+			AssertSuccess(t)
 
 		otu.removeLeaseProfileBan("user1").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
@@ -528,32 +500,27 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			leaseProfileBan("user2")
 
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name3").
-				String("Flow").
-				UFix64(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).
-			AssertFailure("Buyer banned by Tenant")
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name3"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertFailure(t, "Buyer banned by Tenant")
 
-		// Should not be able to accept offer
-		otu.O.TransactionFromFile("acceptLeaseDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("name2")).
-			Test(otu.T).
-			AssertFailure("Buyer banned by Tenant")
+		otu.O.Tx("acceptLeaseDirectOfferSoft",
+			WithSigner("user1"),
+			WithArg("leaseName", "name2"),
+		).
+			AssertFailure(t, "Buyer banned by Tenant")
 
-		// Should not be able to fulfill offer
-		otu.O.TransactionFromFile("fulfillLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("name1").
-				UFix64(price)).
-			Test(otu.T).
-			AssertFailure("Buyer banned by Tenant")
+		otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Buyer banned by Tenant")
 
 		//Should be able to retract offer
 		otu.retractOfferDirectOfferLeaseSoft("user2", "user1", "name2")
@@ -570,21 +537,22 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		otu.saleLeaseListed("user1", "active_ongoing", price)
 
 		newPrice := 11.0
-		otu.O.TransactionFromFile("bidLeaseMarketDirectOfferSoft").
-			SignProposeAndPayAs("user3").
-			Args(otu.O.Arguments().
-				String("name1").
-				String("Flow").
-				UFix64(newPrice).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+
+		otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+			WithSigner("user3"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", newPrice),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount":        newPrice,
 				"leaseName":     "name1",
 				"buyer":         otu.O.Address("user3"),
 				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_offered",
-			}))
+			})
 
 		otu.sendFT("user1", "user2", "Flow", price)
 

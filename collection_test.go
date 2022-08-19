@@ -27,20 +27,19 @@ func TestCollectionScripts(t *testing.T) {
 
 		otu.setUUID(500)
 
-		otu.O.TransactionFromFile("testMintDandyTO").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("user1").
-				UInt64(1).
-				String("Neo").
-				String("Neo Motorcycle").
-				String(`Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`).
-				String("https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp").
-				String("rare").
-				UFix64(50.0).
-				Account("user1")).
-			Test(t).
-			AssertSuccess()
+		otu.O.Tx("testMintDandyTO",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("maxEdition", 1),
+			overflow.WithArg("artist", "Neo"),
+			overflow.WithArg("nftName", "Motorcycle"),
+			overflow.WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
+			overflow.WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+			overflow.WithArg("rarity", "rare"),
+			overflow.WithArg("rarityNum", 50.0),
+			overflow.WithArg("to", "user1"),
+		).
+			AssertSuccess(t)
 
 		otu.registerDandyInNFTRegistry()
 

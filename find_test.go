@@ -1,12 +1,10 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	"github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
-	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -37,32 +35,29 @@ func TestFIND(t *testing.T) {
 	})
 
 	t.Run("Should get error if you try to register a name and dont have enough money", func(t *testing.T) {
-
-		otu.O.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("usr").UFix64(500.0)).
-			Test(t).
-			AssertFailure("Amount withdrawn must be less than or equal than the balance of the Vault")
+		otu.O.Tx("register",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "usr"),
+			overflow.WithArg("amount", 500.0),
+		).AssertFailure(t, "Amount withdrawn must be less than or equal than the balance of the Vault")
 
 	})
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("ur").UFix64(5.0)).
-			Test(t).
-			AssertFailure("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
-
+		otu.O.Tx("register",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "ur"),
+			overflow.WithArg("amount", 5.0),
+		).AssertFailure(t, "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 	})
 
 	t.Run("Should get error if you try to register a name that is already claimed", func(t *testing.T) {
-
-		otu.O.TransactionFromFile("register").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1").UFix64(5.0)).
-			Test(t).
-			AssertFailure("Name already registered")
+		otu.O.Tx("register",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("amount", 5.0),
+		).AssertFailure(t, "Name already registered")
 
 	})
 
@@ -70,7 +65,7 @@ func TestFIND(t *testing.T) {
 
 		otu.expireLease().tickClock(2.0)
 
-		otu.O.Transaction(`
+		otu.O.Tx(`
 			import FIND from "../contracts/FIND.cdc"
 
 			transaction(name: String) {
@@ -85,12 +80,11 @@ func TestFIND(t *testing.T) {
 							}
 			    }
 			}
-			`).
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1")).
-			Test(t).
-			AssertFailure("locked").
-			AssertComputationLessThenOrEqual(1000)
+			`,
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+		).AssertFailure(t, "locked").
+			AssertComputationLessThenOrEqual(t, 1000)
 
 		otu.expireLease()
 		otu.registerUser("user1")
@@ -106,8 +100,10 @@ func TestFIND(t *testing.T) {
 		otu.expireLease().
 			tickClock(2.0)
 
-		value := otu.O.ScriptFromFile("getNameStatus").Args(otu.O.Arguments().String("user1")).RunReturnsInterface()
-		assert.Equal(t, nil, value)
+		otu.O.Script("getNameStatus",
+			overflow.WithArg("name", "user1"),
+		).
+			AssertWant(t, autogold.Want("getNameStatus n", nil))
 
 	})
 
@@ -115,40 +111,42 @@ func TestFIND(t *testing.T) {
 
 		otu.createUser(10.0, "find")
 
-		otu.O.TransactionFromFile("adminRegisterName").
-			SignProposeAndPayAs("find").
-			Args(otu.O.Arguments().StringArray("find-admin").Account("find")).
-			Test(otu.T).
-			AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+		otu.O.Tx("adminRegisterName",
+			overflow.WithSigner("find"),
+			overflow.WithArg("names", `["find-admin"]`),
+			overflow.WithArg("user", "find"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
 				"name": "find-admin",
-			}))
+			})
 
 	})
 
-	otu = NewOverflowTest(t).
-		setupFIND().
-		createUser(100.0, "user1").
-		registerUser("user1").
+	otu.renewUserWithName("user1", "user1").
 		createUser(100.0, "user2").
 		registerUser("user2")
 
 	t.Run("Should be able to send lease to another name", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("moveNameTO").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("user1").String("user2")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
+		otu.O.Tx("moveNameTO",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("receiver", "user2"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
 				"name": "user1",
-			}))
+			})
+
 	})
 
-	t.Run("Should automatically set Find Name to empty if sender have none", func(t *testing.T) {
+	t.Run("Should automaticall set Find ame to empty if sender have none", func(t *testing.T) {
 
-		value := otu.O.ScriptFromFile("getName").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-		fmt.Println(value)
-		assert.Equal(t, "", value)
+		otu.O.Script("getName",
+			overflow.WithArg("address", "user1"),
+		).
+			AssertWant(t, autogold.Want("getName empty", nil))
 
 		otu.moveNameTo("user2", "user1", "user1")
 
@@ -159,72 +157,81 @@ func TestFIND(t *testing.T) {
 		otu.registerUserWithName("user1", "name1").
 			moveNameTo("user1", "user2", "user1")
 
-		value := otu.O.ScriptFromFile("getName").Args(otu.O.Arguments().Account("user1")).RunReturnsJsonString()
-		fmt.Println(value)
-		assert.Equal(t, `"name1"`, value)
+		otu.O.Script("getName",
+			overflow.WithArg("address", "user1"),
+		).
+			AssertWant(t, autogold.Want("getName empty", "name1"))
 
 		otu.moveNameTo("user2", "user1", "user1")
 
 	})
 
-	otu = NewOverflowTest(t).
-		setupFIND().
-		createUser(100.0, "user1").
-		registerUser("user1").
-		createUser(100.0, "user2").
-		registerUser("user2").
-		setProfile("user2")
+	otu.setProfile("user2")
 
 	t.Run("Should be able to register related account and remove it", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("setRelatedAccount").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("dapper").String("user2")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+		otu.O.Tx("setRelatedAccount",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "dapper"),
+			overflow.WithArg("target", "user2"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
-			}))
+			})
 
-		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		fmt.Println(value)
-		assert.Contains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).
+			AssertWithPointerWant(t, "/FINDReport/relatedAccounts",
+				autogold.Want("getStatus Dapper", map[string]interface{}{"dapper": "0xf3fcd2c1a78f5eee"}))
 
-		otu.O.TransactionFromFile("removeRelatedAccount").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().String("dapper")).
-			Test(t).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
+		otu.O.Tx("removeRelatedAccount",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "dapper"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
-			}))
+			})
 
-		value = otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		assert.NotContains(t, value, `"dapper": "0xf3fcd2c1a78f5eee"`)
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).
+			AssertWithPointerError(t, "/FINDReport/relatedAccounts",
+				"Object has no key 'relatedAccounts'")
 
 	})
 
 	t.Run("Should be able to set private mode", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("setPrivateMode").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().Boolean(true)).
-			Test(t).AssertSuccess()
+		otu.O.Tx("setPrivateMode",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("mode", true),
+		).AssertSuccess(t)
 
-		value := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).
+			AssertWithPointerWant(t, "/FINDReport/privateMode",
+				autogold.Want("privatemode true", true),
+			)
 
-		assert.Contains(t, value, `"privateMode": true`)
+		otu.O.Tx("setPrivateMode",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("mode", false),
+		).AssertSuccess(t)
 
-		otu.O.TransactionFromFile("setPrivateMode").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().Boolean(false)).
-			Test(t).AssertSuccess()
-
-		//TEST: fix this later, to brittle
-		value = otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-		assert.Contains(t, value, `"privateMode": false`)
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).
+			AssertWithPointerWant(t, "/FINDReport/privateMode",
+				autogold.Want("privatemode false", false),
+			)
 
 	})
 
@@ -232,7 +239,7 @@ func TestFIND(t *testing.T) {
 
 		nameAddress := otu.O.Address("user3")
 		otu.O.Script("getStatus",
-			WithArg("user", nameAddress),
+			overflow.WithArg("user", nameAddress),
 		).AssertWithPointerWant(t,
 			"/FINDReport",
 			autogold.Want("getStatus", map[string]interface{}{"privateMode": false}),
@@ -244,154 +251,115 @@ func TestFIND(t *testing.T) {
 		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
 		otu.O.Script("getStatus",
-			WithArg("user", nameAddress),
+			overflow.WithArg("user", nameAddress),
 		).AssertWithPointerError(t,
 			"/FINDReport/profile/findName",
 			"Object has no key 'findName'",
 		)
 	})
 
-	//TODO: fix this test
 	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
 
-		otu = NewOverflowTest(t).
-			setupFIND().
-			createUser(30.0, "user1").
-			registerUser("user1").
-			createUser(30.0, "user2").
-			registerUser("user2")
+		otu.O.Tx("editProfile",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("description", "This is description"),
+			overflow.WithArg("avatar", "This is avatar"),
+			overflow.WithArg("tags", `["This is tag"]`),
+			overflow.WithArg("allowStoringFollowers", true),
+			overflow.WithArg("linkTitles", map[string]string{"CryptoTwitter": "0xBjartek", "FindTwitter": "find"}),
+			overflow.WithArg("linkTypes", map[string]string{"CryptoTwitter": "Twitter", "FindTwitter": "Twitter"}),
+			overflow.WithArg("linkUrls", map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}),
+			overflow.WithArg("removeLinks", "[]"),
+		).
+			AssertSuccess(t)
 
-		otu.O.TransactionFromFile("editProfile").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("user1").
-				String("This is description").
-				String("This is avatar").
-				StringArray("This is tag").
-				Boolean(true).
-				StringMap(map[string]string{"CryptoTwitter": "0xBjartek", "FindTwitter": "find"}).
-				StringMap(map[string]string{"CryptoTwitter": "Twitter", "FindTwitter": "Twitter"}).
-				StringMap(map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}).
-				StringArray()).
-			Test(t).
-			AssertSuccess()
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).AssertWithPointerWant(t,
+			"/FINDReport/profile/links/FindTwitter",
+			autogold.Want("getStatus Find twitter", map[string]interface{}{
+				"title": "find",
+				"type":  "Twitter",
+				"url":   "https://twitter.com/findonflow",
+			}),
+		)
 
-			//TODO: do not assert with autogold here
-			//	otu.AutoGold("first_edit", result.Events)
+		otu.O.Tx("editProfile",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("description", "This is description"),
+			overflow.WithArg("avatar", "This is avatar"),
+			overflow.WithArg("tags", `["This is tag"]`),
+			overflow.WithArg("allowStoringFollowers", true),
+			overflow.WithArg("linkTitles", "{}"),
+			overflow.WithArg("linkTypes", "{}"),
+			overflow.WithArg("linkUrls", "{}"),
+			overflow.WithArg("removeLinks", `["FindTwitter"]`),
+		).
+			AssertSuccess(t)
 
-			/*
-				profile := otu.O.ScriptFromFile("getProfile").
-					Args(otu.O.Arguments().
-						String("user1")).
-					RunReturnsJsonString()
-			*/
+		otu.O.Script("getStatus",
+			overflow.WithArg("user", "user1"),
+		).AssertWithPointerError(t,
+			"/FINDReport/profile/links/FindTwitter",
+			"Object has no key 'FindTwitter'",
+		)
 
-			//TOOD: do not use autogold here
-		//otu.AutoGold("full_links", profile)
-
-		// Remove find links
-		otu.O.TransactionFromFile("editProfile").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				String("user1").
-				String("This is description").
-				String("This is avatar").
-				StringArray("This is tag").
-				Boolean(true).
-				StringMap(map[string]string{}).
-				StringMap(map[string]string{}).
-				StringMap(map[string]string{}).
-				StringArray("FindTwitter")).
-			Test(t).
-			AssertSuccess()
-
-		//otu.AutoGold("second_edit", result2.Events)
-
-		//profile = otu.O.ScriptFromFile("getProfile").Args(otu.O.Arguments().String("user1")).RunReturnsJsonString()
-
-		//TODO: we cannot do autogold here
-		//	otu.AutoGold("link_removed", profile)
 	})
 
 	t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
 
 		user := "user1"
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, user).
-			createUser(100.0, "user2").
-			setProfile(user).
-			setProfile("user2").
-			registerUser(user).
-			registerUser("user2")
 
-		otu.O.TransactionFromFile("buyAddon").
-			SignProposeAndPayAs(user).
-			Args(otu.O.Arguments().
-				String(user).
-				String("forge").
-				UFix64(50.0)).
-			Test(otu.T).
-			AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FIND.AddonActivated", map[string]interface{}{
-				"name":  user,
-				"addon": "forge",
-			}))
+		otu.buyForge(user)
 
 		/* Should not be able to buy addons with wrong balance */
-		otu.O.TransactionFromFile("buyAddon").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("user2").
-				String("forge").
-				UFix64(10.0)).
-			Test(otu.T).
-			AssertFailure("Expect 50.00000000 FUSD for forge addon")
+		otu.O.Tx("buyAddon",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "name1"),
+			overflow.WithArg("addon", "forge"),
+			overflow.WithArg("amount", 10.0),
+		).
+			AssertFailure(t, "Expect 50.00000000 FUSD for forge addon")
 
 		/* Should not be able to buy addons that does not exist */
-		otu.O.TransactionFromFile("buyAddon").
-			SignProposeAndPayAs(user).
-			Args(otu.O.Arguments().
-				String(user).
-				String("A.f8d6e0586b0a20c7.Dandy.NFT").
-				UFix64(10.0)).
-			Test(otu.T).
-			AssertFailure("This addon is not available.")
+		otu.O.Tx("buyAddon",
+			overflow.WithSigner(user),
+			overflow.WithArg("name", user),
+			overflow.WithArg("addon", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			overflow.WithArg("amount", 10.0),
+		).
+			AssertFailure(t, "This addon is not available.")
 
 	})
 
 	t.Run("Should be able to fund users with profile but without find name", func(t *testing.T) {
 
 		user := "user1"
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, user).
-			createUser(100.0, "user2").
-			setProfile(user).
-			setProfile("user2").
-			registerUser(user).
-			registerFtInRegistry()
+		otu.registerFtInRegistry().
+			createUser(1000, "user3")
 
-		user2 := otu.O.Address("user2")
+		user3 := otu.O.Address("user3")
 
 		otu.O.Tx("sendFT",
-			WithSigner(user),
-			WithArg("name", user2),
-			WithArg("amount", 10.0),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("tag", `""`),
-			WithArg("message", `""`),
+			overflow.WithSigner(user),
+			overflow.WithArg("name", user3),
+			overflow.WithArg("amount", 10.0),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("tag", `""`),
+			overflow.WithArg("message", `""`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
 
 		otu.O.Tx("sendFT",
-			WithSigner("user2"),
-			WithArg("name", user),
-			WithArg("amount", 10.0),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("tag", `""`),
-			WithArg("message", `""`),
+			overflow.WithSigner("user3"),
+			overflow.WithArg("name", user),
+			overflow.WithArg("amount", 10.0),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("tag", `""`),
+			overflow.WithArg("message", `""`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
@@ -401,36 +369,28 @@ func TestFIND(t *testing.T) {
 	t.Run("Should be able to fund users without profile wallet, but with vault proper set up", func(t *testing.T) {
 
 		user := "user1"
-		otu := NewOverflowTest(t).
-			setupFIND().
-			createUser(100.0, user).
-			createUser(100.0, "user2").
-			setProfile(user).
-			setProfile("user2").
-			registerUser(user).
-			registerFtInRegistry()
 
-		user2 := otu.O.Address("user2")
-		otu.removeProfileWallet("user2")
+		user3 := otu.O.Address("user3")
+		otu.removeProfileWallet("user3")
 
 		otu.O.Tx("sendFT",
-			WithSigner(user),
-			WithArg("name", user2),
-			WithArg("amount", 10.0),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("tag", `""`),
-			WithArg("message", `""`),
+			overflow.WithSigner(user),
+			overflow.WithArg("name", user3),
+			overflow.WithArg("amount", 10.0),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("tag", `""`),
+			overflow.WithArg("message", `""`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
 
 		otu.O.Tx("sendFT",
-			WithSigner("user2"),
-			WithArg("name", user),
-			WithArg("amount", 10.0),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("tag", `""`),
-			WithArg("message", `""`),
+			overflow.WithSigner("user3"),
+			overflow.WithArg("name", user),
+			overflow.WithArg("amount", 10.0),
+			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
+			overflow.WithArg("tag", `""`),
+			overflow.WithArg("message", `""`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
