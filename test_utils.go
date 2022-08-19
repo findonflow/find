@@ -733,9 +733,10 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 	).
 		GetAsJson()
-	// fmt.Println(r)
-	// royalty := r.(Royalty)
-	// panic("hi")
+
+	if err != nil {
+		panic(err)
+	}
 
 	var royalty Royalty
 	err = json.Unmarshal([]byte(r), &royalty)
