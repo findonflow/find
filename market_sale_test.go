@@ -594,6 +594,8 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
+		otu.getNFTForMarketSale("user1", saleItemID[0], price)
+
 		otu.buyNFTForMarketSaleDUC("user2", "user1", saleItemID[0], price).
 			sendExampleNFT("user1", "user2")
 
@@ -896,7 +898,7 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0)
-		
+
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),

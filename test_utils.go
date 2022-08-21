@@ -2012,6 +2012,28 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 
 }
 
+func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, price float64) *OverflowTestUtils {
+
+	result, err := otu.O.Script("getMetadataForSaleItem",
+		WithArg("merchantAddress", "account"),
+		WithArg("marketplace", "account"),
+		WithArg("address", seller),
+		WithArg("id", id),
+		WithArg("amount", price),
+	).GetAsJson()
+
+	assert.NoError(otu.T, err)
+	assert.JSONEq(otu.T, `	{
+        	            	    "amount": 10,
+        	            	    "description": "For testing listing in DUC",
+        	            	    "id": 103,
+        	            	    "imageURL": "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
+        	            	    "name": "DUCExampleNFT"
+        	            	}`, result)
+
+	return otu
+
+}
 func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("buyNFTForSaleDUC",
