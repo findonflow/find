@@ -188,22 +188,23 @@
         }
     },
     "nftDetail": {
-        "collectionDescription": "Neo Collectibles FIND",
-        "collectionName": "user1",
+        "collection": {
+            "bannerImage": {
+                "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1": "image"
+            },
+            "description": "Neo Collectibles FIND",
+            "externalURL": "https://neomotorcycles.co.uk/index.html",
+            "name": "user1",
+            "socials": {
+                "Discord": "discord.gg/",
+                "Twitter": "https://twitter.com/home"
+            },
+            "squareImage": {
+                "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image"
+            }
+        },
         "data": {
-            "A.f8d6e0586b0a20c7.FindViews.CreativeWork": {
-                "artist": "Neo",
-                "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
-                "name": "Neo Motorcycle",
-                "type": "image"
-            },
-            "A.f8d6e0586b0a20c7.FindViews.Nounce": {
-                "nounce": 1
-            },
-            "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": {
-                "url": "https://find.xyz/collection/user1/dandy/ID1"
-            },
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties": {
+            "Royalties": {
                 "cutInfos": [
                     {
                         "cut": 0.05,
@@ -217,43 +218,51 @@
                     }
                 ]
             },
-            "A.f8d6e0586b0a20c7.MetadataViews.Traits": {
-                "traits": [
-                    {
-                        "displayType": "String",
-                        "name": "NeoMotorCycleTag",
-                        "value": "Tag1"
-                    },
-                    {
-                        "displayType": "Numeric",
-                        "name": "Speed",
-                        "value": 100
-                    },
-                    {
-                        "displayType": "Date",
-                        "name": "Birthday",
-                        "value": 1660145023
-                    }
-                ]
+            "ce": {
+                "nounce": 1
+            },
+            "tiveWork": {
+                "artist": "Neo",
+                "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+                "name": "Neo Motorcycle",
+                "type": "image"
             }
         },
-        "editionNumber": 2,
+        "editions": [
+            {
+                "max": 3,
+                "number": 2
+            },
+            {
+                "max": 3,
+                "name": "set",
+                "number": 2
+            }
+        ],
+        "externalViewURL": "https://find.xyz/collection/user1/dandy/ID1",
         "id": 303,
         "media": {
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
         "name": "Neo Motorcycle 2 of 3",
-        "scalars": {
-            "Speed": 100,
-            "edition_set_max": 3,
-            "edition_set_number": 2,
-            "number.date.Birthday": 1660145023
-        },
-        "tags": {
-            "NeoMotorCycleTag": "Tag1"
-        },
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        "totalInEdition": 3,
+        "traits": [
+            {
+                "displayType": "String",
+                "name": "NeoMotorCycleTag",
+                "value": "Tag1"
+            },
+            {
+                "displayType": "Numeric",
+                "name": "Speed",
+                "value": 100
+            },
+            {
+                "displayType": "Date",
+                "name": "Birthday",
+                "value": 1660145023
+            }
+        ],
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": 303,
         "views": [

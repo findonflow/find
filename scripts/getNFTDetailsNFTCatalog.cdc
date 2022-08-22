@@ -43,12 +43,14 @@ pub struct NFTDetail {
 	pub let name:String
 	pub let thumbnail:String
 	pub let type: String
-	pub var rarity:String?
-	pub var editionNumber: UInt64? 
-	pub var totalInEdition: UInt64?
+	pub var externalViewURL: String?
+	pub var rarity:MetadataViews.Rarity?
+	pub var editions: [MetadataViews.Edition]
+	pub var serial: UInt64?
+	pub var traits: [MetadataViews.Trait]
 	pub var media : {String: String} //url to mediaType
-	pub var collectionName: String? 
-	pub var collectionDescription: String? 
+	pub var collection : NFTCollectionDisplay?
+	pub var license : String? 
 	pub var data: {String : AnyStruct?}
 	pub var views :[String]
 
@@ -63,28 +65,45 @@ pub struct NFTDetail {
 		let d = display as! MetadataViews.Display
 		self.name=d.name
 		self.thumbnail=d.thumbnail.uri()
+		views.remove(key: "Display")
+
+		// External URL 
+		self.externalViewURL = nil 
+		if let externalURL = views["ExternalURL"] {
+			if let e = externalURL as? MetadataViews.ExternalURL {
+				self.externalViewURL = e.url
+			}
+		}
+		views.remove(key: "ExternalURL")
 
 		// Edition
-		self.editionNumber=nil 
-		self.totalInEdition=nil
+		self.editions=[] 
 		if let editions = views["Editions"] {
 			if let e = editions as? MetadataViews.Editions {
 				if e.infoList.length > 0 {
-					self.editionNumber=e.infoList[0].number
-					self.totalInEdition=e.infoList[0].max
+					self.editions=e.infoList
 				}
 			}
 		}
+		views.remove(key: "Editions")
 
-		// subCollection
-		self.collectionName=nil
-		self.collectionDescription=nil
-		if let grouping = views["NFTCollectionDisplay"] {
-			if let sc = grouping as? MetadataViews.NFTCollectionDisplay {
-				self.collectionName=sc.name
-				self.collectionDescription=sc.description
+		// Serial
+		self.serial=nil
+		if let serial = views["Serial"] {
+			if let s = serial as? MetadataViews.Serial {
+				self.serial=s.number
 			}
 		}
+		views.remove(key: "Serial")
+
+		// subCollection
+		self.collection=nil
+		if let grouping = views["NFTCollectionDisplay"] {
+			if let sc = grouping as? MetadataViews.NFTCollectionDisplay {
+				self.collection=NFTCollectionDisplay(sc)
+			}
+		}
+		views.remove(key: "NFTCollectionDisplay")
 
 		// Medias 
 		self.media={}
@@ -97,14 +116,36 @@ pub struct NFTDetail {
 				}
 			}
 		}
+		views.remove(key: "Medias")
 
 		// Rarity 
 		self.rarity=nil
 		if let rarity= views["Rarity"] {
 			if let r = rarity as? MetadataViews.Rarity {
-				self.rarity = r.description
+				self.rarity = r
 			}
 		}
+		views.remove(key: "Rarity")
+
+		// Traits
+		self.traits=[] 
+		if let traits = views["Traits"] {
+			if let t = traits as? MetadataViews.Traits {
+				if t.traits.length > 0 {
+					self.traits=t.traits
+				}
+			}
+		}
+		views.remove(key: "Traits")
+
+		// License 
+		self.license= nil 
+		if let license= views["License"] {
+			if let l = license as? MetadataViews.License {
+				self.license = l.spdxIdentifier
+			}
+		}
+		views.remove(key: "License")
 
 		self.views=[]
 
@@ -173,6 +214,48 @@ pub struct StorefrontListing {
 		self.foo ="bar"
 	}
 }
+
+pub struct NFTCollectionDisplay {
+	// Name that should be used when displaying this NFT collection.
+	pub let name: String
+
+	// Description that should be used to give an overview of this collection.
+	pub let description: String
+
+	// External link to a URL to view more information about this collection.
+	pub let externalURL: String
+
+	// Square-sized image to represent this collection.
+	pub let squareImage: {String : String}
+
+	// Banner-sized image for this collection, recommended to have a size near 1200x630.
+	pub let bannerImage: {String : String}
+
+	// Social links to reach this collection's social homepages.
+	// Possible keys may be "instagram", "twitter", "discord", etc.
+	pub let socials: {String: String}
+
+	init(
+		_ nftCD : MetadataViews.NFTCollectionDisplay
+	) {
+		self.name = nftCD.name
+		self.description = nftCD.description
+		self.externalURL = nftCD.externalURL.url
+
+		let squareImage = {nftCD.squareImage.file.uri() : nftCD.squareImage.mediaType}
+		self.squareImage = squareImage
+
+		let bannerImage = {nftCD.bannerImage.file.uri() : nftCD.bannerImage.mediaType}
+		self.bannerImage = bannerImage
+
+		let socials : {String : String} = {}
+		for key in nftCD.socials.keys{
+			socials[key] = nftCD.socials[key]!.url
+		}
+		self.socials = socials
+	}
+}
+
 /*
 pub struct StorefrontListing {
 	pub let nftID:UInt64
