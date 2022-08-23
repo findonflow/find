@@ -1,0 +1,1 @@
+{"buildTargets":[".PHONY","all","client","contract","contract_publish","deploy","dev","emulator","lint","major","minor","patch","publish","setup","test"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

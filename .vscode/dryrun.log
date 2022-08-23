@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/huiben/Documents/Github/find'
+gotestsum -f testname --watch
+make: Leaving directory `/Users/huiben/Documents/Github/find'
+ 

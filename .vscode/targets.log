@@ -1,0 +1,417 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-apple-darwin11.3.0
+ 
+
+# Make data base, printed on Tue Aug 23 15:13:30 2022
+
+# Variables
+
+# environment
+ACCESS_TOKEN_SECRET = evDuqJcps6CLcfBKtwPLzn5ReuItXhjyJYBz0w5mQBf5k
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
+# environment
+LC_CTYPE = UTF-8
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /Users/huiben/Documents/Github/find
+# makefile
+SHELL = /bin/sh
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-gb","availableLanguages":{},"_languagePackSupport":true}
+# environment
+_ = /usr/bin/make
+# environment
+MAINNET_FIND_ADMIN = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# makefile (from `Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+NPM = 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
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+BEARER_TOKEN = AAAAAAAAAAAAAAAAAAAAACzLfwEAAAAASwa9gSj9f8SOXvjomc1zQ%2FGQ11Q%3DhPpN6xUsrcyoCANGPsr8Ots5HR9Q1A21CL26hgBr34JKBG99LF
+# environment
+TESTNET_NEO_ADMIN = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+__CFBundleIdentifier = com.microsoft.VSCode
+# environment
+INFOPATH = /opt/homebrew/share/info:
+# environment
+TESTNET_FIND = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+P9K_SSH = 0
+# environment
+ACCESS_TOKEN = 1362086237411020803-169nrGZzGBdDX3Bkg8P6auLm0OnqEB
+# environment
+VSCODE_CWD = /Users/huiben/Documents/Github/find
+# environment
+GOPROXY = https://proxy.golang.org,direct
+# environment
+PATH = /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/huiben/go/bin
+# environment
+TESTNET_FIND_USER3 = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+LaunchInstanceID = 5A97D966-6F55-4296-8DC6-8916A9AB12B4
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
+# environment
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.OPGjKiA9rq/Listeners
+# environment
+MAINNET_NEO_ADMIN = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+MAINNET_FIND = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+PWD = /Users/huiben/documents/github/find
+# environment
+HOMEBREW_CELLAR = /opt/homebrew/Cellar
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+MANPATH = /opt/homebrew/share/man::
+# environment
+GOMODCACHE = /Users/huiben/go/pkg/mod
+# environment
+HOME = /Users/huiben
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+TESTNET_NEO = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+VSCODE_CLI = 1
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/huiben/Library/Application Support/Code/CachedData/da76f93349a72022ca4670c1b84860304616aaa2
+# environment
+LOGNAME = huiben
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+XPC_FLAGS = 0x0
+# environment
+COLORTERM = truecolor
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+LC_TERMINAL = iTerm2
+# environment
+SHLVL = 3
+# environment
+GOPATH = /Users/huiben/go
+# default
+MAKE_VERSION := 3.81
+# environment
+ 
+USER = huiben
+# makefile
+.DEFAULT_GOAL := all
+# default
+MAKECMDGOALS := all
+# environment
+TERM_SESSION_ID = w0t1p0:42DA477B-1FEE-4D3B-B8D8-1435DB68B260
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# default
+MAKE_COMMAND := /Library/Developer/CommandLineTools/usr/bin/make
+# environment
+MAINNET_NEO = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+TERM_PROGRAM = iTerm.app
+# default
+.VARIABLES := 
+# environment
+TMPDIR = /var/folders/gk/fqvp42vx4tg6zh5jsx2m097m0000gn/T/
+# automatic
+*F = $(notdir $*)
+# environment
+VSCODE_IPC_HOOK = /Users/huiben/Library/Application Support/Code/1.70.0-main.sock
+# environment
+MallocNanoZone = 0
+# makefile
+MAKEFLAGS = Rrqp
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+TERM_PROGRAM_VERSION = 3.4.16
+# environment
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.15008571.15008577.E498D6B3-B7A3-4D2D-81B0-648D68BDEDFF
+# environment
+LC_TERMINAL_VERSION = 3.4.16
+# environment
+HOMEBREW_PREFIX = /opt/homebrew
+# environment
+CONSUMER_SECRET = 9w2Y3AiXGabd1YnrFRptrgNZazi4u1DXnpnfyTBt2t5QIYnLnp
+# automatic
++F = $(notdir $+)
+# automatic
+%F = $(notdir $%)
+# environment
+ITERM_SESSION_ID = w0t1p0:42DA477B-1FEE-4D3B-B8D8-1435DB68B260
+# environment
+HOMEBREW_REPOSITORY = /opt/homebrew
+# environment
+COLORFGBG = 7;0
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
+# environment
+COMMAND_MODE = unix2003
+# default
+MAKEFILES := 
+# environment
+CONSUMER_KEY = gv9QKU9hnhm1PrXsUacE7Aj3Q
+# automatic
+<F = $(notdir $<)
+# environment
+ITERM_PROFILE = Default
+# environment
+TESTNET_FIND_USER1 = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# default
+MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
+# environment
+LC_ALL = C
+# environment
+SECURITYSESSIONID = 186b2
+# environment
+P9K_TTY = old
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+TESTNET_KEY = e8f34988de164383f60cc15d0ad2d6eeca3bb34758f08e829c67566cbff84fcb1967097686b7217d01cd4ddaa2cea5f1daa0822709386df887b29993eeeb24ab
+# environment
+TESTNET_FIND_ADMIN = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+MAKELEVEL := 0
+# environment
+TESTNET_ACCOUNT = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# environment
+LANG = C
+# environment
+TERM = xterm-256color
+# environment
+_P9K_TTY = /dev/ttys021
+# environment
+VSCODE_PID = 76695
+# environment
+TESTNET_FIND_USER2 = dbe20e84ed24836b8c5b9a4f4c12398fde2d75461381d4283fddf0ca73e2142e
+# variable set hash-table stats:
+ 
+# Load=102/1024=10%, Rehash=0, Collisions=9/127=7%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 16777232, inode 943168): 61 files, no impossibilities.
+
+# 61 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+setup: deploy
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 6):
+	go run ./tasks/setup/main.go
+	
+
+minor:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 34):
+	json-bump lib/package.json --minor
+	
+
+all: dev
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/2=0%
+
+client:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 25):
+	go run tasks/client/main.go > lib/find.json
+	
+
+.PHONY: setup deploy emulator test dev contract contract_publish client lint
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-07-30 08:44:01
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+test:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 19):
+	gotessum -f testname
+	
+
+contract_publish:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+patch:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 31):
+	json-bump lib/package.json --patch
+	
+
+dev:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := dev
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/10=10%
+#  commands to execute (from `Makefile', line 22):
+	gotestsum -f testname --watch
+	
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+publish:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 28):
+	cd lib && npm publish --access public && cd ..
+	
+
+emulator:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 16):
+	flow project start-emulator -v
+	
+
+major:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 37):
+	json-bump lib/package.json --major
+	
+
+contract:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+lint:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 9):
+	golangci-lint run 
+	
+
+deploy:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 13):
+	flow project deploy 
+	
+
+# files hash-table stats:
+# Load=18/1024=2%, Rehash=0, Collisions=0/43=0%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+
+# Finished Make data base on Tue Aug 23 15:13:30 2022
+
+ 
