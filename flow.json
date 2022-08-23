@@ -57,6 +57,27 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
+    "FeeEstimator.": {
+      "source": "./contracts/standard/FeeEstimator.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "FlowStorageFees": {
+      "source": "./contracts/standard/FlowStorageFees.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "LostAndFound": {
+      "source": "./contracts/standard/LostAndFound.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
     "AlchemyMetadataWrapperMainnetShard1": {
       "aliases": {
         "mainnet": "0xeb8cb4c3157d5dac"
@@ -218,10 +239,10 @@
       "address": "0x097bafa4e0b48eef",
       "key": "${MAINNET_FIND}"
     },
-		"mainnet-find-forge" : {
-			"address": "0x123cb666996b8432",
-			"key": "${MAINNET_FIND}"
-		},
+    "mainnet-find-forge": {
+      "address": "0x123cb666996b8432",
+      "key": "${MAINNET_FIND}"
+    },
     "mainnet-find-admin": {
       "address": "0x09a86f2493ce2e9d",
       "key": "${MAINNET_FIND_ADMIN}"
@@ -260,10 +281,10 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin"
-      ], 
-			"mainnet-find-forge": [
-				"NFGv3"
-			]
+      ],
+      "mainnet-find-forge": [
+        "NFGv3"
+      ]
     },
     "testnet": {
       "testnet-find": [
@@ -295,10 +316,10 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin"
-      ], 
-			"testnet-user1": [
-				"NFGv3"
-			]
+      ],
+      "testnet-user1": [
+        "NFGv3"
+      ]
     },
     "emulator": {
       "emulator-account": [
@@ -346,8 +367,8 @@
       "emulator-user2": [],
       "emulator-user3": [],
       "emulator-user4": [
-				"NFGv3"
-			]
+        "NFGv3"
+      ]
     }
   }
 }
