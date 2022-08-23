@@ -310,51 +310,53 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.AutoGold("actual", actual4)
 	})
 
-	t.Run("Should not be fetching NFTInfo when item is stopped", func(t *testing.T) {
-		otu.setUUID(1100)
-		ids := otu.mintThreeExampleDandies()
-		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
-			listNFTForSale("user1", ids[1], price).
-			directOfferMarketSoft("user2", "user1", ids[0], price).
-			listNFTForEscrowedAuction("user1", ids[1], price).
-			listNFTForSoftAuction("user1", ids[1], price).
-			directOfferMarketEscrowed("user2", "user1", ids[0], price).
-			alterMarketOption("Sale", "stop").
-			alterMarketOption("AuctionSoft", "stop").
-			alterMarketOption("AuctionEscrow", "stop").
-			alterMarketOption("DirectOfferSoft", "stop").
-			alterMarketOption("DirectOfferEscrow", "stop")
+	/*
+		t.Run("Should not be fetching NFTInfo when item is stopped", func(t *testing.T) {
+			otu.setUUID(1100)
+			ids := otu.mintThreeExampleDandies()
+			otu.setProfile("user1").
+				setFlowDandyMarketOption("DirectOfferEscrow").
+				setFlowDandyMarketOption("DirectOfferSoft").
+				setFlowDandyMarketOption("Sale").
+				setFlowDandyMarketOption("AuctionEscrow").
+				setFlowDandyMarketOption("AuctionSoft").
+				listNFTForSale("user1", ids[1], price).
+				directOfferMarketSoft("user2", "user1", ids[0], price).
+				listNFTForEscrowedAuction("user1", ids[1], price).
+				listNFTForSoftAuction("user1", ids[1], price).
+				directOfferMarketEscrowed("user2", "user1", ids[0], price).
+				alterMarketOption("Sale", "stop").
+				alterMarketOption("AuctionSoft", "stop").
+				alterMarketOption("AuctionEscrow", "stop").
+				alterMarketOption("DirectOfferSoft", "stop").
+				alterMarketOption("DirectOfferEscrow", "stop")
 
-		otu.O.Script("getStatus",
-			WithArg("user", "user1"),
-		).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionSoft/items/0",
-			autogold.Want("Should not be fetching NFTInfo if stopped", map[string]interface{}{
-				"amount": 10, "auction": map[string]interface{}{
-					"currentPrice": 10, "extentionOnLateBid": 60, "minimumBidIncrement": 1,
-					"reservePrice": 15,
-					"startPrice":   10,
-					"timestamp":    1,
-				},
-				"ftAlias":               "Flow",
-				"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId":             1103,
-				"listingStatus":         "stopped",
-				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-				"listingValidUntil":     101,
-				"nftId":                 1103,
-				"nftIdentifier":         "A.f8d6e0586b0a20c7.Dandy.NFT",
-				"saleType":              "active_listed",
-				"seller":                "0x179b6b1cb6755e31",
-				"sellerName":            "user1",
-			}),
-		)
+			otu.O.Script("getStatus",
+				WithArg("user", "user1"),
+			).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionSoft/items/0",
+				autogold.Want("Should not be fetching NFTInfo if stopped", map[string]interface{}{
+					"amount": 10, "auction": map[string]interface{}{
+						"currentPrice": 10, "extentionOnLateBid": 60, "minimumBidIncrement": 1,
+						"reservePrice": 15,
+						"startPrice":   10,
+						"timestamp":    1,
+					},
+					"ftAlias":               "Flow",
+					"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
+					"listingId":             1103,
+					"listingStatus":         "stopped",
+					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
+					"listingValidUntil":     101,
+					"nftId":                 1103,
+					"nftIdentifier":         "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"saleType":              "active_listed",
+					"seller":                "0x179b6b1cb6755e31",
+					"sellerName":            "user1",
+				}),
+			)
 
-	})
+		})
+	*/
 
 	t.Run("Should return all blocked NFTs by type", func(t *testing.T) {
 		otu.setUUID(1300)
