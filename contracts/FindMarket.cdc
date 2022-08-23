@@ -1103,14 +1103,10 @@ pub contract FindMarket {
 
 			return self.capability!.borrow()!
 		}
-
 	}
 
-	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule]) : Capability<&Tenant> {
+	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule], findRoyalty: MetadataViews.Royalty?) : Capability<&Tenant> {
 		let account=FindMarket.account
-
-		let receiver=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 
 		let tenant <- create Tenant(name)
 		//fetch the TenentRegistry from our storage path and add the new tenant with the given name and address
