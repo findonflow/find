@@ -30,6 +30,8 @@ transaction(merchantAddress: Address, marketplace:Address, address: Address, id:
 			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinReceiver)
 		}
 		
+		var created=false
+		var updated=false
 		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if !profileCap.check() {
 			let profile <-Profile.createUser(name:name, createdAt: "find")
@@ -40,8 +42,17 @@ transaction(merchantAddress: Address, marketplace:Address, address: Address, id:
 
 		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
 		if !profile.hasWallet("DUC") {
+			updated=true
 			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
 		}
+
+
+		if created {
+			profile.emitCreatedEvent()
+		} else if updated {
+			profile.emitUpdatedEvent()
+		}
+
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
