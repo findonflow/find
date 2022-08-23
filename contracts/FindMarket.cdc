@@ -814,7 +814,7 @@ pub contract FindMarket {
 				emit TenantAllowRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
 				return
 			} else if type == "cut" {
-				emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut!.cut, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+				emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut?.cut ?? 0.0, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
 				return
 			}
 			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
