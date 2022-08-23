@@ -38,12 +38,21 @@ transaction(merchantAddress: Address, marketplace:Address, address: Address, id:
 			account.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+			created=true
 		}
 
 		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
+
 		if !profile.hasWallet("DUC") {
 			updated=true
 			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
+			updated=true
+		}
+
+		if created {
+			profile.emitCreatedEvent()
+		} else {
+			profile.emitUpdatedEvent()
 		}
 
 
