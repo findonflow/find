@@ -2020,16 +2020,10 @@ func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, pric
 		WithArg("address", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
-	).GetAsJson()
+	).GetWithPointer("/name")
 
 	assert.NoError(otu.T, err)
-	assert.JSONEq(otu.T, `	{
-        	            	    "amount": 10,
-        	            	    "description": "For testing listing in DUC",
-        	            	    "id": 103,
-        	            	    "imageURL": "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
-        	            	    "name": "DUCExampleNFT"
-        	            	}`, result)
+	assert.Equal(otu.T, "DUCExampleNFT", result)
 
 	return otu
 
