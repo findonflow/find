@@ -6,23 +6,6 @@ import (
 
 func main() {
 
-	// o2 := overflow.NewOverflowMainnet().Start()
-
-	//pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
-	// res3 := o2.ScriptFromFile("getNFTDetailsNFTCatalog").NamedArguments(map[string]string{
-	// 	"user":                 "christian",
-	// 	"nftAliasOrIdentifier": "Dandy",
-	// 	"id":                   "97168801",
-	// 	"views":                `["A.631e88ae7f1d7c20.MetadataViews.NFTCollectionData"]`,
-	// }).RunReturnsJsonString()
-
-	// res3 := o2.ScriptFromFile("getFactoryCollectionsNFTCatalog").NamedArguments(map[string]string{
-	// 	"user":        "bjartek",
-	// 	"collections": `[]`,
-	// }).RunReturnsJsonString()
-
-	// fmt.Println(res3)
-
 	//mainnet script test
 
 	network := "mainnet"
