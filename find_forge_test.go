@@ -44,9 +44,8 @@ func TestFindForge(t *testing.T) {
 
 		// autogold.Equal(t, result)
 
-		otu.O.Script("getFactoryCollectionsNFTCatalog",
+		otu.O.Script("getNFTCatalogIDs",
 			overflow.WithArg("user", "user1"),
-			overflow.WithArg("maxItems", 0),
 			overflow.WithArg("collections", `[]`),
 		).AssertWant(t,
 			autogold.Want("collection", map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": map[string]interface{}{
