@@ -57,6 +57,27 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
+    "GrantedAccountAccess": {
+      "source": "./contracts/standard/GrantedAccountAccess.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
+    "FLOAT": {
+      "source": "./contracts/standard/FLOAT.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
+    "FLOATVerifiers": {
+      "source": "./contracts/standard/FLOATVerifiers.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
     "FeeEstimator.": {
       "source": "./contracts/standard/FeeEstimator.cdc",
       "aliases": {
@@ -146,6 +167,20 @@
       "aliases": {
         "mainnet": "0x49a7cda3a1eecc29",
         "testnet": "0x324c34e1c517e4db"
+      }
+    },
+    "Bl0xPack": {
+      "source": "./contracts/Bl0xPack.cdc",
+      "aliases": {
+        "mainnet": "0x7620acf6d7f2468a",
+        "testnet": "0xe8124d8428980aa6"
+      }
+    },
+    "Bl0x": {
+      "source": "./contracts/Bl0x.cdc",
+      "aliases": {
+        "mainnet": "0x7620acf6d7f2468a",
+        "testnet": "0xe8124d8428980aa6"
       }
     },
     "ProfileCache": "./contracts/ProfileCache.cdc",

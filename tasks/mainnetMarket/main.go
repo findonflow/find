@@ -57,16 +57,26 @@ func main() {
 				WithArg("nftID", 225),
 				WithArg("publicPathIdentifier", "BitkuCollection"),
 			)
+
+			o.Tx("adminAddNFTCatalog",
+				WithSigner("find"),
+				WithArg("collectionIdentifier", "some.place"),
+				WithArg("contractName", "SomePlaceCollectible"),
+				WithArg("contractAddress", "0x667a16294a089ef"),
+				WithArg("addressWithNFT", "0x886f3aeaf848c535"),
+				WithArg("nftID", 164769803),
+				WithArg("publicPathIdentifier", "somePlaceCollectibleCollection"),
+			)
 	*/
 
 	o.Tx("adminAddNFTCatalog",
 		WithSigner("find"),
-		WithArg("collectionIdentifier", "some.place"),
-		WithArg("contractName", "SomePlaceCollectible"),
-		WithArg("contractAddress", "0x667a16294a089ef"),
-		WithArg("addressWithNFT", "0x886f3aeaf848c535"),
-		WithArg("nftID", 164769803),
-		WithArg("publicPathIdentifier", "somePlaceCollectibleCollection"),
+		WithArg("collectionIdentifier", "bl0xPack"),
+		WithArg("contractName", "Bl0xPack"),
+		WithArg("contractAddress", "0x7620acf6d7f2468a"),
+		WithArg("addressWithNFT", "0x0893d4423f25c7d6"),
+		WithArg("nftID", 208638414),
+		WithArg("publicPathIdentifier", "Bl0xPackCollection"),
 	)
 
 	upsertItem := o.TxFileNameFN("adminMainnetAddItem",
@@ -82,7 +92,8 @@ func main() {
 		//	"SoulMade": `["A.9a57dfe5c8ce609c.SoulMadeComponent.NFT", "A.9a57dfe5c8ce609c.SoulMadeMain.NFT"]`,
 		//	"Bitku":    `["A.f61e40c19db2a9e2.HaikuNFT.NFT"]`,
 		//		"Dandy": `["A.097bafa4e0b48eef.Dandy.NFT"]`,
-		"some.place": `["A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
+		// "some.place": `["A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
+		"bl0xPack": `["A.7620acf6d7f2468a.Bl0xPack.NFT"]`,
 	}
 
 	for name, contracts := range flowNfts {
