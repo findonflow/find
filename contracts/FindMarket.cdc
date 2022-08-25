@@ -1320,7 +1320,7 @@ pub contract FindMarket {
 						if numericValues[display] != nil {
 
 							if display == "Date" || display == "date" {
-								traitName = "number.date.".concat(traitName)
+								traitName = "date.".concat(traitName)
 							}
 
 							if let value = trait.value as? Number {
