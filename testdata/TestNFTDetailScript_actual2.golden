@@ -172,32 +172,55 @@
         }
     },
     "nftDetail": {
-        "collectionDescription": "xtingle FIND",
-        "collectionName": "xtingles",
+        "collection": {
+            "bannerImage": {
+                "https://xtingles.com/images/main-metaverse.png": "image"
+            },
+            "description": "xtingle FIND",
+            "externalURL": "https://xtingles.com/",
+            "name": "xtingles",
+            "socials": {
+                "Discord": "https://discord.com/invite/XZDYE6jEuq"
+            },
+            "squareImage": {
+                "https://xtingles-strapi-prod.s3.us-east-2.amazonaws.com/copy_of_upcoming_drops_db41fbf287.png": "image"
+            }
+        },
+        "editions": [
+            {
+                "max": 1,
+                "name": "nft",
+                "number": 1
+            }
+        ],
+        "externalViewURL": "https://nft.blocto.app/xtingles//ID1",
         "id": 954,
         "media": {
             "https://nft.blocto.app/xtingles/preview-xBloctopus.png": "image/png;display=thumbnail",
             "https://nft.blocto.app/xtingles/xBloctopus.mp4": "video/mp4"
         },
         "name": "xtingle 1 of 1",
-        "rarity": "rare",
-        "scalars": {
-            "edition_nft_max": 1,
-            "edition_nft_number": 1,
-            "rarity_max": 100,
-            "rarity_score": 50,
-            "video_length": 27
-        },
-        "tags": {
-            "Author": "Xtingels"
+        "rarity": {
+            "description": "rare",
+            "max": 100,
+            "score": 50
         },
         "thumbnail": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
+        "traits": [
+            {
+                "displayType": "String",
+                "name": "Author",
+                "value": "Xtingels"
+            },
+            {
+                "displayType": "Numeric",
+                "name": "video_length",
+                "value": 27
+            }
+        ],
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": 954,
         "views": [
-            "checked",
-            "checked",
-            "checked",
             "checked",
             "checked",
             "checked",
