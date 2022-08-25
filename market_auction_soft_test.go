@@ -30,7 +30,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	mintFund("testMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(300)
+	otu.setUUID(400)
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
@@ -93,7 +93,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "finished_completed", price+5.0).
 			sendDandy("user2", "user1", id)
 
-		otu.setUUID(400)
+		otu.setUUID(500)
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner("user1"),
@@ -237,7 +237,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.setUUID(600)
+		otu.setUUID(700)
 
 		otu.auctionBidMarketSoft("user2", "user1", id, price+5.0)
 

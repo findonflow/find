@@ -186,6 +186,7 @@
                 "https://xtingles-strapi-prod.s3.us-east-2.amazonaws.com/copy_of_upcoming_drops_db41fbf287.png": "image"
             }
         },
+        "description": "xtingle_NFT",
         "editions": [
             {
                 "max": 1,
