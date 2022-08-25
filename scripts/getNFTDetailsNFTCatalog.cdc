@@ -41,6 +41,7 @@ pub struct NFTDetail {
 	pub let id: UInt64 
 	pub let uuid: UInt64 
 	pub let name:String
+	pub let description:String
 	pub let thumbnail:String
 	pub let type: String
 	pub var externalViewURL: String?
@@ -64,6 +65,7 @@ pub struct NFTDetail {
 		let display = views["Display"] ?? panic("Could not find display")
 		let d = display as! MetadataViews.Display
 		self.name=d.name
+		self.description=d.description
 		self.thumbnail=d.thumbnail.uri()
 		views.remove(key: "Display")
 

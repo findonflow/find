@@ -27,11 +27,19 @@ transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String
             listing.append(CompositeType(type)!)
         }
 
-        let rules = [
-            FindMarket.TenantRule(name:listingName, types:listing, ruleType: "listing", allow: true), 
-            FindMarket.TenantRule(name:ftName, types:ft, ruleType: "ft", allow: true),
-            FindMarket.TenantRule(name:nftName, types:nft, ruleType: "nft", allow: true)
-        ]
+        let rules : [FindMarket.TenantRule] = []
+        if listing.length > 0 {
+            rules.append(FindMarket.TenantRule(name:listingName, types:listing, ruleType: "listing", allow: true))
+        }
+
+        if ft.length > 0 {
+            rules.append(FindMarket.TenantRule(name:ftName, types:ft, ruleType: "ft", allow: true))
+        }
+
+        if nft.length > 0 {
+            rules.append(FindMarket.TenantRule(name:nftName, types:nft, ruleType: "nft", allow: true))
+        }
+        
 
         let tenantSaleItem = FindMarket.TenantSaleItem(
             name: listingName.concat(ftName).concat(nftName), 
