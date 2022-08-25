@@ -188,25 +188,56 @@
     },
   },
   "nftDetail": map[string]interface {}{
-    "collectionDescription": "Neo Collectibles FIND",
-    "collectionName": "user1",
-    "editionNumber": 2,
+    "collection": map[string]interface {}{
+      "bannerImage": map[string]interface {}{
+        "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1": "image",
+      },
+      "description": "Neo Collectibles FIND",
+      "externalURL": "https://neomotorcycles.co.uk/index.html",
+      "name": "user1",
+      "socials": map[string]interface {}{
+        "Discord": "discord.gg/",
+        "Twitter": "https://twitter.com/home",
+      },
+      "squareImage": map[string]interface {}{
+        "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image",
+      },
+    },
+    "editions": []interface {}{
+      map[string]interface {}{
+        "max": 3,
+        "number": 2,
+      },
+      map[string]interface {}{
+        "max": 3,
+        "name": "set",
+        "number": 2,
+      },
+    },
+    "externalViewURL": "https://find.xyz/collection/user1/dandy/703",
     "id": 703,
     "media": map[string]interface {}{
       "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png",
     },
     "name": "Neo Motorcycle 2 of 3",
-    "scalars": map[string]interface {}{
-      "Speed": 100.0,
-      "edition_set_max": 3.0,
-      "edition_set_number": 2.0,
-      "number.date.Birthday": 1660145023.0,
-    },
-    "tags": map[string]interface {}{
-      "NeoMotorCycleTag": "Tag1",
-    },
     "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-    "totalInEdition": 3,
+    "traits": []interface {}{
+      map[string]interface {}{
+        "displayType": "String",
+        "name": "NeoMotorCycleTag",
+        "value": "Tag1",
+      },
+      map[string]interface {}{
+        "displayType": "Numeric",
+        "name": "Speed",
+        "value": 100.0,
+      },
+      map[string]interface {}{
+        "displayType": "Date",
+        "name": "Birthday",
+        "value": 1660145023.0,
+      },
+    },
     "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
     "uuid": 703,
     "views": []interface {}{
@@ -214,8 +245,6 @@
       "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
       "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
       "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-      "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-      "A.f8d6e0586b0a20c7.MetadataViews.Traits",
     },
   },
 }`
