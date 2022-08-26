@@ -31,7 +31,29 @@ pub contract FindMarket {
 	access(account) let tenantNameAddress : {String:Address}
 	access(account) let tenantAddressName : {Address:String}
 
+	// Deprecated in testnet
+	pub struct TenantCuts {
+		pub let findCut:MetadataViews.Royalty?
+		pub let tenantCut:MetadataViews.Royalty?
 
+		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
+			self.findCut=findCut
+			self.tenantCut=tenantCut
+		}
+	}
+
+	// Deprecated in testnet
+	pub struct ActionResult {
+		pub let allowed:Bool
+		pub let message:String
+		pub let name:String
+
+		init(allowed:Bool, message:String, name:String) {
+			self.allowed=allowed
+			self.message=message
+			self.name =name
+		}
+	}
 
 	// ========================================
 	pub fun getPublicPath(_ type: Type, name:String) : PublicPath {
