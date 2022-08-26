@@ -187,6 +187,7 @@
                 "https://prod-jambb-issuance-static-public.s3.amazonaws.com/issuance-ui/logos/jambb-full-color-wordmark-inverted.svg": "image"
             }
         },
+        "description": "jambb_NFT",
         "editions": [
             {
                 "max": 1,

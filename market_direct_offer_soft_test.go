@@ -29,7 +29,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	mintFund("testMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(300)
+	otu.setUUID(400)
 
 	bidTx := otu.O.TxFN(
 		WithSigner("user2"),
@@ -162,7 +162,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
-			otu.sendDandy("user1", "user2", id)
+		otu.sendDandy("user1", "user2", id)
 	})
 
 	t.Run("Should be able to increase offer", func(t *testing.T) {

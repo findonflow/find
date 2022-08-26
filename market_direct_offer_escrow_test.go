@@ -29,7 +29,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	mintFund("testMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(300)
+	otu.setUUID(400)
 
 	bidTx := otu.O.TxFN(
 		WithSigner("user2"),
