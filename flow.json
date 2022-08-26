@@ -384,7 +384,9 @@
       "emulator-user1": [],
       "emulator-user2": [],
       "emulator-user3": [],
-      "emulator-user4": [],
+      "emulator-user4": [
+        "NFGv3"
+      ],
       "emulator-user5-dapper": []
     }
   }

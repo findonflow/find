@@ -622,4 +622,3 @@ pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
 	}
 	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 }
-
