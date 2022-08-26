@@ -2,46 +2,21 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-pub fun main(user: String, maxItems: Int, collections: [String]) : {String : ItemReport} {
-	return fetchNFTCatalog(user: user, maxItems: maxItems, targetCollections:collections)
+pub fun main(user: String, collections: [String]) : {String : ItemReport} {
+	return fetchNFTCatalog(user: user, targetCollections:collections)
 }
 
 pub struct ItemReport {
-	pub let items : [MetadataCollectionItem]
 	pub let length : Int // mapping of collection to no. of ids 
 	pub let extraIDs : [UInt64]
 	pub let shard : String 
 	pub let extraIDsIdentifier : String 
 
-	init(items: [MetadataCollectionItem],  length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) {
-		self.items=items 
+	init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) {
 		self.length=length 
 		self.extraIDs=extraIDs
 		self.shard=shard
 		self.extraIDsIdentifier=extraIDsIdentifier
-	}
-}
-
-pub struct MetadataCollectionItem {
-	pub let id:UInt64
-	pub let name: String
-	pub let collection: String // <- This will be Alias unless they want something else
-	pub let subCollection: String? // <- This will be Alias unless they want something else
-	pub let nftDetailIdentifier: String
-
-	pub let media  : String
-	pub let mediaType : String 
-	pub let source : String 
-
-	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
-		self.id=id
-		self.name=name 
-		self.collection=collection 
-		self.subCollection=subCollection 
-		self.media=media 
-		self.mediaType=mediaType 
-		self.source=source
-		self.nftDetailIdentifier=nftDetailIdentifier
 	}
 }
 
@@ -121,7 +96,7 @@ pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 	return inventory
 }
 
-pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]) : {String : ItemReport} {
+pub fun fetchNFTCatalog(user: String, targetCollections: [String]) : {String : ItemReport} {
 	let source = "NFTCatalog"
 	let account = resolveAddress(user: user)
 	if account == nil { return {} }
@@ -145,68 +120,11 @@ pub fun fetchNFTCatalog(user: String, maxItems: Int, targetCollections: [String]
 
 		// by pass if this is not the target collection
 		if targetCollections.length > 0 && !targetCollections.contains(project) {
-			// inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
+			// inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
 			continue
 		}
 
-		
-		if fetchedCount >= maxItems {
-			inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source, extraIDsIdentifier: project)
-			continue
-		}
-
-		var fetchArray : [UInt64] = []
-		if extraIDs[project]!.length + fetchedCount > maxItems {
-			while fetchedCount < maxItems {
-				fetchArray.append(extraIDs[project]!.remove(at: 0))
-				fetchedCount = fetchedCount + 1
-			}
-		}else {
-			fetchArray = extraIDs.remove(key: project)! 
-			fetchedCount = fetchedCount + fetchArray.length
-		}
-
-		let returnedNFTs = getNFTs(ownerAddress: account!, ids: {project : fetchArray})
-
-		var collectionItems : [MetadataCollectionItem] = []
-		for nft in returnedNFTs {
-			if nft == nil {
-				continue
-			}
-			
-			var subCollection = ""
-			if project != nft!.collectionDisplay!.name {
-			 subCollection = nft!.collectionDisplay!.name
-			}
-
-			var name = nft!.display!.name 
-			if name == "" {
-				name = projectName
-			}
-
-			if nft.editions != nil && nft.editions!.infoList.length > 0 {
-				let edition = nft.editions!.infoList[0].number.toString()
-				// check if the name ends with "editionNumber"
-				// If the name ends with "editionNumber", we do not concat the edition
-				if name.length > edition.length && name.slice(from: name.length - edition.length, upTo: name.length) != edition {
-					name = name.concat("#").concat(nft.editions!.infoList[0].number.toString())
-				}
-			}
-			
-			let item = MetadataCollectionItem(
-				id: nft!.id,
-				name: name,
-				collection: project,
-				subCollection: subCollection, 
-				media: nft!.display!.thumbnail.uri(),
-				mediaType: "image/png",
-				source: source, 
-				nftDetailIdentifier: nft!.nftType.identifier
-			)
-			collectionItems.append(item)
-		}
-
-		inventory[catalogEntry.contractName] = ItemReport(items: collectionItems,  length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project)
+		inventory[catalogEntry.contractName] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project)
 
 	}
 

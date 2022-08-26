@@ -57,6 +57,27 @@
         "mainnet": "0xb19436aae4d94622"
       }
     },
+    "GrantedAccountAccess": {
+      "source": "./contracts/standard/GrantedAccountAccess.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
+    "FLOAT": {
+      "source": "./contracts/standard/FLOAT.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
+    "FLOATVerifiers": {
+      "source": "./contracts/standard/FLOATVerifiers.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
     "AlchemyMetadataWrapperMainnetShard1": {
       "aliases": {
         "mainnet": "0xeb8cb4c3157d5dac"
@@ -127,6 +148,20 @@
         "testnet": "0x324c34e1c517e4db"
       }
     },
+    "Bl0xPack": {
+      "source": "./contracts/Bl0xPack.cdc",
+      "aliases": {
+        "mainnet": "0x7620acf6d7f2468a",
+        "testnet": "0xe8124d8428980aa6"
+      }
+    },
+    "Bl0x": {
+      "source": "./contracts/Bl0x.cdc",
+      "aliases": {
+        "mainnet": "0x7620acf6d7f2468a",
+        "testnet": "0xe8124d8428980aa6"
+      }
+    },
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
     "CollectionFactory": "./contracts/CollectionFactory.cdc",
@@ -190,6 +225,10 @@
       "address": "045a1763c93006ca",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
+    "emulator-user5-dapper": {
+      "address": "120e725050340cab",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
     "testnet-account": {
       "address": "0x1ff7e32d71183db0",
       "key": "${TESTNET_ACCOUNT}"
@@ -218,10 +257,10 @@
       "address": "0x097bafa4e0b48eef",
       "key": "${MAINNET_FIND}"
     },
-		"mainnet-find-forge" : {
-			"address": "0x123cb666996b8432",
-			"key": "${MAINNET_FIND}"
-		},
+    "mainnet-find-forge": {
+      "address": "0x123cb666996b8432",
+      "key": "${MAINNET_FIND}"
+    },
     "mainnet-find-admin": {
       "address": "0x09a86f2493ce2e9d",
       "key": "${MAINNET_FIND_ADMIN}"
@@ -260,10 +299,10 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin"
-      ], 
-			"mainnet-find-forge": [
-				"NFGv3"
-			]
+      ],
+      "mainnet-find-forge": [
+        "NFGv3"
+      ]
     },
     "testnet": {
       "testnet-find": [
@@ -295,10 +334,10 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin"
-      ], 
-			"testnet-user1": [
-				"NFGv3"
-			]
+      ],
+      "testnet-user1": [
+        "NFGv3"
+      ]
     },
     "emulator": {
       "emulator-account": [
@@ -345,9 +384,8 @@
       "emulator-user1": [],
       "emulator-user2": [],
       "emulator-user3": [],
-      "emulator-user4": [
-				"NFGv3"
-			]
+      "emulator-user4": [],
+      "emulator-user5-dapper": []
     }
   }
 }

@@ -43,11 +43,10 @@ func TestCollectionScripts(t *testing.T) {
 
 		otu.registerDandyInNFTRegistry()
 
-		result, err := otu.O.Script("getFactoryCollectionsNFTCatalog",
+		result, err := otu.O.Script("getNFTCatalogItems",
 			overflow.WithArg("user", "user1"),
-			overflow.WithArg("maxItems", 100),
-			overflow.WithArg("collections", "[]"),
-		).GetWithPointer("/A.f8d6e0586b0a20c7.Dandy.NFT/items")
+			overflow.WithArg("collectionIDs", `{"A.f8d6e0586b0a20c7.Dandy.NFT" : [504,505,503,506,502,507]}`),
+		).GetWithPointer("/A.f8d6e0586b0a20c7.Dandy.NFT")
 
 		if err != nil {
 			panic(err)

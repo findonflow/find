@@ -269,6 +269,15 @@ pub contract FindMarketSale {
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
 			let tenant=self.getTenant()
+
+			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC) 
+			if tenant.name == "onefootball" {
+				// ensure it is not a 0 dollar listing
+				if directSellPrice <= 0.65 {
+					panic("Listing price should be greater than 0.65")
+				}
+			} 
+
 			let nftType=saleItem.getItemType()
 			let ftType=saleItem.getFtType()
 

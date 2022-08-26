@@ -1200,7 +1200,17 @@ pub contract FindMarket {
 			for royaltyItem in royalties {
 				totalRoyalties = totalRoyalties + royaltyItem.cut
 				let description=royaltyItem.description
-				let cutAmount= soldFor * royaltyItem.cut
+
+				var cutAmount= soldFor * royaltyItem.cut
+				if tenant == "onefootball" {
+					//{"onefootball largest of 6% or 0.65": 0.65)}
+					let minAmount = 0.65
+
+					if minAmount > cutAmount {
+						cutAmount = minAmount
+					}
+				}
+
 				let receiver = royaltyItem.receiver.address
 				let name = resolveName(royaltyItem.receiver.address)
 
@@ -1320,7 +1330,7 @@ pub contract FindMarket {
 						if numericValues[display] != nil {
 
 							if display == "Date" || display == "date" {
-								traitName = "number.date.".concat(traitName)
+								traitName = "date.".concat(traitName)
 							}
 
 							if let value = trait.value as? Number {

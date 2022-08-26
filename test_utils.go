@@ -1984,8 +1984,8 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 
 	res := otu.O.Tx("listNFTForSaleDUC",
 		WithSigner(name),
-		WithArg("dapperAddress", "account"),
 		WithArg("marketplace", "account"),
+		WithArg("dapperAddress", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("id", id),
 		WithArg("directSellPrice", price),
@@ -2012,14 +2012,30 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 
 }
 
+func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, price float64) *OverflowTestUtils {
+
+	result, err := otu.O.Script("getMetadataForSaleItem",
+		WithArg("merchantAddress", "account"),
+		WithArg("marketplace", "account"),
+		WithArg("address", seller),
+		WithArg("id", id),
+		WithArg("amount", price),
+	).GetWithPointer("/name")
+
+	assert.NoError(otu.T, err)
+	assert.Equal(otu.T, "DUCExampleNFT", result)
+
+	return otu
+
+}
 func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("buyNFTForSaleDUC",
 		WithSigner(name),
 		WithPayloadSigner("account"),
-		WithArg("dapperAddress", "account"),
+		WithArg("merchantAddress", "account"),
 		WithArg("marketplace", "account"),
-		WithArg("user", seller),
+		WithArg("address", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
