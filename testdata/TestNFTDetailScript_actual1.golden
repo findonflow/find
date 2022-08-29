@@ -172,31 +172,56 @@
         }
     },
     "nftDetail": {
-        "collectionDescription": "Neo Collectibles FIND",
-        "collectionName": "neomotorcycle",
+        "collection": {
+            "bannerImage": {
+                "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1": "image"
+            },
+            "description": "Neo Collectibles FIND",
+            "externalURL": "https://neomotorcycles.co.uk/index.html",
+            "name": "neomotorcycle",
+            "socials": {
+                "Discord": "https://discord.com/invite/XwSdNydezR",
+                "Twitter": "https://twitter.com/MotorcyclesNeo"
+            },
+            "squareImage": {
+                "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image"
+            }
+        },
+        "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+        "editions": [
+            {
+                "max": 1,
+                "name": "nft",
+                "number": 1
+            }
+        ],
+        "externalViewURL": "https://find.xyz/collection/user1/dandy/ID0",
         "id": 953,
         "media": {
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
         "name": "Neo Motorcycle 1 of 1",
-        "rarity": "rare",
-        "scalars": {
-            "Speed": 200,
-            "edition_nft_max": 1,
-            "edition_nft_number": 1,
-            "rarity_max": 100,
-            "rarity_score": 50
-        },
-        "tags": {
-            "Color": "Pearl"
+        "rarity": {
+            "description": "rare",
+            "max": 100,
+            "score": 50
         },
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+        "traits": [
+            {
+                "displayType": "String",
+                "name": "Color",
+                "value": "Pearl"
+            },
+            {
+                "displayType": "Numeric",
+                "name": "Speed",
+                "value": 200
+            }
+        ],
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
         "uuid": 953,
         "views": [
-            "checked",
-            "checked",
-            "checked",
             "checked",
             "checked",
             "checked",

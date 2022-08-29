@@ -49,6 +49,32 @@ func TestNFTDetailScript(t *testing.T) {
 		autogold.Equal(t, actual)
 	})
 
+	// t.Run("Should be able to get nft details of item with views", func(t *testing.T) {
+
+	// 	otu.listNFTForSale("user1", ids[1], price)
+
+	// 	actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
+	// 		WithArg("user", "user1"),
+	// 		WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+	// 		WithArg("id", ids[1]),
+	// 		WithArg("views", `[
+	// 		"A.f8d6e0586b0a20c7.FindViews.Nounce",
+	// 		"A.f8d6e0586b0a20c7.MetadataViews.Traits",
+	// 		"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+	// 		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+	// 		"A.f8d6e0586b0a20c7.FindViews.CreativeWork",]`),
+	// 	).
+	// 		GetAsJson()
+
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+
+	// 	actual = otu.replaceID(actual, ids)
+
+	// 	autogold.Equal(t, actual)
+	// })
+
 	t.Run("Should be able to get nft details of item if listed in rule with no listing type", func(t *testing.T) {
 
 		otu.O.Tx("adminSetSellDandyRules",
@@ -75,31 +101,19 @@ func TestNFTDetailScript(t *testing.T) {
 
 		autogold.Equal(t, actual)
 
-	})
-
-	t.Run("Should be able to get nft details of item with views", func(t *testing.T) {
-
-		otu.listNFTForSale("user1", ids[1], price)
-
-		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
-			WithArg("user", "user1"),
-			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-			WithArg("id", ids[1]),
-			WithArg("views", `[					"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",]`),
+		// Remove these general rule for later testing
+		otu.O.Tx("removeMarketOption",
+			WithSigner("account"),
+			WithArg("saleItemName", "FUSDDandy"),
 		).
-			GetAsJson()
+			AssertSuccess(t)
 
-		if err != nil {
-			panic(err)
-		}
+		otu.O.Tx("removeMarketOption",
+			WithSigner("account"),
+			WithArg("saleItemName", "FlowDandy"),
+		).
+			AssertSuccess(t)
 
-		actual = otu.replaceID(actual, ids)
-
-		autogold.Equal(t, actual)
 	})
 
 	t.Run("Should be able to get all listings of a person by a script", func(t *testing.T) {
@@ -141,10 +155,10 @@ func TestNFTDetailScript(t *testing.T) {
 					"id":                    503,
 					"name":                  "Neo Motorcycle 2 of 3",
 					"scalars": map[string]interface{}{
-						"Speed":                100,
-						"edition_set_max":      3,
-						"edition_set_number":   2,
-						"number.date.Birthday": 1.660145023e+09,
+						"Speed":              100,
+						"date.Birthday":      1.660145023e+09,
+						"edition_set_max":    3,
+						"edition_set_number": 2,
 					},
 					"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 					"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
@@ -332,7 +346,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
-		).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionSoft/items/0",
+		).Print().AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionSoft/items/0",
 			autogold.Want("Should not be fetching NFTInfo if stopped", map[string]interface{}{
 				"amount": 10, "auction": map[string]interface{}{
 					"currentPrice": 10, "extentionOnLateBid": 60, "minimumBidIncrement": 1,

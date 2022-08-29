@@ -580,6 +580,15 @@ pub contract FindMarketAuctionSoft {
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
 			let tenant = self.getTenant()
+
+			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC) 
+			if tenant.name == "onefootball" {
+				// ensure it is not a 0 dollar listing
+				if auctionStartPrice <= 0.65 {
+					panic("Auction start price should be greater than 0.65")
+				}
+			} 
+
 			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: pointer.getItemType(), ftType: vaultType, action: FindMarket.MarketAction(listing:true, name:"list item for soft-auction"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {

@@ -607,6 +607,15 @@ pub contract FindMarketDirectOfferEscrow {
 				panic("You already have an bid for this item, use increaseBid on that bid")
 			}
 			let tenant=self.getTenant()
+
+			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC) 
+			if tenant.name == "onefootball" {
+				// ensure it is not a 0 dollar listing
+				if vault.balance <= 0.65 {
+					panic("Offer price should be greater than 0.65")
+				}
+			} 
+
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 
 			let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)

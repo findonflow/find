@@ -6,24 +6,6 @@ import (
 
 func main() {
 
-	// o2 := overflow.NewOverflowMainnet().Start()
-
-	//pub fun main(user: String, nftAliasOrIdentifier:String, id: UInt64, views: [String]) : NFTDetailReport?{
-	// res3 := o2.ScriptFromFile("getNFTDetailsNFTCatalog").NamedArguments(map[string]string{
-	// 	"user":                 "christian",
-	// 	"nftAliasOrIdentifier": "Dandy",
-	// 	"id":                   "97168801",
-	// 	"views":                `["A.631e88ae7f1d7c20.MetadataViews.NFTCollectionData"]`,
-	// }).RunReturnsJsonString()
-
-	// res3 := o2.ScriptFromFile("getFactoryCollectionsNFTCatalog").NamedArguments(map[string]string{
-	// 	"user":        "bjartek",
-	// 	"maxItems":    "5",
-	// 	"collections": `[]`,
-	// }).RunReturnsJsonString()
-
-	// fmt.Println(res3)
-
 	//mainnet script test
 
 	network := "mainnet"
@@ -32,86 +14,81 @@ func main() {
 		WithNetwork(network),
 	)
 
-	prefix := network
+	prefix := network + "get"
 
-	script := "getFactoryCollections"
+	IdSuffix := "IDs"
+	ItemSuffix := "Items"
 
-	suffix := "RaribleNFT"
-	o.Script(prefix+script+suffix,
+	script := "Socks"
+	o.Script(prefix+script+IdSuffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
+	o.Script(prefix+script+ItemSuffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"FlowverseSocks" : [14939]}`),
 	)
 
-	suffix = "Shard1"
-	o.Script(prefix+script+suffix,
+	script = "Alchemy1"
+	o.Script(prefix+script+IdSuffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
+	o.Script(prefix+script+ItemSuffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"TuneGO" : [328]}`),
 	)
 
-	suffix = "Shard2"
-	o.Script(prefix+script+suffix,
+	script = "Alchemy2"
+	o.Script(prefix+script+IdSuffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
+	o.Script(prefix+script+ItemSuffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"Xtingles" : [1281]}`),
 	)
 
-	suffix = "Shard3"
-	o.Script(prefix+script+suffix,
+	script = "Alchemy3"
+	o.Script(prefix+script+IdSuffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "2"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
+	o.Script(prefix+script+ItemSuffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"SomePlaceCollectible" : [164769803]}`),
 	)
 
-	suffix = "Shard4"
-	o.Script(prefix+script+suffix,
+	script = "Alchemy4"
+	o.Script(prefix+script+IdSuffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "10"),
 		WithArg("collections", "[]"),
 	)
 
-	o.Script(prefix+"getAdditionalFactoryCollectionItems"+suffix,
+	o.Script(prefix+script+ItemSuffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"PartyMansionDrinksContract" : [836]}`),
 	)
 
-	suffix = "NFTCatalog"
-	o.Script(script+suffix,
+	script = "NFTCatalog"
+	o.Script("get"+script+IdSuffix,
 		WithArg("user", "bjartek"),
-		WithArg("maxItems", "1"),
 		WithArg("collections", `[]`),
 	)
 
-	o.Script("getAdditionalFactoryCollectionItemsNFTCatalog",
+	o.Script("get"+script+ItemSuffix,
 		WithArg("user", "bjartek"),
 		WithArg("collectionIDs", `{"schmoes_prelaunch_token" : [9]}`),
 	)
 
 	// get NFTDetail script
-	script = "getNFTDetails"
+	script = "NFTDetails"
 
-	suffix = "RaribleNFT"
+	suffix := "Socks"
 	o.Script(prefix+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "Flowverse Socks"),
@@ -152,7 +129,7 @@ func main() {
 	)
 
 	suffix = "NFTCatalog"
-	o.Script(script+suffix,
+	o.Script("get"+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "A.921ea449dffec68a.Flovatar.NFT"),
 		WithArg("id", 2271),
@@ -160,7 +137,7 @@ func main() {
 	)
 
 	// if that item is soul bounded , it will not show on allow listing
-	o.Script(script+suffix,
+	o.Script("get"+script+suffix,
 		WithArg("user", "bjartek"),
 		WithArg("project", "FLOAT"),
 		WithArg("id", 277927096),

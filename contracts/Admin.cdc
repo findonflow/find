@@ -77,12 +77,18 @@ pub contract Admin {
 			FindForge.removeForgeType(type: type)
 		}
 
-		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule]) : Capability<&FindMarket.Tenant> {
+		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules)
+			var findRoyalty:MetadataViews.Royalty?=nil
+			if let cut = findCut{
+				let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+				findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: cut,  description: "find")
+			}
+
+			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules, findRoyalty:findRoyalty)
 		}
 
 		/// Set the wallet used for the network

@@ -31,7 +31,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	mintFund("testMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(300)
+	otu.setUUID(400)
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
@@ -889,24 +889,24 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-			otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0)
 
-			ids, err := otu.O.Script("getRoyaltyChangedIds",
-				WithArg("marketplace", "account"),
-				WithArg("user", "user1"),
-			).
-				GetAsJson()
-	
-			if err != nil {
-				panic(err)
-			}
-	
-			otu.O.Tx("relistMarketListings",
-				WithSigner("user1"),
-				WithArg("marketplace", "account"),
-				WithArg("ids", ids),
-			).
-				AssertSuccess(t)
+		ids, err := otu.O.Script("getRoyaltyChangedIds",
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+		).
+			GetAsJson()
+
+		if err != nil {
+			panic(err)
+		}
+
+		otu.O.Tx("relistMarketListings",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", ids),
+		).
+			AssertSuccess(t)
 
 	})
 
@@ -931,6 +931,5 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertSuccess(t)
 
 	})
-
 
 }

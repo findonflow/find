@@ -31,7 +31,29 @@ pub contract FindMarket {
 	access(account) let tenantNameAddress : {String:Address}
 	access(account) let tenantAddressName : {Address:String}
 
+	// Deprecated in testnet
+	pub struct TenantCuts {
+		pub let findCut:MetadataViews.Royalty?
+		pub let tenantCut:MetadataViews.Royalty?
 
+		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
+			self.findCut=findCut
+			self.tenantCut=tenantCut
+		}
+	}
+
+	// Deprecated in testnet
+	pub struct ActionResult {
+		pub let allowed:Bool
+		pub let message:String
+		pub let name:String
+
+		init(allowed:Bool, message:String, name:String) {
+			self.allowed=allowed
+			self.message=message
+			self.name =name
+		}
+	}
 
 	// ========================================
 	pub fun getPublicPath(_ type: Type, name:String) : PublicPath {
@@ -814,7 +836,7 @@ pub contract FindMarket {
 				emit TenantAllowRules(tenant: tenant, ruleName: ruleName, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
 				return
 			} else if type == "cut" {
-				emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut!.cut, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
+				emit FindCutRules(tenant: tenant, ruleName: ruleName, cut:item.cut?.cut ?? 0.0, ftTypes:ftTypes, nftTypes:nftTypes, listingTypes:listingTypes, status:ruleStatus!)
 				return
 			}
 			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
@@ -1103,14 +1125,10 @@ pub contract FindMarket {
 
 			return self.capability!.borrow()!
 		}
-
 	}
 
-	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule]) : Capability<&Tenant> {
+	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule], findRoyalty: MetadataViews.Royalty?) : Capability<&Tenant> {
 		let account=FindMarket.account
-
-		let receiver=FindMarket.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025, description: "find")
 
 		let tenant <- create Tenant(name)
 		//fetch the TenentRegistry from our storage path and add the new tenant with the given name and address
@@ -1204,7 +1222,17 @@ pub contract FindMarket {
 			for royaltyItem in royalties {
 				totalRoyalties = totalRoyalties + royaltyItem.cut
 				let description=royaltyItem.description
-				let cutAmount= soldFor * royaltyItem.cut
+
+				var cutAmount= soldFor * royaltyItem.cut
+				if tenant == "onefootball" {
+					//{"onefootball largest of 6% or 0.65": 0.65)}
+					let minAmount = 0.65
+
+					if minAmount > cutAmount {
+						cutAmount = minAmount
+					}
+				}
+
 				let receiver = royaltyItem.receiver.address
 				let name = resolveName(royaltyItem.receiver.address)
 
@@ -1324,7 +1352,7 @@ pub contract FindMarket {
 						if numericValues[display] != nil {
 
 							if display == "Date" || display == "date" {
-								traitName = "number.date.".concat(traitName)
+								traitName = "date.".concat(traitName)
 							}
 
 							if let value = trait.value as? Number {

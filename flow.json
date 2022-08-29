@@ -246,6 +246,10 @@
       "address": "045a1763c93006ca",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
+    "emulator-user5-dapper": {
+      "address": "120e725050340cab",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
     "testnet-account": {
       "address": "0x1ff7e32d71183db0",
       "key": "${TESTNET_ACCOUNT}"
@@ -403,7 +407,8 @@
       "emulator-user3": [],
       "emulator-user4": [
         "NFGv3"
-      ]
+      ],
+      "emulator-user5-dapper": []
     }
   }
 }
