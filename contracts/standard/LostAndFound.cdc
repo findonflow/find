@@ -113,6 +113,31 @@ pub contract LostAndFound {
             return self.item != nil
         }
 
+        // A function to get depositor address / flow Repayment address
+        pub fun getFlowRepaymentAddress() : Address? {
+            return self.flowTokenRepayment?.address
+        }
+
+        // If this is an instance of NFT, return the id , otherwise return nil
+        pub fun getNonFungibleTokenID() : UInt64? {
+            if self.type.isSubtype(of: Type<@NonFungibleToken.NFT>()) {
+                let ref = (&self.item as auth &AnyResource?)!
+                let nft = ref as! &NonFungibleToken.NFT
+                return nft.id
+            }
+            return nil
+        }
+
+        // If this is an instance of FT, return the vault balance , otherwise return nil
+        pub fun getFungibleTokenBalance() : UFix64? {
+            if self.type.isSubtype(of: Type<@FungibleToken.Vault>()) {
+                let ref = (&self.item as auth &AnyResource?)!
+                let ft = ref as! &FungibleToken.Vault
+                return ft.balance
+            }
+            return nil
+        }
+
         pub fun withdraw(receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver address and redeemer must match"
@@ -392,7 +417,7 @@ pub contract LostAndFound {
             display: MetadataViews.Display?,
             storagePayment: &FungibleToken.Vault,
             flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>?
-        ) {
+        ) : UInt64 {
             pre {
                 flowTokenRepayment == nil || flowTokenRepayment!.check(): "flowTokenRepayment is not valid"
                 storagePayment.getType() == Type<@FlowToken.Vault>(): "storage payment must be in flow tokens"
@@ -425,6 +450,7 @@ pub contract LostAndFound {
 
             let storagePaymentVault <- storagePayment.withdraw(amount: storageFee)
             receiver.deposit(from: <-storagePaymentVault)
+            return uuid
         }
 
         pub fun borrowShelf(redeemer: Address): &LostAndFound.Shelf? {
@@ -489,7 +515,7 @@ pub contract LostAndFound {
             item: @AnyResource,
             memo: String?,
             display: MetadataViews.Display?
-        ) {
+        ) : UInt64 {
             let receiver = LostAndFound.account
                 .getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
                 .borrow()!
@@ -520,6 +546,7 @@ pub contract LostAndFound {
             let storagePaymentVault <- self.withdrawTokens(amount: storageFee)
 
             receiver.deposit(from: <-storagePaymentVault)
+            return uuid
         }
 
             pub fun trySendResource(
@@ -679,14 +706,14 @@ pub contract LostAndFound {
         display: MetadataViews.Display?,
         storagePayment: &FungibleToken.Vault,
         flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>?
-    ) {
+    ) : UInt64 {
         pre {
             flowTokenRepayment == nil || flowTokenRepayment!.check(): "flowTokenRepayment is not valid"
             storagePayment.getType() == Type<@FlowToken.Vault>(): "storage payment must be in flow tokens"
         }
 
         let shelfManager = LostAndFound.borrowShelfManager()
-        shelfManager.deposit(redeemer: redeemer, item: <-item, memo: memo, display: display, storagePayment: storagePayment, flowTokenRepayment: flowTokenRepayment)
+        return shelfManager.deposit(redeemer: redeemer, item: <-item, memo: memo, display: display, storagePayment: storagePayment, flowTokenRepayment: flowTokenRepayment)
     }
 
     pub fun trySendResource(

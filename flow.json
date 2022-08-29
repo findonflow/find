@@ -214,7 +214,8 @@
     "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
     "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
     "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
-    "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc"
+    "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
+    "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -354,7 +355,8 @@
         "ProfileCache",
         "FindRulesCache",
         "FINDNFTCatalog",
-        "FINDNFTCatalogAdmin"
+        "FINDNFTCatalogAdmin",
+        "FindLostAndFoundWrapper"
       ],
       "testnet-user1": [
         "NFGv3"
@@ -399,7 +401,8 @@
         "NFTCatalog",
         "FINDNFTCatalog",
         "NFTCatalogAdmin",
-        "FINDNFTCatalogAdmin"
+        "FINDNFTCatalogAdmin",
+        "FindLostAndFoundWrapper"
       ],
       "emulator-find": [],
       "emulator-user1": [],
