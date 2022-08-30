@@ -221,7 +221,7 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 ## Implementing `MetadataViews.Medias`
 
 Medias views can put all the precious media of the NFT on .Find. 
-By returning medias views as recommended, all the medias will be displayed to the viewers instead of just the main one.
+By returning medias views as recommended, all the media will be displayed to the viewers instead of just the main one.
 
 ```cadence
 
@@ -267,7 +267,7 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 ![MetadataViews.Medias](/images/medias.png "Medias")
 
 Thumbnail of the NFT would be placed the first of the album. 
-And followed by the sequence of Medias exposed.
+And followed by the sequence of MetadataViews.Medias exposed.
 
 | Param      | Description |
 | ----------- | ----------- |
