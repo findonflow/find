@@ -109,7 +109,7 @@ By returning trait views as recommended, you can fit the data in the places you 
 pub fun resolveView(_ type: Type): AnyStruct? {
 	switch type {
 
-		// Example for NFTCollectionDisplay 
+		// Example for Traits
 		case Type<MetadataViews.Traits>() : 
 
 			let trait = MetadataViews.Trait(
@@ -216,3 +216,60 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 | value      | Value of the trait  |
 | displayType      | Value of the trait, can be "String", "Number", "Date" etc. |
 | rarity      | Additional rarity to this trait, description / numbder / maximum number of the rarity    |
+
+
+## Implementing `MetadataViews.Medias`
+
+Medias views can put all the precious media of the NFT on .Find. 
+By returning medias views as recommended, all the medias will be displayed to the viewers instead of just the main one.
+
+```cadence
+
+pub fun resolveView(_ type: Type): AnyStruct? {
+	switch type {
+
+		// Example for Medias 
+		case Type<MetadataViews.Medias>() : 
+
+			let IPFSMedia = MetadataViews.Media(
+				file: 		MetadataViews.IPFSFile(
+								cid: "Example_CID", 
+								path: nil
+							)
+				mediaType: 	"image/example"
+			)
+
+			let IPFSMedia2 = MetadataViews.Media(
+				file: 		MetadataViews.IPFSFile(
+								cid: "Example_CID", 
+								path: nil
+							)
+				mediaType: 	"image/example"
+			)
+
+			let HTTPMedia = MetadataViews.HTTPFile(
+				url: 		"Example_HTTP_Link"
+			)
+
+			return MetadataViews.Medias(
+				[
+					IPFSMedia , 
+					IPFSMedia2 , 
+					HTTPMedia
+				]
+			)
+
+	}
+}
+
+```
+
+![MetadataViews.Medias](/images/medias.png "Medias")
+
+Thumbnail of the NFT would be placed the first of the album. 
+And followed by the sequence of Medias exposed.
+
+| Param      | Description |
+| ----------- | ----------- |
+| file   | Structs that implements MetadataViews.File Interface  |
+| mediaType      | Abide by standard trees format. Reference : https://en.wikipedia.org/wiki/Media_type#Standards_tree, e.g. image/png, video/mp4  |
