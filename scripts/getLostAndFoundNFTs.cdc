@@ -1,3 +1,4 @@
+import LostAndFoundHelper from "../contracts/standard/LostAndFoundHelper.cdc"
 import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
@@ -23,17 +24,19 @@ pub fun main(user: String, specificType: String?) : Report {
 
 pub struct Report {
 
-	pub let ticketInfo : {String : [FindLostAndFoundWrapper.TicketInfo]}
+	pub let ticketInfo : {String : [LostAndFoundHelper.Ticket]}
 	pub let tickets : {String : [UInt64]}
 	pub let error : String?
 
-	init(ticketInfo : {String : [FindLostAndFoundWrapper.TicketInfo]}, error: String?) {
+	init(ticketInfo : {String : [LostAndFoundHelper.Ticket]}, error: String?) {
 		self.ticketInfo = ticketInfo
 		let allTickets : {String : [UInt64]} = {}
 		let tickets : [UInt64] = []
 		for type in ticketInfo.keys {
 			for ticket in ticketInfo[type]! {
-				tickets.append(ticket.ticketID)
+				if ticket.ticketID != nil {
+					tickets.append(ticket.ticketID!)
+				}
 			}
 			allTickets.insert(key: type, tickets)
 		}

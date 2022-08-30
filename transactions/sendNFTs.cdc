@@ -1,4 +1,3 @@
-import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FindViews from "../contracts/FindViews.cdc"
@@ -7,8 +6,9 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 
-transaction(nftIdentifiers: [String], receivers: [String] , ids:[UInt64], memos: [String], flowStorageFees: [UFix64]) {
+transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String], random: Bool) {
 
     let pointers : [FindViews.AuthNFTPointer]
     let nftInfos : [NFTCatalog.NFTCollectionData]
@@ -17,7 +17,7 @@ transaction(nftIdentifiers: [String], receivers: [String] , ids:[UInt64], memos:
 
     prepare(account: AuthAccount){
 
-        if receivers.length != nftIdentifiers.length || receivers.length != ids.length || receivers.length != memos.length || receivers.length != flowStorageFees.length {
+        if allReceivers.length != nftIdentifiers.length || allReceivers.length != ids.length || allReceivers.length != memos.length {
             panic("The length of arrays passed in are not equal")
         }
 
@@ -72,6 +72,11 @@ transaction(nftIdentifiers: [String], receivers: [String] , ids:[UInt64], memos:
         let initialFlowBalance = self.flowVault.balance
         let receivingAddresses : {String : Address} = {}
 
+        var receivers = allReceivers
+        if random {
+            receivers = FindLostAndFoundWrapper.shuffleStringArray(allReceivers)
+        }
+
         for i , receiver in receivers {
             if receivingAddresses[receiver] == nil {
                 let receivingAddress = FIND.resolve(receiver) ?? panic("invalid find name or address. Input : ".concat(receiver))
@@ -80,21 +85,11 @@ transaction(nftIdentifiers: [String], receivers: [String] , ids:[UInt64], memos:
             let receivingAddress = receivingAddresses[receiver]!
             let receiverCap = getAccount(receivingAddress).getCapability<&{NonFungibleToken.Receiver}>(self.nftInfos[i].publicPath)
 
-            // Check user flow balance before depositing to give better error message 
-            if self.flowVault.balance < flowStorageFees[i] {
-                var totalRequired = 0.0 
-                for fee in flowStorageFees {
-                    totalRequired = totalRequired + fee
-                }
-                panic("Flow token balance is not sufficient to pay for storageFees required. Balance : ".concat(initialFlowBalance.toString().concat(" Required : ").concat(totalRequired.toString())))
-            }
-
-            let storagePaymentVault <- self.flowVault.withdraw(amount: flowStorageFees[i])
             FindLostAndFoundWrapper.depositNFT(
                 receiverCap: receiverCap,
                 item: self.pointers[i],
                 memo: memos[i],
-                storagePayment: <- storagePaymentVault,
+                storagePayment: self.flowVault,
                 flowTokenRepayment: self.flowTokenRepayment
             )
 

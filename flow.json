@@ -78,7 +78,7 @@
         "testnet": "0x0afe396ebc8eee65"
       }
     },
-    "FeeEstimator.": {
+    "FeeEstimator": {
       "source": "./contracts/standard/FeeEstimator.cdc",
       "aliases": {
         "testnet": "0xbe4635353f55bbd4",
@@ -88,12 +88,20 @@
     "FlowStorageFees": {
       "source": "./contracts/standard/FlowStorageFees.cdc",
       "aliases": {
+        "emulator": "0xf8d6e0586b0a20c7",
         "testnet": "0xbe4635353f55bbd4",
         "mainnet": "0x473d6a2c37eab5be"
       }
     },
     "LostAndFound": {
       "source": "./contracts/standard/LostAndFound.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "LostAndFoundHelper": {
+      "source": "./contracts/standard/LostAndFoundHelper.cdc",
       "aliases": {
         "testnet": "0xbe4635353f55bbd4",
         "mainnet": "0x473d6a2c37eab5be"
@@ -402,7 +410,10 @@
         "FINDNFTCatalog",
         "NFTCatalogAdmin",
         "FINDNFTCatalogAdmin",
-        "FindLostAndFoundWrapper"
+        "FindLostAndFoundWrapper",
+        "FeeEstimator",
+        "LostAndFound",
+        "LostAndFoundHelper"
       ],
       "emulator-find": [],
       "emulator-user1": [],

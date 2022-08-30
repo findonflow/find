@@ -24,13 +24,13 @@ transaction(ids: {String : [UInt64]}) {
             }
             let nft = nftInfos[type]!
 
-			var targetCapability = self.receiverCaps[type]!
+			var targetCapability = self.receiverCaps[type]
 			if targetCapability == nil {
 				targetCapability = account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(nft.publicPath)
-				if !targetCapability.check(){
+				if !targetCapability!.check(){
 					panic("Corresponding collection is not initialized. Type : ".concat(type))
 				}
-				self.receiverCaps.insert(key: type, targetCapability)
+				self.receiverCaps.insert(key: type, targetCapability!)
 			}
 
 		}
