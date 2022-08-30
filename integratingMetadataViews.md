@@ -124,16 +124,64 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 			)
 
 			let dateTrait = MetadataViews.Trait(
-				name: "BirthDay" ,      // Type<String>
-				value: "1546360800",    // Type<AnyStruct>
-				displayType: "Date",    // Type<String?>
-				rarity: nil             // Type<MetadataViews.Rarity?>
+				name: "BirthDay" ,      
+				value: 1546360800.0,    		
+				displayType: "Date",    
+				rarity: nil             			// Not Needed
+			)
+
+			let numberTrait = MetadataViews.Trait(
+				name: "Generation" ,      
+				value: 1.0,    
+				displayType: "Number",    
+				rarity: MetadataViews.Rarity(
+					score: nil,              		// Not Needed
+					max: 2.0,                		// Optional
+					description: nil    			// Optional
+				)           
+			)
+
+			let boostTrait = MetadataViews.Trait(
+				name: "Aqua Power" ,      
+				value: 10.0,    
+				displayType: "Boost",    
+				rarity: MetadataViews.Rarity(		
+					score: nil,              		// Not Needed
+					max: 40.0,                		// Optional
+					description: nil    			// Optional
+				)           
+			)
+
+			let boostPercentageTrait = MetadataViews.Trait(
+				name: "Stamina Increase" ,      
+				value: 0.05,    
+				displayType: "BoostPercentage",    
+				rarity: MetadataViews.Rarity(		
+					score: nil,              		// Not Needed
+					max: nil,                		// Not Needed
+					description: nil    			// Optional
+				)           
+			)
+
+			let levelTrait = MetadataViews.Trait(
+				name: "Stamina Increase" ,      
+				value: 90.2,    
+				displayType: "Level",    
+				rarity: MetadataViews.Rarity(		
+					score: nil,              		// Not Needed
+					max: 90.2,                		// Optional
+					description: nil    			// Optional
+				)           
 			)
 
 			return MetadataViews.Traits(
 				[
 					trait, 
-					dateTrait
+					dateTrait, 
+					numberTrait, 
+					boostTrait, 
+					boostPercentageTrait, 
+					levelTrait
 				]
 			)
 
@@ -148,6 +196,19 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 
 ## Date Trait (Under development)
 ![MetadataViews.Traits](/images/traits_Date.png "traits_Date")
+
+## Number Trait (Under development)
+### Number
+![MetadataViews.Traits](/images/traits_Number.png "traits_Number")
+
+### Boost
+![MetadataViews.Traits](/images/traits_Boost.png "traits_Boost")
+
+### Boost Percentage
+![MetadataViews.Traits](/images/traits_BoostPercentage.png "traits_BoostPercentage")
+
+### Level
+![MetadataViews.Traits](/images/traits_Level.png "traits_Level")
 
 | Param      | Description |
 | ----------- | ----------- |
