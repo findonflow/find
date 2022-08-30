@@ -17,7 +17,7 @@ var (
 	saSigner    = WithSignerServiceAccount()
 	user1Signer = WithSigner("user1")
 
-//	user2Signer = SignProposeAndPayAs("user2")
+// user2Signer = SignProposeAndPayAs("user2")
 )
 
 type OverflowTestUtils struct {
