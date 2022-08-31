@@ -1927,14 +1927,14 @@ func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTes
 
 func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowTestUtils {
 
-	otu.O.Tx("setUpExampleNFT",
+	otu.O.Tx("setUpExampleNFTCollection",
 		WithSigner(receiver),
 	).
 		AssertSuccess(otu.T)
 
 	otu.O.Tx("sendExampleNFT",
 		WithSigner(sender),
-		WithArg("user", receiver),
+		WithArg("user", otu.O.Address(receiver)),
 		WithArg("id", 0),
 	).
 		AssertSuccess(otu.T)
@@ -1943,7 +1943,7 @@ func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowT
 }
 
 func (otu *OverflowTestUtils) sendSoulBoundNFT(receiver, sender string) *OverflowTestUtils {
-	otu.O.Tx("setUpExampleNFT",
+	otu.O.Tx("setUpExampleNFTCollection",
 		WithSigner(receiver),
 	).
 		AssertSuccess(otu.T)
@@ -2369,6 +2369,33 @@ func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64) *O
 	).
 		AssertSuccess(otu.T)
 	return otu
+}
+
+func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
+	res := otu.O.Tx("sendNFTs",
+		WithSigner("account"),
+		WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
+		WithArg("allReceivers", `["user1"]`),
+		WithArg("ids", []uint64{0}),
+		WithArg("memos", `["Hello!"]`),
+		WithArg("random", false),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
+			"receiver":     otu.O.Address("user1"),
+			"receiverName": "user1",
+			"sender":       otu.O.Address("account"),
+			"type":         "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+			"id":           0,
+			"memo":         "Hello!",
+			"name":         "DUCExampleNFT",
+			"description":  "For testing listing in DUC",
+			"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
+		})
+
+	ticketID, err := res.GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
+	assert.NoError(otu.T, err)
+	return ticketID
 }
 
 type SaleItem struct {

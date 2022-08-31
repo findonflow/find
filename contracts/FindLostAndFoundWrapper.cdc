@@ -15,6 +15,11 @@ pub contract FindLostAndFoundWrapper {
     pub event TicketDeposited(receiver: Address, receiverName: String?, sender: Address, senderName: String?, ticketID: UInt64, type: String, id: UInt64, uuid: UInt64, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?, flowStorageFee: UFix64)
     pub event TicketRedeemed(receiver: Address, ticketID: UInt64, type: String)
 
+    // check if they have that storage 
+    // npm module for NFT catalog, that can init the storage of the users.  
+    // List of what you have in lost and found. 
+    // a button to init the storage 
+
     // Mapping of vault uuid to vault.  
     // A method to get around passing the "Vault" reference to Lost and Found to ensure it cannot be hacked. 
     // All vaults should be destroyed after deposit function
@@ -135,6 +140,45 @@ pub contract FindLostAndFoundWrapper {
         }
 
         return allTickets
+    }
+
+    pub fun getTicketIDs(user: Address, specificType: Type?) : {String : [UInt64]} {
+
+        let allTickets : {String : [UInt64]} = {}
+
+        let ticketTypes = LostAndFound.getRedeemableTypes(user) 
+        for type in ticketTypes {
+            if specificType != nil {
+                if !type.isSubtype(of: specificType!) {
+                    continue
+                }
+            }
+
+            let ticketInfo : [UInt64] = []
+            let tickets = LostAndFound.borrowAllTicketsByType(addr: user, type: type)
+
+            let shelf = LostAndFound.borrowShelfManager().borrowShelf(redeemer: user)!
+
+            let bin = shelf.borrowBin(type: type)!
+            ticketInfo.appendAll(bin.getTicketIDs())
+
+            allTickets[type.identifier] = ticketInfo
+        }
+
+        return allTickets
+    }
+
+    // Check for all types that are in Lost and found which are NFTs
+    pub fun getSpecificRedeemableTypes(user: Address, specificType: Type?) : [Type] {
+        let allTypes : [Type] = []
+        if specificType != nil {
+            for type in LostAndFound.getRedeemableTypes(user) {
+                if type.isSubtype(of: specificType!) {
+                    allTypes.append(type)
+                } 
+            }
+        }
+        return allTypes
     }
 
     // Helper function

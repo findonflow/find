@@ -18,10 +18,8 @@ func TestFindLostAndFound(t *testing.T) {
 		registerUser("user1").
 		registerExampleNFTInNFTRegistry()
 
-	ticketID := uint64(0)
-
 	t.Run("Should be able to send thru sendNFT transaction without account initiated", func(t *testing.T) {
-		res := otu.O.Tx("sendNFTs",
+		otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -42,21 +40,12 @@ func TestFindLostAndFound(t *testing.T) {
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			})
 
-		ticketID, _ = res.GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
-
-	})
-
-	t.Run("Should be able to get Lost And Found Ticket with script", func(t *testing.T) {
-
-		otu.O.Script("getLostAndFoundTickets",
-			WithArg("user", "user1"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-		).
-			AssertWithPointerWant(t, "/0", autogold.Want("Should get ticket no", ticketID))
+		resetState(otu, "user1", true)
 
 	})
 
 	t.Run("Should be able to get all Lost And Found NFT with script", func(t *testing.T) {
+		ticketID := otu.createExampleNFTTicket()
 
 		otu.O.Script("getLostAndFoundNFTs",
 			WithArg("user", "user1"),
@@ -77,9 +66,12 @@ func TestFindLostAndFound(t *testing.T) {
 				"tickets": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{ticketID}},
 			}))
 
+		resetState(otu, "user1", true)
+
 	})
 
 	t.Run("Should be able to get specific type Lost And Found NFT with script (ExampleNFT)", func(t *testing.T) {
+		ticketID := otu.createExampleNFTTicket()
 
 		cadenceString, err := cadence.NewString("A.f8d6e0586b0a20c7.ExampleNFT.NFT")
 		assert.NoError(t, err)
@@ -101,12 +93,15 @@ func TestFindLostAndFound(t *testing.T) {
 					"type":           "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
 				}}},
-				"tickets": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{238}},
+				"tickets": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{ticketID}},
 			}))
+
+		resetState(otu, "user1", true)
 
 	})
 
 	t.Run("Should be able to get specific type Lost And Found NFT with script (Dandy)", func(t *testing.T) {
+		otu.createExampleNFTTicket()
 
 		cadenceString, err := cadence.NewString("A.f8d6e0586b0a20c7.Dandy.NFT")
 		assert.NoError(t, err)
@@ -118,30 +113,40 @@ func TestFindLostAndFound(t *testing.T) {
 		).
 			AssertWant(t, autogold.Want("Should get all NFT Type", nil))
 
+		resetState(otu, "user1", true)
+
 	})
 
 	t.Run("Should be able to redeem NFT after initiating", func(t *testing.T) {
+		ticketID := otu.createExampleNFTTicket()
 
-		otu.O.Tx("setupExampleNFT",
+		otu.O.Tx("setupExampleNFTCollection",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("redeemLostAndFoundNFT",
+		otu.O.Tx("redeemLostAndFoundNFTs",
 			WithSigner("user1"),
 			WithArg("ids", `{"A.f8d6e0586b0a20c7.ExampleNFT.NFT" : [`+fmt.Sprint(ticketID)+`]}`),
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FindLostAndFoundWrapper.TicketRedeemed")
 
+		resetState(otu, "user1", true)
+
 	})
 
 	t.Run("Should be able to send thru sendNFT transaction with account initiated", func(t *testing.T) {
+		otu.O.Tx("setupExampleNFTCollection",
+			WithSigner("user1"),
+		).
+			AssertSuccess(t)
+
 		otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{1}),
+			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("random", false),
 		).
@@ -151,11 +156,12 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("account"),
 				"type":         "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
-				"id":           1,
+				"id":           0,
 				"memo":         "Hello!",
-				"name":         "SoulBoundNFT",
+				"name":         "DUCExampleNFT",
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			})
+		resetState(otu, "user1", false)
 
 	})
 
@@ -182,6 +188,8 @@ func TestFindLostAndFound(t *testing.T) {
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FindLostAndFoundWrapper.NFTDeposited").
 			AssertEmitEventName(t, "FindLostAndFoundWrapper.TicketDeposited")
+
+		resetState(otu, "user1", false)
 	})
 
 	t.Run("Should be able to send a lot of NFTs", func(t *testing.T) {
@@ -208,6 +216,58 @@ func TestFindLostAndFound(t *testing.T) {
 		).
 			AssertSuccess(t)
 
+		resetState(otu, "user1", false)
+	})
+
+	t.Run("Should be able to get required storage type by script so that they can redeem NFTs", func(t *testing.T) {
+
+		resetState(otu, "user2", false)
+
+		// mint one Dandy to "user2"
+		amount := 1
+		ids := mintDandies(otu, amount)
+
+		identifiers := []string{}
+		allReceivers := []string{}
+		memos := []string{}
+
+		for len(identifiers) < len(ids) {
+			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
+			allReceivers = append(allReceivers, "user2")
+			memos = append(memos, "Msg")
+		}
+
+		otu.O.Tx("sendNFTs",
+			WithSigner("user1"),
+			WithArg("nftIdentifiers", identifiers),
+			WithArg("allReceivers", allReceivers),
+			WithArg("ids", ids),
+			WithArg("memos", memos),
+			WithArg("random", false),
+		).
+			AssertSuccess(t)
+
+		// Scripts should be able to get initiable type
+		otu.O.Script("getLostAndFoundRequiredStorageType",
+			WithArg("user", "user2"),
+			WithArg("specificType", nil),
+		).
+			AssertWithPointerWant(t, "/initiableStorage/0", autogold.Want("Should get Dandy Type in initiable", "A.f8d6e0586b0a20c7.Dandy.NFT"))
+
+		otu.O.Tx("setupDandyCollection",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+		// Scripts should get initiated type
+		otu.O.Script("getLostAndFoundRequiredStorageType",
+			WithArg("user", "user2"),
+			WithArg("specificType", nil),
+		).
+			Print().
+			AssertWithPointerWant(t, "/initiatedStorage/0", autogold.Want("Should get Dandy Type in initiated", "A.f8d6e0586b0a20c7.Dandy.NFT"))
+
+		resetState(otu, "user2", false)
 	})
 
 }
@@ -230,4 +290,33 @@ func mintDandies(otu *OverflowTestUtils, number int) []uint64 {
 	).
 		AssertSuccess(otu.T)
 	return result.GetIdsFromEvent("Dandy.Deposit", "id")
+}
+
+func resetState(otu *OverflowTestUtils, user string, resetExampleNFT bool) *OverflowTestUtils {
+
+	signWithUser := otu.O.TxFN(
+		WithSigner(user),
+	)
+
+	signWithUser("setupDandyCollection").
+		AssertSuccess(otu.T)
+
+	signWithUser("setupExampleNFTCollection").
+		AssertSuccess(otu.T)
+
+	signWithUser("redeemAllLostAndFoundNFTs").
+		AssertSuccess(otu.T)
+
+	if resetExampleNFT {
+		otu.sendExampleNFT("account", user)
+	}
+
+	signWithUser("testDestroyExampleNFTCollection").
+		AssertSuccess(otu.T)
+
+	signWithUser("testDestroyDandyCollection").
+		AssertSuccess(otu.T)
+
+	return otu
+
 }
