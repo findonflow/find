@@ -275,6 +275,10 @@
       "address": "d116c726ad1b1cab",
       "key": "${TESTNET_ACCOUNT}"
     },
+    "testnet-find-lost-and-found-wrapper": {
+      "address": "82836e61c008d6d1",
+      "key": "${TESTNET_ACCOUNT}"
+    },
     "testnet-user1": {
       "address": "3e5b4c627064625d",
       "key": "${TESTNET_ACCOUNT}"
@@ -363,11 +367,13 @@
         "ProfileCache",
         "FindRulesCache",
         "FINDNFTCatalog",
-        "FINDNFTCatalogAdmin",
-        "FindLostAndFoundWrapper"
+        "FINDNFTCatalogAdmin"
       ],
       "testnet-user1": [
         "NFGv3"
+      ],
+      "testnet-find-lost-and-found-wrapper": [
+        "FindLostAndFoundWrapper"
       ]
     },
     "emulator": {
