@@ -1927,7 +1927,7 @@ func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTes
 
 func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowTestUtils {
 
-	otu.O.Tx("setUpExampleNFTCollection",
+	otu.O.Tx("setupExampleNFTCollection",
 		WithSigner(receiver),
 	).
 		AssertSuccess(otu.T)
@@ -1943,7 +1943,7 @@ func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowT
 }
 
 func (otu *OverflowTestUtils) sendSoulBoundNFT(receiver, sender string) *OverflowTestUtils {
-	otu.O.Tx("setUpExampleNFTCollection",
+	otu.O.Tx("setupExampleNFTCollection",
 		WithSigner(receiver),
 	).
 		AssertSuccess(otu.T)
