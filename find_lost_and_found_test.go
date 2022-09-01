@@ -221,6 +221,7 @@ func TestFindLostAndFound(t *testing.T) {
 		otu.O.Script("getLostAndFoundRequiredStorageType",
 			WithArg("user", "user2"),
 		).
+			Print().
 			AssertWithPointerWant(t, "/initiableStorage/0", autogold.Want("Should get Dandy Type in initiable", "A.f8d6e0586b0a20c7.Dandy.NFT"))
 
 		otu.O.Tx("setupDandyCollection",
