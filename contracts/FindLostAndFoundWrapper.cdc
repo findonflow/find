@@ -13,7 +13,8 @@ pub contract FindLostAndFoundWrapper {
 
     pub event NFTDeposited(receiver: Address, receiverName: String?, sender: Address?, senderName: String?, type: String, id: UInt64?, uuid: UInt64?, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?)
     pub event TicketDeposited(receiver: Address, receiverName: String?, sender: Address, senderName: String?, ticketID: UInt64, type: String, id: UInt64, uuid: UInt64, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?, flowStorageFee: UFix64)
-    pub event TicketRedeemed(receiver: Address, ticketID: UInt64, type: String)
+    pub event TicketRedeemed(receiver: Address, receiverName: String?, ticketID: UInt64, type: String)
+    pub event TicketRedeemFailed(receiver: Address, receiverName: String?, ticketID: UInt64, type: String, remark: String)
 
     // check if they have that storage 
     // npm module for NFT catalog, that can init the storage of the users.  
@@ -39,7 +40,7 @@ pub contract FindLostAndFoundWrapper {
         let senderName = FIND.reverseLookup(sender)
 
         let display = item.getDisplay()
-        let collectionDisplay = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) as? MetadataViews.NFTCollectionDisplay
+        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(item.getViewResolver())
         let id = item.id 
         let uuid = item.uuid
         let type = item.getItemType()
@@ -86,7 +87,8 @@ pub contract FindLostAndFoundWrapper {
     pub fun redeemNFT(type: Type, ticketID: UInt64, receiver: Capability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>) {
 
         if !receiver.check() {
-            panic("invalid capability")
+            emit TicketRedeemFailed(receiver: receiver.address, receiverName: FIND.reverseLookup(receiver.address), ticketID: ticketID, type: type.identifier, remark: "invalid capability")
+            return
         }
 
         let shelf = LostAndFound.borrowShelfManager().borrowShelf(redeemer: receiver.address) ?? panic("No items to redeem for this user: ".concat(receiver.address.toString()))
@@ -101,14 +103,14 @@ pub contract FindLostAndFoundWrapper {
         shelf.redeem(type: type, ticketID: ticketID, receiver: receiver)
         let item = FindViews.ViewReadPointer(cap: receiver, id: nftID)
         let display = item.getDisplay()
-        let collectionDisplay = item.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) as? MetadataViews.NFTCollectionDisplay
+        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(item.getViewResolver())
 
         var senderName : String? = nil 
         if sender != nil {
             senderName = FIND.reverseLookup(sender!)
         }
         emit NFTDeposited(receiver: receiver.address, receiverName: FIND.reverseLookup(receiver.address), sender: sender, senderName: senderName, type: type.identifier, id: nftID, uuid: item.uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-        emit TicketRedeemed(receiver: receiver.address, ticketID: ticketID, type: type.identifier)
+        emit TicketRedeemed(receiver: receiver.address, receiverName: FIND.reverseLookup(receiver.address), ticketID: ticketID, type: type.identifier)
 
     }
 

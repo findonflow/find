@@ -3,17 +3,10 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: String, specificType: String?) : Report {
+pub fun main(user: String) : Report {
 
     if let address = FIND.resolve(user){
-        var runTimeType : Type = Type<@NonFungibleToken.NFT>()
-        if specificType != nil {
-            let type = CompositeType(specificType!)
-			if runTimeType == nil {
-				return logErr("Cannot composite run time type. Type : ".concat(specificType!))
-			}
-            runTimeType = type!
-        }
+        let runTimeType : Type = Type<@NonFungibleToken.NFT>()
 
         let types = FindLostAndFoundWrapper.getSpecificRedeemableTypes(user: address, specificType: runTimeType)
 

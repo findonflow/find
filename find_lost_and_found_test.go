@@ -6,8 +6,6 @@ import (
 
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
-	"github.com/onflow/cadence"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFindLostAndFound(t *testing.T) {
@@ -49,10 +47,9 @@ func TestFindLostAndFound(t *testing.T) {
 
 		otu.O.Script("getLostAndFoundNFTs",
 			WithArg("user", "user1"),
-			WithArg("specificType", nil),
 		).
 			AssertWant(t, autogold.Want("Should get all NFT Type", map[string]interface{}{
-				"ticketInfo": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{map[string]interface{}{
+				"nftCatalogTicketInfo": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{map[string]interface{}{
 					"description":    "For testing listing in DUC",
 					"memo":           "Hello!",
 					"name":           "DUCExampleNFT",
@@ -63,55 +60,28 @@ func TestFindLostAndFound(t *testing.T) {
 					"type":           "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
 					"typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
 				}}},
-				"tickets": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{ticketID}},
+				"ticketIds": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{ticketID}},
 			}))
 
 		resetState(otu, "user1", true)
 
 	})
 
-	t.Run("Should be able to get specific type Lost And Found NFT with script (ExampleNFT)", func(t *testing.T) {
+	t.Run("Should not be able to redeem NFT without suitable collection. But tx will still run thru and events will be emitted", func(t *testing.T) {
 		ticketID := otu.createExampleNFTTicket()
 
-		cadenceString, err := cadence.NewString("A.f8d6e0586b0a20c7.ExampleNFT.NFT")
-		assert.NoError(t, err)
-		cadenceValue := cadence.Value(cadenceString)
-
-		otu.O.Script("getLostAndFoundNFTs",
-			WithArg("user", "user1"),
-			WithArg("specificType", cadence.NewOptional(cadenceValue)),
+		otu.O.Tx("redeemLostAndFoundNFTs",
+			WithSigner("user1"),
+			WithArg("ids", `{"A.f8d6e0586b0a20c7.ExampleNFT.NFT" : [`+fmt.Sprint(ticketID)+`]}`),
 		).
-			AssertWant(t, autogold.Want("Should get all NFT Type", map[string]interface{}{
-				"ticketInfo": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{map[string]interface{}{
-					"description":    "For testing listing in DUC",
-					"memo":           "Hello!",
-					"name":           "DUCExampleNFT",
-					"redeemed":       false,
-					"redeemer":       "0x179b6b1cb6755e31",
-					"thumbnail":      "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
-					"ticketID":       ticketID,
-					"type":           "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
-					"typeIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
-				}}},
-				"tickets": map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": []interface{}{ticketID}},
-			}))
-
-		resetState(otu, "user1", true)
-
-	})
-
-	t.Run("Should be able to get specific type Lost And Found NFT with script (Dandy)", func(t *testing.T) {
-		otu.createExampleNFTTicket()
-
-		cadenceString, err := cadence.NewString("A.f8d6e0586b0a20c7.Dandy.NFT")
-		assert.NoError(t, err)
-		cadenceValue := cadence.Value(cadenceString)
-
-		otu.O.Script("getLostAndFoundNFTs",
-			WithArg("user", "user1"),
-			WithArg("specificType", cadence.NewOptional(cadenceValue)),
-		).
-			AssertWant(t, autogold.Want("Should get all NFT Type", nil))
+			AssertSuccess(t).
+			AssertEvent(t, "FindLostAndFoundWrapper.TicketRedeemFailed", map[string]interface{}{
+				"receiver":     otu.O.Address("user1"),
+				"receiverName": "user1",
+				"ticketID":     ticketID,
+				"type":         "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+				"remark":       "invalid capability",
+			})
 
 		resetState(otu, "user1", true)
 
@@ -250,7 +220,6 @@ func TestFindLostAndFound(t *testing.T) {
 		// Scripts should be able to get initiable type
 		otu.O.Script("getLostAndFoundRequiredStorageType",
 			WithArg("user", "user2"),
-			WithArg("specificType", nil),
 		).
 			AssertWithPointerWant(t, "/initiableStorage/0", autogold.Want("Should get Dandy Type in initiable", "A.f8d6e0586b0a20c7.Dandy.NFT"))
 
@@ -262,7 +231,6 @@ func TestFindLostAndFound(t *testing.T) {
 		// Scripts should get initiated type
 		otu.O.Script("getLostAndFoundRequiredStorageType",
 			WithArg("user", "user2"),
-			WithArg("specificType", nil),
 		).
 			Print().
 			AssertWithPointerWant(t, "/initiatedStorage/0", autogold.Want("Should get Dandy Type in initiated", "A.f8d6e0586b0a20c7.Dandy.NFT"))

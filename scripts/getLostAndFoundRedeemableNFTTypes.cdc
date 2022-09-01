@@ -2,13 +2,10 @@ import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: String, specificType: String?) : Report {
+pub fun main(user: String) : Report {
 
     if let address = FIND.resolve(user){
-        var type : Type = Type<@NonFungibleToken.NFT>()
-        if specificType != nil {
-            type = CompositeType(specificType!)!
-        }
+        let type : Type = Type<@NonFungibleToken.NFT>()
         return Report(nftTypes: typeToStringArray(FindLostAndFoundWrapper.getSpecificRedeemableTypes(user: address, specificType: type)), err: nil)
     }
     return logErr("cannot resolve user")
