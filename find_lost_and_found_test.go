@@ -23,7 +23,6 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
-			WithArg("random", false),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -118,7 +117,6 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
-			WithArg("random", false),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -135,36 +133,17 @@ func TestFindLostAndFound(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to send thru sendNFT transaction and shuffle the receivers", func(t *testing.T) {
+	t.Run("Should be able to send a lot of NFTs", func(t *testing.T) {
+		amount := 70
+
 		otu.buyForge("user1").
 			createUser(100, "user2").
 			registerUser("user2").
 			createUser(100, "user3")
-		ids := otu.mintThreeExampleDandies()
+
+		ids := mintDandies(otu, amount)
 
 		otu.registerFtInRegistry()
-
-		user3 := fmt.Sprint(otu.O.Address("user3"))
-		user5 := fmt.Sprint(otu.O.Address("user5-dapper"))
-
-		otu.O.Tx("sendNFTs",
-			WithSigner("user1"),
-			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"]`),
-			WithArg("allReceivers", []string{"user2", user3, user5}),
-			WithArg("ids", ids),
-			WithArg("memos", `["Msg1" , "Msg2", "Msg3"]`),
-			WithArg("random", true),
-		).
-			AssertSuccess(t).
-			AssertEmitEventName(t, "FindLostAndFoundWrapper.NFTDeposited").
-			AssertEmitEventName(t, "FindLostAndFoundWrapper.TicketDeposited")
-
-		resetState(otu, "user1", false)
-	})
-
-	t.Run("Should be able to send a lot of NFTs", func(t *testing.T) {
-		amount := 70
-		ids := mintDandies(otu, amount)
 
 		identifiers := []string{}
 		allReceivers := []string{}
@@ -182,7 +161,6 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", allReceivers),
 			WithArg("ids", ids),
 			WithArg("memos", memos),
-			WithArg("random", false),
 		).
 			AssertSuccess(t)
 
@@ -213,7 +191,6 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", allReceivers),
 			WithArg("ids", ids),
 			WithArg("memos", memos),
-			WithArg("random", false),
 		).
 			AssertSuccess(t)
 

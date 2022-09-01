@@ -8,7 +8,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 
-transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String], random: Bool) {
+transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
     let pointers : [FindViews.AuthNFTPointer]
     let nftInfos : [NFTCatalog.NFTCollectionData]
@@ -73,10 +73,6 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
         let receivingAddresses : {String : Address} = {}
 
         var receivers = allReceivers
-        if random {
-            receivers = FindLostAndFoundWrapper.shuffleStringArray(allReceivers)
-        }
-
         for i , receiver in receivers {
             if receivingAddresses[receiver] == nil {
                 let receivingAddress = FIND.resolve(receiver) ?? panic("invalid find name or address. Input : ".concat(receiver))

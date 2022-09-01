@@ -200,16 +200,6 @@ pub contract FindLostAndFoundWrapper {
         destroy vault
     }
 
-    pub fun shuffleStringArray(_ array: [String]) : [String] {
-        let newArray : [String] = []
-        while array.length > 1 {
-            let random = unsafeRandom() % UInt64(array.length)
-            newArray.append(array.remove(at: random))
-        }
-        newArray.append(array.remove(at: 0))
-        return newArray
-    }
-
     init() {
         self.storagePaymentVaults <- {}
     }

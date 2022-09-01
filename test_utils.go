@@ -2378,7 +2378,6 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 		WithArg("allReceivers", `["user1"]`),
 		WithArg("ids", []uint64{0}),
 		WithArg("memos", `["Hello!"]`),
-		WithArg("random", false),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
