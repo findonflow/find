@@ -60,11 +60,13 @@ pub contract FindLostAndFoundWrapper {
                             memo: memo,
                             display: display
                         )
-
-        let vault <- storagePayment.withdraw(amount: estimate.storageFee)
+        // we add 0.00005 here just incase it falls below
+        // extra fees will be deposited back to the sender
+        let vault <- storagePayment.withdraw(amount: estimate.storageFee + 0.00005)
 
         // Put the payment vault in dictionary and get it's reference, just for safety that we don't pass vault ref to other contracts that we do not control
         let vaultUUID = vault.uuid 
+
         let vaultRef = FindLostAndFoundWrapper.depositVault(<- vault)
 
         let flowStorageFee = vaultRef.balance
