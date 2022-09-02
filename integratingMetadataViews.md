@@ -155,3 +155,4 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 | value      | Value of the trait  |
 | displayType      | Value of the trait, can be "String", "Number", "Date" etc. |
 | rarity      | Additional rarity to this trait, description / numbder / maximum number of the rarity    |
+ 

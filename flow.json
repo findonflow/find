@@ -78,6 +78,35 @@
         "testnet": "0x0afe396ebc8eee65"
       }
     },
+    "FeeEstimator": {
+      "source": "./contracts/standard/FeeEstimator.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "FlowStorageFees": {
+      "source": "./contracts/standard/FlowStorageFees.cdc",
+      "aliases": {
+        "emulator": "0xf8d6e0586b0a20c7",
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "LostAndFound": {
+      "source": "./contracts/standard/LostAndFound.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "LostAndFoundHelper": {
+      "source": "./contracts/standard/LostAndFoundHelper.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
     "AlchemyMetadataWrapperMainnetShard1": {
       "aliases": {
         "mainnet": "0xeb8cb4c3157d5dac"
@@ -193,7 +222,8 @@
     "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
     "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
     "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
-    "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc"
+    "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
+    "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -243,6 +273,10 @@
     },
     "testnet-find-admin": {
       "address": "d116c726ad1b1cab",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-lost-and-found-wrapper": {
+      "address": "82836e61c008d6d1",
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-user1": {
@@ -337,6 +371,9 @@
       ],
       "testnet-user1": [
         "NFGv3"
+      ],
+      "testnet-find-lost-and-found-wrapper": [
+        "FindLostAndFoundWrapper"
       ]
     },
     "emulator": {
@@ -378,7 +415,11 @@
         "NFTCatalog",
         "FINDNFTCatalog",
         "NFTCatalogAdmin",
-        "FINDNFTCatalogAdmin"
+        "FINDNFTCatalogAdmin",
+        "FindLostAndFoundWrapper",
+        "FeeEstimator",
+        "LostAndFound",
+        "LostAndFoundHelper"
       ],
       "emulator-find": [],
       "emulator-user1": [],

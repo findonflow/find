@@ -115,6 +115,20 @@ pub contract FINDNFTCatalog {
         return find
     }
 
+    // A helper function to get CollectionData directly from NFTIdentifier
+    pub fun getCollectionDataForType(nftTypeIdentifier: String) : NFTCatalog.NFTCollectionData? {
+        if let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftTypeIdentifier) {
+            if collections.length < 1 {
+                return nil
+            }
+            if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collections.keys[0]) {
+                return collection.collectionData
+            }
+        }
+        return nil
+    }
+
+
 
     // Get only FIND NFTCatalog
     pub fun getFINDCatalog() : {String : NFTCatalog.NFTCatalogMetadata} {

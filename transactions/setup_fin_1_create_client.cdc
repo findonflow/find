@@ -1,5 +1,5 @@
 
-import "../contracts/Admin.cdc"
+import Admin from "../contracts/Admin.cdc"
 
 //set up the adminClient in the contract that will own the network
 transaction() {
