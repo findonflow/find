@@ -12,15 +12,13 @@ pub struct NFTDetailReport {
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
 	pub let linkedForMarket : Bool?
-	pub let activatedAccount : Bool
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?, activatedAccount : Bool) {
+	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
 		self.storefront=storefront
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
 		self.linkedForMarket = linkedForMarket
-		self.activatedAccount = activatedAccount
 	}
 }
 
@@ -353,9 +351,9 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 				}
 			}
 		}
-		return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket, activatedAccount : true)
+		return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
 	}
-	return NFTDetailReport(findMarket:{}, storefront:nil, nftDetail: nil, allowedListingActions: {}, linkedForMarket : nil, activatedAccount : false)
+	return nil
 
 }
 

@@ -102,6 +102,9 @@ pub struct MetadataCollectionItem {
 pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 	let NFTs: [MetadataCollectionItem] = []
 	let owner = getAccount(ownerAddress)
+	if owner.balance == 0.0 {
+		return []
+	}
 
 	for key in ids.keys {
 		for id in ids[key]! {

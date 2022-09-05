@@ -68,6 +68,9 @@ import Bl0xPack from 0x7620acf6d7f2468a
 
 pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 	let account = getAccount(ownerAddress)
+	if account.balance == 0.0 {
+		return {}
+	}
 	let ids: {String: [UInt64]} = {}
 
 

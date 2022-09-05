@@ -32,6 +32,11 @@ pub struct NFTView {
 pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 
 	let account = getAuthAccount(ownerAddress)
+
+	if account.balance == 0.0 {
+		return []
+	}
+
 	let results : [NFTView] = []
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!

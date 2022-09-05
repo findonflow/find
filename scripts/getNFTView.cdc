@@ -11,7 +11,11 @@ pub fun main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: Str
 	let address = resolveAddress!
 
 	let pp = publicPath
-	let collection= getAccount(address).getCapability(pp).borrow<&{MetadataViews.ResolverCollection}>()!
+	let account = getAccount(address)
+	if account.balance == 0.0 {
+		return nil
+	}
+	let collection= account.getCapability(pp).borrow<&{MetadataViews.ResolverCollection}>()!
 
 	let nft=collection.borrowViewResolver(id: id)
 	for v in nft.getViews() {

@@ -99,6 +99,9 @@ pub fun fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {St
 	let source = "RaribleNFT"
 	let account = resolveAddress(user: user)
 	if account == nil { return {} }
+	if account!.balance == 0.0 {
+		return {}
+	}
 
 	let items : {String : [MetadataCollectionItem]} = {}
 
