@@ -14,9 +14,10 @@ pub struct FINDReport{
 	pub let leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}
 	pub let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
 	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
+	pub let activatedAccount: Bool 
 
 
-	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}, leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}) {
+	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}, leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}, activatedAccount: Bool) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -26,6 +27,7 @@ pub struct FINDReport{
 		self.leasesBids=leasesBids
 		self.itemsForSale=itemsForSale
 		self.marketBids=marketBids
+		self.activatedAccount=activatedAccount
 	}
 }
 
@@ -54,50 +56,66 @@ pub fun main(user: String) : Report? {
 	var findReport: FINDReport? = nil
 	if let address=FIND.resolve(user) {
 		let account=getAccount(address)
-		let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
-		let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+		if account.balance > 0.0 {
+			let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
+			let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
-		let find= FindMarket.getFindTenantAddress()
-		let findLease= FindMarket.getTenantAddress("findLease")!
-		let items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
+			let find= FindMarket.getFindTenantAddress()
+			let findLease= FindMarket.getTenantAddress("findLease")!
+			let items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
-		let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
+			let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
-		let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:findLease, address: address, getLeaseInfo:true)
+			let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:findLease, address: address, getLeaseInfo:true)
 
-		let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:findLease, address: address, getLeaseInfo:true)
+			let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:findLease, address: address, getLeaseInfo:true)
 
-		var profileReport = profile?.asReport() 
-		if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
-			profileReport = Profile.UserReport(
-				findName: "",
-				address: profileReport!.address,
-				name: profileReport!.name,
-				gender: profileReport!.gender,
-				description: profileReport!.description,
-				tags: profileReport!.tags,
-				avatar: profileReport!.avatar,
-				links: profileReport!.links,
-				wallets: profileReport!.wallets, 
-				following: profileReport!.following,
-				followers: profileReport!.followers,
-				allowStoringFollowers: profileReport!.allowStoringFollowers,
-				createdAt: profileReport!.createdAt
+			var profileReport = profile?.asReport() 
+			if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
+				profileReport = Profile.UserReport(
+					findName: "",
+					address: profileReport!.address,
+					name: profileReport!.name,
+					gender: profileReport!.gender,
+					description: profileReport!.description,
+					tags: profileReport!.tags,
+					avatar: profileReport!.avatar,
+					links: profileReport!.links,
+					wallets: profileReport!.wallets, 
+					following: profileReport!.following,
+					followers: profileReport!.followers,
+					allowStoringFollowers: profileReport!.allowStoringFollowers,
+					createdAt: profileReport!.createdAt
+				)
+			}
+
+			findReport = FINDReport(
+				profile: profileReport,
+				relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
+				bids: bidCap.borrow()?.getBids() ?? [],
+				leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
+				privateMode: profile?.isPrivateModeEnabled() ?? false,
+				leasesForSale: leasesSale, 
+				leasesBids: leasesBids,
+				itemsForSale: items,
+				marketBids: marketBids,
+				activatedAccount: true
+			)
+		} else {
+			findReport = FINDReport(
+				profile: nil,
+				relatedAccounts: {},
+				bids: [],
+				leases: [],
+				privateMode: false,
+				leasesForSale: {}, 
+				leasesBids: {},
+				itemsForSale: {},
+				marketBids: {},
+				activatedAccount: false
 			)
 		}
-
-		findReport = FINDReport(
-			profile: profileReport,
-			relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
-			bids: bidCap.borrow()?.getBids() ?? [],
-			leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
-			privateMode: profile?.isPrivateModeEnabled() ?? false,
-			leasesForSale: leasesSale, 
-			leasesBids: leasesBids,
-			itemsForSale: items,
-			marketBids: marketBids
-		)
 	}
 
 	var nameReport : NameReport? = nil 
