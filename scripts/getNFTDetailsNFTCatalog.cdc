@@ -11,12 +11,14 @@ pub struct NFTDetailReport {
 	pub let storefront: StorefrontListing?
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
+	pub let linkedForMarket : Bool?
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}) {
+	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
 		self.storefront=storefront
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
+		self.linkedForMarket = linkedForMarket
 	}
 }
 
@@ -294,58 +296,64 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 	let address = resolveAddress!
 
 	let account = getAuthAccount(address) 
-	let storagePath = getStoragePath(project)
-	let publicPath = PublicPath(identifier: "find_temp_path_".concat(counter.toString()))!
-	counter = counter + 1
-	account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
-	let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
-	if !cap.check() {
-		panic("The user does not set up collection correctly.")
-	}
-	let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
 
-	let nftDetail = getNFTDetail(pointer:pointer, views: views)
-	if nftDetail == nil {
-		return nil
-	}
+	if account.balance > 0.0 {
+		// check link for market
+		let linkedForMarket = account.getCapability<&{MetadataViews.ResolverCollection}>(getPublicPath(project)).check()
+
+		let storagePath = getStoragePath(project)
+		let publicPath = PublicPath(identifier: "find_temp_path_".concat(counter.toString()))!
+		counter = counter + 1
+		account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
+		let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+		if !cap.check() {
+			panic("The user does not set up collection correctly.")
+		}
+		let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
+
+		let nftDetail = getNFTDetail(pointer:pointer, views: views)
+		if nftDetail == nil {
+			return nil
+		}
 
 
-	let findAddress=FindMarket.getFindTenantAddress()
-	let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
+		let findAddress=FindMarket.getFindTenantAddress()
+		let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
-	/*
-	var listings : StorefrontListing? = nil
-	let storefrontCap = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
+		/*
+		var listings : StorefrontListing? = nil
+		let storefrontCap = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
 
-	if storefrontCap.check() {
-		let storefrontRef=storefrontCap.borrow()!
-		for listingId in storefrontRef.getListingIDs() {
-			let listing = storefrontRef.borrowListing(listingResourceID: listingId)!
-			let nft=listing.borrowNFT()
-			if nft.id==id && !listing.getDetails().purchased {
-				listings = StorefrontListing(listingId: listingId, details: listing.getDetails())
+		if storefrontCap.check() {
+			let storefrontRef=storefrontCap.borrow()!
+			for listingId in storefrontRef.getListingIDs() {
+				let listing = storefrontRef.borrowListing(listingResourceID: listingId)!
+				let nft=listing.borrowNFT()
+				if nft.id==id && !listing.getDetails().purchased {
+					listings = StorefrontListing(listingId: listingId, details: listing.getDetails())
+				}
 			}
 		}
-	}
-	*/
+		*/
 
-	var report : {String : ListingTypeReport} = {}
+		var report : {String : ListingTypeReport} = {}
 
-	// check if that's soulBound, if yes, the report will be nil
-	if !pointer.checkSoulBound() {
-		let tenantCap = FindMarket.getTenantCapability(findAddress)!
-		let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
+		// check if that's soulBound, if yes, the report will be nil
+		if !pointer.checkSoulBound() {
+			let tenantCap = FindMarket.getTenantCapability(findAddress)!
+			let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
 
-		let marketTypes = FindMarket.getSaleItemTypes()
+			let marketTypes = FindMarket.getSaleItemTypes()
 
-		for marketType in marketTypes {
-			if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-				report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
+			for marketType in marketTypes {
+				if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
+					report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
+				}
 			}
 		}
+		return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
 	}
-
-	return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report)
+	return nil
 
 }
 
@@ -619,6 +627,18 @@ pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
 
 	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
 		return collection.collectionData.storagePath
+	}
+	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+}
+
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
+	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		return collection.collectionData.publicPath
+	}
+
+	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
+		return collection.collectionData.publicPath
 	}
 	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 }

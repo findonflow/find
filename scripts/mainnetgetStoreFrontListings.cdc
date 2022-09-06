@@ -31,6 +31,9 @@ pub fun main(user: String): {UInt64 :[Listing]} {
 	if resolveAddress == nil {return {}}
 	let address = resolveAddress!
 	let account=getAccount(address)
+	if account.balance == 0.0 {
+		return {}
+	}
 	let storefrontRef = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath).borrow()!
 
 	let listings : {UInt64 : [Listing]} = {}

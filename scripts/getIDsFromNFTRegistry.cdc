@@ -13,6 +13,9 @@ pub fun main(user: String) : {String: [UInt64]} {
 	let address = resolveAddress!
 
 	let account= getAccount(address)
+	if account.balance == 0.0 {
+		return {}
+	}
 	let registryData = NFTRegistry.getNFTInfoAll()
 
 	let collections : {String:[UInt64]} ={}

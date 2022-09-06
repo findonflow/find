@@ -171,6 +171,7 @@
             "status": "active"
         }
     },
+    "linkedForMarket": true,
     "nftDetail": {
         "collection": {
             "bannerImage": {

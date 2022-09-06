@@ -187,6 +187,7 @@
       "sellerName": "user1",
     },
   },
+  "linkedForMarket": true,
   "nftDetail": map[string]interface {}{
     "collection": map[string]interface {}{
       "bannerImage": map[string]interface {}{

@@ -48,36 +48,13 @@ pub fun resolveAddress(user: String) : Address? {
 	return FIND.resolve(user)
 }
 
-pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
-
-	let account = getAuthAccount(ownerAddress)
-	let results : [NFTView] = []
-	for collectionKey in ids.keys {
-		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
-		let storagePath = catalogEntry.collectionData.storagePath
-		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
-		if ref != nil{
-			for id in ids[collectionKey]! {
-				// results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
-				let viewResolver = ref!.borrowViewResolver(id:id)!
-				results.append(
-					NFTView(
-						id : id,
-						display: MetadataViews.getDisplay(viewResolver),
-						editions : MetadataViews.getEditions(viewResolver),
-						collectionDisplay : MetadataViews.getNFTCollectionDisplay(viewResolver),
-						nftType : viewResolver.getType()
-					)
-				)
-			}
-		}
-	}
-	return results
-}
-
 pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 
 	let account = getAuthAccount(ownerAddress)
+
+	if account.balance == 0.0 {
+		return {}
+	}
 
 	let inventory : {String:[UInt64]}={}
 	let types = FINDNFTCatalog.getCatalogTypeData()

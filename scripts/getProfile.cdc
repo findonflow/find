@@ -5,8 +5,12 @@ pub fun main(user: String) :  Profile.UserReport? {
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return nil}
 	let address = resolveAddress!
+	let account = getAccount(address)
+	if account.balance == 0.0 {
+		return nil
+	}
 
-	var profileReport = getAccount(address)
+	var profileReport = account
 		.getCapability<&{Profile.Public}>(Profile.publicPath)
 		.borrow()?.asReport()
 

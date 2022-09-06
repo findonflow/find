@@ -7,6 +7,11 @@ pub fun main(user: String) : [String] {
 	if resolveAddress == nil {return []}
 	let address = resolveAddress!
 	let account=getAccount(address)
+
+	if account.balance == 0.0 {
+		return []
+	}
+
 	let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 	let leases=leaseCap.borrow()?.getLeaseInformation() ?? []

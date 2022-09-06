@@ -70,7 +70,10 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
         let source = "Shard4"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
-
+        if account!.balance == 0.0 {
+		    return {}
+	    }
+        
         let items : {String : [MetadataCollectionItem]} = {}
         
         let fetchingIDs = collectionIDs

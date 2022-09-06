@@ -242,7 +242,7 @@ func TestFIND(t *testing.T) {
 			overflow.WithArg("user", nameAddress),
 		).AssertWithPointerWant(t,
 			"/FINDReport",
-			autogold.Want("getStatus", map[string]interface{}{"privateMode": false}),
+			autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "privateMode": false}),
 		)
 	})
 

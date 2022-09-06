@@ -38,6 +38,9 @@ pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataColle
 	if resolveAddress == nil {return nil}
 	let address = resolveAddress!
 	let account=getAccount(address)
+	if account.balance == 0.0 {
+		return nil
+	}
 	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
 	if !resolverCollectionCap.check() {
 		return nil

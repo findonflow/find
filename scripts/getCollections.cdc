@@ -82,6 +82,11 @@ pub fun main(user: String) : MetadataCollections? {
 	let address = resolvingAddress!
 	var resultMap : {String : MetadataCollectionItem} = {}
 	let account = getAccount(address)
+
+		if account.balance == 0.0 {
+			return nil
+		}
+
 	let results : {String :  [String]}={}
 
 	for nftInfo in NFTRegistry.getNFTInfoAll().values {
