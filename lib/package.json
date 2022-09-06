@@ -1,6 +1,6 @@
 {
     "name": "@findonflow/find-flow-contracts",
-    "version": "1.15.1",
+    "version": "1.16.0",
     "description": "Cadence transactions and scripts to work with https://find.xyz ",
     "main": "index.js",
     "scripts": {
