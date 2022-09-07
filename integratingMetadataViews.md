@@ -113,7 +113,7 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 		case Type<MetadataViews.Traits>() : 
 
 			let trait = MetadataViews.Trait(
-				name: "Edition Stamp" ,      // Type<String>
+				name: "edition_stamp" ,      // Type<String>
 				value: "Grand Architect",    // Type<AnyStruct>
 				displayType: "String",       // Type<String?>
 				rarity: MetadataViews.Rarity(// Type<MetadataViews.Rarity?>
@@ -124,7 +124,7 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 			)
 
 			let dateTrait = MetadataViews.Trait(
-				name: "BirthDay" ,      // Type<String>
+				name: "birthday" ,      // Type<String>
 				value: "1546360800",    // Type<AnyStruct>
 				displayType: "Date",    // Type<String?>
 				rarity: nil             // Type<MetadataViews.Rarity?>
@@ -151,8 +151,8 @@ pub fun resolveView(_ type: Type): AnyStruct? {
 
 | Param      | Description |
 | ----------- | ----------- |
-| name   | Name of the trait  |
-| value      | Value of the trait  |
+| name   | Name of the trait, prefer this to be snake_case in lower and url safe. .find will group traits on _ groups if possible  |
+| value      | Value of the trait,  prefer this to be a primitive value not a struct/dictionary/array.  |
 | displayType      | Value of the trait, can be "String", "Number", "Date" etc. |
 | rarity      | Additional rarity to this trait, description / numbder / maximum number of the rarity    |
  
