@@ -204,14 +204,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let saleItem=self.borrow(id)
 
 			let tenant=self.getTenant()
-			let nftType= saleItem.getItemType()
 			let ftType= saleItem.getFtType()
-
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "cancel in direct offer"), seller: nil, buyer: nil)
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
 
 			let status="cancel"
 			let owner=self.owner!.address
@@ -222,7 +215,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(true)
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
@@ -353,14 +346,8 @@ pub contract FindMarketDirectOfferEscrow {
 			let saleItem=self.borrow(id)
 
 			let tenant=self.getTenant()
-			let nftType= saleItem.getItemType()
 			let ftType= saleItem.getFtType()
 
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "reject in direct offer"), seller: nil, buyer: nil)
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
 
 			var status="rejected"
 			let owner=self.owner!.address
@@ -371,10 +358,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(true)
-				if !saleItem.validateRoyalties() {
-					status = "cancel_royalties_changed"
-				}
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)

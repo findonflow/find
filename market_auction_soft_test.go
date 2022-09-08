@@ -404,13 +404,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.alterMarketOption("AuctionSoft", "stop")
 
-		otu.O.Tx("cancelMarketAuctionSoft",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", []uint64{id}),
-		).
-			AssertFailure(t, "Tenant has stopped this item")
-
 		otu.tickClock(500.0)
 
 		otu.O.Tx("fulfillMarketAuctionSoft",

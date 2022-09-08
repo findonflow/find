@@ -331,23 +331,6 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
-	t.Run("Should not be able to reject offer after stopped", func(t *testing.T) {
-
-		otu.directOfferMarketEscrowed("user2", "user1", id, price).
-			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferEscrow", "stop")
-
-		otu.O.Tx("cancelMarketDirectOfferEscrowed",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", []uint64{id}),
-		).
-			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.alterMarketOption("DirectOfferEscrow", "enable").
-			cancelAllDirectOfferMarketEscrowed("user1")
-	})
-
 	t.Run("Should be able to able to direct offer, add bit and accept offer after enabled", func(t *testing.T) {
 
 		otu.alterMarketOption("DirectOfferEscrow", "deprecate").
@@ -400,18 +383,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to retract offer when deprecated, but not when stopped", func(t *testing.T) {
+	t.Run("Should be able to retract offer when deprecated and stopped", func(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferEscrow", "stop")
-
-		otu.O.Tx("retractOfferMarketDirectOfferEscrowed",
-			WithSigner("user2"),
-			WithArg("marketplace", "account"),
-			WithArg("id", id),
-		).
-			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterMarketOption("DirectOfferEscrow", "deprecate").
 			retractOfferDirectOfferEscrowed("user2", "user1", id)
@@ -798,7 +774,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
-				"status": "cancel_royalties_changed",
+				"status": "rejected",
 			})
 	})
 

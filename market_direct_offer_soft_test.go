@@ -383,24 +383,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	})
 
-	t.Run("Should not be able to reject offer after stopped", func(t *testing.T) {
-
-		otu.directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferSoft", "stop")
-
-		otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64Array(id)).
-			Test(otu.T).
-			AssertFailure("Tenant has stopped this item")
-
-		otu.alterMarketOption("DirectOfferSoft", "enable").
-			cancelAllDirectOfferMarketSoft("user1")
-	})
-
 	t.Run("Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
 
 		otu.alterMarketOption("DirectOfferSoft", "stop").
@@ -462,19 +444,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 
-	t.Run("Should be able to retract offer when deprecated , but not when stopped", func(t *testing.T) {
+	t.Run("Should be able to retract offer when deprecated or stopped", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
 
 		otu.alterMarketOption("DirectOfferSoft", "stop")
-
-		otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64(id)).
-			Test(otu.T).AssertFailure("Tenant has stopped this item")
 
 		otu.alterMarketOption("DirectOfferSoft", "deprecate").
 			retractOfferDirectOfferSoft("user2", "user1", id)
@@ -1028,7 +1003,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"status": "cancel_royalties_changed",
+				"status": "cancel_rejected",
 			})
 
 	})

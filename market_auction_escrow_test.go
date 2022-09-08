@@ -525,13 +525,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.alterMarketOption("AuctionEscrow", "stop")
 
-		otu.O.Tx("cancelMarketAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", []uint64{id}),
-		).
-			AssertFailure(t, "Tenant has stopped this item")
-
 		otu.tickClock(500.0)
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
