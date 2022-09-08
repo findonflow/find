@@ -367,7 +367,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	})
 
-	t.Run("Should no be able to list, bid, add bid , fulfill auction and delist after stopped", func(t *testing.T) {
+	t.Run("Should no be able to list, bid, add bid , fulfill auction after stopped", func(t *testing.T) {
 
 		otu.alterMarketOption("AuctionSoft", "stop")
 
