@@ -332,7 +332,8 @@
         "ProfileCache",
         "FindRulesCache",
         "FINDNFTCatalog",
-        "FINDNFTCatalogAdmin"
+        "FINDNFTCatalogAdmin",
+				"FindLostAndFoundWrapper"
       ],
       "mainnet-find-forge": [
         "NFGv3"
