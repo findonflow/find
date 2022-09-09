@@ -81,7 +81,8 @@ func main() {
 
 	o.Tx("adminAddNFTCatalog",
 		WithSigner("find"),
-		WithArg("collectionIdentifier", "gamisodes"),
+		// This is what Flow NFT Catalog accepted
+		WithArg("collectionIdentifier", "Gamisodes"),
 		WithArg("contractName", "Gamisodes"),
 		WithArg("contractAddress", "0x20187093790b9aef"),
 		WithArg("addressWithNFT", "0x26d91308a791e5f2"),
