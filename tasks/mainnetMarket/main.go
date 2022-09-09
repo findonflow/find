@@ -67,48 +67,58 @@ func main() {
 				WithArg("nftID", 164769803),
 				WithArg("publicPathIdentifier", "somePlaceCollectibleCollection"),
 			)
+
+			o.Tx("adminAddNFTCatalog",
+				WithSigner("find"),
+				WithArg("collectionIdentifier", "bl0xPack"),
+				WithArg("contractName", "Bl0xPack"),
+				WithArg("contractAddress", "0x7620acf6d7f2468a"),
+				WithArg("addressWithNFT", "0x0893d4423f25c7d6"),
+				WithArg("nftID", 208638414),
+				WithArg("publicPathIdentifier", "Bl0xPackCollection"),
+			)
 	*/
 
 	o.Tx("adminAddNFTCatalog",
 		WithSigner("find"),
-		WithArg("collectionIdentifier", "bl0xPack"),
-		WithArg("contractName", "Bl0xPack"),
-		WithArg("contractAddress", "0x7620acf6d7f2468a"),
-		WithArg("addressWithNFT", "0x0893d4423f25c7d6"),
-		WithArg("nftID", 208638414),
-		WithArg("publicPathIdentifier", "Bl0xPackCollection"),
+		WithArg("collectionIdentifier", "gamisodes"),
+		WithArg("contractName", "Gamisodes"),
+		WithArg("contractAddress", "0x20187093790b9aef"),
+		WithArg("addressWithNFT", "0x26d91308a791e5f2"),
+		WithArg("nftID", 656487),
+		WithArg("publicPathIdentifier", "GamisodesCollection"),
 	)
-
-	upsertItem := o.TxFileNameFN("adminMainnetAddItem",
-		adminSigner,
-		WithArg("tenant", "find"),
-		WithArg("ftName", "flow"),
-		WithArg("ftTypes", `["A.1654653399040a61.FlowToken.Vault"]`),
-		WithArg("listingName", "escrow"),
-		WithArg("listingTypes", `["A.097bafa4e0b48eef.FindMarketSale.SaleItem" , "A.097bafa4e0b48eef.FindMarketAuctionEscrow.SaleItem" , "A.097bafa4e0b48eef.FindMarketDirectOfferEscrow.SaleItem"]`),
-	)
-
-	flowNfts := map[string]string{
-		//	"SoulMade": `["A.9a57dfe5c8ce609c.SoulMadeComponent.NFT", "A.9a57dfe5c8ce609c.SoulMadeMain.NFT"]`,
-		//	"Bitku":    `["A.f61e40c19db2a9e2.HaikuNFT.NFT"]`,
-		//		"Dandy": `["A.097bafa4e0b48eef.Dandy.NFT"]`,
-		// "some.place": `["A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
-		"bl0xPack": `["A.7620acf6d7f2468a.Bl0xPack.NFT"]`,
-	}
-
-	for name, contracts := range flowNfts {
-		upsertItem(
-			WithArg("nftName", name), //primary key
-			WithArg("nftTypes", contracts),
-		)
-	}
 	/*
-		o.Tx("adminAddForge",
+		upsertItem := o.TxFileNameFN("adminMainnetAddItem",
 			adminSigner,
-			WithPayloadSigner("find-forge"),
-			WithArg("storagePath", "/storage/nfgforge"),
-			WithArg("name", "nonfungerbils"),
+			WithArg("tenant", "find"),
+			WithArg("ftName", "flow"),
+			WithArg("ftTypes", `["A.1654653399040a61.FlowToken.Vault"]`),
+			WithArg("listingName", "escrow"),
+			WithArg("listingTypes", `["A.097bafa4e0b48eef.FindMarketSale.SaleItem" , "A.097bafa4e0b48eef.FindMarketAuctionEscrow.SaleItem" , "A.097bafa4e0b48eef.FindMarketDirectOfferEscrow.SaleItem"]`),
 		)
+
+		flowNfts := map[string]string{
+			//	"SoulMade": `["A.9a57dfe5c8ce609c.SoulMadeComponent.NFT", "A.9a57dfe5c8ce609c.SoulMadeMain.NFT"]`,
+			//	"Bitku":    `["A.f61e40c19db2a9e2.HaikuNFT.NFT"]`,
+			//		"Dandy": `["A.097bafa4e0b48eef.Dandy.NFT"]`,
+			// "some.place": `["A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
+			"bl0xPack": `["A.7620acf6d7f2468a.Bl0xPack.NFT"]`,
+		}
+
+		for name, contracts := range flowNfts {
+			upsertItem(
+				WithArg("nftName", name), //primary key
+				WithArg("nftTypes", contracts),
+			)
+		}
+
+			o.Tx("adminAddForge",
+				adminSigner,
+				WithPayloadSigner("find-forge"),
+				WithArg("storagePath", "/storage/nfgforge"),
+				WithArg("name", "nonfungerbils"),
+			)
 	*/
 
 }
