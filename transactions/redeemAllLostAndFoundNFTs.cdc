@@ -5,6 +5,7 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import Bl0xPack from "../contracts/Bl0xPack.cdc"
 
 transaction() {
 
@@ -13,18 +14,27 @@ transaction() {
 
 	prepare(account: AuthAccount){
 
-        let nftInfos : {String : NFTCatalog.NFTCollectionData} = {}
+		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Bl0xPack.CollectionPublicPath)
+		if !findPackCap.check() {
+			account.save<@NonFungibleToken.Collection>( <- Bl0xPack.createEmptyCollection(), to: Bl0xPack.CollectionStoragePath)
+			account.link<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				Bl0xPack.CollectionPublicPath,
+				target: Bl0xPack.CollectionStoragePath
+			)
+		}
+
+		let nftInfos : {String : NFTCatalog.NFTCollectionData} = {}
 		self.receiverCaps = {}
 
 		self.ids = FindLostAndFoundWrapper.getTicketIDs(user: account.address, specificType: Type<@NonFungibleToken.NFT>())
 
 		for type in self.ids.keys{ 
 
-            if nftInfos[type] == nil {
-                let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type) ?? panic("NFT type is not supported at the moment. Type : ".concat(type))
-                nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData
-            }
-            let nft = nftInfos[type]!
+			if nftInfos[type] == nil {
+				let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type) ?? panic("NFT type is not supported at the moment. Type : ".concat(type))
+				nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData
+			}
+			let nft = nftInfos[type]!
 
 			var targetCapability = self.receiverCaps[type]
 			if targetCapability == nil {
@@ -46,4 +56,4 @@ transaction() {
 		}
 	}
 }
- 
+
