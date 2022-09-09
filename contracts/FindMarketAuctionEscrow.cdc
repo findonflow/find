@@ -436,6 +436,7 @@ pub contract FindMarketAuctionEscrow {
 			var status = "cancel_listing"
 			if saleItem.checkPointer() {
 				if !saleItem.validateRoyalties() {
+					// this has to be here otherwise people cannot delist
 					status="cancel_royalties_changed"
 				} else if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
 					if saleItem.hasAuctionMetReservePrice() {
@@ -475,22 +476,15 @@ pub contract FindMarketAuctionEscrow {
 
 			let status=status
 			let ftType=saleItem.getFtType()
-			let nftType=saleItem.getItemType()
 			let balance=saleItem.getBalance()
 			let seller=saleItem.getSeller()
 			let id=saleItem.getId()
 
 			let tenant=self.getTenant()
 
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "delist item for auction"), seller: nil, buyer: nil)
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
-
 			var nftInfo:FindMarket.NFTInfo?=nil 
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(true)
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			let buyer=saleItem.getBuyer()
@@ -900,3 +894,4 @@ pub contract FindMarketAuctionEscrow {
 		FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
 	}
 }
+ 

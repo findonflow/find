@@ -304,22 +304,11 @@ pub contract FindMarketSale {
 			let saleItem <- self.items.remove(key: id)!
 
 			let tenant=self.getTenant()
-			let nftType= saleItem.getItemType()
-			let ftType= saleItem.getFtType()
-
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "delist item for sale"), seller: nil, buyer: nil)
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
 
 			var status = "cancel"
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(true)
-				if !saleItem.validateRoyalties() {
-					status = "cancel_royalties_changed"
-				}
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			let owner=self.owner!.address

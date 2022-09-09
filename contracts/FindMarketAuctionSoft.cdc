@@ -423,6 +423,7 @@ pub contract FindMarketAuctionSoft {
 			var status="cancel"
 			if saleItem.checkPointer() {
 				if !saleItem.validateRoyalties() {
+					// this has to be here otherwise people cannot delist
 					status="cancel_royalties_changed"
 				} else if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
 					if saleItem.hasAuctionMetReservePrice() {
@@ -435,13 +436,7 @@ pub contract FindMarketAuctionSoft {
 				status="cancel_ghostlisting"
 			}
 			let ftType=saleItem.getFtType()
-			let nftType=saleItem.getItemType()
 			let tenant=self.getTenant()
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name:"delist item from soft-auction"), seller: nil, buyer: nil)
-
-			if !actionResult.allowed {
-				panic(actionResult.message)
-			}
 
 			let balance=saleItem.getBalance()
 			let seller=self.owner!.address
@@ -449,7 +444,7 @@ pub contract FindMarketAuctionSoft {
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
-				nftInfo=saleItem.toNFTInfo(true)
+				nftInfo=saleItem.toNFTInfo(false)
 			}
 			
 			if buyer != nil {

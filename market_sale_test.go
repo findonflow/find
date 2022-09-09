@@ -267,7 +267,7 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to list it, stop it and cannot list another again, nor buy but able to delist.", func(t *testing.T) {
+	t.Run("Should be able to list it, stop it and cannot list another again, buy, nor delist.", func(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price)
@@ -291,13 +291,6 @@ func TestMarketSale(t *testing.T) {
 			WithArg("user", "user1"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
-		).
-			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.O.Tx("delistNFTSale",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", []uint64{ids[0]}),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
