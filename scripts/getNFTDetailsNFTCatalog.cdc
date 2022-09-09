@@ -486,13 +486,14 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 						if !check {
 							let array = traits.traits
 							array.append(trait)
-							nftViews["Traits"] = MetadataViews.Traits(array)
+
+							nftViews["Traits"] = cleanUpTraits(array)
 							resolvedViews.append(runTimeType)
 							continue
 						}
 					}
 				} 
-				nftViews["Traits"] = traits
+				nftViews["Traits"] = cleanUpTraits(traits.traits)
 				resolvedViews.append(runTimeType)
 				continue
 			}
@@ -641,4 +642,34 @@ pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
 		return collection.collectionData.publicPath
 	}
 	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+}
+
+pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
+	let dateValues  = {"Date" : true, "Numeric":false, "Number":false, "date":true, "numeric":false, "number":false}
+
+	let array : [MetadataViews.Trait] = []
+
+	for i , trait in traits {
+		let displayType = trait.displayType ?? "string"
+		if let isDate = dateValues[displayType] {
+			if isDate {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Date", rarity: trait.rarity))
+			} else {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Numeric", rarity: trait.rarity))
+			}
+		} else {
+			if let value = trait.value as? Bool {
+				if value {
+					array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Bool", rarity: trait.rarity))
+				}else {
+					array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Bool", rarity: trait.rarity))
+				}
+			} else if let value = trait.value as? String {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "String", rarity: trait.rarity))
+			} else {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "String", rarity: trait.rarity))
+			}
+		}
+	}
+	return MetadataViews.Traits(array)
 }
