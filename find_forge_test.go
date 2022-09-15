@@ -36,6 +36,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("nftName", "ExampleNFT"),
 			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
 			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3}),
 			overflow.WithArg("collectionDescription", "Example NFT FIND"),
 			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
@@ -71,6 +72,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("nftName", "ExampleNFT"),
 			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
 			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3}),
 			overflow.WithArg("collectionDescription", "Example NFT FIND"),
 			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
@@ -90,6 +92,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("nftName", "ExampleNFT"),
 			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
 			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3}),
 			overflow.WithArg("collectionDescription", "Example NFT FIND"),
 			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
@@ -107,6 +110,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("nftName", "ExampleNFT"),
 			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
 			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3}),
 			overflow.WithArg("collectionDescription", "Example NFT FIND"),
 			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
@@ -126,6 +130,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("nftName", "ExampleNFT"),
 			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
 			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3}),
 			overflow.WithArg("collectionDescription", "Example NFT FIND"),
 			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
@@ -167,6 +172,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("nftName", "ExampleNFT"),
 			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
 			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3}),
 			overflow.WithArg("collectionDescription", "Example NFT FIND"),
 			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
@@ -187,5 +193,47 @@ func TestFindForge(t *testing.T) {
 			autogold.Want("royalty", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.05, "description": "creator", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"}}}),
 		)
 
+	})
+
+	t.Run("Should not be able to mint Example NFTs with non-exist traits", func(t *testing.T) {
+
+		otu.O.Tx("testMintExampleNFT",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("artist", "Bam"),
+			overflow.WithArg("nftName", "ExampleNFT"),
+			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
+			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3, 4}),
+			overflow.WithArg("collectionDescription", "Example NFT FIND"),
+			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
+			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
+			overflow.WithArg("collectionBannerImage", "Example NFT banner image"),
+		).
+			AssertFailure(t, "This trait does not exist ID :4")
+	})
+
+	t.Run("Should be able register traits to Example NFT and then mint", func(t *testing.T) {
+
+		otu.O.Tx("testAddTraitsExampleNFT",
+			overflow.WithSigner("find"),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("testMintExampleNFT",
+			overflow.WithSigner("user1"),
+			overflow.WithArg("name", "user1"),
+			overflow.WithArg("artist", "Bam"),
+			overflow.WithArg("nftName", "ExampleNFT"),
+			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
+			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3, 4}),
+			overflow.WithArg("collectionDescription", "Example NFT FIND"),
+			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
+			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
+			overflow.WithArg("collectionBannerImage", "Example NFT banner image"),
+		).
+			AssertSuccess(t).
+			GetIdFromEvent("FindForge.Minted", "id")
 	})
 }

@@ -29,16 +29,20 @@ pub contract ExampleNFT: NonFungibleToken {
     pub let CollectionPublicPath: PublicPath
     pub let MinterStoragePath: StoragePath
 
+    pub let traits : {UInt64 : MetadataViews.Trait}
+
     pub struct ExampleNFTInfo {
         pub let name: String
         pub let description: String
         pub let soulBound: Bool 
+        pub let traits : [UInt64]
         pub let thumbnail: String
 
-        init(name: String, description: String, soulBound: Bool, thumbnail: String) {
+        init(name: String, description: String, soulBound: Bool, traits : [UInt64], thumbnail: String) {
             self.name=name 
             self.description=description 
             self.thumbnail=thumbnail 
+            self.traits=traits
             self.soulBound=soulBound
         }
     }
@@ -50,6 +54,8 @@ pub contract ExampleNFT: NonFungibleToken {
         pub let description: String
         pub let thumbnail: String
         pub var soulBound: Bool
+        // For testing 
+        pub let traits : [UInt64]
         access(self) let royalties: MetadataViews.Royalties
 
         pub var changedRoyalties: Bool
@@ -60,6 +66,7 @@ pub contract ExampleNFT: NonFungibleToken {
             description: String,
             thumbnail: String,
             soulBound: Bool, 
+            traits : [UInt64],
             royalties: MetadataViews.Royalties
         ) {
             self.id = id
@@ -68,6 +75,13 @@ pub contract ExampleNFT: NonFungibleToken {
             self.thumbnail = thumbnail
             self.soulBound = soulBound
             self.royalties = royalties
+
+            for traitId in traits {
+                if !ExampleNFT.traits.containsKey(traitId) {
+                    panic("This trait does not exist ID :".concat(traitId.toString()))
+                }
+            }
+            self.traits=traits
             self.changedRoyalties = false
         }
 
@@ -264,6 +278,7 @@ pub contract ExampleNFT: NonFungibleToken {
         description: String,
         thumbnail: String,
         soulBound: Bool ,
+        traits: [UInt64] ,
         royalties: MetadataViews.Royalties
     ) : @NonFungibleToken.NFT
     {
@@ -275,6 +290,7 @@ pub contract ExampleNFT: NonFungibleToken {
             description: description,
             thumbnail: thumbnail,
             soulBound: soulBound, 
+            traits: traits, 
             royalties: royalties
         )
 
@@ -296,8 +312,24 @@ pub contract ExampleNFT: NonFungibleToken {
                                         description: info.description,
                                         thumbnail: info.thumbnail,
                                         soulBound: info.soulBound,
+                                        traits: info.traits,
                                         royalties: MetadataViews.Royalties(royalties))
 		}
+
+        pub fun addContractData(data: AnyStruct, verifier: &FindForge.Verifier) {
+            let type = data.getType() 
+
+            switch type {
+                case Type<{UInt64 : MetadataViews.Trait}>() : 
+                    // for duplicated indexes, the new one will replace the old one 
+                    let typedData = data as! {UInt64 : MetadataViews.Trait}
+                    for key in typedData.keys {
+                        ExampleNFT.traits[key] = ExampleNFT.traits[key] ?? typedData[key]
+                    }
+                    return
+
+            }
+        }
 	}
 
 	access(account) fun createForge() : @{FindForge.Forge} {
@@ -317,6 +349,12 @@ pub contract ExampleNFT: NonFungibleToken {
         self.CollectionPrivatePath = /private/exampleNFTCollection
         self.CollectionPublicPath = /public/exampleNFTCollection
         self.MinterStoragePath = /storage/exampleNFTMinter
+
+        self.traits={
+            1 : MetadataViews.Trait(name: "head", value: "hat", displayType: "string", rarity: nil), 
+            2 : MetadataViews.Trait(name: "shoulder", value: "shoulder pad", displayType: "string", rarity: MetadataViews.Rarity(score: nil, max: nil, description: "Common")), 
+            3 : MetadataViews.Trait(name: "knees", value: "knee pad", displayType: "string", rarity: nil)
+        }
 
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
@@ -340,10 +378,11 @@ pub contract ExampleNFT: NonFungibleToken {
         let minterCut = MetadataViews.Royalty(receiver:dapper , cut: 0.01, description: "creator")
         let royalties : [MetadataViews.Royalty] = []
         royalties.append(minterCut)
-        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false, royalties: MetadataViews.Royalties(royalties))
-        let nft2 <- ExampleNFT.mintNFT(name: "SoulBoundNFT", description: "This is soulBound", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: true, royalties: MetadataViews.Royalties(royalties))
+        let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false,traits : [], royalties: MetadataViews.Royalties(royalties))
+        let nft2 <- ExampleNFT.mintNFT(name: "SoulBoundNFT", description: "This is soulBound", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: true,traits : [1,2,3], royalties: MetadataViews.Royalties(royalties))
 
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft)
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft2)
     }
 }
+ 

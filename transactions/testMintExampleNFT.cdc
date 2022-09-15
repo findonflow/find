@@ -8,7 +8,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
-transaction(name: String, artist:String, nftName:String, nftDescription:String, nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
+transaction(name: String, artist:String, nftName:String, nftDescription:String, traits: [UInt64], nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
 	prepare(account: AuthAccount) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
@@ -51,7 +51,7 @@ transaction(name: String, artist:String, nftName:String, nftDescription:String, 
 		let collection=collectionCap.borrow()!
 		let description=creativeWork.description.concat( " edition ").concat("1 of 1")
 		
-		let mintData = ExampleNFT.ExampleNFTInfo(name: "Neo", description: description, soulBound: false, thumbnail: nftUrl)
+		let mintData = ExampleNFT.ExampleNFTInfo(name: "Neo", description: description, soulBound: false,traits: traits, thumbnail: nftUrl)
 		
 		FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 
