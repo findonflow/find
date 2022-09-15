@@ -22,7 +22,7 @@ func TestMarketSale(t *testing.T) {
 		setProfile("user2")
 	price := 10.0
 
-	otu.setUUID(300)
+	otu.setUUID(400)
 
 	mintFund := otu.O.TxFN(
 		WithSigner("account"),

@@ -3,6 +3,10 @@ import Profile from "../contracts/Profile.cdc"
 import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 
 pub struct FINDReport{
 	pub let profile:Profile.UserReport?
@@ -16,8 +20,25 @@ pub struct FINDReport{
 	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
 	pub let activatedAccount: Bool 
 
+	// NFT Catalog outputs
+	pub let nftCatalogTypes: {String : NFTCatalog.NFTCollectionData}
+	pub let lostAndFoundTypes: [String]
 
-	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}, leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}, itemsForSale: {String : FindMarket.SaleItemCollectionReport}, marketBids: {String : FindMarket.BidItemCollectionReport}, activatedAccount: Bool) {
+
+	init(profile: Profile.UserReport?, 
+		 relatedAccounts: {String: Address}, 
+		 bids: [FIND.BidInfo], 
+		 leases : [FIND.LeaseInformation], 
+		 privateMode: Bool, 
+		 leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}, 
+		 leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}, 
+		 itemsForSale: {String : FindMarket.SaleItemCollectionReport}, 
+		 marketBids: {String : FindMarket.BidItemCollectionReport}, 
+		 activatedAccount: Bool, 
+		 nftCatalogTypes: {String : NFTCatalog.NFTCollectionData}, 
+		 lostAndFoundTypes: [String]
+		 ) {
+
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -28,6 +49,8 @@ pub struct FINDReport{
 		self.itemsForSale=itemsForSale
 		self.marketBids=marketBids
 		self.activatedAccount=activatedAccount
+		self.nftCatalogTypes=nftCatalogTypes
+		self.lostAndFoundTypes=lostAndFoundTypes
 	}
 }
 
@@ -90,6 +113,18 @@ pub fun main(user: String) : Report? {
 				)
 			}
 
+			// NFTCatalog Output 
+			let nftCatalogTypes = FINDNFTCatalog.getCatalogTypeData()
+			let types : {String : NFTCatalog.NFTCollectionData} = {}
+			for type in nftCatalogTypes.keys {
+				types[type] = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: type)
+			}
+
+			let lostAndFoundTypes : [String] = []
+			for type in FindLostAndFoundWrapper.getSpecificRedeemableTypes(user: address, specificType: Type<@NonFungibleToken.NFT>()) {
+				lostAndFoundTypes.append(type.identifier)
+			}
+
 			findReport = FINDReport(
 				profile: profileReport,
 				relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
@@ -100,7 +135,9 @@ pub fun main(user: String) : Report? {
 				leasesBids: leasesBids,
 				itemsForSale: items,
 				marketBids: marketBids,
-				activatedAccount: true
+				activatedAccount: true, 
+				nftCatalogTypes: types, 
+				lostAndFoundTypes: lostAndFoundTypes
 			)
 		} else {
 			findReport = FINDReport(
@@ -113,7 +150,9 @@ pub fun main(user: String) : Report? {
 				leasesBids: {},
 				itemsForSale: {},
 				marketBids: {},
-				activatedAccount: false
+				activatedAccount: false, 
+				nftCatalogTypes: {}, 
+				lostAndFoundTypes: []
 			)
 		}
 	}

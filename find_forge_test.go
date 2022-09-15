@@ -233,7 +233,6 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
 			overflow.WithArg("collectionBannerImage", "Example NFT banner image"),
 		).
-			AssertSuccess(t).
-			GetIdFromEvent("FindForge.Minted", "id")
+			AssertSuccess(t)
 	})
 }

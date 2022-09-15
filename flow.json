@@ -333,7 +333,7 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
-				"FindLostAndFoundWrapper"
+        "FindLostAndFoundWrapper"
       ],
       "mainnet-find-forge": [
         "NFGv3"
@@ -420,7 +420,12 @@
         "FindLostAndFoundWrapper",
         "FeeEstimator",
         "LostAndFound",
-        "LostAndFoundHelper"
+        "LostAndFoundHelper",
+        "FLOAT",
+        "GrantedAccountAccess",
+        "FLOATVerifiers",
+        "Bl0x",
+        "Bl0xPack"
       ],
       "emulator-find": [],
       "emulator-user1": [],
