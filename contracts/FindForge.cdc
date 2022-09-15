@@ -76,6 +76,7 @@ pub contract FindForge {
 	// ForgeMinter Interface 
 	pub resource interface Forge{
 		pub fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @NonFungibleToken.NFT 
+		pub fun addContractData(data: AnyStruct, verifier: &Verifier)
 	}
 
 	access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
@@ -193,6 +194,13 @@ pub contract FindForge {
 
 		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
 
+	}
+
+	access(account) fun addContractData(forgeType: Type , data: AnyStruct) {
+		let verifier = self.borrowVerifier()
+
+		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
+		forge.addContractData(data: data, verifier: verifier)
 	}
 
 	pub fun addForgeType(_ forge: @{Forge}) {

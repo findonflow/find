@@ -77,6 +77,14 @@ pub contract Admin {
 			FindForge.removeForgeType(type: type)
 		}
 
+		pub fun addForgeContractData(forgeType : Type, data: AnyStruct) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForge.addContractData(forgeType: forgeType , data: data)
+		}
+
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
