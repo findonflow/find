@@ -8,11 +8,15 @@ import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Bl0xPack from "../contracts/Bl0xPack.cdc"
 
+//IMPORT
+
 transaction(ids: {String : [UInt64]}) {
 
 	let receiverCaps : {String : Capability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>} 
 
 	prepare(account: AuthAccount){
+
+		//LINK
 
 		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Bl0xPack.CollectionPublicPath)
 		if !findPackCap.check() {

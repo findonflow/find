@@ -7,12 +7,16 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Bl0xPack from "../contracts/Bl0xPack.cdc"
 
+//IMPORT
+
 transaction() {
 
 	let receiverCaps : {String : Capability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>} 
 	let ids : {String : [UInt64]}
 
 	prepare(account: AuthAccount){
+
+		//LINK
 
 		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Bl0xPack.CollectionPublicPath)
 		if !findPackCap.check() {
