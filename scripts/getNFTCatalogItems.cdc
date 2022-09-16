@@ -10,20 +10,29 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 pub struct NFTView {
 	pub let id: UInt64
 	pub let display: MetadataViews.Display?
-	pub let editions: MetadataViews.Editions?
 	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
+	pub var rarity:MetadataViews.Rarity?
+	pub var editions: MetadataViews.Editions?
+	pub var serial: UInt64?
+	pub var traits: MetadataViews.Traits?
 	pub let nftType: Type
 
 	init(
 		id : UInt64,
 		display : MetadataViews.Display?,
 		editions : MetadataViews.Editions?,
+		rarity:MetadataViews.Rarity?,
+		serial: UInt64?,
+		traits: MetadataViews.Traits?,
 		collectionDisplay: MetadataViews.NFTCollectionDisplay?,
 		nftType: Type
 	) {
 		self.id = id
 		self.display = display
 		self.editions = editions
+		self.rarity = rarity
+		self.serial = serial
+		self.traits = traits
 		self.collectionDisplay = collectionDisplay
 		self.nftType = nftType
 	}
@@ -46,11 +55,66 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 			for id in ids[collectionKey]! {
 				// results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
 				let viewResolver = ref!.borrowViewResolver(id:id)!
+
+				var traitsStruct : MetadataViews.Traits? = nil 
+
+				if let traits = MetadataViews.getTraits(viewResolver) {
+					if let trait = getTrait(viewResolver) {
+						var check = false 
+						for item in traits.traits {
+							if item.name == trait.name {
+								check = true 
+								break
+							}
+							if !check {
+								let array = traits.traits
+								array.append(trait)
+
+								traitsStruct = cleanUpTraits(array)
+							}
+						}
+					} else {
+						traitsStruct = cleanUpTraits(traits.traits)
+					}
+				} else {
+					if let trait = getTrait(viewResolver) {
+						traitsStruct = cleanUpTraits([trait])
+					}
+				}
+
+				var editionStruct : MetadataViews.Editions? = nil 
+
+				if let editions = MetadataViews.getEditions(viewResolver) {
+					if let edition = getEdition(viewResolver) {
+						var check = false
+						for item in editions.infoList {
+							if item.name == edition.name && item.number == edition.number && item.max == edition.max {
+								check = true
+								break
+							}
+						}
+						// If the edition does not exist in editions, add it in
+						if !check {
+							let array = editions.infoList 
+							array.append(edition)
+							editionStruct = MetadataViews.Editions(array)
+						}
+					} else {
+					// If edition does not exist OR edition is already in editions , append it to views and continue
+						editionStruct = editions
+					}
+				} else if let edition = getEdition(viewResolver) {
+						editionStruct = MetadataViews.Editions([edition])
+				}
+
 				results.append(
 					NFTView(
 						id : id,
 						display: MetadataViews.getDisplay(viewResolver),
-						editions : MetadataViews.getEditions(viewResolver),
+						editions : editionStruct,
+						rarity : MetadataViews.getRarity(viewResolver),
+						serial :  MetadataViews.getSerial(viewResolver)?.number,
+						traits : traitsStruct,
 						collectionDisplay : MetadataViews.getNFTCollectionDisplay(viewResolver),
 						nftType : viewResolver.getType()
 					)
@@ -84,7 +148,24 @@ pub struct MetadataCollectionItem {
 	pub let mediaType : String 
 	pub let source : String 
 
-	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
+	pub var rarity:MetadataViews.Rarity?
+	pub var editions: MetadataViews.Editions?
+	pub var serial: UInt64?
+	pub var traits: MetadataViews.Traits?
+
+	init(id:UInt64, 
+		 name: String, 
+		 collection: String, 
+		 subCollection: String?, 
+		 media  : String, 
+		 mediaType : String, 
+		 source : String, 
+		 nftDetailIdentifier: String, 
+		 editions : MetadataViews.Editions?,
+		 rarity:MetadataViews.Rarity?,
+		 serial: UInt64?,
+		 traits: MetadataViews.Traits?,
+		 ) {
 		self.id=id
 		self.name=name 
 		self.collection=collection 
@@ -93,6 +174,10 @@ pub struct MetadataCollectionItem {
 		self.mediaType=mediaType 
 		self.source=source
 		self.nftDetailIdentifier=nftDetailIdentifier
+		self.editions=editions
+		self.rarity=rarity
+		self.serial=serial
+		self.traits=traits
 	}
 }
 
@@ -160,7 +245,11 @@ pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {Str
 				media: nft!.display!.thumbnail.uri(),
 				mediaType: "image/png",
 				source: source, 
-				nftDetailIdentifier: nft!.nftType.identifier
+				nftDetailIdentifier: nft!.nftType.identifier, 
+				editions : nft!.editions,
+				rarity: nft!.rarity,
+				serial: nft!.serial,
+				traits: nft!.traits,
 			)
 			collectionItems.append(item)
 		}
@@ -170,4 +259,52 @@ pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {Str
 		}
 	}
 	return items
+}
+
+pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
+	let dateValues  = {"Date" : true, "Numeric":false, "Number":false, "date":true, "numeric":false, "number":false}
+
+	let array : [MetadataViews.Trait] = []
+
+	for i , trait in traits {
+		let displayType = trait.displayType ?? "string"
+		if let isDate = dateValues[displayType] {
+			if isDate {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Date", rarity: trait.rarity))
+			} else {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Numeric", rarity: trait.rarity))
+			}
+		} else {
+			if let value = trait.value as? Bool {
+				if value {
+					array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Bool", rarity: trait.rarity))
+				}else {
+					array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "Bool", rarity: trait.rarity))
+				}
+			} else if let value = trait.value as? String {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "String", rarity: trait.rarity))
+			} else {
+				array.append(MetadataViews.Trait(name: trait.name, value: trait.value, displayType: "String", rarity: trait.rarity))
+			}
+		}
+	}
+	return MetadataViews.Traits(array)
+}
+
+pub fun getTrait(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Trait? {
+	if let view = viewResolver.resolveView(Type<MetadataViews.Trait>()) {
+		if let v = view as? MetadataViews.Trait {
+			return v
+		}
+	}
+	return nil
+}
+
+pub fun getEdition(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Edition? {
+	if let view = viewResolver.resolveView(Type<MetadataViews.Edition>()) {
+		if let v = view as? MetadataViews.Edition {
+			return v
+		}
+	}
+	return nil
 }
