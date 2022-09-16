@@ -67,17 +67,17 @@ func main() {
 				WithArg("nftID", 164769803),
 				WithArg("publicPathIdentifier", "somePlaceCollectibleCollection"),
 			)
-	*/
 
-	o.Tx("adminAddNFTCatalog",
-		WithSigner("find"),
-		WithArg("collectionIdentifier", "bl0xPack"),
-		WithArg("contractName", "Bl0xPack"),
-		WithArg("contractAddress", "0x7620acf6d7f2468a"),
-		WithArg("addressWithNFT", "0x0893d4423f25c7d6"),
-		WithArg("nftID", 208638414),
-		WithArg("publicPathIdentifier", "Bl0xPackCollection"),
-	)
+			o.Tx("adminAddNFTCatalog",
+				WithSigner("find"),
+				WithArg("collectionIdentifier", "bl0xPack"),
+				WithArg("contractName", "Bl0xPack"),
+				WithArg("contractAddress", "0x7620acf6d7f2468a"),
+				WithArg("addressWithNFT", "0x0893d4423f25c7d6"),
+				WithArg("nftID", 208638414),
+				WithArg("publicPathIdentifier", "Bl0xPackCollection"),
+			)
+	*/
 
 	upsertItem := o.TxFileNameFN("adminMainnetAddItem",
 		adminSigner,
@@ -93,6 +93,7 @@ func main() {
 		//	"Bitku":    `["A.f61e40c19db2a9e2.HaikuNFT.NFT"]`,
 		//		"Dandy": `["A.097bafa4e0b48eef.Dandy.NFT"]`,
 		// "some.place": `["A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
+		// "bl0xPack": `["A.7620acf6d7f2468a.Bl0xPack.NFT"]`,
 		"bl0xPack": `["A.7620acf6d7f2468a.Bl0xPack.NFT"]`,
 	}
 
