@@ -5,31 +5,20 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import Bl0xPack from "../contracts/Bl0xPack.cdc"
 
 //IMPORT
 
-transaction() {
+transaction(receiverAddress: Address) {
 
 	let ids : {String : [UInt64]}
 	let nftInfos : {String : NFTCatalog.NFTCollectionData}
 	let receiverAddress : Address
 
 	prepare(account: AuthAccount){
-
-		//LINK
-
-		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Bl0xPack.CollectionPublicPath)
-		if !findPackCap.check() {
-			account.save<@NonFungibleToken.Collection>( <- Bl0xPack.createEmptyCollection(), to: Bl0xPack.CollectionStoragePath)
-			account.link<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-				Bl0xPack.CollectionPublicPath,
-				target: Bl0xPack.CollectionStoragePath
-			)
-		}
+		self.receiverAddress = receiverAddress
 
 		self.nftInfos = {}
-		self.ids = FindLostAndFoundWrapper.getTicketIDs(user: account.address, specificType: Type<@NonFungibleToken.NFT>())
+		self.ids = FindLostAndFoundWrapper.getTicketIDs(user: receiverAddress, specificType: Type<@NonFungibleToken.NFT>())
 
 		for type in self.ids.keys{ 
 			if self.nftInfos[type] == nil {
@@ -38,7 +27,6 @@ transaction() {
 			}
 		}
 
-		self.receiverAddress = account.address
 	}
 
 	execute{

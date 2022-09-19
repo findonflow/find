@@ -69,27 +69,16 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
     }
 
     execute{
-        let initialFlowBalance = self.flowVault.balance
-        let receivingAddresses : {String : Address} = {}
 
-        var receivers = allReceivers
-        for i , receiver in receivers {
-            if receivingAddresses[receiver] == nil {
-                let receivingAddress = FIND.resolve(receiver) ?? panic("invalid find name or address. Input : ".concat(receiver))
-                receivingAddresses.insert(key: receiver, receivingAddress)
-            }
-            let receivingAddress = receivingAddresses[receiver]!
-            let receiverCap = getAccount(receivingAddress).getCapability<&{NonFungibleToken.Receiver}>(self.nftInfos[i].publicPath)
-
+        for i , receiver in allReceivers {
             FindLostAndFoundWrapper.depositNFT(
-                receiverCap: receiverCap,
+                receiver: receiver,
+                collectionPublicPath: self.nftInfos[i].publicPath ,
                 item: self.pointers[i],
                 memo: memos[i],
                 storagePayment: self.flowVault,
                 flowTokenRepayment: self.flowTokenRepayment
             )
-
-
         }
     
     }
