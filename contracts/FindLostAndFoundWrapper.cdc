@@ -12,7 +12,7 @@ import FindViews from "./FindViews.cdc"
 pub contract FindLostAndFoundWrapper {
 
     pub event NFTDeposited(receiver: Address, receiverName: String?, sender: Address?, senderName: String?, type: String, id: UInt64?, uuid: UInt64?, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?)
-    pub event TicketDeposited(receiver: Address, receiverName: String?, sender: Address, senderName: String?, ticketID: UInt64, type: String, id: UInt64, uuid: UInt64, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?, flowStorageFee: UFix64)
+    pub event TicketDeposited(receiver: Address, receiverName: String?, sender: Address, senderName: String?, ticketID: UInt64, type: String, id: UInt64, uuid: UInt64?, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?, flowStorageFee: UFix64)
     pub event TicketRedeemed(receiver: Address, receiverName: String?, ticketID: UInt64, type: String)
     pub event TicketRedeemFailed(receiver: Address, receiverName: String?, ticketID: UInt64, type: String, remark: String)
 
@@ -28,14 +28,16 @@ pub contract FindLostAndFoundWrapper {
 
     // Deposit 
     pub fun depositNFT(
-        receiverCap: Capability<&{NonFungibleToken.Receiver}>,
+        receiver: String,
+        collectionPublicPath: PublicPath,
         item: FindViews.AuthNFTPointer,
         memo: String?,
         storagePayment: &FungibleToken.Vault,
         flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
     ) {
 
-        let receiverName = FIND.reverseLookup(receiverCap.address)
+        let receiverAddress = FIND.resolve(receiver) ?? panic("Receiver cannot be resolved. Receiver : ".concat(receiver))
+
         let sender = item.owner()
         let senderName = FIND.reverseLookup(sender)
 
@@ -45,17 +47,38 @@ pub contract FindLostAndFoundWrapper {
         let uuid = item.uuid
         let type = item.getItemType()
 
-        // Try to send before using Lost & FIND
-        if receiverCap.check() {
-            receiverCap.borrow()!.deposit(token: <- item.withdraw())
-            emit NFTDeposited(receiver: receiverCap.address, receiverName: receiverName, sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-            return
+        // calculate the required storage and check sufficient balance 
+        let senderStorageBeforeSend = getAccount(sender).storageUsed
+
+        let item <- item.withdraw() 
+
+        let requiredStorage = senderStorageBeforeSend - getAccount(sender).storageUsed
+        let receiverAvailableStorage = getAccount(receiverAddress).storageCapacity - getAccount(receiverAddress).storageUsed
+
+        // If the receiver has sufficient storage, then try to send
+        if receiverAvailableStorage >= requiredStorage {
+
+            // Try to send before using Lost & FIND
+            let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
+            if receiverCap.check() {
+                receiverCap.borrow()!.deposit(token: <- item)
+                emit NFTDeposited(receiver: receiverCap.address, receiverName: receiver, sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                return
+            }
+
+            let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.CollectionPublic}>(collectionPublicPath)
+            if collectionPublicCap.check() {
+                collectionPublicCap.borrow()!.deposit(token: <- item)
+                emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                return
+            }
+
         }
 
         // Calculate storage fees required 
-        let nft <- item.withdraw()
+        let nft <- item
         let estimate <- LostAndFound.estimateDeposit(
-                            redeemer: receiverCap.address,
+                            redeemer: receiverAddress,
                             item: <- nft,
                             memo: memo,
                             display: display
@@ -71,7 +94,7 @@ pub contract FindLostAndFoundWrapper {
 
         let flowStorageFee = vaultRef.balance
         let ticketID = LostAndFound.deposit(
-            redeemer: receiverCap.address,
+            redeemer: receiverAddress,
             item: <- estimate.withdraw(),
             memo: memo,
             display: display,
@@ -81,38 +104,50 @@ pub contract FindLostAndFoundWrapper {
         // Destroy the vault after the payment. The vault should be 0 in balance
         FindLostAndFoundWrapper.destroyVault(vaultUUID, cap: flowTokenRepayment)
 
-        emit TicketDeposited(receiver: receiverCap.address, receiverName: receiverName, sender: sender, senderName: senderName, ticketID: ticketID, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri(), flowStorageFee: flowStorageFee)
+        emit TicketDeposited(receiver: receiverAddress, receiverName: receiver, sender: sender, senderName: senderName, ticketID: ticketID, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri(), flowStorageFee: flowStorageFee)
         destroy estimate
     }
 
     // Redeem 
-    pub fun redeemNFT(type: Type, ticketID: UInt64, receiver: Capability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>) {
+    pub fun redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
 
-        if !receiver.check() {
-            emit TicketRedeemFailed(receiver: receiver.address, receiverName: FIND.reverseLookup(receiver.address), ticketID: ticketID, type: type.identifier, remark: "invalid capability")
+        let metadataViewsCap = getAccount(receiverAddress).getCapability<&{MetadataViews.ResolverCollection}>(collectionPublicPath)
+
+        let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
+        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.CollectionPublic}>(collectionPublicPath)
+
+        if !receiverCap.check() && !collectionPublicCap.check() {
+            emit TicketRedeemFailed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier, remark: "invalid capability")
             return
         }
 
-        let shelf = LostAndFound.borrowShelfManager().borrowShelf(redeemer: receiver.address) ?? panic("No items to redeem for this user: ".concat(receiver.address.toString()))
+        let shelf = LostAndFound.borrowShelfManager().borrowShelf(redeemer: receiverAddress) ?? panic("No items to redeem for this user: ".concat(receiverAddress.toString()))
 
-        let bin = shelf.borrowBin(type: type) ?? panic("No items to redeem for this user: ".concat(receiver.address.toString()))
-        let ticket = bin.borrowTicket(id: ticketID) ?? panic("No items to redeem for this user: ".concat(receiver.address.toString()))
+        let bin = shelf.borrowBin(type: type) ?? panic("No items to redeem for this user: ".concat(receiverAddress.toString()))
+        let ticket = bin.borrowTicket(id: ticketID) ?? panic("No items to redeem for this user: ".concat(receiverAddress.toString()))
         let nftID = ticket.getNonFungibleTokenID() ?? panic("The item you are trying to redeem is not an NFT")
 
         let sender = ticket.getFlowRepaymentAddress()
         let memo = ticket.memo
 
-        shelf.redeem(type: type, ticketID: ticketID, receiver: receiver)
-        let item = FindViews.ViewReadPointer(cap: receiver, id: nftID)
-        let display = item.getDisplay()
-        let collectionDisplay = MetadataViews.getNFTCollectionDisplay(item.getViewResolver())
+        // if receiverCap is valid, pass that in, otherwise pass collectionPublicCap
+        shelf.redeem(type: type, ticketID: ticketID, receiver: receiverCap.check() ? receiverCap : collectionPublicCap)
+        var item : FindViews.ViewReadPointer? = nil
+        var display : MetadataViews.Display? = nil
+        var collectionDisplay : MetadataViews.NFTCollectionDisplay? = nil
+
+        if metadataViewsCap.check() {
+            item = FindViews.ViewReadPointer(cap: metadataViewsCap, id: nftID)
+            display = item!.getDisplay()
+            collectionDisplay = MetadataViews.getNFTCollectionDisplay(item!.getViewResolver())
+        }
 
         var senderName : String? = nil 
         if sender != nil {
             senderName = FIND.reverseLookup(sender!)
         }
-        emit NFTDeposited(receiver: receiver.address, receiverName: FIND.reverseLookup(receiver.address), sender: sender, senderName: senderName, type: type.identifier, id: nftID, uuid: item.uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-        emit TicketRedeemed(receiver: receiver.address, receiverName: FIND.reverseLookup(receiver.address), ticketID: ticketID, type: type.identifier)
+        emit NFTDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: nftID, uuid: item?.uuid, memo: memo, name: display?.name, description: display?.description, thumbnail: display?.thumbnail?.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+        emit TicketRedeemed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier)
 
     }
 

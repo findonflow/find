@@ -12,7 +12,8 @@ import Bl0xPack from "../contracts/Bl0xPack.cdc"
 
 transaction(ids: {String : [UInt64]}) {
 
-	let receiverCaps : {String : Capability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>} 
+	let nftInfos : {String : NFTCatalog.NFTCollectionData}
+	let receiverAddress : Address
 
 	prepare(account: AuthAccount){
 
@@ -27,30 +28,23 @@ transaction(ids: {String : [UInt64]}) {
 			)
 		}
 
-		let nftInfos : {String : NFTCatalog.NFTCollectionData} = {}
-		self.receiverCaps = {}
+		self.nftInfos = {}
 
 		for type in ids.keys{ 
-
-			if nftInfos[type] == nil {
+			if self.nftInfos[type] == nil {
 				let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type) ?? panic("NFT type is not supported at the moment. Type : ".concat(type))
-				nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData
+				self.nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData
 			}
-			let nft = nftInfos[type]!
-
-			var targetCapability = self.receiverCaps[type]
-			if targetCapability == nil {
-				targetCapability = account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(nft.publicPath)
-				self.receiverCaps.insert(key: type, targetCapability!)
-			}
-
 		}
+
+		self.receiverAddress = account.address
 	}
 
 	execute{
 		for type in ids.keys{ 
+			let path = self.nftInfos[type]!.publicPath
 			for id in ids[type]! {
-				FindLostAndFoundWrapper.redeemNFT(type: CompositeType(type)!, ticketID: id, receiver:self.receiverCaps[type]!)
+				FindLostAndFoundWrapper.redeemNFT(type: CompositeType(type)!, ticketID: id, receiverAddress:self.receiverAddress, collectionPublicPath: path)
 			}
 		}
 	}
