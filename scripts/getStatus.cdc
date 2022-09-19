@@ -7,6 +7,9 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
+import EmeraldIdentity from "../contracts/standard/EmeraldIdentity.cdc"
+import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.cdc"
+import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
 
 pub struct FINDReport{
 	pub let profile:Profile.UserReport?
@@ -21,8 +24,10 @@ pub struct FINDReport{
 	pub let activatedAccount: Bool 
 
 	// NFT Catalog outputs
-	pub let nftCatalogTypes: {String : NFTCatalog.NFTCollectionData}
-	pub let lostAndFoundTypes: [String]
+	pub let lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}
+
+	// EmeraldID Account Linkage 
+	pub let emeraldIDAccounts : {String : Address}
 
 
 	init(profile: Profile.UserReport?, 
@@ -35,8 +40,8 @@ pub struct FINDReport{
 		 itemsForSale: {String : FindMarket.SaleItemCollectionReport}, 
 		 marketBids: {String : FindMarket.BidItemCollectionReport}, 
 		 activatedAccount: Bool, 
-		 nftCatalogTypes: {String : NFTCatalog.NFTCollectionData}, 
-		 lostAndFoundTypes: [String]
+		 lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}, 
+		 emeraldIDAccounts : {String : Address}
 		 ) {
 
 		self.profile=profile
@@ -49,8 +54,8 @@ pub struct FINDReport{
 		self.itemsForSale=itemsForSale
 		self.marketBids=marketBids
 		self.activatedAccount=activatedAccount
-		self.nftCatalogTypes=nftCatalogTypes
 		self.lostAndFoundTypes=lostAndFoundTypes
+		self.emeraldIDAccounts=emeraldIDAccounts
 	}
 }
 
@@ -116,15 +121,20 @@ pub fun main(user: String) : Report? {
 			// NFTCatalog Output 
 			let nftCatalogTypes = FINDNFTCatalog.getCatalogTypeData()
 			let types : {String : NFTCatalog.NFTCollectionData} = {}
-			for type in nftCatalogTypes.keys {
-				types[type] = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: type)
-			}
-
-			let lostAndFoundTypes : [String] = []
 			for type in FindLostAndFoundWrapper.getSpecificRedeemableTypes(user: address, specificType: Type<@NonFungibleToken.NFT>()) {
-				lostAndFoundTypes.append(type.identifier)
+				types[type.identifier] = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: type.identifier)
 			}
 
+			let discordID = EmeraldIdentity.getDiscordFromAccount(account: address) 
+									?? EmeraldIdentityDapper.getDiscordFromAccount(account: address) 
+									?? EmeraldIdentityLilico.getDiscordFromAccount(account: address)
+									?? ""
+
+			let emeraldIDAccounts : {String : Address} = {}
+			emeraldIDAccounts["blocto"] = EmeraldIdentity.getAccountFromDiscord(discordID: discordID)
+			emeraldIDAccounts["lilico"] = EmeraldIdentityLilico.getAccountFromDiscord(discordID: discordID)
+			emeraldIDAccounts["dapper"] = EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID)
+			
 			findReport = FINDReport(
 				profile: profileReport,
 				relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
@@ -136,8 +146,8 @@ pub fun main(user: String) : Report? {
 				itemsForSale: items,
 				marketBids: marketBids,
 				activatedAccount: true, 
-				nftCatalogTypes: types, 
-				lostAndFoundTypes: lostAndFoundTypes
+				lostAndFoundTypes: types, 
+				emeraldIDAccounts: emeraldIDAccounts
 			)
 		} else {
 			findReport = FINDReport(
@@ -151,8 +161,8 @@ pub fun main(user: String) : Report? {
 				itemsForSale: {},
 				marketBids: {},
 				activatedAccount: false, 
-				nftCatalogTypes: {}, 
-				lostAndFoundTypes: []
+				lostAndFoundTypes: {}, 
+				emeraldIDAccounts: {}
 			)
 		}
 	}

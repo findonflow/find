@@ -78,6 +78,25 @@
         "testnet": "0x0afe396ebc8eee65"
       }
     },
+    "EmeraldIdentity": {
+      "source": "./contracts/standard/EmeraldIdentity.cdc",
+      "aliases": {
+        "mainnet": "0x39e42c67cc851cfb",
+        "testnet": "0xfe433270356d985c"
+      }
+    },
+    "EmeraldIdentityLilico": {
+      "source": "./contracts/standard/EmeraldIdentityLilico.cdc",
+      "aliases": {
+        "mainnet": "0x39e42c67cc851cfb"
+      }
+    },
+    "EmeraldIdentityDapper": {
+      "source": "./contracts/standard/EmeraldIdentityDapper.cdc",
+      "aliases": {
+        "mainnet": "0x39e42c67cc851cfb"
+      }
+    },
     "FeeEstimator": {
       "source": "./contracts/standard/FeeEstimator.cdc",
       "aliases": {
@@ -279,6 +298,10 @@
       "address": "82836e61c008d6d1",
       "key": "${TESTNET_ACCOUNT}"
     },
+    "testnet-emerald-identity": {
+      "address": "c9d218cc626cd7f5",
+      "key": "${TESTNET_ACCOUNT}"
+    },
     "testnet-user1": {
       "address": "3e5b4c627064625d",
       "key": "${TESTNET_ACCOUNT}"
@@ -375,6 +398,10 @@
       ],
       "testnet-find-lost-and-found-wrapper": [
         "FindLostAndFoundWrapper"
+      ],
+      "testnet-emerald-identity": [
+        "EmeraldIdentityLilico",
+        "EmeraldIdentityDapper"
       ]
     },
     "emulator": {
