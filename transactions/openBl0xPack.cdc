@@ -9,15 +9,29 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 transaction(packId:UInt64) {
 
 	let packs: &Bl0xPack.Collection
-	let receiver: Capability<&{NonFungibleToken.Receiver}>
+	var receiver: Capability<&{NonFungibleToken.Receiver}>
 
 	prepare(account: AuthAccount) {
 		self.packs=account.borrow<&Bl0xPack.Collection>(from: Bl0xPack.CollectionStoragePath)!
 		self.receiver = account.getCapability<&{NonFungibleToken.Receiver}>(Bl0x.CollectionPublicPath)
+		if !self.receiver.check() {
+			account.save<@NonFungibleToken.Collection>(<- Bl0x.createEmptyCollection(), to: Bl0x.CollectionStoragePath)
+			account.link<&Bl0x.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				Bl0x.CollectionPublicPath,
+				target: Bl0x.CollectionStoragePath
+			)
+			account.link<&Bl0x.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				Bl0x.CollectionPrivatePath,
+				target: Bl0x.CollectionStoragePath
+			)
+
+			self.receiver = account.getCapability<&{NonFungibleToken.Receiver}>(Bl0x.CollectionPublicPath)
+		}
+
 	}
 
 	pre {
-		self.receiver.check() : "The receiver collection for the packs is not present"
+		self.receiver.check() : "The receiver collection for the packs is not set up properly"
 	}
 	execute {
 		self.packs.open(packId: packId, receiverCap:self.receiver)
