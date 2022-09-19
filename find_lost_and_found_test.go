@@ -364,51 +364,6 @@ func TestFindLostAndFound(t *testing.T) {
 
 	})
 
-	// t.Run("Should send to Lost And Found if the receiver account is full", func(t *testing.T) {
-
-	// 	otu.O.Tx("setupExampleNFTCollection",
-	// 		WithSigner("user1"),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// 	otu.O.Tx("adminSendFlow",
-	// 		WithSigner("user1"),
-	// 		WithArg("receiver", otu.O.Address("account")),
-	// 		WithArg("amount", 99.5),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// 	otu.O.Tx("testFillUpStorage",
-	// 		WithSigner("user1"),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// 	otu.O.FillUpStorage("user1")
-
-	// 	otu.O.Tx("sendNFTs",
-	// 		WithSigner("account"),
-	// 		WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
-	// 		WithArg("allReceivers", `["user1"]`),
-	// 		WithArg("ids", []uint64{0}),
-	// 		WithArg("memos", `["Hello!"]`),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
-	// 			"receiver":     otu.O.Address("user1"),
-	// 			"receiverName": "user1",
-	// 			"sender":       otu.O.Address("account"),
-	// 			"type":         "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
-	// 			"id":           0,
-	// 			"memo":         "Hello!",
-	// 		})
-
-	// 	otu.O.Tx("testRefillStorage",
-	// 		WithSigner("user1"),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// })
-
 	t.Run("Should be able to send a lot of NFTs", func(t *testing.T) {
 		amount := 40
 
