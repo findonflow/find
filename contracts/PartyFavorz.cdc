@@ -103,7 +103,7 @@ pub contract PartyFavorz: NonFungibleToken {
 
 				let square = MetadataViews.Media(
 					file: MetadataViews.IPFSFile(
-						cid: "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c",
+						cid: "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc",
 						path: nil
 					),
 					mediaType: "image/png"
@@ -111,7 +111,7 @@ pub contract PartyFavorz: NonFungibleToken {
 
 				let banner = MetadataViews.Media(
 					file: MetadataViews.IPFSFile(
-						cid: "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1",
+						cid: "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc",
 						path: nil
 					),
 					mediaType: "image/png"
@@ -124,7 +124,7 @@ pub contract PartyFavorz: NonFungibleToken {
 					squareImage: square,
 					bannerImage: banner,
 					socials: {
-						"twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
+						"twitter": MetadataViews.ExternalURL("https://twitter.com/findonflow")
 					}
 				)
 
