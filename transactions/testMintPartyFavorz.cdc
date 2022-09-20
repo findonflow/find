@@ -7,7 +7,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 
-transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String) {
+transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String) {
 	prepare(account: AuthAccount) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(PartyFavorz.CollectionPublicPath)
@@ -29,15 +29,17 @@ transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:Str
 
 		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(PartyFavorz.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to PartyFavorz collection.")
 
-		var i = UInt64(1)
+		var i = 0
 		let collection=collectionCap.borrow()!
-		while  i <= maxEditions {
+		while  i < number {
 			let mintData = PartyFavorz.Info(
 				name: nftName,
 				description: nftDescription, 
 				thumbnailHash: imageHash,
-				edition: i, 
-				maxEdition: maxEditions
+				edition: startFrom + UInt64(i), 
+				maxEdition: maxEditions, 
+				fullSizeHash: fullSizeHash, 
+				artist: artist
 			)
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1

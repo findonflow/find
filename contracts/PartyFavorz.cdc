@@ -16,19 +16,25 @@ pub contract PartyFavorz: NonFungibleToken {
 	pub let CollectionPublicPath: PublicPath
 	pub let MinterStoragePath: StoragePath
 
+	pub let royalties: [MetadataViews.Royalty]
+
 	pub struct Info {
 		pub let name: String
 		pub let description: String
 		pub let thumbnailHash: String
 		pub let edition: UInt64
 		pub let maxEdition: UInt64
+		pub let fullsizeHash: String 
+		pub let artist: String
 
-		init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64) {
+		init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, fullsizeHash: String, artist: String) {
 			self.name=name 
 			self.description=description 
 			self.thumbnailHash=thumbnailHash
 			self.edition=edition
 			self.maxEdition=maxEdition
+			self.fullsizeHash=fullsizeHash
+			self.artist=artist
 		}
 	}
 
@@ -36,15 +42,12 @@ pub contract PartyFavorz: NonFungibleToken {
 		pub let id: UInt64
 
 		pub let info: Info
-		access(self) let royalties: MetadataViews.Royalties
 
 		init(
-			info: Info,
-			royalties: MetadataViews.Royalties
+			info: Info
 		) {
 			self.id = self.uuid
 			self.info=info
-			self.royalties = royalties
 		}
 
 		pub fun getViews(): [Type] {
@@ -76,7 +79,7 @@ pub contract PartyFavorz: NonFungibleToken {
 					editionList
 				)
 			case Type<MetadataViews.Royalties>():
-				return self.royalties
+				return MetadataViews.Royalties(PartyFavorz.royalties)
 
 			case Type<MetadataViews.ExternalURL>():
 				if self.owner != nil {
@@ -200,8 +203,7 @@ pub contract PartyFavorz: NonFungibleToken {
 
 			// create a new NFT
 			var newNFT <- create NFT(
-				info: info,
-				royalties: MetadataViews.Royalties(royalties)
+				info: info
 			)
 
 			PartyFavorz.totalSupply = PartyFavorz.totalSupply + UInt64(1)
@@ -228,6 +230,14 @@ pub contract PartyFavorz: NonFungibleToken {
 		self.CollectionPrivatePath = /private/PartyFavorzCollection
 		self.CollectionPublicPath = /public/PartyFavorzCollection
 		self.MinterStoragePath = /storage/PartyFavorzMinter
+
+		let partyFavorz = getAccount(0xded455fa967d350e).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+		let artist = getAccount(0x34f2bf4a80bb0f69).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+
+		self.royalties = [
+							MetadataViews.Royalty(receiver: partyFavorz, cut: 0.03, description: "Party Favorz"), 
+							MetadataViews.Royalty(receiver: artist, cut: 0.02, description: "Artist") 
+					   	 ]
 
 		// Create a Collection resource and save it to storage
 		let collection <- create Collection()
