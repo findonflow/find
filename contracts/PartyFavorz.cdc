@@ -127,6 +127,11 @@ pub contract PartyFavorz: NonFungibleToken {
 						"twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
 					}
 				)
+
+			case Type<MetadataViews.Traits>() : 
+				return MetadataViews.Traits([
+					MetadataViews.Trait(name: "Artist", value: self.info.artist, displayType: "String", rarity: nil)
+				])
 			}
 			return nil
 		}
