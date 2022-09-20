@@ -234,6 +234,7 @@
     "FindForge": "./contracts/FindForge.cdc",
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "NFGv3": "./contracts/NFGv3.cdc",
+    "PartyFavorz": "./contracts/PartyFavorz.cdc",
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
     "FindToken": "./contracts/FindToken.cdc",
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
@@ -359,7 +360,8 @@
         "FindLostAndFoundWrapper"
       ],
       "mainnet-find-forge": [
-        "NFGv3"
+        "NFGv3",
+        "PartyFavorz"
       ]
     },
     "testnet": {
@@ -394,7 +396,8 @@
         "FINDNFTCatalogAdmin"
       ],
       "testnet-user1": [
-        "NFGv3"
+        "NFGv3",
+        "PartyFavorz"
       ],
       "testnet-find-lost-and-found-wrapper": [
         "FindLostAndFoundWrapper"
@@ -462,7 +465,8 @@
       "emulator-user2": [],
       "emulator-user3": [],
       "emulator-user4": [
-        "NFGv3"
+        "NFGv3",
+        "PartyFavorz"
       ],
       "emulator-user5-dapper": []
     }
