@@ -8,6 +8,7 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
+import FindPack from "./FindPack.cdc"
 
 pub contract Admin {
 
@@ -77,12 +78,12 @@ pub contract Admin {
 			FindForge.removeForgeType(type: type)
 		}
 
-		pub fun addForgeContractData(forgeType : Type, data: AnyStruct) {
+		pub fun addForgeContractData(lease: String, forgeType: Type , data: AnyStruct) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.addContractData(forgeType: forgeType , data: data)
+			FindForge.addContractData(lease: lease, forgeType: forgeType , data: data)
 		}
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
@@ -352,6 +353,26 @@ pub contract Admin {
 
 		pub fun setResidualAddress(_ address: Address) {
 			FindMarket.setResidualAddress(address)
+		}
+
+		/// ===================================================================================
+		// Find Pack
+		/// ===================================================================================
+
+		pub fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			return Admin.account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)	
+		}
+
+		pub fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			let receiver = Admin.account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(FindPack.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to admin find pack collection public")
+			let mintPackData = FindPack.MintPackData(packTypeName: packTypeName, typeId: typeId, hash: hash, verifierRef: FindForge.borrowVerifier())
+			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
 		}
 
 		init() {

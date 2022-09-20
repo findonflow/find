@@ -351,7 +351,7 @@ pub contract Dandy: NonFungibleToken {
 			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)
 		}
 
-		pub fun addContractData(data: AnyStruct, verifier: &FindForge.Verifier) {
+		pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			// not used here 
 
 			panic("Not supported for Dandy Contract") 

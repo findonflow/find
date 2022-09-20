@@ -242,7 +242,9 @@
     "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
     "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
     "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
-    "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc"
+    "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
+    "FindPack": "./contracts/FindPack.cdc",
+    "FindVerifier": "./contracts/FindVerifier.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -452,7 +454,9 @@
         "GrantedAccountAccess",
         "FLOATVerifiers",
         "Bl0x",
-        "Bl0xPack"
+        "Bl0xPack",
+        "FindPack",
+        "FindVerifier"
       ],
       "emulator-find": [],
       "emulator-user1": [],

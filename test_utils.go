@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
+	"github.com/onflow/cadence"
 	"github.com/sanity-io/litter"
 	"github.com/stretchr/testify/assert"
 )
@@ -2397,6 +2399,132 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 	return ticketID
 }
 
+func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
+
+	t := otu.T
+
+	res, err := otu.O.Tx("testMintExampleNFT",
+		WithSigner("user1"),
+		WithArg("name", "user1"),
+		WithArg("artist", "Bam"),
+		WithArg("nftName", "ExampleNFT"),
+		WithArg("nftDescription", "This is an ExampleNFT"),
+		WithArg("nftUrl", "This is an exampleNFT url"),
+		WithArg("traits", []uint64{1, 2, 3}),
+		WithArg("collectionDescription", "Example NFT FIND"),
+		WithArg("collectionExternalURL", "Example NFT external url"),
+		WithArg("collectionSquareImage", "Example NFT square image"),
+		WithArg("collectionBannerImage", "Example NFT banner image"),
+	).
+		AssertSuccess(t).
+		GetIdFromEvent("ExampleNFT.Deposit", "id")
+
+	otu.O.Tx("sendExampleNFT",
+		WithSigner("user1"),
+		WithArg("user", otu.O.Address("account")),
+		WithArg("id", res),
+	)
+
+	assert.NoError(t, err)
+
+	return res
+
+}
+
+func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	o.Tx("setupFindPackMinterPlatform",
+		WithSigner(user),
+		WithArg("lease", user),
+	).
+		AssertSuccess(t)
+
+	o.Tx("adminRegisterFindPackMetadata",
+		WithSigner("find"),
+		WithArg("lease", user),
+		WithArg("typeId", packTypeId),
+		WithArg("thumbnailHash", "thumbnailHash"),
+		WithArg("wallet", clientAddress),
+		WithArg("openTime", openTime),
+		WithArg("royaltyCut", 0.15),
+		WithArg("royaltyAddress", marketAddress),
+		WithArg("startTime", createIntUFix64(map[int]float64{1: whitelistTime, 2: buyTime})),
+		WithArg("endTime", createIntUFix64(map[int]float64{1: buyTime})),
+		WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatId})),
+		WithArg("price", createIntUFix64(map[int]float64{1: 4.20, 2: 4.20})),
+		WithArg("purchaseLimit", createIntUInt64(map[int]uint64{})),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			"packTypeId": packTypeId,
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input []uint64, salt string) uint64 {
+
+	o := otu.O
+	t := otu.T
+
+	packHash := utils.CreateSha3Hash(input, salt)
+
+	res, err := o.Tx("adminMintFindPack",
+		WithSigner("find"),
+		WithArg("packTypeName", minter),
+		WithArg("typeId", packTypeId),
+		WithArg("hashes", []string{packHash}),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Minted", map[string]interface{}{
+			"typeId": packTypeId,
+		}).
+		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
+
+	assert.NoError(t, err)
+	return res
+}
+
+func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint64, numberOfPacks uint64, amount float64) *OverflowTestUtils {
+
+	o := otu.O
+	t := otu.T
+
+	o.Tx("buyFindPack",
+		WithSigner(user),
+		WithArg("packTypeName", packTypeName),
+		WithArg("packTypeId", packTypeId),
+		WithArg("numberOfPacks", numberOfPacks),
+		WithArg("totalAmount", amount),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
+			"amount":  amount,
+			"address": otu.O.Address(user),
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	o.Tx("openFindPack",
+		WithSigner(user),
+		WithArg("packId", packId),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FlomiesPack.Opened", map[string]interface{}{
+			"packId":  packId,
+			"address": otu.O.Address(user),
+		})
+
+	return otu
+}
+
 type SaleItem struct {
 	Amount              float64 `json:"amount"`
 	AuctionReservePrice float64 `json:"auctionReservePrice"`
@@ -2503,4 +2631,24 @@ type GhostListing struct {
 	ListingType           string `json:"listingType"`
 	ListingTypeIdentifier string `json:"listingTypeIdentifier"`
 	Id                    uint64 `json:"id"`
+}
+
+func createIntUFix64(input map[int]float64) cadence.Dictionary {
+	array := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceInt := cadence.NewInt(key)
+		cadenceUFix64, _ := cadence.NewUFix64(fmt.Sprintf("%f", val))
+		array = append(array, cadence.KeyValuePair{Key: cadenceInt, Value: cadenceUFix64})
+	}
+	return cadence.NewDictionary(array)
+}
+
+func createIntUInt64(input map[int]uint64) cadence.Dictionary {
+	array := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceInt := cadence.NewInt(key)
+		cadenceUInt64 := cadence.NewUInt64(val)
+		array = append(array, cadence.KeyValuePair{Key: cadenceInt, Value: cadenceUInt64})
+	}
+	return cadence.NewDictionary(array)
 }

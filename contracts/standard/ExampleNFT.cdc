@@ -316,7 +316,7 @@ pub contract ExampleNFT: NonFungibleToken {
                                         royalties: MetadataViews.Royalties(royalties))
 		}
 
-        pub fun addContractData(data: AnyStruct, verifier: &FindForge.Verifier) {
+        pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let type = data.getType() 
 
             switch type {
