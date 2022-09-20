@@ -177,6 +177,7 @@ pub contract FindForge {
 		let nftType = nft.getType().identifier
 		receiver.deposit(token: <- nft)
 
+		/*
 		let vr = receiver.borrowViewResolver(id: id)
 		let view = vr.resolveView(Type<MetadataViews.Display>())  ?? panic("The minting nft should implement MetadataViews Display view.") 
 		let display = view as! MetadataViews.Display
@@ -188,6 +189,7 @@ pub contract FindForge {
 		let from = FindForge.account.address
 
 		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
+		*/
 
 	}
 
