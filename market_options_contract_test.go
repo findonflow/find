@@ -53,7 +53,7 @@ func TestMarketOptionsContract(t *testing.T) {
 					},
 					"ftAlias":               "Flow",
 					"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId":             302,
+					"listingId":             362,
 					"listingStatus":         "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil":     101,
@@ -61,7 +61,7 @@ func TestMarketOptionsContract(t *testing.T) {
 						"collectionDescription": "Neo Collectibles FIND",
 						"collectionName":        "user1",
 						"editionNumber":         2,
-						"id":                    302,
+						"id":                    362,
 						"name":                  "Neo Motorcycle 2 of 3",
 						"scalars": map[string]interface{}{
 							"Speed":              100,
@@ -74,14 +74,14 @@ func TestMarketOptionsContract(t *testing.T) {
 						"totalInEdition": 3,
 						"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
 					},
-					"nftId":         302,
+					"nftId":         362,
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType":      "active_listed",
 					"seller":        "0x179b6b1cb6755e31",
 					"sellerName":    "user1",
 				}}},
 				"FindMarketDirectOfferSoft": map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{
-					"id":                    301,
+					"id":                    361,
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				}}},
 			}),
@@ -117,7 +117,7 @@ func TestMarketOptionsContract(t *testing.T) {
 			autogold.Want("ghostBids", map[string]interface{}{
 				"FindMarketAuctionEscrow": map[string]interface{}{
 					"ghosts": []interface{}{map[string]interface{}{
-						"id":                    301,
+						"id":                    361,
 						"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					}},
 					"items": []interface{}{map[string]interface{}{
@@ -135,7 +135,7 @@ func TestMarketOptionsContract(t *testing.T) {
 						"bidderName":            "user2",
 						"ftAlias":               "Flow",
 						"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"listingId":             302,
+						"listingId":             362,
 						"listingStatus":         "active",
 						"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 						"listingValidUntil":     301,
@@ -143,7 +143,7 @@ func TestMarketOptionsContract(t *testing.T) {
 							"collectionDescription": "Neo Collectibles FIND",
 							"collectionName":        "user1",
 							"editionNumber":         2,
-							"id":                    302,
+							"id":                    362,
 							"name":                  "Neo Motorcycle 2 of 3",
 							"scalars": map[string]interface{}{
 								"Speed":              100,
@@ -156,7 +156,7 @@ func TestMarketOptionsContract(t *testing.T) {
 							"totalInEdition": 3,
 							"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
 						},
-						"nftId":         302,
+						"nftId":         362,
 						"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 						"saleType":      "active_ongoing",
 						"seller":        "0x179b6b1cb6755e31",
@@ -164,7 +164,7 @@ func TestMarketOptionsContract(t *testing.T) {
 					}},
 				},
 				"FindMarketDirectOfferSoft": map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{
-					"id":                    301,
+					"id":                    361,
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				}}},
 			}),

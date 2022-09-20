@@ -452,7 +452,10 @@
         "GrantedAccountAccess",
         "FLOATVerifiers",
         "Bl0x",
-        "Bl0xPack"
+        "Bl0xPack",
+        "EmeraldIdentityLilico",
+        "EmeraldIdentityDapper",
+        "EmeraldIdentity"
       ],
       "emulator-find": [],
       "emulator-user1": [],
