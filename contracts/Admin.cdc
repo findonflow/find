@@ -157,6 +157,15 @@ pub contract Admin {
 			walletRef.internal_register(name:name, profile: profile, leases: leases)
 		}
 
+
+		pub fun mintForge(leaseName: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForge.mintAdmin(leaseName: leaseName, forgeType: forgeType, data: data, receiver: receiver)
+		}
+
 		pub fun advanceClock(_ time: UFix64) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
