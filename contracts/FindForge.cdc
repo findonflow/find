@@ -76,7 +76,7 @@ pub contract FindForge {
 	// ForgeMinter Interface 
 	pub resource interface Forge{
 		pub fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @NonFungibleToken.NFT 
-		pub fun addContractData(data: AnyStruct, verifier: &Verifier)
+		pub fun addContractData(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier)
 	}
 
 	access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
@@ -196,11 +196,27 @@ pub contract FindForge {
 
 	}
 
-	access(account) fun addContractData(forgeType: Type , data: AnyStruct) {
+	access(account) fun addContractData(lease: &FIND.Lease, forgeType: Type , data: AnyStruct) {
+
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			panic("The minter platform is not set. Please set up properly before mint.")
+		}
+		let leaseName = lease.getName()
+
+		if !lease.checkAddon(addon: "forge") && !lease.checkAddon(addon: "premiumForge") {
+			panic("Please purchase forge addon to start forging. Name: ".concat(leaseName))
+		}
+
+		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
+
+		if minterPlatform.description == "" {
+			panic("Please set up minter platform before mint")
+		}
+
 		let verifier = self.borrowVerifier()
 
 		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
-		forge.addContractData(data: data, verifier: verifier)
+		forge.addContractData(platform: minterPlatform, data: data, verifier: verifier)
 	}
 
 	pub fun addForgeType(_ forge: @{Forge}) {
