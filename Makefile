@@ -13,7 +13,7 @@ deploy:
 	flow project deploy 
 
 emulator:
-	flow project start-emulator -v
+	flow emulator -v
 
 test:
 	gotessum -f testname
