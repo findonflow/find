@@ -23,7 +23,7 @@ func TestNFTDetailScript(t *testing.T) {
 		createUser(1000.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(300)
+	otu.setUUID(400)
 	ids := otu.mintThreeExampleDandies()
 	otu.registerFtInRegistry().
 		setFlowDandyMarketOption("Sale")
