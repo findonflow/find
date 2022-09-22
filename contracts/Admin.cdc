@@ -379,9 +379,18 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			let receiver = Admin.account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(FindPack.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to admin find pack collection public")
+			let pathIdentifier = FindPack.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
+			let path = PublicPath(identifier: pathIdentifier)!
+			let receiver = Admin.account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(path).borrow() ?? panic("Cannot borrow reference to admin find pack collection public from Path : ".concat(pathIdentifier))
 			let mintPackData = FindPack.MintPackData(packTypeName: packTypeName, typeId: typeId, hash: hash, verifierRef: FindForge.borrowVerifier())
 			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
+		}
+
+		pub fun fulfillFindPack(packId:UInt64, rewardIds:{Type : [UInt64]}, salt:String) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			FindPack.fulfill(packId:packId, rewardIds:rewardIds, salt:salt)
 		}
 
 		init() {

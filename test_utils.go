@@ -2423,7 +2423,8 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 		WithSigner("user1"),
 		WithArg("user", otu.O.Address("account")),
 		WithArg("id", res),
-	)
+	).
+		AssertSuccess(t)
 
 	assert.NoError(t, err)
 
@@ -2517,10 +2518,74 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 		WithArg("packId", packId),
 	).
 		AssertSuccess(t).
-		AssertEvent(t, "A.f8d6e0586b0a20c7.FlomiesPack.Opened", map[string]interface{}{
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Opened", map[string]interface{}{
 			"packId":  packId,
 			"address": otu.O.Address(user),
 		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	mapping := map[string][]uint64{
+		"A.f8d6e0586b0a20c7.ExampleNFT.NFT": ids,
+	}
+
+	o.Tx("adminFulfillFindPack",
+		WithSigner("find"),
+		WithArg("packId", packId),
+		WithArg("rewardIds", createStringToUInt64Array(mapping)),
+		WithArg("salt", salt),
+	).
+		AssertSuccess(t)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) createFloatEvent(minter string) uint64 {
+	o := otu.O
+	t := otu.T
+
+	floatId, err := o.Tx("testfloatCreateEvent",
+		WithSigner(minter),
+		WithArg("forHost", minter),
+		WithArg("claimable", true),
+		WithArg("name", "FloatName"),
+		WithArg("description", "FloatDesciption"),
+		WithArg("image", "IMG"),
+		WithArg("url", "URL"),
+		WithArg("transferrable", true),
+		WithArg("timelock", false),
+		WithArg("dateStart", 0.0),
+		WithArg("timePeriod", 0.0),
+		WithArg("secret", false),
+		WithArg("secrets", `[]`),
+		WithArg("limited", false),
+		WithArg("capacity", 0),
+		WithArg("initialGroups", `[]`),
+		WithArg("flowTokenPurchase", false),
+		WithArg("flowTokenCost", 0.0),
+	).
+		AssertSuccess(t).
+		GetIdFromEvent("A.f8d6e0586b0a20c7.FLOAT.FLOATEventCreated", "eventId")
+
+	assert.NoError(t, err)
+	return floatId
+}
+
+func (otu *OverflowTestUtils) claimFloat(minter, receiver string, floatId uint64) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	o.Tx("testfloatClaim",
+		WithSigner(receiver),
+		WithArg("eventId", floatId),
+		WithArg("host", minter),
+	).
+		AssertSuccess(t)
 
 	return otu
 }
@@ -2651,4 +2716,18 @@ func createIntUInt64(input map[int]uint64) cadence.Dictionary {
 		array = append(array, cadence.KeyValuePair{Key: cadenceInt, Value: cadenceUInt64})
 	}
 	return cadence.NewDictionary(array)
+}
+
+func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {
+	mapping := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceString, _ := cadence.NewString(key)
+		array := []cadence.Value{}
+		for _, value := range val {
+			cadenceUInt64 := cadence.NewUInt64(value)
+			array = append(array, cadenceUInt64)
+		}
+		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
+	}
+	return cadence.NewDictionary(mapping)
 }

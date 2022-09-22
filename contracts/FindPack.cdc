@@ -20,7 +20,7 @@ pub contract FindPack: NonFungibleToken {
 
 	pub event Opened(packTypeName: String, packTypeId:UInt64, packId: UInt64, address:Address)
 	pub event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address)
-	pub event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, nftPerPack: Int, packTier: String?)
+	pub event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, packFields: {String : String})
 
 	pub event Purchased(packTypeName: String, packTypeId: UInt64, packId: UInt64, address: Address, amount:UFix64)
 	pub event MetadataRegistered(packTypeName: String, packTypeId: UInt64)
@@ -52,15 +52,17 @@ pub contract FindPack: NonFungibleToken {
 		pub let price : UFix64
 		pub let purchaseLimit : UInt64?
 		pub let purchaseRecord : {Address : UInt64}
-		pub let verifier : {FindVerifier.Verifier}?
+		pub let verifiers : [{FindVerifier.Verifier}]
+		pub let verifyAll : Bool 
 
-		init(startTime : UFix64 , endTime : UFix64? , price : UFix64, purchaseLimit : UInt64?, verifier: {FindVerifier.Verifier}?) {
+		init(startTime : UFix64 , endTime : UFix64? , price : UFix64, purchaseLimit : UInt64?, verifiers: [{FindVerifier.Verifier}], verifyAll : Bool ) {
 			self.startTime = startTime
 			self.endTime = endTime
 			self.price = price
 			self.purchaseLimit = purchaseLimit
 			self.purchaseRecord = {}
-			self.verifier = verifier
+			self.verifiers = verifiers
+			self.verifyAll = verifyAll
 		}
 
 		pub fun inTime(_ time: UFix64) : Bool {
@@ -69,13 +71,14 @@ pub contract FindPack: NonFungibleToken {
 				return started
 			}
 
-			return started && time < self.endTime!
+			return started && time <= self.endTime!
 		}
 
 		pub fun buy(_ addr: Address) {
 
 			// If verified false, then panic 
-			if self.verifier != nil && !self.verifier!.verify(self.generateParam(addr)) {
+
+			if !self.verify(addr) {
 				panic("You are not qualified to buy this pack at the moment")
 			}
 
@@ -97,7 +100,7 @@ pub contract FindPack: NonFungibleToken {
 			}
 
 			// If verified false, then false 
-			if self.verifier != nil && !self.verifier!.verify(self.generateParam(addr)) {
+			if !self.verify(addr) {
 				return false
 			}
 
@@ -108,6 +111,28 @@ pub contract FindPack: NonFungibleToken {
 			}
 			// else return true
 			return true
+		}
+
+		access(contract) fun verify(_ addr: Address) : Bool {
+			if self.verifiers.length == 0 {
+				return true
+			}
+
+			if self.verifyAll {
+				for verifier in self.verifiers {
+					if !verifier.verify(self.generateParam(addr)) {
+						return false
+					}
+				}
+				return true
+			}
+			// If only has to verify one 
+			for verifier in self.verifiers {
+				if verifier.verify(self.generateParam(addr)) {
+					return true
+				}
+			}
+			return false
 		}
 
 		access(contract) fun generateParam(_ addr: Address) : {String : AnyStruct} {
@@ -153,21 +178,21 @@ pub contract FindPack: NonFungibleToken {
 		pub let walletType: Type
 
 		pub let openTime: UFix64
-		pub let saleInfo: [SaleInfo]
+		pub let saleInfos: [SaleInfo]
 
 		pub let storageRequirement: UInt64
 
-        pub let items : Int
-        pub let tier : String?
+		pub let packFields: {String : String}
+		pub let extraData : {String : AnyStruct}
 
-		access(contract) let providerCap: Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> 
+		pub let itemTypes: [Type]
+		access(contract) let providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} 
 
-		access(contract) let royaltyCap: Capability<&{FungibleToken.Receiver}>?
-		access(contract) let royaltyCut: UFix64
+		access(contract) let royalties : MetadataViews.Royalties
 
 		pub let requiresReservation: Bool
 
-		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, providerCap: Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>?, storageRequirement: UInt64, items: Int, tier: String?, saleInfo: [SaleInfo]) {
+		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], royalties : MetadataViews.Royalties, packFields: {String : String} , extraData : {String : AnyStruct}) {
 			self.name = name
 			self.description = description
 			self.thumbnailUrl = thumbnailUrl
@@ -176,18 +201,19 @@ pub contract FindPack: NonFungibleToken {
 			self.walletType=walletType
 
 			self.openTime=openTime
-			self.providerCap=providerCap
+			self.itemTypes=itemTypes
+			self.providerCaps=providerCaps
 
 			//If this pack has royalties then they can be added here later. For the current implementations royalties appear to be handled offchain. 
-			self.royaltyCap=royaltyWallet
-			self.royaltyCut=royaltyCut
+			self.royalties=royalties
 
 			self.storageRequirement= storageRequirement
 
 			self.requiresReservation=requiresReservation
-			self.items=items
-			self.tier=tier
-			self.saleInfo=saleInfo
+			self.packFields=packFields
+
+			self.saleInfos=saleInfos
+			self.extraData=extraData
 		}
 
 		pub fun getThumbnail() : AnyStruct{MetadataViews.File} {
@@ -198,17 +224,30 @@ pub contract FindPack: NonFungibleToken {
 		}
 
 		pub fun canBeOpened() : Bool {
-			return self.openTime < Clock.time()
+			return self.openTime <= Clock.time()
 		}
 
 		access(contract) fun borrowSaleInfo(_ i: Int) : &SaleInfo {
-			return &self.saleInfo[i] as &FindPack.SaleInfo
+			return &self.saleInfos[i] as &FindPack.SaleInfo
 		}
 	}
 
 	access(account) fun registerMetadata(packTypeName: String, typeId: UInt64, metadata: Metadata) {
 		emit MetadataRegistered(packTypeName: packTypeName, packTypeId: typeId)
-        let mapping = self.packMetadata[packTypeName] ?? {}
+        let mapping = self.packMetadata[packTypeName] ?? {} //<- if this is empty then setup the storage slot for this pack type
+
+		// first time we create this type ID, if its not there then we create it. 
+		if mapping[typeId] == nil {
+			let pathIdentifier = self.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
+			let storagePath = StoragePath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
+			let publicPath = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
+			FindPack.account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: storagePath)
+			FindPack.account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, FindPack.CollectionPublic, MetadataViews.ResolverCollection}>(
+				publicPath,
+				target: storagePath
+			)
+		}
+
         mapping[typeId] = metadata
 		self.packMetadata[packTypeName] = mapping
 	}
@@ -240,7 +279,7 @@ pub contract FindPack: NonFungibleToken {
 		access(self) var typeId: UInt64
 
 		//this is added to the NFT when it is opened
-		access(self) var openedBy: Capability<&{NonFungibleToken.Receiver}>?
+		access(self) var openedBy: {Type : Capability<&{NonFungibleToken.Receiver}>}
 
 		access(account) let hash: String
 
@@ -251,13 +290,13 @@ pub contract FindPack: NonFungibleToken {
 		init(packTypeName: String, typeId: UInt64, hash:String, royalties: [MetadataViews.Royalty]) {
 			self.id = self.uuid
 			self.typeId = typeId
-			self.openedBy=nil
+			self.openedBy={}
 			self.hash=hash
 			self.royalties=royalties
 			self.packTypeName=packTypeName
 		}
 
-		pub fun getOpenedBy() : Capability<&{NonFungibleToken.Receiver}> {
+		pub fun getOpenedBy() : {Type : Capability<&{NonFungibleToken.Receiver}>} {
 			if self.openedBy== nil {
 				panic("Pack is not opened")
 			}
@@ -273,17 +312,17 @@ pub contract FindPack: NonFungibleToken {
 		}
 
 		access(contract) fun resetOpenedBy() : Address {
-			if self.openedBy==nil {
+			if self.openedBy.length == 0 {
 				panic("Pack is not opened")
 			}
-  		let cap = self.openedBy!
+  			let cap = self.openedBy!
 
-			self.openedBy=nil
-			return cap.address
+			self.openedBy={}
+			return cap.values[0].address
 		}
 
-		access(contract) fun setOpenedBy(_ cap:Capability<&{NonFungibleToken.Receiver}>) {
-			if self.openedBy!=nil {
+		access(contract) fun setOpenedBy(_ cap:{Type : Capability<&{NonFungibleToken.Receiver}>}) {
+			if self.openedBy.length != 0 {
 				panic("Pack has already been opened")
 			}
 			self.openedBy=cap
@@ -366,7 +405,7 @@ pub contract FindPack: NonFungibleToken {
 	pub resource interface CollectionPublic {
 		pub fun deposit(token: @NonFungibleToken.NFT)
 		pub fun getIDs(): [UInt64]
-		pub fun getPacksLeftForType(_ type:UInt64) : UInt64
+		pub fun getPacksLeft() : Int   // returns the no of a type 
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
 		pub fun borrowFindPack(id: UInt64): &FindPack.NFT? 
 		pub fun buyWithSignature(packTypeName: String, packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
@@ -382,23 +421,6 @@ pub contract FindPack: NonFungibleToken {
 		//
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
-		pub var nftsPerType: {UInt64:UInt64}
-
-		//This will not work at all on large collecitons
-		// since maps are not ordered in cadence this will pick any random key and that works really well
-		access(self) fun getPackIdForType(packTypeName: String, typeId: UInt64): UInt64? {
-			for key in self.ownedNFTs.keys {
-				if let pack= self.borrowFindPack(id: key) {
-					if pack.packTypeName == packTypeName {
-						if pack.getTypeID() == typeId {
-							return key
-						}
-					}
-				}
-			}
-			return nil
-		}
-
 		//this has to be called on the DLQ collection
 		pub fun requeue(packId:UInt64) {
 			let token <- self.withdraw(withdrawID: packId) as! @NFT
@@ -410,9 +432,11 @@ pub contract FindPack: NonFungibleToken {
 			emit Requeued(packId:packId, address: cap.address)
 		}
 
-		pub fun open(packId: UInt64, receiverCap: Capability<&{NonFungibleToken.Receiver}>) {
-			if !receiverCap.check() {
-				panic("Receiver cap is not valid")
+		pub fun open(packId: UInt64, receiverCap: {Type : Capability<&{NonFungibleToken.Receiver}>}) {
+			for cap in receiverCap.values {
+				if !cap.check() {
+					panic("Receiver cap is not valid")
+				}
 			}
 			let pack=self.borrowFindPack(id:packId) ?? panic ("This pack is not in your collection")
 
@@ -446,10 +470,11 @@ pub contract FindPack: NonFungibleToken {
 			var saleInfo : SaleInfo? = nil 
 			let timestamp=Clock.time()
 			var saleInfoIndex : Int? = nil
-			for i, info in metadata.saleInfo {
+			for i, info in metadata.saleInfos {
 				if info.checkBuyable(addr: collectionCapability.address, time:timestamp) {
 					saleInfo = info
 					saleInfoIndex = i
+					break
 				}
 			}
 
@@ -498,9 +523,13 @@ pub contract FindPack: NonFungibleToken {
 
 			let packTypeId=nft.getTypeID()
 
-			if metadata.royaltyCut != 0.0 && metadata.royaltyCap != nil && metadata.royaltyCap!.check() {
-				metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * metadata.royaltyCut))
-			} 
+			for royalty in metadata.royalties.getRoyalties() {
+				if royalty.receiver.check(){
+					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
+				} else {
+					//to-do :  emit events here ?
+				}
+			}
 
 			metadata.wallet.borrow()!.deposit(from: <- vault)
 			collectionCapability.borrow()!.deposit(token: <- nft)
@@ -513,11 +542,12 @@ pub contract FindPack: NonFungibleToken {
 				self.owner!.address == FindPack.account.address : "You can only buy pack directly from the FindPack account"
 			}
 
-			let packId= self.getPackIdForType(packTypeName: packTypeName, typeId: typeId)
-			if packId == nil {
+			let keys = self.ownedNFTs.keys
+			if  keys.length == 0 {
 				panic("No more packs of this type. PackName: ".concat(packTypeName).concat(" packId : ").concat(typeId.toString()))
 			}
-			let key=packId!
+
+			let key=keys[0]
 			let nft <- self.withdraw(withdrawID: key) as!  @NFT
 			let metadata= nft.getMetadata()
 
@@ -530,10 +560,12 @@ pub contract FindPack: NonFungibleToken {
 
 			var saleInfo : SaleInfo? = nil
 			var saleInfoIndex : Int? = nil
-			for i, info in metadata.saleInfo {
+			for i, info in metadata.saleInfos {
+				// for later implement : if it requires all sale info checks 
 				if info.checkBuyable(addr: collectionCapability.address, time:timestamp) {
 					saleInfo = info
 					saleInfoIndex = i
+					break 
 				}
 			}
 
@@ -550,9 +582,13 @@ pub contract FindPack: NonFungibleToken {
 			}
 
 			//TODO: test
-			if metadata.royaltyCut != 0.0 && metadata.royaltyCap != nil && metadata.royaltyCap!.check() {
-				metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * metadata.royaltyCut))
-			} 
+			for royalty in metadata.royalties.getRoyalties() {
+				if royalty.receiver.check(){
+					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
+				} else {
+					//to-do :  emit events here ?
+				}
+			}
 
 			// record buy 
 			FindPack.borrowSaleInfo(packTypeName: packTypeName, packTypeId: typeId, index: saleInfoIndex!).buy(collectionCapability.address)
@@ -571,11 +607,7 @@ pub contract FindPack: NonFungibleToken {
 
 			let nft <- token as! @NFT
 
-			let oldNumber= self.nftsPerType[nft.getTypeID()]!
-			self.nftsPerType[nft.getTypeID()]=oldNumber-1
-
 			emit Withdraw(id: nft.id, from: self.owner?.address)
-
 
 			return <-nft
 		}
@@ -589,9 +621,6 @@ pub contract FindPack: NonFungibleToken {
 
 			let id: UInt64 = token.id
 			let tokenTypeId = token.getTypeID()
-
-			let oldNumber= self.nftsPerType[tokenTypeId] ?? 0
-			self.nftsPerType[tokenTypeId]=oldNumber+1
 
 			// add the new token to the dictionary which removes the old one
 			let oldToken <- self.ownedNFTs[id] <- token
@@ -609,8 +638,8 @@ pub contract FindPack: NonFungibleToken {
 		}
 
 		//return the number of packs left of a type
-		pub fun getPacksLeftForType(_ type:UInt64) : UInt64 {
-			return self.nftsPerType[type] ?? 0
+		pub fun getPacksLeft() : Int {
+			return self.ownedNFTs.length
 		}
 
 		// borrowNFT
@@ -651,7 +680,6 @@ pub contract FindPack: NonFungibleToken {
 		//
 		init () {
 			self.ownedNFTs <- {}
-			self.nftsPerType= {}
 		}
 	}
 
@@ -668,86 +696,95 @@ pub contract FindPack: NonFungibleToken {
 		return <- nft
 	}
 
-	access(account) fun fulfill(packId: UInt64, rewardIds:[UInt64], salt:String) {
+	access(account) fun fulfill(packId: UInt64, rewardIds:{Type : [UInt64]}, salt:String) {
 
 		let openedPacksCollection = FindPack.account.borrow<&FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
 		let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
 		let packTypeName = pack.packTypeName
 		let packTypeId = pack.getTypeID()
-
-		let receiver= pack.getOpenedBy()
-		if !receiver.check() {
-			emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver.address, reason: "The receiver registered in this pack is not valid")
-			self.transferToDLQ(<- pack)
-			return
-		}
-
-		let hash= pack.getHash()
-		let rewards=pack.getMetadata().providerCap
-
-		if !rewards.check() {
-			emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver.address, reason: "Cannot borrow provider capability to withdraw nfts")
-			self.transferToDLQ(<- pack)
-			return
-		}
-
-		let receiverAccount=getAccount(receiver.address)
-		let freeStorage=receiverAccount.storageCapacity - receiverAccount.storageUsed
-		Debug.log("Free capacity from account ".concat(freeStorage.toString()))
-
-		if pack.getMetadata().storageRequirement > freeStorage {
-			emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver.address, reason: "Not enough flow to hold the content of the pack. Please top up your account")
-			self.transferToDLQ(<- pack)
-			return
-		}
-
-		var string=salt
-		for id in rewardIds {
-			var seperator="-" 
-			if string!=salt {
-				seperator=","
+		var receivingAddress : Address? = nil
+		for type in rewardIds.keys {
+			let receiver= pack.getOpenedBy()
+			if receivingAddress == nil {
+				receivingAddress = receiver[type]!.address
 			}
-			string=string.concat(seperator).concat(id.toString())
-		}
 
-		let digest = HashAlgorithm.SHA3_384.hash(string.utf8)
-		let digestAsString=String.encodeHex(digest)
-		if digestAsString != hash {
-			emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver.address, reason: "The content of the pack was not verified with the hash provided at mint")
-			self.transferToDLQ(<- pack)
-			return
-		}
-
-		let target=receiver.borrow()!
-		let source=rewards.borrow()!
-		for reward in rewardIds {
-
-			let viewType= Type<PackRevealData>()
-			let nft=source.borrowViewResolver(id: reward)
-
-			var fields : {String: String}= {}
-			if nft.getViews().contains(viewType) {
-				let view=nft.resolveView(viewType)! as! PackRevealData
-				fields=view.data
+			if !receiver[type]!.check() {
+				emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver[type]!.address, reason: "The receiver registered in this pack is not valid")
+				self.transferToDLQ(<- pack)
+				return
 			}
-			let token <- source.withdraw(withdrawID: reward)
 
-            let metadata = pack.getMetadata()
+			let hash= pack.getHash()
+			let rewards=pack.getMetadata().providerCaps
 
-			emit PackReveal(
-				packTypeName: packTypeName, 
-				packTypeId: packTypeId,
-				packId:packId,
-				address:receiver.address,
-				rewardId: reward,
-				rewardType: token.getType().identifier,
-				rewardFields: fields,
-				nftPerPack: metadata.items,
-				packTier: metadata.tier
-			)
-			target.deposit(token: <-token)
+			if !rewards[type]!.check() {
+				emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver[type]!.address, reason: "Cannot borrow provider capability to withdraw nfts")
+				self.transferToDLQ(<- pack)
+				return
+			}
+
+			let receiverAccount=getAccount(receiver[type]!.address)
+			var freeStorage=UInt64(0) 
+			// prevent underflow
+			if receiverAccount.storageCapacity >= receiverAccount.storageUsed {
+				freeStorage = receiverAccount.storageCapacity - receiverAccount.storageUsed
+			}
+			Debug.log("Free capacity from account ".concat(freeStorage.toString()))
+
+			if pack.getMetadata().storageRequirement > freeStorage {
+				emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver[type]!.address, reason: "Not enough flow to hold the content of the pack. Please top up your account")
+				self.transferToDLQ(<- pack)
+				return
+			}
+
+			var string=salt
+			for id in rewardIds[type]! {
+				var seperator="-" 
+				if string!=salt {
+					seperator=","
+				}
+				string=string.concat(seperator).concat(id.toString())
+			}
+
+			let digest = HashAlgorithm.SHA3_384.hash(string.utf8)
+			let digestAsString=String.encodeHex(digest)
+			if digestAsString != hash {
+				emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver[type]!.address, reason: "The content of the pack was not verified with the hash provided at mint")
+				self.transferToDLQ(<- pack)
+				return
+			}
+
+			let target=receiver[type]!.borrow()!
+			let source=rewards[type]!.borrow()!
+			for reward in rewardIds[type]! {
+
+				let viewType= Type<PackRevealData>()
+				let nft=source.borrowViewResolver(id: reward)
+
+				var fields : {String: String}= {}
+				if nft.getViews().contains(viewType) {
+					let view=nft.resolveView(viewType)! as! PackRevealData
+					fields=view.data
+				}
+				let token <- source.withdraw(withdrawID: reward)
+
+				let metadata = pack.getMetadata()
+
+				emit PackReveal(
+					packTypeName: packTypeName, 
+					packTypeId: packTypeId,
+					packId:packId,
+					address:receiver[type]!.address,
+					rewardId: reward,
+					rewardType: token.getType().identifier,
+					rewardFields: fields,
+					packFields: metadata.packFields
+				)
+				target.deposit(token: <-token)
+			}
 		}
-		emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver.address)
+		emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!)
 
 		destroy pack
 	}
@@ -757,16 +794,34 @@ pub contract FindPack: NonFungibleToken {
 		dlq.deposit(token: <- pack)
 	}
 
+	access(account) fun getPacksCollectionPath(packTypeName: String, packTypeId: UInt64) : String {
+		return "FindPack_".concat(packTypeName).concat("_").concat(packTypeId.toString())
+	}
 
-	pub fun getPacksCollection() : &FindPack.Collection{CollectionPublic} {
-		return FindPack.account.getCapability<&FindPack.Collection{FindPack.CollectionPublic}>(FindPack.CollectionPublicPath).borrow() ?? panic("Could not borow FindPack collection")
+	pub fun getPacksCollection(packTypeName: String, packTypeId: UInt64) : &FindPack.Collection{CollectionPublic} {
+
+		let pathIdentifier = self.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: packTypeId)
+		let path = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
+		return FindPack.account.getCapability<&FindPack.Collection{FindPack.CollectionPublic}>(path).borrow() ?? panic("Could not borow FindPack collection for path : ".concat(pathIdentifier))
+	}
+
+	// given a path, lookin to the NFT Collection and return a new empty collection
+	pub fun createEmptyCollectionFromPath(_ path: PublicPath) : @NonFungibleToken.Collection {
+		let cap = FindPack.account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+		if !cap.check() {
+			panic("Cannot borrow collection from path : ".concat(path.toString()))
+		}
+		let ref = cap.borrow()!
+		let resolver = ref.borrowViewResolver(id : ref.getIDs()[0])  // if the ID length is 0, there must be some problem
+		let collectionData = MetadataViews.getNFTCollectionData(resolver) ?? panic("Collection Data for this NFT Type is missing. Type : ".concat(resolver.getType().identifier))
+		return <- collectionData.createEmptyCollection()
 	}
 
 	pub fun canBuy(packTypeName: String, packTypeId:UInt64, user:Address) : Bool {
 
-		let packs=FindPack.getPacksCollection()
+		let packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
-		let packsLeft= packs.getPacksLeftForType(packTypeId)
+		let packsLeft= packs.getPacksLeft()
 		if packsLeft == 0 {
 			return false
 		}
@@ -780,7 +835,7 @@ pub contract FindPack: NonFungibleToken {
 
 		let metadata=packMetadata!
 
-		for info in metadata.saleInfo {
+		for info in metadata.saleInfos {
 			if info.checkBuyable(addr: user, time:timestamp) {
 				return true
 			}
@@ -791,9 +846,9 @@ pub contract FindPack: NonFungibleToken {
 
 	pub fun getCurrentPrice(packTypeName: String, packTypeId:UInt64, user:Address) : UFix64? {
 
-		let packs=FindPack.getPacksCollection()
+		let packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
-		let packsLeft= packs.getPacksLeftForType(packTypeId)
+		let packsLeft= packs.getPacksLeft()
 		if packsLeft == 0 {
 			return nil
 		}
@@ -807,7 +862,7 @@ pub contract FindPack: NonFungibleToken {
 
 		let metadata=packMetadata!
 
-		for info in metadata.saleInfo {
+		for info in metadata.saleInfos {
 			if info.checkBuyable(addr: user, time:timestamp) {
 				return info!.price
 			}
@@ -890,13 +945,6 @@ pub contract FindPack: NonFungibleToken {
 		let dlqCollection <- create Collection()
 		self.account.save(<- dlqCollection, to: self.DLQCollectionStoragePath) 
 		self.account.link<&FindPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, FindPack.CollectionPublic, MetadataViews.ResolverCollection}>(FindPack.DLQCollectionPublicPath, target: FindPack.DLQCollectionStoragePath)
-
-		self.account.save<@NonFungibleToken.Collection>( <- self.createEmptyCollection(), to: self.CollectionStoragePath)
-
-		self.account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, FindPack.CollectionPublic, MetadataViews.ResolverCollection}>(
-			FindPack.CollectionPublicPath,
-			target: FindPack.CollectionStoragePath
-		)
 
 		FindForge.addForgeType(<- create Forge())
 

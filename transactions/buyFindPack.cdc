@@ -68,10 +68,10 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
 		}
 
 		self.userPacks=account.getCapability<&FindPack.Collection{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath)
-		self.packs=FindPack.getPacksCollection()
+		self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
 		self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic ("Cannot buy the pack now") 
-		self.packsLeft= self.packs.getPacksLeftForType(packTypeId)
+		self.packsLeft= UInt64(self.packs.getPacksLeft())
 
 
 		self.userFlowTokenVault = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")

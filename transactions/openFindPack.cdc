@@ -1,5 +1,6 @@
-import Flomies from "../contracts/Flomies.cdc"
-import FlomiesPack from "../contracts/FlomiesPack.cdc"
+import FindPack from "../contracts/FindPack.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -8,17 +9,37 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 /// @param packId: The id of the pack to open
 transaction(packId:UInt64) {
 
-	let packs: &FlomiesPack.Collection
-	let receiver: Capability<&{NonFungibleToken.Receiver}>
+	let packs: &FindPack.Collection
+	let receiver: { Type : Capability<&{NonFungibleToken.Receiver}>}
 
 	prepare(account: AuthAccount) {
-		self.packs=account.borrow<&FlomiesPack.Collection>(from: FlomiesPack.CollectionStoragePath)!
-		self.receiver = account.getCapability<&{NonFungibleToken.Receiver}>(Flomies.CollectionPublicPath)
+		self.packs=account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
+
+		let packData = self.packs.borrowFindPack(id: packId) ?? panic("You do not own this pack. ID : ".concat(packId.toString()))
+		let types = packData.getMetadata().itemTypes
+
+		self.receiver = {}
+
+		// check the account setup for receiving nfts
+		for type in types {
+			let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)
+			if collection == nil || collection!.length == 0 {
+				panic("Type : ".concat(type.identifier).concat(" is not supported in NFTCatalog at the moment"))
+			}
+			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
+
+			let cap = account.getCapability<&{NonFungibleToken.Receiver}>(collectionInfo.publicPath)
+			if !cap.check() {
+				let newCollection <- FindPack.createEmptyCollectionFromPath(collectionInfo.publicPath)
+				account.save(<- newCollection, to: collectionInfo.storagePath)
+				account.link<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+					collectionInfo.publicPath, target: collectionInfo.storagePath)
+			}
+			self.receiver[type] = cap
+		}
+
 	}
 
-	pre {
-		self.receiver.check() : "The receiver collection for the packs is not present"
-	}
 	execute {
 		self.packs.open(packId: packId, receiverCap:self.receiver)
 	}

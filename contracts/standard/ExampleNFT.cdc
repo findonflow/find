@@ -366,6 +366,12 @@ pub contract ExampleNFT: NonFungibleToken {
             target: self.CollectionStoragePath
         )
 
+        // create a private capability for the collection
+        self.account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic, MetadataViews.ResolverCollection}>(
+            self.CollectionPrivatePath,
+            target: self.CollectionStoragePath
+        )
+
 		FindForge.addForgeType(<- create Forge())
 
 		//TODO: Add the Forge resource aswell
