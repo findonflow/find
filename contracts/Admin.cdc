@@ -157,13 +157,32 @@ pub contract Admin {
 			walletRef.internal_register(name:name, profile: profile, leases: leases)
 		}
 
+		pub fun addAddon(name:String, addon:String){
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+			}
 
-		pub fun mintForge(leaseName: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+			let user = FIND.lookupAddress(name) ?? panic("Cannot find lease owner. Lease : ".concat(name))
+			let ref = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
+			ref.adminAddAddon(name:name, addon:addon)
+		}
+
+		pub fun adminSetMinterPlatform(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+			}
+
+			FindForge.adminSetMinterPlatform(leaseName: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
+		}
+
+		pub fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.mintAdmin(leaseName: leaseName, forgeType: forgeType, data: data, receiver: receiver)
+			FindForge.mintAdmin(leaseName: name, forgeType: forgeType, data: data, receiver: receiver)
 		}
 
 		pub fun advanceClock(_ time: UFix64) {
