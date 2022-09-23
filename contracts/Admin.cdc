@@ -465,6 +465,15 @@ pub contract Admin {
 			FindPack.fulfill(packId:packId, rewardIds:rewardIds, salt:salt)
 		}
 
+		pub fun requeueFindPack(packId:UInt64) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+
+			let cap= Admin.account.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+			cap.requeue(packId: packId)
+		}
+
 		init() {
 			self.capability = nil
 		}
