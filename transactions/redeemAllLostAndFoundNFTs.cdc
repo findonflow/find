@@ -5,7 +5,6 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
-import Bl0xPack from "../contracts/Bl0xPack.cdc"
 
 //IMPORT
 
@@ -19,14 +18,6 @@ transaction() {
 
 		//LINK
 
-		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Bl0xPack.CollectionPublicPath)
-		if !findPackCap.check() {
-			account.save<@NonFungibleToken.Collection>( <- Bl0xPack.createEmptyCollection(), to: Bl0xPack.CollectionStoragePath)
-			account.link<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-				Bl0xPack.CollectionPublicPath,
-				target: Bl0xPack.CollectionStoragePath
-			)
-		}
 
 		self.nftInfos = {}
 		self.ids = FindLostAndFoundWrapper.getTicketIDs(user: account.address, specificType: Type<@NonFungibleToken.NFT>())

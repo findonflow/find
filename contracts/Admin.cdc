@@ -200,18 +200,27 @@ pub contract Admin {
 
 		// Registry FungibleToken Information
 		pub fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FTRegistry.setFTInfo(alias: alias, type: type, tag: tag, icon: icon, receiverPath: receiverPath, balancePath: balancePath, vaultPath:vaultPath)
 
 		}
 
 		// Remove FungibleToken Information by type identifier
 		pub fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FTRegistry.removeFTInfoByTypeIdentifier(typeIdentifier)
 		}
 
 
 		// Remove FungibleToken Information by alias
 		pub fun removeFTInfoByAlias(_ alias: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FTRegistry.removeFTInfoByAlias(alias)
 		}
 
@@ -219,34 +228,58 @@ pub contract Admin {
 		// Find Market Options 
 		/// ===================================================================================
 		pub fun addSaleItemType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.addSaleItemType(type) 
 		}
 
 		pub fun addMarketBidType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.addMarketBidType(type) 
 		}
 
 		pub fun addSaleItemCollectionType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.addSaleItemCollectionType(type) 
 		}
 
 		pub fun addMarketBidCollectionType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.addMarketBidCollectionType(type) 
 		}
 
 		pub fun removeSaleItemType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.removeSaleItemType(type) 
 		}
 
 		pub fun removeMarketBidType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.removeMarketBidType(type) 
 		}
 
 		pub fun removeSaleItemCollectionType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.removeSaleItemCollectionType(type) 
 		}
 
 		pub fun removeMarketBidCollectionType(_ type: Type) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.removeMarketBidCollectionType(type) 
 		}
 
@@ -254,6 +287,9 @@ pub contract Admin {
 		// Tenant Rules Management
 		/// ===================================================================================
 		pub fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let string = FindMarket.getTenantPathForAddress(tenant)
 			let pp = PrivatePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
 			let cap = Admin.account.getCapability<&FindMarket.Tenant>(pp)
@@ -261,16 +297,25 @@ pub contract Admin {
 		}
 
 		pub fun addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant)
 			tenant.addSaleItem(item, type: "find")
 		}
 
 		pub fun removeFindBlockItem(tenant: Address, name: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant)
 			tenant.removeSaleItem(name, type: "find")
 		}
 
 		pub fun setFindCut(tenant: Address, saleItemName: String, cut: UFix64?, rules: [FindMarket.TenantRule]?, status: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant)
 			let oldCut = tenant.removeSaleItem(saleItemName, type: "cut")
 
@@ -294,6 +339,9 @@ pub contract Admin {
 		}
 
 		pub fun addFindCut(tenant: Address, FindCutName: String, rayalty: MetadataViews.Royalty, rules: [FindMarket.TenantRule], status: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			if !(rules.length > 0) {
 				panic("Rules cannot be empty array")
 			}
@@ -321,37 +369,58 @@ pub contract Admin {
 		), type: "cut")
 		 */
 		pub fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant) 
 			tenant.addSaleItem(saleItem, type: "tenant")
 			//Emit Event here
 		}
 
 		pub fun removeMarketOption(tenant: Address, name: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant) 
 			tenant.removeSaleItem(name, type: "tenant")
 		}
 
 		pub fun enableMarketOption(tenant: Address, name: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant) 
 			tenant.alterMarketOption(name: name, status: "active")
 		}
 
 		pub fun deprecateMarketOption(tenant: Address, name: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant) 
 			tenant.alterMarketOption(name: name, status: "deprecated")
 		}
 
 		pub fun stopMarketOption(tenant: Address, name: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenant = self.getTenantRef(tenant) 
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
 		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarket.TenantRule) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenantRef = self.getTenantRef(tenant)
 			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
 		}
 
 		pub fun removeTenantRule(tenant: Address, optionName: String, tenantRuleName: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			let tenantRef = self.getTenantRef(tenant)
 			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
 		}
@@ -361,6 +430,9 @@ pub contract Admin {
 		/// ===================================================================================
 
 		pub fun setResidualAddress(_ address: Address) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindMarket.setResidualAddress(address)
 		}
 
