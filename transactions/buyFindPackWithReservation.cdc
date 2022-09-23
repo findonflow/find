@@ -6,7 +6,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import Profile from "../contracts/Profile.cdc"
 
-transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, totalAmount: UFix64) {
+transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFix64, signature:String) {
 	let packs: &FindPack.Collection{FindPack.CollectionPublic}
 
 	let userPacks: Capability<&FindPack.Collection{NonFungibleToken.Receiver}>
@@ -71,35 +71,27 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
 		self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
 		self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic ("Cannot buy the pack now") 
+
 		self.packsLeft= UInt64(self.packs.getPacksLeft())
 
 
 		self.userFlowTokenVault = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
 		self.balanceBeforeTransfer = self.userFlowTokenVault.balance
 
-		if self.balanceBeforeTransfer < totalAmount {
-			panic("Your account does not have enough funds has ".concat(self.balanceBeforeTransfer.toString()).concat(" needs ").concat(totalAmount.toString()))
+		if self.balanceBeforeTransfer < amount {
+			panic("Your account does not have enough funds has ".concat(self.balanceBeforeTransfer.toString()).concat(" needs ").concat(amount.toString()))
 		}
-		self.paymentVault <- self.userFlowTokenVault.withdraw(amount: totalAmount)
+		self.paymentVault <- self.userFlowTokenVault.withdraw(amount: amount)
 	}
 
 	pre {
-		self.salePrice * UFix64(numberOfPacks) == totalAmount: "unexpected sending amount"
-		self.packsLeft >= numberOfPacks : "Rats! there are no packs left"
+		self.salePrice == amount: "unexpected sending amount"
+		self.packs.contains(packId): "The pack does not exist. ID : ".concat(packId.toString())
 		self.userPacks.check() : "User need a receiver to put the pack in"
 	}
 
 	execute {
-		var counter = numberOfPacks
-		while counter > 0 {
-			let purchasingVault <- self.paymentVault.withdraw(amount: self.salePrice)
-			self.packs.buy(packTypeName: packTypeName, typeId:packTypeId, vault: <- purchasingVault, collectionCapability: self.userPacks)
-			counter = counter - 1
-		}
-		if self.paymentVault.balance != 0.0 {
-			panic("paymentVault balance is non-zero after paying")
-		}
-		destroy self.paymentVault
+		self.packs.buyWithSignature(packId:packId, signature: signature, vault: <- self.paymentVault, collectionCapability: self.userPacks)
 	}
 
 }

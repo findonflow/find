@@ -2451,6 +2451,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, w
 		WithArg("openTime", openTime),
 		WithArg("royaltyCut", 0.15),
 		WithArg("royaltyAddress", marketAddress),
+		WithArg("requiresReservation", requiresReservation),
 		WithArg("startTime", createIntUFix64(map[int]float64{1: whitelistTime, 2: buyTime})),
 		WithArg("endTime", createIntUFix64(map[int]float64{1: buyTime})),
 		WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatId})),
@@ -2486,6 +2487,33 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 
 	assert.NoError(t, err)
 	return res
+}
+
+func (otu *OverflowTestUtils) mintPackWithSignature(minter string, packTypeId uint64, input []uint64, salt string) (uint64, string) {
+
+	o := otu.O
+	t := otu.T
+
+	packHash := utils.CreateSha3Hash(input, salt)
+
+	res, err := o.Tx("adminMintFindPack",
+		WithSigner("find"),
+		WithArg("packTypeName", minter),
+		WithArg("typeId", packTypeId),
+		WithArg("hashes", []string{packHash}),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Minted", map[string]interface{}{
+			"typeId": packTypeId,
+		}).
+		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
+
+	assert.NoError(t, err)
+
+	signature, err := o.SignUserMessage("account", packHash)
+	assert.NoError(otu.T, err)
+
+	return res, signature
 }
 
 func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint64, numberOfPacks uint64, amount float64) *OverflowTestUtils {

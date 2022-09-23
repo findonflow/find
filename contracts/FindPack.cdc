@@ -47,6 +47,7 @@ pub contract FindPack: NonFungibleToken {
 	// Verifier container for packs
 	// Each struct is one sale type. If they 
 	pub struct SaleInfo {
+
 		pub let startTime : UFix64 
 		pub let endTime : UFix64?
 		pub let price : UFix64
@@ -405,10 +406,11 @@ pub contract FindPack: NonFungibleToken {
 	pub resource interface CollectionPublic {
 		pub fun deposit(token: @NonFungibleToken.NFT)
 		pub fun getIDs(): [UInt64]
+		pub fun contains(_ id: UInt64): Bool
 		pub fun getPacksLeft() : Int   // returns the no of a type 
 		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
 		pub fun borrowFindPack(id: UInt64): &FindPack.NFT? 
-		pub fun buyWithSignature(packTypeName: String, packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
+		pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
 		pub fun buy(packTypeName: String, typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>)
 	}
 
@@ -458,7 +460,7 @@ pub contract FindPack: NonFungibleToken {
 			emit Opened(packTypeName: packTypeName, packTypeId:typeId, packId: packId, address:self.owner!.address) 
 		}
 
-		pub fun buyWithSignature(packTypeName: String, packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+		pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
 			pre {
 				self.owner!.address == FindPack.account.address : "You can only buy pack directly from the FindPack account"
 			}
@@ -466,19 +468,23 @@ pub contract FindPack: NonFungibleToken {
 			let nft <- self.withdraw(withdrawID: packId) as!  @NFT
 			let metadata= nft.getMetadata()
 
-			// get the correct sale struct based on time 
-			var saleInfo : SaleInfo? = nil 
+			// get the correct sale struct based on time and lowest price
 			let timestamp=Clock.time()
+			var lowestPrice : UFix64? = nil
+			var saleInfo : SaleInfo? = nil
 			var saleInfoIndex : Int? = nil
 			for i, info in metadata.saleInfos {
+				// for later implement : if it requires all sale info checks 
 				if info.checkBuyable(addr: collectionCapability.address, time:timestamp) {
-					saleInfo = info
-					saleInfoIndex = i
-					break
+					if lowestPrice == nil || lowestPrice! > info!.price {
+						lowestPrice = info!.price
+						saleInfo = info
+						saleInfoIndex = i
+					}
 				}
 			}
 
-			if saleInfo == nil || saleInfoIndex == nil {
+			if saleInfo == nil || saleInfoIndex == nil || lowestPrice == nil {
 				panic("You cannot buy the pack yet")
 			}
 
@@ -522,6 +528,7 @@ pub contract FindPack: NonFungibleToken {
 			}
 
 			let packTypeId=nft.getTypeID()
+			let packTypeName = nft.packTypeName
 
 			for royalty in metadata.royalties.getRoyalties() {
 				if royalty.receiver.check(){
@@ -558,18 +565,21 @@ pub contract FindPack: NonFungibleToken {
 			let user=collectionCapability.address
 			let timestamp=Clock.time()
 
+			var lowestPrice : UFix64? = nil
 			var saleInfo : SaleInfo? = nil
 			var saleInfoIndex : Int? = nil
 			for i, info in metadata.saleInfos {
 				// for later implement : if it requires all sale info checks 
 				if info.checkBuyable(addr: collectionCapability.address, time:timestamp) {
-					saleInfo = info
-					saleInfoIndex = i
-					break 
+					if lowestPrice == nil || lowestPrice! > info!.price {
+						lowestPrice = info!.price
+						saleInfo = info
+						saleInfoIndex = i
+					}
 				}
 			}
 
-			if saleInfo == nil || saleInfoIndex == nil {
+			if saleInfo == nil || saleInfoIndex == nil || lowestPrice == nil {
 				panic("You cannot buy the pack yet")
 			}
 
@@ -635,6 +645,10 @@ pub contract FindPack: NonFungibleToken {
 		//
 		pub fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
+		}
+
+		pub fun contains(_ id: UInt64) : Bool {
+			return self.ownedNFTs.containsKey(id)
 		}
 
 		//return the number of packs left of a type
@@ -862,13 +876,16 @@ pub contract FindPack: NonFungibleToken {
 
 		let metadata=packMetadata!
 
+		var lowestPrice : UFix64? = nil
 		for info in metadata.saleInfos {
 			if info.checkBuyable(addr: user, time:timestamp) {
-				return info!.price
+				if lowestPrice == nil || lowestPrice! > info!.price {
+					lowestPrice = info!.price
+				}
 			}
 		}
 
-		return nil
+		return lowestPrice
 	}
 
 	access(contract) fun borrowSaleInfo(packTypeName: String, packTypeId: UInt64, index: Int) : &FindPack.SaleInfo {

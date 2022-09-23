@@ -101,7 +101,8 @@ pub contract ExampleNFT: NonFungibleToken {
                 Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>(),
-                Type<MetadataViews.Serial>()
+                Type<MetadataViews.Serial>(), 
+                Type<MetadataViews.Rarity>()
             ]
 
             if self.soulBound {
@@ -181,6 +182,9 @@ pub contract ExampleNFT: NonFungibleToken {
                     return FindViews.SoulBound(
                          "This NFT is soulbound."
                     )
+
+                case Type<MetadataViews.Rarity>() : 
+                    return MetadataViews.Rarity(score: 1.0, max: 2.0, description: "rarity description")
 
             }
             return nil

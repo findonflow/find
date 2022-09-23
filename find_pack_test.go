@@ -15,6 +15,7 @@ func TestFindPack(t *testing.T) {
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createUser(10000.0, "user1").
+		createUser(10000.0, "user2").
 		registerUser("user1").
 		buyForge("user1").
 		registerExampleNFTInNFTRegistry()
@@ -76,6 +77,20 @@ func TestFindPack(t *testing.T) {
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
+		otu.fulfillPack(packId, ids, salt)
+		packTypeId++
+	})
+
+	t.Run("Should be able to buy and open with no collection setup", func(t *testing.T) {
+
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		otu.registerPackType("user1", packTypeId, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		packId := otu.mintPack("user1", packTypeId, ids, salt)
+
+		otu.buyPack("user2", buyer, packTypeId, 1, 4.20)
+		otu.openPack("user2", packId)
 		otu.fulfillPack(packId, ids, salt)
 		packTypeId++
 	})
@@ -273,6 +288,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("openTime", 1.0),
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "account"),
+			WithArg("requiresReservation", false),
 			WithArg("startTime", createIntUFix64(map[int]float64{1: 10.0, 2: 20.0, 3: 30.0})),
 			WithArg("endTime", createIntUFix64(map[int]float64{1: 20.0, 2: 30.0})),
 			WithArg("floatEventId", createIntUInt64(map[int]uint64{1: freeMintFloat, 2: whiteListFloat})),
@@ -287,7 +303,7 @@ func TestFindPack(t *testing.T) {
 		otu.mintPack("user1", packTypeId, ids, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 0.0)
-
+		// no need to pump packTypeId here
 	})
 
 	t.Run("Should not be able to buy nft for free with free-mint Float more than allowed", func(t *testing.T) {
@@ -331,7 +347,203 @@ func TestFindPack(t *testing.T) {
 				"amount": totalAmount * 0.15,
 				"to":     otu.O.Address("account"),
 			})
+		packTypeId++
+	})
+
+	t.Run("Should be able to buy only if fulfills all verifiers specified", func(t *testing.T) {
+
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		floatID := otu.createFloatEvent("account")
+
+		// buyer should have find name "user1" and float
+		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+			WithSigner("find"),
+			WithArg("lease", "user1"),
+			WithArg("typeId", packTypeId),
+			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("wallet", "find"),
+			WithArg("openTime", 2.0),
+			WithArg("royaltyCut", 0.15),
+			WithArg("royaltyAddress", "account"),
+			WithArg("requiresReservation", false),
+			WithArg("startTime", createIntUFix64(map[int]float64{1: 0.0})),
+			WithArg("endTime", createIntUFix64(map[int]float64{})),
+			WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatID})),
+			WithArg("price", createIntUFix64(map[int]float64{1: 4.20})),
+			WithArg("purchaseLimit", createIntUInt64(map[int]uint64{})),
+			WithArg("checkAll", true),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+
+		otu.mintPack("user1", packTypeId, ids, salt)
+
+		// should not be able to buy with no float
+		otu.O.Tx("buyFindPack",
+			WithSigner(buyer),
+			WithArg("packTypeName", buyer),
+			WithArg("packTypeId", packTypeId),
+			WithArg("numberOfPacks", 1),
+			WithArg("totalAmount", 4.2),
+		).
+			AssertFailure(t, "Cannot buy the pack now")
+
+		// should be able to buy with user1 name and float
+		otu.claimFloat("account", buyer, floatID)
+		otu.buyPack(buyer, buyer, packTypeId, 1, 4.2)
+
+		packTypeId++
 
 	})
 
+	t.Run("Should be able to buy if fulfills either verifiers specified", func(t *testing.T) {
+
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		floatID := otu.createFloatEvent("account")
+
+		// buyer should have find name "user1" or float
+		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+			WithSigner("find"),
+			WithArg("lease", "user1"),
+			WithArg("typeId", packTypeId),
+			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("wallet", "find"),
+			WithArg("openTime", 2.0),
+			WithArg("royaltyCut", 0.15),
+			WithArg("royaltyAddress", "account"),
+			WithArg("requiresReservation", false),
+			WithArg("startTime", createIntUFix64(map[int]float64{1: 0.0})),
+			WithArg("endTime", createIntUFix64(map[int]float64{})),
+			WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatID})),
+			WithArg("price", createIntUFix64(map[int]float64{1: 4.20})),
+			WithArg("purchaseLimit", createIntUInt64(map[int]uint64{})),
+			WithArg("checkAll", false),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+
+		otu.mintPack("user1", packTypeId, ids, salt)
+
+		// should be able to buy with user1 name only
+		otu.buyPack(buyer, buyer, packTypeId, 1, 4.2)
+
+		packTypeId++
+
+	})
+
+	t.Run("Should be able to buy if fulfills either verifiers specified 2", func(t *testing.T) {
+
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		floatID := otu.createFloatEvent("account")
+
+		// buyer should have find name "user1" or float
+		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+			WithSigner("find"),
+			WithArg("lease", "user1"),
+			WithArg("typeId", packTypeId),
+			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("wallet", "find"),
+			WithArg("openTime", 2.0),
+			WithArg("royaltyCut", 0.15),
+			WithArg("royaltyAddress", "account"),
+			WithArg("requiresReservation", false),
+			WithArg("startTime", createIntUFix64(map[int]float64{1: 0.0})),
+			WithArg("endTime", createIntUFix64(map[int]float64{})),
+			WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatID})),
+			WithArg("price", createIntUFix64(map[int]float64{1: 4.20})),
+			WithArg("purchaseLimit", createIntUInt64(map[int]uint64{})),
+			WithArg("checkAll", false),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+
+		otu.mintPack("user1", packTypeId, ids, salt)
+
+		// should be able to buy with float only
+		otu.claimFloat("account", "user2", floatID)
+		otu.buyPack("user2", buyer, packTypeId, 1, 4.2)
+
+		packTypeId++
+
+	})
+
+	t.Run("Shouldg get the lowest price if several options are enabled at the same time", func(t *testing.T) {
+
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		floatID := otu.createFloatEvent("account")
+
+		// buyer should have find name "user1" or float
+		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+			WithSigner("find"),
+			WithArg("lease", "user1"),
+			WithArg("typeId", packTypeId),
+			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("wallet", "find"),
+			WithArg("openTime", 2.0),
+			WithArg("royaltyCut", 0.15),
+			WithArg("royaltyAddress", "account"),
+			WithArg("requiresReservation", false),
+			WithArg("startTime", createIntUFix64(map[int]float64{1: 0.0, 2: 0.0, 3: 0.0})),
+			WithArg("endTime", createIntUFix64(map[int]float64{})),
+			WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatID, 2: floatID, 3: floatID})),
+			WithArg("price", createIntUFix64(map[int]float64{1: 3.3, 2: 2.2, 3: 1.1})),
+			WithArg("purchaseLimit", createIntUInt64(map[int]uint64{})),
+			WithArg("checkAll", false),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+
+		otu.mintPack("user1", packTypeId, ids, salt)
+
+		// should be able to buy with float only
+		otu.claimFloat("account", buyer, floatID)
+		otu.buyPack(buyer, buyer, packTypeId, 1, 1.1)
+
+		packTypeId++
+
+	})
+
+	// buy with Reservation
+	t.Run("Should be able to buy with reservation", func(t *testing.T) {
+
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		otu.registerPackType("user1", packTypeId, 0.0, 0.0, 15.0, true, 0, "find", "account")
+		packId, signature := otu.mintPackWithSignature("user1", packTypeId, ids, salt)
+
+		otu.O.Tx("buyFindPackWithReservation",
+			WithSigner(buyer),
+			WithArg("packTypeName", buyer),
+			WithArg("packTypeId", packTypeId),
+			WithArg("packId", packId),
+			WithArg("amount", 4.2),
+			WithArg("signature", signature),
+		).
+			Print().
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
+				"packId": packId,
+			})
+
+		packTypeId++
+	})
+
+	// Scripts - ways to return useful sales
 }

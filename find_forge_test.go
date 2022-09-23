@@ -217,6 +217,7 @@ func TestFindForge(t *testing.T) {
 
 		otu.O.Tx("testAddTraitsExampleNFT",
 			overflow.WithSigner("find"),
+			overflow.WithArg("lease", "user1"),
 		).
 			AssertSuccess(t)
 
