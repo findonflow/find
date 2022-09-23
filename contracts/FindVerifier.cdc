@@ -102,7 +102,7 @@ pub contract FindVerifier {
 		}
 	}
 
-	pub struct HasWhiteLabel : Verifier {
+	pub struct IsInWhiteList : Verifier {
 		pub let addressList : [Address] 
 		pub let description: String
 

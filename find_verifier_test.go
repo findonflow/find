@@ -128,7 +128,7 @@ func TestFindVerifier(t *testing.T) {
 	// WhiteLabel
 	t.Run("Should return true if user is in whiteLabel", func(t *testing.T) {
 
-		otu.O.Script("testFindVerifierHasWhiteLabel",
+		otu.O.Script("testFindVerifierIsInWhiteList",
 			WithArg("user", otu.O.Address(user)),
 			WithAddresses("addresses", user, "user2", "user3"),
 		).
@@ -140,7 +140,7 @@ func TestFindVerifier(t *testing.T) {
 
 	t.Run("Should return true if user is not in whiteLabel", func(t *testing.T) {
 
-		otu.O.Script("testFindVerifierHasWhiteLabel",
+		otu.O.Script("testFindVerifierIsInWhiteList",
 			WithArg("user", otu.O.Address(user)),
 			WithAddresses("addresses", "user2", "user3"),
 		).
@@ -152,7 +152,7 @@ func TestFindVerifier(t *testing.T) {
 
 	t.Run("Should panic if no one is not in whiteLabel", func(t *testing.T) {
 
-		_, err := otu.O.Script("testFindVerifierHasWhiteLabel",
+		_, err := otu.O.Script("testFindVerifierIsInWhiteList",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("addresses", "[]"),
 		).

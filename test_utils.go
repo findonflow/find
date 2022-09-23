@@ -2452,11 +2452,11 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, w
 		WithArg("royaltyCut", 0.15),
 		WithArg("royaltyAddress", marketAddress),
 		WithArg("requiresReservation", requiresReservation),
-		WithArg("startTime", createIntUFix64(map[int]float64{1: whitelistTime, 2: buyTime})),
-		WithArg("endTime", createIntUFix64(map[int]float64{1: buyTime})),
-		WithArg("floatEventId", createIntUInt64(map[int]uint64{1: floatId})),
-		WithArg("price", createIntUFix64(map[int]float64{1: 4.20, 2: 4.20})),
-		WithArg("purchaseLimit", createIntUInt64(map[int]uint64{})),
+		WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": whitelistTime, "publicSale": buyTime})),
+		WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": buyTime})),
+		WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatId})),
+		WithArg("price", createStringUFix64(map[string]float64{"whiteList": 4.20, "publicSale": 4.20})),
+		WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
 	).
 		AssertSuccess(t).
 		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
@@ -2726,22 +2726,22 @@ type GhostListing struct {
 	Id                    uint64 `json:"id"`
 }
 
-func createIntUFix64(input map[int]float64) cadence.Dictionary {
+func createStringUFix64(input map[string]float64) cadence.Dictionary {
 	array := []cadence.KeyValuePair{}
 	for key, val := range input {
-		cadenceInt := cadence.NewInt(key)
+		cadenceString, _ := cadence.NewString(key)
 		cadenceUFix64, _ := cadence.NewUFix64(fmt.Sprintf("%f", val))
-		array = append(array, cadence.KeyValuePair{Key: cadenceInt, Value: cadenceUFix64})
+		array = append(array, cadence.KeyValuePair{Key: cadenceString, Value: cadenceUFix64})
 	}
 	return cadence.NewDictionary(array)
 }
 
-func createIntUInt64(input map[int]uint64) cadence.Dictionary {
+func createStringUInt64(input map[string]uint64) cadence.Dictionary {
 	array := []cadence.KeyValuePair{}
 	for key, val := range input {
-		cadenceInt := cadence.NewInt(key)
+		cadenceString, _ := cadence.NewString(key)
 		cadenceUInt64 := cadence.NewUInt64(val)
-		array = append(array, cadence.KeyValuePair{Key: cadenceInt, Value: cadenceUInt64})
+		array = append(array, cadence.KeyValuePair{Key: cadenceString, Value: cadenceUInt64})
 	}
 	return cadence.NewDictionary(array)
 }

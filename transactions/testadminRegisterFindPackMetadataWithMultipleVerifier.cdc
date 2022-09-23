@@ -11,7 +11,7 @@ import Admin from "../contracts/Admin.cdc"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
-transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, startTime:{Int : UFix64}, endTime: {Int : UFix64}, floatEventId: {Int : UInt64}, price: {Int : UFix64}, purchaseLimit:{Int: UInt64}, checkAll: Bool) {
+transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, checkAll: Bool) {
 
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
@@ -32,13 +32,13 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 		/* For testing only */
 		var saleInfo : [FindPack.SaleInfo] = []
 		for key in startTime.keys {
-			let price = price[key] ?? panic("Price for key ".concat(key.toString()).concat(" is missing"))
+			let price = price[key] ?? panic("Price for key ".concat(key).concat(" is missing"))
 			var verifier : [{FindVerifier.Verifier}] = [] 
 			if floatEventId[key] != nil {
 				verifier.append(FindVerifier.HasOneFLOAT([floatEventId[key]!]))
 				verifier.append(FindVerifier.HasFINDName(["user1"]))
 			}
-			saleInfo.append(FindPack.SaleInfo(startTime : startTime[key]! , endTime : endTime[key] , price : price, purchaseLimit: purchaseLimit[key], verifiers: verifier, verifyAll: checkAll))
+			saleInfo.append(FindPack.SaleInfo(name: key, startTime : startTime[key]! , endTime : endTime[key] , price : price, purchaseLimit: purchaseLimit[key], verifiers: verifier, verifyAll: checkAll))
 		}
 
 		let season=typeId-1

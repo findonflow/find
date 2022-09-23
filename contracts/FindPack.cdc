@@ -19,7 +19,7 @@ pub contract FindPack: NonFungibleToken {
 	pub event Requeued(packId: UInt64, address:Address)
 
 	pub event Opened(packTypeName: String, packTypeId:UInt64, packId: UInt64, address:Address)
-	pub event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address)
+	pub event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, packFields: {String : String})
 	pub event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, packFields: {String : String})
 
 	pub event Purchased(packTypeName: String, packTypeId: UInt64, packId: UInt64, address: Address, amount:UFix64)
@@ -47,7 +47,7 @@ pub contract FindPack: NonFungibleToken {
 	// Verifier container for packs
 	// Each struct is one sale type. If they 
 	pub struct SaleInfo {
-
+		pub let name : String
 		pub let startTime : UFix64 
 		pub let endTime : UFix64?
 		pub let price : UFix64
@@ -56,7 +56,8 @@ pub contract FindPack: NonFungibleToken {
 		pub let verifiers : [{FindVerifier.Verifier}]
 		pub let verifyAll : Bool 
 
-		init(startTime : UFix64 , endTime : UFix64? , price : UFix64, purchaseLimit : UInt64?, verifiers: [{FindVerifier.Verifier}], verifyAll : Bool ) {
+		init(name : String, startTime : UFix64 , endTime : UFix64? , price : UFix64, purchaseLimit : UInt64?, verifiers: [{FindVerifier.Verifier}], verifyAll : Bool ) {
+			self.name = name
 			self.startTime = startTime
 			self.endTime = endTime
 			self.price = price
@@ -716,6 +717,7 @@ pub contract FindPack: NonFungibleToken {
 		let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
 		let packTypeName = pack.packTypeName
 		let packTypeId = pack.getTypeID()
+		let packFields = FindPack.getMetadataById(packTypeName:packTypeName, typeId:packTypeId)!.packFields
 		var receivingAddress : Address? = nil
 		for type in rewardIds.keys {
 			let receiver= pack.getOpenedBy()
@@ -798,7 +800,7 @@ pub contract FindPack: NonFungibleToken {
 				target.deposit(token: <-token)
 			}
 		}
-		emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!)
+		emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!, packFields:packFields)
 
 		destroy pack
 	}
