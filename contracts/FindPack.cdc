@@ -30,6 +30,7 @@ pub contract FindPack: NonFungibleToken {
 
 	pub let CollectionStoragePath: StoragePath
 	pub let CollectionPublicPath: PublicPath
+	pub let CollectionPrivatePath: PrivatePath
 
 	pub let OpenedCollectionPublicPath: PublicPath
 	pub let OpenedCollectionStoragePath: StoragePath
@@ -378,7 +379,7 @@ pub contract FindPack: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(
 					storagePath: FindPack.CollectionStoragePath,
 					publicPath: FindPack.CollectionPublicPath,
-					providerPath: /private/FindPackCollection,
+					providerPath: FindPack.CollectionPrivatePath,
 					publicCollection: Type<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
 					publicLinkedType: Type<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
 					providerLinkedType: Type<&FindPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
@@ -946,6 +947,7 @@ pub contract FindPack: NonFungibleToken {
 	init() {
 		self.CollectionStoragePath = /storage/FindPackCollection
 		self.CollectionPublicPath = /public/FindPackCollection
+		self.CollectionPrivatePath = /private/FindPackCollection
 
 		self.OpenedCollectionStoragePath = /storage/FindPackOpenedCollection
 		self.OpenedCollectionPublicPath = /public/FindPackOpenedCollection
