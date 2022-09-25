@@ -344,10 +344,6 @@ func TestFindPack(t *testing.T) {
 			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
 				"amount": totalAmount * 0.15,
 				"to":     otu.O.Address("account"),
-			}).
-			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
-				"amount": totalAmount * 0.15,
-				"to":     otu.O.Address("account"),
 			})
 		packTypeId++
 	})

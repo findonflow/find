@@ -474,6 +474,14 @@ pub contract Admin {
 			cap.requeue(packId: packId)
 		}
 
+		pub fun getFindRoyaltyCap() : Capability<&{FungibleToken.Receiver}> {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			
+			return Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		}
+
 		init() {
 			self.capability = nil
 		}
@@ -489,3 +497,4 @@ pub contract Admin {
 	}
 
 }
+ 

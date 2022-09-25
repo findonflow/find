@@ -191,11 +191,12 @@ pub contract FindPack: NonFungibleToken {
 		pub let itemTypes: [Type]
 		access(contract) let providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} 
 
+		access(contract) let primarySaleRoyalties : MetadataViews.Royalties
 		access(contract) let royalties : MetadataViews.Royalties
 
 		pub let requiresReservation: Bool
 
-		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
+		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
 			self.name = name
 			self.description = description
 			self.thumbnailUrl = thumbnailUrl
@@ -207,7 +208,7 @@ pub contract FindPack: NonFungibleToken {
 			self.itemTypes=itemTypes
 			self.providerCaps=providerCaps
 
-			//If this pack has royalties then they can be added here later. For the current implementations royalties appear to be handled offchain. 
+			self.primarySaleRoyalties=primarySaleRoyalties
 			self.royalties=royalties
 
 			self.storageRequirement= storageRequirement
@@ -538,7 +539,7 @@ pub contract FindPack: NonFungibleToken {
 			let packTypeId=nft.getTypeID()
 			let packTypeName = nft.packTypeName
 
-			for royalty in metadata.royalties.getRoyalties() {
+			for royalty in metadata.primarySaleRoyalties.getRoyalties() {
 				if royalty.receiver.check(){
 					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
 				} else {
@@ -600,7 +601,7 @@ pub contract FindPack: NonFungibleToken {
 			}
 
 			//TODO: test
-			for royalty in metadata.royalties.getRoyalties() {
+			for royalty in metadata.primarySaleRoyalties.getRoyalties() {
 				if royalty.receiver.check(){
 					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
 				} else {
@@ -911,9 +912,7 @@ pub contract FindPack: NonFungibleToken {
 		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 
             let royalties : [MetadataViews.Royalty] = []
-            if platform.platformPercentCut != 0.0 {
-                royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
-            }
+			// there should be no find cut for the pack. 
             if platform.minterCut != nil && platform.minterCut! != 0.0 {
                 royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "creator"))
             }

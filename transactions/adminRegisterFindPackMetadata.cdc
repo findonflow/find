@@ -77,6 +77,10 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			providerCaps[type] = providerCap
 		}
 
+		let packRoyalty = MetadataViews.Royalties([
+			MetadataViews.Royalty(receiver: self.admin.getFindRoyaltyCap(), cut: 0.15, description: "find")
+		])
+
 		let metadata = FindPack.Metadata(
 			name: name,
 			description: name, 
@@ -90,6 +94,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			requiresReservation:requiresReservation,
 			storageRequirement:10000, 
 			saleInfos: saleInfo, 
+			primarySaleRoyalties: packRoyalty,
 			royalties: royalties, 
 			collectionDisplay: collectionDisplay,
 			packFields: {"Items" : "1"}, 
