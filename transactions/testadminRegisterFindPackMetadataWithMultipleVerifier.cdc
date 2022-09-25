@@ -6,6 +6,7 @@ import FindPack from "../contracts/FindPack.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FindVerifier from "../contracts/FindVerifier.cdc"
 import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import FindForge from "../contracts/FindForge.cdc"
 
 import Admin from "../contracts/Admin.cdc"
 
@@ -29,6 +30,26 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			panic("wallet has to exist")
 		}
 
+		let minterPlatform = FindForge.getMinterPlatform(name: lease, forgeType: Type<@ExampleNFT.Forge>()) ?? panic("Please set up minter platform for Find Pack Forge")
+
+		let season=typeId-1
+		// leaseName + season + #PackTypeId
+		let name=lease.concat(" season #".concat(season.toString()))
+
+		let socials : {String: MetadataViews.ExternalURL} = {}
+		for key in minterPlatform.socials.keys {
+			socials[key] = MetadataViews.ExternalURL(url: minterPlatform.socials[key]!)
+		}
+
+		let collectionDisplay = MetadataViews.NFTCollectionDisplay(
+            name: name,
+            description: minterPlatform.description,
+            externalURL: MetadataViews.ExternalURL(url: minterPlatform.externalURL),
+            squareImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.squareImage), mediaType: "image"),
+            bannerImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.bannerImage), mediaType: "image"),
+            socials: socials
+        )
+
 		/* For testing only */
 		var saleInfo : [FindPack.SaleInfo] = []
 		for key in startTime.keys {
@@ -40,9 +61,6 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			}
 			saleInfo.append(FindPack.SaleInfo(name: key, startTime : startTime[key]! , endTime : endTime[key] , price : price, purchaseLimit: purchaseLimit[key], verifiers: verifier, verifyAll: checkAll))
 		}
-
-		let season=typeId-1
-		let name="ExampleNFT Season #".concat(season.toString())
 
 		let royalties = MetadataViews.Royalties([
 			MetadataViews.Royalty(receiver: self.royaltyWallet, cut: royaltyCut, description: "creator")
@@ -74,6 +92,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			storageRequirement:10000, 
 			saleInfos: saleInfo, 
 			royalties: royalties, 
+			collectionDisplay: collectionDisplay, 
 			packFields: {"Items" : "1"}, 
 			extraData: {}
 		)

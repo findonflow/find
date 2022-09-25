@@ -2485,6 +2485,19 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 		}).
 		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
 
+	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
+
+	otu.O.Tx("adminAddNFTCatalog",
+		WithSigner("account"),
+		WithArg("collectionIdentifier", minter+" season#"+fmt.Sprint(packTypeId)),
+		WithArg("contractName", "A.f8d6e0586b0a20c7.FindPack.NFT"),
+		WithArg("contractAddress", "account"),
+		WithArg("addressWithNFT", "account"),
+		WithArg("nftID", res),
+		WithArg("publicPathIdentifier", publicPathIdentifier),
+	).
+		AssertSuccess(otu.T)
+
 	assert.NoError(t, err)
 	return res
 }

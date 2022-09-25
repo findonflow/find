@@ -1,12 +1,16 @@
 import FindPack from "../contracts/FindPack.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-pub fun main(packTypeName: String, packTypeId: UInt64) : Report? {
-	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
-		let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()
-		return Report(metadata, packsLeft: packsLeft)
+pub fun main(packTypeName: String) : {UInt64 : Report} {
+	let packs = FindPack.getMetadataByName(packTypeName: packTypeName)
+	let packData : {UInt64 : Report} = {}
+	for packTypeId in packs.keys {
+		if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
+			let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()
+			packData[packTypeId] = Report(metadata, packsLeft: packsLeft)
+		}
 	}
-	return nil
+	return packData
 }
 
 pub struct Report {

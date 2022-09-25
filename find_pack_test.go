@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/bjartek/overflow"
@@ -579,12 +580,13 @@ func TestFindPack(t *testing.T) {
 			WithArg("packTypeId", packTypeId),
 		).
 			AssertWant(t, autogold.Want("getFindPackSaleDetails", map[string]interface{}{
-				"description": "ExampleNFT Season #19", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
-				"name":                "ExampleNFT Season #19",
+				"description": "user1 season #19", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"name":                "user1 season #19",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
 				"requiresReservation": false,
+				"saleEnded":           true,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
 						"endTime":   3,
@@ -592,7 +594,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 602",
+							"User with one of these FLOATs are verified : 619",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -603,7 +605,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 602",
+							"User with one of these FLOATs are verified : 619",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -614,7 +616,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 3,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 602",
+							"User with one of these FLOATs are verified : 619",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -661,8 +663,8 @@ func TestFindPack(t *testing.T) {
 			WithArg("user", buyer),
 		).
 			AssertWant(t, autogold.Want("getFindPackSaleDetailsWithUser1", map[string]interface{}{
-				"description": "ExampleNFT Season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
-				"name":                "ExampleNFT Season #20",
+				"description": "user1 season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
@@ -689,8 +691,8 @@ func TestFindPack(t *testing.T) {
 			WithArg("user", "user2"),
 		).
 			AssertWant(t, autogold.Want("getFindPackSaleDetailsWithUser2", map[string]interface{}{
-				"description": "ExampleNFT Season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
-				"name":                "ExampleNFT Season #20",
+				"description": "user1 season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
@@ -705,6 +707,55 @@ func TestFindPack(t *testing.T) {
 					"userPurchaseRecord": 0,
 				},
 				"walletType": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+			}))
+
+	})
+
+	t.Run("Should get all pack sale under a lease name type", func(t *testing.T) {
+
+		otu.O.Script("getAllFindPackSaleDetailsByName",
+			WithArg("packTypeName", "user1"),
+		).
+			AssertWithPointerWant(t, "/"+fmt.Sprint(packTypeId), autogold.Want("getAllFindPackSaleDetailsByName", map[string]interface{}{
+				"description": "user1 season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"name":                "user1 season #20",
+				"openTime":            2,
+				"packFields":          map[string]interface{}{"Items": "1"},
+				"packsLeft":           0,
+				"requiresReservation": false,
+				"saleEnded":           true,
+				"saleInfos": []interface{}{
+					map[string]interface{}{
+						"name":      "pre-sale",
+						"price":     2.2,
+						"startTime": 2,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 623",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"endTime":   2,
+						"name":      "whiteList",
+						"price":     1.1,
+						"startTime": 1,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 623",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
+						"verifyAll": false,
+					},
+				},
+				"storageRequirement": 10000,
+				"thumbnailHash":      "thumbnailHash",
+				"walletType":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}))
 		packTypeId++
 	})

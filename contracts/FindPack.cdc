@@ -183,6 +183,7 @@ pub contract FindPack: NonFungibleToken {
 		pub let saleInfos: [SaleInfo]
 
 		pub let storageRequirement: UInt64
+		pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
 		pub let packFields: {String : String}
 		pub let extraData : {String : AnyStruct}
@@ -194,7 +195,7 @@ pub contract FindPack: NonFungibleToken {
 
 		pub let requiresReservation: Bool
 
-		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], royalties : MetadataViews.Royalties, packFields: {String : String} , extraData : {String : AnyStruct}) {
+		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
 			self.name = name
 			self.description = description
 			self.thumbnailUrl = thumbnailUrl
@@ -210,6 +211,7 @@ pub contract FindPack: NonFungibleToken {
 			self.royalties=royalties
 
 			self.storageRequirement= storageRequirement
+			self.collectionDisplay= collectionDisplay
 
 			self.requiresReservation=requiresReservation
 			self.packFields=packFields
@@ -385,6 +387,10 @@ pub contract FindPack: NonFungibleToken {
 				)
 
 			case Type<MetadataViews.NFTCollectionDisplay>(): 
+
+				return self.getMetadata().collectionDisplay
+
+				/* to be determined
 				//let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/findPack")
 				let externalURL = MetadataViews.ExternalURL("https://find.xyz/")
 				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"), mediaType: "image")
@@ -398,6 +404,7 @@ pub contract FindPack: NonFungibleToken {
 														  	"discord": MetadataViews.ExternalURL("https://discord.gg/ejdVgzWmYN"), 
 															"twitter" : MetadataViews.ExternalURL("https://twitter.com/findonflow")
 														  })
+				*/
 			}
 			return nil
 		}
