@@ -235,4 +235,41 @@ func TestFindForge(t *testing.T) {
 		).
 			AssertSuccess(t)
 	})
+
+	t.Run("Should be able to add addon and mint for users as admin", func(t *testing.T) {
+
+		otu.registerUserWithName("user1", "testingname")
+
+		otu.O.Tx("adminAddAddon",
+			overflow.WithSigner("find"),
+			overflow.WithArg("name", "testingname"),
+			overflow.WithArg("addon", "premiumForge"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "AddonActivated", map[string]interface{}{
+				"name":  "testingname",
+				"addon": "premiumForge",
+			})
+
+		otu.O.Tx("adminAddForge",
+			overflow.WithSigner("find"),
+			overflow.WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			overflow.WithArg("name", "testingname"),
+		).AssertSuccess(t)
+
+		otu.O.Tx("testadminMintExampleNFT",
+			overflow.WithSigner("find"),
+			overflow.WithArg("name", "testingname"),
+			overflow.WithArg("artist", "Bam"),
+			overflow.WithArg("nftName", "ExampleNFT"),
+			overflow.WithArg("nftDescription", "This is an ExampleNFT"),
+			overflow.WithArg("nftUrl", "This is an exampleNFT url"),
+			overflow.WithArg("traits", []uint64{1, 2, 3, 4}),
+			overflow.WithArg("collectionDescription", "Example NFT FIND"),
+			overflow.WithArg("collectionExternalURL", "Example NFT external url"),
+			overflow.WithArg("collectionSquareImage", "Example NFT square image"),
+			overflow.WithArg("collectionBannerImage", "Example NFT banner image"),
+		).
+			AssertSuccess(t)
+	})
 }

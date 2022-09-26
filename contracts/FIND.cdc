@@ -551,6 +551,7 @@ pub contract FIND {
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
 		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
+		access(account) fun adminAddAddon(name:String, addon: String) 
 		pub fun getAddon(name:String) : [String]
 		pub fun checkAddon(name:String, addon: String) : Bool
 		access(account) fun getNames() : [String]
@@ -611,6 +612,34 @@ pub contract FIND {
 			emit AddonActivated(name: name, addon: addon)
 			let networkWallet = self.networkWallet.borrow() ?? panic("The network is not up")
 			networkWallet.deposit(from: <- vault)
+		}
+
+		access(account) fun adminAddAddon(name:String, addon:String)  {
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
+			}
+
+			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+			if !network.publicEnabled {
+				panic("Public registration is not enabled yet")
+			}
+
+			if network.addonPrices[addon] == nil {
+				panic("This addon is not available. addon : ".concat(addon))
+			}
+			let addonPrice = network.addonPrices[addon]!
+
+			let lease = self.borrow(name)
+
+			if lease.addons.containsKey(addon) {
+				panic("You already have this addon : ".concat(addon))
+			}
+
+			lease.addAddon(addon)
+
+			//put something in your storage
+			emit AddonActivated(name: name, addon: addon)
 		}
 
 		pub fun getAddon(name: String) : [String] {
