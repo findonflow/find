@@ -229,7 +229,7 @@ pub contract NFGv3: NonFungibleToken {
 			return <- newNFT
 		}
 
-		pub fun addContractData(data: AnyStruct, verifier: &FindForge.Verifier) {
+		pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			// not used here 
 
 			panic("Not supported for NFGv3 Contract") 

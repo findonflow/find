@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
+	"github.com/onflow/cadence"
 	"github.com/sanity-io/litter"
 	"github.com/stretchr/testify/assert"
 )
@@ -2397,6 +2399,238 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 	return ticketID
 }
 
+func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
+
+	t := otu.T
+
+	res, err := otu.O.Tx("testMintExampleNFT",
+		WithSigner("user1"),
+		WithArg("name", "user1"),
+		WithArg("artist", "Bam"),
+		WithArg("nftName", "ExampleNFT"),
+		WithArg("nftDescription", "This is an ExampleNFT"),
+		WithArg("nftUrl", "This is an exampleNFT url"),
+		WithArg("traits", []uint64{1, 2, 3}),
+		WithArg("collectionDescription", "Example NFT FIND"),
+		WithArg("collectionExternalURL", "Example NFT external url"),
+		WithArg("collectionSquareImage", "Example NFT square image"),
+		WithArg("collectionBannerImage", "Example NFT banner image"),
+	).
+		AssertSuccess(t).
+		GetIdFromEvent("ExampleNFT.Deposit", "id")
+
+	otu.O.Tx("sendExampleNFT",
+		WithSigner("user1"),
+		WithArg("user", otu.O.Address("account")),
+		WithArg("id", res),
+	).
+		AssertSuccess(t)
+
+	assert.NoError(t, err)
+
+	return res
+
+}
+
+func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	o.Tx("setupFindPackMinterPlatform",
+		WithSigner(user),
+		WithArg("lease", user),
+	).
+		AssertSuccess(t)
+
+	o.Tx("adminRegisterFindPackMetadata",
+		WithSigner("find"),
+		WithArg("lease", user),
+		WithArg("typeId", packTypeId),
+		WithArg("thumbnailHash", "thumbnailHash"),
+		WithArg("wallet", clientAddress),
+		WithArg("openTime", openTime),
+		WithArg("royaltyCut", 0.075),
+		WithArg("royaltyAddress", clientAddress),
+		WithArg("requiresReservation", requiresReservation),
+		WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": whitelistTime, "publicSale": buyTime})),
+		WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": buyTime})),
+		WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatId})),
+		WithArg("price", createStringUFix64(map[string]float64{"whiteList": 4.20, "publicSale": 4.20})),
+		WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			"packTypeId": packTypeId,
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input []uint64, salt string) uint64 {
+
+	o := otu.O
+	t := otu.T
+
+	packHash := utils.CreateSha3Hash(input, salt)
+
+	res, err := o.Tx("adminMintFindPack",
+		WithSigner("find"),
+		WithArg("packTypeName", minter),
+		WithArg("typeId", packTypeId),
+		WithArg("hashes", []string{packHash}),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Minted", map[string]interface{}{
+			"typeId": packTypeId,
+		}).
+		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
+
+	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
+
+	otu.O.Tx("adminAddNFTCatalog",
+		WithSigner("account"),
+		WithArg("collectionIdentifier", minter+" season#"+fmt.Sprint(packTypeId)),
+		WithArg("contractName", "A.f8d6e0586b0a20c7.FindPack.NFT"),
+		WithArg("contractAddress", "account"),
+		WithArg("addressWithNFT", "account"),
+		WithArg("nftID", res),
+		WithArg("publicPathIdentifier", publicPathIdentifier),
+	).
+		AssertSuccess(otu.T)
+
+	assert.NoError(t, err)
+	return res
+}
+
+func (otu *OverflowTestUtils) mintPackWithSignature(minter string, packTypeId uint64, input []uint64, salt string) (uint64, string) {
+
+	o := otu.O
+	t := otu.T
+
+	packHash := utils.CreateSha3Hash(input, salt)
+
+	res, err := o.Tx("adminMintFindPack",
+		WithSigner("find"),
+		WithArg("packTypeName", minter),
+		WithArg("typeId", packTypeId),
+		WithArg("hashes", []string{packHash}),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Minted", map[string]interface{}{
+			"typeId": packTypeId,
+		}).
+		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
+
+	assert.NoError(t, err)
+
+	signature, err := o.SignUserMessage("account", packHash)
+	assert.NoError(otu.T, err)
+
+	return res, signature
+}
+
+func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint64, numberOfPacks uint64, amount float64) *OverflowTestUtils {
+
+	o := otu.O
+	t := otu.T
+
+	o.Tx("buyFindPack",
+		WithSigner(user),
+		WithArg("packTypeName", packTypeName),
+		WithArg("packTypeId", packTypeId),
+		WithArg("numberOfPacks", numberOfPacks),
+		WithArg("totalAmount", amount),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
+			"amount":  amount,
+			"address": otu.O.Address(user),
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	o.Tx("openFindPack",
+		WithSigner(user),
+		WithArg("packId", packId),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Opened", map[string]interface{}{
+			"packId":  packId,
+			"address": otu.O.Address(user),
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	mapping := map[string][]uint64{
+		"A.f8d6e0586b0a20c7.ExampleNFT.NFT": ids,
+	}
+
+	o.Tx("adminFulfillFindPack",
+		WithSigner("find"),
+		WithArg("packId", packId),
+		WithArg("rewardIds", createStringToUInt64Array(mapping)),
+		WithArg("salt", salt),
+	).
+		AssertSuccess(t)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) createFloatEvent(minter string) uint64 {
+	o := otu.O
+	t := otu.T
+
+	floatId, err := o.Tx("testfloatCreateEvent",
+		WithSigner(minter),
+		WithArg("forHost", minter),
+		WithArg("claimable", true),
+		WithArg("name", "FloatName"),
+		WithArg("description", "FloatDesciption"),
+		WithArg("image", "IMG"),
+		WithArg("url", "URL"),
+		WithArg("transferrable", true),
+		WithArg("timelock", false),
+		WithArg("dateStart", 0.0),
+		WithArg("timePeriod", 0.0),
+		WithArg("secret", false),
+		WithArg("secrets", `[]`),
+		WithArg("limited", false),
+		WithArg("capacity", 0),
+		WithArg("initialGroups", `[]`),
+		WithArg("flowTokenPurchase", false),
+		WithArg("flowTokenCost", 0.0),
+	).
+		AssertSuccess(t).
+		GetIdFromEvent("A.f8d6e0586b0a20c7.FLOAT.FLOATEventCreated", "eventId")
+
+	assert.NoError(t, err)
+	return floatId
+}
+
+func (otu *OverflowTestUtils) claimFloat(minter, receiver string, floatId uint64) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	o.Tx("testfloatClaim",
+		WithSigner(receiver),
+		WithArg("eventId", floatId),
+		WithArg("host", minter),
+	).
+		AssertSuccess(t)
+
+	return otu
+}
+
 type SaleItem struct {
 	Amount              float64 `json:"amount"`
 	AuctionReservePrice float64 `json:"auctionReservePrice"`
@@ -2503,4 +2737,38 @@ type GhostListing struct {
 	ListingType           string `json:"listingType"`
 	ListingTypeIdentifier string `json:"listingTypeIdentifier"`
 	Id                    uint64 `json:"id"`
+}
+
+func createStringUFix64(input map[string]float64) cadence.Dictionary {
+	array := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceString, _ := cadence.NewString(key)
+		cadenceUFix64, _ := cadence.NewUFix64(fmt.Sprintf("%f", val))
+		array = append(array, cadence.KeyValuePair{Key: cadenceString, Value: cadenceUFix64})
+	}
+	return cadence.NewDictionary(array)
+}
+
+func createStringUInt64(input map[string]uint64) cadence.Dictionary {
+	array := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceString, _ := cadence.NewString(key)
+		cadenceUInt64 := cadence.NewUInt64(val)
+		array = append(array, cadence.KeyValuePair{Key: cadenceString, Value: cadenceUInt64})
+	}
+	return cadence.NewDictionary(array)
+}
+
+func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {
+	mapping := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceString, _ := cadence.NewString(key)
+		array := []cadence.Value{}
+		for _, value := range val {
+			cadenceUInt64 := cadence.NewUInt64(value)
+			array = append(array, cadenceUInt64)
+		}
+		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
+	}
+	return cadence.NewDictionary(mapping)
 }

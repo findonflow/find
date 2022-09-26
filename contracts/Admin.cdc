@@ -8,6 +8,7 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
+import FindPack from "./FindPack.cdc"
 
 pub contract Admin {
 
@@ -77,12 +78,12 @@ pub contract Admin {
 			FindForge.removeForgeType(type: type)
 		}
 
-		pub fun addForgeContractData(forgeType : Type, data: AnyStruct) {
+		pub fun addForgeContractData(lease: String, forgeType: Type , data: AnyStruct) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.addContractData(forgeType: forgeType , data: data)
+			FindForge.addContractData(lease: lease, forgeType: forgeType , data: data)
 		}
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
@@ -454,6 +455,52 @@ pub contract Admin {
 			FindMarket.setResidualAddress(address)
 		}
 
+		/// ===================================================================================
+		// Find Pack
+		/// ===================================================================================
+
+		pub fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			return Admin.account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)	
+		}
+
+		pub fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			let pathIdentifier = FindPack.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
+			let path = PublicPath(identifier: pathIdentifier)!
+			let receiver = Admin.account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(path).borrow() ?? panic("Cannot borrow reference to admin find pack collection public from Path : ".concat(pathIdentifier))
+			let mintPackData = FindPack.MintPackData(packTypeName: packTypeName, typeId: typeId, hash: hash, verifierRef: FindForge.borrowVerifier())
+			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
+		}
+
+		pub fun fulfillFindPack(packId:UInt64, rewardIds:{Type : [UInt64]}, salt:String) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			FindPack.fulfill(packId:packId, rewardIds:rewardIds, salt:salt)
+		}
+
+		pub fun requeueFindPack(packId:UInt64) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+
+			let cap= Admin.account.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+			cap.requeue(packId: packId)
+		}
+
+		pub fun getFindRoyaltyCap() : Capability<&{FungibleToken.Receiver}> {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			
+			return Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		}
+
 		init() {
 			self.capability = nil
 		}
@@ -469,3 +516,4 @@ pub contract Admin {
 	}
 
 }
+ 

@@ -9,8 +9,10 @@ require (
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.24.2-0.20220725233315-443ea529bed1
+	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
 	github.com/sanity-io/litter v1.5.5
 	github.com/stretchr/testify v1.8.0
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )
 
 require (
@@ -135,7 +137,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.8.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/exp v0.0.0-20220909182711-5c715a9e8561 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect

@@ -40,17 +40,18 @@
             "amount": 10,
             "ftAlias": "Flow",
             "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-            "listingId": 303,
+            "listingId": 403,
             "listingStatus": "active",
             "listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
             "listingValidUntil": 101,
-            "nftId": 303,
+            "nftId": 403,
             "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
             "saleType": "active_listed",
             "seller": "0x179b6b1cb6755e31",
             "sellerName": "user1"
         }
     },
+    "linkedForMarket": true,
     "nftDetail": {
         "collection": {
             "bannerImage": {
@@ -92,6 +93,7 @@
                 "type": "image"
             }
         },
+        "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
         "editions": [
             {
                 "max": 3,
@@ -104,7 +106,7 @@
             }
         ],
         "externalViewURL": "https://find.xyz/collection/user1/dandy/ID1",
-        "id": 303,
+        "id": 403,
         "media": {
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
@@ -128,7 +130,7 @@
             }
         ],
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 303,
+        "uuid": 403,
         "views": [
             "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData"
         ]

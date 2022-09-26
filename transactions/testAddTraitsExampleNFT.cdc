@@ -3,7 +3,7 @@ import Admin from "../contracts/Admin.cdc"
 import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-transaction() {
+transaction(lease: String) {
 
 	prepare(admin:AuthAccount) {
 
@@ -14,7 +14,7 @@ transaction() {
 														4 : MetadataViews.Trait(name: "toes", value: "flowverse socks", displayType: "string", rarity: MetadataViews.Rarity(score: nil, max: nil, description: "Legendary"))
 													}
 
-		client.addForgeContractData(forgeType : Type<@ExampleNFT.Forge>(), 
+		client.addForgeContractData(lease: lease, forgeType : Type<@ExampleNFT.Forge>(), 
 									data: data) 
 
 	}

@@ -76,7 +76,7 @@ pub contract FindForge {
 	// ForgeMinter Interface 
 	pub resource interface Forge{
 		pub fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @NonFungibleToken.NFT 
-		pub fun addContractData(data: AnyStruct, verifier: &Verifier)
+		pub fun addContractData(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier)
 	}
 
 	access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
@@ -273,11 +273,70 @@ pub contract FindForge {
 
 	}
 
-	access(account) fun addContractData(forgeType: Type , data: AnyStruct) {
+	access(account) fun adminMint(lease: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}){
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			panic("The minter platform is not set. Please set up properly before adding contract data.")
+		}
+		let address = FIND.lookupAddress(lease) ?? panic("This name is not owned by anyone. Name : ".concat(lease))
+		let leaseCol = getAccount(address).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
+
+		if !leaseCol.checkAddon(name:lease, addon: "forge") && !leaseCol.checkAddon(name:lease, addon: "premiumForge") {
+			panic("Please purchase forge addon to start forging. Name: ".concat(lease))
+		}
+
+		let minterPlatform = FindForge.minterPlatforms[forgeType]![lease] ?? panic("The minter platform is not set. Please set up properly before mint.")
+
+		if minterPlatform.description == "" {
+			panic("Please set up minter platform before mint")
+		}
+
 		let verifier = self.borrowVerifier()
 
 		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
-		forge.addContractData(data: data, verifier: verifier)
+
+		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
+
+		let id = nft.id 
+		let uuid = nft.uuid 
+		let nftType = nft.getType().identifier
+		receiver.deposit(token: <- nft)
+
+		let vr = receiver.borrowViewResolver(id: id)
+		let view = vr.resolveView(Type<MetadataViews.Display>())  ?? panic("The minting nft should implement MetadataViews Display view.") 
+		let display = view as! MetadataViews.Display
+		let nftName = display.name 
+		let thumbnail = display.thumbnail.uri()
+		let to = receiver.owner!.address 
+		let toName = FIND.reverseLookup(to)
+		let new = FIND.reverseLookup(to)
+		let from = FindForge.account.address
+
+		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: "find", to: to, toName: toName)
+
+	}
+
+	access(account) fun addContractData(lease: String, forgeType: Type , data: AnyStruct) {
+
+		if !FindForge.minterPlatforms.containsKey(forgeType) {
+			panic("The minter platform is not set. Please set up properly before adding contract data.")
+		}
+		let address = FIND.lookupAddress(lease) ?? panic("This name is not owned by anyone. Name : ".concat(lease))
+		let leaseCol = getAccount(address).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
+
+		if !leaseCol.checkAddon(name:lease, addon: "forge") && !leaseCol.checkAddon(name:lease, addon: "premiumForge") {
+			panic("Please purchase forge addon to start forging. Name: ".concat(lease))
+		}
+
+		let minterPlatform = FindForge.minterPlatforms[forgeType]![lease] ?? panic("The minter platform is not set. Please set up properly.")
+
+		if minterPlatform.description == "" {
+			panic("Please set up minter platform")
+		}
+
+		let verifier = self.borrowVerifier()
+
+		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
+		forge.addContractData(platform: minterPlatform, data: data, verifier: verifier)
 	}
 
 	pub fun addForgeType(_ forge: @{Forge}) {

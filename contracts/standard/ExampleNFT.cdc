@@ -101,7 +101,8 @@ pub contract ExampleNFT: NonFungibleToken {
                 Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>(),
-                Type<MetadataViews.Serial>()
+                Type<MetadataViews.Serial>(), 
+                Type<MetadataViews.Rarity>()
             ]
 
             if self.soulBound {
@@ -181,6 +182,9 @@ pub contract ExampleNFT: NonFungibleToken {
                     return FindViews.SoulBound(
                          "This NFT is soulbound."
                     )
+
+                case Type<MetadataViews.Rarity>() : 
+                    return MetadataViews.Rarity(score: 1.0, max: 2.0, description: "rarity description")
 
             }
             return nil
@@ -316,7 +320,7 @@ pub contract ExampleNFT: NonFungibleToken {
                                         royalties: MetadataViews.Royalties(royalties))
 		}
 
-        pub fun addContractData(data: AnyStruct, verifier: &FindForge.Verifier) {
+        pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let type = data.getType() 
 
             switch type {
@@ -363,6 +367,12 @@ pub contract ExampleNFT: NonFungibleToken {
         // create a public capability for the collection
         self.account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic, MetadataViews.ResolverCollection}>(
             self.CollectionPublicPath,
+            target: self.CollectionStoragePath
+        )
+
+        // create a private capability for the collection
+        self.account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic, MetadataViews.ResolverCollection}>(
+            self.CollectionPrivatePath,
             target: self.CollectionStoragePath
         )
 
