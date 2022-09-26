@@ -27,7 +27,7 @@ func TestFindVerifier(t *testing.T) {
 			WithArg("floatIDs", []uint64{floatID, 0}),
 		).
 			AssertWant(t, autogold.Want("Has no float, false", map[string]interface{}{
-				"description": "User with one of these FLOATs are verified : 253, 0",
+				"description": "User with one of these FLOATs are verified : 255, 0",
 				"result":      false,
 			}))
 	})
@@ -55,7 +55,7 @@ func TestFindVerifier(t *testing.T) {
 			WithArg("floatIDs", []uint64{floatID, 0}),
 		).
 			AssertWant(t, autogold.Want("Has one float, true", map[string]interface{}{
-				"description": "User with one of these FLOATs are verified : 255, 0",
+				"description": "User with one of these FLOATs are verified : 257, 0",
 				"result":      true,
 			}))
 	})
@@ -72,7 +72,7 @@ func TestFindVerifier(t *testing.T) {
 			WithArg("floatIDs", []uint64{notClaimedFloatID, 0}),
 		).
 			AssertWant(t, autogold.Want("Has one float, false", map[string]interface{}{
-				"description": "User with one of these FLOATs are verified : 264, 0",
+				"description": "User with one of these FLOATs are verified : 266, 0",
 				"result":      false,
 			}))
 	})
@@ -91,7 +91,7 @@ func TestFindVerifier(t *testing.T) {
 			WithArg("floatIDs", []uint64{floatID, floatID2}),
 		).
 			AssertWant(t, autogold.Want("Has all float, true", map[string]interface{}{
-				"description": "User with all of these FLOATs are verified : 268, 270",
+				"description": "User with all of these FLOATs are verified : 270, 272",
 				"result":      true,
 			}))
 	})
@@ -109,7 +109,7 @@ func TestFindVerifier(t *testing.T) {
 			WithArg("floatIDs", []uint64{floatID, floatID2, 0}),
 		).
 			AssertWant(t, autogold.Want("Has all float, false", map[string]interface{}{
-				"description": "User with all of these FLOATs are verified : 276, 278, 0",
+				"description": "User with all of these FLOATs are verified : 278, 280, 0",
 				"result":      false,
 			}))
 	})
