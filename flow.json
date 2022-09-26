@@ -360,7 +360,8 @@
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
         "FindLostAndFoundWrapper",
-				"FindPack"
+				"FindPack",
+				"FindVerifier"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -397,7 +398,8 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
-				"FindPack"
+				"FindPack",
+				"FindVerifier"
       ],
       "testnet-user1": [
         "NFGv3",
