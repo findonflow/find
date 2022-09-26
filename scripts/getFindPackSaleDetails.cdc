@@ -1,5 +1,6 @@
 import FindPack from "../contracts/FindPack.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub fun main(packTypeName: String, packTypeId: UInt64) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
@@ -24,6 +25,7 @@ pub struct Report {
 		pub let saleInfos: [SaleInfo]
 
 		pub let storageRequirement: UInt64
+		pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
 		pub let itemTypes: [Type]
 
@@ -48,6 +50,7 @@ pub struct Report {
 			self.packFields=md.packFields
 			self.requiresReservation=md.requiresReservation
 			self.saleInfos=convertSaleInfo(md.saleInfos)
+			self.collectionDisplay=md.collectionDisplay
 			self.saleEnded=false
 			if self.packsLeft == 0 {
 				self.saleEnded=true

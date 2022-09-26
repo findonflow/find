@@ -1,6 +1,7 @@
 import FindPack from "../contracts/FindPack.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 pub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
@@ -23,6 +24,7 @@ pub struct Report {
 		pub let openTime: UFix64
 
 		pub let storageRequirement: UInt64
+		pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
 		pub let itemTypes: [Type]
 
@@ -50,6 +52,7 @@ pub struct Report {
 			self.requiresReservation=md.requiresReservation
 			self.userQualifiedSale=getSoonestQualifiedSale(md.saleInfos, user: user)
 			self.storageFlowNeeded=getRequiredFlow(md.storageRequirement, user: user)
+			self.collectionDisplay=md.collectionDisplay
 		}
 }
 
