@@ -774,6 +774,8 @@ pub contract FindPack: NonFungibleToken {
 		let digestAsString=String.encodeHex(digest)
 		if digestAsString != hash {
 			emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress, reason: "The content of the pack was not verified with the hash provided at mint")
+			Debug.log("digestAsString : ".concat(hashString))
+			Debug.log("hash : ".concat(hash))
 			self.transferToDLQ(<- pack)
 			return
 		}

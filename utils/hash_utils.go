@@ -11,15 +11,15 @@ import (
 // Create a hash from the given ids and salt using '-' as the placeholder between salt an ids and , as the separator between ids
 func CreateSha3Hash(input []uint64, types []string, salt string) string {
 
-	joined := []string{}
+	joined := salt
 	for i, id := range input {
 		typ := types[i]
-		joined = append(joined, fmt.Sprintf("%s-%d", typ, id))
+		joined = fmt.Sprintf("%s,%s-%d", joined, typ, id)
 	}
 
-	data := fmt.Sprintf("%s,%s", salt, joined)
-	hash := sha3.Sum384([]byte(data))
+	hash := sha3.Sum384([]byte(joined))
 	packHash := fmt.Sprintf("%x", hash)
+
 	return packHash
 
 }

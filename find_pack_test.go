@@ -584,7 +584,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 619",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -595,7 +595,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 619",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -606,7 +606,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 3,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 619",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -618,10 +618,10 @@ func TestFindPack(t *testing.T) {
 			}))
 		packTypeId++
 	})
+	floatID := otu.createFloatEvent("account")
 
 	t.Run("Should get the running sale for user with the lowest price -> 2.2", func(t *testing.T) {
 
-		floatID := otu.createFloatEvent("account")
 		otu.claimFloat("account", buyer, floatID)
 
 		// buyer should have find name "user1" or float
@@ -720,7 +720,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -731,7 +731,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,

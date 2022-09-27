@@ -2579,7 +2579,10 @@ func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt stri
 		WithArg("rewardIds", ids),
 		WithArg("salt", salt),
 	).
-		AssertSuccess(t)
+		AssertSuccess(t).
+		AssertEvent(t, "Fulfilled", map[string]interface{}{
+			"packId": packId,
+		})
 
 	return otu
 }
