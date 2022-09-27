@@ -55,14 +55,15 @@ pub struct Report {
 			self.requiresReservation=md.requiresReservation
 			self.saleInfos=convertSaleInfo(md.saleInfos)
 			self.collectionDisplay=md.collectionDisplay
-			self.saleEnded=false
-			if self.packsLeft == 0 {
-				self.saleEnded=true
+			self.saleEnded=true
+			if self.packsLeft != 0 {
+				self.saleEnded=false
 			} else {
 				let currentTime = getCurrentBlock().timestamp
+				var saleEnded = true
 				for saleInfo in self.saleInfos{
 					if saleInfo.endTime == nil || saleInfo.endTime! > currentTime {
-						self.saleEnded=true
+						saleEnded=true
 						break
 					}
 				}

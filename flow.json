@@ -245,7 +245,8 @@
     "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
     "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
     "FindPack": "./contracts/FindPack.cdc",
-    "FindVerifier": "./contracts/FindVerifier.cdc"
+    "FindVerifier": "./contracts/FindVerifier.cdc",
+    "Flomies": "./contracts/Flomies.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -360,8 +361,8 @@
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
         "FindLostAndFoundWrapper",
-				"FindPack",
-				"FindVerifier"
+        "FindPack",
+        "FindVerifier"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -396,12 +397,13 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
-				"FindPack",
-				"FindVerifier"
+        "FindPack",
+        "FindVerifier"
       ],
       "testnet-user1": [
         "NFGv3",
-        "PartyFavorz"
+        "PartyFavorz",
+        "Flomies"
       ],
       "testnet-find-lost-and-found-wrapper": [
         "FindLostAndFoundWrapper"
