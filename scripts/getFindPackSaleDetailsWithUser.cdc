@@ -1,12 +1,15 @@
 import FindPack from "../contracts/FindPack.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 pub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
 		let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()
 		return Report(metadata, user: user, packsLeft:packsLeft)
 	}
+
 	return nil
 }
 
@@ -23,6 +26,7 @@ pub struct Report {
 		pub let openTime: UFix64
 
 		pub let storageRequirement: UInt64
+		pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
 		pub let itemTypes: [Type]
 
@@ -31,7 +35,8 @@ pub struct Report {
 		pub let requiresReservation: Bool
 		pub let storageFlowNeeded: UFix64? 
 
-		pub let userQualifiedSale : SaleInfo?
+		pub let userQualifiedSale : UserSaleInfo?
+		pub let saleInfos: [SaleInfo]
 		pub let packsLeft : Int 
 
 		init(_ md: FindPack.Metadata, user: Address, packsLeft: Int) {
@@ -50,10 +55,12 @@ pub struct Report {
 			self.requiresReservation=md.requiresReservation
 			self.userQualifiedSale=getSoonestQualifiedSale(md.saleInfos, user: user)
 			self.storageFlowNeeded=getRequiredFlow(md.storageRequirement, user: user)
+			self.collectionDisplay=md.collectionDisplay
+			self.saleInfos=convertSaleInfo(md.saleInfos)
 		}
 }
 
-pub struct SaleInfo {
+pub struct UserSaleInfo {
 		pub let name : String
 		pub let startTime : UFix64 
 		pub let endTime : UFix64?
@@ -73,8 +80,8 @@ pub struct SaleInfo {
 		}
 }
 
-pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : SaleInfo? {
-	let res : [SaleInfo] = []
+pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {
+	let res : [UserSaleInfo] = []
 	let currentTime = getCurrentBlock().timestamp
 	var availableOption : FindPack.SaleInfo? = nil 
 	var soonestOption : FindPack.SaleInfo? = nil 
@@ -103,14 +110,15 @@ pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : S
 	}
 
 	if availableOption != nil {
-		return SaleInfo(availableOption!, user: user, timeStamp: currentTime)
+		return UserSaleInfo(availableOption!, user: user, timeStamp: currentTime)
 	} else if soonestOption != nil {
-		return SaleInfo(soonestOption!, user: user, timeStamp: currentTime)
+		return UserSaleInfo(soonestOption!, user: user, timeStamp: currentTime)
 	}
 	return nil
 }
 
 pub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {
+
 	let account = getAccount(user)
 	if account.storageCapacity > account.storageUsed {
 		if account.storageCapacity - account.storageUsed > requiresReservation {
@@ -118,4 +126,39 @@ pub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? 
 		}
 	}
 	return FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(account.storageUsed + requiresReservation))
+}
+
+pub struct SaleInfo {
+		pub let name : String
+		pub let startTime : UFix64 
+		pub let endTime : UFix64?
+		pub let price : UFix64
+		pub let purchaseLimit : UInt64?
+		pub let purchaseRecord : {Address : UInt64}
+		pub let verifiers : [String]
+		pub let verifyAll : Bool 
+
+		init(_ si: FindPack.SaleInfo) {
+			self.name=si.name
+			self.startTime=si.startTime
+			self.endTime=si.endTime
+			self.price=si.price
+			self.purchaseLimit=si.purchaseLimit
+			self.purchaseRecord=si.purchaseRecord
+
+			var verifierDesc : [String] = []
+			for verifier in si.verifiers {
+				verifierDesc.append(verifier.description)
+			}
+			self.verifiers=verifierDesc
+			self.verifyAll=si.verifyAll
+		}
+}
+
+pub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
+	let res : [SaleInfo] = []
+	for i in info {
+		res.append(SaleInfo(i))
+	}
+	return res
 }

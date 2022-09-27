@@ -570,7 +570,22 @@ func TestFindPack(t *testing.T) {
 			WithArg("packTypeId", packTypeId),
 		).
 			AssertWant(t, autogold.Want("getFindPackSaleDetails", map[string]interface{}{
-				"description": "user1 season #19", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"collectionDisplay": map[string]interface{}{
+					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
+					"description": "Example NFT FIND",
+					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
+					"name":        "user1 season #19",
+					"socials": map[string]interface{}{
+						"Discord": map[string]interface{}{"url": "discord.gg/"},
+						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
+					},
+					"squareImage": map[string]interface{}{
+						"file":      map[string]interface{}{"url": "Example NFT square image"},
+						"mediaType": "image",
+					},
+				},
+				"description":         "user1 season #19",
+				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
 				"name":                "user1 season #19",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -653,7 +668,22 @@ func TestFindPack(t *testing.T) {
 			WithArg("user", buyer),
 		).
 			AssertWant(t, autogold.Want("getFindPackSaleDetailsWithUser1", map[string]interface{}{
-				"description": "user1 season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"collectionDisplay": map[string]interface{}{
+					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
+					"description": "Example NFT FIND",
+					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
+					"name":        "user1 season #20",
+					"socials": map[string]interface{}{
+						"Discord": map[string]interface{}{"url": "discord.gg/"},
+						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
+					},
+					"squareImage": map[string]interface{}{
+						"file":      map[string]interface{}{"url": "Example NFT square image"},
+						"mediaType": "image",
+					},
+				},
+				"description":         "user1 season #20",
+				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
 				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -681,7 +711,22 @@ func TestFindPack(t *testing.T) {
 			WithArg("user", "user2"),
 		).
 			AssertWant(t, autogold.Want("getFindPackSaleDetailsWithUser2", map[string]interface{}{
-				"description": "user1 season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"collectionDisplay": map[string]interface{}{
+					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
+					"description": "Example NFT FIND",
+					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
+					"name":        "user1 season #20",
+					"socials": map[string]interface{}{
+						"Discord": map[string]interface{}{"url": "discord.gg/"},
+						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
+					},
+					"squareImage": map[string]interface{}{
+						"file":      map[string]interface{}{"url": "Example NFT square image"},
+						"mediaType": "image",
+					},
+				},
+				"description":         "user1 season #20",
+				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
 				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -707,7 +752,22 @@ func TestFindPack(t *testing.T) {
 			WithArg("packTypeName", "user1"),
 		).
 			AssertWithPointerWant(t, "/"+fmt.Sprint(packTypeId), autogold.Want("getAllFindPackSaleDetailsByName", map[string]interface{}{
-				"description": "user1 season #20", "itemTypes": []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"collectionDisplay": map[string]interface{}{
+					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
+					"description": "Example NFT FIND",
+					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
+					"name":        "user1 season #20",
+					"socials": map[string]interface{}{
+						"Discord": map[string]interface{}{"url": "discord.gg/"},
+						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
+					},
+					"squareImage": map[string]interface{}{
+						"file":      map[string]interface{}{"url": "Example NFT square image"},
+						"mediaType": "image",
+					},
+				},
+				"description":         "user1 season #20",
+				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
 				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},

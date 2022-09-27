@@ -2,6 +2,17 @@
    "networks": {
       "emulator": {
          "scripts": {
+            "getAllFindPackSaleDetails": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport FTRegistry from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\npub fun main(packTypeName: String) : {UInt64 : Report} {\n    let packs = FindPack.getMetadataByName(packTypeName: packTypeName)\n    let packData : {UInt64 : Report} = {}\n    for packTypeId in packs.keys {\n        if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {\n            let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()\n            packData[packTypeId] = Report(metadata, packsLeft: packsLeft)\n        }\n    }\n    return packData\n}\n\npub struct Report {\n        pub let name: String\n        pub let description: String\n\n        pub let thumbnailHash: String?\n        pub let thumbnailUrl:String?\n\n        pub let walletType: String\n        pub let walletAlias: String?\n\n        pub let openTime: UFix64\n        pub var saleEnded: Bool\n        pub let saleInfos: [SaleInfo]\n\n        pub let storageRequirement: UInt64\n        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay\n\n        pub let itemTypes: [Type]\n\n        pub let extraData : {String : AnyStruct}\n        pub let packFields: {String : String}\n        pub let requiresReservation: Bool\n\n        pub let packsLeft : Int \n\n        init(_ md: FindPack.Metadata, packsLeft: Int) {\n            self.packsLeft = packsLeft\n            self.name=md.name\n            self.description=md.description\n            self.thumbnailHash=md.thumbnailHash\n            self.thumbnailUrl=md.thumbnailUrl\n            self.walletType=md.walletType.identifier\n            self.walletAlias=FTRegistry.getFTInfoByTypeIdentifier(md.walletType.identifier)?.alias\n            self.openTime=md.openTime\n            self.storageRequirement=md.storageRequirement\n            self.itemTypes=md.itemTypes\n            self.extraData=md.extraData\n            self.packFields=md.packFields\n            self.requiresReservation=md.requiresReservation\n            self.saleInfos=convertSaleInfo(md.saleInfos)\n            self.collectionDisplay=md.collectionDisplay\n            self.saleEnded=false\n            if self.packsLeft == 0 {\n                self.saleEnded=true\n            } else {\n                let currentTime = getCurrentBlock().timestamp\n                for saleInfo in self.saleInfos{\n                    if saleInfo.endTime == nil || saleInfo.endTime! \u003e currentTime {\n                        self.saleEnded=true\n                        break\n                    }\n                }\n            }\n        }\n}\n\npub struct SaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let purchaseRecord : {Address : UInt64}\n        pub let verifiers : [String]\n        pub let verifyAll : Bool \n\n        init(_ si: FindPack.SaleInfo) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.purchaseRecord=si.purchaseRecord\n\n            var verifierDesc : [String] = []\n            for verifier in si.verifiers {\n                verifierDesc.append(verifier.description)\n            }\n            self.verifiers=verifierDesc\n            self.verifyAll=si.verifyAll\n        }\n}\n\npub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {\n    let res : [SaleInfo] = []\n    for i in info {\n        res.append(SaleInfo(i))\n    }\n    return res\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName"
+                  ],
+                  "parameters": {
+                     "packTypeName": "String"
+                  }
+               }
+            },
             "getCatalog": {
                "code": "import NFTCatalog from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\n\npub fun main() : {String : NFTCatalog.NFTCatalogMetadata} {\n    return FINDNFTCatalog.getCatalog() \n}",
                "spec": {
@@ -128,6 +139,21 @@
                "spec": {
                   "order": [],
                   "parameters": {}
+               }
+            },
+            "getFindPackSaleDetailsWithUser": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport FTRegistry from 0xf8d6e0586b0a20c7\nimport FlowStorageFees from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\nimport FIND from 0xf8d6e0586b0a20c7\n\npub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {\n    if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {\n        let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()\n        return Report(metadata, user: user, packsLeft:packsLeft)\n    }\n\n    return nil\n}\n\npub struct Report {\n        pub let name: String\n        pub let description: String\n\n        pub let thumbnailHash: String?\n        pub let thumbnailUrl:String?\n\n        pub let walletType: String\n        pub let walletAlias: String?\n\n        pub let openTime: UFix64\n\n        pub let storageRequirement: UInt64\n        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay\n\n        pub let itemTypes: [Type]\n\n        pub let extraData : {String : AnyStruct}\n        pub let packFields: {String : String}\n        pub let requiresReservation: Bool\n        pub let storageFlowNeeded: UFix64? \n\n        pub let userQualifiedSale : UserSaleInfo?\n        pub let saleInfos: [SaleInfo]\n        pub let packsLeft : Int \n\n        init(_ md: FindPack.Metadata, user: Address, packsLeft: Int) {\n            self.packsLeft=packsLeft\n            self.name=md.name\n            self.description=md.description\n            self.thumbnailHash=md.thumbnailHash\n            self.thumbnailUrl=md.thumbnailUrl\n            self.walletType=md.walletType.identifier\n            self.walletAlias=FTRegistry.getFTInfoByTypeIdentifier(md.walletType.identifier)?.alias\n            self.openTime=md.openTime\n            self.storageRequirement=md.storageRequirement\n            self.itemTypes=md.itemTypes\n            self.extraData=md.extraData\n            self.packFields=md.packFields\n            self.requiresReservation=md.requiresReservation\n            self.userQualifiedSale=getSoonestQualifiedSale(md.saleInfos, user: user)\n            self.storageFlowNeeded=getRequiredFlow(md.storageRequirement, user: user)\n            self.collectionDisplay=md.collectionDisplay\n            self.saleInfos=convertSaleInfo(md.saleInfos)\n        }\n}\n\npub struct UserSaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let userPurchaseRecord : UInt64\n        pub let canBuyNow : Bool\n\n        init(_ si: FindPack.SaleInfo, user: Address, timeStamp: UFix64) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.userPurchaseRecord=si.purchaseRecord[user] ?? 0\n            self.canBuyNow= si.startTime\u003e=timeStamp\n        }\n}\n\npub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {\n    let res : [UserSaleInfo] = []\n    let currentTime = getCurrentBlock().timestamp\n    var availableOption : FindPack.SaleInfo? = nil \n    var soonestOption : FindPack.SaleInfo? = nil \n\n    // check for the sale option that is available to the user, and is with the lowest price\n    for info in infos {\n        if info.checkBuyable(addr: user, time: currentTime){\n            if availableOption == nil || availableOption!.price \u003e info!.price {\n                availableOption = info\n            }\n        } else {\n            let endTime = info.endTime ?? UFix64.max\n            if currentTime \u003e endTime {\n                continue\n            }\n\n    // if there is no option available, get the soonest option available to the user, again, lowest price\n            if info.checkBuyable(addr: user, time: info.startTime) {\n                if soonestOption == nil || soonestOption!.startTime \u003c info.startTime {\n                    soonestOption = info\n                } else if soonestOption!.startTime == info.startTime \u0026\u0026 soonestOption!.price \u003e info.price {\n                    soonestOption = info\n                }\n            }\n        }\n    }\n\n    if availableOption != nil {\n        return UserSaleInfo(availableOption!, user: user, timeStamp: currentTime)\n    } else if soonestOption != nil {\n        return UserSaleInfo(soonestOption!, user: user, timeStamp: currentTime)\n    }\n    return nil\n}\n\npub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {\n\n    let account = getAccount(user)\n    if account.storageCapacity \u003e account.storageUsed {\n        if account.storageCapacity - account.storageUsed \u003e requiresReservation {\n            return nil\n        }\n    }\n    return FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(account.storageUsed + requiresReservation))\n}\n\npub struct SaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let purchaseRecord : {Address : UInt64}\n        pub let verifiers : [String]\n        pub let verifyAll : Bool \n\n        init(_ si: FindPack.SaleInfo) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.purchaseRecord=si.purchaseRecord\n\n            var verifierDesc : [String] = []\n            for verifier in si.verifiers {\n                verifierDesc.append(verifier.description)\n            }\n            self.verifiers=verifierDesc\n            self.verifyAll=si.verifyAll\n        }\n}\n\npub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {\n    let res : [SaleInfo] = []\n    for i in info {\n        res.append(SaleInfo(i))\n    }\n    return res\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "user"
+                  ],
+                  "parameters": {
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "user": "Address"
+                  }
                }
             },
             "getItem": {
@@ -576,6 +602,19 @@
                   }
                }
             },
+            "adminAddAddon": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\n\ntransaction(name: String, addon: String){\n    prepare(account: AuthAccount){\n        let adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n\n        adminRef.addAddon(name: name, addon: addon)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "name",
+                     "addon"
+                  ],
+                  "parameters": {
+                     "addon": "String",
+                     "name": "String"
+                  }
+               }
+            },
             "adminAddForge": {
                "code": "import Admin from 0xf8d6e0586b0a20c7\n\ntransaction(name: String, type: String) {\n\n    prepare(admin:AuthAccount) {\n\n        let client= admin.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath)!\n\n        client.addPrivateForgeType(name: name, forgeType: CompositeType(type)!)\n\n    }\n\n}",
                "spec": {
@@ -657,6 +696,21 @@
                   }
                }
             },
+            "adminFulfillFindPack": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport Admin from 0xf8d6e0586b0a20c7\n\ntransaction(packId:UInt64, rewardIds:{String : [UInt64]}, salt:String) {\n    let admin: \u0026Admin.AdminProxy\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n    }\n\n    execute {\n        let reward : {Type : [UInt64]} = {}\n        for type in rewardIds.keys {\n            reward[CompositeType(type)!] = rewardIds[type]\n        }\n\n        self.admin.fulfillFindPack(packId:packId, rewardIds:reward, salt:salt)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packId",
+                     "rewardIds",
+                     "salt"
+                  ],
+                  "parameters": {
+                     "packId": "UInt64",
+                     "rewardIds": "{String: [UInt64]}",
+                     "salt": "String"
+                  }
+               }
+            },
             "adminInitDUC": {
                "code": "import FungibleToken from 0xee82856bf20e2aa6\nimport DapperUtilityCoin from 0xf8d6e0586b0a20c7\nimport TokenForwarding from 0xf8d6e0586b0a20c7\n\n\ntransaction(dapperAddress:Address) {\n\n    prepare(acct: AuthAccount) {\n        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC\n        let dapper = getAccount(dapperAddress)\n      let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)\n\n      // Create a new Forwarder resource for DUC and store it in the new account's storage\n      let ducForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)\n      acct.save(\u003c-ducForwarder, to: /storage/dapperUtilityCoinReceiver)\n\n      // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder\n      acct.link\u003c\u0026{FungibleToken.Receiver}\u003e(\n      /public/dapperUtilityCoinReceiver,\n      target: /storage/dapperUtilityCoinReceiver\n      )\n    }\n}",
                "spec": {
@@ -731,11 +785,61 @@
                   }
                }
             },
+            "adminMintFindPack": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport Admin from 0xf8d6e0586b0a20c7\n\ntransaction(packTypeName: String, typeId: UInt64, hashes: [String]) {\n    let admin: \u0026Admin.AdminProxy\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n    }\n\n    execute {\n        for hash in hashes {\n            self.admin.mintFindPack(packTypeName: packTypeName, typeId:typeId,hash: hash)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "typeId",
+                     "hashes"
+                  ],
+                  "parameters": {
+                     "hashes": "[String]",
+                     "packTypeName": "String",
+                     "typeId": "UInt64"
+                  }
+               }
+            },
             "adminRecreateDandy": {
                "code": "import NonFungibleToken from 0xf8d6e0586b0a20c7\nimport Dandy from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\ntransaction {\n    prepare(account: AuthAccount) {\n        account.unlink(Dandy.CollectionPrivatePath)\n        account.unlink(Dandy.CollectionPublicPath)\n        destroy \u003c- account.load\u003c@NonFungibleToken.Collection\u003e(from:Dandy.CollectionStoragePath)\n\n        let dandyCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(Dandy.CollectionPublicPath)\n        if !dandyCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e(\u003c- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)\n            account.link\u003c\u0026Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}\u003e(\n                Dandy.CollectionPublicPath,\n                target: Dandy.CollectionStoragePath\n            )\n            account.link\u003c\u0026Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}\u003e(\n                Dandy.CollectionPrivatePath,\n                target: Dandy.CollectionStoragePath\n            )\n        }\n    }\n}",
                "spec": {
                   "order": [],
                   "parameters": {}
+               }
+            },
+            "adminRegisterFindPackMetadata": {
+               "code": "import NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\nimport FungibleToken from 0xee82856bf20e2aa6\nimport FindPack from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\nimport FindVerifier from 0xf8d6e0586b0a20c7\nimport ExampleNFT from 0xf8d6e0586b0a20c7\nimport FindForge from 0xf8d6e0586b0a20c7\n\nimport Admin from 0xf8d6e0586b0a20c7\n\n// this is a simple tx to update the metadata of a given type of NeoVoucher\n\ntransaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}) {\n\n    let admin: \u0026Admin.AdminProxy\n    let wallet: Capability\u003c\u0026{FungibleToken.Receiver}\u003e\n    let royaltyWallet: Capability\u003c\u0026{FungibleToken.Receiver}\u003e\n\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n        self.wallet = getAccount(wallet).getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver)\n        self.royaltyWallet = getAccount(royaltyAddress).getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver)\n    }\n\n    execute {\n\n        if !self.wallet.check() {\n            panic(\"wallet has to exist\")\n        }\n\n        let minterPlatform = FindForge.getMinterPlatform(name: lease, forgeType: Type\u003c@ExampleNFT.Forge\u003e()) ?? panic(\"Please set up minter platform for Find Pack Forge\")\n\n        let season=typeId-1\n        // leaseName + season + #PackTypeId\n        let name=lease.concat(\" season #\".concat(season.toString()))\n\n        let socials : {String: MetadataViews.ExternalURL} = {}\n        for key in minterPlatform.socials.keys {\n            socials[key] = MetadataViews.ExternalURL(url: minterPlatform.socials[key]!)\n        }\n\n        let collectionDisplay = MetadataViews.NFTCollectionDisplay(\n            name: name,\n            description: minterPlatform.description,\n            externalURL: MetadataViews.ExternalURL(url: minterPlatform.externalURL),\n            squareImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.squareImage), mediaType: \"image\"),\n            bannerImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: minterPlatform.bannerImage), mediaType: \"image\"),\n            socials: socials\n        )\n\n        /* For testing only */\n        var saleInfo : [FindPack.SaleInfo] = []\n        for key in startTime.keys {\n            let price = price[key] ?? panic(\"Price for key \".concat(key).concat(\" is missing\"))\n            var verifier : [{FindVerifier.Verifier}] = [] \n            if floatEventId[key] != nil {\n                verifier.append(FindVerifier.HasOneFLOAT([floatEventId[key]!]))\n            }\n            saleInfo.append(FindPack.SaleInfo(name: key, startTime : startTime[key]! , endTime : endTime[key] , price : price, purchaseLimit: purchaseLimit[key], verifiers: verifier, verifyAll: true))\n        }\n\n        let royalties = MetadataViews.Royalties([\n            MetadataViews.Royalty(receiver: self.royaltyWallet, cut: royaltyCut, description: \"creator\")\n        ])\n\n        let itemTypes = [Type\u003c@ExampleNFT.NFT\u003e()]\n        let providerCaps : {Type : Capability\u003c\u0026AnyResource{NonFungibleToken.Provider, MetadataViews.ResolverCollection}\u003e} = {}\n        for type in itemTypes {\n            let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)\n            if collection == nil || collection!.length == 0 {\n                panic(\"Type : \".concat(type.identifier).concat(\" is not supported in NFTCatalog at the moment\"))\n            }\n            let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData\n            let providerCap= self.admin.getProviderCap(collectionInfo.privatePath)\n            providerCaps[type] = providerCap\n        }\n\n        let packRoyalty = MetadataViews.Royalties([\n            MetadataViews.Royalty(receiver: self.admin.getFindRoyaltyCap(), cut: 0.15, description: \"find\")\n        ])\n\n        let metadata = FindPack.Metadata(\n            name: name,\n            description: name, \n            thumbnailUrl: nil, \n            thumbnailHash: thumbnailHash, \n            wallet: self.wallet, \n            openTime:openTime, \n            walletType: Type\u003c@FlowToken.Vault\u003e(),\n            itemTypes: itemTypes,\n            providerCaps: providerCaps, \n            requiresReservation:requiresReservation,\n            storageRequirement:10000, \n            saleInfos: saleInfo, \n            primarySaleRoyalties: packRoyalty,\n            royalties: royalties, \n            collectionDisplay: collectionDisplay,\n            packFields: {\"Items\" : \"1\"}, \n            extraData: {}\n        )\n\n        let input : {UInt64 : FindPack.Metadata} = {typeId : metadata}\n\n        self.admin.addForgeContractData(lease: lease, forgeType: Type\u003c@FindPack.Forge\u003e() , data: input)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "lease",
+                     "typeId",
+                     "thumbnailHash",
+                     "wallet",
+                     "openTime",
+                     "royaltyCut",
+                     "royaltyAddress",
+                     "requiresReservation",
+                     "startTime",
+                     "endTime",
+                     "floatEventId",
+                     "price",
+                     "purchaseLimit"
+                  ],
+                  "parameters": {
+                     "endTime": "{String: UFix64}",
+                     "floatEventId": "{String: UInt64}",
+                     "lease": "String",
+                     "openTime": "UFix64",
+                     "price": "{String: UFix64}",
+                     "purchaseLimit": "{String: UInt64}",
+                     "requiresReservation": "Bool",
+                     "royaltyAddress": "Address",
+                     "royaltyCut": "UFix64",
+                     "startTime": "{String: UFix64}",
+                     "thumbnailHash": "String",
+                     "typeId": "UInt64",
+                     "wallet": "Address"
+                  }
                }
             },
             "adminRegisterName": {
@@ -892,6 +996,31 @@
                   "parameters": {
                      "cut": "UFix64",
                      "tenant": "Address"
+                  }
+               }
+            },
+            "adminSetMinterPlatform": {
+               "code": "import Admin from 0xf8d6e0586b0a20c7\n\ntransaction(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}){\n    prepare(account: AuthAccount){\n        let adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n\n        adminRef.adminSetMinterPlatform(name: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "name",
+                     "forgeType",
+                     "minterCut",
+                     "description",
+                     "externalURL",
+                     "squareImage",
+                     "bannerImage",
+                     "socials"
+                  ],
+                  "parameters": {
+                     "bannerImage": "String",
+                     "description": "String",
+                     "externalURL": "String",
+                     "forgeType": "Type",
+                     "minterCut": "UFix64?",
+                     "name": "String",
+                     "socials": "{String: String}",
+                     "squareImage": "String"
                   }
                }
             },
@@ -1363,6 +1492,42 @@
                      "addon": "String",
                      "amount": "UFix64",
                      "name": "String"
+                  }
+               }
+            },
+            "buyFindPack": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport FungibleToken from 0xee82856bf20e2aa6\nimport NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\nimport FUSD from 0xf8d6e0586b0a20c7\nimport Profile from 0xf8d6e0586b0a20c7\n\ntransaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, totalAmount: UFix64) {\n    let packs: \u0026FindPack.Collection{FindPack.CollectionPublic}\n\n    let userPacks: Capability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e\n    let salePrice: UFix64\n    let packsLeft: UInt64\n\n    let userFlowTokenVault: \u0026FlowToken.Vault\n\n    let paymentVault: @FungibleToken.Vault\n    let balanceBeforeTransfer:UFix64\n\n    prepare(account: AuthAccount) {\n\n        let findPackCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(FindPack.CollectionPublicPath)\n        if !findPackCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e( \u003c- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)\n            account.link\u003c\u0026FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                FindPack.CollectionPublicPath,\n                target: FindPack.CollectionStoragePath\n            )\n        }\n\n        let profileCap = account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath)\n        if !profileCap.check() {\n            let profile \u003c-Profile.createUser(name:account.address.toString(), createdAt: \"find\")\n\n            //Add exising FUSD or create a new one and add it\n            let fusdReceiver = account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver)\n            if !fusdReceiver.check() {\n                let fusd \u003c- FUSD.createEmptyVault()\n                account.save(\u003c- fusd, to: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Receiver}\u003e( /public/fusdReceiver, target: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Balance}\u003e( /public/fusdBalance, target: /storage/fusdVault)\n            }\n\n            let fusdWallet=Profile.Wallet(\n                name:\"FUSD\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/fusdBalance),\n                accept: Type\u003c@FUSD.Vault\u003e(),\n                names: [\"fusd\", \"stablecoin\"]\n            )\n\n            profile.addWallet(fusdWallet)\n\n            let flowWallet=Profile.Wallet(\n                name:\"Flow\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/flowTokenBalance),\n                accept: Type\u003c@FlowToken.Vault\u003e(),\n                names: [\"flow\"]\n            )\n            profile.addWallet(flowWallet)\n            account.save(\u003c-profile, to: Profile.storagePath)\n            account.link\u003c\u0026Profile.User{Profile.Public}\u003e(Profile.publicPath, target: Profile.storagePath)\n            account.link\u003c\u0026{FungibleToken.Receiver}\u003e(Profile.publicReceiverPath, target: Profile.storagePath)\n\n\n        }\n\n        self.userPacks=account.getCapability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e(FindPack.CollectionPublicPath)\n        self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)\n\n        self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic (\"Cannot buy the pack now\") \n        self.packsLeft= UInt64(self.packs.getPacksLeft())\n\n\n        self.userFlowTokenVault = account.borrow\u003c\u0026FlowToken.Vault\u003e(from: /storage/flowTokenVault) ?? panic(\"Cannot borrow FlowToken vault from account storage\")\n        self.balanceBeforeTransfer = self.userFlowTokenVault.balance\n\n        if self.balanceBeforeTransfer \u003c totalAmount {\n            panic(\"Your account does not have enough funds has \".concat(self.balanceBeforeTransfer.toString()).concat(\" needs \").concat(totalAmount.toString()))\n        }\n        self.paymentVault \u003c- self.userFlowTokenVault.withdraw(amount: totalAmount)\n    }\n\n    pre {\n        self.salePrice * UFix64(numberOfPacks) == totalAmount: \"unexpected sending amount\"\n        self.packsLeft \u003e= numberOfPacks : \"Rats! there are no packs left\"\n        self.userPacks.check() : \"User need a receiver to put the pack in\"\n    }\n\n    execute {\n        var counter = numberOfPacks\n        while counter \u003e 0 {\n            let purchasingVault \u003c- self.paymentVault.withdraw(amount: self.salePrice)\n            self.packs.buy(packTypeName: packTypeName, typeId:packTypeId, vault: \u003c- purchasingVault, collectionCapability: self.userPacks)\n            counter = counter - 1\n        }\n        if self.paymentVault.balance != 0.0 {\n            panic(\"paymentVault balance is non-zero after paying\")\n        }\n        destroy self.paymentVault\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "numberOfPacks",
+                     "totalAmount"
+                  ],
+                  "parameters": {
+                     "numberOfPacks": "UInt64",
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "totalAmount": "UFix64"
+                  }
+               }
+            },
+            "buyFindPackWithReservation": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport FungibleToken from 0xee82856bf20e2aa6\nimport NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\nimport FlowToken from 0x0ae53cb6e3f42a79\nimport FUSD from 0xf8d6e0586b0a20c7\nimport Profile from 0xf8d6e0586b0a20c7\n\ntransaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFix64, signature:String) {\n    let packs: \u0026FindPack.Collection{FindPack.CollectionPublic}\n\n    let userPacks: Capability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e\n    let salePrice: UFix64\n    let packsLeft: UInt64\n\n    let userFlowTokenVault: \u0026FlowToken.Vault\n\n    let paymentVault: @FungibleToken.Vault\n    let balanceBeforeTransfer:UFix64\n\n    prepare(account: AuthAccount) {\n\n        let findPackCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(FindPack.CollectionPublicPath)\n        if !findPackCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e( \u003c- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)\n            account.link\u003c\u0026FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                FindPack.CollectionPublicPath,\n                target: FindPack.CollectionStoragePath\n            )\n        }\n\n        let profileCap = account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath)\n        if !profileCap.check() {\n            let profile \u003c-Profile.createUser(name:account.address.toString(), createdAt: \"find\")\n\n            //Add exising FUSD or create a new one and add it\n            let fusdReceiver = account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver)\n            if !fusdReceiver.check() {\n                let fusd \u003c- FUSD.createEmptyVault()\n                account.save(\u003c- fusd, to: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Receiver}\u003e( /public/fusdReceiver, target: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Balance}\u003e( /public/fusdBalance, target: /storage/fusdVault)\n            }\n\n            let fusdWallet=Profile.Wallet(\n                name:\"FUSD\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/fusdBalance),\n                accept: Type\u003c@FUSD.Vault\u003e(),\n                names: [\"fusd\", \"stablecoin\"]\n            )\n\n            profile.addWallet(fusdWallet)\n\n            let flowWallet=Profile.Wallet(\n                name:\"Flow\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/flowTokenBalance),\n                accept: Type\u003c@FlowToken.Vault\u003e(),\n                names: [\"flow\"]\n            )\n            profile.addWallet(flowWallet)\n            account.save(\u003c-profile, to: Profile.storagePath)\n            account.link\u003c\u0026Profile.User{Profile.Public}\u003e(Profile.publicPath, target: Profile.storagePath)\n            account.link\u003c\u0026{FungibleToken.Receiver}\u003e(Profile.publicReceiverPath, target: Profile.storagePath)\n\n\n        }\n\n        self.userPacks=account.getCapability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e(FindPack.CollectionPublicPath)\n        self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)\n\n        self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic (\"Cannot buy the pack now\") \n\n        self.packsLeft= UInt64(self.packs.getPacksLeft())\n\n\n        self.userFlowTokenVault = account.borrow\u003c\u0026FlowToken.Vault\u003e(from: /storage/flowTokenVault) ?? panic(\"Cannot borrow FlowToken vault from account storage\")\n        self.balanceBeforeTransfer = self.userFlowTokenVault.balance\n\n        if self.balanceBeforeTransfer \u003c amount {\n            panic(\"Your account does not have enough funds has \".concat(self.balanceBeforeTransfer.toString()).concat(\" needs \").concat(amount.toString()))\n        }\n        self.paymentVault \u003c- self.userFlowTokenVault.withdraw(amount: amount)\n    }\n\n    pre {\n        self.salePrice == amount: \"unexpected sending amount\"\n        self.packs.contains(packId): \"The pack does not exist. ID : \".concat(packId.toString())\n        self.userPacks.check() : \"User need a receiver to put the pack in\"\n    }\n\n    execute {\n        self.packs.buyWithSignature(packId:packId, signature: signature, vault: \u003c- self.paymentVault, collectionCapability: self.userPacks)\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "packId",
+                     "amount",
+                     "signature"
+                  ],
+                  "parameters": {
+                     "amount": "UFix64",
+                     "packId": "UInt64",
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "signature": "String"
                   }
                }
             },
@@ -2392,6 +2557,17 @@
                   }
                }
             },
+            "openFindPack": {
+               "code": "import FindPack from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\nimport NFTCatalog from 0xf8d6e0586b0a20c7\nimport FungibleToken from 0xee82856bf20e2aa6\nimport NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\n\n/// A transaction to open a pack with a given id\n/// @param packId: The id of the pack to open\ntransaction(packId:UInt64) {\n\n    let packs: \u0026FindPack.Collection\n    let receiver: { Type : Capability\u003c\u0026{NonFungibleToken.Receiver}\u003e}\n\n    prepare(account: AuthAccount) {\n        self.packs=account.borrow\u003c\u0026FindPack.Collection\u003e(from: FindPack.CollectionStoragePath)!\n\n        let packData = self.packs.borrowFindPack(id: packId) ?? panic(\"You do not own this pack. ID : \".concat(packId.toString()))\n        let types = packData.getMetadata().itemTypes\n\n        self.receiver = {}\n\n        // check the account setup for receiving nfts\n        for type in types {\n            let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)\n            if collection == nil || collection!.length == 0 {\n                panic(\"Type : \".concat(type.identifier).concat(\" is not supported in NFTCatalog at the moment\"))\n            }\n            let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData\n\n            let cap = account.getCapability\u003c\u0026{NonFungibleToken.Receiver}\u003e(collectionInfo.publicPath)\n            if !cap.check() {\n                let newCollection \u003c- FindPack.createEmptyCollectionFromPath(collectionInfo.publicPath)\n                account.save(\u003c- newCollection, to: collectionInfo.storagePath)\n                account.link\u003c\u0026{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}\u003e(\n                    collectionInfo.publicPath, target: collectionInfo.storagePath)\n            }\n            self.receiver[type] = cap\n        }\n\n    }\n\n    execute {\n        self.packs.open(packId: packId, receiverCap:self.receiver)\n    }\n\n    post {\n        !self.packs.getIDs().contains(packId) : \"The pack is still present in the users collection\"\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packId"
+                  ],
+                  "parameters": {
+                     "packId": "UInt64"
+                  }
+               }
+            },
             "redeemAllLostAndFoundNFTs": {
                "code": "import FindLostAndFoundWrapper from 0xf8d6e0586b0a20c7\nimport LostAndFound from 0xf8d6e0586b0a20c7\nimport FINDNFTCatalog from 0xf8d6e0586b0a20c7\nimport NFTCatalog from 0xf8d6e0586b0a20c7\nimport NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\nimport FIND from 0xf8d6e0586b0a20c7\n\n//IMPORT\n\ntransaction() {\n\n    let ids : {String : [UInt64]}\n    let nftInfos : {String : NFTCatalog.NFTCollectionData}\n    let receiverAddress : Address\n\n    prepare(account: AuthAccount){\n\n        //LINK\n\n\n        self.nftInfos = {}\n        self.ids = FindLostAndFoundWrapper.getTicketIDs(user: account.address, specificType: Type\u003c@NonFungibleToken.NFT\u003e())\n\n        for type in self.ids.keys{ \n            if self.nftInfos[type] == nil {\n                let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type) ?? panic(\"NFT type is not supported at the moment. Type : \".concat(type))\n                self.nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData\n            }\n        }\n\n        self.receiverAddress = account.address\n    }\n\n    execute{\n        for type in self.ids.keys{ \n            let path = self.nftInfos[type]!.publicPath\n            for id in self.ids[type]! {\n                FindLostAndFoundWrapper.redeemNFT(type: CompositeType(type)!, ticketID: id, receiverAddress: self.receiverAddress, collectionPublicPath: path)\n            }\n        }\n    }\n}",
                "spec": {
@@ -2875,6 +3051,17 @@
                   }
                }
             },
+            "getAllFindPackSaleDetails": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport FTRegistry from 0x097bafa4e0b48eef\nimport MetadataViews from 0x1d7e57aa55817448\n\npub fun main(packTypeName: String) : {UInt64 : Report} {\n    let packs = FindPack.getMetadataByName(packTypeName: packTypeName)\n    let packData : {UInt64 : Report} = {}\n    for packTypeId in packs.keys {\n        if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {\n            let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()\n            packData[packTypeId] = Report(metadata, packsLeft: packsLeft)\n        }\n    }\n    return packData\n}\n\npub struct Report {\n        pub let name: String\n        pub let description: String\n\n        pub let thumbnailHash: String?\n        pub let thumbnailUrl:String?\n\n        pub let walletType: String\n        pub let walletAlias: String?\n\n        pub let openTime: UFix64\n        pub var saleEnded: Bool\n        pub let saleInfos: [SaleInfo]\n\n        pub let storageRequirement: UInt64\n        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay\n\n        pub let itemTypes: [Type]\n\n        pub let extraData : {String : AnyStruct}\n        pub let packFields: {String : String}\n        pub let requiresReservation: Bool\n\n        pub let packsLeft : Int \n\n        init(_ md: FindPack.Metadata, packsLeft: Int) {\n            self.packsLeft = packsLeft\n            self.name=md.name\n            self.description=md.description\n            self.thumbnailHash=md.thumbnailHash\n            self.thumbnailUrl=md.thumbnailUrl\n            self.walletType=md.walletType.identifier\n            self.walletAlias=FTRegistry.getFTInfoByTypeIdentifier(md.walletType.identifier)?.alias\n            self.openTime=md.openTime\n            self.storageRequirement=md.storageRequirement\n            self.itemTypes=md.itemTypes\n            self.extraData=md.extraData\n            self.packFields=md.packFields\n            self.requiresReservation=md.requiresReservation\n            self.saleInfos=convertSaleInfo(md.saleInfos)\n            self.collectionDisplay=md.collectionDisplay\n            self.saleEnded=false\n            if self.packsLeft == 0 {\n                self.saleEnded=true\n            } else {\n                let currentTime = getCurrentBlock().timestamp\n                for saleInfo in self.saleInfos{\n                    if saleInfo.endTime == nil || saleInfo.endTime! \u003e currentTime {\n                        self.saleEnded=true\n                        break\n                    }\n                }\n            }\n        }\n}\n\npub struct SaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let purchaseRecord : {Address : UInt64}\n        pub let verifiers : [String]\n        pub let verifyAll : Bool \n\n        init(_ si: FindPack.SaleInfo) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.purchaseRecord=si.purchaseRecord\n\n            var verifierDesc : [String] = []\n            for verifier in si.verifiers {\n                verifierDesc.append(verifier.description)\n            }\n            self.verifiers=verifierDesc\n            self.verifyAll=si.verifyAll\n        }\n}\n\npub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {\n    let res : [SaleInfo] = []\n    for i in info {\n        res.append(SaleInfo(i))\n    }\n    return res\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName"
+                  ],
+                  "parameters": {
+                     "packTypeName": "String"
+                  }
+               }
+            },
             "getCatalog": {
                "code": "import NFTCatalog from 0x49a7cda3a1eecc29\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\n\npub fun main() : {String : NFTCatalog.NFTCatalogMetadata} {\n    return FINDNFTCatalog.getCatalog() \n}",
                "spec": {
@@ -3001,6 +3188,21 @@
                "spec": {
                   "order": [],
                   "parameters": {}
+               }
+            },
+            "getFindPackSaleDetailsWithUser": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport FTRegistry from 0x097bafa4e0b48eef\nimport FlowStorageFees from 0xe467b9dd11fa00df\nimport MetadataViews from 0x1d7e57aa55817448\nimport FIND from 0x097bafa4e0b48eef\n\npub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {\n    if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {\n        let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()\n        return Report(metadata, user: user, packsLeft:packsLeft)\n    }\n\n    return nil\n}\n\npub struct Report {\n        pub let name: String\n        pub let description: String\n\n        pub let thumbnailHash: String?\n        pub let thumbnailUrl:String?\n\n        pub let walletType: String\n        pub let walletAlias: String?\n\n        pub let openTime: UFix64\n\n        pub let storageRequirement: UInt64\n        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay\n\n        pub let itemTypes: [Type]\n\n        pub let extraData : {String : AnyStruct}\n        pub let packFields: {String : String}\n        pub let requiresReservation: Bool\n        pub let storageFlowNeeded: UFix64? \n\n        pub let userQualifiedSale : UserSaleInfo?\n        pub let saleInfos: [SaleInfo]\n        pub let packsLeft : Int \n\n        init(_ md: FindPack.Metadata, user: Address, packsLeft: Int) {\n            self.packsLeft=packsLeft\n            self.name=md.name\n            self.description=md.description\n            self.thumbnailHash=md.thumbnailHash\n            self.thumbnailUrl=md.thumbnailUrl\n            self.walletType=md.walletType.identifier\n            self.walletAlias=FTRegistry.getFTInfoByTypeIdentifier(md.walletType.identifier)?.alias\n            self.openTime=md.openTime\n            self.storageRequirement=md.storageRequirement\n            self.itemTypes=md.itemTypes\n            self.extraData=md.extraData\n            self.packFields=md.packFields\n            self.requiresReservation=md.requiresReservation\n            self.userQualifiedSale=getSoonestQualifiedSale(md.saleInfos, user: user)\n            self.storageFlowNeeded=getRequiredFlow(md.storageRequirement, user: user)\n            self.collectionDisplay=md.collectionDisplay\n            self.saleInfos=convertSaleInfo(md.saleInfos)\n        }\n}\n\npub struct UserSaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let userPurchaseRecord : UInt64\n        pub let canBuyNow : Bool\n\n        init(_ si: FindPack.SaleInfo, user: Address, timeStamp: UFix64) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.userPurchaseRecord=si.purchaseRecord[user] ?? 0\n            self.canBuyNow= si.startTime\u003e=timeStamp\n        }\n}\n\npub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {\n    let res : [UserSaleInfo] = []\n    let currentTime = getCurrentBlock().timestamp\n    var availableOption : FindPack.SaleInfo? = nil \n    var soonestOption : FindPack.SaleInfo? = nil \n\n    // check for the sale option that is available to the user, and is with the lowest price\n    for info in infos {\n        if info.checkBuyable(addr: user, time: currentTime){\n            if availableOption == nil || availableOption!.price \u003e info!.price {\n                availableOption = info\n            }\n        } else {\n            let endTime = info.endTime ?? UFix64.max\n            if currentTime \u003e endTime {\n                continue\n            }\n\n    // if there is no option available, get the soonest option available to the user, again, lowest price\n            if info.checkBuyable(addr: user, time: info.startTime) {\n                if soonestOption == nil || soonestOption!.startTime \u003c info.startTime {\n                    soonestOption = info\n                } else if soonestOption!.startTime == info.startTime \u0026\u0026 soonestOption!.price \u003e info.price {\n                    soonestOption = info\n                }\n            }\n        }\n    }\n\n    if availableOption != nil {\n        return UserSaleInfo(availableOption!, user: user, timeStamp: currentTime)\n    } else if soonestOption != nil {\n        return UserSaleInfo(soonestOption!, user: user, timeStamp: currentTime)\n    }\n    return nil\n}\n\npub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {\n\n    let account = getAccount(user)\n    if account.storageCapacity \u003e account.storageUsed {\n        if account.storageCapacity - account.storageUsed \u003e requiresReservation {\n            return nil\n        }\n    }\n    return FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(account.storageUsed + requiresReservation))\n}\n\npub struct SaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let purchaseRecord : {Address : UInt64}\n        pub let verifiers : [String]\n        pub let verifyAll : Bool \n\n        init(_ si: FindPack.SaleInfo) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.purchaseRecord=si.purchaseRecord\n\n            var verifierDesc : [String] = []\n            for verifier in si.verifiers {\n                verifierDesc.append(verifier.description)\n            }\n            self.verifiers=verifierDesc\n            self.verifyAll=si.verifyAll\n        }\n}\n\npub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {\n    let res : [SaleInfo] = []\n    for i in info {\n        res.append(SaleInfo(i))\n    }\n    return res\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "user"
+                  ],
+                  "parameters": {
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "user": "Address"
+                  }
                }
             },
             "getItem": {
@@ -3595,6 +3797,19 @@
                   }
                }
             },
+            "adminAddAddon": {
+               "code": "import Admin from 0x097bafa4e0b48eef\n\ntransaction(name: String, addon: String){\n    prepare(account: AuthAccount){\n        let adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n\n        adminRef.addAddon(name: name, addon: addon)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "name",
+                     "addon"
+                  ],
+                  "parameters": {
+                     "addon": "String",
+                     "name": "String"
+                  }
+               }
+            },
             "adminAddForge": {
                "code": "import Admin from 0x097bafa4e0b48eef\n\ntransaction(name: String, type: String) {\n\n    prepare(admin:AuthAccount) {\n\n        let client= admin.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath)!\n\n        client.addPrivateForgeType(name: name, forgeType: CompositeType(type)!)\n\n    }\n\n}",
                "spec": {
@@ -3676,6 +3891,21 @@
                   }
                }
             },
+            "adminFulfillFindPack": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport Admin from 0x097bafa4e0b48eef\n\ntransaction(packId:UInt64, rewardIds:{String : [UInt64]}, salt:String) {\n    let admin: \u0026Admin.AdminProxy\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n    }\n\n    execute {\n        let reward : {Type : [UInt64]} = {}\n        for type in rewardIds.keys {\n            reward[CompositeType(type)!] = rewardIds[type]\n        }\n\n        self.admin.fulfillFindPack(packId:packId, rewardIds:reward, salt:salt)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packId",
+                     "rewardIds",
+                     "salt"
+                  ],
+                  "parameters": {
+                     "packId": "UInt64",
+                     "rewardIds": "{String: [UInt64]}",
+                     "salt": "String"
+                  }
+               }
+            },
             "adminInitDUC": {
                "code": "import FungibleToken from 0xf233dcee88fe0abe\nimport DapperUtilityCoin from 0xead892083b3e2c6c\nimport TokenForwarding from 0xe544175ee0461c4b\n\n\ntransaction(dapperAddress:Address) {\n\n    prepare(acct: AuthAccount) {\n        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC\n        let dapper = getAccount(dapperAddress)\n      let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)\n\n      // Create a new Forwarder resource for DUC and store it in the new account's storage\n      let ducForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)\n      acct.save(\u003c-ducForwarder, to: /storage/dapperUtilityCoinReceiver)\n\n      // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder\n      acct.link\u003c\u0026{FungibleToken.Receiver}\u003e(\n      /public/dapperUtilityCoinReceiver,\n      target: /storage/dapperUtilityCoinReceiver\n      )\n    }\n}",
                "spec": {
@@ -3747,6 +3977,21 @@
                      "name": "String",
                      "nftDescription": "String",
                      "nftName": "String"
+                  }
+               }
+            },
+            "adminMintFindPack": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport Admin from 0x097bafa4e0b48eef\n\ntransaction(packTypeName: String, typeId: UInt64, hashes: [String]) {\n    let admin: \u0026Admin.AdminProxy\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n    }\n\n    execute {\n        for hash in hashes {\n            self.admin.mintFindPack(packTypeName: packTypeName, typeId:typeId,hash: hash)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "typeId",
+                     "hashes"
+                  ],
+                  "parameters": {
+                     "hashes": "[String]",
+                     "packTypeName": "String",
+                     "typeId": "UInt64"
                   }
                }
             },
@@ -3911,6 +4156,31 @@
                   "parameters": {
                      "cut": "UFix64",
                      "tenant": "Address"
+                  }
+               }
+            },
+            "adminSetMinterPlatform": {
+               "code": "import Admin from 0x097bafa4e0b48eef\n\ntransaction(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}){\n    prepare(account: AuthAccount){\n        let adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n\n        adminRef.adminSetMinterPlatform(name: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "name",
+                     "forgeType",
+                     "minterCut",
+                     "description",
+                     "externalURL",
+                     "squareImage",
+                     "bannerImage",
+                     "socials"
+                  ],
+                  "parameters": {
+                     "bannerImage": "String",
+                     "description": "String",
+                     "externalURL": "String",
+                     "forgeType": "Type",
+                     "minterCut": "UFix64?",
+                     "name": "String",
+                     "socials": "{String: String}",
+                     "squareImage": "String"
                   }
                }
             },
@@ -4353,6 +4623,42 @@
                      "addon": "String",
                      "amount": "UFix64",
                      "name": "String"
+                  }
+               }
+            },
+            "buyFindPack": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport FungibleToken from 0xf233dcee88fe0abe\nimport NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\nimport FlowToken from 0x1654653399040a61\nimport FUSD from 0x3c5959b568896393\nimport Profile from 0x097bafa4e0b48eef\n\ntransaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, totalAmount: UFix64) {\n    let packs: \u0026FindPack.Collection{FindPack.CollectionPublic}\n\n    let userPacks: Capability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e\n    let salePrice: UFix64\n    let packsLeft: UInt64\n\n    let userFlowTokenVault: \u0026FlowToken.Vault\n\n    let paymentVault: @FungibleToken.Vault\n    let balanceBeforeTransfer:UFix64\n\n    prepare(account: AuthAccount) {\n\n        let findPackCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(FindPack.CollectionPublicPath)\n        if !findPackCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e( \u003c- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)\n            account.link\u003c\u0026FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                FindPack.CollectionPublicPath,\n                target: FindPack.CollectionStoragePath\n            )\n        }\n\n        let profileCap = account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath)\n        if !profileCap.check() {\n            let profile \u003c-Profile.createUser(name:account.address.toString(), createdAt: \"find\")\n\n            //Add exising FUSD or create a new one and add it\n            let fusdReceiver = account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver)\n            if !fusdReceiver.check() {\n                let fusd \u003c- FUSD.createEmptyVault()\n                account.save(\u003c- fusd, to: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Receiver}\u003e( /public/fusdReceiver, target: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Balance}\u003e( /public/fusdBalance, target: /storage/fusdVault)\n            }\n\n            let fusdWallet=Profile.Wallet(\n                name:\"FUSD\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/fusdBalance),\n                accept: Type\u003c@FUSD.Vault\u003e(),\n                names: [\"fusd\", \"stablecoin\"]\n            )\n\n            profile.addWallet(fusdWallet)\n\n            let flowWallet=Profile.Wallet(\n                name:\"Flow\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/flowTokenBalance),\n                accept: Type\u003c@FlowToken.Vault\u003e(),\n                names: [\"flow\"]\n            )\n            profile.addWallet(flowWallet)\n            account.save(\u003c-profile, to: Profile.storagePath)\n            account.link\u003c\u0026Profile.User{Profile.Public}\u003e(Profile.publicPath, target: Profile.storagePath)\n            account.link\u003c\u0026{FungibleToken.Receiver}\u003e(Profile.publicReceiverPath, target: Profile.storagePath)\n\n\n        }\n\n        self.userPacks=account.getCapability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e(FindPack.CollectionPublicPath)\n        self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)\n\n        self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic (\"Cannot buy the pack now\") \n        self.packsLeft= UInt64(self.packs.getPacksLeft())\n\n\n        self.userFlowTokenVault = account.borrow\u003c\u0026FlowToken.Vault\u003e(from: /storage/flowTokenVault) ?? panic(\"Cannot borrow FlowToken vault from account storage\")\n        self.balanceBeforeTransfer = self.userFlowTokenVault.balance\n\n        if self.balanceBeforeTransfer \u003c totalAmount {\n            panic(\"Your account does not have enough funds has \".concat(self.balanceBeforeTransfer.toString()).concat(\" needs \").concat(totalAmount.toString()))\n        }\n        self.paymentVault \u003c- self.userFlowTokenVault.withdraw(amount: totalAmount)\n    }\n\n    pre {\n        self.salePrice * UFix64(numberOfPacks) == totalAmount: \"unexpected sending amount\"\n        self.packsLeft \u003e= numberOfPacks : \"Rats! there are no packs left\"\n        self.userPacks.check() : \"User need a receiver to put the pack in\"\n    }\n\n    execute {\n        var counter = numberOfPacks\n        while counter \u003e 0 {\n            let purchasingVault \u003c- self.paymentVault.withdraw(amount: self.salePrice)\n            self.packs.buy(packTypeName: packTypeName, typeId:packTypeId, vault: \u003c- purchasingVault, collectionCapability: self.userPacks)\n            counter = counter - 1\n        }\n        if self.paymentVault.balance != 0.0 {\n            panic(\"paymentVault balance is non-zero after paying\")\n        }\n        destroy self.paymentVault\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "numberOfPacks",
+                     "totalAmount"
+                  ],
+                  "parameters": {
+                     "numberOfPacks": "UInt64",
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "totalAmount": "UFix64"
+                  }
+               }
+            },
+            "buyFindPackWithReservation": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport FungibleToken from 0xf233dcee88fe0abe\nimport NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\nimport FlowToken from 0x1654653399040a61\nimport FUSD from 0x3c5959b568896393\nimport Profile from 0x097bafa4e0b48eef\n\ntransaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFix64, signature:String) {\n    let packs: \u0026FindPack.Collection{FindPack.CollectionPublic}\n\n    let userPacks: Capability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e\n    let salePrice: UFix64\n    let packsLeft: UInt64\n\n    let userFlowTokenVault: \u0026FlowToken.Vault\n\n    let paymentVault: @FungibleToken.Vault\n    let balanceBeforeTransfer:UFix64\n\n    prepare(account: AuthAccount) {\n\n        let findPackCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(FindPack.CollectionPublicPath)\n        if !findPackCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e( \u003c- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)\n            account.link\u003c\u0026FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                FindPack.CollectionPublicPath,\n                target: FindPack.CollectionStoragePath\n            )\n        }\n\n        let profileCap = account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath)\n        if !profileCap.check() {\n            let profile \u003c-Profile.createUser(name:account.address.toString(), createdAt: \"find\")\n\n            //Add exising FUSD or create a new one and add it\n            let fusdReceiver = account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver)\n            if !fusdReceiver.check() {\n                let fusd \u003c- FUSD.createEmptyVault()\n                account.save(\u003c- fusd, to: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Receiver}\u003e( /public/fusdReceiver, target: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Balance}\u003e( /public/fusdBalance, target: /storage/fusdVault)\n            }\n\n            let fusdWallet=Profile.Wallet(\n                name:\"FUSD\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/fusdBalance),\n                accept: Type\u003c@FUSD.Vault\u003e(),\n                names: [\"fusd\", \"stablecoin\"]\n            )\n\n            profile.addWallet(fusdWallet)\n\n            let flowWallet=Profile.Wallet(\n                name:\"Flow\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/flowTokenBalance),\n                accept: Type\u003c@FlowToken.Vault\u003e(),\n                names: [\"flow\"]\n            )\n            profile.addWallet(flowWallet)\n            account.save(\u003c-profile, to: Profile.storagePath)\n            account.link\u003c\u0026Profile.User{Profile.Public}\u003e(Profile.publicPath, target: Profile.storagePath)\n            account.link\u003c\u0026{FungibleToken.Receiver}\u003e(Profile.publicReceiverPath, target: Profile.storagePath)\n\n\n        }\n\n        self.userPacks=account.getCapability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e(FindPack.CollectionPublicPath)\n        self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)\n\n        self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic (\"Cannot buy the pack now\") \n\n        self.packsLeft= UInt64(self.packs.getPacksLeft())\n\n\n        self.userFlowTokenVault = account.borrow\u003c\u0026FlowToken.Vault\u003e(from: /storage/flowTokenVault) ?? panic(\"Cannot borrow FlowToken vault from account storage\")\n        self.balanceBeforeTransfer = self.userFlowTokenVault.balance\n\n        if self.balanceBeforeTransfer \u003c amount {\n            panic(\"Your account does not have enough funds has \".concat(self.balanceBeforeTransfer.toString()).concat(\" needs \").concat(amount.toString()))\n        }\n        self.paymentVault \u003c- self.userFlowTokenVault.withdraw(amount: amount)\n    }\n\n    pre {\n        self.salePrice == amount: \"unexpected sending amount\"\n        self.packs.contains(packId): \"The pack does not exist. ID : \".concat(packId.toString())\n        self.userPacks.check() : \"User need a receiver to put the pack in\"\n    }\n\n    execute {\n        self.packs.buyWithSignature(packId:packId, signature: signature, vault: \u003c- self.paymentVault, collectionCapability: self.userPacks)\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "packId",
+                     "amount",
+                     "signature"
+                  ],
+                  "parameters": {
+                     "amount": "UFix64",
+                     "packId": "UInt64",
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "signature": "String"
                   }
                }
             },
@@ -5382,6 +5688,17 @@
                   }
                }
             },
+            "openFindPack": {
+               "code": "import FindPack from 0x097bafa4e0b48eef\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\nimport NFTCatalog from 0x49a7cda3a1eecc29\nimport FungibleToken from 0xf233dcee88fe0abe\nimport NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\n\n/// A transaction to open a pack with a given id\n/// @param packId: The id of the pack to open\ntransaction(packId:UInt64) {\n\n    let packs: \u0026FindPack.Collection\n    let receiver: { Type : Capability\u003c\u0026{NonFungibleToken.Receiver}\u003e}\n\n    prepare(account: AuthAccount) {\n        self.packs=account.borrow\u003c\u0026FindPack.Collection\u003e(from: FindPack.CollectionStoragePath)!\n\n        let packData = self.packs.borrowFindPack(id: packId) ?? panic(\"You do not own this pack. ID : \".concat(packId.toString()))\n        let types = packData.getMetadata().itemTypes\n\n        self.receiver = {}\n\n        // check the account setup for receiving nfts\n        for type in types {\n            let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)\n            if collection == nil || collection!.length == 0 {\n                panic(\"Type : \".concat(type.identifier).concat(\" is not supported in NFTCatalog at the moment\"))\n            }\n            let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData\n\n            let cap = account.getCapability\u003c\u0026{NonFungibleToken.Receiver}\u003e(collectionInfo.publicPath)\n            if !cap.check() {\n                let newCollection \u003c- FindPack.createEmptyCollectionFromPath(collectionInfo.publicPath)\n                account.save(\u003c- newCollection, to: collectionInfo.storagePath)\n                account.link\u003c\u0026{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}\u003e(\n                    collectionInfo.publicPath, target: collectionInfo.storagePath)\n            }\n            self.receiver[type] = cap\n        }\n\n    }\n\n    execute {\n        self.packs.open(packId: packId, receiverCap:self.receiver)\n    }\n\n    post {\n        !self.packs.getIDs().contains(packId) : \"The pack is still present in the users collection\"\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packId"
+                  ],
+                  "parameters": {
+                     "packId": "UInt64"
+                  }
+               }
+            },
             "redeemAllLostAndFoundNFTs": {
                "code": "import FindLostAndFoundWrapper from 0x097bafa4e0b48eef\nimport LostAndFound from 0x473d6a2c37eab5be\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\nimport NFTCatalog from 0x49a7cda3a1eecc29\nimport NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\nimport FIND from 0x097bafa4e0b48eef\n\n//IMPORT\n\ntransaction() {\n\n    let ids : {String : [UInt64]}\n    let nftInfos : {String : NFTCatalog.NFTCollectionData}\n    let receiverAddress : Address\n\n    prepare(account: AuthAccount){\n\n        //LINK\n\n\n        self.nftInfos = {}\n        self.ids = FindLostAndFoundWrapper.getTicketIDs(user: account.address, specificType: Type\u003c@NonFungibleToken.NFT\u003e())\n\n        for type in self.ids.keys{ \n            if self.nftInfos[type] == nil {\n                let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type) ?? panic(\"NFT type is not supported at the moment. Type : \".concat(type))\n                self.nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData\n            }\n        }\n\n        self.receiverAddress = account.address\n    }\n\n    execute{\n        for type in self.ids.keys{ \n            let path = self.nftInfos[type]!.publicPath\n            for id in self.ids[type]! {\n                FindLostAndFoundWrapper.redeemNFT(type: CompositeType(type)!, ticketID: id, receiverAddress: self.receiverAddress, collectionPublicPath: path)\n            }\n        }\n    }\n}",
                "spec": {
@@ -5748,6 +6065,17 @@
       },
       "testnet": {
          "scripts": {
+            "getAllFindPackSaleDetails": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport MetadataViews from 0x631e88ae7f1d7c20\n\npub fun main(packTypeName: String) : {UInt64 : Report} {\n    let packs = FindPack.getMetadataByName(packTypeName: packTypeName)\n    let packData : {UInt64 : Report} = {}\n    for packTypeId in packs.keys {\n        if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {\n            let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()\n            packData[packTypeId] = Report(metadata, packsLeft: packsLeft)\n        }\n    }\n    return packData\n}\n\npub struct Report {\n        pub let name: String\n        pub let description: String\n\n        pub let thumbnailHash: String?\n        pub let thumbnailUrl:String?\n\n        pub let walletType: String\n        pub let walletAlias: String?\n\n        pub let openTime: UFix64\n        pub var saleEnded: Bool\n        pub let saleInfos: [SaleInfo]\n\n        pub let storageRequirement: UInt64\n        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay\n\n        pub let itemTypes: [Type]\n\n        pub let extraData : {String : AnyStruct}\n        pub let packFields: {String : String}\n        pub let requiresReservation: Bool\n\n        pub let packsLeft : Int \n\n        init(_ md: FindPack.Metadata, packsLeft: Int) {\n            self.packsLeft = packsLeft\n            self.name=md.name\n            self.description=md.description\n            self.thumbnailHash=md.thumbnailHash\n            self.thumbnailUrl=md.thumbnailUrl\n            self.walletType=md.walletType.identifier\n            self.walletAlias=FTRegistry.getFTInfoByTypeIdentifier(md.walletType.identifier)?.alias\n            self.openTime=md.openTime\n            self.storageRequirement=md.storageRequirement\n            self.itemTypes=md.itemTypes\n            self.extraData=md.extraData\n            self.packFields=md.packFields\n            self.requiresReservation=md.requiresReservation\n            self.saleInfos=convertSaleInfo(md.saleInfos)\n            self.collectionDisplay=md.collectionDisplay\n            self.saleEnded=false\n            if self.packsLeft == 0 {\n                self.saleEnded=true\n            } else {\n                let currentTime = getCurrentBlock().timestamp\n                for saleInfo in self.saleInfos{\n                    if saleInfo.endTime == nil || saleInfo.endTime! \u003e currentTime {\n                        self.saleEnded=true\n                        break\n                    }\n                }\n            }\n        }\n}\n\npub struct SaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let purchaseRecord : {Address : UInt64}\n        pub let verifiers : [String]\n        pub let verifyAll : Bool \n\n        init(_ si: FindPack.SaleInfo) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.purchaseRecord=si.purchaseRecord\n\n            var verifierDesc : [String] = []\n            for verifier in si.verifiers {\n                verifierDesc.append(verifier.description)\n            }\n            self.verifiers=verifierDesc\n            self.verifyAll=si.verifyAll\n        }\n}\n\npub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {\n    let res : [SaleInfo] = []\n    for i in info {\n        res.append(SaleInfo(i))\n    }\n    return res\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName"
+                  ],
+                  "parameters": {
+                     "packTypeName": "String"
+                  }
+               }
+            },
             "getCatalog": {
                "code": "import NFTCatalog from 0x324c34e1c517e4db\nimport FINDNFTCatalog from 0x35717efbbce11c74\n\npub fun main() : {String : NFTCatalog.NFTCatalogMetadata} {\n    return FINDNFTCatalog.getCatalog() \n}",
                "spec": {
@@ -5874,6 +6202,21 @@
                "spec": {
                   "order": [],
                   "parameters": {}
+               }
+            },
+            "getFindPackSaleDetailsWithUser": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport FlowStorageFees from 0x8c5303eaa26202d6\nimport MetadataViews from 0x631e88ae7f1d7c20\nimport FIND from 0x35717efbbce11c74\n\npub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {\n    if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {\n        let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()\n        return Report(metadata, user: user, packsLeft:packsLeft)\n    }\n\n    return nil\n}\n\npub struct Report {\n        pub let name: String\n        pub let description: String\n\n        pub let thumbnailHash: String?\n        pub let thumbnailUrl:String?\n\n        pub let walletType: String\n        pub let walletAlias: String?\n\n        pub let openTime: UFix64\n\n        pub let storageRequirement: UInt64\n        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay\n\n        pub let itemTypes: [Type]\n\n        pub let extraData : {String : AnyStruct}\n        pub let packFields: {String : String}\n        pub let requiresReservation: Bool\n        pub let storageFlowNeeded: UFix64? \n\n        pub let userQualifiedSale : UserSaleInfo?\n        pub let saleInfos: [SaleInfo]\n        pub let packsLeft : Int \n\n        init(_ md: FindPack.Metadata, user: Address, packsLeft: Int) {\n            self.packsLeft=packsLeft\n            self.name=md.name\n            self.description=md.description\n            self.thumbnailHash=md.thumbnailHash\n            self.thumbnailUrl=md.thumbnailUrl\n            self.walletType=md.walletType.identifier\n            self.walletAlias=FTRegistry.getFTInfoByTypeIdentifier(md.walletType.identifier)?.alias\n            self.openTime=md.openTime\n            self.storageRequirement=md.storageRequirement\n            self.itemTypes=md.itemTypes\n            self.extraData=md.extraData\n            self.packFields=md.packFields\n            self.requiresReservation=md.requiresReservation\n            self.userQualifiedSale=getSoonestQualifiedSale(md.saleInfos, user: user)\n            self.storageFlowNeeded=getRequiredFlow(md.storageRequirement, user: user)\n            self.collectionDisplay=md.collectionDisplay\n            self.saleInfos=convertSaleInfo(md.saleInfos)\n        }\n}\n\npub struct UserSaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let userPurchaseRecord : UInt64\n        pub let canBuyNow : Bool\n\n        init(_ si: FindPack.SaleInfo, user: Address, timeStamp: UFix64) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.userPurchaseRecord=si.purchaseRecord[user] ?? 0\n            self.canBuyNow= si.startTime\u003e=timeStamp\n        }\n}\n\npub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {\n    let res : [UserSaleInfo] = []\n    let currentTime = getCurrentBlock().timestamp\n    var availableOption : FindPack.SaleInfo? = nil \n    var soonestOption : FindPack.SaleInfo? = nil \n\n    // check for the sale option that is available to the user, and is with the lowest price\n    for info in infos {\n        if info.checkBuyable(addr: user, time: currentTime){\n            if availableOption == nil || availableOption!.price \u003e info!.price {\n                availableOption = info\n            }\n        } else {\n            let endTime = info.endTime ?? UFix64.max\n            if currentTime \u003e endTime {\n                continue\n            }\n\n    // if there is no option available, get the soonest option available to the user, again, lowest price\n            if info.checkBuyable(addr: user, time: info.startTime) {\n                if soonestOption == nil || soonestOption!.startTime \u003c info.startTime {\n                    soonestOption = info\n                } else if soonestOption!.startTime == info.startTime \u0026\u0026 soonestOption!.price \u003e info.price {\n                    soonestOption = info\n                }\n            }\n        }\n    }\n\n    if availableOption != nil {\n        return UserSaleInfo(availableOption!, user: user, timeStamp: currentTime)\n    } else if soonestOption != nil {\n        return UserSaleInfo(soonestOption!, user: user, timeStamp: currentTime)\n    }\n    return nil\n}\n\npub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {\n\n    let account = getAccount(user)\n    if account.storageCapacity \u003e account.storageUsed {\n        if account.storageCapacity - account.storageUsed \u003e requiresReservation {\n            return nil\n        }\n    }\n    return FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(account.storageUsed + requiresReservation))\n}\n\npub struct SaleInfo {\n        pub let name : String\n        pub let startTime : UFix64 \n        pub let endTime : UFix64?\n        pub let price : UFix64\n        pub let purchaseLimit : UInt64?\n        pub let purchaseRecord : {Address : UInt64}\n        pub let verifiers : [String]\n        pub let verifyAll : Bool \n\n        init(_ si: FindPack.SaleInfo) {\n            self.name=si.name\n            self.startTime=si.startTime\n            self.endTime=si.endTime\n            self.price=si.price\n            self.purchaseLimit=si.purchaseLimit\n            self.purchaseRecord=si.purchaseRecord\n\n            var verifierDesc : [String] = []\n            for verifier in si.verifiers {\n                verifierDesc.append(verifier.description)\n            }\n            self.verifiers=verifierDesc\n            self.verifyAll=si.verifyAll\n        }\n}\n\npub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {\n    let res : [SaleInfo] = []\n    for i in info {\n        res.append(SaleInfo(i))\n    }\n    return res\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "user"
+                  ],
+                  "parameters": {
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "user": "Address"
+                  }
                }
             },
             "getItem": {
@@ -6322,6 +6665,19 @@
                   }
                }
             },
+            "adminAddAddon": {
+               "code": "import Admin from 0x35717efbbce11c74\n\ntransaction(name: String, addon: String){\n    prepare(account: AuthAccount){\n        let adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n\n        adminRef.addAddon(name: name, addon: addon)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "name",
+                     "addon"
+                  ],
+                  "parameters": {
+                     "addon": "String",
+                     "name": "String"
+                  }
+               }
+            },
             "adminAddForge": {
                "code": "import Admin from 0x35717efbbce11c74\n\ntransaction(name: String, type: String) {\n\n    prepare(admin:AuthAccount) {\n\n        let client= admin.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath)!\n\n        client.addPrivateForgeType(name: name, forgeType: CompositeType(type)!)\n\n    }\n\n}",
                "spec": {
@@ -6403,6 +6759,21 @@
                   }
                }
             },
+            "adminFulfillFindPack": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport Admin from 0x35717efbbce11c74\n\ntransaction(packId:UInt64, rewardIds:{String : [UInt64]}, salt:String) {\n    let admin: \u0026Admin.AdminProxy\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n    }\n\n    execute {\n        let reward : {Type : [UInt64]} = {}\n        for type in rewardIds.keys {\n            reward[CompositeType(type)!] = rewardIds[type]\n        }\n\n        self.admin.fulfillFindPack(packId:packId, rewardIds:reward, salt:salt)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packId",
+                     "rewardIds",
+                     "salt"
+                  ],
+                  "parameters": {
+                     "packId": "UInt64",
+                     "rewardIds": "{String: [UInt64]}",
+                     "salt": "String"
+                  }
+               }
+            },
             "adminInitDUC": {
                "code": "import FungibleToken from 0x9a0766d93b6608b7\nimport DapperUtilityCoin from 0x82ec283f88a62e65\nimport TokenForwarding from 0x51ea0e37c27a1f1a\n\n\ntransaction(dapperAddress:Address) {\n\n    prepare(acct: AuthAccount) {\n        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC\n        let dapper = getAccount(dapperAddress)\n      let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)\n\n      // Create a new Forwarder resource for DUC and store it in the new account's storage\n      let ducForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)\n      acct.save(\u003c-ducForwarder, to: /storage/dapperUtilityCoinReceiver)\n\n      // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder\n      acct.link\u003c\u0026{FungibleToken.Receiver}\u003e(\n      /public/dapperUtilityCoinReceiver,\n      target: /storage/dapperUtilityCoinReceiver\n      )\n    }\n}",
                "spec": {
@@ -6474,6 +6845,21 @@
                      "name": "String",
                      "nftDescription": "String",
                      "nftName": "String"
+                  }
+               }
+            },
+            "adminMintFindPack": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport Admin from 0x35717efbbce11c74\n\ntransaction(packTypeName: String, typeId: UInt64, hashes: [String]) {\n    let admin: \u0026Admin.AdminProxy\n    prepare(account: AuthAccount) {\n        self.admin =account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Could not borrow admin\")\n    }\n\n    execute {\n        for hash in hashes {\n            self.admin.mintFindPack(packTypeName: packTypeName, typeId:typeId,hash: hash)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "typeId",
+                     "hashes"
+                  ],
+                  "parameters": {
+                     "hashes": "[String]",
+                     "packTypeName": "String",
+                     "typeId": "UInt64"
                   }
                }
             },
@@ -6638,6 +7024,31 @@
                   "parameters": {
                      "cut": "UFix64",
                      "tenant": "Address"
+                  }
+               }
+            },
+            "adminSetMinterPlatform": {
+               "code": "import Admin from 0x35717efbbce11c74\n\ntransaction(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}){\n    prepare(account: AuthAccount){\n        let adminRef = account.borrow\u003c\u0026Admin.AdminProxy\u003e(from: Admin.AdminProxyStoragePath) ?? panic(\"Cannot borrow Admin Reference.\")\n\n        adminRef.adminSetMinterPlatform(name: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)\n    }\n}",
+               "spec": {
+                  "order": [
+                     "name",
+                     "forgeType",
+                     "minterCut",
+                     "description",
+                     "externalURL",
+                     "squareImage",
+                     "bannerImage",
+                     "socials"
+                  ],
+                  "parameters": {
+                     "bannerImage": "String",
+                     "description": "String",
+                     "externalURL": "String",
+                     "forgeType": "Type",
+                     "minterCut": "UFix64?",
+                     "name": "String",
+                     "socials": "{String: String}",
+                     "squareImage": "String"
                   }
                }
             },
@@ -7080,6 +7491,42 @@
                      "addon": "String",
                      "amount": "UFix64",
                      "name": "String"
+                  }
+               }
+            },
+            "buyFindPack": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\nimport FlowToken from 0x7e60df042a9c0868\nimport FUSD from 0xe223d8a629e49c68\nimport Profile from 0x35717efbbce11c74\n\ntransaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, totalAmount: UFix64) {\n    let packs: \u0026FindPack.Collection{FindPack.CollectionPublic}\n\n    let userPacks: Capability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e\n    let salePrice: UFix64\n    let packsLeft: UInt64\n\n    let userFlowTokenVault: \u0026FlowToken.Vault\n\n    let paymentVault: @FungibleToken.Vault\n    let balanceBeforeTransfer:UFix64\n\n    prepare(account: AuthAccount) {\n\n        let findPackCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(FindPack.CollectionPublicPath)\n        if !findPackCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e( \u003c- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)\n            account.link\u003c\u0026FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                FindPack.CollectionPublicPath,\n                target: FindPack.CollectionStoragePath\n            )\n        }\n\n        let profileCap = account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath)\n        if !profileCap.check() {\n            let profile \u003c-Profile.createUser(name:account.address.toString(), createdAt: \"find\")\n\n            //Add exising FUSD or create a new one and add it\n            let fusdReceiver = account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver)\n            if !fusdReceiver.check() {\n                let fusd \u003c- FUSD.createEmptyVault()\n                account.save(\u003c- fusd, to: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Receiver}\u003e( /public/fusdReceiver, target: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Balance}\u003e( /public/fusdBalance, target: /storage/fusdVault)\n            }\n\n            let fusdWallet=Profile.Wallet(\n                name:\"FUSD\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/fusdBalance),\n                accept: Type\u003c@FUSD.Vault\u003e(),\n                names: [\"fusd\", \"stablecoin\"]\n            )\n\n            profile.addWallet(fusdWallet)\n\n            let flowWallet=Profile.Wallet(\n                name:\"Flow\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/flowTokenBalance),\n                accept: Type\u003c@FlowToken.Vault\u003e(),\n                names: [\"flow\"]\n            )\n            profile.addWallet(flowWallet)\n            account.save(\u003c-profile, to: Profile.storagePath)\n            account.link\u003c\u0026Profile.User{Profile.Public}\u003e(Profile.publicPath, target: Profile.storagePath)\n            account.link\u003c\u0026{FungibleToken.Receiver}\u003e(Profile.publicReceiverPath, target: Profile.storagePath)\n\n\n        }\n\n        self.userPacks=account.getCapability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e(FindPack.CollectionPublicPath)\n        self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)\n\n        self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic (\"Cannot buy the pack now\") \n        self.packsLeft= UInt64(self.packs.getPacksLeft())\n\n\n        self.userFlowTokenVault = account.borrow\u003c\u0026FlowToken.Vault\u003e(from: /storage/flowTokenVault) ?? panic(\"Cannot borrow FlowToken vault from account storage\")\n        self.balanceBeforeTransfer = self.userFlowTokenVault.balance\n\n        if self.balanceBeforeTransfer \u003c totalAmount {\n            panic(\"Your account does not have enough funds has \".concat(self.balanceBeforeTransfer.toString()).concat(\" needs \").concat(totalAmount.toString()))\n        }\n        self.paymentVault \u003c- self.userFlowTokenVault.withdraw(amount: totalAmount)\n    }\n\n    pre {\n        self.salePrice * UFix64(numberOfPacks) == totalAmount: \"unexpected sending amount\"\n        self.packsLeft \u003e= numberOfPacks : \"Rats! there are no packs left\"\n        self.userPacks.check() : \"User need a receiver to put the pack in\"\n    }\n\n    execute {\n        var counter = numberOfPacks\n        while counter \u003e 0 {\n            let purchasingVault \u003c- self.paymentVault.withdraw(amount: self.salePrice)\n            self.packs.buy(packTypeName: packTypeName, typeId:packTypeId, vault: \u003c- purchasingVault, collectionCapability: self.userPacks)\n            counter = counter - 1\n        }\n        if self.paymentVault.balance != 0.0 {\n            panic(\"paymentVault balance is non-zero after paying\")\n        }\n        destroy self.paymentVault\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "numberOfPacks",
+                     "totalAmount"
+                  ],
+                  "parameters": {
+                     "numberOfPacks": "UInt64",
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "totalAmount": "UFix64"
+                  }
+               }
+            },
+            "buyFindPackWithReservation": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\nimport FlowToken from 0x7e60df042a9c0868\nimport FUSD from 0xe223d8a629e49c68\nimport Profile from 0x35717efbbce11c74\n\ntransaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFix64, signature:String) {\n    let packs: \u0026FindPack.Collection{FindPack.CollectionPublic}\n\n    let userPacks: Capability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e\n    let salePrice: UFix64\n    let packsLeft: UInt64\n\n    let userFlowTokenVault: \u0026FlowToken.Vault\n\n    let paymentVault: @FungibleToken.Vault\n    let balanceBeforeTransfer:UFix64\n\n    prepare(account: AuthAccount) {\n\n        let findPackCap= account.getCapability\u003c\u0026{NonFungibleToken.CollectionPublic}\u003e(FindPack.CollectionPublicPath)\n        if !findPackCap.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e( \u003c- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)\n            account.link\u003c\u0026FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                FindPack.CollectionPublicPath,\n                target: FindPack.CollectionStoragePath\n            )\n        }\n\n        let profileCap = account.getCapability\u003c\u0026{Profile.Public}\u003e(Profile.publicPath)\n        if !profileCap.check() {\n            let profile \u003c-Profile.createUser(name:account.address.toString(), createdAt: \"find\")\n\n            //Add exising FUSD or create a new one and add it\n            let fusdReceiver = account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver)\n            if !fusdReceiver.check() {\n                let fusd \u003c- FUSD.createEmptyVault()\n                account.save(\u003c- fusd, to: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Receiver}\u003e( /public/fusdReceiver, target: /storage/fusdVault)\n                account.link\u003c\u0026FUSD.Vault{FungibleToken.Balance}\u003e( /public/fusdBalance, target: /storage/fusdVault)\n            }\n\n            let fusdWallet=Profile.Wallet(\n                name:\"FUSD\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/fusdReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/fusdBalance),\n                accept: Type\u003c@FUSD.Vault\u003e(),\n                names: [\"fusd\", \"stablecoin\"]\n            )\n\n            profile.addWallet(fusdWallet)\n\n            let flowWallet=Profile.Wallet(\n                name:\"Flow\", \n                receiver:account.getCapability\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowTokenReceiver),\n                balance:account.getCapability\u003c\u0026{FungibleToken.Balance}\u003e(/public/flowTokenBalance),\n                accept: Type\u003c@FlowToken.Vault\u003e(),\n                names: [\"flow\"]\n            )\n            profile.addWallet(flowWallet)\n            account.save(\u003c-profile, to: Profile.storagePath)\n            account.link\u003c\u0026Profile.User{Profile.Public}\u003e(Profile.publicPath, target: Profile.storagePath)\n            account.link\u003c\u0026{FungibleToken.Receiver}\u003e(Profile.publicReceiverPath, target: Profile.storagePath)\n\n\n        }\n\n        self.userPacks=account.getCapability\u003c\u0026FindPack.Collection{NonFungibleToken.Receiver}\u003e(FindPack.CollectionPublicPath)\n        self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)\n\n        self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic (\"Cannot buy the pack now\") \n\n        self.packsLeft= UInt64(self.packs.getPacksLeft())\n\n\n        self.userFlowTokenVault = account.borrow\u003c\u0026FlowToken.Vault\u003e(from: /storage/flowTokenVault) ?? panic(\"Cannot borrow FlowToken vault from account storage\")\n        self.balanceBeforeTransfer = self.userFlowTokenVault.balance\n\n        if self.balanceBeforeTransfer \u003c amount {\n            panic(\"Your account does not have enough funds has \".concat(self.balanceBeforeTransfer.toString()).concat(\" needs \").concat(amount.toString()))\n        }\n        self.paymentVault \u003c- self.userFlowTokenVault.withdraw(amount: amount)\n    }\n\n    pre {\n        self.salePrice == amount: \"unexpected sending amount\"\n        self.packs.contains(packId): \"The pack does not exist. ID : \".concat(packId.toString())\n        self.userPacks.check() : \"User need a receiver to put the pack in\"\n    }\n\n    execute {\n        self.packs.buyWithSignature(packId:packId, signature: signature, vault: \u003c- self.paymentVault, collectionCapability: self.userPacks)\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "packTypeName",
+                     "packTypeId",
+                     "packId",
+                     "amount",
+                     "signature"
+                  ],
+                  "parameters": {
+                     "amount": "UFix64",
+                     "packId": "UInt64",
+                     "packTypeId": "UInt64",
+                     "packTypeName": "String",
+                     "signature": "String"
                   }
                }
             },
@@ -8100,6 +8547,17 @@
             },
             "openBl0xPack": {
                "code": "import Bl0x from 0xe8124d8428980aa6\nimport Bl0xPack from 0xe8124d8428980aa6\nimport FungibleToken from 0x9a0766d93b6608b7\nimport NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\n\n/// A transaction to open a pack with a given id\n/// @param packId: The id of the pack to open\ntransaction(packId:UInt64) {\n\n    let packs: \u0026Bl0xPack.Collection\n    var receiver: Capability\u003c\u0026{NonFungibleToken.Receiver}\u003e\n\n    prepare(account: AuthAccount) {\n        self.packs=account.borrow\u003c\u0026Bl0xPack.Collection\u003e(from: Bl0xPack.CollectionStoragePath)!\n        self.receiver = account.getCapability\u003c\u0026{NonFungibleToken.Receiver}\u003e(Bl0x.CollectionPublicPath)\n        if !self.receiver.check() {\n            account.save\u003c@NonFungibleToken.Collection\u003e(\u003c- Bl0x.createEmptyCollection(), to: Bl0x.CollectionStoragePath)\n            account.link\u003c\u0026Bl0x.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                Bl0x.CollectionPublicPath,\n                target: Bl0x.CollectionStoragePath\n            )\n            account.link\u003c\u0026Bl0x.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}\u003e(\n                Bl0x.CollectionPrivatePath,\n                target: Bl0x.CollectionStoragePath\n            )\n\n            self.receiver = account.getCapability\u003c\u0026{NonFungibleToken.Receiver}\u003e(Bl0x.CollectionPublicPath)\n        }\n\n    }\n\n    pre {\n        self.receiver.check() : \"The receiver collection for the packs is not set up properly\"\n    }\n    execute {\n        self.packs.open(packId: packId, receiverCap:self.receiver)\n    }\n\n    post {\n        !self.packs.getIDs().contains(packId) : \"The pack is still present in the users collection\"\n    }\n}",
+               "spec": {
+                  "order": [
+                     "packId"
+                  ],
+                  "parameters": {
+                     "packId": "UInt64"
+                  }
+               }
+            },
+            "openFindPack": {
+               "code": "import FindPack from 0x35717efbbce11c74\nimport FINDNFTCatalog from 0x35717efbbce11c74\nimport NFTCatalog from 0x324c34e1c517e4db\nimport FungibleToken from 0x9a0766d93b6608b7\nimport NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\n\n/// A transaction to open a pack with a given id\n/// @param packId: The id of the pack to open\ntransaction(packId:UInt64) {\n\n    let packs: \u0026FindPack.Collection\n    let receiver: { Type : Capability\u003c\u0026{NonFungibleToken.Receiver}\u003e}\n\n    prepare(account: AuthAccount) {\n        self.packs=account.borrow\u003c\u0026FindPack.Collection\u003e(from: FindPack.CollectionStoragePath)!\n\n        let packData = self.packs.borrowFindPack(id: packId) ?? panic(\"You do not own this pack. ID : \".concat(packId.toString()))\n        let types = packData.getMetadata().itemTypes\n\n        self.receiver = {}\n\n        // check the account setup for receiving nfts\n        for type in types {\n            let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)\n            if collection == nil || collection!.length == 0 {\n                panic(\"Type : \".concat(type.identifier).concat(\" is not supported in NFTCatalog at the moment\"))\n            }\n            let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData\n\n            let cap = account.getCapability\u003c\u0026{NonFungibleToken.Receiver}\u003e(collectionInfo.publicPath)\n            if !cap.check() {\n                let newCollection \u003c- FindPack.createEmptyCollectionFromPath(collectionInfo.publicPath)\n                account.save(\u003c- newCollection, to: collectionInfo.storagePath)\n                account.link\u003c\u0026{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}\u003e(\n                    collectionInfo.publicPath, target: collectionInfo.storagePath)\n            }\n            self.receiver[type] = cap\n        }\n\n    }\n\n    execute {\n        self.packs.open(packId: packId, receiverCap:self.receiver)\n    }\n\n    post {\n        !self.packs.getIDs().contains(packId) : \"The pack is still present in the users collection\"\n    }\n}",
                "spec": {
                   "order": [
                      "packId"
