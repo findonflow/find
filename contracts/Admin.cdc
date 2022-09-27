@@ -477,11 +477,11 @@ pub contract Admin {
 			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
 		}
 
-		pub fun fulfillFindPack(packId:UInt64, rewardIds:{Type : [UInt64]}, salt:String) {
+		pub fun fulfillFindPack(packId:UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			FindPack.fulfill(packId:packId, rewardIds:rewardIds, salt:salt)
+			FindPack.fulfill(packId:packId, types:types, rewardIds:rewardIds, salt:salt)
 		}
 
 		pub fun requeueFindPack(packId:UInt64) {

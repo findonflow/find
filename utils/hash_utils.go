@@ -3,21 +3,23 @@ package utils
 import (
 	"fmt"
 	"math/rand"
-	"sort"
-	"strings"
 	"unsafe"
 
 	"golang.org/x/crypto/sha3"
 )
 
 // Create a hash from the given ids and salt using '-' as the placeholder between salt an ids and , as the separator between ids
-func CreateSha3Hash(input []uint64, salt string) string {
-	sort.Slice(input, func(i, j int) bool { return input[i] < input[j] })
-	joined := strings.Trim(strings.Replace(fmt.Sprint(input), " ", ",", -1), "[]")
+func CreateSha3Hash(input []uint64, types []string, salt string) string {
 
-	data := fmt.Sprintf("%s-%s", salt, joined)
-	hash := sha3.Sum384([]byte(data))
+	joined := salt
+	for i, id := range input {
+		typ := types[i]
+		joined = fmt.Sprintf("%s,%s-%d", joined, typ, id)
+	}
+
+	hash := sha3.Sum384([]byte(joined))
 	packHash := fmt.Sprintf("%x", hash)
+
 	return packHash
 
 }

@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	findSigner  = WithSigner("find")
-	saSigner    = WithSignerServiceAccount()
-	user1Signer = WithSigner("user1")
+	findSigner     = WithSigner("find")
+	saSigner       = WithSignerServiceAccount()
+	user1Signer    = WithSigner("user1")
+	exampleNFTType = "A.f8d6e0586b0a20c7.ExampleNFT.NFT"
 
 // user2Signer = SignProposeAndPayAs("user2")
 )
@@ -2466,12 +2467,12 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, w
 	return otu
 }
 
-func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input []uint64, salt string) uint64 {
+func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input []uint64, types []string, salt string) uint64 {
 
 	o := otu.O
 	t := otu.T
 
-	packHash := utils.CreateSha3Hash(input, salt)
+	packHash := utils.CreateSha3Hash(input, types, salt)
 
 	res, err := o.Tx("adminMintFindPack",
 		WithSigner("find"),
@@ -2502,12 +2503,12 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 	return res
 }
 
-func (otu *OverflowTestUtils) mintPackWithSignature(minter string, packTypeId uint64, input []uint64, salt string) (uint64, string) {
+func (otu *OverflowTestUtils) mintPackWithSignature(minter string, packTypeId uint64, input []uint64, types []string, salt string) (uint64, string) {
 
 	o := otu.O
 	t := otu.T
 
-	packHash := utils.CreateSha3Hash(input, salt)
+	packHash := utils.CreateSha3Hash(input, types, salt)
 
 	res, err := o.Tx("adminMintFindPack",
 		WithSigner("find"),
@@ -2571,17 +2572,17 @@ func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt stri
 	o := otu.O
 	t := otu.T
 
-	mapping := map[string][]uint64{
-		"A.f8d6e0586b0a20c7.ExampleNFT.NFT": ids,
-	}
-
 	o.Tx("adminFulfillFindPack",
 		WithSigner("find"),
 		WithArg("packId", packId),
-		WithArg("rewardIds", createStringToUInt64Array(mapping)),
+		WithArg("typeIdentifiers", []string{exampleNFTType}),
+		WithArg("rewardIds", ids),
 		WithArg("salt", salt),
 	).
-		AssertSuccess(t)
+		AssertSuccess(t).
+		AssertEvent(t, "Fulfilled", map[string]interface{}{
+			"packId": packId,
+		})
 
 	return otu
 }
