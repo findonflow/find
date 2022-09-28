@@ -2420,9 +2420,14 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 		AssertSuccess(t).
 		GetIdFromEvent("ExampleNFT.Deposit", "id")
 
+	otu.O.Tx("setupExampleNFTCollection",
+		WithSigner("find"),
+	).
+		AssertSuccess(t)
+
 	otu.O.Tx("sendExampleNFT",
 		WithSigner("user1"),
-		WithArg("user", otu.O.Address("account")),
+		WithArg("user", otu.O.Address("find")),
 		WithArg("id", res),
 	).
 		AssertSuccess(t)

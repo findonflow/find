@@ -17,11 +17,27 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
 	let royaltyWallet: Capability<&{FungibleToken.Receiver}>
+	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+	let itemTypes : [Type]
 
 	prepare(account: AuthAccount) {
 		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		self.royaltyWallet = getAccount(royaltyAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+
+		self.itemTypes = [Type<@ExampleNFT.NFT>()]
+		self.providerCaps = {}
+		for type in self.itemTypes {
+			let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)
+			if collection == nil || collection!.length == 0 {
+				panic("Type : ".concat(type.identifier).concat(" is not supported in NFTCatalog at the moment"))
+			}
+			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
+			let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)	
+
+			self.providerCaps[type] = providerCap
+		}
+
 	}
 
 	execute {
@@ -65,18 +81,6 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			MetadataViews.Royalty(receiver: self.royaltyWallet, cut: royaltyCut, description: "creator")
 		])
 
-		let itemTypes = [Type<@ExampleNFT.NFT>()]
-		let providerCaps : {Type : Capability<&AnyResource{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} = {}
-		for type in itemTypes {
-			let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)
-			if collection == nil || collection!.length == 0 {
-				panic("Type : ".concat(type.identifier).concat(" is not supported in NFTCatalog at the moment"))
-			}
-			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
-			let providerCap= self.admin.getProviderCap(collectionInfo.privatePath)
-			providerCaps[type] = providerCap
-		}
-
 		let packRoyalty = MetadataViews.Royalties([
 			MetadataViews.Royalty(receiver: self.admin.getFindRoyaltyCap(), cut: 0.15, description: "find")
 		])
@@ -89,8 +93,8 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			wallet: self.wallet, 
 			openTime:openTime, 
 			walletType: Type<@FlowToken.Vault>(),
-			itemTypes: itemTypes,
-			providerCaps: providerCaps, 
+			itemTypes: self.itemTypes,
+			providerCaps: self.providerCaps, 
 			requiresReservation:requiresReservation,
 			storageRequirement:10000, 
 			saleInfos: saleInfo, 

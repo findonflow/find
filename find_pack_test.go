@@ -598,7 +598,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 3,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 619",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -609,7 +609,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 619",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -620,7 +620,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 619",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -700,7 +700,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -711,7 +711,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -772,7 +772,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -783,7 +783,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -843,7 +843,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -854,7 +854,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 623",
+							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
