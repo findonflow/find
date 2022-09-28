@@ -767,7 +767,7 @@ pub contract FindPack: NonFungibleToken {
 			}
 
 			let id = rewardIds[i]
-			hashString= hashString.concat(",").concat(type.identifier).concat("-").concat(id.toString())
+			hashString= hashString.concat(",").concat(type.identifier).concat(";").concat(id.toString())
 		}
 
 		let digest = HashAlgorithm.SHA3_384.hash(hashString.utf8)
