@@ -2765,16 +2765,16 @@ func createStringUInt64(input map[string]uint64) cadence.Dictionary {
 	return cadence.NewDictionary(array)
 }
 
-func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {
-	mapping := []cadence.KeyValuePair{}
-	for key, val := range input {
-		cadenceString, _ := cadence.NewString(key)
-		array := []cadence.Value{}
-		for _, value := range val {
-			cadenceUInt64 := cadence.NewUInt64(value)
-			array = append(array, cadenceUInt64)
-		}
-		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
-	}
-	return cadence.NewDictionary(mapping)
-}
+// func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {
+// 	mapping := []cadence.KeyValuePair{}
+// 	for key, val := range input {
+// 		cadenceString, _ := cadence.NewString(key)
+// 		array := []cadence.Value{}
+// 		for _, value := range val {
+// 			cadenceUInt64 := cadence.NewUInt64(value)
+// 			array = append(array, cadenceUInt64)
+// 		}
+// 		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
+// 	}
+// 	return cadence.NewDictionary(mapping)
+// }
