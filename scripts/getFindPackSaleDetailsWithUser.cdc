@@ -76,7 +76,7 @@ pub struct UserSaleInfo {
 			self.price=si.price
 			self.purchaseLimit=si.purchaseLimit
 			self.userPurchaseRecord=si.purchaseRecord[user] ?? 0
-			self.canBuyNow= si.startTime>=timeStamp
+			self.canBuyNow= si.startTime<=timeStamp
 		}
 }
 
