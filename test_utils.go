@@ -2420,9 +2420,14 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 		AssertSuccess(t).
 		GetIdFromEvent("ExampleNFT.Deposit", "id")
 
+	otu.O.Tx("setupExampleNFTCollection",
+		WithSigner("find"),
+	).
+		AssertSuccess(t)
+
 	otu.O.Tx("sendExampleNFT",
 		WithSigner("user1"),
-		WithArg("user", otu.O.Address("account")),
+		WithArg("user", otu.O.Address("find")),
 		WithArg("id", res),
 	).
 		AssertSuccess(t)
@@ -2797,16 +2802,16 @@ func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
 	return cadence.NewDictionary(mapping)
 }
 
-func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {
-	mapping := []cadence.KeyValuePair{}
-	for key, val := range input {
-		cadenceString, _ := cadence.NewString(key)
-		array := []cadence.Value{}
-		for _, value := range val {
-			cadenceUInt64 := cadence.NewUInt64(value)
-			array = append(array, cadenceUInt64)
-		}
-		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
-	}
-	return cadence.NewDictionary(mapping)
-}
+// func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {
+// 	mapping := []cadence.KeyValuePair{}
+// 	for key, val := range input {
+// 		cadenceString, _ := cadence.NewString(key)
+// 		array := []cadence.Value{}
+// 		for _, value := range val {
+// 			cadenceUInt64 := cadence.NewUInt64(value)
+// 			array = append(array, cadenceUInt64)
+// 		}
+// 		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
+// 	}
+// 	return cadence.NewDictionary(mapping)
+// }
