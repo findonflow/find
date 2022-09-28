@@ -2755,6 +2755,15 @@ func createStringUFix64(input map[string]float64) cadence.Dictionary {
 	return cadence.NewDictionary(array)
 }
 
+func createUInt64ToString(input map[uint64]string) cadence.Dictionary {
+	array := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceUInt64 := cadence.NewUInt64(key)
+		cadenceString, _ := cadence.NewString(val)
+		array = append(array, cadence.KeyValuePair{Key: cadenceUInt64, Value: cadenceString})
+	}
+	return cadence.NewDictionary(array)
+}
 func createStringUInt64(input map[string]uint64) cadence.Dictionary {
 	array := []cadence.KeyValuePair{}
 	for key, val := range input {
@@ -2763,6 +2772,34 @@ func createStringUInt64(input map[string]uint64) cadence.Dictionary {
 		array = append(array, cadence.KeyValuePair{Key: cadenceString, Value: cadenceUInt64})
 	}
 	return cadence.NewDictionary(array)
+}
+
+func createUInt64ToString64Array(input map[uint64][]string) cadence.Dictionary {
+	mapping := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceString := cadence.NewUInt64(key)
+		array := []cadence.Value{}
+		for _, value := range val {
+			cadenceUInt64 := cadence.String(value)
+			array = append(array, cadenceUInt64)
+		}
+		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
+	}
+	return cadence.NewDictionary(mapping)
+}
+
+func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
+	mapping := []cadence.KeyValuePair{}
+	for key, val := range input {
+		cadenceString := cadence.NewUInt64(key)
+		array := []cadence.Value{}
+		for _, value := range val {
+			cadenceUInt64 := cadence.NewUInt64(value)
+			array = append(array, cadenceUInt64)
+		}
+		mapping = append(mapping, cadence.KeyValuePair{Key: cadenceString, Value: cadence.NewArray(array)})
+	}
+	return cadence.NewDictionary(mapping)
 }
 
 // func createStringToUInt64Array(input map[string][]uint64) cadence.Dictionary {

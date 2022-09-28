@@ -201,12 +201,15 @@ func TestFindPack(t *testing.T) {
 				break
 			}
 		}
-		otu.O.Tx("adminFulfillFindPack",
+
+		pid := map[uint64][]uint64{packId: ids}
+		types := map[uint64][]string{packId: {exampleNFTType}}
+
+		otu.O.Tx("adminFulfillPacks",
 			WithSigner("find"),
-			WithArg("packId", packId),
-			WithArg("typeIdentifiers", []string{exampleNFTType}),
-			WithArg("rewardIds", ids),
-			WithArg("salt", "wrong salt"),
+			WithArg("types", createUInt64ToString64Array(types)),
+			WithArg("rewards", createUInt64ToUInt64Array(pid)),
+			WithArg("salts", createUInt64ToString(map[uint64]string{packId: "wrong salt"})),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.FulfilledError", map[string]interface{}{
