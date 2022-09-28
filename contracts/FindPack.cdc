@@ -832,10 +832,10 @@ pub contract FindPack: NonFungibleToken {
 	}
 
 	// given a path, lookin to the NFT Collection and return a new empty collection
-	pub fun createEmptyCollectionFromPath(_ path: PublicPath) : @NonFungibleToken.Collection {
-		let cap = FindPack.account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	pub fun createEmptyCollectionFromPackData(packData: FindPack.Metadata, type: Type) : @NonFungibleToken.Collection {
+		let cap = packData.providerCaps[type] ?? panic("Type passed in does not exist in this pack ".concat(type.identifier))
 		if !cap.check() {
-			panic("Cannot borrow collection from path : ".concat(path.toString()))
+			panic("Provider capability of pack is not valid Name and ID".concat(type.identifier))
 		}
 		let ref = cap.borrow()!
 		let resolver = ref.borrowViewResolver(id : ref.getIDs()[0])  // if the ID length is 0, there must be some problem

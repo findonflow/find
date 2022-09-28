@@ -16,7 +16,8 @@ transaction(packId:UInt64) {
 		self.packs=account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
 
 		let packData = self.packs.borrowFindPack(id: packId) ?? panic("You do not own this pack. ID : ".concat(packId.toString()))
-		let types = packData.getMetadata().itemTypes
+		let packMetadata = packData.getMetadata()
+		let types = packMetadata.itemTypes
 
 		self.receiver = {}
 
@@ -30,7 +31,7 @@ transaction(packId:UInt64) {
 
 			let cap = account.getCapability<&{NonFungibleToken.Receiver}>(collectionInfo.publicPath)
 			if !cap.check() {
-				let newCollection <- FindPack.createEmptyCollectionFromPath(collectionInfo.publicPath)
+				let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
 				account.save(<- newCollection, to: collectionInfo.storagePath)
 				account.link<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
 					collectionInfo.publicPath, target: collectionInfo.storagePath)
