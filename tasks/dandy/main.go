@@ -10,7 +10,7 @@ func main() {
 
 	o := Overflow(WithGlobalPrintOptions(), WithExistingEmulator(), WithNetwork("mainnet"))
 
-	findSigner := WithSigner("find")
+	adminSigner := WithSigner("find-admin")
 	// nameArg := WithArg("name", "find")
 
 	//should these two join together?
@@ -51,12 +51,12 @@ func main() {
 
 	// Add Dandy to FIND NFT Catalog
 	o.Tx("adminRemoveNFTCatalog",
-		findSigner,
+		adminSigner,
 		WithArg("collectionIdentifier", "A.097bafa4e0b48eef.Dandy.NFT"),
 	)
 
 	o.Tx("adminAddNFTCatalog",
-		findSigner,
+		adminSigner,
 		WithArg("collectionIdentifier", "A.097bafa4e0b48eef.Dandy.NFT"),
 		WithArg("contractName", "Dandy"),
 		WithArg("contractAddress", "find"),

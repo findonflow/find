@@ -565,11 +565,10 @@ func TestFindPack(t *testing.T) {
 				"packTypeId": packTypeId,
 			})
 
-		otu.O.Script("getFindPackSaleDetails",
+		otu.O.Script("getAllFindPackSaleDetails",
 			WithArg("packTypeName", "user1"),
-			WithArg("packTypeId", packTypeId),
 		).
-			AssertWant(t, autogold.Want("getFindPackSaleDetails", map[string]interface{}{
+			AssertWithPointerWant(t, fmt.Sprintf("/%d", packTypeId), autogold.Want("getFindPackSaleDetails", map[string]interface{}{
 				"collectionDisplay": map[string]interface{}{
 					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
 					"description": "Example NFT FIND",
@@ -594,12 +593,23 @@ func TestFindPack(t *testing.T) {
 				"saleEnded":           true,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
+						"endTime":   4,
+						"name":      "public sale",
+						"price":     1.1,
+						"startTime": 3,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 619",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
 						"endTime":   3,
 						"name":      "pre-sale",
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 619",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -610,18 +620,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
-							"Users with one of these find names are verified : user1",
-						},
-						"verifyAll": false,
-					},
-					map[string]interface{}{
-						"endTime":   4,
-						"name":      "public sale",
-						"price":     1.1,
-						"startTime": 3,
-						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 619",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -689,10 +688,39 @@ func TestFindPack(t *testing.T) {
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
 				"requiresReservation": false,
-				"storageRequirement":  10000,
-				"thumbnailHash":       "thumbnailHash",
+				"saleInfos": []interface{}{
+					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"name":      "pre-sale",
+						"price":     2.2,
+						"startTime": 2,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 623",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"endTime":   2,
+						"name":      "whiteList",
+						"price":     1.1,
+						"startTime": 1,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 623",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+				},
+				"storageRequirement": 10000,
+				"thumbnailHash":      "thumbnailHash",
 				"userQualifiedSale": map[string]interface{}{
-					"canBuyNow":          false,
+					"canBuyNow":          true,
 					"name":               "pre-sale",
 					"price":              2.2,
 					"startTime":          2,
@@ -732,10 +760,39 @@ func TestFindPack(t *testing.T) {
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
 				"requiresReservation": false,
-				"storageRequirement":  10000,
-				"thumbnailHash":       "thumbnailHash",
+				"saleInfos": []interface{}{
+					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"name":      "pre-sale",
+						"price":     2.2,
+						"startTime": 2,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 623",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"endTime":   2,
+						"name":      "whiteList",
+						"price":     1.1,
+						"startTime": 1,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 623",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+				},
+				"storageRequirement": 10000,
+				"thumbnailHash":      "thumbnailHash",
 				"userQualifiedSale": map[string]interface{}{
-					"canBuyNow":          false,
+					"canBuyNow":          true,
 					"name":               "public sale",
 					"price":              3.3,
 					"startTime":          3,
@@ -748,10 +805,10 @@ func TestFindPack(t *testing.T) {
 
 	t.Run("Should get all pack sale under a lease name type", func(t *testing.T) {
 
-		otu.O.Script("getAllFindPackSaleDetailsByName",
+		otu.O.Script("getAllFindPackSaleDetails",
 			WithArg("packTypeName", "user1"),
 		).
-			AssertWithPointerWant(t, "/"+fmt.Sprint(packTypeId), autogold.Want("getAllFindPackSaleDetailsByName", map[string]interface{}{
+			AssertWithPointerWant(t, "/"+fmt.Sprint(packTypeId), autogold.Want("getAllFindPackSaleDetails", map[string]interface{}{
 				"collectionDisplay": map[string]interface{}{
 					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
 					"description": "Example NFT FIND",
@@ -776,11 +833,17 @@ func TestFindPack(t *testing.T) {
 				"saleEnded":           true,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
+						"verifyAll": false,
+					},
+					map[string]interface{}{
 						"name":      "pre-sale",
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 623",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -791,15 +854,9 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 623",
 							"Users with one of these find names are verified : user1",
 						},
-						"verifyAll": false,
-					},
-					map[string]interface{}{
-						"name":      "public sale",
-						"price":     3.3,
-						"startTime": 3,
 						"verifyAll": false,
 					},
 				},

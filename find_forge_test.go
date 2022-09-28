@@ -18,7 +18,7 @@ func TestFindForge(t *testing.T) {
 	t.Run("Should be able to mint Example NFT and then get it by script", func(t *testing.T) {
 
 		otu.O.TransactionFromFile("adminAddNFTCatalog").
-			SignProposeAndPayAs("account").
+			SignProposeAndPayAs("find").
 			Args(otu.O.Arguments().
 				String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
 				String("A.f8d6e0586b0a20c7.ExampleNFT.NFT").

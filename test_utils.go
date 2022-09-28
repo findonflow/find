@@ -1495,7 +1495,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 	}
 
 	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("collectionIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("contractName", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("contractAddress", "account"),
@@ -1520,7 +1520,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 // 		}))
 
 // 	otu.O.TransactionFromFile("adminRemoveNFTCatalog").
-// 		SignProposeAndPayAs("account").
+// 		SignProposeAndPayAs("find").
 // 		Args(otu.O.Arguments().
 // 			String("A.f8d6e0586b0a20c7.Dandy.NFT")).
 // 		Test(otu.T).
@@ -1532,7 +1532,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUtils {
 
 	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("collectionIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("contractName", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("contractAddress", "account"),
@@ -2489,7 +2489,7 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
 
 	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("collectionIdentifier", minter+" season#"+fmt.Sprint(packTypeId)),
 		WithArg("contractName", "A.f8d6e0586b0a20c7.FindPack.NFT"),
 		WithArg("contractAddress", "account"),

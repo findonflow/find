@@ -43,7 +43,7 @@ func main() {
 		)
 	}
 	o.Tx("adminAddNFTCatalog",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("collectionIdentifier", "A.195caada038c5806.BarterYardClubWerewolf.NFT"),
 		WithArg("contractName", "BarterYardClubWerewolf"),
 		WithArg("contractAddress", "0x195caada038c5806"),

@@ -9,6 +9,8 @@ import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
+import NFTCatalog from "./standard/NFTCatalog.cdc"
+import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
 
 pub contract Admin {
 
@@ -499,6 +501,28 @@ pub contract Admin {
 			}
 			
 			return Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		}
+
+		/// ===================================================================================
+		// FINDNFTCatalog
+		/// ===================================================================================
+
+		pub fun addCatalogEntry(collectionIdentifier : String, metadata : NFTCatalog.NFTCatalogMetadata) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			
+			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
+        	FINDCatalogAdmin.addCatalogEntry(collectionIdentifier : collectionIdentifier, metadata : metadata)
+		}
+
+		pub fun removeCatalogEntry(collectionIdentifier : String) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			
+			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
+        	FINDCatalogAdmin.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
 		}
 
 		init() {

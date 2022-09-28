@@ -15,12 +15,12 @@ func main() {
 
 	/*
 		o.Tx("adminRemoveNFTCatalog",
-			WithSigner("find"),
+			adminSigner,
 			WithArg("collectionIdentifier", "A.9a57dfe5c8ce609c.SoulMadeComponent"),
 		)
 
 		o.Tx("adminAddNFTCatalog",
-			WithSigner("find"),
+			adminSigner,
 			WithArg("collectionIdentifier", "SoulMadeComponent"),
 			WithArg("contractName", "SoulMadeComponent"),
 			WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
@@ -29,7 +29,7 @@ func main() {
 			WithArg("publicPathIdentifier", "SoulMadeComponentCollection"),
 		)
 			o.Tx("adminAddNFTCatalog",
-				WithSigner("find"),
+				adminSigner,
 				WithArg("collectionIdentifier", "SoulMade"),
 				WithArg("contractName", "SoulMadeMain"),
 				WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
@@ -39,7 +39,7 @@ func main() {
 			)
 
 			o.Tx("adminAddNFTCatalog",
-				WithSigner("find"),
+				adminSigner,
 				WithArg("collectionIdentifier", "SoulMadeComponent"),
 				WithArg("contractName", "SoulMadeComponent"),
 				WithArg("contractAddress", "0x9a57dfe5c8ce609c"),
@@ -49,7 +49,7 @@ func main() {
 			)
 
 			o.Tx("adminAddNFTCatalog",
-				WithSigner("find"),
+				adminSigner,
 				WithArg("collectionIdentifier", "Bitku"),
 				WithArg("contractName", "HaikuNFT"),
 				WithArg("contractAddress", "0xf61e40c19db2a9e2"),
@@ -59,7 +59,7 @@ func main() {
 			)
 
 			o.Tx("adminAddNFTCatalog",
-				WithSigner("find"),
+				adminSigner,
 				WithArg("collectionIdentifier", "some.place"),
 				WithArg("contractName", "SomePlaceCollectible"),
 				WithArg("contractAddress", "0x667a16294a089ef"),
@@ -69,7 +69,7 @@ func main() {
 			)
 
 			o.Tx("adminAddNFTCatalog",
-				WithSigner("find"),
+				adminSigner,
 				WithArg("collectionIdentifier", "bl0xPack"),
 				WithArg("contractName", "Bl0xPack"),
 				WithArg("contractAddress", "0x7620acf6d7f2468a"),

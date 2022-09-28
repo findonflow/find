@@ -1,9 +1,8 @@
 
 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalogAdmin from "../contracts/FINDNFTCatalogAdmin.cdc"
+import Admin from "../contracts/Admin.cdc"
 
 transaction(
     collectionIdentifier : String,
@@ -27,10 +26,10 @@ transaction(
     socials: {String : String},
 ) {
     
-    let adminResource: &FINDNFTCatalogAdmin.Admin
+    let adminResource: &Admin.AdminProxy
     
     prepare(acct: AuthAccount) {
-        self.adminResource = acct.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath)!
+        self.adminResource = acct.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
     }
     
     execute {

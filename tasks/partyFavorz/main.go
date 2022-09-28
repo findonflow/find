@@ -72,7 +72,7 @@ func main() {
 	}
 
 	o.Tx("adminAddNFTCatalog",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("collectionIdentifier", "PartyFavorz"),
 		WithArg("contractName", "PartyFavorz"),
 		WithArg("contractAddress", "user4"),
