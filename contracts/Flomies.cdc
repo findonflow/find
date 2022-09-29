@@ -77,7 +77,9 @@ pub contract Flomies: NonFungibleToken {
 			Type<MetadataViews.NFTCollectionData>(),
 			Type<MetadataViews.NFTCollectionDisplay>(),
 			Type<MetadataViews.Traits>(), 
-			Type<FindPack.PackRevealData>()
+			Type<FindPack.PackRevealData>(), 
+			Type<MetadataViews.Editions>(), 
+			Type<MetadataViews.Serial>()
 			]
 		}
 
@@ -156,6 +158,14 @@ pub contract Flomies: NonFungibleToken {
 					"packType" : "Flomies"
 				}
 				return FindPack.PackRevealData(data)
+
+			case Type<MetadataViews.Editions>() : 
+				return MetadataViews.Editions([
+					MetadataViews.Edition(name: "set", number: self.serial, max: 3333)
+				])
+
+			case Type<MetadataViews.Serial>() : 
+				return MetadataViews.Serial(self.serial)
 			}
 
 			return nil
