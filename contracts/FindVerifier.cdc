@@ -42,10 +42,9 @@ pub contract FindVerifier {
 
 			let floatsCollection=float!
 
-			let ids = floatsCollection.getIDs()
-			for id in ids {
-				let nft: &FLOAT.NFT = floatsCollection.borrowFLOAT(id: id)!
-				if self.floatEventIds.contains(nft.eventId) {
+			for eventId in self.floatEventIds {
+				let ids = floatsCollection.ownedIdsFromEvent(eventId: eventId)
+				if ids.length > 0 {
 					return true
 				}
 			}
@@ -86,15 +85,14 @@ pub contract FindVerifier {
 
 			let floatsCollection=float!
 
-			let ids = floatsCollection.getIDs()
 			let checked : [UInt64] = []
-			for id in ids {
-				let nft: &FLOAT.NFT = floatsCollection.borrowFLOAT(id: id)!
-				if self.floatEventIds.contains(nft.eventId) && !checked.contains(nft.eventId) {
-					checked.append(nft.eventId)
+			for eventId in self.floatEventIds {
+				let ids = floatsCollection.ownedIdsFromEvent(eventId: eventId)
+				if ids.length > 0 {
+					checked.append(ids[0])
 				}
 			}
-			
+	
 			if checked.length == self.floatEventIds.length {
 				return true
 			}
