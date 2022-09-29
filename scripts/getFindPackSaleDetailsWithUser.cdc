@@ -100,7 +100,7 @@ pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : U
 
 	// if there is no option available, get the soonest option available to the user, again, lowest price
 			if info.checkBuyable(addr: user, time: info.startTime) {
-				if soonestOption == nil || soonestOption!.startTime < info.startTime {
+				if soonestOption == nil || soonestOption!.startTime > info.startTime {
 					soonestOption = info
 				} else if soonestOption!.startTime == info.startTime && soonestOption!.price > info.price {
 					soonestOption = info

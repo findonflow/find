@@ -1,0 +1,2 @@
+#!/bin/bash
+flow scripts execute -n testnet $@  -o json | ./overflow-json
