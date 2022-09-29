@@ -366,7 +366,8 @@
       ],
       "mainnet-find-forge": [
         "NFGv3",
-        "PartyFavorz"
+        "PartyFavorz",
+        "Flomies"
       ]
     },
     "testnet": {

@@ -1,7 +1,8 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
-import FindForge from ".//FindForge.cdc"
+import FindForge from "./FindForge.cdc"
+import FindPack from "./FindPack.cdc"
 
 
 pub contract Flomies: NonFungibleToken {
@@ -75,7 +76,8 @@ pub contract Flomies: NonFungibleToken {
 			Type<Metadata>(),
 			Type<MetadataViews.NFTCollectionData>(),
 			Type<MetadataViews.NFTCollectionDisplay>(),
-			Type<MetadataViews.Traits>()
+			Type<MetadataViews.Traits>(), 
+			Type<FindPack.PackRevealData>()
 			]
 		}
 
@@ -145,7 +147,17 @@ pub contract Flomies: NonFungibleToken {
 
 			case Type<MetadataViews.Traits>():
 				return MetadataViews.Traits(self.getAllTraitsMetadataAsArray())
+			
+
+			case Type<FindPack.PackRevealData>():
+				let data : {String : String} = {
+					"nftImage" : imageFile.uri() ,
+					"nftName" : "Flomies ".concat(self.serial.toString()), 
+					"packType" : "Flomies"
+				}
+				return FindPack.PackRevealData(data)
 			}
+
 			return nil
 		}
 
