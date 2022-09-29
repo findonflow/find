@@ -104,8 +104,10 @@ func main() {
 		// "CryptoPiggoNFTCollection":     `["A.d3df824bf81910a4.CryptoPiggo.NFT"]`,
 		// "FlowverseSocks":               `["A.ce4c02539d1fabe8.FlowverseSocks.NFT"]`,
 		// "Zeedz":                        `["A.62b3063fbe672fc8.ZeedzINO.NFT"]`,
+		// "PartyFavorz": `["A.123cb666996b8432.PartyFavorz.NFT"]`,
 
-		"PartyFavorz": `["A.123cb666996b8432.PartyFavorz.NFT"]`,
+		"xG":     `["A.c357c8d061353f5f.XGStudio.NFT"]`,
+		"digiYo": `["A.ae3baa0d314e546b.Digiyo.NFT"]`,
 	}
 
 	for name, contracts := range flowNfts {
