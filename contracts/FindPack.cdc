@@ -548,6 +548,12 @@ pub contract FindPack: NonFungibleToken {
 				}
 			}
 
+			let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+			if wallet.check() {
+				let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
+				r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
+			}
+
 			metadata.wallet.borrow()!.deposit(from: <- vault)
 			collectionCapability.borrow()!.deposit(token: <- nft)
 
@@ -608,6 +614,12 @@ pub contract FindPack: NonFungibleToken {
 				} else {
 					//to-do :  emit events here ?
 				}
+			}
+
+			let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+			if wallet.check() {
+				let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
+				r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
 			}
 
 			// record buy 
