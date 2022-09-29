@@ -19,7 +19,6 @@ func main() {
 		"transferAllFusd",
 		"fillUpTheChest",
 		"setSellDandyForFlow.cdc",
-		"test*",
 	}, []string{})
 	if err != nil {
 		panic(err)
