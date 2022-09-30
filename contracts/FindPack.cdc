@@ -621,7 +621,7 @@ pub contract FindPack: NonFungibleToken {
 			if !royaltiesPaid {
 				let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 				if wallet.check() {
-					let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
+					let r = MetadataViews.Royalty(receiver: wallet, cut: 0.10, description: ".find")
 					r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
 				}
 			}
