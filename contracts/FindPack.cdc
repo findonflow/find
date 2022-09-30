@@ -607,19 +607,23 @@ pub contract FindPack: NonFungibleToken {
 				panic("Vault does not contain required amount of FT ".concat(saleInfo!.price.toString()))
 			}
 
-			//TODO: test
+			var royaltiesPaid=false
 			for royalty in metadata.primarySaleRoyalties.getRoyalties() {
 				if royalty.receiver.check(){
 					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
+					royaltiesPaid=true
 				} else {
 					//to-do :  emit events here ?
 				}
 			}
 
-			let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-			if wallet.check() {
-				let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
-				r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
+			//TODO: REMOVE THIS 
+			if !royaltiesPaid {
+				let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+				if wallet.check() {
+					let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
+					r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
+				}
 			}
 
 			// record buy 
@@ -996,4 +1000,4 @@ pub contract FindPack: NonFungibleToken {
 	}
 }
 
- 
+

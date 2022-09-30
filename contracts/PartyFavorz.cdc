@@ -111,7 +111,7 @@ pub contract PartyFavorz: NonFungibleToken {
 
 				let banner = MetadataViews.Media(
 					file: MetadataViews.IPFSFile(
-						cid: "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc",
+						cid: "QmVuMpDyJXHMCK9LnFboemWfPYabcwPNEmXgQMWbtxtGWD",
 						path: nil
 					),
 					mediaType: "image/png"
@@ -120,7 +120,7 @@ pub contract PartyFavorz: NonFungibleToken {
 				return MetadataViews.NFTCollectionDisplay(
 					name: "PartyFavorz",
 					description: "Party Favorz are born to celebrate the first ever official NFTDay by Dapper on Sept 20, 2022",
-					externalURL: MetadataViews.ExternalURL("https://find.xyz"),
+					externalURL: MetadataViews.ExternalURL("https://find.xyz/partyfavorz"),
 					squareImage: square,
 					bannerImage: banner,
 					socials: {
