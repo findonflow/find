@@ -2,7 +2,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
 import TokenForwarding from "./standard/TokenForwarding.cdc"
 
-pub contract FindIOwnU {
+pub contract FindIOU {
 
 	pub event IOUCreated(type: String, amount: UFix64)
 	pub event IOURedeemed(type: String, amount: UFix64)
@@ -25,7 +25,7 @@ pub contract FindIOwnU {
 
 		destroy() {
 			pre {
-				self.vault.balance == 0.0 : "balance of vault in IOU cannot be zero when destroy"
+				self.vault.balance == 0.0 : "balance of vault in IOU cannot be non-zero when destroy"
 			}
 			destroy self.vault
 		}
@@ -41,15 +41,15 @@ pub contract FindIOwnU {
 	}
 
 	pub fun createIOU(_ vault: @FungibleToken.Vault) : @EscrowedIOU {
+		emit IOUCreated(type: vault.getType().identifier, amount: vault.balance)
 		if vault.getType() == Type<@DapperUtilityCoin.Vault>() {
 			// Handle Dapper stuff here
-			let receiver = FindIOwnU.account.borrow<&TokenForwarding.Forwarder>(from: /storage/DUCForwarder)
+			let receiver = FindIOU.account.borrow<&{FungibleToken.Receiver}>(from: /storage/dapperUtilityCoinReceiver)
 				?? panic("Cannot borrow DUC receiver vault balance from FIND.")
 
 			let iou <- create EscrowedIOU(<- vault)
 			receiver.deposit(from: <- iou.redeem()) 
 
-			emit 
 			return <- iou
 		}
 
@@ -61,6 +61,7 @@ pub contract FindIOwnU {
 		pre {
 			iou.vaultType == vault.getType() : "The vault type passed in does not match with the redeeming iou. Required vault type : ".concat(iou.vaultType.identifier)
 		}
+		emit IOURedeemed(type: iou.vaultType.identifier, amount: iou.balance)
 
 		if iou.vaultType == Type<@DapperUtilityCoin.Vault>() {
 			if vault.balance != iou.balance {

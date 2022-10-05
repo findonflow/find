@@ -210,6 +210,7 @@
         "testnet": "0xe8124d8428980aa6"
       }
     },
+    "FindIOU": "./contracts/FindIOU.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
     "CollectionFactory": "./contracts/CollectionFactory.cdc",
@@ -467,7 +468,8 @@
         "EmeraldIdentityDapper",
         "EmeraldIdentity",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindIOU"
       ],
       "emulator-find": [],
       "emulator-user1": [],
