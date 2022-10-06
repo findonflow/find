@@ -5,6 +5,7 @@ import Dandy from "../contracts/Dandy.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
+import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 
@@ -20,6 +21,9 @@ transaction(tenant: Address, market: String){
 
             case "AuctionSoft" :
                 marketType = [Type<@FindMarketAuctionSoft.SaleItem>()]
+
+            case "Auction" :
+                marketType = [Type<@FindMarketAuctionIOU.SaleItem>()]
 
             case "DirectOfferEscrow" :
                 marketType = [Type<@FindMarketDirectOfferEscrow.SaleItem>()]

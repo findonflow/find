@@ -58,6 +58,72 @@ pub contract FindIOU {
 
 	}
 
+	pub fun createEscrowedIOU(_ vault: @FungibleToken.Vault) : @IOU {
+		pre {
+			vault.getType() != Type<@DapperUtilityCoin.Vault>() : "Please call createDapperIOU on Dapper Utility Coin Vaults"
+		}
+		let iou <- create IOU(<- vault)
+		emit IOUCreated(uuid: iou.uuid, by: nil, type: iou.vaultType.identifier, amount: iou.balance)
+		return <- iou
+	}
+
+	pub fun createDapperIOU(_ vault: @FungibleToken.Vault) : @IOU {
+		pre {
+			vault.getType() == Type<@DapperUtilityCoin.Vault>() : "Please call createEscrowIOU on non-DUC Vaults"
+		}
+		let iou <- create IOU(<- vault)
+		emit IOUCreated(uuid: iou.uuid, by: nil, type: iou.vaultType.identifier, amount: iou.balance)
+		let receiver = FindIOU.borrowDUCReceiver()
+		receiver.deposit(from: <- iou.redeem()) 
+		return <- iou
+	}
+
+	pub fun create(_ vault: @FungibleToken.Vault) : @IOU {
+		if vault.getType() == Type<@DapperUtilityCoin.Vault>() {
+			return <- self.createDapperIOU( <- vault)
+		}
+		return <- self.createEscrowedIOU(<- vault)
+	}
+
+	pub fun redeemEscrowIOU(_ iou: @FindIOU.IOU) : @FungibleToken.Vault {
+		if iou.vaultType == Type<@DapperUtilityCoin.Vault>() {
+			panic("Please call redeemDapperIOU on Dapper Utility Coin Vaults")
+		}
+		emit IOURedeemed(uuid: iou.uuid, by:nil, type: iou.vaultType.identifier, amount: iou.balance)
+		let vault <- iou.redeem()
+		destroy iou 
+		return <- vault
+	}
+
+	pub fun redeemDapperIOU(iou: @FindIOU.IOU, vault: @FungibleToken.Vault) : @FungibleToken.Vault {
+		if iou.vaultType != Type<@DapperUtilityCoin.Vault>() {
+			panic("Please call redeemEscrowIOU on non-DUC Vaults")
+		}
+		if vault.getType() != Type<@DapperUtilityCoin.Vault>() || vault.balance != iou.balance {
+			panic("Please pass in a DUC Vault with exact redeeming balance : ".concat(iou.balance.toString()))
+		}
+		emit IOURedeemed(uuid: iou.uuid, by:nil, type: iou.vaultType.identifier, amount: iou.balance)
+		destroy iou 
+		return <- vault
+	}
+
+	pub fun redeem(iou: @FindIOU.IOU, vault: @FungibleToken.Vault?) :  @FungibleToken.Vault {
+		if iou.vaultType == Type<@DapperUtilityCoin.Vault>() {
+			if vault != nil {
+				let returningVault <- self.redeemDapperIOU(iou: <- iou, vault: <- vault!)
+				return <- returningVault
+			}
+			panic("Please pass in a DUC Vault with exact redeeming balance : ".concat(iou.balance.toString()))
+		}
+		if vault == nil {
+			destroy vault
+			let returningVault <- self.redeemEscrowIOU(<- iou)
+			return <- returningVault
+		}
+		destroy vault
+		panic("Please do not pass in any vault when redeeming non-Dapper IOU")
+	}
+
 	pub resource interface CollectionPublic {
 		pub let IOUTypes : {Type : [UInt64]}
 		pub fun getIOUs() : [UInt64]
