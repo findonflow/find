@@ -4,20 +4,23 @@ import FindIOU from "../contracts/FindIOU.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 
-transaction(name: String) {
+transaction(id: UInt64) {
 
 	let walletReference : &FungibleToken.Vault
 	let walletBalance : UFix64
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
-		let iou <- account.load<@FindIOU.EscrowedIOU>(from: StoragePath(identifier: name.concat("_Find_IOU"))!) ?? panic("Cannot load IOU from storage path")
+		let collectionRef = account.borrow<&FindIOU.Collection>(from: FindIOU.CollectionStoragePath)!
+		let iouRef = collectionRef.borrowIOU(id)
+		let iouBalance = iouRef.balance
+		let vaultType = iouRef.vaultType.identifier
 
-		let ft = FTRegistry.getFTInfo(name) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(name))
+		let ft = FTRegistry.getFTInfo(vaultType) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(vaultType))
 		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("Cannot borrow DUC wallet reference from Dapper")
 		self.walletBalance = self.walletReference.balance
-		let returningVault <- self.walletReference.withdraw(amount: iou.balance)
+		let redeemingVault <- self.walletReference.withdraw(amount: iouBalance)
 
-		let vault <- FindIOU.redeemIOU(iou: <- iou, vault: <- returningVault)
+		let vault <- collectionRef.redeem(id:id, vault: <- redeemingVault)
 
 		var ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		if !ducReceiver.check() {

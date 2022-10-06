@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFindIOU(t *testing.T) {
@@ -34,8 +35,13 @@ func TestFindIOU(t *testing.T) {
 
 	otu.setUUID(400)
 
+	var flowIOUId uint64
+	var usdcIOUId uint64
+	var fusdIOUId uint64
+	var ducIOUId uint64
+
 	t.Run("Should be able to create IOU with Flow", func(t *testing.T) {
-		otu.O.Tx("createIOU",
+		iouId, err := otu.O.Tx("createIOU",
 			WithSigner("user1"),
 			WithArg("name", "Flow"),
 			WithArg("amount", 100.0),
@@ -44,13 +50,27 @@ func TestFindIOU(t *testing.T) {
 			AssertEvent(t, "IOUCreated", map[string]interface{}{
 				"type":   "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				"amount": 100.0,
-			})
+			}).
+			GetIdFromEvent("IOUCreated", "uuid")
+		assert.NoError(t, err)
+
+		flowIOUId = iouId
 	})
+
+	if flowIOUId == 0 {
+		flowIOUId, _ = otu.O.Tx("createIOU",
+			WithSigner("user1"),
+			WithArg("name", "Flow"),
+			WithArg("amount", 100.0),
+		).
+			AssertSuccess(t).
+			GetIdFromEvent("IOUCreated", "uuid")
+	}
 
 	t.Run("Should not be able to destroy IOU", func(t *testing.T) {
 		otu.O.Tx("testDestroyIOU",
 			WithSigner("user1"),
-			WithArg("name", "Flow"),
+			WithArg("id", flowIOUId),
 		).
 			AssertFailure(t, "balance of vault in IOU cannot be non-zero when destroy")
 	})
@@ -58,22 +78,22 @@ func TestFindIOU(t *testing.T) {
 	t.Run("Should be able to topUp IOU with flow", func(t *testing.T) {
 		otu.O.Tx("topUpIOU",
 			WithSigner("user1"),
-			WithArg("name", "Flow"),
+			WithArg("id", flowIOUId),
 			WithArg("amount", 200.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOUToppedUp", map[string]interface{}{
-				"type":   "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"amount": 200.0,
-				"from":   100.0,
-				"to":     300.0,
+				"type":       "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				"amount":     200.0,
+				"fromAmount": 100.0,
+				"toAmount":   300.0,
 			})
 	})
 
 	t.Run("Should be able to redeem IOU with Flow", func(t *testing.T) {
 		otu.O.Tx("redeemIOU",
 			WithSigner("user1"),
-			WithArg("name", "Flow"),
+			WithArg("id", flowIOUId),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOURedeemed", map[string]interface{}{
@@ -83,7 +103,7 @@ func TestFindIOU(t *testing.T) {
 	})
 
 	t.Run("Should be able to create IOU with USDC", func(t *testing.T) {
-		otu.O.Tx("createIOU",
+		iouId, err := otu.O.Tx("createIOU",
 			WithSigner("user1"),
 			WithArg("name", "USDC"),
 			WithArg("amount", 100.0),
@@ -92,28 +112,42 @@ func TestFindIOU(t *testing.T) {
 			AssertEvent(t, "IOUCreated", map[string]interface{}{
 				"type":   "A.f8d6e0586b0a20c7.FiatToken.Vault",
 				"amount": 100.0,
-			})
+			}).
+			GetIdFromEvent("IOUCreated", "uuid")
+
+		assert.NoError(t, err)
+		usdcIOUId = iouId
 	})
+
+	if usdcIOUId == 0 {
+		usdcIOUId, _ = otu.O.Tx("createIOU",
+			WithSigner("user1"),
+			WithArg("name", "USDC"),
+			WithArg("amount", 100.0),
+		).
+			AssertSuccess(t).
+			GetIdFromEvent("IOUCreated", "uuid")
+	}
 
 	t.Run("Should be able to topUp IOU with USDC", func(t *testing.T) {
 		otu.O.Tx("topUpIOU",
 			WithSigner("user1"),
-			WithArg("name", "USDC"),
+			WithArg("id", usdcIOUId),
 			WithArg("amount", 200.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOUToppedUp", map[string]interface{}{
-				"type":   "A.f8d6e0586b0a20c7.FiatToken.Vault",
-				"amount": 200.0,
-				"from":   100.0,
-				"to":     300.0,
+				"type":       "A.f8d6e0586b0a20c7.FiatToken.Vault",
+				"amount":     200.0,
+				"fromAmount": 100.0,
+				"toAmount":   300.0,
 			})
 	})
 
 	t.Run("Should be able to redeem IOU with USDC", func(t *testing.T) {
 		otu.O.Tx("redeemIOU",
 			WithSigner("user1"),
-			WithArg("name", "USDC"),
+			WithArg("id", usdcIOUId),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOURedeemed", map[string]interface{}{
@@ -123,7 +157,7 @@ func TestFindIOU(t *testing.T) {
 	})
 
 	t.Run("Should be able to create IOU with FUSD", func(t *testing.T) {
-		otu.O.Tx("createIOU",
+		iouId, err := otu.O.Tx("createIOU",
 			WithSigner("user1"),
 			WithArg("name", "FUSD"),
 			WithArg("amount", 100.0),
@@ -132,28 +166,42 @@ func TestFindIOU(t *testing.T) {
 			AssertEvent(t, "IOUCreated", map[string]interface{}{
 				"type":   "A.f8d6e0586b0a20c7.FUSD.Vault",
 				"amount": 100.0,
-			})
+			}).
+			GetIdFromEvent("IOUCreated", "uuid")
+
+		assert.NoError(t, err)
+		fusdIOUId = iouId
 	})
+
+	if fusdIOUId == 0 {
+		fusdIOUId, _ = otu.O.Tx("createIOU",
+			WithSigner("user1"),
+			WithArg("name", "FUSD"),
+			WithArg("amount", 100.0),
+		).
+			AssertSuccess(t).
+			GetIdFromEvent("IOUCreated", "uuid")
+	}
 
 	t.Run("Should be able to topUp IOU with FUSD", func(t *testing.T) {
 		otu.O.Tx("topUpIOU",
 			WithSigner("user1"),
-			WithArg("name", "FUSD"),
+			WithArg("id", fusdIOUId),
 			WithArg("amount", 200.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOUToppedUp", map[string]interface{}{
-				"type":   "A.f8d6e0586b0a20c7.FUSD.Vault",
-				"amount": 200.0,
-				"from":   100.0,
-				"to":     300.0,
+				"type":       "A.f8d6e0586b0a20c7.FUSD.Vault",
+				"amount":     200.0,
+				"fromAmount": 100.0,
+				"toAmount":   300.0,
 			})
 	})
 
 	t.Run("Should be able to redeem IOU with FUSD", func(t *testing.T) {
 		otu.O.Tx("redeemIOU",
 			WithSigner("user1"),
-			WithArg("name", "FUSD"),
+			WithArg("id", fusdIOUId),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOURedeemed", map[string]interface{}{
@@ -163,7 +211,7 @@ func TestFindIOU(t *testing.T) {
 	})
 
 	t.Run("Should be able to create IOU with Dapper DUC", func(t *testing.T) {
-		otu.O.Tx("createDapperIOU",
+		iouId, err := otu.O.Tx("createDapperIOU",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
 			WithArg("name", "DUC"),
@@ -173,22 +221,37 @@ func TestFindIOU(t *testing.T) {
 			AssertEvent(t, "IOUCreated", map[string]interface{}{
 				"type":   "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
 				"amount": 100.0,
-			})
+			}).
+			GetIdFromEvent("IOUCreated", "uuid")
+
+		assert.NoError(t, err)
+		ducIOUId = iouId
 	})
+
+	if ducIOUId == 0 {
+		ducIOUId, _ = otu.O.Tx("createDapperIOU",
+			WithSigner("user1"),
+			WithPayloadSigner("account"),
+			WithArg("name", "DUC"),
+			WithArg("amount", 100.0),
+		).
+			AssertSuccess(t).
+			GetIdFromEvent("IOUCreated", "uuid")
+	}
 
 	t.Run("Should be able to topUp IOU with Dapper DUC", func(t *testing.T) {
 		otu.O.Tx("topUpDapperIOU",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
-			WithArg("name", "DUC"),
+			WithArg("id", ducIOUId),
 			WithArg("amount", 200.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOUToppedUp", map[string]interface{}{
-				"type":   "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
-				"amount": 200.0,
-				"from":   100.0,
-				"to":     300.0,
+				"type":       "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
+				"amount":     200.0,
+				"fromAmount": 100.0,
+				"toAmount":   300.0,
 			})
 	})
 
@@ -196,7 +259,7 @@ func TestFindIOU(t *testing.T) {
 		otu.O.Tx("redeemDapperIOU",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
-			WithArg("name", "DUC"),
+			WithArg("id", ducIOUId),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "IOURedeemed", map[string]interface{}{

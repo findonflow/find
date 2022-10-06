@@ -1,10 +1,11 @@
 import FindIOU from "../contracts/FindIOU.cdc"
 
 
-transaction(name: String) {
+transaction(id: UInt64) {
 
 	prepare(account: AuthAccount) {
-		let iou <- account.load<@FindIOU.EscrowedIOU>(from: StoragePath(identifier: name.concat("_Find_IOU"))!) ?? panic("Cannot load IOU from storage path")
+		let collectionRef = account.borrow<&FindIOU.Collection>(from: FindIOU.CollectionStoragePath)!
+		let iou <- collectionRef.withdraw(id)
 
 		destroy iou
 	}

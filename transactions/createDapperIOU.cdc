@@ -10,13 +10,19 @@ transaction(name: String, amount: UFix64) {
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
 
+		if account.borrow<&FindIOU.Collection>(from: FindIOU.CollectionStoragePath) == nil {
+			account.save<@FindIOU.Collection>( <- FindIOU.createEmptyCollection() , to: FindIOU.CollectionStoragePath)
+			account.link<&FindIOU.Collection{FindIOU.CollectionPublic}>(FindIOU.CollectionPublicPath, target: FindIOU.CollectionStoragePath)
+		}
+		let collectionRef = account.borrow<&FindIOU.Collection>(from: FindIOU.CollectionStoragePath)!
+
 		let ft = FTRegistry.getFTInfo(name) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(name))
 		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("Cannot borrow DUC wallet reference from Dapper")
 		self.walletBalance = self.walletReference.balance
 		let vault <- self.walletReference.withdraw(amount: amount)
 
-		let iou <- FindIOU.createIOU(<- vault)
-		account.save(<- iou, to: StoragePath(identifier: name.concat("_Find_IOU"))!)
+		let iou <- collectionRef.create(<- vault)
+		collectionRef.deposit(<- iou)
 	}
 
 	post{
