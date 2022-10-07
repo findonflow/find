@@ -847,7 +847,7 @@ pub contract FindMarketAuctionIOU {
 
 			if iou.vaultType == Type<@DapperUtilityCoin.Vault>() {
 				if !self.iouReceiver.check() {
-					panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.iouReceiver.address.toString()))
+					panic("This user does not have iou receiver set up. User: ".concat(self.receiver.address.toString()))
 				}
 				self.iouReceiver.borrow()!.deposit(<- iou)
 				destroy bid
@@ -856,7 +856,7 @@ pub contract FindMarketAuctionIOU {
 
 			let vault <- FindIOU.redeemEscrowIOU(<- iou)
 			if !self.receiver.check() {
-				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
+				panic("This user does not have receiver vault set up. User: ".concat(self.receiver.address.toString()))
 			}
 			self.receiver.borrow()!.deposit(from: <- vault)
 			destroy bid

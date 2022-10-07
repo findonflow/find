@@ -5,6 +5,7 @@ import (
 
 	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketAuctionIOU(t *testing.T) {
@@ -134,6 +135,9 @@ func TestMarketAuctionIOU(t *testing.T) {
 				"buyer":  otu.O.Address("user2"),
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
+			}).
+			AssertEvent(otu.T, "IOURedeemed", map[string]interface{}{
+				"amount": 15.0,
 			})
 
 		otu.sendDandy("user1", "user3", id)
@@ -834,6 +838,41 @@ func TestMarketAuctionIOU(t *testing.T) {
 			fulfillMarketAuctionIOUDUC("user2", saleItemID[0], 15.0)
 
 		otu.sendExampleNFT("user1", "user2")
+	})
+
+	t.Run("Should return fund in IOU for DUC bids when cancelled", func(t *testing.T) {
+
+		saleItemID := otu.listNFTForIOUAuctionDUC("user1", 0, price)
+
+		otu.saleItemListed("user1", "active_listed", price).
+			auctionBidMarketIOUDUC("user2", "user1", saleItemID[0], price+5.0)
+
+		ducIOUId, err := otu.O.Tx("cancelMarketAuctionIOU",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", saleItemID),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
+				"status": "cancel_listing",
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindIOU.IOUDesposited", map[string]interface{}{
+				"to": otu.O.Address("user2"),
+			}).
+			GetIdFromEvent("A.f8d6e0586b0a20c7.FindIOU.IOUDesposited", "uuid")
+
+		assert.NoError(t, err)
+
+		otu.O.Tx("redeemDapperIOU",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("id", ducIOUId),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "IOURedeemed", map[string]interface{}{
+				"type":   "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
+				"amount": price + 5.0,
+			})
 	})
 
 	t.Run("Should not be able to list soul bound items", func(t *testing.T) {

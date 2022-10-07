@@ -1,8 +1,11 @@
+import FindIOU from "../contracts/FindIOU.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
+import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import FindMarketDirectOfferIOU from "../contracts/FindMarketDirectOfferIOU.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -217,6 +220,50 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		if !asBidCap.check() {
 			account.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
+		}
+
+	 /// auctions that refers FT so 'IOU' auction
+		let aiSaleType= Type<@FindMarketAuctionIOU.SaleItemCollection>()
+		let aiSalePublicPath=FindMarket.getPublicPath(aiSaleType, name: tenant.name)
+		let aiSaleStoragePath= FindMarket.getStoragePath(aiSaleType, name:tenant.name)
+		let aiSaleCap= account.getCapability<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aiSalePublicPath) 
+		if !aiSaleCap.check() {
+			account.save<@FindMarketAuctionIOU.SaleItemCollection>(<- FindMarketAuctionIOU.createEmptySaleItemCollection(tenantCapability), to: aiSaleStoragePath)
+			account.link<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aiSalePublicPath, target: aiSaleStoragePath)
+		}
+
+		let iouCap = account.getCapability<&FindIOU.Collection{FindIOU.CollectionPublic}>(FindIOU.CollectionPublicPath)
+		if !iouCap.check() {
+			account.save<@FindIOU.Collection>( <- FindIOU.createEmptyCollection() , to: FindIOU.CollectionStoragePath)
+			account.link<&FindIOU.Collection{FindIOU.CollectionPublic}>(FindIOU.CollectionPublicPath, target: FindIOU.CollectionStoragePath)
+		}
+
+		let aiBidType= Type<@FindMarketAuctionIOU.MarketBidCollection>()
+		let aiBidPublicPath=FindMarket.getPublicPath(aiBidType, name: tenant.name)
+		let aiBidStoragePath= FindMarket.getStoragePath(aiBidType, name:tenant.name)
+		let aiBidCap= account.getCapability<&FindMarketAuctionIOU.MarketBidCollection{FindMarketAuctionIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aiBidPublicPath) 
+		if !aiBidCap.check() {
+			account.save<@FindMarketAuctionIOU.MarketBidCollection>(<- FindMarketAuctionIOU.createEmptyMarketBidCollection(receiver:receiverCap, iouReceiver: iouCap, tenantCapability:tenantCapability), to: aiBidStoragePath)
+			account.link<&FindMarketAuctionIOU.MarketBidCollection{FindMarketAuctionIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aiBidPublicPath, target: aiBidStoragePath)
+		}
+
+	 /// direct offers that refers FT so 'IOU' direct offer
+		let diSaleType= Type<@FindMarketDirectOfferIOU.SaleItemCollection>()
+		let diSalePublicPath=FindMarket.getPublicPath(diSaleType, name: tenant.name)
+		let diSaleStoragePath= FindMarket.getStoragePath(diSaleType, name:tenant.name)
+		let diSaleCap= account.getCapability<&FindMarketDirectOfferIOU.SaleItemCollection{FindMarketDirectOfferIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(diSalePublicPath) 
+		if !diSaleCap.check() {
+			account.save<@FindMarketDirectOfferIOU.SaleItemCollection>(<- FindMarketDirectOfferIOU.createEmptySaleItemCollection(tenantCapability), to: diSaleStoragePath)
+			account.link<&FindMarketDirectOfferIOU.SaleItemCollection{FindMarketDirectOfferIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(diSalePublicPath, target: diSaleStoragePath)
+		}
+
+		let diBidType= Type<@FindMarketDirectOfferIOU.MarketBidCollection>()
+		let diBidPublicPath=FindMarket.getPublicPath(diBidType, name: tenant.name)
+		let diBidStoragePath= FindMarket.getStoragePath(diBidType, name:tenant.name)
+		let diBidCap= account.getCapability<&FindMarketDirectOfferIOU.MarketBidCollection{FindMarketDirectOfferIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(diBidPublicPath) 
+		if !diBidCap.check() {
+			account.save<@FindMarketDirectOfferIOU.MarketBidCollection>(<- FindMarketDirectOfferIOU.createEmptyMarketBidCollection(receiver:receiverCap, iouReceiver: iouCap, tenantCapability:tenantCapability), to: diBidStoragePath)
+			account.link<&FindMarketDirectOfferIOU.MarketBidCollection{FindMarketDirectOfferIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(diBidPublicPath, target: diBidStoragePath)
 		}
 		//SYNC with register
 

@@ -828,7 +828,7 @@ pub contract FindMarketAuctionEscrow {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 			if !self.receiver.check() {
-				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
+				panic("This user does not have receiver vault set up. User: ".concat(self.receiver.address.toString()))
 			}
 			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
 			destroy bid

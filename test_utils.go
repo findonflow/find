@@ -1002,7 +1002,8 @@ func (otu *OverflowTestUtils) auctionBidMarketIOU(name string, seller string, id
 			"id":     id,
 			"buyer":  otu.O.Address(name),
 			"status": "active_ongoing",
-		})
+		}).
+		AssertEmitEventName(otu.T, "IOUCreated")
 
 	return otu
 }
@@ -1056,6 +1057,25 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"amount": totalPrice,
+			"id":     id,
+			"buyer":  otu.O.Address(name),
+			"status": "active_offered",
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) increaseDirectOfferMarketIOU(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.Tx("increaseBidMarketDirectOfferIOU",
+		WithSigner(name),
+		WithArg("marketplace", "account"),
+		WithArg("id", id),
+		WithArg("amount", price),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
 			"amount": totalPrice,
 			"id":     id,
 			"buyer":  otu.O.Address(name),
@@ -1126,6 +1146,29 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 
 }
 
+func (otu *OverflowTestUtils) directOfferMarketIOU(name string, seller string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("bidMarketDirectOfferIOU",
+		WithSigner(name),
+		WithArg("marketplace", "account"),
+		WithArg("user", seller),
+		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("amount", price),
+		WithArg("validUntil", otu.currentTime()+100.0),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
+			"amount": price,
+			"id":     id,
+			"buyer":  otu.O.Address(name),
+		})
+
+	return otu
+
+}
+
 func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
 
 	res := otu.O.Tx("bidMarketDirectOfferEscrowed",
@@ -1148,9 +1191,43 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, s
 	return res
 }
 
+func (otu *OverflowTestUtils) directOfferMarketIOUExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
+
+	res := otu.O.Tx("bidMarketDirectOfferIOU",
+		WithSigner(name),
+		WithArg("marketplace", "account"),
+		WithArg("user", seller),
+		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("amount", price),
+		WithArg("validUntil", otu.currentTime()+100.0),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
+			"amount": price,
+			"buyer":  otu.O.Address(name),
+		}).
+		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferIOU.DirectOffer", "id")
+
+	return res
+}
+
 func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) *OverflowTestUtils {
 
 	otu.O.Tx("cancelAllMarketDirectOfferEscrowed",
+		WithSigner(signer),
+		WithArg("marketplace", "account"),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+
+}
+
+func (otu *OverflowTestUtils) cancelAllDirectOfferMarketIOU(signer string) *OverflowTestUtils {
+
+	otu.O.Tx("cancelAllMarketDirectOfferIOU",
 		WithSigner(signer),
 		WithArg("marketplace", "account"),
 	).
@@ -1243,6 +1320,25 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 	return otu
 }
 
+func (otu *OverflowTestUtils) acceptDirectOfferMarketIOU(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("fulfillMarketDirectOfferIOU",
+		WithSigner(name),
+		WithArg("marketplace", "account"),
+		WithArg("id", id),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
+			"id":     id,
+			"seller": otu.O.Address(name),
+			"buyer":  otu.O.Address(buyer),
+			"amount": price,
+			"status": "sold",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("acceptDirectOfferSoft",
@@ -1298,6 +1394,24 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 	return otu
 }
 
+func (otu *OverflowTestUtils) rejectDirectOfferIOU(name string, id uint64, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("cancelMarketDirectOfferIOU",
+		WithSigner(name),
+		WithArg("marketplace", "account"),
+		WithArg("ids", []uint64{id}),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
+			"status": "rejected",
+			"id":     id,
+			"seller": otu.O.Address(name),
+			"amount": price,
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller string, id uint64) *OverflowTestUtils {
 
 	otu.O.Tx("retractOfferMarketDirectOfferEscrowed",
@@ -1307,6 +1421,23 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller stri
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"status": "cancel",
+			"id":     id,
+			"seller": otu.O.Address(seller),
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) retractOfferDirectOfferIOU(buyer, seller string, id uint64) *OverflowTestUtils {
+
+	otu.O.Tx("retractOfferMarketDirectOfferIOU",
+		WithSigner(buyer),
+		WithArg("marketplace", "account"),
+		WithArg("id", id),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
 			"status": "cancel",
 			"id":     id,
 			"seller": otu.O.Address(seller),
@@ -1414,7 +1545,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionIOUFromBidder(name string, id 
 			"buyer":  otu.O.Address(name),
 			"amount": price,
 			"status": "sold",
-		})
+		}).
+		AssertEmitEventName(otu.T, "IOURedeemed")
 
 	return otu
 }
@@ -1454,7 +1586,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionIOU(name string, id uint64, bu
 			"buyer":  otu.O.Address(buyer),
 			"amount": price,
 			"status": "sold",
-		})
+		}).
+		AssertEmitEventName(otu.T, "IOURedeemed")
 
 	return otu
 }
@@ -2446,6 +2579,24 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 	return res
 }
 
+func (otu *OverflowTestUtils) directOfferMarketIOUDUC(name string, seller string, id uint64, price float64) []uint64 {
+
+	res := otu.O.Tx("bidMarketDirectOfferIOUDUC",
+		WithSigner(name),
+		WithPayloadSigner("account"),
+		WithArg("marketplace", "account"),
+		WithArg("user", seller),
+		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("id", id),
+		WithArg("amount", price),
+		WithArg("validUntil", otu.currentTime()+100.0),
+	).
+		AssertSuccess(otu.T).
+		GetIdsFromEvent("FindMarketDirectOfferIOU.DirectOffer", "id")
+
+	return res
+}
+
 func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name string, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("bidLeaseMarketDirectOfferSoftDUC",
@@ -2493,6 +2644,26 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uin
 			"buyer":  otu.O.Address(buyer),
 			"amount": price,
 			"status": "active_accepted",
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) acceptDirectOfferMarketIOUDUC(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("acceptDirectOfferIOUDUC",
+		WithSigner(name),
+		WithPayloadSigner("account"),
+		WithArg("marketplace", "account"),
+		WithArg("id", id),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindMarketDirectOfferIOU.DirectOffer", map[string]interface{}{
+			"id":     id,
+			"seller": otu.O.Address(name),
+			"buyer":  otu.O.Address(buyer),
+			"amount": price,
+			"status": "sold",
 		})
 
 	return otu

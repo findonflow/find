@@ -37,7 +37,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 	mintFund("testMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(350)
+	otu.setUUID(400)
 
 	/* MarketSale */
 	t.Run("Should not be able to fullfill sale if item was already sold on direct offer", func(t *testing.T) {
@@ -308,7 +308,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 
-		otu.setUUID(500)
+		otu.setUUID(600)
 
 		otu.directOfferMarketSoft("user2", "user1", id, price)
 
