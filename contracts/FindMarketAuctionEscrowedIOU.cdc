@@ -6,7 +6,7 @@ import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import Profile from "./Profile.cdc"
-import FindIOU from "./FindIOU.cdc"
+import IOweYou from "./IOweYou.cdc"
 import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT

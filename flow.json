@@ -168,6 +168,13 @@
         "testnet": "0x82ec283f88a62e65"
       }
     },
+    "FlowUtilityToken": {
+      "source": "./contracts/standard/FlowUtilityToken.cdc",
+      "aliases": {
+        "mainnet": "0xead892083b3e2c6c",
+        "testnet": "0x82ec283f88a62e65"
+      }
+    },
     "TokenForwarding": {
       "source": "./contracts/standard/TokenForwarding.cdc",
       "aliases": {
