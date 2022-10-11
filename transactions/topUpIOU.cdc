@@ -1,13 +1,13 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindIOU from "../contracts/FindIOU.cdc"
+import EscrowedIOweYou from "../contracts/EscrowedIOweYou.cdc"
 
 
 transaction(id: UInt64, amount: UFix64) {
 	
 	prepare(account: AuthAccount) {
 
-		let collectionRef = account.borrow<&FindIOU.Collection>(from: FindIOU.CollectionStoragePath)!
+		let collectionRef = account.borrow<&EscrowedIOweYou.Collection>(from: EscrowedIOweYou.CollectionStoragePath)!
 		let vaultType = collectionRef.borrowIOU(id).vaultType.identifier
 
 		let ft = FTRegistry.getFTInfo(vaultType) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(vaultType))

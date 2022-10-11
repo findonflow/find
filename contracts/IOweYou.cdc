@@ -1,4 +1,6 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
+import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
+import FlowUtilityToken from "./standard/FlowUtilityToken.cdc"
 
 // This is a contract that specifies the IOweYou resource interface. 
 // IOUs are resources of proof of payments.  
@@ -6,6 +8,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 pub contract IOweYou {
 
 	pub var DapperCoinTypes : [Type]
+	pub let IOUTypePathMap : {Type : String}
 
 	pub resource interface IOU {
 		// Type of the vault 
@@ -41,6 +44,7 @@ pub contract IOweYou {
 		pub fun containsIOU(_ id: UInt64) : Bool 
 		pub fun deposit(_ token: @{IOU})
 		pub fun depositAndRedeemToAccount(token: @{IOU}, vault: @FungibleToken.Vault?)
+		pub fun redeemToAccount(id: UInt64, vault: @FungibleToken.Vault?)
 		pub fun redeem(token: @{IOU}, vault: @FungibleToken.Vault?) : @FungibleToken.Vault
 	}
 
@@ -48,11 +52,37 @@ pub contract IOweYou {
 		self.DapperCoinTypes = types
 	}
 
-	init(){
-		self.DapperCoinTypes=[
+	access(account) fun addTypePath(type : Type, path: String) {
+		pre{
+			type.isSubtype(of: Type<&{IOweYou.IOU}>()) : "The type passed in is not implementing IOU Interface. Type : ".concat(type.identifier)
+		}
 
-		]
 	}
 
+	pub fun getPathFromType(_ type: Type) : String {
+			let identifier=type.identifier
 
+		var i=0
+		var newIdentifier=""
+		while i < identifier.length {
+
+			let item= identifier.slice(from: i, upTo: i+1) 
+			if item=="." {
+				newIdentifier=newIdentifier.concat("_")
+			} else {
+				newIdentifier=newIdentifier.concat(item)
+			}
+			i=i+1
+		}
+		return newIdentifier
+	}
+
+	init(){
+		self.DapperCoinTypes=[
+			Type<@DapperUtilityCoin.Vault>(),
+			Type<@FlowUtilityToken.Vault>()
+		]
+
+		self.IOUTypePathMap = {}
+	}
 }

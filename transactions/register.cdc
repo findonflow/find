@@ -1,4 +1,5 @@
-import FindIOU from "../contracts/FindIOU.cdc"
+import IOweYou from "../contracts/IOweYou.cdc"
+import EscrowedIOweYou from "../contracts/EscrowedIOweYou.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
@@ -8,7 +9,6 @@ import FIND from "../contracts/FIND.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarketDirectOfferIOU from "../contracts/FindMarketDirectOfferIOU.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
@@ -28,6 +28,7 @@ transaction(name: String, amount: UFix64) {
 	let vaultRef : &FUSD.Vault?
 	let leases : &FIND.LeaseCollection?
 	let price : UFix64
+	let iouCollection: &EscrowedIOweYou.Collection
 
 	prepare(account: AuthAccount) {
 
@@ -227,39 +228,23 @@ transaction(name: String, amount: UFix64) {
 			account.link<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aiSalePublicPath, target: aiSaleStoragePath)
 		}
 
-		let iouCap = account.getCapability<&FindIOU.Collection{FindIOU.CollectionPublic}>(FindIOU.CollectionPublicPath)
+		let iouCap = account.getCapability<&EscrowedIOweYou.Collection{IOweYou.CollectionPublic}>(EscrowedIOweYou.CollectionPublicPath)
 		if !iouCap.check() {
-			account.save<@FindIOU.Collection>( <- FindIOU.createEmptyCollection() , to: FindIOU.CollectionStoragePath)
-			account.link<&FindIOU.Collection{FindIOU.CollectionPublic}>(FindIOU.CollectionPublicPath, target: FindIOU.CollectionStoragePath)
+			account.save<@EscrowedIOweYou.Collection>( <- EscrowedIOweYou.createEmptyCollection(receiverCap) , to: EscrowedIOweYou.CollectionStoragePath)
+			account.link<&EscrowedIOweYou.Collection{IOweYou.CollectionPublic}>(EscrowedIOweYou.CollectionPublicPath, target: EscrowedIOweYou.CollectionStoragePath)
 		}
+
+		self.iouCollection = account.borrow<&EscrowedIOweYou.Collection>(from: EscrowedIOweYou.CollectionStoragePath)!
 
 		let aiBidType= Type<@FindMarketAuctionIOU.MarketBidCollection>()
 		let aiBidPublicPath=FindMarket.getPublicPath(aiBidType, name: tenant.name)
 		let aiBidStoragePath= FindMarket.getStoragePath(aiBidType, name:tenant.name)
 		let aiBidCap= account.getCapability<&FindMarketAuctionIOU.MarketBidCollection{FindMarketAuctionIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aiBidPublicPath) 
 		if !aiBidCap.check() {
-			account.save<@FindMarketAuctionIOU.MarketBidCollection>(<- FindMarketAuctionIOU.createEmptyMarketBidCollection(receiver:receiverCap, iouReceiver: iouCap, tenantCapability:tenantCapability), to: aiBidStoragePath)
+			account.save<@FindMarketAuctionIOU.MarketBidCollection>(<- FindMarketAuctionIOU.createEmptyMarketBidCollection(receiver: iouCap, tenantCapability:tenantCapability), to: aiBidStoragePath)
 			account.link<&FindMarketAuctionIOU.MarketBidCollection{FindMarketAuctionIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aiBidPublicPath, target: aiBidStoragePath)
 		}
 
-	 /// direct offers that refers FT so 'IOU' direct offer
-		let diSaleType= Type<@FindMarketDirectOfferIOU.SaleItemCollection>()
-		let diSalePublicPath=FindMarket.getPublicPath(diSaleType, name: tenant.name)
-		let diSaleStoragePath= FindMarket.getStoragePath(diSaleType, name:tenant.name)
-		let diSaleCap= account.getCapability<&FindMarketDirectOfferIOU.SaleItemCollection{FindMarketDirectOfferIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(diSalePublicPath) 
-		if !diSaleCap.check() {
-			account.save<@FindMarketDirectOfferIOU.SaleItemCollection>(<- FindMarketDirectOfferIOU.createEmptySaleItemCollection(tenantCapability), to: diSaleStoragePath)
-			account.link<&FindMarketDirectOfferIOU.SaleItemCollection{FindMarketDirectOfferIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(diSalePublicPath, target: diSaleStoragePath)
-		}
-
-		let diBidType= Type<@FindMarketDirectOfferIOU.MarketBidCollection>()
-		let diBidPublicPath=FindMarket.getPublicPath(diBidType, name: tenant.name)
-		let diBidStoragePath= FindMarket.getStoragePath(diBidType, name:tenant.name)
-		let diBidCap= account.getCapability<&FindMarketDirectOfferIOU.MarketBidCollection{FindMarketDirectOfferIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(diBidPublicPath) 
-		if !diBidCap.check() {
-			account.save<@FindMarketDirectOfferIOU.MarketBidCollection>(<- FindMarketDirectOfferIOU.createEmptyMarketBidCollection(receiver:receiverCap, iouReceiver: iouCap, tenantCapability:tenantCapability), to: diBidStoragePath)
-			account.link<&FindMarketDirectOfferIOU.MarketBidCollection{FindMarketDirectOfferIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(diBidPublicPath, target: diBidStoragePath)
-		}
 
 		let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
 

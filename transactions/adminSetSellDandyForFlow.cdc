@@ -8,7 +8,6 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarketDirectOfferIOU from "../contracts/FindMarketDirectOfferIOU.cdc"
 
 
 transaction(tenant: Address, market: String){
@@ -31,9 +30,6 @@ transaction(tenant: Address, market: String){
 
             case "DirectOfferSoft" :
                 marketType = [Type<@FindMarketDirectOfferSoft.SaleItem>()]
-
-            case "DirectOffer" :
-                marketType = [Type<@FindMarketDirectOfferIOU.SaleItem>()]
         }
 
         let saleItem = FindMarket.TenantSaleItem(name:"FlowDandy".concat(market), cut: nil, rules:[

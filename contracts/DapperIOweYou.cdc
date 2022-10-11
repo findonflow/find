@@ -1,7 +1,7 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import IOweYou from "./IOweYou.cdc"
 
-pub contract EscrowedIOweYou {
+pub contract DapperIOweYou {
 
 	pub event IOUCreated(uuid: UInt64, by:Address?, type: String, amount: UFix64)
 	pub event IOUToppedUp(uuid: UInt64, by:Address?, type: String, amount: UFix64, fromAmount: UFix64, toAmount: UFix64)
@@ -13,11 +13,14 @@ pub contract EscrowedIOweYou {
 	pub let CollectionStoragePath : StoragePath
 	pub let CollectionPublicPath : PublicPath
 
+	access(contract) fun borrowDapperAccountReceiver() : &{FungibleToken.Receiver} {
+		return DapperIOweYou.account.borrow<&{FungibleToken.Receiver}>()
+	}
+
 	pub resource IOU : IOweYou.IOU {
 		pub let vaultType : Type 
 		pub var balance : UFix64 
 		pub let receiver : Capability<&{FungibleToken.Receiver}>
-		access(self) let vault : @FungibleToken.Vault
 
 		init(vault: @FungibleToken.Vault, receiver: Capability<&{FungibleToken.Receiver}>) {
 			self.receiver = receiver

@@ -1,4 +1,4 @@
-import FindIOU from "../contracts/FindIOU.cdc"
+import IOweYou from "../contracts/IOweYou.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
@@ -6,7 +6,6 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarketDirectOfferIOU from "../contracts/FindMarketDirectOfferIOU.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
@@ -32,6 +31,8 @@ transaction(dapperAccount: Address, marketplace:Address, nftAliasOrIdentifier:St
 	let saleItems : &FindMarketAuctionIOU.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
 	let vaultType : Type
+	let iouCollection: &EscrowedIOweYou.Collection
+
 	
 	prepare(account: AuthAccount) {
 
