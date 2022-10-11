@@ -1,5 +1,6 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
+import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
@@ -362,6 +363,11 @@ pub contract FIND {
 			network.renew(name: self.name, vault:<-  vault)
 		}
 
+		pub fun extendLeaseDapper(merchAccount: Address, vault: @DapperUtilityCoin.Vault) {
+			let network= self.networkCap.borrow() ?? panic("The network is not up")
+			network.renewDapper(merchAccount: merchAccount, name: self.name, vault:<-  vault)
+		}
+
 		access(contract) fun move(profile: Capability<&{Profile.Public}>) {
 			let network= self.networkCap.borrow() ?? panic("The network is not up")
 			let senderAddress= network.profiles[self.name]!.address
@@ -551,10 +557,12 @@ pub contract FIND {
 		//anybody should be able to fulfill an auction as long as it is done
 		pub fun fulfillAuction(_ name: String) 
 		pub fun buyAddon(name:String, addon: String, vault: @FUSD.Vault) 
+		pub fun buyAddonDapper(merchAccount: Address, name:String, addon:String, vault: @DapperUtilityCoin.Vault) 
 		access(account) fun adminAddAddon(name:String, addon: String) 
 		pub fun getAddon(name:String) : [String]
 		pub fun checkAddon(name:String, addon: String) : Bool
 		access(account) fun getNames() : [String]
+		access(account) fun containsName(_ name: String) : Bool 
 		access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) 
 		pub fun getLeaseUUID(_ name: String) : UInt64 
 	}
@@ -612,6 +620,48 @@ pub contract FIND {
 			emit AddonActivated(name: name, addon: addon)
 			let networkWallet = self.networkWallet.borrow() ?? panic("The network is not up")
 			networkWallet.deposit(from: <- vault)
+		}
+
+		pub fun buyAddonDapper(merchAccount: Address, name:String, addon:String, vault: @DapperUtilityCoin.Vault)  {
+			FIND.checkMerchantAddress(merchAccount)
+
+			if !self.leases.containsKey(name) {
+				panic("Invalid name=".concat(name))
+			}
+
+			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+			if !network.publicEnabled {
+				panic("Public registration is not enabled yet")
+			}
+
+			if network.addonPrices[addon] == nil {
+				panic("This addon is not available. addon : ".concat(addon))
+			}
+			let addonPrice = network.addonPrices[addon]!
+
+			let lease = self.borrow(name)
+
+			if lease.addons.containsKey(addon) {
+				panic("You already have this addon : ".concat(addon))
+			}
+
+			if vault.balance != addonPrice {
+				panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
+			}
+
+			lease.addAddon(addon)
+
+			//put something in your storage
+			emit AddonActivated(name: name, addon: addon)
+
+			// This is here just to check if the network is up
+			let networkWallet = self.networkWallet.borrow() ?? panic("The network is not up")
+
+			let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+			
+			let walletRef = wallet.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
+			walletRef.deposit(from: <- vault)
 		}
 
 		access(account) fun adminAddAddon(name:String, addon:String)  {
@@ -683,6 +733,10 @@ pub contract FIND {
 
 		access(account) fun getNames() : [String] {
 			return self.leases.keys
+		} 
+
+		access(account) fun containsName(_ name: String) : Bool {
+			return self.leases.containsKey(name)
 		} 
 
 		pub fun getLeaseInformation() : [LeaseInformation]  {
@@ -1173,6 +1227,20 @@ pub contract FIND {
 			network.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
 		}
 
+		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
+		pub fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
+			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
+			let leases= self.owner!.getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+
+			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+			if !network.publicEnabled {
+				panic("Public registration is not enabled yet")
+			}
+
+			network.registerDapper(merchAccount: merchAccount, name:name, vault: <- vault, profile: profileCap, leases: leases)
+		}
+
 		destroy() {
 			destroy self.leases
 			destroy self.auctions
@@ -1319,6 +1387,36 @@ pub contract FIND {
 			panic("Could not find profile with name=".concat(name))
 		}
 
+		access(contract) fun renewDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault) {
+
+			FIND.checkMerchantAddress(merchAccount)
+
+			if let lease= self.profiles[name] {
+
+				var newTime=0.0
+				if lease.status() == LeaseStatus.TAKEN {
+					//the name is taken but not expired so we extend the total period of the lease
+					lease.setValidUntil(lease.validUntil + self.leasePeriod)
+				} else {
+					lease.setValidUntil(Clock.time() + self.leasePeriod)
+				}
+				lease.setLockedUntil(lease.validUntil+ self.lockPeriod)
+
+				let cost= self.calculateCost(name)
+				if vault.balance != cost {
+					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+				}
+				let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+				
+				let walletRef = wallet.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
+				walletRef.deposit(from: <- vault)
+
+				emit Register(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
+				self.profiles[name] =  lease
+				return
+			}
+			panic("Could not find profile with name=".concat(name))
+		}
 
 		access(account) fun getLeaseExpireTime(_ name: String) : UFix64{
 			if let lease= self.profiles[name] {
@@ -1367,6 +1465,36 @@ pub contract FIND {
 			}
 			self.wallet.borrow()!.deposit(from: <- vault)
 
+			self.internal_register(name: name, profile: profile, leases: leases)
+		}
+
+		//everybody can call register, normally done through the convenience method in the contract
+		pub fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+			FIND.checkMerchantAddress(merchAccount)
+
+			if name.length < 3 {
+				panic( "A FIND name has to be minimum 3 letters long")
+			}
+
+			let nameStatus=self.readStatus(name)
+			if nameStatus.status == LeaseStatus.TAKEN {
+				panic("Name already registered")
+			}
+
+			//if we have a locked profile that is not owned by the same identity then panic
+			if nameStatus.status == LeaseStatus.LOCKED {
+				panic("Name is locked")
+			}
+
+			let cost= self.calculateCost(name)
+			if vault.balance != cost {
+				panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+			}
+
+			let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+			
+			let walletRef = wallet.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
+			walletRef.deposit(from: <- vault)
 			self.internal_register(name: name, profile: profile, leases: leases)
 		}
 
@@ -1739,6 +1867,28 @@ pub contract FIND {
 		}
 		return true
 
+	}
+
+	access(contract) fun checkMerchantAddress(_ merchAccount: Address) {
+		// If only find can sign the trxns and call this function, then we do not have to check the address passed in.  
+		// Otherwise, would it be wiser if we hard code the address here? 
+
+		if FIND.account.address == 0x097bafa4e0b48eef {
+		// This is for mainnet
+			if merchAccount != 0x097bafa4e0b48eef {
+				panic("Merch Account address does not match with expected")
+			}
+		} else if FIND.account.address == 0x35717efbbce11c74 {
+		// This is for testnet
+			if merchAccount != 0x35717efbbce11c74 {
+				panic("Merch Account address does not match with expected")
+			}
+		} else {
+		// otherwise falls into emulator
+			if merchAccount != 0x01cf0e2f2f715450 {
+				panic("Merch Account address does not match with expected")
+			}
+		}
 	}
 
 	init() {

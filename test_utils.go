@@ -185,6 +185,28 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 	return otu
 }
 
+func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
+
+	nameSigner := WithSigner(name)
+	nameArg := WithArg("name", name)
+	merchAccountArg := WithArg("merchAccount", "find")
+
+	nameAddress := otu.O.Address(name)
+
+	otu.O.Tx("createProfileDapper",
+		nameSigner,
+		merchAccountArg,
+		nameArg).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
+			"account":   nameAddress,
+			"userName":  name,
+			"createdAt": "find",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 	otu.registerUserTransaction(name)
 	return otu
@@ -218,9 +240,73 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResul
 
 }
 
+func (otu *OverflowTestUtils) registerDapperUser(name string) *OverflowTestUtils {
+	nameAddress := otu.O.Address(name)
+	expireTime := otu.currentTime() + leaseDurationFloat
+
+	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
+
+	otu.O.Tx("registerDapper",
+		WithSigner(name),
+		WithPayloadSigner("account"),
+		WithArg("merchAccount", "find"),
+		WithArg("name", name),
+		WithArg("amount", 5.0),
+	).AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
+			"validUntil":  expireTime,
+			"lockedUntil": lockedTime,
+			"owner":       nameAddress,
+			"name":        name,
+		}).
+		AssertEvent(otu.T, "TokenForwarding.ForwardedDeposit", map[string]interface{}{
+			"amount": 5.0,
+		})
+
+	return otu
+
+}
+
+func (otu *OverflowTestUtils) registerDapperUserWithName(buyer, name string) *OverflowTestUtils {
+	nameAddress := otu.O.Address(buyer)
+	expireTime := otu.currentTime() + leaseDurationFloat
+
+	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
+
+	otu.O.Tx("registerDapper",
+		WithSigner(buyer),
+		WithPayloadSigner("account"),
+		WithArg("merchAccount", "find"),
+		WithArg("name", name),
+		WithArg("amount", 5.0),
+	).AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
+			"validUntil":  expireTime,
+			"lockedUntil": lockedTime,
+			"owner":       nameAddress,
+			"name":        name,
+		}).
+		AssertEvent(otu.T, "TokenForwarding.ForwardedDeposit", map[string]interface{}{
+			"amount": 5.0,
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) renewUserWithName(user, name string) *OverflowTestUtils {
 	otu.O.Tx("renewName",
 		WithSigner(user),
+		WithArg("name", name),
+		WithArg("amount", 5.0),
+	)
+	return otu
+}
+
+func (otu *OverflowTestUtils) renewDapperUserWithName(user, name string) *OverflowTestUtils {
+	otu.O.Tx("renewNameDapper",
+		WithSigner(user),
+		WithPayloadSigner("account"),
+		WithArg("merchAccount", "find"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
 	)
@@ -422,6 +508,25 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 
 	otu.O.Tx("buyAddon",
 		WithSigner(user),
+		WithArg("name", user),
+		WithArg("addon", "forge"),
+		WithArg("amount", 50.0),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
+			"name":  user,
+			"addon": "forge",
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) buyForgeDapper(user string) *OverflowTestUtils {
+
+	otu.O.Tx("buyAddonDapper",
+		WithSigner(user),
+		WithPayloadSigner("account"),
+		WithArg("merchAccount", "find"),
 		WithArg("name", user),
 		WithArg("addon", "forge"),
 		WithArg("amount", 50.0),
