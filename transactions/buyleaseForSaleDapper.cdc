@@ -6,7 +6,7 @@ import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 //TODO: test, and rename to Dapper, repeat for other tx
-transaction(dapperAddress: Address, leaseName: String, amount: UFix64) {
+transaction(leaseName: String, amount: UFix64) {
 
 	let to : Address
 	let saleItemsCap: Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>

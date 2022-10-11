@@ -135,7 +135,7 @@ func TestFINDDapper(t *testing.T) {
 
 	})
 
-	t.Run("Should automaticall set Find ame to empty if sender have none", func(t *testing.T) {
+	t.Run("Should automatically set Find name to empty if sender have none", func(t *testing.T) {
 
 		otu.O.Script("getName",
 			WithArg("address", "user1"),
@@ -317,7 +317,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("addon", "forge"),
 			WithArg("amount", 10.0),
 		).
-			AssertFailure(t, "Expect 50.00000000 FUSD for forge addon")
+			AssertFailure(t, "Expect 50.00000000 Dapper Credit for forge addon")
 
 		/* Should not be able to buy addons that does not exist */
 		otu.O.Tx("buyAddonDapper",
@@ -331,69 +331,5 @@ func TestFINDDapper(t *testing.T) {
 			AssertFailure(t, "This addon is not available.")
 
 	})
-
-	// Should not be able to manage fund
-	// t.Run("Should be able to fund users with profile but without find name", func(t *testing.T) {
-
-	// 	user := "user1"
-	// 	otu.registerFtInRegistry().
-	// 		createUser(1000, "user3")
-
-	// 	user3 := otu.O.Address("user3")
-
-	// 	otu.O.Tx("sendFT",
-	// 		WithSigner(user),
-	// 		WithArg("name", user3),
-	// 		WithArg("amount", 10.0),
-	// 		WithArg("ftAliasOrIdentifier", "Flow"),
-	// 		WithArg("tag", `""`),
-	// 		WithArg("message", `""`),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEmitEventName(t, "FungibleTokenSent")
-
-	// 	otu.O.Tx("sendFT",
-	// 		WithSigner("user3"),
-	// 		WithArg("name", user),
-	// 		WithArg("amount", 10.0),
-	// 		WithArg("ftAliasOrIdentifier", "Flow"),
-	// 		WithArg("tag", `""`),
-	// 		WithArg("message", `""`),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEmitEventName(t, "FungibleTokenSent")
-
-	// })
-
-	// t.Run("Should be able to fund users without profile wallet, but with vault proper set up", func(t *testing.T) {
-
-	// 	user := "user1"
-
-	// 	user3 := otu.O.Address("user3")
-	// 	otu.removeProfileWallet("user3")
-
-	// 	otu.O.Tx("sendFT",
-	// 		overflow.WithSigner(user),
-	// 		overflow.WithArg("name", user3),
-	// 		overflow.WithArg("amount", 10.0),
-	// 		overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-	// 		overflow.WithArg("tag", `""`),
-	// 		overflow.WithArg("message", `""`),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEmitEventName(t, "FungibleTokenSent")
-
-	// 	otu.O.Tx("sendFT",
-	// 		overflow.WithSigner("user3"),
-	// 		overflow.WithArg("name", user),
-	// 		overflow.WithArg("amount", 10.0),
-	// 		overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-	// 		overflow.WithArg("tag", `""`),
-	// 		overflow.WithArg("message", `""`),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEmitEventName(t, "FungibleTokenSent")
-
-	// })
 
 }

@@ -141,7 +141,7 @@ func TestFIND(t *testing.T) {
 
 	})
 
-	t.Run("Should automaticall set Find ame to empty if sender have none", func(t *testing.T) {
+	t.Run("Should automatically set Find name to empty if sender have none", func(t *testing.T) {
 
 		otu.O.Script("getName",
 			overflow.WithArg("address", "user1"),

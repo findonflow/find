@@ -647,7 +647,7 @@ pub contract FIND {
 			}
 
 			if vault.balance != addonPrice {
-				panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
+				panic("Expect ".concat(addonPrice.toString()).concat(" Dapper Credit for ").concat(addon).concat(" addon"))
 			}
 
 			lease.addAddon(addon)
@@ -1404,7 +1404,7 @@ pub contract FIND {
 
 				let cost= self.calculateCost(name)
 				if vault.balance != cost {
-					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Dapper Credit"))
 				}
 				let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 				
@@ -1488,7 +1488,7 @@ pub contract FIND {
 
 			let cost= self.calculateCost(name)
 			if vault.balance != cost {
-				panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+				panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Dapper Credit"))
 			}
 
 			let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
