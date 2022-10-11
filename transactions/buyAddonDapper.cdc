@@ -4,24 +4,24 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(merchAccount: Address, name: String, addon:String, amount:UFix64) {
 
-	let leases : &FIND.LeaseCollection?
-	let vaultRef : &DapperUtilityCoin.Vault? 
+	let finLeases : &FIND.LeaseCollection
+	let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
+	let balanceBeforeTransfer: UFix64
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
+		self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
+		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
+		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")
 
-		self.leases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
-		self.vaultRef = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
-
-	}
-
-	pre{
-		self.leases != nil : "Could not borrow reference to the leases collection"
-		self.vaultRef != nil : "Could not borrow reference to the dapper coin vault!"
 	}
 
 	execute {
-		let vault <- self.vaultRef!.withdraw(amount: amount) as! @DapperUtilityCoin.Vault
-		self.leases!.buyAddonDapper(merchAccount: merchAccount, name: name, addon: addon, vault: <- vault)
+		let vault <- self.mainDapperUtilityCoinVault.withdraw(amount: amount) as! @DapperUtilityCoin.Vault
+		self.finLeases.buyAddonDapper(merchAccount: merchAccount, name: name, addon: addon, vault: <- vault)
+	}
+
+	post {
+		self.mainDapperUtilityCoinVault.balance == self.balanceBeforeTransfer: "DapperUtilityCoin leakage"
 	}
 }
 

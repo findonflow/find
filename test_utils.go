@@ -2161,7 +2161,7 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 
 func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("buyLeaseForSaleDUC",
+	otu.O.Tx("buyLeaseForSaleDapper",
 		WithSigner(buyer),
 		WithPayloadSigner("account"),
 		WithArg("dapperAddress", "account"),
