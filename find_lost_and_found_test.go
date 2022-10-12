@@ -134,6 +134,36 @@ func TestFindLostAndFound(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to send thru sendNFT transaction with account initiated and display receiverName in event", func(t *testing.T) {
+		otu.O.Tx("setupExampleNFTCollection",
+			WithSigner("user1"),
+		).
+			AssertSuccess(t)
+
+		receiverAddress := otu.O.Address("user1")
+
+		otu.O.Tx("sendNFTs",
+			WithSigner("account"),
+			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
+			WithArg("allReceivers", `["`+receiverAddress+`"]`),
+			WithArg("ids", []uint64{0}),
+			WithArg("memos", `["Hello!"]`),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
+				"receiver":     otu.O.Address("user1"),
+				"receiverName": "user1",
+				"sender":       otu.O.Address("account"),
+				"type":         "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+				"id":           0,
+				"memo":         "Hello!",
+				"name":         "DUCExampleNFT",
+				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
+			})
+		resetState(otu, "user1", true)
+
+	})
+
 	t.Run("Should be able to redeem with Collection Public and MetadataViews linked", func(t *testing.T) {
 
 		ticketID, err := otu.O.Tx("sendNFTs",
