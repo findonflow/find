@@ -14,10 +14,11 @@ import DapperIOweYou from "../contracts/DapperIOweYou.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 
-transaction(merchAccount: Address, ) {
+transaction() {
 	prepare(account: AuthAccount) {
 
-		let dapper = getAccount(merchAccount)
+		// this is just for "account" signing the transaction to set up "account" user
+		let dapper = account
 
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register

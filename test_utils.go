@@ -635,7 +635,7 @@ func (otu *OverflowTestUtils) listNFTForIOUAuctionDapper(name string, id uint64,
 
 	otu.O.Tx("listNFTForAuctionIOUDapper",
 		WithSigner(name),
-		WithArg("merchAccount", "find"),
+		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
@@ -1940,6 +1940,18 @@ func (otu *OverflowTestUtils) setLeaseTenantRuleFUSD(optionName string) *Overflo
 func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetFindCut",
+		WithSigner("find"),
+		WithArg("tenant", "account"),
+		WithArg("cut", cut),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFindDapperCoinCut(cut float64) *OverflowTestUtils {
+
+	otu.O.Tx("adminSetFindDapperCoinCut",
 		WithSigner("find"),
 		WithArg("tenant", "account"),
 		WithArg("cut", cut),

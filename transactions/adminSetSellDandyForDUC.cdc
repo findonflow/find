@@ -1,6 +1,9 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import Admin from "../contracts/Admin.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
+import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
@@ -28,6 +31,14 @@ transaction(tenant: Address, market: String){
 
             case "AuctionIOUDapper" :
                 marketType = [Type<@FindMarketAuctionIOUDapper.SaleItem>()]
+
+                // If it is with Dapper, have to set Find Cuts for Dapper Coins 
+                let rules = [
+                    FindMarket.TenantRule(name:"DUC", types:[Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()], ruleType: "ft", allow: true),
+                    FindMarket.TenantRule(name:"ExampleNFT", types:[ Type<@Dandy.NFT>()], ruleType: "nft", allow: true)
+                    ]
+                let cap = getAccount(tenant).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+                adminRef.addFindCut(tenant: tenant, FindCutName: "findDapperRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 
             case "DirectOfferEscrow" :
                 marketType = [Type<@FindMarketDirectOfferEscrow.SaleItem>()]

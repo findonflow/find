@@ -32,7 +32,6 @@ func TestMarketAuctionIOUEscrowed(t *testing.T) {
 
 	otu.O.Tx("initIOUCollections",
 		WithSigner("account"),
-		WithArg("merchAccount", "account"),
 	).
 		AssertSuccess(t)
 

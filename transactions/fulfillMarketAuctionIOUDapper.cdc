@@ -20,7 +20,7 @@ transaction(marketplace:Address, owner: String, id: UInt64) {
 		self.saleItem = FindMarketAuctionIOUDapper.getSaleItemCapability(marketplace:marketplace, user:address)
 
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionIOUDapper.MarketBidCollection>())
-		let item = FindMarket.assertOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
+		let item = FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 	

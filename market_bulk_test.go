@@ -106,7 +106,7 @@ func TestBulkMarketSale(t *testing.T) {
 			WithArg("amounts", `[10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]`),
 		).
 			AssertSuccess(t).
-			AssertComputationLessThenOrEqual(t, 2100)
+			AssertComputationLessThenOrEqual(t, 2200)
 
 		result.Print(WithMeter(), WithoutEvents())
 

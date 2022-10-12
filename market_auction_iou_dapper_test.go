@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketAuctionIOUDapper(t *testing.T) {
@@ -33,7 +34,6 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 
 	otu.O.Tx("initIOUCollections",
 		WithSigner("account"),
-		WithArg("merchAccount", "account"),
 	).
 		AssertSuccess(t)
 
@@ -47,7 +47,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
-		WithArg("merchAccount", "account"),
+		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
@@ -135,7 +135,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 
 		otu.setUUID(600)
 
-		otu.O.Tx("cancelMarketAuctionIOUDapper",
+		iouId, err := otu.O.Tx("cancelMarketAuctionIOUDapper",
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("ids", []uint64{id}),
@@ -148,9 +148,16 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
 			}).
-			AssertEvent(otu.T, "IOURedeemed", map[string]interface{}{
-				"amount": 15.0,
-			})
+			GetIdFromEvent("DapperIOweYou.IOUDesposited", "uuid")
+
+		assert.NoError(t, err)
+
+		otu.O.Tx("redeemIOUDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("id", iouId),
+		).
+			AssertSuccess(t)
 
 		otu.sendDandy("user1", "user3", id)
 
@@ -161,7 +168,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 		otu.O.Tx(
 			"listNFTForAuctionIOUDapper",
 			WithSigner("user1"),
-			WithArg("merchAccount", "account"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
@@ -182,7 +189,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 		otu.O.Tx(
 			"listNFTForAuctionIOUDapper",
 			WithSigner("user1"),
-			WithArg("merchAccount", "account"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
@@ -202,7 +209,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 		otu.O.Tx(
 			"listNFTForAuctionIOUDapper",
 			WithSigner("user1"),
-			WithArg("merchAccount", "account"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
@@ -391,7 +398,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 		buyer := "user2"
 		name := "user1"
 
-		otu.O.Tx("cancelMarketAuctionIOUDapper",
+		iouId, err := otu.O.Tx("cancelMarketAuctionIOUDapper",
 			WithSigner(name),
 			WithArg("marketplace", "account"),
 			WithArg("ids", []uint64{id}),
@@ -403,7 +410,17 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 				"buyer":  otu.O.Address(buyer),
 				"amount": 11.0,
 				"status": "cancel_listing",
-			})
+			}).
+			GetIdFromEvent("DapperIOweYou.IOUDesposited", "uuid")
+
+		assert.NoError(t, err)
+
+		otu.O.Tx("redeemIOUDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("id", iouId),
+		).
+			AssertSuccess(t)
 
 	})
 
@@ -655,7 +672,6 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
-				"findName":    "user1",
 				"id":          id,
 				"royaltyName": "creator",
 				"tenant":      "find",
@@ -678,7 +694,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 		otu.listNFTForIOUAuctionDapper("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketIOUDapper("user2", "user1", id, price+5.0).
-			setFindCut(0.035)
+			setFindDapperCoinCut(0.035)
 
 		otu.tickClock(500.0)
 

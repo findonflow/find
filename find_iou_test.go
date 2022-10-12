@@ -28,11 +28,6 @@ func TestFindIOU(t *testing.T) {
 	otu.registerFtInRegistry().
 		registerDUCInRegistry()
 
-	otu.O.Tx("adminInitDUC",
-		WithSigner("account"),
-		WithArg("dapperAddress", "account"),
-	).AssertSuccess(t)
-
 	otu.setUUID(400)
 
 	var flowIOUId uint64

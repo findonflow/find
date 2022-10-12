@@ -365,6 +365,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 	}
 
 	pre{
+		!IOweYou.DapperCoinTypes.contains(self.vaultType) : "Please use Dapper contracts for this token type. Type : ".concat(self.vaultType.identifier)
 		// Ben : panic on some unreasonable inputs in trxn 
 		minimumBidIncrement > 0.0 : "Minimum bid increment should be larger than 0."
 		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment." 

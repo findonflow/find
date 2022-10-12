@@ -2,16 +2,16 @@
     "FindMarketAuctionEscrow": [
         "A.f8d6e0586b0a20c7.Dandy.NFT"
     ],
-    "FindMarketAuctionIOU": [
+    "FindMarketAuctionIOUDapper": [
+        "A.f8d6e0586b0a20c7.Dandy.NFT"
+    ],
+    "FindMarketAuctionIOUEscrowed": [
         "A.f8d6e0586b0a20c7.Dandy.NFT"
     ],
     "FindMarketAuctionSoft": [
         "A.f8d6e0586b0a20c7.Dandy.NFT"
     ],
     "FindMarketDirectOfferEscrow": [
-        "A.f8d6e0586b0a20c7.Dandy.NFT"
-    ],
-    "FindMarketDirectOfferIOU": [
         "A.f8d6e0586b0a20c7.Dandy.NFT"
     ],
     "FindMarketDirectOfferSoft": [

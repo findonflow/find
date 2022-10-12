@@ -15,16 +15,14 @@ import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
-transaction(merchAccount: Address, marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
+transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 	
 	let saleItems : &FindMarketAuctionIOUDapper.SaleItemCollection?
 	let vaultType : Type
 	let pointer : FindViews.AuthNFTPointer
-	let ftType : Type
 	
-	prepare(account: AuthAccount) {
+	prepare(dapper: AuthAccount, account: AuthAccount) {
 		let name = account.address.toString()
-		let dapper = getAccount(merchAccount)
 		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		if !ducReceiver.check() {
 			// Create a new Forwarder resource for DUC and store it in the new account's storage
@@ -140,7 +138,7 @@ transaction(merchAccount: Address, marketplace:Address, nftAliasOrIdentifier:Str
 		let nft = collection.collectionData
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		self.ftType = ft.type
+		self.vaultType = ft.type
 
 		var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
 		
@@ -164,11 +162,10 @@ transaction(merchAccount: Address, marketplace:Address, nftAliasOrIdentifier:Str
 
 		self.saleItems= account.borrow<&FindMarketAuctionIOUDapper.SaleItemCollection>(from: path)
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
-		self.vaultType= ft.type
 	}
 
 	pre{
-		IOweYou.DapperCoinTypes.contains(self.ftType) : "Please use Escrowed contracts for this token type. Type : ".concat(self.ftType.identifier)
+		IOweYou.DapperCoinTypes.contains(self.vaultType) : "Please use Escrowed contracts for this token type. Type : ".concat(self.vaultType.identifier)
 		// Ben : panic on some unreasonable inputs in trxn 
 		minimumBidIncrement > 0.0 : "Minimum bid increment should be larger than 0."
 		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment." 
