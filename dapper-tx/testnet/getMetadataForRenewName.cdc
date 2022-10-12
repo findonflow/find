@@ -1,22 +1,11 @@
-import DapperUtilityCoin from 0x82ec283f88a62e65
 import FIND from 0x35717efbbce11c74
 
 pub fun main(merchAccount: Address, name: String, amount: UFix64) : PurchaseData {
 
-    let price = FIND.calculateCost(name)
-    if amount != price {
-        panic("Amount passed in does not match. Required price : ".concat(price.toString()))
-    }
-    let nameStatus=FIND.status(name)
-    if nameStatus.status == FIND.LeaseStatus.FREE {
-        panic("Name is not registered")
-    }
-
     let description = "Renew name :".concat(name).concat(" for Dapper Credit ").concat(amount.toString())
-    let imageURL = "https://i.imgur.com/8W8NoO1.png"
+    let imageURL = "https://ik.imagekit.io/xyvsisxky/tr:ot-".concat(name).concat(",ots-55,otc-58B792,ox-N166,oy-N24,ott-b/https://i.imgur.com/8W8NoO1.png")
 
     return PurchaseData(
-            // what should we put here?
             id: 0, 
             name: name, 
             amount: amount, 
