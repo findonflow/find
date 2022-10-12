@@ -1,5 +1,4 @@
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
 
 pub struct PurchaseData {
 	pub let id: UInt64
@@ -23,7 +22,7 @@ pub fun main(merchantAddress: Address, marketplace:Address, address: Address, id
 
 	let display = item.getDisplay()
 
-	var thumbnail = replacePrefix(display.thumbnail.uri(), prefix: "ipfs://", replace:"https://nftstorage.link/ipfs/")
+	var thumbnail = replacePrefix(display.thumbnail.uri(), prefix: "ipfs://", replace:"https://find.mypinata.clloud/ipfs/")
 	return PurchaseData(
 		id: id, 
 		name: display.name, 
