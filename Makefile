@@ -40,9 +40,9 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.createProfileDapper.code" lib/find.json -r > dapper-tx/testnet/createProfile.cdc
 	jq ".networks.testnet.transactions.buyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/buyLeaseForSale.cdc
 	jq ".networks.testnet.transactions.buyAddonDapper.code" lib/find.json -r > dapper-tx/testnet/buyAddon.cdc
-	jq ".networks.testnet.transactions.editProfileDapper.code" lib/find.json -r > dapper-tx/editProfile.cdc
-	jq ".networks.testnet.transactions.listLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/listLeaseForSale.cdc
-	jq ".networks.testnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/moveNameTo.cdc
+	jq ".networks.testnet.transactions.editProfileDapper.code" lib/find.json -r > dapper-tx/testnet/editProfile.cdc
+	jq ".networks.testnet.transactions.listLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/listLeaseForSale.cdc
+	jq ".networks.testnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/testnet/moveNameTo.cdc
 	jq ".networks.testnet.transactions.registerDapper.code" lib/find.json -r > dapper-tx/testnet/register.cdc
 	jq ".networks.testnet.transactions.removeRelatedAccountDapper.code" lib/find.json -r > dapper-tx/testnet/removeRelatedAccount.cdc
 	jq ".networks.testnet.transactions.renewNameDapper.code" lib/find.json -r > dapper-tx/testnet/renewName.cdc
@@ -57,9 +57,9 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.createProfileDapper.code" lib/find.json -r > dapper-tx/mainnet/createProfile.cdc
 	jq ".networks.mainnet.transactions.buyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/buyLeaseForSale.cdc
 	jq ".networks.mainnet.transactions.buyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/buyAddon.cdc
-	jq ".networks.mainnet.transactions.editProfileDapper.code" lib/find.json -r > dapper-tx/editProfile.cdc
-	jq ".networks.mainnet.transactions.listLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/listLeaseForSale.cdc
-	jq ".networks.mainnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/moveNameTo.cdc
+	jq ".networks.mainnet.transactions.editProfileDapper.code" lib/find.json -r > dapper-tx/mainnet/editProfile.cdc
+	jq ".networks.mainnet.transactions.listLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listLeaseForSale.cdc
+	jq ".networks.mainnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/mainnet/moveNameTo.cdc 
 	jq ".networks.mainnet.transactions.registerDapper.code" lib/find.json -r > dapper-tx/mainnet/register.cdc
 	jq ".networks.mainnet.transactions.removeRelatedAccountDapper.code" lib/find.json -r > dapper-tx/mainnet/removeRelatedAccount.cdc
 	jq ".networks.mainnet.transactions.renewNameDapper.code" lib/find.json -r > dapper-tx/mainnet/renewName.cdc
