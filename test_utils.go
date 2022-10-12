@@ -682,28 +682,6 @@ func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id u
 
 }
 
-func (otu *OverflowTestUtils) listExampleNFTForIOUAuction(name string, id uint64, price float64) []uint64 {
-
-	res := otu.O.Tx("listNFTForAuctionIOU",
-		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("price", price),
-		WithArg("auctionReservePrice", price+5.0),
-		WithArg("auctionDuration", 300.0),
-		WithArg("auctionExtensionOnLateBid", 60.0),
-		WithArg("minimumBidIncrement", 1.0),
-		WithArg("auctionValidUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketAuctionIOUEscrowed.EnglishAuction", "id")
-
-	return res
-
-}
-
 func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *OverflowTestUtils {
 
 	otu.O.Tx("cancelAllMarketAuctionEscrowed",
@@ -2531,24 +2509,6 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 	).
 		AssertSuccess(otu.T).
 		GetIdsFromEvent("FindMarketDirectOfferSoft.DirectOffer", "id")
-
-	return res
-}
-
-func (otu *OverflowTestUtils) directOfferMarketIOUDUC(name string, seller string, id uint64, price float64) []uint64 {
-
-	res := otu.O.Tx("bidMarketDirectOfferIOUDUC",
-		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("marketplace", "account"),
-		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-		WithArg("id", id),
-		WithArg("amount", price),
-		WithArg("validUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		GetIdsFromEvent("FindMarketDirectOfferIOU.DirectOffer", "id")
 
 	return res
 }
