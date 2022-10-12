@@ -17,7 +17,7 @@ transaction(leaseName: String, amount: UFix64) {
 
 		let profile=account.borrow<&Profile.User>(from: Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 	
-		let address = FIND.resolve(leaseName) ??	panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
+		let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
 		let leaseMarketplace = FindMarket.getTenantAddress("findLease") ?? panic("Cannot find findLease tenant")
 		self.saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for findLease")
 

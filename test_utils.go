@@ -188,14 +188,14 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
 
 	nameSigner := WithSigner(name)
+	dapperSigner := WithPayloadSigner("account")
 	nameArg := WithArg("name", name)
-	merchAccountArg := WithArg("merchAccount", "find")
 
 	nameAddress := otu.O.Address(name)
 
 	otu.O.Tx("createProfileDapper",
 		nameSigner,
-		merchAccountArg,
+		dapperSigner,
 		nameArg).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
@@ -2107,10 +2107,11 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 
 func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listLeaseForSaleDUC",
+	otu.O.Tx("listLeaseForSaleDapper",
 		WithSigner(user),
 		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", "DUC"),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).

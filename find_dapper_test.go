@@ -34,6 +34,20 @@ func TestFINDDapper(t *testing.T) {
 		)
 	})
 
+	t.Run("Should get expected output for register script", func(t *testing.T) {
+
+		otu.O.Script("getMetadataForRegisterDapper",
+			WithArg("merchAccount", "find"),
+			WithArg("name", "user2"),
+			WithArg("amount", 5.0),
+		).AssertWant(t, autogold.Want("getMetadataForRegisterDapper", map[string]interface{}{
+			"amount": 5, "description": "Name :user2 for Dapper Credit 5.00000000",
+			"id":       0,
+			"imageURL": "https://i.imgur.com/8W8NoO1.png",
+			"name":     "user2",
+		}))
+	})
+
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
 
 		otu.O.Tx("registerDapper",
@@ -115,6 +129,20 @@ func TestFINDDapper(t *testing.T) {
 				"name": "find-admin",
 			})
 
+	})
+
+	t.Run("Should get expected output for renew name script", func(t *testing.T) {
+
+		otu.O.Script("getMetadataForRenewNameDapper",
+			WithArg("merchAccount", "find"),
+			WithArg("name", "user1"),
+			WithArg("amount", 5.0),
+		).AssertWant(t, autogold.Want("getMetadataForRenewNameDapper", map[string]interface{}{
+			"amount": 5, "description": "Renew name :user1 for Dapper Credit 5.00000000",
+			"id":       0,
+			"imageURL": "https://i.imgur.com/8W8NoO1.png",
+			"name":     "user1",
+		}))
 	})
 
 	otu.renewDapperUserWithName("user1", "user1").
@@ -300,6 +328,21 @@ func TestFINDDapper(t *testing.T) {
 			"Object has no key 'FindTwitter'",
 		)
 
+	})
+
+	t.Run("Should get expected output for buyAddon script", func(t *testing.T) {
+
+		otu.O.Script("getMetadataForBuyAddonDapper",
+			WithArg("merchAccount", "find"),
+			WithArg("name", "name1"),
+			WithArg("addon", "forge"),
+			WithArg("amount", 10.0),
+		).AssertWant(t, autogold.Want("getMetadataForBuyAddonDapper", map[string]interface{}{
+			"amount": 10, "description": "Purchase addon forge for name :name1 for Dapper Credit 10.00000000",
+			"id":       316,
+			"imageURL": "https://i.imgur.com/8W8NoO1.png",
+			"name":     "name1",
+		}))
 	})
 
 	t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
