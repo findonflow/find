@@ -62,7 +62,7 @@ pub contract FindLostAndFoundWrapper {
             let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
             if receiverCap.check() {
                 receiverCap.borrow()!.deposit(token: <- item)
-                emit NFTDeposited(receiver: receiverCap.address, receiverName: receiver, sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
                 return
             }
 
@@ -104,7 +104,7 @@ pub contract FindLostAndFoundWrapper {
         // Destroy the vault after the payment. The vault should be 0 in balance
         FindLostAndFoundWrapper.destroyVault(vaultUUID, cap: flowTokenRepayment)
 
-        emit TicketDeposited(receiver: receiverAddress, receiverName: receiver, sender: sender, senderName: senderName, ticketID: ticketID, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri(), flowStorageFee: flowStorageFee)
+        emit TicketDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, ticketID: ticketID, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri(), flowStorageFee: flowStorageFee)
         destroy estimate
     }
 
