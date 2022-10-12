@@ -1,9 +1,9 @@
-import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
+import FindMarketAuctionIOUEscrowed from "../contracts/FindMarketAuctionIOUEscrowed.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 transaction(marketplace:Address, owner: String, id: UInt64) {
 
-	let saleItem : Capability<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic}>?
+	let saleItem : Capability<&FindMarketAuctionIOUEscrowed.SaleItemCollection{FindMarketAuctionIOUEscrowed.SaleItemCollectionPublic}>?
 
 	prepare(account: AuthAccount) {
 		let resolveAddress = FIND.resolve(owner)
@@ -11,7 +11,7 @@ transaction(marketplace:Address, owner: String, id: UInt64) {
 			panic("The address input is not a valid name nor address. Input : ".concat(owner))
 		}
 		let address = resolveAddress!
-		self.saleItem = FindMarketAuctionIOU.getSaleItemCapability(marketplace:marketplace, user:address)
+		self.saleItem = FindMarketAuctionIOUEscrowed.getSaleItemCapability(marketplace:marketplace, user:address)
 
 	}
 

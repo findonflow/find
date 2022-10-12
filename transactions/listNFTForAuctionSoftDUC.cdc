@@ -41,9 +41,9 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifier:St
 			let dapper = getAccount(dapperAddress)
 			// Create a new Forwarder resource for DUC and store it in the new account's storage
 			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
-			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
+			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
 			// Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
-			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinReceiver)
+			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinVault)
 		}
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)

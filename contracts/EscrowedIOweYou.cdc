@@ -27,11 +27,11 @@ pub contract EscrowedIOweYou {
 		}
 
 		destroy() {
-			if self.balance != 0.0 {
+			if self.vault.balance != 0.0 {
 				if !self.receiver.check() {
 					panic("Cannot destroy this IOU. The balance of the IOU is not empty")
 				}
-				self.receiver.borrow()!.deposit(from: <- self.vault.withdraw(amount: self.balance))
+				self.receiver.borrow()!.deposit(from: <- self.vault.withdraw(amount: self.vault.balance))
 			}
 			destroy self.vault
 		}
@@ -116,10 +116,12 @@ pub contract EscrowedIOweYou {
 			self.ownedIOUs[iou.uuid] <-! iou
 		}
 
-		pub fun redeem(_ token: @{IOweYou.IOU}) : @FungibleToken.Vault {
+		pub fun redeem(token: @{IOweYou.IOU}, vault: @FungibleToken.Vault?) : @FungibleToken.Vault {
 			pre{
+				vault == nil : "Please pass in nil to redeem Escrowed IOUs"
 				token.getType() == Type<@EscrowedIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@EscrowedIOweYou.IOU>().identifier)
 			}
+			destroy vault
 			let iou <- token as! @EscrowedIOweYou.IOU 
 			emit IOURedeemed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
 			let vault <- iou.redeem()

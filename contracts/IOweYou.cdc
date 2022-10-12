@@ -53,10 +53,8 @@ pub contract IOweYou {
 	}
 
 	access(account) fun addTypePath(type : Type, path: String) {
-		pre{
-			type.isSubtype(of: Type<&{IOweYou.IOU}>()) : "The type passed in is not implementing IOU Interface. Type : ".concat(type.identifier)
-		}
 
+		self.IOUTypePathMap[type] = path
 	}
 
 	pub fun getPathFromType(_ type: Type) : String {

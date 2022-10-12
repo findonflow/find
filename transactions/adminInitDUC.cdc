@@ -12,12 +12,12 @@ transaction(dapperAddress:Address) {
 
 	  // Create a new Forwarder resource for DUC and store it in the new account's storage
 	  let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
-	  acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
+	  acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
 
 	  // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
 	  acct.link<&{FungibleToken.Receiver}>(
       /public/dapperUtilityCoinReceiver,
-      target: /storage/dapperUtilityCoinReceiver
+      target: /storage/dapperUtilityCoinVault
 	  )
 	}
 }

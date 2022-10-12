@@ -3,12 +3,10 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestMarketAuctionIOU(t *testing.T) {
+func TestMarketAuctionIOUEscrowed(t *testing.T) {
 
 	otu := NewOverflowTest(t)
 
@@ -22,9 +20,21 @@ func TestMarketAuctionIOU(t *testing.T) {
 	preIncrement := 5.0
 	id := otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("Auction").
+		setFlowDandyMarketOption("AuctionIOUEscrowed").
 		setProfile("user1").
 		setProfile("user2")
+
+	otu.O.Tx("createProfile",
+		WithSigner("account"),
+		WithArg("name", "account"),
+	).
+		AssertSuccess(t)
+
+	otu.O.Tx("initIOUCollections",
+		WithSigner("account"),
+		WithArg("merchAccount", "account"),
+	).
+		AssertSuccess(t)
 
 	mintFund("testMintFusd").AssertSuccess(t)
 
@@ -129,7 +139,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
@@ -269,7 +279,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address(name),
 				"buyer":  otu.O.Address(buyer),
@@ -292,7 +302,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address(name),
 				"amount": 10.0,
@@ -376,7 +386,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address(name),
 				"buyer":  otu.O.Address(buyer),
@@ -421,7 +431,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
 
-		otu.alterMarketOption("Auction", "deprecate")
+		otu.alterMarketOption("AuctionIOUEscrowed", "deprecate")
 
 		listingTx("listNFTForAuctionIOU",
 			WithSigner("user1"),
@@ -430,14 +440,14 @@ func TestMarketAuctionIOU(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOption("Auction", "enable")
+		otu.alterMarketOption("AuctionIOUEscrowed", "enable")
 	})
 
 	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
 
 		otu.listNFTForIOUAuction("user1", id, price)
 
-		otu.alterMarketOption("Auction", "deprecate")
+		otu.alterMarketOption("AuctionIOUEscrowed", "deprecate")
 
 		otu.O.Tx("bidMarketAuctionIOU",
 			WithSigner("user2"),
@@ -465,7 +475,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOption("Auction", "enable")
+		otu.alterMarketOption("AuctionIOUEscrowed", "enable")
 
 		listingTx("listNFTForAuctionIOU",
 			WithSigner("user2"),
@@ -476,7 +486,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 
 		otu.auctionBidMarketIOU("user1", "user2", id, price+5.0)
 
-		otu.alterMarketOption("Auction", "deprecate")
+		otu.alterMarketOption("AuctionIOUEscrowed", "deprecate")
 
 		otu.O.Tx("cancelMarketAuctionIOU",
 			WithSigner("user2"),
@@ -485,7 +495,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOption("Auction", "enable")
+		otu.alterMarketOption("AuctionIOUEscrowed", "enable")
 		otu.delistAllNFTForIOUAuction("user2").
 			sendDandy("user1", "user2", id)
 
@@ -493,7 +503,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction after stopped", func(t *testing.T) {
 
-		otu.alterMarketOption("Auction", "stop")
+		otu.alterMarketOption("AuctionIOUEscrowed", "stop")
 
 		listingTx("listNFTForAuctionIOU",
 			WithSigner("user1"),
@@ -502,9 +512,9 @@ func TestMarketAuctionIOU(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("Auction", "enable").
+		otu.alterMarketOption("AuctionIOUEscrowed", "enable").
 			listNFTForIOUAuction("user1", id, price).
-			alterMarketOption("Auction", "stop")
+			alterMarketOption("AuctionIOUEscrowed", "stop")
 
 		otu.O.Tx("bidMarketAuctionIOU",
 			WithSigner("user2"),
@@ -515,9 +525,9 @@ func TestMarketAuctionIOU(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("Auction", "enable").
+		otu.alterMarketOption("AuctionIOUEscrowed", "enable").
 			auctionBidMarketIOU("user2", "user1", id, price+5.0).
-			alterMarketOption("Auction", "stop")
+			alterMarketOption("AuctionIOUEscrowed", "stop")
 
 		otu.O.Tx("increaseBidMarketAuctionIOU",
 			WithSigner("user2"),
@@ -527,7 +537,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("Auction", "stop")
+		otu.alterMarketOption("AuctionIOUEscrowed", "stop")
 
 		otu.tickClock(500.0)
 
@@ -539,7 +549,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 			/* Reset */
-		otu.alterMarketOption("Auction", "enable")
+		otu.alterMarketOption("AuctionIOUEscrowed", "enable")
 
 		otu.O.Tx("fulfillMarketAuctionIOUFromBidder",
 			WithSigner("user2"),
@@ -794,7 +804,7 @@ func TestMarketAuctionIOU(t *testing.T) {
 			WithArg("amount", 20.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
 				"amount":        20.0,
 				"id":            id,
 				"buyer":         otu.O.Address("user3"),
@@ -803,161 +813,6 @@ func TestMarketAuctionIOU(t *testing.T) {
 			})
 
 		otu.delistAllNFTForIOUAuction("user1")
-	})
-
-	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
-
-		otu.registerDUCInRegistry().
-			setDUCExampleNFT().
-			sendExampleNFT("user1", "account")
-
-		saleItem := otu.listExampleNFTForIOUAuction("user1", 0, price)
-
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketIOU("user2", "user1", saleItem[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionIOU("user1", saleItem[0], "user2", price+5.0).
-			sendExampleNFT("user1", "user2")
-
-	})
-
-	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
-
-		otu.O.Tx("adminInitDUC",
-			WithSigner("account"),
-			WithArg("dapperAddress", "account"),
-		).AssertSuccess(t)
-
-		saleItemID := otu.listNFTForIOUAuctionDUC("user1", 0, price)
-
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketIOUDUC("user2", "user1", saleItemID[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionIOUDUC("user2", saleItemID[0], 15.0)
-
-		otu.sendExampleNFT("user1", "user2")
-	})
-
-	t.Run("Should return fund in IOU for DUC bids when cancelled", func(t *testing.T) {
-
-		saleItemID := otu.listNFTForIOUAuctionDUC("user1", 0, price)
-
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketIOUDUC("user2", "user1", saleItemID[0], price+5.0)
-
-		ducIOUId, err := otu.O.Tx("cancelMarketAuctionIOU",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", saleItemID),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
-				"status": "cancel_listing",
-			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindIOU.IOUDesposited", map[string]interface{}{
-				"to": otu.O.Address("user2"),
-			}).
-			GetIdFromEvent("A.f8d6e0586b0a20c7.FindIOU.IOUDesposited", "uuid")
-
-		assert.NoError(t, err)
-
-		otu.O.Tx("redeemDapperIOU",
-			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("id", ducIOUId),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, "IOURedeemed", map[string]interface{}{
-				"type":   "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
-				"amount": price + 5.0,
-			})
-	})
-
-	t.Run("Should not be able to list soul bound items", func(t *testing.T) {
-		otu.sendSoulBoundNFT("user1", "account")
-		// set market rules
-		otu.O.Tx("adminSetSellExampleNFTForFlow",
-			overflow.WithSigner("find"),
-			overflow.WithArg("tenant", "account"),
-		)
-
-		otu.O.Tx("listNFTForAuctionIOU",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			overflow.WithArg("id", 1),
-			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-			overflow.WithArg("price", price),
-			overflow.WithArg("auctionReservePrice", price+5.0),
-			overflow.WithArg("auctionDuration", 300.0),
-			overflow.WithArg("auctionExtensionOnLateBid", 60.0),
-			overflow.WithArg("minimumBidIncrement", 1.0),
-			overflow.WithArg("auctionValidUntil", otu.currentTime()+100.0),
-		).AssertFailure(t, "This item is soul bounded and cannot be traded")
-
-	})
-
-	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
-
-		saleItem := otu.listExampleNFTForIOUAuction("user1", 0, price)
-
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketIOU("user2", "user1", saleItem[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0)
-
-		otu.changeRoyaltyExampleNFT("user1", 0)
-
-		otu.O.Tx("fulfillMarketAuctionIOU",
-			WithSigner("user2"),
-			WithArg("marketplace", "account"),
-			WithArg("owner", "user1"),
-			WithArg("id", saleItem[0]),
-		).
-			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
-
-		otu.O.Tx("cancelMarketAuctionIOU",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", []uint64{saleItem[0]}),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionIOU.EnglishAuction", map[string]interface{}{
-				"status": "cancel_royalties_changed",
-			})
-
-	})
-
-	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
-
-		saleItem := otu.listExampleNFTForIOUAuction("user1", 0, price)
-
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketIOU("user2", "user1", saleItem[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0)
-
-		otu.changeRoyaltyExampleNFT("user1", 0)
-
-		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "account"),
-			WithArg("user", "user1"),
-		).
-			GetAsJson()
-
-		if err != nil {
-			panic(err)
-		}
-
-		otu.O.Tx("relistMarketListings",
-			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", ids),
-		).
-			AssertSuccess(t)
-
 	})
 
 }

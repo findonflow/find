@@ -67,14 +67,6 @@ func TestFindIOU(t *testing.T) {
 			GetIdFromEvent("IOUCreated", "uuid")
 	}
 
-	t.Run("Should not be able to destroy IOU", func(t *testing.T) {
-		otu.O.Tx("testDestroyIOU",
-			WithSigner("user1"),
-			WithArg("id", flowIOUId),
-		).
-			AssertFailure(t, "balance of vault in IOU cannot be non-zero when destroy")
-	})
-
 	t.Run("Should be able to topUp IOU with flow", func(t *testing.T) {
 		otu.O.Tx("topUpIOU",
 			WithSigner("user1"),
@@ -90,6 +82,26 @@ func TestFindIOU(t *testing.T) {
 			})
 	})
 
+	t.Run("Balance will go back to the issuer when the IOU is destroyed", func(t *testing.T) {
+		otu.O.Tx("testDestroyIOU",
+			WithSigner("user1"),
+			WithArg("id", flowIOUId),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FlowToken.TokensDeposited", map[string]interface{}{
+				"amount": 300.0,
+				"to":     otu.O.Address("user1"),
+			})
+	})
+
+	flowIOUId, _ = otu.O.Tx("createIOU",
+		WithSigner("user1"),
+		WithArg("name", "Flow"),
+		WithArg("amount", 100.0),
+	).
+		AssertSuccess(t).
+		GetIdFromEvent("IOUCreated", "uuid")
+
 	t.Run("Should be able to redeem IOU with Flow", func(t *testing.T) {
 		otu.O.Tx("redeemIOU",
 			WithSigner("user1"),
@@ -98,7 +110,7 @@ func TestFindIOU(t *testing.T) {
 			AssertSuccess(t).
 			AssertEvent(t, "IOURedeemed", map[string]interface{}{
 				"type":   "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"amount": 300.0,
+				"amount": 100.0,
 			})
 	})
 
@@ -211,7 +223,7 @@ func TestFindIOU(t *testing.T) {
 	})
 
 	t.Run("Should be able to create IOU with Dapper DUC", func(t *testing.T) {
-		iouId, err := otu.O.Tx("createDapperIOU",
+		iouId, err := otu.O.Tx("createIOUDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
 			WithArg("name", "DUC"),
@@ -229,7 +241,7 @@ func TestFindIOU(t *testing.T) {
 	})
 
 	if ducIOUId == 0 {
-		ducIOUId, _ = otu.O.Tx("createDapperIOU",
+		ducIOUId, _ = otu.O.Tx("createIOUDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
 			WithArg("name", "DUC"),
@@ -240,7 +252,7 @@ func TestFindIOU(t *testing.T) {
 	}
 
 	t.Run("Should be able to topUp IOU with Dapper DUC", func(t *testing.T) {
-		otu.O.Tx("topUpDapperIOU",
+		otu.O.Tx("topUpIOUDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
 			WithArg("id", ducIOUId),
@@ -256,7 +268,7 @@ func TestFindIOU(t *testing.T) {
 	})
 
 	t.Run("Should be able to redeem IOU with Dapper DUC", func(t *testing.T) {
-		otu.O.Tx("redeemDapperIOU",
+		otu.O.Tx("redeemIOUDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("account"),
 			WithArg("id", ducIOUId),

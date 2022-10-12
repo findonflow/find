@@ -1,6 +1,7 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindIOU from "../contracts/FindIOU.cdc"
+import IOweYou from "../contracts/IOweYou.cdc"
+import DapperIOweYou from "../contracts/DapperIOweYou.cdc"
 
 
 transaction(id: UInt64, amount: UFix64) {
@@ -10,7 +11,7 @@ transaction(id: UInt64, amount: UFix64) {
 	let walletBalance : UFix64
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
-		let collectionRef = account.borrow<&FindIOU.Collection>(from: FindIOU.CollectionStoragePath)!
+		let collectionRef = account.borrow<&DapperIOweYou.Collection>(from: DapperIOweYou.CollectionStoragePath)!
 		let vaultType = collectionRef.borrowIOU(id).vaultType.identifier
 
 		let ft = FTRegistry.getFTInfo(vaultType) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(vaultType))

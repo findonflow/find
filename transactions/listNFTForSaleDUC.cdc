@@ -25,8 +25,8 @@ transaction(dapperAddress:Address, marketplace:Address, nftAliasOrIdentifier: St
 		if !ducReceiver.check() {
 			let dapper = getAccount(dapperAddress)
 			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
-			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
-			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinReceiver)
+			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
+			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinVault)
 		}
 
 		var created=false

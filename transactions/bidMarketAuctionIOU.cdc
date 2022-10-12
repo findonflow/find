@@ -3,14 +3,13 @@ import EscrowedIOweYou from "../contracts/EscrowedIOweYou.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketAuctionIOU from "../contracts/FindMarketAuctionIOU.cdc"
+import FindMarketAuctionIOUEscrowed from "../contracts/FindMarketAuctionIOUEscrowed.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
@@ -29,10 +28,10 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
-	let saleItemsCap: Capability<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic}> 
+	let saleItemsCap: Capability<&FindMarketAuctionIOUEscrowed.SaleItemCollection{FindMarketAuctionIOUEscrowed.SaleItemCollectionPublic}> 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
-	let bidsReference: &FindMarketAuctionIOU.MarketBidCollection?
+	let bidsReference: &FindMarketAuctionIOUEscrowed.MarketBidCollection?
 	let balanceBeforeBid: UFix64
 	let pointer: FindViews.ViewReadPointer
 	let iouCollection: &EscrowedIOweYou.Collection
@@ -220,14 +219,14 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
 		}
 
-	 /// auctions that refers FT so 'IOU' auction
-		let aiSaleType= Type<@FindMarketAuctionIOU.SaleItemCollection>()
-		let aiSalePublicPath=FindMarket.getPublicPath(aiSaleType, name: tenant.name)
-		let aiSaleStoragePath= FindMarket.getStoragePath(aiSaleType, name:tenant.name)
-		let aiSaleCap= account.getCapability<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aiSalePublicPath) 
-		if !aiSaleCap.check() {
-			account.save<@FindMarketAuctionIOU.SaleItemCollection>(<- FindMarketAuctionIOU.createEmptySaleItemCollection(tenantCapability), to: aiSaleStoragePath)
-			account.link<&FindMarketAuctionIOU.SaleItemCollection{FindMarketAuctionIOU.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aiSalePublicPath, target: aiSaleStoragePath)
+	 /// auctions that refers FT 'IOUEscrowed' auction
+		let aeiSaleType= Type<@FindMarketAuctionIOUEscrowed.SaleItemCollection>()
+		let aeiSalePublicPath=FindMarket.getPublicPath(aeiSaleType, name: tenant.name)
+		let aeiSaleStoragePath= FindMarket.getStoragePath(aeiSaleType, name:tenant.name)
+		let aeiSaleCap= account.getCapability<&FindMarketAuctionIOUEscrowed.SaleItemCollection{FindMarketAuctionIOUEscrowed.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeiSalePublicPath) 
+		if !aeiSaleCap.check() {
+			account.save<@FindMarketAuctionIOUEscrowed.SaleItemCollection>(<- FindMarketAuctionIOUEscrowed.createEmptySaleItemCollection(tenantCapability), to: aeiSaleStoragePath)
+			account.link<&FindMarketAuctionIOUEscrowed.SaleItemCollection{FindMarketAuctionIOUEscrowed.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeiSalePublicPath, target: aeiSaleStoragePath)
 		}
 
 		let iouCap = account.getCapability<&EscrowedIOweYou.Collection{IOweYou.CollectionPublic}>(EscrowedIOweYou.CollectionPublicPath)
@@ -236,15 +235,13 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 			account.link<&EscrowedIOweYou.Collection{IOweYou.CollectionPublic}>(EscrowedIOweYou.CollectionPublicPath, target: EscrowedIOweYou.CollectionStoragePath)
 		}
 
-		self.iouCollection = account.borrow<&EscrowedIOweYou.Collection>(from: EscrowedIOweYou.CollectionStoragePath)!
-
-		let aiBidType= Type<@FindMarketAuctionIOU.MarketBidCollection>()
-		let aiBidPublicPath=FindMarket.getPublicPath(aiBidType, name: tenant.name)
-		let aiBidStoragePath= FindMarket.getStoragePath(aiBidType, name:tenant.name)
-		let aiBidCap= account.getCapability<&FindMarketAuctionIOU.MarketBidCollection{FindMarketAuctionIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aiBidPublicPath) 
-		if !aiBidCap.check() {
-			account.save<@FindMarketAuctionIOU.MarketBidCollection>(<- FindMarketAuctionIOU.createEmptyMarketBidCollection(receiver: iouCap, tenantCapability:tenantCapability), to: aiBidStoragePath)
-			account.link<&FindMarketAuctionIOU.MarketBidCollection{FindMarketAuctionIOU.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aiBidPublicPath, target: aiBidStoragePath)
+		let aeiBidType= Type<@FindMarketAuctionIOUEscrowed.MarketBidCollection>()
+		let aeiBidPublicPath=FindMarket.getPublicPath(aeiBidType, name: tenant.name)
+		let aeiBidStoragePath= FindMarket.getStoragePath(aeiBidType, name:tenant.name)
+		let aeiBidCap= account.getCapability<&FindMarketAuctionIOUEscrowed.MarketBidCollection{FindMarketAuctionIOUEscrowed.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeiBidPublicPath) 
+		if !aeiBidCap.check() {
+			account.save<@FindMarketAuctionIOUEscrowed.MarketBidCollection>(<- FindMarketAuctionIOUEscrowed.createEmptyMarketBidCollection(receiver: iouCap, tenantCapability:tenantCapability), to: aeiBidStoragePath)
+			account.link<&FindMarketAuctionIOUEscrowed.MarketBidCollection{FindMarketAuctionIOUEscrowed.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeiBidPublicPath, target: aeiBidStoragePath)
 		}
 
 		let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
@@ -341,9 +338,10 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
 
-		self.saleItemsCap= FindMarketAuctionIOU.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap. User address : ".concat(address.toString()))
+		self.saleItemsCap= FindMarketAuctionIOUEscrowed.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap. User address : ".concat(address.toString()))
 
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionIOU.SaleItemCollection>())
+		self.iouCollection = account.borrow<&EscrowedIOweYou.Collection>(from: EscrowedIOweYou.CollectionStoragePath)!
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionIOUEscrowed.SaleItemCollection>())
 		let item = FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 
 		let nftIdentifier = item.getItemType().identifier
@@ -376,9 +374,9 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
-		let bidSstoragePath=tenant.getStoragePath(Type<@FindMarketAuctionIOU.MarketBidCollection>())!
+		let bidSstoragePath=tenant.getStoragePath(Type<@FindMarketAuctionIOUEscrowed.MarketBidCollection>())!
 
-		self.bidsReference= account.borrow<&FindMarketAuctionIOU.MarketBidCollection>(from: bidSstoragePath)
+		self.bidsReference= account.borrow<&FindMarketAuctionIOUEscrowed.MarketBidCollection>(from: bidSstoragePath)
 		self.balanceBeforeBid=self.walletReference.balance
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: item.getItemID())
 	}

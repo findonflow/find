@@ -9,7 +9,7 @@ import Profile from "./Profile.cdc"
 import IOweYou from "./IOweYou.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
-pub contract FindMarketAuctionIOU {
+pub contract FindMarketAuctionIOUEscrowed {
 
 	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
@@ -286,7 +286,7 @@ pub contract FindMarketAuctionIOU {
 			let nftType=saleItem.getItemType()
 			let ftType=saleItem.getFtType()
 
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOU.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name:"add bid in auction"), seller: self.owner!.address, buyer: newOffer.address)
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOUEscrowed.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name:"add bid in auction"), seller: self.owner!.address, buyer: newOffer.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -391,7 +391,7 @@ pub contract FindMarketAuctionIOU {
 			let nftType= saleItem.getItemType()
 			let ftType= saleItem.getFtType()
 
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOU.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "bid in auction"), seller: self.owner!.address, buyer: callback.address)
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOUEscrowed.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "bid in auction"), seller: self.owner!.address, buyer: callback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -506,6 +506,9 @@ pub contract FindMarketAuctionIOU {
 
 		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
 		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault?) {
+			pre{
+				vault == nil : "Please do not pass in vaults for Escrowed Auction fulfilling" 
+			}
 
 			if !self.items.containsKey(id) {
 				panic("Invalid id=".concat(id.toString()))
@@ -525,23 +528,16 @@ pub contract FindMarketAuctionIOU {
 				let nftType= saleItem.getItemType()
 				let ftType= saleItem.getFtType()
 
-				let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOU.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "fulfill auction"), seller: self.owner!.address, buyer: saleItem.offerCallback!.address)
+				let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOUEscrowed.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:false, name: "fulfill auction"), seller: self.owner!.address, buyer: saleItem.offerCallback!.address)
 
 				if !actionResult.allowed {
 					panic(actionResult.message)
 				}
 
-				let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionIOU.SaleItem>(), nftType: nftType, ftType: ftType)
+				let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionIOUEscrowed.SaleItem>(), nftType: nftType, ftType: ftType)
 
 				if !saleItem.hasAuctionMetReservePrice() {
 					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
-					if vault != nil {
-						// If this is to be cancelled, the DUC fund should go back to find.  
-						let receiver = FindMarketAuctionIOU.account.borrow<&{FungibleToken.Receiver}>(from: /storage/dapperUtilityCoinReceiver)
-							?? panic("Cannot borrow DUC receiver vault balance from FIND.")
-						receiver.deposit(from: <- vault!)
-						return
-					}
 					destroy vault
 					return
 				}
@@ -561,13 +557,13 @@ pub contract FindMarketAuctionIOU {
 				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: sellerName, amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 				let iou <- saleItem.acceptEscrowedBid()
-				let findIOUCollection = FindMarketAuctionIOU.borrowIOUCollection(iou.getType())
+				let findIOUCollection = FindMarketAuctionIOUEscrowed.borrowIOUCollection(iou.getType())
 				let redeemedVault <- findIOUCollection.redeem(token: <- iou, vault: <- vault)
 
 				let resolved : {Address : String} = {}
 				resolved[buyer] = buyerName ?? ""
 				resolved[seller] = sellerName ?? ""
-				resolved[FindMarketAuctionIOU.account.address] =  "find" 
+				resolved[FindMarketAuctionIOUEscrowed.account.address] =  "find" 
 				// Have to make sure the tenant always have the valid find name 
 				resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
@@ -618,7 +614,7 @@ pub contract FindMarketAuctionIOU {
 			let nftType= saleItem.getItemType()
 			let ftType= saleItem.getFtType()
 
-			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOU.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:true, name: "list item for auction"), seller: self.owner!.address, buyer: nil)
+			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketAuctionIOUEscrowed.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:true, name: "list item for auction"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -908,7 +904,7 @@ pub contract FindMarketAuctionIOU {
 	access(contract) fun borrowIOUCollection(_ type: Type) : &{IOweYou.Owner} {
 		let pathIdentifier = IOweYou.IOUTypePathMap[type] ?? panic("Cannot find path with type : ".concat(type.identifier))
 		let path = StoragePath(identifier: pathIdentifier)!
-		let ref = FindMarketAuctionIOU.account.borrow<&{IOweYou.Owner}>(from: path) ?? panic("Cannot borrow reference to find IOweYou collection for type : ".concat(type.identifier))
+		let ref = FindMarketAuctionIOUEscrowed.account.borrow<&{IOweYou.Owner}>(from: path) ?? panic("Cannot borrow reference to find IOweYou collection for type : ".concat(type.identifier))
 		return ref
 	}
 

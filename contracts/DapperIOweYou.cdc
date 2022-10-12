@@ -1,3 +1,5 @@
+import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
+import FlowUtilityToken from "./standard/FlowUtilityToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import IOweYou from "./IOweYou.cdc"
 
@@ -13,8 +15,16 @@ pub contract DapperIOweYou {
 	pub let CollectionStoragePath : StoragePath
 	pub let CollectionPublicPath : PublicPath
 
-	access(contract) fun borrowDapperAccountReceiver() : &{FungibleToken.Receiver} {
-		return DapperIOweYou.account.borrow<&{FungibleToken.Receiver}>()
+	access(contract) fun borrowDapperAccountReceiver(_ type: Type) : &{FungibleToken.Receiver} {
+		switch type {
+			case Type<@DapperUtilityCoin.Vault>() : 
+				return DapperIOweYou.account.borrow<&{FungibleToken.Receiver}>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow reference to DUC receiver")
+
+			case Type<@FlowUtilityToken.Vault>() : 
+				return DapperIOweYou.account.borrow<&{FungibleToken.Receiver}>(from: /storage/flowUtilityTokenVault) ?? panic("Cannot borrow reference to DUC receiver")
+		}
+		panic("Type passed in is not supported. Type : ".concat(type.identifier))
+		
 	}
 
 	pub resource IOU : IOweYou.IOU {
@@ -26,17 +36,7 @@ pub contract DapperIOweYou {
 			self.receiver = receiver
 			self.vaultType = vault.getType()
 			self.balance = vault.balance
-			self.vault <- vault
-		}
-
-		destroy() {
-			if self.balance != 0.0 {
-				if !self.receiver.check() {
-					panic("Cannot destroy this IOU. The balance of the IOU is not empty")
-				}
-				self.receiver.borrow()!.deposit(from: <- self.vault.withdraw(amount: self.balance))
-			}
-			destroy self.vault
+			DapperIOweYou.borrowDapperAccountReceiver(self.vaultType).deposit(from: <- vault)
 		}
 
 		pub fun topUp(_ vault: @FungibleToken.Vault) {
@@ -45,11 +45,16 @@ pub contract DapperIOweYou {
 			}
 			emit IOUToppedUp(uuid: self.uuid, by: self.owner?.address, type: self.vaultType.identifier, amount: vault.balance, fromAmount: self.balance, toAmount: self.balance + vault.balance)
 			self.balance = self.balance + vault.balance
-			self.vault.deposit(from: <- vault)
+			DapperIOweYou.borrowDapperAccountReceiver(self.vaultType).deposit(from: <- vault)
 		}
 
-		access(contract) fun redeem() : @FungibleToken.Vault {
-			return <- self.vault.withdraw(amount: self.vault.balance)
+		// we might not need it here
+		access(contract) fun redeem(_ vault: @FungibleToken.Vault) : @FungibleToken.Vault {
+			pre {
+				self.vaultType == vault.getType() : "Vault passed in is not in type of IOU. Type required : ".concat(self.vaultType.identifier)
+				self.balance == vault.balance : "Vault passed in is not in same balance of IOU. Balance required : ".concat(self.balance.toString())
+			}
+			return <- vault
 		}
 
 	}
@@ -83,9 +88,9 @@ pub contract DapperIOweYou {
 
 		pub fun deposit(_ token: @{IOweYou.IOU}) {
 			pre{
-				token.getType() == Type<@EscrowedIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@EscrowedIOweYou.IOU>().identifier)
+				token.getType() == Type<@DapperIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@DapperIOweYou.IOU>().identifier)
 			}
-			let iou <- token as! @EscrowedIOweYou.IOU 
+			let iou <- token as! @DapperIOweYou.IOU 
 			emit IOUDesposited(uuid: iou.uuid, to: self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
 
 			let iouTypes = self.IOUTypes[iou.vaultType] ?? []
@@ -97,20 +102,22 @@ pub contract DapperIOweYou {
 
 		pub fun depositAndRedeemToAccount(token: @{IOweYou.IOU}, vault: @FungibleToken.Vault?) {
 			pre{
-				vault == nil : "Please pass in nil to redeem Escrowed IOUs"
-				token.getType() == Type<@EscrowedIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@EscrowedIOweYou.IOU>().identifier)
+				token.getType() == Type<@DapperIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@DapperIOweYou.IOU>().identifier)
+			}
+			let iou <- token as! @DapperIOweYou.IOU 
+
+			if vault != nil {
+				if self.receiver.check(){
+					emit IOURedeemed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
+					let vault <- iou.redeem(<- vault!)
+					destroy iou 
+					self.receiver.borrow()!.deposit(from: <- vault)
+					return 
+				} 
+				panic("Invalid receiver capability. Account : ".concat(self.receiver.address.toString()))
 			}
 			destroy vault
-			let iou <- token as! @EscrowedIOweYou.IOU 
-			if self.receiver.check(){
-				emit IOURedeemed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
-				let vault <- iou.redeem()
-				destroy iou 
-				self.receiver.borrow()!.deposit(from: <- vault)
-				return 
-			} 
-			
-			emit IOURedeemFailed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance, reason: "Invalid receiver capability. Account : ".concat(self.receiver.address.toString()))
+			emit IOURedeemFailed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance, reason: "No vault passed in to redeem. Account : ".concat(self.receiver.address.toString()))
 			emit IOUDesposited(uuid: iou.uuid, to: self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
 			let iouTypes = self.IOUTypes[iou.vaultType] ?? []
 			iouTypes.append(iou.uuid)
@@ -119,27 +126,27 @@ pub contract DapperIOweYou {
 			self.ownedIOUs[iou.uuid] <-! iou
 		}
 
-		pub fun redeem(_ token: @{IOweYou.IOU}) : @FungibleToken.Vault {
+		pub fun redeem(token: @{IOweYou.IOU}, vault: @FungibleToken.Vault?) : @FungibleToken.Vault {
 			pre{
-				token.getType() == Type<@EscrowedIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@EscrowedIOweYou.IOU>().identifier)
+				vault != nil : "Please pass in a vault with same type and balance of the IOU to redeem the IOU"
+				token.getType() == Type<@DapperIOweYou.IOU>() : "Please pass in the correct type of resource : ".concat(Type<@DapperIOweYou.IOU>().identifier)
 			}
-			let iou <- token as! @EscrowedIOweYou.IOU 
+			let iou <- token as! @DapperIOweYou.IOU 
 			emit IOURedeemed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
-			let vault <- iou.redeem()
+			let returnedVault <- iou.redeem(<- vault!)
 			destroy iou 
-			return <- vault
+			return <- returnedVault
 		}
 
 		pub fun redeemToAccount(id: UInt64, vault: @FungibleToken.Vault?) {
 			pre{
-				vault == nil : "Please pass in nil to redeem Escrowed IOUs"
+				vault != nil : "Please pass in a vault with same type and balance of the IOU to redeem the IOU"
 				self.receiver.check() : "Invalid receiver capability. Account : ".concat(self.receiver.address.toString())
 			}
-			destroy vault
 			let iou <- self.withdraw(id)
 
 			emit IOURedeemed(uuid: iou.uuid, by:self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
-			let vault <- iou.redeem()
+			let vault <- iou.redeem(<- vault!)
 			destroy iou 
 			self.receiver.borrow()!.deposit(from: <- vault)
 			return 
@@ -156,7 +163,7 @@ pub contract DapperIOweYou {
 
 		pub fun create(_ vault: @FungibleToken.Vault) : @IOU {
 			pre {
-				!IOweYou.DapperCoinTypes.contains(vault.getType()) : "Please use other resource types for Dapper Utility Coin types"
+				IOweYou.DapperCoinTypes.contains(vault.getType()) : "Please use escrowed IOweYou resource types for non-Dapper coins"
 			}
 			let iou <- create IOU(vault: <- vault, receiver: self.receiver)
 			emit IOUCreated(uuid: iou.uuid, by: self.owner?.address, type: iou.vaultType.identifier, amount: iou.balance)
@@ -183,11 +190,11 @@ pub contract DapperIOweYou {
 	}
 
 	init(){
-		let path = IOweYou.getPathFromType(Type<@EscrowedIOweYou.IOU>())
+		let path = IOweYou.getPathFromType(Type<@DapperIOweYou.IOU>())
 		self.CollectionStoragePath = StoragePath(identifier: path)!
 		self.CollectionPublicPath = PublicPath(identifier: path)!
 
-		IOweYou.addTypePath(type: Type<@EscrowedIOweYou.IOU>(), path: path)
+		IOweYou.addTypePath(type: Type<@DapperIOweYou.IOU>(), path: path)
 	}
 
 }
