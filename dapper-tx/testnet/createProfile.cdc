@@ -1,29 +1,22 @@
 import FungibleToken from 0x9a0766d93b6608b7
 import NonFungibleToken from 0x631e88ae7f1d7c20
-import FlowToken from 0x7e60df042a9c0868
 import MetadataViews from 0x631e88ae7f1d7c20
 import FIND from 0x35717efbbce11c74
 import Dandy from 0x35717efbbce11c74
 import Profile from 0x35717efbbce11c74
 import FindMarket from 0x35717efbbce11c74
 import FindMarketSale from 0x35717efbbce11c74
-import FindMarketAuctionEscrow from 0x35717efbbce11c74
 import FindMarketAuctionSoft from 0x35717efbbce11c74
-import FindMarketDirectOfferEscrow from 0x35717efbbce11c74
 import FindMarketDirectOfferSoft from 0x35717efbbce11c74
 import DapperUtilityCoin from 0x82ec283f88a62e65
 import FlowUtilityToken from 0x82ec283f88a62e65 
-import TokenForwarding from 0x51ea0e37c27a1f1a
 import FindLeaseMarketSale from 0x35717efbbce11c74
 import FindLeaseMarketAuctionSoft from 0x35717efbbce11c74
-// import FindLeaseMarketAuctionEscrow from "../contracts/FindLeaseMarketAuctionEscrow.cdc"
 import FindLeaseMarketDirectOfferSoft from 0x35717efbbce11c74
-// import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import FindLeaseMarket from 0x35717efbbce11c74
 
-
 transaction(name: String) {
-    prepare(dapper: AuthAccount, account: AuthAccount) {
+    prepare(account: AuthAccount) {
         let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
         if !leaseCollection.check() {
             account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
@@ -43,24 +36,6 @@ transaction(name: String) {
             )
         }
 
-        let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        if !ducReceiver.check() {
-            // Create a new Forwarder resource for DUC and store it in the new account's storage
-            let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
-            account.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
-            // Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
-            account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinVault)
-        }
-
-        let futReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-        if !futReceiver.check() {
-            // Create a new Forwarder resource for FUT and store it in the new account's storage
-            let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
-            account.save(<-futForwarder, to: /storage/flowUtilityTokenVault)
-            // Publish a Receiver capability for the new account, which is linked to the FUT Forwarder
-            account.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver,target: /storage/flowUtilityTokenVault)
-        }
-
         var created=false
         var updated=false
         let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
@@ -76,18 +51,17 @@ transaction(name: String) {
 
         if !profile.hasWallet("DUC") {
             let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-            profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:dapper.getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
+            profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
             updated=true
         }
 
         if !profile.hasWallet("FUT") {
             let futReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-            profile.addWallet(Profile.Wallet( name:"FUT", receiver:futReceiver, balance:dapper.getCapability<&{FungibleToken.Balance}>(/public/flowUtilityTokenBalance), accept: Type<@FlowUtilityToken.Vault>(), tags: ["fut", "flowUtilityToken","dapper"]))
+            profile.addWallet(Profile.Wallet( name:"FUT", receiver:futReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowUtilityTokenBalance), accept: Type<@FlowUtilityToken.Vault>(), tags: ["fut", "flowUtilityToken","dapper"]))
             updated=true
         }
 
         profile.emitCreatedEvent()
-
 
         let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
@@ -104,39 +78,9 @@ transaction(name: String) {
             account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
         }
 
-        let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
-        let doeSalePublicPath=FindMarket.getPublicPath(doeSaleType, name: tenant.name)
-        let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
-        let doeSaleCap= account.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath) 
-        if !doeSaleCap.check() {
-            account.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
-            account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
-        }
-
-        let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
-        let doeBidPublicPath=FindMarket.getPublicPath(doeBidType, name: tenant.name)
-        let doeBidStoragePath= FindMarket.getStoragePath(doeBidType, name:tenant.name)
-        let doeBidCap= account.getCapability<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath) 
-        if !doeBidCap.check() {
-            account.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: doeBidStoragePath)
-            account.link<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath, target: doeBidStoragePath)
-        }
-
-        /// auctions that escrow ft
-        let aeSaleType= Type<@FindMarketAuctionEscrow.SaleItemCollection>()
-        let aeSalePublicPath=FindMarket.getPublicPath(aeSaleType, name: tenant.name)
-        let aeSaleStoragePath= FindMarket.getStoragePath(aeSaleType, name:tenant.name)
-        let aeSaleCap= account.getCapability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeSalePublicPath) 
-        if !aeSaleCap.check() {
-            account.save<@FindMarketAuctionEscrow.SaleItemCollection>(<- FindMarketAuctionEscrow.createEmptySaleItemCollection(tenantCapability), to: aeSaleStoragePath)
-            account.link<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeSalePublicPath, target: aeSaleStoragePath)
-        }
-
         let dosSaleType= Type<@FindMarketDirectOfferSoft.SaleItemCollection>()
-
         let dosSalePublicPath=FindMarket.getPublicPath(dosSaleType, name: tenant.name)
         let dosSaleStoragePath= FindMarket.getStoragePath(dosSaleType, name:tenant.name)
-
         let dosSaleCap= account.getCapability<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(dosSalePublicPath) 
         if !dosSaleCap.check() {
             account.save<@FindMarketDirectOfferSoft.SaleItemCollection>(<- FindMarketDirectOfferSoft.createEmptySaleItemCollection(tenantCapability), to: dosSaleStoragePath)
@@ -152,17 +96,7 @@ transaction(name: String) {
             account.link<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath, target: dosBidStoragePath)
         }
 
-        let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
-
-        let aeBidPublicPath=FindMarket.getPublicPath(aeBidType, name: tenant.name)
-        let aeBidStoragePath= FindMarket.getStoragePath(aeBidType, name:tenant.name)
-        let aeBidCap= account.getCapability<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath) 
-        if !aeBidCap.check() {
-            account.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: aeBidStoragePath)
-            account.link<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath, target: aeBidStoragePath)
-        }
-
-     /// auctions that refers FT so 'soft' auction
+        /// auctions that refers FT so 'soft' auction
         let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
         let asSalePublicPath=FindMarket.getPublicPath(asSaleType, name: tenant.name)
         let asSaleStoragePath= FindMarket.getStoragePath(asSaleType, name:tenant.name)
@@ -213,25 +147,6 @@ transaction(name: String) {
             account.link<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath, target: leaseASBidStoragePath)
         }
 
-        // let leaseAESaleItemType= Type<@FindLeaseMarketAuctionEscrow.SaleItemCollection>()
-        // let leaseAEPublicPath=FindMarket.getPublicPath(leaseAESaleItemType, name: "findLease")
-        // let leaseAEStoragePath= FindMarket.getStoragePath(leaseAESaleItemType, name:"findLease")
-        // let leaseAESaleItemCap= account.getCapability<&FindLeaseMarketAuctionEscrow.SaleItemCollection{FindLeaseMarketAuctionEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseAEPublicPath) 
-        // if !leaseAESaleItemCap.check() {
-        //     //The link here has to be a capability not a tenant, because it can change.
-        //     account.save<@FindLeaseMarketAuctionEscrow.SaleItemCollection>(<- FindLeaseMarketAuctionEscrow.createEmptySaleItemCollection(leaseTenantCapability), to: leaseAEStoragePath)
-        //     account.link<&FindLeaseMarketAuctionEscrow.SaleItemCollection{FindLeaseMarketAuctionEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseAEPublicPath, target: leaseAEStoragePath)
-        // }
-
-        // let leaseAEBidType= Type<@FindLeaseMarketAuctionEscrow.MarketBidCollection>()
-        // let leaseAEBidPublicPath=FindMarket.getPublicPath(leaseAEBidType, name: "findLease")
-        // let leaseAEBidStoragePath= FindMarket.getStoragePath(leaseAEBidType, name: "findLease")
-        // let leaseAEBidCap= account.getCapability<&FindLeaseMarketAuctionEscrow.MarketBidCollection{FindLeaseMarketAuctionEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseAEBidPublicPath) 
-        // if !leaseAEBidCap.check() {
-        //     account.save<@FindLeaseMarketAuctionEscrow.MarketBidCollection>(<- FindLeaseMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseAEBidStoragePath)
-        //     account.link<&FindLeaseMarketAuctionEscrow.MarketBidCollection{FindLeaseMarketAuctionEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseAEBidPublicPath, target: leaseAEBidStoragePath)
-        // }
-
         let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
         let leaseDOSPublicPath=FindMarket.getPublicPath(leaseDOSSaleItemType, name: "findLease")
         let leaseDOSStoragePath= FindMarket.getStoragePath(leaseDOSSaleItemType, name:"findLease")
@@ -250,25 +165,5 @@ transaction(name: String) {
             account.save<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOSBidStoragePath)
             account.link<&FindLeaseMarketDirectOfferSoft.MarketBidCollection{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidPublicPath, target: leaseDOSBidStoragePath)
         }
-
-        // let leaseDOESaleItemType= Type<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>()
-        // let leaseDOEPublicPath=FindMarket.getPublicPath(leaseDOESaleItemType, name: "findLease")
-        // let leaseDOEStoragePath= FindMarket.getStoragePath(leaseDOESaleItemType, name:"findLease")
-        // let leaseDOESaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOEPublicPath) 
-        // if !leaseDOESaleItemCap.check() {
-        //     //The link here has to be a capability not a tenant, because it can change.
-        //     account.save<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptySaleItemCollection(leaseTenantCapability), to: leaseDOEStoragePath)
-        //     account.link<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOEPublicPath, target: leaseDOEStoragePath)
-        // }
-
-        // let leaseDOEBidType= Type<@FindLeaseMarketDirectOfferEscrow.MarketBidCollection>()
-        // let leaseDOEBidPublicPath=FindMarket.getPublicPath(leaseDOEBidType, name: "findLease")
-        // let leaseDOEBidStoragePath= FindMarket.getStoragePath(leaseDOEBidType, name: "findLease")
-        // let leaseDOEBidCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.MarketBidCollection{FindLeaseMarketDirectOfferEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOEBidPublicPath) 
-        // if !leaseDOEBidCap.check() {
-        //     account.save<@FindLeaseMarketDirectOfferEscrow.MarketBidCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOEBidStoragePath)
-        //     account.link<&FindLeaseMarketDirectOfferEscrow.MarketBidCollection{FindLeaseMarketDirectOfferEscrow.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOEBidPublicPath, target: leaseDOEBidStoragePath)
-        // }
-        //SYNC with register
     }
 }

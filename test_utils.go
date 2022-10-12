@@ -188,14 +188,15 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
 
 	nameSigner := WithSigner(name)
-	dapperSigner := WithPayloadSigner("account")
 	nameArg := WithArg("name", name)
 
 	nameAddress := otu.O.Address(name)
 
+	otu.O.Tx("initDapperAccount", nameSigner, WithArg("dapperAddress", "account")).
+		AssertSuccess(otu.T)
+
 	otu.O.Tx("createProfileDapper",
 		nameSigner,
-		dapperSigner,
 		nameArg).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
