@@ -523,8 +523,7 @@ pub contract Profile {
 			//I need to destroy here for this to compile, but WHY?
 			// oh we dont neet this anymore
 			// destroy from
-			// panic("could not find a supported wallet for:".concat(identifier))
-			panic(identifier.slice(from: identifier.length - "FlowToken.Vault".length, upTo: identifier.length ))
+			panic("could not find a supported wallet for:".concat(identifier))
 		}
 
 

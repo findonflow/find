@@ -99,18 +99,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to sell and buy at auction even the buyer is without the collection", func(t *testing.T) {
-
-		otu.listNFTForEscrowedAuction("user1", id, price).
-			saleItemListed("user1", "active_listed", price).
-			destroyDandyCollection("user2").
-			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0).
-			sendDandy("user1", "user2", id)
-	})
-
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
 
 		otu.listNFTForEscrowedAuction("user1", id, price).

@@ -669,6 +669,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
 
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
 		otu.registerDUCInRegistry().
 			setDUCExampleNFT().
 			sendExampleNFT("user1", "account")

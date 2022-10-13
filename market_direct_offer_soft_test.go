@@ -70,20 +70,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should not be able to offer with price 0", func(t *testing.T) {
 
-		// otu.O.Tx(
-		// 	"bidMarketDirectOfferSoft",
-		// 	WithSigner("user2"),
-		// 	WithArg("marketplace", "account"),
-		// 	WithArg("user", "user1"),
-		// 	WithArg("nftAliasOrIdentifier", "Dandy"),
-		// 	WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-		// 	WithArg("id", id),
-		// 	WithArg("ftAliasOrIdentifier", "Flow"),
-		// 	WithArg("amount", 0.0),
-		// 	WithArg("validUntil", otu.currentTime()+10.0),
-		// ).
-		// 	AssertFailure(t, "Offer price should be greater than 0")
-
 		bidTx("bidMarketDirectOfferSoft",
 			WithArg("amount", 0.0),
 		).
@@ -92,19 +78,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to offer with invalid time", func(t *testing.T) {
-
-		// otu.O.Tx(
-		// 	"bidMarketDirectOfferSoft",
-		// 	WithSigner("user2"),
-		// 	WithArg("marketplace", "account"),
-		// 	WithArg("user", "user1"),
-		// 	WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-		// 	WithArg("id", id),
-		// 	WithArg("ftAliasOrIdentifier", "Flow"),
-		// 	WithArg("amount", price),
-		// 	WithArg("validUntil", 0.0),
-		// ).
-		// 	AssertFailure(t, "Valid until is before current time")
 
 		bidTx("bidMarketDirectOfferSoft",
 			WithArg("amount", price),
@@ -121,14 +94,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sendDandy("user2", "user1", id)
 
 		otu.setUUID(600)
-
-		// otu.O.TransactionFromFile("cancelMarketDirectOfferSoft").
-		// 	SignProposeAndPayAs("user1").
-		// 	Args(otu.O.Arguments().
-		// 		Account("account").
-		// 		UInt64Array(id)).
-		// 	Test(otu.T).
-		// 	AssertSuccess()
 
 		otu.O.Tx("cancelMarketDirectOfferSoft",
 			WithSigner("user1"),
@@ -147,14 +112,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sendDandy("user2", "user1", id)
 
 		otu.setUUID(900)
-
-		// otu.O.TransactionFromFile("retractOfferMarketDirectOfferSoft").
-		// 	SignProposeAndPayAs("user2").
-		// 	Args(otu.O.Arguments().
-		// 		Account("account").
-		// 		UInt64(id)).
-		// 	Test(otu.T).
-		// 	AssertSuccess()
 
 		otu.O.Tx("retractOfferMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -191,18 +148,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should not be able to offer your own NFT", func(t *testing.T) {
 
-		// otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
-		// 	SignProposeAndPayAs("user1").
-		// 	Args(otu.O.Arguments().
-		// 		Account("account").
-		// 		String("user1").
-		// 		String("A.f8d6e0586b0a20c7.Dandy.NFT").
-		// 		UInt64(id).
-		// 		String("Flow").
-		// 		UFix64(price).
-		// 		UFix64(otu.currentTime() + 100.0)).
-		// 	Test(otu.T).AssertFailure("You cannot bid on your own resource")
-
 		bidTx("bidMarketDirectOfferSoft",
 			WithSigner("user1"),
 			WithArg("validUntil", otu.currentTime()+10.0),
@@ -216,13 +161,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			tickClock(200.0)
-
-			// otu.O.TransactionFromFile("acceptDirectOfferSoft").
-			// 	SignProposeAndPayAs("user1").
-			// 	Args(otu.O.Arguments().
-			// 		Account("account").
-			// 		UInt64(id)).
-			// 	Test(otu.T).AssertFailure("This direct offer is already expired")
 
 		otu.O.Tx("acceptDirectOfferSoft",
 			WithSigner("user1"),
@@ -239,19 +177,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterMarketOption("DirectOfferSoft", "deprecate")
 
-		// otu.O.TransactionFromFile("bidMarketDirectOfferSoft").
-		// 	SignProposeAndPayAs("user2").
-		// 	Args(otu.O.Arguments().
-		// 		Account("account").
-		// 		String("user1").
-		// 		String("A.f8d6e0586b0a20c7.Dandy.NFT").
-		// 		UInt64(id).
-		// 		String("Flow").
-		// 		UFix64(price).
-		// 		UFix64(otu.currentTime() + 100.0)).
-		// 	Test(otu.T).
-		// 	AssertFailure("Tenant has deprected mutation options on this item")
-
 		bidTx("bidMarketDirectOfferSoft",
 			WithSigner("user2"),
 			WithArg("validUntil", otu.currentTime()+100.0),
@@ -266,15 +191,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			alterMarketOption("DirectOfferSoft", "deprecate")
-
-		// otu.O.TransactionFromFile("increaseBidMarketDirectOfferSoft").
-		// 	SignProposeAndPayAs("user2").
-		// 	Args(otu.O.Arguments().
-		// 		Account("account").
-		// 		UInt64(id).
-		// 		UFix64(price)).
-		// 	Test(otu.T).
-		// 	AssertFailure("Tenant has deprected mutation options on this item")
 
 		otu.O.Tx("increaseBidMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -687,6 +603,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
 
 		otu.registerDUCInRegistry().
 			setDUCExampleNFT().

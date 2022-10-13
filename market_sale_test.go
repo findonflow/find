@@ -572,9 +572,14 @@ func TestMarketSale(t *testing.T) {
 			)
 
 		otu.cancelAllNFTForSale("user1")
+		otu.initFUSDVault("user1")
 	})
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
 		otu.registerDUCInRegistry().
 			setDUCExampleNFT().
 			sendExampleNFT("user1", "account")

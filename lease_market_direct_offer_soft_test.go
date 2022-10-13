@@ -74,19 +74,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
-
-		otu.destroyLeaseCollection("user2").
-			directOfferLeaseMarketSoft("user2", "name1", price).
-			saleLeaseListed("user1", "active_ongoing", price).
-			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
-			saleLeaseListed("user1", "active_finished", price).
-			fulfillLeaseMarketDirectOfferSoft("user2", "name1", price)
-
-		otu.moveNameTo("user2", "user1", "name1").
-			sendFT("user1", "user2", "Flow", price)
-	})
-
 	t.Run("Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
@@ -560,6 +547,9 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
 
 		otu.registerDUCInRegistry().
 			setDUCLease()

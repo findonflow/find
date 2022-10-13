@@ -185,6 +185,30 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 	return otu
 }
 
+func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
+
+	nameAddress := otu.O.Address(name)
+
+	otu.O.Tx("initDapperAccount",
+		WithSigner(name),
+		WithArg("dapperAddress", "account"),
+	).
+		AssertSuccess(otu.T)
+
+	otu.O.Tx("createProfileDapper",
+		WithSigner(name),
+		WithArg("name", name),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
+			"account":   nameAddress,
+			"userName":  name,
+			"createdAt": "find",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 	otu.registerUserTransaction(name)
 	return otu
@@ -1736,6 +1760,16 @@ func (otu *OverflowTestUtils) unlinkProfileWallet(user string) *OverflowTestUtil
 func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 
 	otu.O.Tx("testDestroyFUSDVault",
+		WithSigner(user),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) initFUSDVault(user string) *OverflowTestUtils {
+
+	otu.O.Tx("testInitFUSDVault",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)

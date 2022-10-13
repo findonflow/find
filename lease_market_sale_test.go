@@ -42,13 +42,6 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to list a lease for sale and buy it without the collection", func(t *testing.T) {
-		otu.listLeaseForSale("user1", "name1", price).
-			destroyLeaseCollection("user2").
-			buyLeaseForMarketSale("user2", "user1", "name1", price).
-			moveNameTo("user2", "user1", "name1")
-	})
-
 	t.Run("Should not be able to list with price $0", func(t *testing.T) {
 
 		otu.O.Tx("listLeaseForSale",
@@ -456,6 +449,10 @@ func TestLeaseMarketSale(t *testing.T) {
 	})
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
 		otu.registerDUCInRegistry().
 			setDUCLease()
 

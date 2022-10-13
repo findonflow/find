@@ -72,19 +72,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.moveNameTo("user2", "user1", "name1")
 	})
 
-	t.Run("Should be able to sell and buy at auction even buyer is without the collection.", func(t *testing.T) {
-
-		otu.listLeaseForSoftAuction("user1", "name1", price).
-			saleLeaseListed("user1", "active_listed", price).
-			destroyLeaseCollection("user2").
-			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-			tickClock(400.0).
-			saleLeaseListed("user1", "finished_completed", price+5.0).
-			fulfillLeaseMarketAuctionSoft("user2", "name1", 15.0)
-
-		otu.moveNameTo("user2", "user1", "name1")
-	})
-
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
 
 		otu.listLeaseForSoftAuction("user1", "name1", price).
@@ -667,6 +654,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
 
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
 		otu.registerDUCInRegistry().
 			setDUCLease()
 
@@ -675,7 +665,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoftDUC("user2", "name1", price+5.0)
 
-		otu.O.Tx("increaseBidLeaseMarketAuctionSoft",
+		otu.O.Tx("increaseBidLeaseMarketAuctionSoftDUC",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 5.0),
