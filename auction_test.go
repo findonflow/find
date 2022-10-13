@@ -107,7 +107,7 @@ func TestAuction(t *testing.T) {
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.O.Address("user1"),
-				"sellerName":  "name1",
+				"sellerName":  "name2",
 				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
 				"buyerName":   "user2",
 				"status":      "sold",
@@ -143,7 +143,7 @@ func TestAuction(t *testing.T) {
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.O.Address("user1"),
-				"sellerName":  "name1",
+				"sellerName":  "name2",
 				"amount":      20.0,
 				"status":      "sold",
 				"buyer":       otu.O.Address("user3"),
@@ -196,7 +196,7 @@ func TestAuction(t *testing.T) {
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.O.Address("user1"),
-				"sellerName":  "name1",
+				"sellerName":  "name2",
 				"amount":      11.0,
 				"status":      "sold",
 				"buyer":       otu.O.Address(buyer),
