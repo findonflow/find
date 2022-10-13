@@ -19,10 +19,6 @@ transaction(leaseName: String, amount: UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
-		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) 
-		if ft.alias != "DUC" && walletReference == nil {
-			panic("No suitable wallet linked for this account")
-		}
 	}
 
 	execute {

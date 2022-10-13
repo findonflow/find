@@ -135,7 +135,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		WithArg("address", "find"),
 	).AssertSuccess(otu.T)
 
-	otu.O.Tx("adminInitDUC",
+	otu.O.Tx("adminInitDapper",
 		findSigner,
 		WithArg("dapperAddress", "account"),
 	).AssertSuccess(otu.T)
@@ -2019,12 +2019,12 @@ func (otu *OverflowTestUtils) setDUCLease() *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("listNFTForSaleDUC",
+	res := otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
-		WithArg("dapperAddress", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2036,10 +2036,10 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 
 func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listLeaseForSaleDUC",
+	otu.O.Tx("listLeaseForSaleDapper",
 		WithSigner(user),
-		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2067,10 +2067,9 @@ func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, pric
 }
 func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("buyNFTForSaleDUC",
+	otu.O.Tx("buyNFTForSaleDapper",
 		WithSigner(name),
 		WithPayloadSigner("account"),
-		WithArg("merchantAddress", "account"),
 		WithArg("marketplace", "account"),
 		WithArg("address", seller),
 		WithArg("id", id),
@@ -2090,10 +2089,9 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 
 func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("buyLeaseForSaleDUC",
+	otu.O.Tx("buyLeaseForSaleDapper",
 		WithSigner(buyer),
 		WithPayloadSigner("account"),
-		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
@@ -2119,12 +2117,12 @@ func (otu *OverflowTestUtils) registerDUCInRegistry() *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("listNFTForAuctionSoftDUC",
+	res := otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "account"),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -2141,10 +2139,10 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 
 func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listLeaseForAuctionSoftDUC",
+	otu.O.Tx("listLeaseForAuctionSoftDapper",
 		WithSigner(user),
-		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -2182,9 +2180,8 @@ func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint6
 
 func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidMarketAuctionSoftDUC",
+	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "account"),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
 		WithArg("id", id),
@@ -2203,9 +2200,8 @@ func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string
 
 func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidLeaseMarketAuctionSoftDUC",
+	otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 		WithSigner(user),
-		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
@@ -2222,7 +2218,7 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name str
 
 func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillLeaseMarketAuctionSoftDUC",
+	otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 		WithSigner(user),
 		WithPayloadSigner("account"),
 		WithArg("leaseName", name),
@@ -2241,7 +2237,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name
 
 func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillMarketAuctionSoftDUC",
+	otu.O.Tx("fulfillMarketAuctionSoftDapper",
 		WithSigner(name),
 		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
@@ -2261,9 +2257,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64
 
 func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("bidMarketDirectOfferSoftDUC",
+	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "account"),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
@@ -2279,9 +2274,8 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 
 func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidLeaseMarketDirectOfferSoftDUC",
+	otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 		WithSigner(buyer),
-		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
@@ -2311,9 +2305,8 @@ func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, selle
 
 func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("acceptDirectOfferSoftDUC",
+	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "account"),
 		WithArg("marketplace", "account"),
 		WithArg("id", id),
 	).
@@ -2331,9 +2324,8 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uin
 
 func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("acceptLeaseDirectOfferSoftDUC",
+	otu.O.Tx("acceptLeaseDirectOfferSoftDapper",
 		WithSigner(seller),
-		WithArg("dapperAddress", "account"),
 		WithArg("leaseName", name),
 	).
 		AssertSuccess(otu.T).
@@ -2350,7 +2342,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller 
 
 func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillMarketDirectOfferSoftDUC",
+	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 		WithSigner(name),
 		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
@@ -2370,7 +2362,7 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id ui
 
 func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDUC",
+	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 		WithSigner(user),
 		WithPayloadSigner("account"),
 		WithArg("leaseName", name),

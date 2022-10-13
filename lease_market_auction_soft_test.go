@@ -665,7 +665,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoftDUC("user2", "name1", price+5.0)
 
-		otu.O.Tx("increaseBidLeaseMarketAuctionSoftDUC",
+		otu.O.Tx("increaseBidLeaseMarketAuctionSoft",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 5.0),

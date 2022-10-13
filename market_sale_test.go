@@ -761,12 +761,12 @@ func TestMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list ExampleNFT for sale and buy it with DUC using MultipleNFT transaction", func(t *testing.T) {
 
-		saleItemID := otu.O.Tx("listMultipleNFTForSaleDUC",
+		saleItemID := otu.O.Tx("listMultipleNFTForSaleDapper",
 			WithSigner("user1"),
-			WithArg("dapperAddress", "account"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("ids", []uint64{0}),
+			WithArg("ftAliasOrIdentifiers", `["A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"]`),
 			WithArg("directSellPrices", `[10.0]`),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -779,12 +779,11 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.O.Tx("buyMultipleNFTForSaleDUC",
+		otu.O.Tx("buyMultipleNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
-			WithArg("dapperAddress", "account"),
 			WithArg("marketplace", "account"),
-			WithArg("users", `["user1"]`),
+			WithAddresses("users", "user1"),
 			WithArg("ids", saleItemID[0:1]),
 			WithArg("amounts", `[10.0]`),
 		).

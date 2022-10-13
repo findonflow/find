@@ -5,6 +5,7 @@ import (
 
 	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketDirectOfferSoft(t *testing.T) {
@@ -829,52 +830,48 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC with multiple direct offer transaction", func(t *testing.T) {
 
-		// saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)
+		saleItemID, err := otu.O.Tx("bidMultipleMarketDirectOfferSoftDapper",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("users", []string{"user1"}),
+			WithArg("nftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"}),
+			WithArg("ids", []uint64{0}),
+			WithArg("amounts", `[10.0]`),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t).
+			GetIdFromEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
 
-		res := otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoftDUC").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				Account("account").
-				StringArray("user1").
-				StringArray("A.f8d6e0586b0a20c7.ExampleNFT.NFT").
-				UInt64Array(0).
-				UFix64Array(price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		assert.NoError(t, err)
 
-		saleItemID := otu.getIDFromEvent(res.Events, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
-
-		// otu.acceptDirectOfferMarketSoftDUC("user1", saleItemID[0], "user2", price).
-
-		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoftDUC").
-			SignProposeAndPayAs("user1").
-			Args(otu.O.Arguments().
-				Account("account").
-				Account("account").
-				UInt64Array(saleItemID[0])).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     saleItemID[0],
+		otu.O.Tx("acceptMultipleDirectOfferSoftDapper",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("ids", []uint64{saleItemID}),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     saleItemID,
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
-			}))
+			})
 
-		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferSoftDUC").
-			SignProposeAndPayAs("user2").PayloadSigner("account").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64Array(saleItemID[0]).
-				UFix64Array(price)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     saleItemID[0],
+		otu.O.Tx("fulfillMultipleMarketDirectOfferSoftDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("marketplace", "account"),
+			WithArg("amounts", `[10.0]`),
+			WithArg("ids", []uint64{saleItemID}),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+				"id":     saleItemID,
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
-			}))
+			})
 		otu.sendExampleNFT("user1", "user2")
 	})
 

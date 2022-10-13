@@ -7,7 +7,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(dapperAddress: Address, marketplace:Address, user: String, id: UInt64, amount: UFix64) {
+transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}> 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>

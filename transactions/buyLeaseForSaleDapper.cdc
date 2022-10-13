@@ -2,17 +2,16 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(dapperAddress: Address, leaseName: String, amount: UFix64) {
+transaction(leaseName: String, amount: UFix64) {
 
 	let to : Address
 	let walletReference : &FungibleToken.Vault
 
 	let saleItemsCap: Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>
-	let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
+	let mainDapperCoinVault: &FungibleToken.Vault
 	let balanceBeforeTransfer: UFix64
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
@@ -30,12 +29,8 @@ transaction(dapperAddress: Address, leaseName: String, amount: UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 	
-		if ft.type != Type<@DapperUtilityCoin.Vault>() {
-			panic("This item is not listed for Dapper Wallets. Please buy in with other wallets.")
-		}
-
-		self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
-		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
+		self.mainDapperCoinVault = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("Cannot borrow DapperCoin vault from account storage".concat(dapper.address.toString()))
+		self.balanceBeforeTransfer = self.mainDapperCoinVault.balance
 
 		self.to= account.address
 
@@ -51,8 +46,8 @@ transaction(dapperAddress: Address, leaseName: String, amount: UFix64) {
 		self.saleItemsCap.borrow()!.buy(name:leaseName, vault: <- vault, to: self.to)
 	}
 
-	// Check that all dapperUtilityCoin was routed back to Dapper
+	// Check that all dapper Coin was routed back to Dapper
 	post {
-		self.mainDapperUtilityCoinVault.balance == self.balanceBeforeTransfer: "DapperUtilityCoin leakage"
+		self.mainDapperCoinVault.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
 	}
 }

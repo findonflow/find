@@ -1,6 +1,5 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
@@ -8,10 +7,11 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64], directSellPrices:[UFix64], validUntil: UFix64?) {
+transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
 	
 	let saleItems : &FindMarketSale.SaleItemCollection?
 	let pointers : [FindViews.AuthNFTPointer]
+	let vaultTypes : [Type]
 	
 	prepare(account: AuthAccount) {
 
@@ -26,14 +26,15 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifiers: 
 		let tenant = tenantCapability.borrow()!
 		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 		self.pointers= []
+		self.vaultTypes= []
 
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
+		let fts : {String : FTRegistry.FTInfo} = {}
 
 		var counter = 0
 		while counter < ids.length {
 			// Get supported NFT and FT Information from Registries from input alias
 			var nft : NFTCatalog.NFTCollectionData? = nil
-			var ft : FTRegistry.FTInfo? = nil
 
 			if nfts[nftAliasOrIdentifiers[counter]] != nil {
 				nft = nfts[nftAliasOrIdentifiers[counter]]
@@ -43,6 +44,17 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifiers: 
 				nft = collection.collectionData
 				nfts[nftAliasOrIdentifiers[counter]] = nft
 			}
+
+			if fts[ftAliasOrIdentifiers[counter]] != nil {
+				let ft = fts[ftAliasOrIdentifiers[counter]]!
+				self.vaultTypes.append(ft.type)
+			} else {
+				let ft = FTRegistry.getFTInfo(ftAliasOrIdentifiers[counter]) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifiers[counter]))
+				fts[ftAliasOrIdentifiers[counter]] = ft 
+				self.vaultTypes.append(ft.type)
+			}
+
+
 
 			var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
 
@@ -77,7 +89,7 @@ transaction(dapperAddress: Address, marketplace:Address, nftAliasOrIdentifiers: 
 	execute{
 		var counter = 0
 		while counter < ids.length {
-			self.saleItems!.listForSale(pointer: self.pointers[counter], vaultType: Type<@DapperUtilityCoin.Vault>(), directSellPrice: directSellPrices[counter], validUntil: validUntil, extraField: {})
+			self.saleItems!.listForSale(pointer: self.pointers[counter], vaultType: self.vaultTypes[counter], directSellPrice: directSellPrices[counter], validUntil: validUntil, extraField: {})
 			counter = counter + 1
 		}
 	}

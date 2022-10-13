@@ -1,11 +1,10 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(dapperAddress: Address, leaseName: String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
+transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 	
 	let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
 	let pointer : FindLeaseMarket.AuthLeasePointer
@@ -14,7 +13,7 @@ transaction(dapperAddress: Address, leaseName: String, price:UFix64, auctionRese
 	prepare(account: AuthAccount) {
 
 		// Get supported NFT and FT Information from Registries from input alias
-		let ft = FTRegistry.getFTInfo(Type<@DapperUtilityCoin.Vault>().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(Type<@DapperUtilityCoin.Vault>().identifier))
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 		
 		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!

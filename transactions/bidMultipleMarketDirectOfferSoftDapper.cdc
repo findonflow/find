@@ -11,7 +11,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 
-transaction(dapperAddress: Address, marketplace:Address, users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], amounts: [UFix64], validUntil: UFix64?) {
+transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], amounts: [UFix64], validUntil: UFix64?) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?

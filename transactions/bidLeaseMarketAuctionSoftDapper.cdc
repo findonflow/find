@@ -4,7 +4,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-transaction(dapperAddress: Address, leaseName: String, amount: UFix64) {
+transaction(leaseName: String, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}> 
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?

@@ -4,7 +4,7 @@ import FIND from "../contracts/FIND.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 
-transaction(dapperAddress: Address, leaseName: String, amount: UFix64, validUntil: UFix64?) {
+transaction(leaseName: String, amount: UFix64, validUntil: UFix64?) {
 
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 	let ftVaultType: Type
