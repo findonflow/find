@@ -37,10 +37,6 @@ transaction(leaseName: String, amount: UFix64) {
 		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 	}
 
-	pre {
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
-	}
-
 	execute {
 		let vault <- self.walletReference.withdraw(amount: amount) 
 		self.saleItemsCap.borrow()!.buy(name:leaseName, vault: <- vault, to: self.to)

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -456,6 +457,8 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.registerDUCInRegistry().
 			setDUCLease()
 
+		otu.createDapperUser("user1")
+
 		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		itemsForSale := otu.getLeasesForSale("user1")
@@ -464,6 +467,24 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.buyLeaseForMarketSaleDUC("user2", "user1", "name1", price).
 			moveNameTo("user2", "user1", "name1")
+
+	})
+
+	t.Run("Should be able to get required output for buy lease for sale", func(t *testing.T) {
+
+		otu.listLeaseForSaleDUC("user1", "name1", price)
+
+		otu.O.Script("getMetadataForBuyLeaseForSaleDapper",
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
+			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
+			"id":       323,
+			"imageURL": "https://i.imgur.com/8W8NoO1.png",
+			"name":     "name1",
+		}))
+
+		otu.cancelAllNFTForSale("user1")
 
 	})
 
