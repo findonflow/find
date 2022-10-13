@@ -1,17 +1,16 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 
-transaction(leaseName: String, amount: UFix64, validUntil: UFix64?) {
+transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 	let ftVaultType: Type
 
 	prepare(account: AuthAccount) {
 		
-		let ft = FTRegistry.getFTInfo(Type<@DapperUtilityCoin.Vault>().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(Type<@DapperUtilityCoin.Vault>().identifier))
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
 		self.ftVaultType = ft.type
 

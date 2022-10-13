@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow"
@@ -638,34 +639,32 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 
-		// otu.directOfferMarketSoft("user2", "user1", id, price).
-
-		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				StringArray("user1", "user1", "user1").
-				StringArray("A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT").
-				UInt64Array(ids...).
-				StringArray("Flow", "Flow", "Flow").
-				UFix64Array(price, price, price).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess().
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+		otu.O.Tx("bidMultipleMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("users", []string{"user1", "user1", "user1"}),
+			WithArg("nftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}),
+			WithArg("ids", ids),
+			WithArg("ftAliasOrIdentifiers", []string{"Flow", "Flow", "Flow"}),
+			WithArg("amounts", fmt.Sprintf(`[%f, %f, %f]`, price, price, price)),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
 				"buyer":  otu.O.Address("user2"),
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
 				"buyer":  otu.O.Address("user2"),
-			})).
-			AssertPartialEvent(NewTestEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			}).
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
 				"buyer":  otu.O.Address("user2"),
-			}))
+			})
 
 		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoft").
 			SignProposeAndPayAs("user1").
@@ -735,7 +734,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		sellers := []string{seller}
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
-		prices := []float64{price}
+		prices := fmt.Sprintf(`[%f`, price)
 
 		for len(ids) < number {
 			id := otu.mintThreeExampleDandies()
@@ -748,20 +747,23 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sellers = append(sellers, sellers[0])
 			dandy = append(dandy, dandy[0])
 			flow = append(flow, flow[0])
-			prices = append(prices, prices[0])
+			prices = prices + fmt.Sprintf(`, %f`, price)
 		}
 
-		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				StringArray(sellers...).
-				StringArray(dandy...).
-				UInt64Array(ids...).
-				StringArray(flow...).
-				UFix64Array(prices...).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		prices = prices + `]`
+
+		otu.O.Tx("bidMultipleMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("users", sellers),
+			WithArg("nftAliasOrIdentifiers", dandy),
+			WithArg("ids", ids),
+			WithArg("ftAliasOrIdentifiers", flow),
+			WithArg("amounts", prices),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
+
 	})
 
 	t.Run("Should be able to multiple offer to and fulfill 4 items in one go", func(t *testing.T) {
@@ -783,7 +785,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		sellers := []string{seller}
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
-		prices := []float64{price}
+		prices := fmt.Sprintf(`[%f`, price)
 
 		for len(ids) < number {
 			id := otu.mintThreeExampleDandies()
@@ -796,20 +798,22 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sellers = append(sellers, sellers[0])
 			dandy = append(dandy, dandy[0])
 			flow = append(flow, flow[0])
-			prices = append(prices, prices[0])
+			prices = prices + fmt.Sprintf(`, %f`, price)
 		}
 
-		otu.O.TransactionFromFile("bidMultipleMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				StringArray(sellers...).
-				StringArray(dandy...).
-				UInt64Array(ids...).
-				StringArray(flow...).
-				UFix64Array(prices...).
-				UFix64(otu.currentTime() + 100.0)).
-			Test(otu.T).AssertSuccess()
+		prices = prices + `]`
+
+		otu.O.Tx("bidMultipleMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("users", sellers),
+			WithArg("nftAliasOrIdentifiers", dandy),
+			WithArg("ids", ids),
+			WithArg("ftAliasOrIdentifiers", flow),
+			WithArg("amounts", prices),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(t)
 
 		otu.O.TransactionFromFile("acceptMultipleDirectOfferSoft").
 			SignProposeAndPayAs("user1").
@@ -818,13 +822,13 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				UInt64Array(ids...)).
 			Test(otu.T).AssertSuccess()
 
-		otu.O.TransactionFromFile("fulfillMultipleMarketDirectOfferSoft").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				Account("account").
-				UInt64Array(ids...).
-				UFix64Array(prices...)).
-			Test(otu.T).AssertSuccess()
+		otu.O.Tx("fulfillMultipleMarketDirectOfferSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("amounts", prices),
+			WithArg("ids", ids),
+		).
+			AssertSuccess(t)
 
 	})
 
@@ -836,6 +840,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("users", []string{"user1"}),
 			WithArg("nftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"}),
 			WithArg("ids", []uint64{0}),
+			WithArg("ftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"}),
 			WithArg("amounts", `[10.0]`),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).

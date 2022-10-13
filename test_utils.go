@@ -2263,6 +2263,7 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2277,6 +2278,7 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name s
 	otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 		WithSigner(buyer),
 		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).

@@ -2,7 +2,6 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 
 transaction(marketplace:Address, ids: [UInt64], amounts:[UFix64]) {
 

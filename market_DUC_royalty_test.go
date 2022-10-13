@@ -292,6 +292,7 @@ func TestMarketDUCRoyalty(t *testing.T) {
 			WithArg("user", name),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 			WithArg("amount", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -437,6 +438,7 @@ func directOfferMarketSoft(otu *OverflowTestUtils, name string, seller string, i
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).

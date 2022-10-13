@@ -6,9 +6,8 @@ import FindViews from "../contracts/FindViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, amount: UFix64, validUntil: UFix64?) {
+transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
@@ -25,7 +24,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 		let nft = collection.collectionData
 
-		let ft = FTRegistry.getFTInfo(Type<@DapperUtilityCoin.Vault>().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(Type<@DapperUtilityCoin.Vault>().identifier))
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
 		self.ftVaultType = ft.type
 
