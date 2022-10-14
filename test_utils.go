@@ -1868,16 +1868,6 @@ func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestU
 	return otu
 }
 
-func (otu *OverflowTestUtils) destroyLeaseCollection(user string) *OverflowTestUtils {
-
-	otu.O.Tx("testDestroyLeaseCollection",
-		WithSigner(user),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *OverflowTestUtils {
 
 	otu.O.Tx("sendDandy",
@@ -1956,30 +1946,6 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 		counter = counter + 1
 	}
 	return result
-}
-
-// func (otu *OverflowTestUtils) retrieveEvent(events []*OverflowFormatedEvent, eventNames []string) string {
-// 	string := ""
-// 	for _, event := range events {
-// 		for _, eventName := range eventNames {
-// 			if event.Name == eventName {
-// 				string = fmt.Sprintf("%s%s", string, event.String())
-// 			}
-// 		}
-// 	}
-
-// 	return string
-// }
-
-func (otu *OverflowTestUtils) getIDFromEvent(events []*OverflowFormatedEvent, eventName, field string) []uint64 {
-	Ids := []uint64{}
-	for _, event := range events {
-		if event.Name == eventName {
-			Ids = append(Ids, event.GetFieldAsUInt64(field))
-		}
-	}
-
-	return Ids
 }
 
 func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *OverflowTestUtils {
