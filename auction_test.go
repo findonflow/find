@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 )
 
 /*
@@ -34,8 +34,8 @@ func TestAuction(t *testing.T) {
 			setProfile("user1")
 
 		otu.O.Tx("delistNameSale",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", `["user1","name1"]`),
+			WithSigner("user1"),
+			WithArg("names", `["user1","name1"]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
@@ -61,7 +61,7 @@ func TestAuction(t *testing.T) {
 			listNameForSale("user1", "name2")
 
 		otu.O.Tx("delistAllNameSale",
-			overflow.WithSigner("user1"),
+			WithSigner("user1"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
@@ -100,8 +100,8 @@ func TestAuction(t *testing.T) {
 		otu.setProfile("user2")
 
 		otu.O.Tx("fulfillName",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("name", "user1"),
+			WithSigner("user1"),
+			WithArg("name", "user1"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
@@ -135,9 +135,9 @@ func TestAuction(t *testing.T) {
 			setProfile("user3")
 
 		otu.O.Tx("fulfillNameAuction",
-			overflow.WithSigner("user3"),
-			overflow.WithArg("owner", "user1"),
-			overflow.WithArg("name", "user1"),
+			WithSigner("user3"),
+			WithArg("owner", "user1"),
+			WithArg("name", "user1"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
@@ -169,9 +169,9 @@ func TestAuction(t *testing.T) {
 			auctionBid("user3", "user1", 20.0)
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 10.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "bid must be larger then current bid. Current bid is : 20.00000000. New bid is at : 10.00000000")
 
@@ -188,9 +188,9 @@ func TestAuction(t *testing.T) {
 		amount := 11.0
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner(buyer),
-			overflow.WithArg("name", name),
-			overflow.WithArg("amount", amount),
+			WithSigner(buyer),
+			WithArg("name", name),
+			WithArg("amount", amount),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
@@ -222,13 +222,13 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0)
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user2"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user1"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})
@@ -238,15 +238,15 @@ func TestAuction(t *testing.T) {
 		otu.directOffer("user2", "user1", 10.0)
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user3"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 5.0),
+			WithSigner("user3"),
+			WithArg("name", "user1"),
+			WithArg("amount", 5.0),
 		).
 			AssertFailure(t, "There is already a higher bid on this lease. Current bid is : 10.00000000 New bid is at : 5.00000000")
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user2"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})
@@ -256,15 +256,15 @@ func TestAuction(t *testing.T) {
 		otu.directOffer("user2", "user1", 10.0)
 
 		otu.O.Tx("increaseNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 0.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 0.0),
 		).
 			AssertFailure(t, "Increment should be greater than 10.00000000")
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user2"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})
@@ -276,9 +276,9 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0)
 
 		otu.O.Tx("increaseNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 10.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
@@ -290,8 +290,8 @@ func TestAuction(t *testing.T) {
 			})
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user1"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})
@@ -304,9 +304,9 @@ func TestAuction(t *testing.T) {
 			setProfile("user2")
 
 		otu.O.Tx("fulfillNameAuction",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("owner", "user1"),
-			overflow.WithArg("name", "user1"),
+			WithSigner("user2"),
+			WithArg("owner", "user1"),
+			WithArg("name", "user1"),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
 				map[string]interface{}{
@@ -331,15 +331,15 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 10.0)
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 15.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 15.0),
 		).
 			AssertFailure(t, "You already have the latest bid on this item, use the incraseBid transaction")
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user1"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})
@@ -350,9 +350,9 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0)
 
 		otu.O.Tx("increaseNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 10.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
@@ -367,18 +367,21 @@ func TestAuction(t *testing.T) {
 
 	t.Run("Should not be able to increase bid less than increment", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("increaseNameBid").
-			SignProposeAndPayAs("user2").
-			Args(otu.O.Arguments().
-				String("user1").
-				UFix64(0.0)).
-			Test(t).
-			AssertFailure("Increment should be greater than 10.00000000")
+		otu.O.Tx("increaseNameBid",
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 0.0),
+		).
+			AssertFailure(t, "Increment should be greater than 10.00000000")
 
 		otu.O.Tx("increaseNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 0.0),
+			WithSigner("user2"),
+		)
+
+		otu.O.Tx("increaseNameBid",
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 0.0),
 		).
 			AssertFailure(t, "Increment should be greater than 10.00000000")
 
@@ -387,9 +390,9 @@ func TestAuction(t *testing.T) {
 	t.Run("Should be able to increase auction bid", func(t *testing.T) {
 
 		otu.O.Tx("increaseNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 10.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
@@ -409,8 +412,8 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0)
 
 		otu.O.Tx("startNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("name", "user1"),
+			WithSigner("user1"),
+			WithArg("name", "user1"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
@@ -431,8 +434,8 @@ func TestAuction(t *testing.T) {
 			directOffer("user2", "user1", 4.0)
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("names", `["user1"]`),
+			WithSigner("user2"),
+			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
@@ -455,8 +458,8 @@ func TestAuction(t *testing.T) {
 		otu.assertLookupAddress("user2", nil)
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("names", `["user1"]`),
+			WithSigner("user2"),
+			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
@@ -476,14 +479,14 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 5.0)
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("names", `["user1"]`),
+			WithSigner("user2"),
+			WithArg("names", `["user1"]`),
 		).
 			AssertFailure(t, "Cannot cancel a bid that is in an auction")
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user1"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})
@@ -494,9 +497,9 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 5.0)
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user3"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 15.0),
+			WithSigner("user3"),
+			WithArg("name", "user1"),
+			WithArg("amount", 15.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
@@ -524,9 +527,9 @@ func TestAuction(t *testing.T) {
 		otu.tickClock(86380.0)
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user3"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 15.0),
+			WithSigner("user3"),
+			WithArg("name", "user1"),
+			WithArg("amount", 15.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
@@ -552,8 +555,8 @@ func TestAuction(t *testing.T) {
 			bid("user2", "user1", 5.0)
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", `["user1"]`),
+			WithSigner("user1"),
+			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
@@ -579,9 +582,9 @@ func TestAuction(t *testing.T) {
 		otu.expireLock().tickClock(2.0)
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 10.0),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "cannot bid on name that is free")
 
@@ -596,8 +599,8 @@ func TestAuction(t *testing.T) {
 			setProfile("user2")
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", `["user1"]`),
+			WithSigner("user1"),
+			WithArg("names", `["user1"]`),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
 				map[string]interface{}{
@@ -617,15 +620,15 @@ func TestAuction(t *testing.T) {
 			expireAuction().tickClock(2.0)
 
 		otu.O.Tx("cancelNameAuction",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("names", `["user1"]`),
+			WithSigner("user1"),
+			WithArg("names", `["user1"]`),
 		).
 			AssertFailure(t, "Cannot cancel finished auction")
 
 		otu.O.Tx("fulfillNameAuction",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("owner", "user1"),
-			overflow.WithArg("name", "user1"),
+			WithSigner("user2"),
+			WithArg("owner", "user1"),
+			WithArg("name", "user1"),
 		).AssertSuccess(t)
 
 		otu.moveNameTo("user2", "user1", "user1")
@@ -635,9 +638,9 @@ func TestAuction(t *testing.T) {
 	t.Run("Should not be able to direct offer on your own name", func(t *testing.T) {
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 5.0),
+			WithSigner("user1"),
+			WithArg("name", "user1"),
+			WithArg("amount", 5.0),
 		).
 			AssertFailure(t, "cannot bid on your own name")
 
@@ -650,12 +653,12 @@ func TestAuction(t *testing.T) {
 		name := "user1"
 
 		otu.O.Tx("listNameForAuction",
-			overflow.WithSigner(name),
-			overflow.WithArg("name", name),
-			overflow.WithArg("auctionStartPrice", 5.0),
-			overflow.WithArg("auctionReservePrice", 20.0),
-			overflow.WithArg("auctionDuration", auctionDurationFloat),
-			overflow.WithArg("auctionExtensionOnLateBid", 300.0),
+			WithSigner(name),
+			WithArg("name", name),
+			WithArg("auctionStartPrice", 5.0),
+			WithArg("auctionReservePrice", 20.0),
+			WithArg("auctionDuration", auctionDurationFloat),
+			WithArg("auctionExtensionOnLateBid", 300.0),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
 				"name":       name,
@@ -684,9 +687,9 @@ func TestAuction(t *testing.T) {
 			setProfile("user3")
 
 		otu.O.Tx("bidName",
-			overflow.WithSigner("user3"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 10.0),
+			WithSigner("user3"),
+			WithArg("name", "user1"),
+			WithArg("amount", 10.0),
 		).AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer",
 				map[string]interface{}{
@@ -697,8 +700,8 @@ func TestAuction(t *testing.T) {
 			)
 
 		otu.O.Tx("cancelNameBid",
-			overflow.WithSigner("user3"),
-			overflow.WithArg("names", []string{"user1"}),
+			WithSigner("user3"),
+			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 
 	})

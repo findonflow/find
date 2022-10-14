@@ -1614,27 +1614,6 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 	return otu
 }
 
-// func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, argument string) *OverflowTestUtils {
-// 	otu.O.TransactionFromFile(transactionFile).
-// 		SignProposeAndPayAs("find").
-// 		Args(otu.O.Arguments().String(argument)).
-// 		Test(otu.T).
-// 		AssertSuccess().
-// 		AssertEmitEvent(NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRemoved", map[string]interface{}{
-// 			"alias":          "Dandy",
-// 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-// 		}))
-
-// 	otu.O.TransactionFromFile("adminRemoveNFTCatalog").
-// 		SignProposeAndPayAs("find").
-// 		Args(otu.O.Arguments().
-// 			String("A.f8d6e0586b0a20c7.Dandy.NFT")).
-// 		Test(otu.T).
-// 		AssertSuccess()
-
-// 	return otu
-// }
-
 func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUtils {
 
 	otu.O.Tx("adminAddNFTCatalog",
@@ -1969,16 +1948,6 @@ func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUt
 
 	return otu
 }
-
-// func (otu *OverflowTestUtils) setFindName(user, name string) *OverflowTestUtils {
-// 	otu.O.TransactionFromFile("testSetMainName").
-// 		SignProposeAndPayAs(user).
-// 		Args(otu.O.Arguments().
-// 			String(name)).
-// 		Test(otu.T).
-// 		AssertSuccess()
-// 	return otu
-// }
 
 func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string {
 	counter := 0
