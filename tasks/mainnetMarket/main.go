@@ -105,9 +105,13 @@ func main() {
 		// "FlowverseSocks":               `["A.ce4c02539d1fabe8.FlowverseSocks.NFT"]`,
 		// "Zeedz":                        `["A.62b3063fbe672fc8.ZeedzINO.NFT"]`,
 		// "PartyFavorz": `["A.123cb666996b8432.PartyFavorz.NFT"]`,
+		// "xG":     `["A.c357c8d061353f5f.XGStudio.NFT"]`,
+		// "digiYo": `["A.ae3baa0d314e546b.Digiyo.NFT"]`,
 
-		"xG":     `["A.c357c8d061353f5f.XGStudio.NFT"]`,
-		"digiYo": `["A.ae3baa0d314e546b.Digiyo.NFT"]`,
+		"flovatar":             `["A.921ea449dffec68a.Flovatar.NFT" , "A.921ea449dffec68a.FlovatarComponent.NFT", "A.921ea449dffec68a.Flobot.NFT"]`,
+		"Emeralds":             `["A.5643fd47a29770e7.Emeralds.NFT"]`,
+		"FridgeMagnet":         `["A.4e7213d003a3a38a.FridgeMagnet.NFT"]`,
+		"FlowverseMysteryPass": `["A.9212a87501a8a6a2.FlowversePass.NFT"]`,
 	}
 
 	for name, contracts := range flowNfts {
