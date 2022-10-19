@@ -36,6 +36,10 @@ minor:
 major:
 	json-bump lib/package.json --major
 
+update-overflow: 
+	go get github.com/bjartek/overflow@v1.0.2
+	go mod tidy
+
 client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.createProfileDapper.code" lib/find.json -r > dapper-tx/testnet/createProfile.cdc
 	jq ".networks.testnet.transactions.buyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/buyLeaseForSale.cdc
@@ -69,4 +73,6 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyLeaseForSale.cdc
 	jq ".networks.mainnet.scripts.getMetadataForRegisterDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForRegister.cdc
 	jq ".networks.mainnet.scripts.getMetadataForRenewNameDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForRenewName.cdc
+
+
 
