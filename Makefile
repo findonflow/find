@@ -40,6 +40,9 @@ update-overflow:
 	go get github.com/bjartek/overflow@v1.0.2
 	go mod tidy
 
+downgrade-overflow: 
+	git checkout 7e71b2f go.*
+
 client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.createProfileDapper.code" lib/find.json -r > dapper-tx/testnet/createProfile.cdc
 	jq ".networks.testnet.transactions.buyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/buyLeaseForSale.cdc
