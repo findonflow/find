@@ -89,8 +89,8 @@ pub contract ExampleNFT: NonFungibleToken {
             self.soulBound = status
         }
 
-        pub fun changeRoyalties() {
-            self.changedRoyalties = !self.changedRoyalties
+        pub fun changeRoyalties(_ bool: Bool) {
+            self.changedRoyalties = bool
         }
     
         pub fun getViews(): [Type] {
@@ -137,12 +137,9 @@ pub contract ExampleNFT: NonFungibleToken {
                 case Type<MetadataViews.Royalties>():
                     if !self.changedRoyalties {
                         return self.royalties
-                    } else {
-                        return MetadataViews.Royalties([MetadataViews.Royalty(receiver:ExampleNFT.account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), cut: 0.99, description: "cheater")])
-
-                    }
+                    } 
+                    return MetadataViews.Royalties([MetadataViews.Royalty(receiver:ExampleNFT.account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), cut: 0.99, description: "cheater")])
                     
-
                 case Type<MetadataViews.ExternalURL>():
                     return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
                 case Type<MetadataViews.NFTCollectionData>():

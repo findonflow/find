@@ -733,7 +733,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		otu.O.Tx("fulfillMarketAuctionSoft",
 			WithSigner("user2"),
@@ -764,7 +764,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),
@@ -786,7 +786,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),

@@ -11,13 +11,8 @@ pub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentif
 	let collection= getAuthAccount(address).borrow<&{MetadataViews.ResolverCollection}>(from: collectionPublicPath)!
 
 	// let nft=collection.borrowViewResolver(id: id)
-	let nft=collection.borrowViewResolver(id: collection.getIDs()[0])
-	for v in nft.getViews() {
-		if v.identifier== viewIdentifier {
-			return nft.resolveView(v)
-		}
-	}
-	return nil
+	let nft=collection.borrowViewResolver(id: id)
+	return nft.resolveView(CompositeType(viewIdentifier)!)
 }
 
 pub fun getPublicPath(_ nftIdentifier: String) : StoragePath {

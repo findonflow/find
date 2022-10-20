@@ -838,7 +838,7 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		otu.checkRoyalty("user1", 0, "cheater", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.99)
 
@@ -858,7 +858,7 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
 	})
 
 	t.Run("should be able to get listings with royalty problems and relist", func(t *testing.T) {
@@ -870,7 +870,7 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		otu.checkRoyalty("user1", 0, "cheater", "A.f8d6e0586b0a20c7.ExampleNFT.NFT", 0.99)
 
@@ -894,7 +894,7 @@ func TestMarketSale(t *testing.T) {
 	})
 
 	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),

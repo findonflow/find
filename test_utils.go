@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -833,29 +832,18 @@ func (otu *OverflowTestUtils) delistAllLeaseForSoftAuction(name string) *Overflo
 
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
+	var royalty Royalty
 
-	r, err := otu.O.Script("getCheckRoyalty",
+	otu.O.Script("getCheckRoyalty",
 		WithSigner(name),
 		WithArg("name", name),
 		WithArg("id", id),
 		WithArg("nftAliasOrIdentifier", nftAlias),
 		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 	).
-		GetAsJson()
+		MarshalAs(&royalty)
 
-	if err != nil {
-		panic(err)
-	}
-
-	var royalty Royalty
-	err = json.Unmarshal([]byte(r), &royalty)
-	if err != nil {
-		panic(err)
-	}
-
-	// royalty := Royalty{}
-	assert.NoError(otu.T, err)
-	litter.Sdump(royalty)
+	litter.Dump(royalty)
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
@@ -2409,11 +2397,12 @@ func (otu *OverflowTestUtils) setUUID(uuid uint64) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64) *OverflowTestUtils {
+func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64, cheat bool) *OverflowTestUtils {
 
 	otu.O.Tx("testchangeRoyaltyExampleNFT",
 		WithSigner(user),
 		WithArg("id", id),
+		WithArg("cheat", cheat),
 	).
 		AssertSuccess(otu.T)
 	return otu

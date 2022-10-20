@@ -744,7 +744,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 			WithSigner("user1"),
@@ -770,7 +770,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),
