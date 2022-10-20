@@ -834,7 +834,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 	/* Ben : Should we rename the check royalty script name? */
 	var royalty Royalty
 
-	otu.O.Script("getCheckRoyalty",
+	err := otu.O.Script("getCheckRoyalty",
 		WithSigner(name),
 		WithArg("name", name),
 		WithArg("id", id),
@@ -842,6 +842,8 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 	).
 		MarshalAs(&royalty)
+
+	assert.NoError(otu.T, err)
 
 	litter.Dump(royalty)
 
