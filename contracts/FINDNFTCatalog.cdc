@@ -128,7 +128,14 @@ pub contract FINDNFTCatalog {
         return nil
     }
 
-
+    // helper function to get Paths 
+    pub fun getMetadataFromType(_ t: Type) : NFTCatalog.NFTCatalogMetadata? {
+        let collectionIdentifier = self.getCollectionsForType(nftTypeIdentifier: t.identifier) 
+        if collectionIdentifier == nil || collectionIdentifier!.length < 1 {
+            return nil
+        }
+        return self.getCatalogEntry(collectionIdentifier : collectionIdentifier!.keys[0])
+    }
 
     // Get only FIND NFTCatalog
     pub fun getFINDCatalog() : {String : NFTCatalog.NFTCatalogMetadata} {
