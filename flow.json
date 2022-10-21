@@ -253,7 +253,9 @@
     "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
     "FindPack": "./contracts/FindPack.cdc",
     "FindVerifier": "./contracts/FindVerifier.cdc",
-    "Flomies": "./contracts/Flomies.cdc"
+    "Flomies": "./contracts/Flomies.cdc",
+    "FindAirdropper": "./contracts/FindAirdropper.cdc",
+    "FindFurnace": "./contracts/FindFurnace.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -369,7 +371,9 @@
         "FINDNFTCatalogAdmin",
         "FindLostAndFoundWrapper",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -406,7 +410,9 @@
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -475,7 +481,9 @@
         "EmeraldIdentityDapper",
         "EmeraldIdentity",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace"
       ],
       "emulator-find": [],
       "emulator-user1": [],
