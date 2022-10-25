@@ -255,7 +255,8 @@
     "FindVerifier": "./contracts/FindVerifier.cdc",
     "Flomies": "./contracts/Flomies.cdc",
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
-    "FindFurnace": "./contracts/FindFurnace.cdc"
+    "FindFurnace": "./contracts/FindFurnace.cdc",
+    "FindThoughts": "./contracts/FindThoughts.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -373,7 +374,8 @@
         "FindPack",
         "FindVerifier",
         "FindAirdropper",
-        "FindFurnace"
+        "FindFurnace",
+        "FindThoughts"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -412,7 +414,8 @@
         "FindPack",
         "FindVerifier",
         "FindAirdropper",
-        "FindFurnace"
+        "FindFurnace",
+        "FindThoughts"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -483,7 +486,8 @@
         "FindPack",
         "FindVerifier",
         "FindAirdropper",
-        "FindFurnace"
+        "FindFurnace",
+        "FindThoughts"
       ],
       "emulator-find": [],
       "emulator-user1": [],
