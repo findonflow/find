@@ -11,6 +11,7 @@ pub contract PartyFavorz: NonFungibleToken {
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
+	pub event Minted(id:UInt64, serial: UInt64, season: UInt64, name: String )
 
 	pub let CollectionStoragePath: StoragePath
 	pub let CollectionPrivatePath: PrivatePath
@@ -261,6 +262,7 @@ pub contract PartyFavorz: NonFungibleToken {
 			)
 
 			PartyFavorz.totalSupply = PartyFavorz.totalSupply + UInt64(1)
+			emit Minted(id:newNFT.id, serial: PartyFavorz.totalSupply, season: info["season"]! as! UInt64 , name: newNFT.info.name )
 			return <- newNFT
 		}
 
