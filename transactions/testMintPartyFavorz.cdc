@@ -7,7 +7,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 
-transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String) {
+transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String, season: UInt64, royaltyReceivers: [Address], royaltyCuts: [UFix64], royaltyDescs: [String], squareImage: String, bannerImage: String) {
 	prepare(account: AuthAccount) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(PartyFavorz.CollectionPublicPath)
@@ -29,18 +29,34 @@ transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nf
 
 		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(PartyFavorz.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to PartyFavorz collection.")
 
+		let royalties : [MetadataViews.Royalty] = []
+		for i , rec in royaltyReceivers {
+			var cap = getAccount(rec).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			if !cap.check() {
+				cap = getAccount(rec).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+			}
+			royalties.append(MetadataViews.Royalty(receiver: cap, cut: royaltyCuts[i], description: royaltyDescs[i]))
+		}
+
 		var i = 0
 		let collection=collectionCap.borrow()!
 		while  i < number {
-			let mintData = PartyFavorz.Info(
-				name: nftName,
-				description: nftDescription, 
-				thumbnailHash: imageHash,
-				edition: startFrom + UInt64(i), 
-				maxEdition: maxEditions, 
-				fullSizeHash: fullSizeHash, 
-				artist: artist
-			)
+			let mintData: {String : AnyStruct} = {
+			
+				"info" : PartyFavorz.Info(
+					name: nftName,
+					description: nftDescription, 
+					thumbnailHash: imageHash,
+					edition: startFrom + UInt64(i), 
+					maxEdition: maxEditions, 
+					fullSizeHash: fullSizeHash, 
+					artist: artist
+				), 
+				"royalties" : royalties, 
+				"season" : season, 
+				"squareImage" : squareImage, 
+				"bannerImage" : bannerImage 
+			}
 			FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 			i=i+1
 		}
