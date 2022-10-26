@@ -1880,7 +1880,7 @@ pub contract FIND {
 			}
 		} else if FIND.account.address == 0x35717efbbce11c74 {
 		// This is for testnet
-			if merchAccount != 0x35717efbbce11c74 {
+			if merchAccount != 0x4748780c8bf65e19{
 				panic("Merch Account address does not match with expected")
 			}
 		} else {
