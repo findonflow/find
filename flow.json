@@ -242,6 +242,7 @@
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "NFGv3": "./contracts/NFGv3.cdc",
     "PartyFavorz": "./contracts/PartyFavorz.cdc",
+    "PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc",
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
     "FindToken": "./contracts/FindToken.cdc",
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
@@ -378,6 +379,7 @@
       "mainnet-find-forge": [
         "NFGv3",
         "PartyFavorz",
+        "PartyFavorzExtraData",
         "Flomies"
       ]
     },
@@ -417,6 +419,7 @@
       "testnet-user1": [
         "NFGv3",
         "PartyFavorz",
+        "PartyFavorzExtraData",
         "Flomies"
       ],
       "testnet-find-lost-and-found-wrapper": [
@@ -491,7 +494,8 @@
       "emulator-user3": [],
       "emulator-user4": [
         "NFGv3",
-        "PartyFavorz"
+        "PartyFavorz",
+        "PartyFavorzExtraData"
       ],
       "emulator-user5-dapper": []
     }

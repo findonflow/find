@@ -57,13 +57,24 @@ func main() {
 
 	//mint PartyFavorz
 
+	//transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String, season: UInt64, royaltyReceivers: [Address], royaltyCuts: [UFix64], royaltyDescs: [String], squareImage: String, bannerImage: String) {
 	id, err := o.Tx("testMintPartyFavorz",
 		nameSigner,
 		nameArg,
+		WithArg("startFrom", 1),
+		WithArg("number", 6),
+		WithArg("maxEditions", 6),
 		WithArg("nftName", "Party Favorz"),
 		WithArg("nftDescription", desc),
 		WithArg("imageHash", "QmbGVd9281kdD65wdD8QRqLzXN56KCgvBB4HySQuv24rmC"),
-		WithArg("maxEditions", 6),
+		WithArg("fullSizeHash", "QmbGVd9281kdD65wdD8QRqLzXN56KCgvBB4HySQuv24rmC"),
+		WithArg("artist", "Nick"),
+		WithArg("season", 2),
+		WithAddresses("royaltyReceivers", "user1", "user2", "find"),
+		WithArg("royaltyCuts", `[0.1, 0.2, 0.3]`),
+		WithArg("royaltyDescs", []string{"user1", "user2", "find"}),
+		WithArg("squareImage", "season 2 square image"),
+		WithArg("bannerImage", "season 2 banner image"),
 	).
 		GetIdFromEvent("Minted", "id")
 
@@ -86,6 +97,12 @@ func main() {
 		WithArg("project", "A.045a1763c93006ca.PartyFavorz.NFT"),
 		WithArg("id", id),
 		WithArg("views", "[]"),
+	)
+
+	o.Script("getAllNFTViews",
+		WithArg("user", name),
+		WithArg("aliasOrIdentifier", "A.045a1763c93006ca.PartyFavorz.NFT"),
+		WithArg("id", id),
 	)
 
 }
