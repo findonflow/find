@@ -2,6 +2,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
+import FindPack from "./FindPack.cdc"
 import PartyFavorzExtraData from "./PartyFavorzExtraData.cdc"
 
 pub contract PartyFavorz: NonFungibleToken {
@@ -69,12 +70,26 @@ pub contract PartyFavorz: NonFungibleToken {
 			Type<MetadataViews.ExternalURL>(),
 			Type<MetadataViews.NFTCollectionData>(),
 			Type<MetadataViews.NFTCollectionDisplay>(), 
-			Type<MetadataViews.Medias>()
+			Type<MetadataViews.Medias>(),
+			Type<FindPack.PackRevealData>()
 			]
 		}
 
 		pub fun resolveView(_ view: Type): AnyStruct? {
+	
+
+			let imageFile = MetadataViews.IPFSFile( cid: self.info.thumbnailHash, path: nil)
+
 			switch view {
+			
+			case Type<FindPack.PackRevealData>():
+				let data : {String : String} = {
+					"nftImage" : imageFile.uri() ,
+					"nftName" : self.info.name
+				}
+				return FindPack.PackRevealData(data)
+
+
 			case Type<MetadataViews.Display>():
 				return MetadataViews.Display(
 					name: self.info.name,
