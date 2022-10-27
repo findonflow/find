@@ -85,10 +85,10 @@ pub contract PartyFavorz: NonFungibleToken {
 			case Type<FindPack.PackRevealData>():
 				let data : {String : String} = {
 					"nftImage" : imageFile.uri() ,
-					"nftName" : self.info.name
+					"nftName" : self.info.name,
+					"packType" : "PartyFavorz"
 				}
 				return FindPack.PackRevealData(data)
-
 
 			case Type<MetadataViews.Display>():
 				return MetadataViews.Display(
