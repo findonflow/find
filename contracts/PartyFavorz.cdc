@@ -68,7 +68,8 @@ pub contract PartyFavorz: NonFungibleToken {
 			Type<MetadataViews.Traits>(),
 			Type<MetadataViews.ExternalURL>(),
 			Type<MetadataViews.NFTCollectionData>(),
-			Type<MetadataViews.NFTCollectionDisplay>()
+			Type<MetadataViews.NFTCollectionDisplay>(), 
+			Type<MetadataViews.Medias>()
 			]
 		}
 
@@ -180,6 +181,27 @@ pub contract PartyFavorz: NonFungibleToken {
 				return MetadataViews.Traits([
 					MetadataViews.Trait(name: "Artist", value: self.info.artist, displayType: "String", rarity: nil) ,
 					MetadataViews.Trait(name: "Season", value: season, displayType: "Numeric", rarity: nil) 
+				])
+
+			case Type<MetadataViews.Medias>() : 
+				let seasonData = PartyFavorzExtraData.getData(id: self.id, field: "season")
+				var season = 1 as UInt64
+				if seasonData != nil {
+					season = seasonData! as! UInt64
+				}
+
+				var thumbnailMediaType = "image/png"
+				var fullImageMediaType = "image/png"
+
+				switch season {
+					case 2 as UInt64 : 
+						fullImageMediaType = "image/gif"
+
+				}
+
+				return MetadataViews.Medias([
+						MetadataViews.Media(file: MetadataViews.IPFSFile(cid: self.info.thumbnailHash, path: nil), mediaType: thumbnailMediaType),
+						MetadataViews.Media(file: MetadataViews.IPFSFile(cid: self.info.fullsizeHash, path: nil), mediaType: fullImageMediaType)
 				])
 			}
 			return nil
@@ -310,3 +332,4 @@ pub contract PartyFavorz: NonFungibleToken {
 	}
 }
 
+ 
