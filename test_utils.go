@@ -2645,6 +2645,7 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 
 	o := otu.O
 	t := otu.T
+	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
 
 	o.Tx("buyFindPack",
 		WithSigner(user),
@@ -2657,6 +2658,13 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
 			"amount":  amount,
 			"address": otu.O.Address(user),
+			"packFields": map[string]interface{}{
+				"packImage": "ipfs://thumbnailHash",
+				"Items":     "1",
+			},
+			"packNFTTypes": []interface{}{
+				nftType,
+			},
 		})
 
 	return otu
@@ -2666,6 +2674,8 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 	o := otu.O
 	t := otu.T
 
+	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
+
 	o.Tx("openFindPack",
 		WithSigner(user),
 		WithArg("packId", packId),
@@ -2674,6 +2684,13 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Opened", map[string]interface{}{
 			"packId":  packId,
 			"address": otu.O.Address(user),
+			"packFields": map[string]interface{}{
+				"packImage": "ipfs://thumbnailHash",
+				"Items":     "1",
+			},
+			"packNFTTypes": []interface{}{
+				nftType,
+			},
 		})
 
 	return otu
