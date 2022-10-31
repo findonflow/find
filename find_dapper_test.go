@@ -264,7 +264,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("user", nameAddress),
 		).AssertWithPointerWant(t,
 			"/FINDReport",
-			autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "privateMode": false}),
+			autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "isDapper": false, "privateMode": false}),
 		)
 	})
 
