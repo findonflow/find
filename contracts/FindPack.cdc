@@ -18,11 +18,11 @@ pub contract FindPack: NonFungibleToken {
 
 	pub event Requeued(packId: UInt64, address:Address)
 
-	pub event Opened(packTypeName: String, packTypeId:UInt64, packId: UInt64, address:Address)
-	pub event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, packFields: {String : String})
-	pub event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, packFields: {String : String})
+	pub event Opened(packTypeName: String, packTypeId:UInt64, packId: UInt64, address:Address, packFields: {String : String}, packNFTTypes: [String])
+	pub event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, packFields: {String : String}, packNFTTypes: [String])
+	pub event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, packFields: {String : String}, packNFTTypes: [String])
 
-	pub event Purchased(packTypeName: String, packTypeId: UInt64, packId: UInt64, address: Address, amount:UFix64)
+	pub event Purchased(packTypeName: String, packTypeId: UInt64, packId: UInt64, address: Address, amount:UFix64, packFields: {String : String}, packNFTTypes: [String])
 	pub event MetadataRegistered(packTypeName: String, packTypeId: UInt64)
 	pub event FulfilledError(packTypeName: String, packTypeId: UInt64, packId:UInt64, address:Address?, reason:String)
 
@@ -227,6 +227,14 @@ pub contract FindPack: NonFungibleToken {
 				return MetadataViews.IPFSFile(cid: hash, path: nil)
 			}
 			return MetadataViews.HTTPFile(url:self.thumbnailUrl!)
+		}
+
+		pub fun getItemTypesAsStringArray() : [String] {
+			let types : [String] = []
+			for t in self.itemTypes {
+				types.append(t.identifier)
+			}
+			return types
 		}
 
 		pub fun canBeOpened() : Bool {
@@ -464,10 +472,14 @@ pub contract FindPack: NonFungibleToken {
 
 			let typeId=token.getTypeID()
 			let packTypeName=token.packTypeName
+			let metadata= token.getMetadata()
 			// deposit for consumption
 			receiver.deposit(token: <- token)
 
-			emit Opened(packTypeName: packTypeName, packTypeId:typeId, packId: packId, address:self.owner!.address) 
+			let packFields = metadata.packFields
+			packFields["packImage"] = packFields["packImage"] ?? metadata.getThumbnail().uri()
+			let packNFTTypes = metadata.getItemTypesAsStringArray()
+			emit Opened(packTypeName: packTypeName, packTypeId:typeId, packId: packId, address:self.owner!.address, packFields:packFields, packNFTTypes:packNFTTypes) 
 		}
 
 		pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
@@ -557,7 +569,10 @@ pub contract FindPack: NonFungibleToken {
 			metadata.wallet.borrow()!.deposit(from: <- vault)
 			collectionCapability.borrow()!.deposit(token: <- nft)
 
-			emit Purchased(packTypeName: packTypeName, packTypeId: packTypeId, packId: packId, address: collectionCapability.address, amount:saleInfo!.price)
+			let packFields = metadata.packFields
+			packFields["packImage"] = packFields["packImage"] ?? metadata.getThumbnail().uri()
+			let packNFTTypes = metadata.getItemTypesAsStringArray()
+			emit Purchased(packTypeName: packTypeName, packTypeId: packTypeId, packId: packId, address: collectionCapability.address, amount:saleInfo!.price, packFields:packFields, packNFTTypes:packNFTTypes)
 		}
 
 		pub fun buy(packTypeName: String, typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
@@ -632,7 +647,10 @@ pub contract FindPack: NonFungibleToken {
 			metadata.wallet.borrow()!.deposit(from: <- vault)
 			collectionCapability.borrow()!.deposit(token: <- nft)
 
-			emit Purchased(packTypeName: packTypeName, packTypeId: typeId, packId: key, address: collectionCapability.address, amount:saleInfo!.price)
+			let packFields = metadata.packFields
+			packFields["packImage"] = packFields["packImage"] ?? metadata.getThumbnail().uri()
+			let packNFTTypes = metadata.getItemTypesAsStringArray()
+			emit Purchased(packTypeName: packTypeName, packTypeId: typeId, packId: key, address: collectionCapability.address, amount:saleInfo!.price, packFields: packFields, packNFTTypes:packNFTTypes)
 		}
 
 		// withdraw
@@ -742,7 +760,9 @@ pub contract FindPack: NonFungibleToken {
 		let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
 		let packTypeName = pack.packTypeName
 		let packTypeId = pack.getTypeID()
-		let packFields = FindPack.getMetadataById(packTypeName:packTypeName, typeId:packTypeId)!.packFields
+		let metadata = FindPack.getMetadataById(packTypeName:packTypeName, typeId:packTypeId)!
+		let packFields = metadata.packFields
+		let packNFTTypes = metadata.getItemTypesAsStringArray()
 
 		let firstType = types[0]
 		let receiver= pack.getOpenedBy()
@@ -811,8 +831,6 @@ pub contract FindPack: NonFungibleToken {
 			}
 			let token <- source.withdraw(withdrawID: id)
 
-			let metadata = pack.getMetadata()
-
 			emit PackReveal(
 				packTypeName: packTypeName, 
 				packTypeId: packTypeId,
@@ -822,11 +840,12 @@ pub contract FindPack: NonFungibleToken {
 				rewardId: id,
 				rewardType: token.getType().identifier,
 				rewardFields: fields,
-				packFields: metadata.packFields
+				packFields: packFields, 
+				packNFTTypes: packNFTTypes
 			)
 			target.deposit(token: <-token)
 		}
-		emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!, packFields:packFields)
+		emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!, packFields:packFields, packNFTTypes:packNFTTypes)
 
 		destroy pack
 	}
