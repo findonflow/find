@@ -31,7 +31,7 @@ func TestNameDetailScript(t *testing.T) {
 		// 	SignProposeAndPayAs("user1").
 		// 	Args(otu.O.Arguments().String("dapper").String("user2")).
 		// 	Test(t).AssertSuccess().
-		// 	AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+		// 	AssertPartialEvent(overflow.NewTestEvent("A.f8d6e0586b0a20c7.RelatedAccounts.RelatedccountAdded", map[string]interface{}{
 		// 		"name":    "dapper",
 		// 		"address": "0x179b6b1cb6755e31",
 		// 		"related": "0xf3fcd2c1a78f5eee",
@@ -43,7 +43,7 @@ func TestNameDetailScript(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
