@@ -20,7 +20,7 @@ func TestMarketOptions(t *testing.T) {
 	ids := otu.mintThreeExampleDandies()
 	otu.registerFtInRegistry()
 
-	otu.setUUID(300)
+	otu.setUUID(400)
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
@@ -51,7 +51,7 @@ func TestMarketOptions(t *testing.T) {
 		otu.removeMarketOption("FlowDandySale")
 
 		/* Should fail for MarketSale */
-			listingTx("listNFTForSale").
+		listingTx("listNFTForSale").
 			AssertFailure(t, "Nothing matches")
 
 		/* Should success for auction escrowed */
@@ -66,17 +66,16 @@ func TestMarketOptions(t *testing.T) {
 	t.Run("Should not be able to list Dandy with FUSD at first, but able after removing tenant rules.", func(t *testing.T) {
 
 		/* Should fail on listing MarketSale with FUSD */
-			listingTx("listNFTForSale", 
+		listingTx("listNFTForSale",
 			WithArg("ftAliasOrIdentifier", "FUSD"),
-			).
+		).
 			AssertFailure(t, "Nothing matches")
 
 		otu.removeTenantRule("FlowDandySale", "Flow")
 
 		/* Should success on listing MarketSale with FUSD */
-			listingTx("listNFTForSale", 
-		).
-			AssertSuccess(t). 
+		listingTx("listNFTForSale").
+			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
 				"amount": price,
@@ -95,23 +94,20 @@ func TestMarketOptions(t *testing.T) {
 	t.Run("Should not be able to list Dandy with FUSD at first, but able after removing tenant rules.", func(t *testing.T) {
 
 		/* Should fail on listing MarketSale with FUSD */
-			listingTx("listNFTForSale", 
-			).
+		listingTx("listNFTForSale").
 			AssertFailure(t, "Nothing matches")
 
 		otu.setTenantRuleFUSD("FlowDandySale")
 
 		/* Should fail on listing MarketSale with FUSD */
-		listingTx("listNFTForSale",
-			).
-		AssertFailure(t, "Nothing matches")
+		listingTx("listNFTForSale").
+			AssertFailure(t, "Nothing matches")
 
 		otu.removeTenantRule("FlowDandySale", "Flow")
 
 		/* Should success on listing MarketSale with FUSD */
-			listingTx("listNFTForSale", 
-			).
-			AssertSuccess(t). 
+		listingTx("listNFTForSale").
+			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
 				"status": "active_listed",
 				"amount": price,
