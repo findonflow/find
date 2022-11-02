@@ -25,7 +25,7 @@ func TestNameDetailScript(t *testing.T) {
 			listForAuction("user2").
 			bid("user1", "user2", 8.0)
 
-		otu.setUUID(300)
+		otu.setUUID(400)
 
 		// otu.O.TransactionFromFile("setRelatedAccount").
 		// 	SignProposeAndPayAs("user1").
