@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -10,7 +9,6 @@ import (
 	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
-	"github.com/sanity-io/litter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -834,28 +832,23 @@ func (otu *OverflowTestUtils) delistAllLeaseForSoftAuction(name string) *Overflo
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 
-	r, err := otu.O.Script("getCheckRoyalty",
+	var royalty Royalty
+
+	err := otu.O.Script("getCheckRoyalty",
 		WithSigner(name),
 		WithArg("name", name),
 		WithArg("id", id),
 		WithArg("nftAliasOrIdentifier", nftAlias),
 		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 	).
-		GetAsJson()
+		MarshalAs(&royalty)
 
-	if err != nil {
-		panic(err)
-	}
-
-	var royalty Royalty
-	err = json.Unmarshal([]byte(r), &royalty)
-	if err != nil {
-		panic(err)
-	}
-
-	// royalty := Royalty{}
 	assert.NoError(otu.T, err)
-	litter.Sdump(royalty)
+
+	// if royaltyName == "cheater" {
+	// 	litter.Dump(royalty)
+	// 	panic(royalty)
+	// }
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
