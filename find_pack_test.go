@@ -596,23 +596,23 @@ func TestFindPack(t *testing.T) {
 				"saleEnded":           true,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
-						"endTime":   4,
-						"name":      "public sale",
-						"price":     1.1,
-						"startTime": 3,
-						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
-							"Users with one of these find names are verified : user1",
-						},
-						"verifyAll": false,
-					},
-					map[string]interface{}{
 						"endTime":   3,
 						"name":      "pre-sale",
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 658",
+							"Users with one of these find names are verified : user1",
+						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"endTime":   4,
+						"name":      "public sale",
+						"price":     1.1,
+						"startTime": 3,
+						"verifiers": []interface{}{
+							"User with one of these FLOATs are verified : 658",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -623,7 +623,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 658",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -693,19 +693,19 @@ func TestFindPack(t *testing.T) {
 				"requiresReservation": false,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
-						"name":      "public sale",
-						"price":     3.3,
-						"startTime": 3,
-						"verifyAll": false,
-					},
-					map[string]interface{}{
 						"name":      "pre-sale",
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 662",
 							"Users with one of these find names are verified : user1",
 						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
 						"verifyAll": false,
 					},
 					map[string]interface{}{
@@ -714,7 +714,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 662",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -765,19 +765,19 @@ func TestFindPack(t *testing.T) {
 				"requiresReservation": false,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
-						"name":      "public sale",
-						"price":     3.3,
-						"startTime": 3,
-						"verifyAll": false,
-					},
-					map[string]interface{}{
 						"name":      "pre-sale",
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 662",
 							"Users with one of these find names are verified : user1",
 						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
 						"verifyAll": false,
 					},
 					map[string]interface{}{
@@ -786,7 +786,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 662",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -836,19 +836,19 @@ func TestFindPack(t *testing.T) {
 				"saleEnded":           true,
 				"saleInfos": []interface{}{
 					map[string]interface{}{
-						"name":      "public sale",
-						"price":     3.3,
-						"startTime": 3,
-						"verifyAll": false,
-					},
-					map[string]interface{}{
 						"name":      "pre-sale",
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 662",
 							"Users with one of these find names are verified : user1",
 						},
+						"verifyAll": false,
+					},
+					map[string]interface{}{
+						"name":      "public sale",
+						"price":     3.3,
+						"startTime": 3,
 						"verifyAll": false,
 					},
 					map[string]interface{}{
@@ -857,7 +857,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 662",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
