@@ -38,11 +38,11 @@ func TestDandy(t *testing.T) {
   "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
   "A.f8d6e0586b0a20c7.MetadataViews.Display",
   "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+  "A.f8d6e0586b0a20c7.MetadataViews.Editions",
   "A.f8d6e0586b0a20c7.MetadataViews.Medias",
-  "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
   "A.f8d6e0586b0a20c7.MetadataViews.Traits",
   "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-  "A.f8d6e0586b0a20c7.MetadataViews.Editions",
+  "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
 }`),
 		)
 		otu.O.Script("getNFTView",

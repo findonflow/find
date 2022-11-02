@@ -5,6 +5,7 @@ import (
 
 	"github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
+	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -176,7 +177,7 @@ func TestFIND(t *testing.T) {
 			overflow.WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
@@ -193,7 +194,7 @@ func TestFIND(t *testing.T) {
 			overflow.WithArg("name", "dapper"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountRemoved", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountRemoved", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",
@@ -242,7 +243,7 @@ func TestFIND(t *testing.T) {
 			overflow.WithArg("user", nameAddress),
 		).AssertWithPointerWant(t,
 			"/FINDReport",
-			autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "privateMode": false}),
+			autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "isDapper": false, "privateMode": false}),
 		)
 	})
 
@@ -394,6 +395,25 @@ func TestFIND(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
+
+	})
+
+	t.Run("Should be able to resolve find name without .find", func(t *testing.T) {
+		otu.O.Script("resolve",
+			overflow.WithArg("input", "user1.find"),
+		).
+			AssertWant(t, autogold.Want("user 1 address", otu.O.Address("user1")))
+
+	})
+
+	t.Run("Should panic if user pass in invalid character '.'", func(t *testing.T) {
+		_, err := otu.O.Script("resolve",
+			overflow.WithArg("input", "user1.fn"),
+		).
+			GetAsJson()
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Please do not pass in invalid character : '.'")
 
 	})
 

@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -10,7 +9,6 @@ import (
 	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
-	"github.com/sanity-io/litter"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -832,28 +830,23 @@ func (otu *OverflowTestUtils) delistAllLeaseForSoftAuction(name string) *Overflo
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
 	/* Ben : Should we rename the check royalty script name? */
 
-	r, err := otu.O.Script("getCheckRoyalty",
+	var royalty Royalty
+
+	err := otu.O.Script("getCheckRoyalty",
 		WithSigner(name),
 		WithArg("name", name),
 		WithArg("id", id),
 		WithArg("nftAliasOrIdentifier", nftAlias),
 		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
 	).
-		GetAsJson()
+		MarshalAs(&royalty)
 
-	if err != nil {
-		panic(err)
-	}
-
-	var royalty Royalty
-	err = json.Unmarshal([]byte(r), &royalty)
-	if err != nil {
-		panic(err)
-	}
-
-	// royalty := Royalty{}
 	assert.NoError(otu.T, err)
-	litter.Sdump(royalty)
+
+	// if royaltyName == "cheater" {
+	// 	litter.Dump(royalty)
+	// 	panic(royalty)
+	// }
 
 	for _, item := range royalty.Items {
 		if item.Description == royaltyName {
@@ -2599,6 +2592,7 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 
 	o := otu.O
 	t := otu.T
+	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
 
 	o.Tx("buyFindPack",
 		WithSigner(user),
@@ -2611,6 +2605,13 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
 			"amount":  amount,
 			"address": otu.O.Address(user),
+			"packFields": map[string]interface{}{
+				"packImage": "ipfs://thumbnailHash",
+				"Items":     "1",
+			},
+			"packNFTTypes": []interface{}{
+				nftType,
+			},
 		})
 
 	return otu
@@ -2620,6 +2621,8 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 	o := otu.O
 	t := otu.T
 
+	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
+
 	o.Tx("openFindPack",
 		WithSigner(user),
 		WithArg("packId", packId),
@@ -2628,6 +2631,13 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Opened", map[string]interface{}{
 			"packId":  packId,
 			"address": otu.O.Address(user),
+			"packFields": map[string]interface{}{
+				"packImage": "ipfs://thumbnailHash",
+				"Items":     "1",
+			},
+			"packNFTTypes": []interface{}{
+				nftType,
+			},
 		})
 
 	return otu

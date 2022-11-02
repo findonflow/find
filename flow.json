@@ -242,6 +242,7 @@
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "NFGv3": "./contracts/NFGv3.cdc",
     "PartyFavorz": "./contracts/PartyFavorz.cdc",
+    "PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc",
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
     "FindToken": "./contracts/FindToken.cdc",
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
@@ -256,6 +257,7 @@
     "Flomies": "./contracts/Flomies.cdc",
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
     "FindFurnace": "./contracts/FindFurnace.cdc",
+    "FindUtils": "./contracts/FindUtils.cdc",
     "FindThoughts": "./contracts/FindThoughts.cdc"
   },
   "networks": {
@@ -375,11 +377,13 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
+        "FindUtils",
         "FindThoughts"
       ],
       "mainnet-find-forge": [
         "NFGv3",
         "PartyFavorz",
+        "PartyFavorzExtraData",
         "Flomies"
       ]
     },
@@ -415,11 +419,13 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-        "FindThoughts"
+        "FindThoughts",
+        "FindUtils"
       ],
       "testnet-user1": [
         "NFGv3",
         "PartyFavorz",
+        "PartyFavorzExtraData",
         "Flomies"
       ],
       "testnet-find-lost-and-found-wrapper": [
@@ -487,6 +493,7 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
+        "FindUtils",
         "FindThoughts"
       ],
       "emulator-find": [],
@@ -495,7 +502,8 @@
       "emulator-user3": [],
       "emulator-user4": [
         "NFGv3",
-        "PartyFavorz"
+        "PartyFavorz",
+        "PartyFavorzExtraData"
       ],
       "emulator-user5-dapper": []
     }

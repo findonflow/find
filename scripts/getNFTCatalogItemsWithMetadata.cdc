@@ -1,5 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
@@ -15,6 +16,7 @@ pub struct NFTView {
 	pub var editions: MetadataViews.Editions?
 	pub var serial: UInt64?
 	pub var traits: MetadataViews.Traits?
+	pub let soulBounded: Bool 
 	pub let nftType: Type
 
 	init(
@@ -25,6 +27,7 @@ pub struct NFTView {
 		serial: UInt64?,
 		traits: MetadataViews.Traits?,
 		collectionDisplay: MetadataViews.NFTCollectionDisplay?,
+		soulBounded: Bool ,
 		nftType: Type
 	) {
 		self.id = id
@@ -34,6 +37,7 @@ pub struct NFTView {
 		self.serial = serial
 		self.traits = traits
 		self.collectionDisplay = collectionDisplay
+		self.soulBounded = soulBounded
 		self.nftType = nftType
 	}
 }
@@ -116,6 +120,7 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 						serial :  MetadataViews.getSerial(viewResolver)?.number,
 						traits : traitsStruct,
 						collectionDisplay : MetadataViews.getNFTCollectionDisplay(viewResolver),
+						soulBounded : FindViews.checkSoulBound(viewResolver),
 						nftType : viewResolver.getType()
 					)
 				)
@@ -143,6 +148,7 @@ pub struct MetadataCollectionItem {
 	pub let collection: String // <- This will be Alias unless they want something else
 	pub let subCollection: String? // <- This will be Alias unless they want something else
 	pub let nftDetailIdentifier: String
+	pub let soulBounded: Bool 
 
 	pub let media  : String
 	pub let mediaType : String 
@@ -165,6 +171,7 @@ pub struct MetadataCollectionItem {
 		 rarity:MetadataViews.Rarity?,
 		 serial: UInt64?,
 		 traits: MetadataViews.Traits?,
+		 soulBounded: Bool 
 		 ) {
 		self.id=id
 		self.name=name 
@@ -178,6 +185,7 @@ pub struct MetadataCollectionItem {
 		self.rarity=rarity
 		self.serial=serial
 		self.traits=traits
+		self.soulBounded=soulBounded
 	}
 }
 
@@ -193,7 +201,7 @@ pub fun resolveAddress(user: String) : PublicAccount? {
 
 
 //////////////////////////////////////////////////////////////
-// Fetch Specific Collections in Shard 1
+// Fetch Specific Collections in Find Catalog
 //////////////////////////////////////////////////////////////
 pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 	let source = "NFTCatalog"
@@ -250,6 +258,7 @@ pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {Str
 				rarity: nft!.rarity,
 				serial: nft!.serial,
 				traits: nft!.traits,
+				soulBounded: nft.soulBounded
 			)
 			collectionItems.append(item)
 		}
