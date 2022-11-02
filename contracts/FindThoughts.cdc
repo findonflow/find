@@ -5,10 +5,10 @@ import Clock from "./Clock.cdc"
 
 pub contract FindThoughts {
 
-	pub event Published(from: Address, name: String?, header: String, message: String, medias: [String], tags: [String])
-	pub event Edited(from: Address, name: String?, header: String, message: String, medias: [String], tags: [String])
-	pub event Deleted(from: Address, name: String?, header: String, message: String, medias: [String], tags: [String])
-	pub event Reacted(by: Address, byName: String?, owner: Address, name: String?, header: String, reaction: String?, totalCount: {String : Int})
+	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
+	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
+	pub event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
+	pub event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
 
 	pub let CollectionStoragePath : StoragePath 
 	pub let CollectionPublicPath : PublicPath 
@@ -16,6 +16,7 @@ pub contract FindThoughts {
 
 	pub resource interface ThoughtPublic {
 		pub let id: UInt64 
+		pub let creator: Address 
 		pub var header: String 
 		pub var body: String 
 		pub let created: UFix64 
@@ -26,11 +27,12 @@ pub contract FindThoughts {
 		pub var reacted: {Address : String}
 		pub var reactions: {String : Int}
 
-		access(contract) fun internal_react(user: Address, reaction: String) 
+		access(contract) fun internal_react(user: Address, reaction: String?) 
 	}
 
 	pub resource Thought : ThoughtPublic , MetadataViews.Resolver {
 		pub let id: UInt64 
+		pub let creator: Address 
 		pub var header: String 
 		pub var body: String 
 		pub let created: UFix64 
@@ -50,8 +52,9 @@ pub contract FindThoughts {
 		pub let scalars: {String : UFix64} 
 		pub let extras: {String : AnyStruct} 
 
-		init(header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
+		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
 			self.id = self.uuid 
+			self.creator = creator
 			self.header = header
 			self.body = body
 			self.created = created
@@ -69,12 +72,17 @@ pub contract FindThoughts {
 		}
 
 		destroy(){
-			let address = self.owner!.address
+			let address = self.owner?.address
 			let medias : [String] = []
 			for m in self.medias {
 				medias.append(m.file.uri())
 			}
-			emit Deleted(from: address, name: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, tags: self.tags)
+			
+			var name : String? = nil 
+			if address != nil {
+				name = FIND.reverseLookup(address!)
+			}
+			emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
 		}
 
 		pub fun edit(header: String , body: String, tags: [String]) {
@@ -86,31 +94,29 @@ pub contract FindThoughts {
 			for m in self.medias {
 				medias.append(m.file.uri())
 			}
-			emit Edited(from: address, name: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, tags: self.tags)
+			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, tags: self.tags)
 		}
 
-		// To withdraw reaction, pass in empty string ""
-		access(contract) fun internal_react(user: Address, reaction: String) {
+		// To withdraw reaction, pass in nil
+		access(contract) fun internal_react(user: Address, reaction: String?) {
 			let owner = self.owner!.address
 			if let previousReaction = self.reacted[user] {
-				// reaction here cannot be nil
+				// reaction here cannot be nil, therefore we can ! 
 				self.reactions[previousReaction] = self.reactions[previousReaction]! - 1
 				if self.reactions[previousReaction]! == 0 {
 					self.reactions.remove(key: previousReaction)
 				}
 			} 
 
-			if reaction != "" {
-				self.reacted[user] = reaction
-				var reacted = self.reactions[reaction] ?? 0
+			self.reacted[user] = reaction
+			
+			if reaction != nil {
+				var reacted = self.reactions[reaction!] ?? 0
 				reacted = reacted + 1
-				self.reactions[reaction] = reacted
+				self.reactions[reaction!] = reacted
 			}
-			var r : String? = reaction 
-			if r == "" {
-				r = nil
-			}
-			emit Reacted(by: user, byName: FIND.reverseLookup(user), owner: owner, name: FIND.reverseLookup(owner), header: self.header, reaction: r, totalCount: self.reactions)
+
+			emit Reacted(id: self.id, by: user, byName: FIND.reverseLookup(user), creator: owner, creatorName: FIND.reverseLookup(owner), header: self.header, reaction: reaction, totalCount: self.reactions)
 		}
 
         pub fun getViews(): [Type] {
@@ -186,13 +192,15 @@ pub contract FindThoughts {
 			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
 		}
 
-		pub fun publish(header: String , body: String , created: UInt64, tags: [String], media: MetadataViews.Media) {
-			let thought <- create Thought(header: header , body: body , created: Clock.time(), tags: tags, medias: [media], nft: [], stringTags: {}, scalars : {}, extras: {})
+		pub fun publish(header: String , body: String , tags: [String], mediaHash: String, mediaType: String) {
+			let media = MetadataViews.Media(file: MetadataViews.IPFSFile(cid:mediaHash, path: nil), mediaType: mediaType)
+			let address = self.owner!.address
+			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: [media], nft: [], stringTags: {}, scalars : {}, extras: {})
 
 			self.sequence.append(thought.uuid)
 
-			let address = self.owner!.address
-			emit Published(from: address, name: FIND.reverseLookup(address), header: header, message: body, medias: [media.file.uri()], tags: tags)
+			let creatorName = FIND.reverseLookup(address)
+			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: [media.file.uri()], tags: tags)
 
 			self.ownedThoughts[thought.uuid] <-! thought
 		}
@@ -209,7 +217,7 @@ pub contract FindThoughts {
 			destroy thought
 		}
 
-		pub fun react(user: Address, id: UInt64, reaction: String) {
+		pub fun react(user: Address, id: UInt64, reaction: String?) {
 			let cap = FindThoughts.getFindThoughtsCapability(user)
 			let ref = cap.borrow() ?? panic("Cannot borrow reference to Find Thoughts Collection from user : ".concat(user.toString()))
 
