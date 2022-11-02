@@ -256,7 +256,8 @@
     "FindVerifier": "./contracts/FindVerifier.cdc",
     "Flomies": "./contracts/Flomies.cdc",
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
-    "FindFurnace": "./contracts/FindFurnace.cdc"
+    "FindFurnace": "./contracts/FindFurnace.cdc",
+    "FindUtils": "./contracts/FindUtils.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -486,7 +487,8 @@
         "FindPack",
         "FindVerifier",
         "FindAirdropper",
-        "FindFurnace"
+        "FindFurnace",
+        "FindUtils"
       ],
       "emulator-find": [],
       "emulator-user1": [],

@@ -3,8 +3,8 @@
         "FindMarketAuctionEscrow": {
             "ListingDetails": [
                 {
-                    "ftAlias": "FUSD",
-                    "ftIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "royalties": [
                         {
                             "address": "0xf8d6e0586b0a20c7",
@@ -26,10 +26,10 @@
                 }
             ],
             "ftAlias": [
-                "FUSD"
+                "Flow"
             ],
             "ftIdentifiers": [
-                "A.f8d6e0586b0a20c7.FUSD.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
             "status": "active"
@@ -37,8 +37,8 @@
         "FindMarketAuctionSoft": {
             "ListingDetails": [
                 {
-                    "ftAlias": "FUSD",
-                    "ftIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "royalties": [
                         {
                             "address": "0xf8d6e0586b0a20c7",
@@ -60,10 +60,10 @@
                 }
             ],
             "ftAlias": [
-                "FUSD"
+                "Flow"
             ],
             "ftIdentifiers": [
-                "A.f8d6e0586b0a20c7.FUSD.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
             "status": "active"
@@ -71,8 +71,8 @@
         "FindMarketDirectOfferEscrow": {
             "ListingDetails": [
                 {
-                    "ftAlias": "FUSD",
-                    "ftIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "royalties": [
                         {
                             "address": "0xf8d6e0586b0a20c7",
@@ -94,10 +94,10 @@
                 }
             ],
             "ftAlias": [
-                "FUSD"
+                "Flow"
             ],
             "ftIdentifiers": [
-                "A.f8d6e0586b0a20c7.FUSD.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
             "status": "active"
@@ -105,8 +105,8 @@
         "FindMarketDirectOfferSoft": {
             "ListingDetails": [
                 {
-                    "ftAlias": "FUSD",
-                    "ftIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "royalties": [
                         {
                             "address": "0xf8d6e0586b0a20c7",
@@ -128,10 +128,10 @@
                 }
             ],
             "ftAlias": [
-                "FUSD"
+                "Flow"
             ],
             "ftIdentifiers": [
-                "A.f8d6e0586b0a20c7.FUSD.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
             "status": "active"
@@ -139,8 +139,8 @@
         "FindMarketSale": {
             "ListingDetails": [
                 {
-                    "ftAlias": "FUSD",
-                    "ftIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+                    "ftAlias": "Flow",
+                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
                     "royalties": [
                         {
                             "address": "0xf8d6e0586b0a20c7",
@@ -162,10 +162,10 @@
                 }
             ],
             "ftAlias": [
-                "FUSD"
+                "Flow"
             ],
             "ftIdentifiers": [
-                "A.f8d6e0586b0a20c7.FUSD.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
             "status": "active"
