@@ -375,7 +375,8 @@
         "FindPack",
         "FindVerifier",
         "FindAirdropper",
-        "FindFurnace"
+        "FindFurnace",
+				"FindUtils"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -415,7 +416,8 @@
         "FindPack",
         "FindVerifier",
         "FindAirdropper",
-        "FindFurnace"
+        "FindFurnace",
+				"FindUtils"
       ],
       "testnet-user1": [
         "NFGv3",
