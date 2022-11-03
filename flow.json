@@ -34,6 +34,41 @@
         "mainnet": "0x4eb8a10cb9f87357"
       }
     },
+    "NFTStorefrontV2": {
+      "source": "./contracts/standard/NFTStorefrontV2.cdc",
+      "aliases": {
+        "testnet": "0x2d55b98eb200daef",
+        "mainnet": "0x4eb8a10cb9f87357"
+      }
+    },
+    "CoatCheck": {
+      "source": "./contracts/standard/CoatCheck.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "FlowtyUtils": {
+      "source": "./contracts/standard/FlowtyUtils.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "FlowtyRentals": {
+      "source": "./contracts/standard/FlowtyRentals.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "Flowty": {
+      "source": "./contracts/standard/Flowty.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -376,7 +411,7 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-				"FindUtils"
+        "FindUtils"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -417,7 +452,7 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-				"FindUtils"
+        "FindUtils"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -462,6 +497,7 @@
         "RelatedAccounts",
         "FTRegistry",
         "NFTStorefront",
+        "NFTStorefrontV2",
         "DapperUtilityCoin",
         "FlowUtilityToken",
         "TokenForwarding",
