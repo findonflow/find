@@ -13,9 +13,12 @@ func TestFindAirdropper(t *testing.T) {
 
 	otu := NewOverflowTest(t).
 		setupFIND().
-		setupDandy("user1").
+		createUser(1000.0, "user1").
+		registerUser("user1").
+		buyForge("user1").
 		createUser(100.0, "user2").
-		registerUser("user2")
+		registerUser("user2").
+		registerExampleNFTInNFTRegistry()
 
 	dandyType := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "Dandy", "NFT")
 	otu.mintThreeExampleDandies()
@@ -46,6 +49,46 @@ func TestFindAirdropper(t *testing.T) {
 				},
 			})
 		}
+	})
+
+	packType := "user1"
+	packTypeId := uint64(1)
+	salt := "find"
+	singleType := []string{exampleNFTType}
+
+	t.Run("Should be able to send packs thru airdropper with struct", func(t *testing.T) {
+
+		type FindPack_AirdropInfo struct {
+			PackTypeName string `cadence:"packTypeName"`
+			PackTypeId   uint64 `cadence:"packTypeId"`
+			Users        []string
+			Message      string
+		}
+
+		id1 := otu.mintExampleNFTs()
+
+		otu.registerPackType("user1", packTypeId, 0.0, 1.0, 1.0, false, 0, "find", "account").
+			mintPack("user1", packTypeId, []uint64{id1}, singleType, salt)
+
+		res := otu.O.Tx("sendFindPacks",
+			WithSigner("find"),
+			WithArg("packInfo", FindPack_AirdropInfo{
+				PackTypeName: packType,
+				PackTypeId:   packTypeId,
+				Users:        []string{"user2"},
+				Message:      "I can use struct here",
+			}),
+		).
+			AssertSuccess(t)
+
+		res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
+			"from": otu.O.Address("account"),
+			"to":   otu.O.Address("user2"),
+			"type": "A.f8d6e0586b0a20c7.FindPack.NFT",
+			"context": map[string]interface{}{
+				"message": "I can use struct here",
+			},
+		})
 	})
 
 	t.Run("Should be able to send Airdrop with only collection public linked", func(t *testing.T) {

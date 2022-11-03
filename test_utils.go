@@ -2428,7 +2428,7 @@ func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64) *O
 }
 
 func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
-	res := otu.O.Tx("sendNFTs",
+	res := otu.O.Tx("sendNFTsL&F",
 		WithSigner("account"),
 		WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 		WithArg("allReceivers", `["user1"]`),

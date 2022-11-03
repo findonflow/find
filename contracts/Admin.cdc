@@ -11,6 +11,7 @@ import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
 import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
+import FindViews from "./FindViews.cdc"
 
 pub contract Admin {
 
@@ -460,6 +461,21 @@ pub contract Admin {
 		/// ===================================================================================
 		// Find Pack
 		/// ===================================================================================
+
+		pub fun getAuthPointer(pathIdentifier: String, id: UInt64) : FindViews.AuthNFTPointer {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			
+			let privatePath = PrivatePath(identifier: pathIdentifier)! 
+			var cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
+			if !cap.check() {
+				let storagePath = StoragePath(identifier: pathIdentifier)! 
+				Admin.account.link<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath , target: storagePath)
+				cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
+			}
+			return FindViews.AuthNFTPointer(cap: cap, id: id)
+		}
 
 		pub fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
 			pre {
