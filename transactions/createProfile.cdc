@@ -19,6 +19,7 @@ import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 // import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import FindThoughts from "../contracts/FindThoughts.cdc"
 
 transaction(name: String) {
 	prepare(account: AuthAccount) {
@@ -68,6 +69,15 @@ transaction(name: String) {
 			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPrivatePath,
 				target: Dandy.CollectionStoragePath
+			)
+		}
+
+		let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+		if !thoughtsCap.check() {
+			account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
+			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , MetadataViews.ResolverCollection}>(
+				FindThoughts.CollectionPublicPath,
+				target: FindThoughts.CollectionStoragePath
 			)
 		}
 
