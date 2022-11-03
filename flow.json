@@ -257,7 +257,8 @@
     "Flomies": "./contracts/Flomies.cdc",
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
     "FindFurnace": "./contracts/FindFurnace.cdc",
-    "FindUtils": "./contracts/FindUtils.cdc"
+    "FindUtils": "./contracts/FindUtils.cdc",
+    "FindThoughts": "./contracts/FindThoughts.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -376,7 +377,8 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-				"FindUtils"
+        "FindUtils",
+        "FindThoughts"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -417,7 +419,8 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-				"FindUtils"
+        "FindThoughts",
+        "FindUtils"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -490,7 +493,8 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-        "FindUtils"
+        "FindUtils",
+        "FindThoughts"
       ],
       "emulator-find": [],
       "emulator-user1": [],

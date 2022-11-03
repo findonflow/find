@@ -17,8 +17,6 @@ var (
 	saSigner       = WithSignerServiceAccount()
 	user1Signer    = WithSigner("user1")
 	exampleNFTType = "A.f8d6e0586b0a20c7.ExampleNFT.NFT"
-
-// user2Signer = SignProposeAndPayAs("user2")
 )
 
 type OverflowTestUtils struct {
@@ -1607,27 +1605,6 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 	return otu
 }
 
-// func (otu *OverflowTestUtils) removeDandyInNFtRegistry(transactionFile string, argument string) *OverflowTestUtils {
-// 	otu.O.TransactionFromFile(transactionFile).
-// 		SignProposeAndPayAs("find").
-// 		Args(otu.O.Arguments().String(argument)).
-// 		Test(otu.T).
-// 		AssertSuccess().
-// 		AssertEmitEvent(NewTestEvent("A.f8d6e0586b0a20c7.NFTRegistry.NFTInfoRemoved", map[string]interface{}{
-// 			"alias":          "Dandy",
-// 			"typeIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
-// 		}))
-
-// 	otu.O.TransactionFromFile("adminRemoveNFTCatalog").
-// 		SignProposeAndPayAs("find").
-// 		Args(otu.O.Arguments().
-// 			String("A.f8d6e0586b0a20c7.Dandy.NFT")).
-// 		Test(otu.T).
-// 		AssertSuccess()
-
-// 	return otu
-// }
-
 func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUtils {
 
 	otu.O.Tx("adminAddNFTCatalog",
@@ -1953,16 +1930,6 @@ func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUt
 	return otu
 }
 
-// func (otu *OverflowTestUtils) setFindName(user, name string) *OverflowTestUtils {
-// 	otu.O.TransactionFromFile("testSetMainName").
-// 		SignProposeAndPayAs(user).
-// 		Args(otu.O.Arguments().
-// 			String(name)).
-// 		Test(otu.T).
-// 		AssertSuccess()
-// 	return otu
-// }
-
 func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string {
 	counter := 0
 	for _, id := range dandyIds {
@@ -1971,19 +1938,6 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 	}
 	return result
 }
-
-// func (otu *OverflowTestUtils) retrieveEvent(events []*OverflowFormatedEvent, eventNames []string) string {
-// 	string := ""
-// 	for _, event := range events {
-// 		for _, eventName := range eventNames {
-// 			if event.Name == eventName {
-// 				string = fmt.Sprintf("%s%s", string, event.String())
-// 			}
-// 		}
-// 	}
-
-// 	return string
-// }
 
 func (otu *OverflowTestUtils) getIDFromEvent(events []*OverflowFormatedEvent, eventName, field string) []uint64 {
 	Ids := []uint64{}

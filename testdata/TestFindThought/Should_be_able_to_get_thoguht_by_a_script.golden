@@ -1,0 +1,18 @@
+`[
+    {
+        "body": "This is new body",
+        "created": 1,
+        "creator": "0x179b6b1cb6755e31",
+        "creatorName": "user1",
+        "header": "This is new header",
+        "id": 297,
+        "medias": {
+            "ipfs://mediaHash": "mediaType"
+        },
+        "tags": [
+            "tag4",
+            "tag5",
+            "@fest"
+        ]
+    }
+]`
