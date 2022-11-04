@@ -128,3 +128,4 @@ pub fun checkSameContract(collection: Type, nft: Type) : Bool {
 	}
 	return false
 }
+ 

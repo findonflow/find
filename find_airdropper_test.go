@@ -28,7 +28,7 @@ func TestFindAirdropper(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 
-		res := otu.O.Tx("airdropNFTs",
+		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
 			WithArg("receivers", []string{"user2", "user2", "user2"}),
 			WithArg("types", []string{dandyType, dandyType, dandyType}),
@@ -99,7 +99,7 @@ func TestFindAirdropper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		res := otu.O.Tx("airdropNFTs",
+		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
 			WithArg("receivers", []string{"user2", "user2", "user2"}),
 			WithArg("types", []string{dandyType, dandyType, dandyType}),
@@ -128,7 +128,7 @@ func TestFindAirdropper(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		user3 := otu.O.Address("user3")
 
-		res := otu.O.Tx("airdropNFTs",
+		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
 			WithArg("receivers", []string{user3, user3, user3}),
 			WithArg("types", []string{dandyType, dandyType, dandyType}),
@@ -171,7 +171,7 @@ func TestFindAirdropper(t *testing.T) {
 			}
 		}
 
-		res := otu.O.Script("airdropNFTs",
+		res := otu.O.Script("sendNFTs",
 			WithArg("sender", "user1"),
 			WithArg("receivers", []string{"user1", "user2", user3}),
 			WithArg("types", []string{dandyType, dandyType, dandyType}),
@@ -183,7 +183,7 @@ func TestFindAirdropper(t *testing.T) {
 		user2Res := makeResult(true, true, ids[1], 1, true, true, "user2", false, dandyType)
 		user3Res := makeResult(false, false, ids[2], 2, true, false, otu.O.Address("user3"), false, dandyType)
 
-		res.AssertWant(t, autogold.Want("airdropNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
+		res.AssertWant(t, autogold.Want("sendNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
 
 	})
 
