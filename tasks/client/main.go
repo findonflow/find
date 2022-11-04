@@ -14,7 +14,7 @@ func main() {
 		"^setup_*",
 		"^mint*",
 		"^admin*",
-		"^testnet*",
+		"^dev*",
 		"clock",
 		"test",
 		"registerAdmin",
