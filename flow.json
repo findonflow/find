@@ -293,7 +293,8 @@
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
     "FindFurnace": "./contracts/FindFurnace.cdc",
     "FindUtils": "./contracts/FindUtils.cdc",
-    "FindUserStatus": "./contracts/FindUserStatus.cdc"
+    "FindUserStatus": "./contracts/FindUserStatus.cdc",
+    "FindThoughts": "./contracts/FindThoughts.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -413,7 +414,7 @@
         "FindAirdropper",
         "FindFurnace",
         "FindUtils",
-        "FindUserStatus"
+        "FindThoughts"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -454,8 +455,8 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-        "FindUtils",
-        "FindUserStatus"
+        "FindThoughts",
+        "FindUtils"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -534,7 +535,8 @@
         "Flowty",
         "FlowtyRentals",
         "FlowtyUtils",
-        "FindUserStatus"
+        "FindUserStatus",
+        "FindThoughts"
       ],
       "emulator-find": [],
       "emulator-user1": [],

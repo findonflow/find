@@ -308,7 +308,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 
-		otu.setUUID(550)
+		otu.setUUID(600)
 
 		otu.directOfferMarketSoft("user2", "user1", id, price)
 
