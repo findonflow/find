@@ -30,10 +30,10 @@ func TestFindAirdropper(t *testing.T) {
 
 		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
-			WithArg("receivers", []string{"user2", "user2", "user2"}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
@@ -101,10 +101,10 @@ func TestFindAirdropper(t *testing.T) {
 
 		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
-			WithArg("receivers", []string{"user2", "user2", "user2"}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
@@ -130,10 +130,10 @@ func TestFindAirdropper(t *testing.T) {
 
 		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
-			WithArg("receivers", []string{user3, user3, user3}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{user3, user3, user3}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
@@ -173,10 +173,10 @@ func TestFindAirdropper(t *testing.T) {
 
 		res := otu.O.Script("sendNFTs",
 			WithArg("sender", "user1"),
-			WithArg("receivers", []string{"user1", "user2", user3}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{"user1", "user2", user3}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		)
 
 		user1Res := makeResult(true, true, ids[0], 0, true, true, "user1", true, dandyType)

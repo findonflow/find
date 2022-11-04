@@ -6,10 +6,10 @@ import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
 
-pub fun main(sender: Address, receivers:[String], types: [String] , ids: [UInt64], messages: [String]) : [Report] {
+pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
 
  	fun logErr(_ i: Int , err: String) : Report {
-		return Report(receiver: receivers[i] , type: types[i], id: ids[i] , message: messages[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, err: err)
+		return Report(receiver: allReceivers[i] , type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, err: err)
 	}
 
 		let paths : [PublicPath] = []
@@ -19,7 +19,7 @@ pub fun main(sender: Address, receivers:[String], types: [String] , ids: [UInt64
 
 		let account = getAuthAccount(sender)
 		let report : [Report] = []
-		for i , typeIdentifier in types {
+		for i , typeIdentifier in nftIdentifiers {
 			let checkType = CompositeType(typeIdentifier) 
 			if checkType == nil {
 				report.append(logErr(i, err: "Cannot refer to type with identifier : ".concat(typeIdentifier)))
@@ -54,9 +54,9 @@ pub fun main(sender: Address, receivers:[String], types: [String] , ids: [UInt64
 				owned = true
 			}
 
-			let receiver = receivers[i]
+			let receiver = allReceivers[i]
 			let id = ids[i] 
-			let message = messages[i]
+			let message = memos[i]
 
 			var user = addresses[receiver]
 			if user == nil {
@@ -79,7 +79,7 @@ pub fun main(sender: Address, receivers:[String], types: [String] , ids: [UInt64
 				storageInited = true
 			}
 
-			let r = Report(receiver: receivers[i] , type: types[i], id: ids[i] , message: messages[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, err: nil)
+			let r = Report(receiver: allReceivers[i] , type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, err: nil)
 			report.append(r)
 		}
 	
