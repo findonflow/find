@@ -42,28 +42,28 @@
       }
     },
     "CoatCheck": {
-      "source": "./contracts/standard/CoatCheck.cdc",
+      "source": "./contracts/community/CoatCheck.cdc",
       "aliases": {
         "testnet": "0xe1d43e0cfc237807",
         "mainnet": "0x5c57f79c6694797f"
       }
     },
     "FlowtyUtils": {
-      "source": "./contracts/standard/FlowtyUtils.cdc",
+      "source": "./contracts/community/FlowtyUtils.cdc",
       "aliases": {
         "testnet": "0xe1d43e0cfc237807",
         "mainnet": "0x5c57f79c6694797f"
       }
     },
     "FlowtyRentals": {
-      "source": "./contracts/standard/FlowtyRentals.cdc",
+      "source": "./contracts/community/FlowtyRentals.cdc",
       "aliases": {
         "testnet": "0xe1d43e0cfc237807",
         "mainnet": "0x5c57f79c6694797f"
       }
     },
     "Flowty": {
-      "source": "./contracts/standard/Flowty.cdc",
+      "source": "./contracts/community/Flowty.cdc",
       "aliases": {
         "testnet": "0xe1d43e0cfc237807",
         "mainnet": "0x5c57f79c6694797f"
@@ -292,7 +292,8 @@
     "Flomies": "./contracts/Flomies.cdc",
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
     "FindFurnace": "./contracts/FindFurnace.cdc",
-    "FindUtils": "./contracts/FindUtils.cdc"
+    "FindUtils": "./contracts/FindUtils.cdc",
+    "FindUserStatus": "./contracts/FindUserStatus.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -411,7 +412,8 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-        "FindUtils"
+        "FindUtils",
+        "FindUserStatus"
       ],
       "mainnet-find-forge": [
         "NFGv3",
@@ -452,7 +454,8 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-        "FindUtils"
+        "FindUtils",
+        "FindUserStatus"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -497,6 +500,7 @@
         "RelatedAccounts",
         "FTRegistry",
         "NFTStorefront",
+        "NFTStorefrontV2",
         "DapperUtilityCoin",
         "FlowUtilityToken",
         "TokenForwarding",
@@ -525,7 +529,12 @@
         "FindVerifier",
         "FindAirdropper",
         "FindFurnace",
-        "FindUtils"
+        "FindUtils",
+        "CoatCheck",
+        "Flowty",
+        "FlowtyRentals",
+        "FlowtyUtils",
+        "FindUserStatus"
       ],
       "emulator-find": [],
       "emulator-user1": [],

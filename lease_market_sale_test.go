@@ -482,7 +482,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       327,
+			"id":       339,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))
