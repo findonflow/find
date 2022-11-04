@@ -51,7 +51,7 @@ func TestFindAirdropper(t *testing.T) {
 	t.Run("Should be able to send Airdrop with only collection public linked", func(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
-		otu.O.Tx("testUnlinkDandyReceiver",
+		otu.O.Tx("devUnlinkDandyReceiver",
 			WithSigner("user2"),
 		).
 			AssertSuccess(t)

@@ -418,7 +418,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.setLeaseTenantRuleFUSD("FlowLeaseSale").
 			removeLeaseTenantRule("FlowLeaseSale", "Flow")
 
-		otu.O.Tx("testSetResidualAddress",
+		otu.O.Tx("devSetResidualAddress",
 			WithSigner("find"),
 			WithArg("address", "user3"),
 		).

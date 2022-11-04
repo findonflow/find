@@ -176,7 +176,7 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
 
-		otu.O.Tx("testFillUpStorage",
+		otu.O.Tx("devFillUpStorage",
 			WithSigner(buyer),
 		).
 			AssertSuccess(t)
@@ -184,7 +184,7 @@ func TestFindPack(t *testing.T) {
 		// try to fill that up with Example NFT
 
 		for {
-			res := otu.O.Tx("testMintExampleNFT",
+			res := otu.O.Tx("devMintExampleNFT",
 				WithSigner("user1"),
 				WithArg("name", "user1"),
 				WithArg("artist", "Bam"),
@@ -217,7 +217,7 @@ func TestFindPack(t *testing.T) {
 				"address": otu.O.Address(buyer),
 				"reason":  "Not enough flow to hold the content of the pack. Please top up your account"})
 
-		otu.O.Tx("testRefillStorage",
+		otu.O.Tx("devRefillStorage",
 			WithSigner(buyer),
 		).
 			AssertSuccess(t)
@@ -353,7 +353,7 @@ func TestFindPack(t *testing.T) {
 		floatID := otu.createFloatEvent("account")
 
 		// buyer should have find name "user1" and float
-		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
 			WithSigner("find"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
@@ -403,7 +403,7 @@ func TestFindPack(t *testing.T) {
 		floatID := otu.createFloatEvent("account")
 
 		// buyer should have find name "user1" or float
-		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
 			WithSigner("find"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
@@ -442,7 +442,7 @@ func TestFindPack(t *testing.T) {
 		floatID := otu.createFloatEvent("account")
 
 		// buyer should have find name "user1" or float
-		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
 			WithSigner("find"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
@@ -482,7 +482,7 @@ func TestFindPack(t *testing.T) {
 		floatID := otu.createFloatEvent("account")
 
 		// buyer should have find name "user1" or float
-		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
 			WithSigner("find"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
@@ -546,7 +546,7 @@ func TestFindPack(t *testing.T) {
 		floatID := otu.createFloatEvent("account")
 
 		// buyer should have find name "user1" or float
-		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
 			WithSigner("find"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
@@ -642,7 +642,7 @@ func TestFindPack(t *testing.T) {
 		otu.claimFloat("account", buyer, floatID)
 
 		// buyer should have find name "user1" or float
-		otu.O.Tx("testadminRegisterFindPackMetadataWithMultipleVerifier",
+		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
 			WithSigner("find"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),

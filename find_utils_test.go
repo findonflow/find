@@ -15,7 +15,7 @@ func TestFindUtils(t *testing.T) {
 
 	// containsChar
 	t.Run("containsChar should return false if string does not contain", func(t *testing.T) {
-		o.Script("testCheckContainsChar",
+		o.Script("devCheckContainsChar",
 			WithArg("string", "bam.find"),
 			WithArg("char", cadence.Character(",")),
 		).
@@ -23,7 +23,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("containsChar should return true if string contains", func(t *testing.T) {
-		o.Script("testCheckContainsChar",
+		o.Script("devCheckContainsChar",
 			WithArg("string", "bam.find"),
 			WithArg("char", cadence.Character(".")),
 		).
@@ -32,7 +32,7 @@ func TestFindUtils(t *testing.T) {
 
 	// contains
 	t.Run("contains should be able to check contains", func(t *testing.T) {
-		o.Script("testCheckContains",
+		o.Script("devCheckContains",
 			WithArg("string", "string"),
 			WithArg("element", "string"),
 		).
@@ -40,7 +40,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("contains should return false if string does not contain", func(t *testing.T) {
-		o.Script("testCheckContains",
+		o.Script("devCheckContains",
 			WithArg("string", "string"),
 			WithArg("element", "stt"),
 		).
@@ -48,7 +48,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("contains should return true if string partially contains", func(t *testing.T) {
-		o.Script("testCheckContains",
+		o.Script("devCheckContains",
 			WithArg("string", "string"),
 			WithArg("element", "ing"),
 		).
@@ -56,7 +56,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("contains should return false if element is longer than string", func(t *testing.T) {
-		o.Script("testCheckContains",
+		o.Script("devCheckContains",
 			WithArg("string", "string"),
 			WithArg("element", "substring"),
 		).
@@ -64,7 +64,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("contains should return true if element is empty string", func(t *testing.T) {
-		o.Script("testCheckContains",
+		o.Script("devCheckContains",
 			WithArg("string", "string"),
 			WithArg("element", `""`),
 		).
@@ -72,7 +72,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("contains should return false if string is empty string", func(t *testing.T) {
-		o.Script("testCheckContains",
+		o.Script("devCheckContains",
 			WithArg("string", `""`),
 			WithArg("element", "string"),
 		).
@@ -81,7 +81,7 @@ func TestFindUtils(t *testing.T) {
 
 	// hasSuffix
 	t.Run("hasSuffix should return true if suffix is valid", func(t *testing.T) {
-		o.Script("testCheckHasSuffix",
+		o.Script("devCheckHasSuffix",
 			WithArg("string", "bam.find"),
 			WithArg("suffix", ".find"),
 		).
@@ -89,7 +89,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasSuffix should return false if suffix is not valid", func(t *testing.T) {
-		o.Script("testCheckHasSuffix",
+		o.Script("devCheckHasSuffix",
 			WithArg("string", "bam.find"),
 			WithArg("suffix", "..find"),
 		).
@@ -97,7 +97,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasSuffix should return true if entire string is passed in", func(t *testing.T) {
-		o.Script("testCheckHasSuffix",
+		o.Script("devCheckHasSuffix",
 			WithArg("string", "bam.find"),
 			WithArg("suffix", "bam.find"),
 		).
@@ -105,7 +105,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasSuffix should return true if empty string is passed in", func(t *testing.T) {
-		o.Script("testCheckHasSuffix",
+		o.Script("devCheckHasSuffix",
 			WithArg("string", "bam.find"),
 			WithArg("suffix", `""`),
 		).
@@ -113,7 +113,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasSuffix should return false if suffix is longer than string", func(t *testing.T) {
-		o.Script("testCheckHasSuffix",
+		o.Script("devCheckHasSuffix",
 			WithArg("string", "bam.find"),
 			WithArg("suffix", "bambambambambam"),
 		).
@@ -122,7 +122,7 @@ func TestFindUtils(t *testing.T) {
 
 	// hasPrefix
 	t.Run("hasPrefix should return true if prefix is valid", func(t *testing.T) {
-		o.Script("testCheckHasPrefix",
+		o.Script("devCheckHasPrefix",
 			WithArg("string", "bam.find"),
 			WithArg("prefix", "bam."),
 		).
@@ -130,7 +130,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasPrefix should return false if prefix is not valid", func(t *testing.T) {
-		o.Script("testCheckHasPrefix",
+		o.Script("devCheckHasPrefix",
 			WithArg("string", "bam.find"),
 			WithArg("prefix", "bamm"),
 		).
@@ -138,7 +138,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasPrefix should return true if entire string is passed in", func(t *testing.T) {
-		o.Script("testCheckHasPrefix",
+		o.Script("devCheckHasPrefix",
 			WithArg("string", "bam.find"),
 			WithArg("prefix", "bam.find"),
 		).
@@ -146,7 +146,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasPrefix should return true if empty string is passed in", func(t *testing.T) {
-		o.Script("testCheckHasPrefix",
+		o.Script("devCheckHasPrefix",
 			WithArg("string", "bam.find"),
 			WithArg("prefix", `""`),
 		).
@@ -154,7 +154,7 @@ func TestFindUtils(t *testing.T) {
 	})
 
 	t.Run("hasPrefix should return false if prefix is longer than string", func(t *testing.T) {
-		o.Script("testCheckHasPrefix",
+		o.Script("devCheckHasPrefix",
 			WithArg("string", "bam.find"),
 			WithArg("prefix", "bambambambambam"),
 		).
