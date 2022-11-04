@@ -6,7 +6,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
 
-transaction(receivers:[String], types: [String] , ids: [UInt64], messages: [String]) {
+transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
 	let authPointers : [FindViews.AuthNFTPointer]
 	let paths : [PublicPath]
@@ -19,7 +19,7 @@ transaction(receivers:[String], types: [String] , ids: [UInt64], messages: [Stri
 		let contractData : {Type : NFTCatalog.NFTCatalogMetadata} = {}
 
 
-		for i , typeIdentifier in types {
+		for i , typeIdentifier in nftIdentifiers {
 			let type = CompositeType(typeIdentifier) ?? panic("Cannot refer to type with identifier : ".concat(typeIdentifier))
 
 			var data : NFTCatalog.NFTCatalogMetadata? = contractData[type]
@@ -56,9 +56,9 @@ transaction(receivers:[String], types: [String] , ids: [UInt64], messages: [Stri
 	execute {
 		let addresses : {String : Address} = {} 
 		for i,  pointer in self.authPointers {
-			let receiver = receivers[i]
+			let receiver = allReceivers[i]
 			let id = ids[i] 
-			let message = messages[i]
+			let message = memos[i]
 			let path = self.paths[i]
 
 			var user = addresses[receiver]
