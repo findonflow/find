@@ -67,7 +67,7 @@ func TestFindAirdropper(t *testing.T) {
 
 		id1 := otu.mintExampleNFTs()
 
-		otu.registerPackType("user1", packTypeId, 0.0, 1.0, 1.0, false, 0, "find", "account").
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account").
 			mintPack("user1", packTypeId, []uint64{id1}, singleType, salt)
 
 		res := otu.O.Tx("sendFindPacks",
