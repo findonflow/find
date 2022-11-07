@@ -12,17 +12,21 @@ pub struct NFTDetailReport {
 	pub let storefrontV2: FindUserStatus.StorefrontListing? 
 	pub let flowty: FindUserStatus.FlowtyListing? 
 	pub let flowtyRental: FindUserStatus.FlowtyRental? 
+	pub let flovatar: FindUserStatus.FlovatarListing? 
+	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing? 
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
 	pub let linkedForMarket : Bool?
 
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
+	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
 		self.storefront=storefront
 		self.storefrontV2=storefrontV2
 		self.flowty=flowty
 		self.flowtyRental=flowtyRental
+		self.flovatar=flovatar
+		self.flovatarComponent=flovatarComponent
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
 		self.linkedForMarket = linkedForMarket
@@ -294,13 +298,16 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 			}
 		}
 
-		let listingsV1 = FindUserStatus.getStorefrontListing(user: address, id : id)
-		let listingsV2 = FindUserStatus.getStorefrontV2Listing(user: address, id : id)
-		let flowty = FindUserStatus.getFlowtyListing(user: address, id : id)
-		let flowtyRental = FindUserStatus.getFlowtyRentals(user: address, id : id)
+		let nftType = pointer.itemType
+		let listingsV1 = FindUserStatus.getStorefrontListing(user: address, id : id, type: nftType)
+		let listingsV2 = FindUserStatus.getStorefrontV2Listing(user: address, id : id, type: nftType)
+		let flowty = FindUserStatus.getFlowtyListing(user: address, id : id, type: nftType)
+		let flowtyRental = FindUserStatus.getFlowtyRentals(user: address, id : id, type: nftType)
+		let flovatar = FindUserStatus.getFlovatarListing(user: address, id : id, type: nftType)
+		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
 
 
-		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
+		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
 	}
 	return nil
 

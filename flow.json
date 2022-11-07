@@ -69,6 +69,41 @@
         "mainnet": "0x5c57f79c6694797f"
       }
     },
+    "Flovatar": {
+      "source": "./contracts/community/Flovatar.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarComponent": {
+      "source": "./contracts/community/FlovatarComponent.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarComponentTemplate": {
+      "source": "./contracts/community/FlovatarComponentTemplate.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarMarketplace": {
+      "source": "./contracts/community/FlovatarMarketplace.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarPack": {
+      "source": "./contracts/community/FlovatarPack.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -534,6 +569,11 @@
         "CoatCheck",
         "Flowty",
         "FlowtyRentals",
+        "Flovatar",
+        "FlovatarComponent",
+        "FlovatarMarketplace",
+        "FlovatarComponentTemplate",
+        "FlovatarPack",
         "FlowtyUtils",
         "FindUserStatus",
         "FindThoughts"
@@ -551,3 +591,4 @@
     }
   }
 }
+ 
