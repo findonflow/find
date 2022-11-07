@@ -188,7 +188,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionCPMV",
+		otu.O.Tx("devsetupExampleNFTCollectionCPMV",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -228,7 +228,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionRMV",
+		otu.O.Tx("devsetupExampleNFTCollectionRMV",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -266,7 +266,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionCP",
+		otu.O.Tx("devsetupExampleNFTCollectionCP",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -304,7 +304,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionR",
+		otu.O.Tx("devsetupExampleNFTCollectionR",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -342,7 +342,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionR",
+		otu.O.Tx("devsetupExampleNFTCollectionR",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -378,7 +378,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"memo":         "Hello!",
 			})
 
-		otu.O.Tx("testsetupExampleNFTCollectionCP",
+		otu.O.Tx("devsetupExampleNFTCollectionCP",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -435,7 +435,7 @@ func TestFindLostAndFound(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("testFillUpStorage",
+		otu.O.Tx("devFillUpStorage",
 			WithSigner("user2"),
 		).
 			AssertSuccess(t)
@@ -470,7 +470,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"type":     "A.f8d6e0586b0a20c7.Dandy.NFT",
 			})
 
-		otu.O.Tx("testRefillStorage",
+		otu.O.Tx("devRefillStorage",
 			WithSigner("user2"),
 		).
 			AssertSuccess(t)
@@ -567,10 +567,10 @@ func resetState(otu *OverflowTestUtils, user string, resetExampleNFT bool) *Over
 		otu.sendExampleNFT("account", user)
 	}
 
-	signWithUser("testDestroyExampleNFTCollection").
+	signWithUser("devDestroyExampleNFTCollection").
 		AssertSuccess(otu.T)
 
-	signWithUser("testDestroyDandyCollection").
+	signWithUser("devDestroyDandyCollection").
 		AssertSuccess(otu.T)
 
 	return otu

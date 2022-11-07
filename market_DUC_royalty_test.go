@@ -345,7 +345,7 @@ func setupDapper(otu *OverflowTestUtils) *OverflowTestUtils {
 	otu.createUser(100.0, "user4")
 
 	//link in the server in the versus client
-	otu.O.Tx("testSetResidualAddress",
+	otu.O.Tx("devSetResidualAddress",
 		findSigner,
 		WithArg("address", "find"),
 	).AssertSuccess(otu.T)

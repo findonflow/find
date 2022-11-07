@@ -38,7 +38,7 @@ func main() {
 		RunPrintEventsFull()
 
 	//we advance the clock
-	o.TransactionFromFile("testClock").SignProposeAndPayAs("find").
+	o.TransactionFromFile("devClock").SignProposeAndPayAs("find").
 		Args(o.Arguments().UFix64(1.0)).
 		RunPrintEventsFull()
 
@@ -69,7 +69,7 @@ func main() {
 		Args(o.Arguments().String("Find")).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("testMintFusd").
+	o.TransactionFromFile("devMintFusd").
 		SignProposeAndPayAsService().
 		Args(o.Arguments().Account("user1").UFix64(100.0)).
 		RunPrintEventsFull()
@@ -79,12 +79,12 @@ func main() {
 		Args(o.Arguments().String("user1").UFix64(5.0)).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("testMintFusd").
+	o.TransactionFromFile("devMintFusd").
 		SignProposeAndPayAsService().
 		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()
 
-	o.TransactionFromFile("testMintFlow").
+	o.TransactionFromFile("devMintFlow").
 		SignProposeAndPayAsService().
 		Args(o.Arguments().Account("user2").UFix64(100.0)).
 		RunPrintEventsFull()

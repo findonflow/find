@@ -22,11 +22,11 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		setProfile("user2")
 	price := 10.0
 
-	mintFund("testMintFusd").AssertSuccess(t)
+	mintFund("devMintFusd").AssertSuccess(t)
 
-	mintFund("testMintFlow").AssertSuccess(t)
+	mintFund("devMintFlow").AssertSuccess(t)
 
-	mintFund("testMintUsdc").AssertSuccess(t)
+	mintFund("devMintUsdc").AssertSuccess(t)
 
 	otu.registerUserWithName("user1", "name1").
 		registerUserWithName("user1", "name2").

@@ -64,7 +64,7 @@ func main() {
 	// o.SimpleTxArgs("adminSellNeoTestnet", "find", o.Arguments().Account("find"))
 
 	//	o.SimpleTxArgs("adminSetNFTInfo_Neo", "find-admin", o.Arguments())
-	//	o.SimpleTxArgs("testSetSellNeoTestnetRules", "find-admin", o.Arguments().Account("find"))
+	//	o.SimpleTxArgs("devSetSellNeoTestnetRules", "find-admin", o.Arguments().Account("find"))
 
 	o.SimpleTxArgs("adminSetSellDandyRules", "find-admin", o.Arguments().Account("find"))
 

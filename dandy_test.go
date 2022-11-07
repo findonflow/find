@@ -102,7 +102,7 @@ func TestDandy(t *testing.T) {
 		/* mint new dandies and withdraw all of them */
 		dandiesIDs = append(dandiesIDs, otu.mintThreeExampleDandies()...)
 
-		otu.O.Tx("testDestroyDandies",
+		otu.O.Tx("devDestroyDandies",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("ids", dandiesIDs),
 		).AssertSuccess(t)

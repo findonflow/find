@@ -17,6 +17,7 @@ var (
 	saSigner       = WithSignerServiceAccount()
 	user1Signer    = WithSigner("user1")
 	exampleNFTType = "A.f8d6e0586b0a20c7.ExampleNFT.NFT"
+	dandyNFTType   = "A.f8d6e0586b0a20c7.Dandy.NFT"
 )
 
 type OverflowTestUtils struct {
@@ -126,7 +127,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	otu.createUser(100.0, "user4")
 
 	//link in the server in the versus client
-	otu.O.Tx("testSetResidualAddress",
+	otu.O.Tx("devSetResidualAddress",
 		findSigner,
 		WithArg("address", "find"),
 	).AssertSuccess(otu.T)
@@ -140,7 +141,7 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 }
 
 func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
-	otu.O.Tx("testClock",
+	otu.O.Tx("devClock",
 		findSigner,
 		WithArg("clock", time),
 	).AssertSuccess(otu.T)
@@ -168,8 +169,8 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 	)
 
 	for _, mintName := range []string{
-		"testMintFusd",
-		"testMintUsdc",
+		"devMintFusd",
+		"devMintUsdc",
 	} {
 		mintFn(mintName).AssertSuccess(otu.T).
 			AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
@@ -1675,7 +1676,7 @@ func (otu *OverflowTestUtils) setFlowLeaseMarketOption(marketType string) *Overf
 
 func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *OverflowTestUtils {
 
-	otu.O.Tx("testAlterMarketOption",
+	otu.O.Tx("devAlterMarketOption",
 		WithSigner("account"),
 		WithArg("market", marketType),
 		WithArg("action", ruleName),
@@ -1687,7 +1688,7 @@ func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *Ov
 
 func (otu *OverflowTestUtils) alterLeaseMarketOption(marketType, ruleName string) *OverflowTestUtils {
 
-	otu.O.Tx("testAlterLeaseMarketOption",
+	otu.O.Tx("devAlterLeaseMarketOption",
 		WithSigner("user4"),
 		WithArg("market", marketType),
 		WithArg("action", ruleName),
@@ -1791,7 +1792,7 @@ func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) removeProfileWallet(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testRemoveProfileWallet",
+	otu.O.Tx("devRemoveProfileWallet",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -1801,7 +1802,7 @@ func (otu *OverflowTestUtils) removeProfileWallet(user string) *OverflowTestUtil
 
 func (otu *OverflowTestUtils) unlinkProfileWallet(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testUnlinkProfileWallet",
+	otu.O.Tx("devUnlinkProfileWallet",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -1811,7 +1812,7 @@ func (otu *OverflowTestUtils) unlinkProfileWallet(user string) *OverflowTestUtil
 
 func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testDestroyFUSDVault",
+	otu.O.Tx("devDestroyFUSDVault",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -1821,7 +1822,7 @@ func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) unlinkDandyProvider(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testUnlinkDandyProvider",
+	otu.O.Tx("devUnlinkDandyProvider",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -1831,7 +1832,7 @@ func (otu *OverflowTestUtils) unlinkDandyProvider(user string) *OverflowTestUtil
 
 func (otu *OverflowTestUtils) unlinkDandyReceiver(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testUnlinkDandyReceiver",
+	otu.O.Tx("devUnlinkDandyReceiver",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -1841,7 +1842,7 @@ func (otu *OverflowTestUtils) unlinkDandyReceiver(user string) *OverflowTestUtil
 
 func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testDestroyDandyCollection",
+	otu.O.Tx("devDestroyDandyCollection",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -1851,7 +1852,7 @@ func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestU
 
 func (otu *OverflowTestUtils) destroyLeaseCollection(user string) *OverflowTestUtils {
 
-	otu.O.Tx("testDestroyLeaseCollection",
+	otu.O.Tx("devDestroyLeaseCollection",
 		WithSigner(user),
 	).
 		AssertSuccess(otu.T)
@@ -2408,7 +2409,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name st
 
 func (otu *OverflowTestUtils) setUUID(uuid uint64) *OverflowTestUtils {
 
-	otu.O.Tx("testSetUUID",
+	otu.O.Tx("devSetUUID",
 		WithSigner("user1"),
 		WithArg("target", uuid),
 	).
@@ -2419,7 +2420,7 @@ func (otu *OverflowTestUtils) setUUID(uuid uint64) *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64) *OverflowTestUtils {
 
-	otu.O.Tx("testchangeRoyaltyExampleNFT",
+	otu.O.Tx("devchangeRoyaltyExampleNFT",
 		WithSigner(user),
 		WithArg("id", id),
 	).
@@ -2457,7 +2458,7 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 
 	t := otu.T
 
-	res, err := otu.O.Tx("testMintExampleNFT",
+	res, err := otu.O.Tx("devMintExampleNFT",
 		WithSigner("user1"),
 		WithArg("name", "user1"),
 		WithArg("artist", "Bam"),
@@ -2491,7 +2492,7 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 
 }
 
-func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
 	o := otu.O
 	t := otu.T
 
@@ -2511,6 +2512,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, w
 		WithArg("royaltyCut", 0.075),
 		WithArg("royaltyAddress", clientAddress),
 		WithArg("requiresReservation", requiresReservation),
+		WithArg("itemTypes", itemType),
 		WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": whitelistTime, "publicSale": buyTime})),
 		WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": buyTime})),
 		WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatId})),
@@ -2592,7 +2594,6 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 
 	o := otu.O
 	t := otu.T
-	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
 
 	o.Tx("buyFindPack",
 		WithSigner(user),
@@ -2609,9 +2610,6 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 				"packImage": "ipfs://thumbnailHash",
 				"Items":     "1",
 			},
-			"packNFTTypes": []interface{}{
-				nftType,
-			},
 		})
 
 	return otu
@@ -2620,8 +2618,6 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTestUtils {
 	o := otu.O
 	t := otu.T
-
-	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
 
 	o.Tx("openFindPack",
 		WithSigner(user),
@@ -2634,9 +2630,6 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 			"packFields": map[string]interface{}{
 				"packImage": "ipfs://thumbnailHash",
 				"Items":     "1",
-			},
-			"packNFTTypes": []interface{}{
-				nftType,
 			},
 		})
 
@@ -2666,7 +2659,7 @@ func (otu *OverflowTestUtils) createFloatEvent(minter string) uint64 {
 	o := otu.O
 	t := otu.T
 
-	floatId, err := o.Tx("testfloatCreateEvent",
+	floatId, err := o.Tx("devfloatCreateEvent",
 		WithSigner(minter),
 		WithArg("forHost", minter),
 		WithArg("claimable", true),
@@ -2697,7 +2690,7 @@ func (otu *OverflowTestUtils) claimFloat(minter, receiver string, floatId uint64
 	o := otu.O
 	t := otu.T
 
-	o.Tx("testfloatClaim",
+	o.Tx("devfloatClaim",
 		WithSigner(receiver),
 		WithArg("eventId", floatId),
 		WithArg("host", minter),

@@ -34,6 +34,76 @@
         "mainnet": "0x4eb8a10cb9f87357"
       }
     },
+    "NFTStorefrontV2": {
+      "source": "./contracts/standard/NFTStorefrontV2.cdc",
+      "aliases": {
+        "testnet": "0x2d55b98eb200daef",
+        "mainnet": "0x4eb8a10cb9f87357"
+      }
+    },
+    "CoatCheck": {
+      "source": "./contracts/community/CoatCheck.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "FlowtyUtils": {
+      "source": "./contracts/community/FlowtyUtils.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "FlowtyRentals": {
+      "source": "./contracts/community/FlowtyRentals.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "Flowty": {
+      "source": "./contracts/community/Flowty.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "Flovatar": {
+      "source": "./contracts/community/Flovatar.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarComponent": {
+      "source": "./contracts/community/FlovatarComponent.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarComponentTemplate": {
+      "source": "./contracts/community/FlovatarComponentTemplate.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarMarketplace": {
+      "source": "./contracts/community/FlovatarMarketplace.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarPack": {
+      "source": "./contracts/community/FlovatarPack.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -258,6 +328,7 @@
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
     "FindFurnace": "./contracts/FindFurnace.cdc",
     "FindUtils": "./contracts/FindUtils.cdc",
+    "FindUserStatus": "./contracts/FindUserStatus.cdc",
     "FindThoughts": "./contracts/FindThoughts.cdc"
   },
   "networks": {
@@ -465,6 +536,7 @@
         "RelatedAccounts",
         "FTRegistry",
         "NFTStorefront",
+        "NFTStorefrontV2",
         "DapperUtilityCoin",
         "FlowUtilityToken",
         "TokenForwarding",
@@ -494,6 +566,16 @@
         "FindAirdropper",
         "FindFurnace",
         "FindUtils",
+        "CoatCheck",
+        "Flowty",
+        "FlowtyRentals",
+        "Flovatar",
+        "FlovatarComponent",
+        "FlovatarMarketplace",
+        "FlovatarComponentTemplate",
+        "FlovatarPack",
+        "FlowtyUtils",
+        "FindUserStatus",
         "FindThoughts"
       ],
       "emulator-find": [],
@@ -509,3 +591,4 @@
     }
   }
 }
+ 

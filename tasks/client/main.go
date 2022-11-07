@@ -13,9 +13,11 @@ func main() {
 	res, err := g.ParseAllWithConfig(true, []string{
 		"^setup_*",
 		"^mint*",
+		"^admin*",
+		"^dev*",
 		"clock",
+		"test",
 		"registerAdmin",
-		"adminSendFlow",
 		"transferAllFusd",
 		"fillUpTheChest",
 		"setSellDandyForFlow.cdc",
