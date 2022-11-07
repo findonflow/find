@@ -17,6 +17,7 @@ var (
 	saSigner       = WithSignerServiceAccount()
 	user1Signer    = WithSigner("user1")
 	exampleNFTType = "A.f8d6e0586b0a20c7.ExampleNFT.NFT"
+	dandyNFTType   = "A.f8d6e0586b0a20c7.Dandy.NFT"
 )
 
 type OverflowTestUtils struct {
@@ -2491,7 +2492,7 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 
 }
 
-func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
 	o := otu.O
 	t := otu.T
 
@@ -2511,6 +2512,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, w
 		WithArg("royaltyCut", 0.075),
 		WithArg("royaltyAddress", clientAddress),
 		WithArg("requiresReservation", requiresReservation),
+		WithArg("itemTypes", itemType),
 		WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": whitelistTime, "publicSale": buyTime})),
 		WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": buyTime})),
 		WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatId})),
@@ -2592,7 +2594,6 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 
 	o := otu.O
 	t := otu.T
-	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
 
 	o.Tx("buyFindPack",
 		WithSigner(user),
@@ -2609,9 +2610,6 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 				"packImage": "ipfs://thumbnailHash",
 				"Items":     "1",
 			},
-			"packNFTTypes": []interface{}{
-				nftType,
-			},
 		})
 
 	return otu
@@ -2620,8 +2618,6 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTestUtils {
 	o := otu.O
 	t := otu.T
-
-	nftType := fmt.Sprintf("A.%s.%s.NFT", o.Account("account").Address().String(), "ExampleNFT")
 
 	o.Tx("openFindPack",
 		WithSigner(user),
@@ -2634,9 +2630,6 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 			"packFields": map[string]interface{}{
 				"packImage": "ipfs://thumbnailHash",
 				"Items":     "1",
-			},
-			"packNFTTypes": []interface{}{
-				nftType,
 			},
 		})
 
