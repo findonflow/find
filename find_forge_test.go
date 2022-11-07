@@ -29,7 +29,7 @@ func TestFindForge(t *testing.T) {
 			Test(otu.T).
 			AssertSuccess()
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("artist", "Bam"),
@@ -65,7 +65,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
 		).AssertSuccess(t)
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("artist", "Bam"),
@@ -85,7 +85,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("name", "user1"),
 		).AssertSuccess(t)
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("artist", "Bam"),
@@ -103,7 +103,7 @@ func TestFindForge(t *testing.T) {
 			registerUser("user2").
 			buyForge("user2")
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user2"),
 			overflow.WithArg("name", "user2"),
 			overflow.WithArg("artist", "Bam"),
@@ -123,7 +123,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("name", "user2"),
 		).AssertSuccess(t)
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user2"),
 			overflow.WithArg("name", "user2"),
 			overflow.WithArg("artist", "Bam"),
@@ -165,7 +165,7 @@ func TestFindForge(t *testing.T) {
 				},
 			)
 
-		id, err := otu.O.Tx("testMintExampleNFT",
+		id, err := otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("artist", "Bam"),
@@ -197,7 +197,7 @@ func TestFindForge(t *testing.T) {
 
 	t.Run("Should not be able to mint Example NFTs with non-exist traits", func(t *testing.T) {
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("artist", "Bam"),
@@ -215,13 +215,13 @@ func TestFindForge(t *testing.T) {
 
 	t.Run("Should be able register traits to Example NFT and then mint", func(t *testing.T) {
 
-		otu.O.Tx("testAddTraitsExampleNFT",
+		otu.O.Tx("devAddTraitsExampleNFT",
 			overflow.WithSigner("find"),
 			overflow.WithArg("lease", "user1"),
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("testMintExampleNFT",
+		otu.O.Tx("devMintExampleNFT",
 			overflow.WithSigner("user1"),
 			overflow.WithArg("name", "user1"),
 			overflow.WithArg("artist", "Bam"),
@@ -258,7 +258,7 @@ func TestFindForge(t *testing.T) {
 			overflow.WithArg("name", "testingname"),
 		).AssertSuccess(t)
 
-		otu.O.Tx("testadminMintExampleNFT",
+		otu.O.Tx("devadminMintExampleNFT",
 			overflow.WithSigner("find"),
 			overflow.WithArg("name", "testingname"),
 			overflow.WithArg("artist", "Bam"),

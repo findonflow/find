@@ -18,7 +18,7 @@ func main() {
 
 	// o.SimpleTxArgs("adminSendFlow", "account", o.Arguments().RawAccount(user).UFix64(10.0))
 
-	// o.TransactionFromFile("testMintDandyTO").
+	// o.TransactionFromFile("devMintDandyTO").
 	// 	SignProposeAndPayAs("user1").
 	// 	Args(o.Arguments().
 	// 		String("user1").
@@ -74,7 +74,7 @@ func main() {
 	// 	Arg("name", "user2"),
 	// )
 
-	ids := o.Tx("testMintDandyTO",
+	ids := o.Tx("devMintDandyTO",
 		WithSigner("user1"),
 		WithArg("name", "user1"),
 		WithArg("maxEdition", 12),

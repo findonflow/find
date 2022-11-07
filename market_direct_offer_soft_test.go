@@ -23,11 +23,11 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		setProfile("user2")
 	price := 10.0
 
-	mintFund("testMintFusd").AssertSuccess(t)
+	mintFund("devMintFusd").AssertSuccess(t)
 
-	mintFund("testMintFlow").AssertSuccess(t)
+	mintFund("devMintFlow").AssertSuccess(t)
 
-	mintFund("testMintUsdc").AssertSuccess(t)
+	mintFund("devMintUsdc").AssertSuccess(t)
 
 	otu.setUUID(400)
 
@@ -789,7 +789,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to multiple offer to and fulfill 4 items in one go", func(t *testing.T) {
 
-		otu.O.TransactionFromFile("testMintFusd").
+		otu.O.TransactionFromFile("devMintFusd").
 			SignProposeAndPayAsService().
 			Args(otu.O.Arguments().
 				Account("user2").

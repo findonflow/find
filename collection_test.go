@@ -29,7 +29,7 @@ func TestCollectionScripts(t *testing.T) {
 
 	otu.setUUID(500)
 
-	otu.O.Tx("testMintDandyTO",
+	otu.O.Tx("devMintDandyTO",
 		overflow.WithSigner("user1"),
 		overflow.WithArg("name", "user1"),
 		overflow.WithArg("maxEdition", 1),

@@ -43,7 +43,7 @@ func TestGas(t *testing.T) {
 			// registerUserWithName("user1", "ddddd").
 			// setFindName("user1", "")
 
-		result := otu.O.TransactionFromFile("testResolveName").
+		result := otu.O.TransactionFromFile("devResolveName").
 			SignProposeAndPayAs("user1").
 			Args(otu.O.Arguments().
 				String("179b6b1cb6755e31")).

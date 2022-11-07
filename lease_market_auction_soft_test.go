@@ -24,13 +24,13 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
-	mintFund("testMintFusd").
+	mintFund("devMintFusd").
 		AssertSuccess(t)
 
-	mintFund("testMintFlow").
+	mintFund("devMintFlow").
 		AssertSuccess(t)
 
-	mintFund("testMintUsdc").
+	mintFund("devMintUsdc").
 		AssertSuccess(t)
 
 	otu.registerUserWithName("user1", "name1").

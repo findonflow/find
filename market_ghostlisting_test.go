@@ -31,11 +31,11 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
-	mintFund("testMintFusd").AssertSuccess(t)
+	mintFund("devMintFusd").AssertSuccess(t)
 
-	mintFund("testMintFlow").AssertSuccess(t)
+	mintFund("devMintFlow").AssertSuccess(t)
 
-	mintFund("testMintUsdc").AssertSuccess(t)
+	mintFund("devMintUsdc").AssertSuccess(t)
 
 	otu.setUUID(400)
 
@@ -471,7 +471,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		).AssertSuccess(t)
 
 		// make it non-soulBound before listing
-		otu.O.Tx("testtoggleSoulBoundExampleNFT",
+		otu.O.Tx("devtoggleSoulBoundExampleNFT",
 			WithSigner("user1"),
 			WithArg("id", 1),
 			WithArg("soulBound", false),
@@ -496,7 +496,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		}
 
 		// make it soulBound before listing
-		otu.O.Tx("testtoggleSoulBoundExampleNFT",
+		otu.O.Tx("devtoggleSoulBoundExampleNFT",
 			WithSigner("user1"),
 			WithArg("id", 1),
 			WithArg("soulBound", true),
