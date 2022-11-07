@@ -13,9 +13,12 @@ func TestFindAirdropper(t *testing.T) {
 
 	otu := NewOverflowTest(t).
 		setupFIND().
-		setupDandy("user1").
+		createUser(1000.0, "user1").
+		registerUser("user1").
+		buyForge("user1").
 		createUser(100.0, "user2").
-		registerUser("user2")
+		registerUser("user2").
+		registerExampleNFTInNFTRegistry()
 
 	dandyType := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "Dandy", "NFT")
 	otu.mintThreeExampleDandies()
@@ -25,12 +28,12 @@ func TestFindAirdropper(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 
-		res := otu.O.Tx("airdropNFTs",
+		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
-			WithArg("receivers", []string{"user2", "user2", "user2"}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
@@ -48,6 +51,46 @@ func TestFindAirdropper(t *testing.T) {
 		}
 	})
 
+	packType := "user1"
+	packTypeId := uint64(1)
+	salt := "find"
+	singleType := []string{exampleNFTType}
+
+	t.Run("Should be able to send packs thru airdropper with struct", func(t *testing.T) {
+
+		type FindPack_AirdropInfo struct {
+			PackTypeName string `cadence:"packTypeName"`
+			PackTypeId   uint64 `cadence:"packTypeId"`
+			Users        []string
+			Message      string
+		}
+
+		id1 := otu.mintExampleNFTs()
+
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account").
+			mintPack("user1", packTypeId, []uint64{id1}, singleType, salt)
+
+		res := otu.O.Tx("sendFindPacks",
+			WithSigner("find"),
+			WithArg("packInfo", FindPack_AirdropInfo{
+				PackTypeName: packType,
+				PackTypeId:   packTypeId,
+				Users:        []string{"user2"},
+				Message:      "I can use struct here",
+			}),
+		).
+			AssertSuccess(t)
+
+		res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
+			"from": otu.O.Address("account"),
+			"to":   otu.O.Address("user2"),
+			"type": "A.f8d6e0586b0a20c7.FindPack.NFT",
+			"context": map[string]interface{}{
+				"message": "I can use struct here",
+			},
+		})
+	})
+
 	t.Run("Should be able to send Airdrop with only collection public linked", func(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
@@ -56,12 +99,12 @@ func TestFindAirdropper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		res := otu.O.Tx("airdropNFTs",
+		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
-			WithArg("receivers", []string{"user2", "user2", "user2"}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
@@ -85,12 +128,12 @@ func TestFindAirdropper(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		user3 := otu.O.Address("user3")
 
-		res := otu.O.Tx("airdropNFTs",
+		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
-			WithArg("receivers", []string{user3, user3, user3}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{user3, user3, user3}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
@@ -128,19 +171,19 @@ func TestFindAirdropper(t *testing.T) {
 			}
 		}
 
-		res := otu.O.Script("airdropNFTs",
+		res := otu.O.Script("sendNFTs",
 			WithArg("sender", "user1"),
-			WithArg("receivers", []string{"user1", "user2", user3}),
-			WithArg("types", []string{dandyType, dandyType, dandyType}),
+			WithArg("allReceivers", []string{"user1", "user2", user3}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
-			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		)
 
 		user1Res := makeResult(true, true, ids[0], 0, true, true, "user1", true, dandyType)
 		user2Res := makeResult(true, true, ids[1], 1, true, true, "user2", false, dandyType)
 		user3Res := makeResult(false, false, ids[2], 2, true, false, otu.O.Address("user3"), false, dandyType)
 
-		res.AssertWant(t, autogold.Want("airdropNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
+		res.AssertWant(t, autogold.Want("sendNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
 
 	})
 

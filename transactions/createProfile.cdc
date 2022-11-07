@@ -5,6 +5,7 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindPack from "../contracts/FindPack.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
@@ -78,6 +79,15 @@ transaction(name: String) {
 			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , MetadataViews.ResolverCollection}>(
 				FindThoughts.CollectionPublicPath,
 				target: FindThoughts.CollectionStoragePath
+			)
+		}
+
+		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(FindPack.CollectionPublicPath)
+		if !findPackCap.check() {
+			account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+			account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				FindPack.CollectionPublicPath,
+				target: FindPack.CollectionStoragePath
 			)
 		}
 

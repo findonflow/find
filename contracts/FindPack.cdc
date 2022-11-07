@@ -44,6 +44,20 @@ pub contract FindPack: NonFungibleToken {
 	// Mapping of packTypeName (which is the find name) : {typeId : Metadata}
 	access(contract) let packMetadata: {String : {UInt64: Metadata}}
 
+	// this is a struct specific for airdropping packs
+	pub struct AirdropInfo {
+		pub let packTypeName: String 
+		pub let packTypeId: UInt64 
+		pub let users: [String]
+		pub let message: String
+
+		init(packTypeName: String , packTypeId: UInt64 , users: [String],  message: String){
+			self.packTypeName = packTypeName
+			self.packTypeId = packTypeId
+			self.users = users
+			self.message = message
+		}
+	}
 
 	// Verifier container for packs
 	// Each struct is one sale type. If they 
