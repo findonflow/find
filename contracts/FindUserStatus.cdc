@@ -62,31 +62,20 @@ pub contract FindUserStatus {
 	}
 
 	pub struct FlowtyListing {
-        pub var listingId: UInt64
-        // Whether this listing has been funded or not.
-        pub var funded: Bool
-        // The Type of the NonFungibleToken.NFT that is being listed.
-        pub let nftIdentifier: String
-        // The ID of the NFT within that type.
-        pub let nftId: UInt64
-        // The amount of the requested loan.
-        pub let amount: UFix64
-        // The interest rate in %, a number between 0 and 1.
-        pub let interestRate: UFix64
-        //The term in seconds for this listing.
-        pub var term: UFix64
-        // The Type of the FungibleToken that fundings must be made in.
-        pub let paymentVaultType: String
+		pub var listingId: UInt64
+		pub var funded: Bool
+		pub let nftIdentifier: String
+		pub let nftId: UInt64
+		pub let amount: UFix64
+		pub let interestRate: UFix64
+		pub var term: UFix64
+		pub let paymentVaultType: String
 
 		pub let paymentCuts: [StoreFrontCut]
-        //The time the funding start at
-        pub var listedTime: UFix64
-        // The royalty rate needed as a deposit for this loan to be funded
-        pub var royaltyRate: UFix64
-        // The number of seconds this listing is valid for
-        pub var listingValidUntil: UFix64
-		// Total fee needed for repayment
-        pub var repaymentAmount: UFix64
+		pub var listedTime: UFix64
+		pub var royaltyRate: UFix64
+		pub var listingValidUntil: UFix64
+		pub var repaymentAmount: UFix64
 
 		pub let tags: {String : String} 
 		pub let scalars: {String : UFix64}
@@ -113,32 +102,22 @@ pub contract FindUserStatus {
 	}
 
 	pub struct FlowtyRental {
-        pub var listingId: UInt64
-        // Whether this listing has been funded or not.
-        pub var rented: Bool
-        // The Type of the NonFungibleToken.NFT that is being listed.
-        pub let nftIdentifier: String
-        // The ID of the NFT within that type.
-        pub let nftId: UInt64
-        // The amount of the requested loan.
-        pub let amount: UFix64
+		pub var listingId: UInt64
+		pub var rented: Bool
+		pub let nftIdentifier: String
+		pub let nftId: UInt64
+		pub let amount: UFix64
 		pub let deposit: UFix64
-        //The term in seconds for this listing.
-        pub var term: UFix64
-        // The Type of the FungibleToken that fundings must be made in.
-        pub let paymentVaultType: String
-        pub let reenableOnReturn: Bool
+		pub var term: UFix64
+		pub let paymentVaultType: String
+		pub let reenableOnReturn: Bool
 
 		pub let paymentCuts: [StoreFrontCut]
-        //The time the funding start at
-        pub var listedTime: UFix64
-        // The royalty rate needed as a deposit for this loan to be funded
-        pub var royaltyRate: UFix64
-        // The number of seconds this listing is valid for
-        pub var listingValidUntil: UFix64
-		// Total fee needed for repayment
-        pub var repaymentAmount: UFix64
-        pub var renter: Address? 
+		pub var listedTime: UFix64
+		pub var royaltyRate: UFix64
+		pub var listingValidUntil: UFix64
+		pub var repaymentAmount: UFix64
+		pub var renter: Address? 
 		pub var renterName: String? 
 
 		pub let tags: {String : String} 
@@ -173,24 +152,22 @@ pub contract FindUserStatus {
 
 	pub struct FlovatarListing {
 		pub var listingId: UInt64
-		// if purchased is true -> don't show it
-		//pub var purchased: Bool
 		pub let nftIdentifier: String
 		pub let nftId: UInt64
 		pub let ftTypeIdentifier: String
 		pub let amount: UFix64
 		pub let cuts: [StoreFrontCut]
 		pub let accessoryId: UInt64?
-        pub let hatId: UInt64?
-        pub let eyeglassesId: UInt64?
-        pub let backgroundId: UInt64?
-        pub let mint: UInt64
-        pub let series: UInt32
-        pub let creatorAddress: Address
-        pub let components: {String: UInt64}
-        pub let rareCount: UInt8
-        pub let epicCount: UInt8
-        pub let legendaryCount: UInt8
+		pub let hatId: UInt64?
+		pub let eyeglassesId: UInt64?
+		pub let backgroundId: UInt64?
+		pub let mint: UInt64
+		pub let series: UInt32
+		pub let creatorAddress: Address
+		pub let components: {String: UInt64}
+		pub let rareCount: UInt8
+		pub let epicCount: UInt8
+		pub let legendaryCount: UInt8
 		pub let tags: {String : String} 
 		pub let scalars: {String : UFix64}
 		pub let extra: {String : AnyStruct}
@@ -223,20 +200,18 @@ pub contract FindUserStatus {
 
 	pub struct FlovatarComponentListing {
 		pub var listingId: UInt64
-		// if purchased is true -> don't show it
-		//pub var purchased: Bool
 		pub let nftIdentifier: String
 		pub let nftId: UInt64
 		pub let ftTypeIdentifier: String
 		pub let amount: UFix64
 		pub let cuts: [StoreFrontCut]
-        pub let mint: UInt64
-        pub let templateId: UInt64
+		pub let mint: UInt64
+		pub let templateId: UInt64
 		pub let name: String
-        pub let description: String
-        pub let category: String
-        pub let rarity: String
-        pub let color: String
+		pub let description: String
+		pub let category: String
+		pub let rarity: String
+		pub let color: String
 		pub let tags: {String : String} 
 		pub let scalars: {String : UFix64}
 		pub let extra: {String : AnyStruct}
