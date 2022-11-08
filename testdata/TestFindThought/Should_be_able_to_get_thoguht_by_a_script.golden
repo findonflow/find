@@ -6,6 +6,7 @@
         "creatorName": "user1",
         "header": "This is new header",
         "id": 323,
+        "lastUpdated": 1,
         "medias": {
             "ipfs://mediaHash": "mediaType"
         },

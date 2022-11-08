@@ -94,6 +94,7 @@ pub contract FindThoughts {
 			for m in self.medias {
 				medias.append(m.file.uri())
 			}
+			self.lastUpdated = Clock.time()
 			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, tags: self.tags)
 		}
 
