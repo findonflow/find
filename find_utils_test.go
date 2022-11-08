@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/bjartek/overflow"
@@ -159,6 +160,56 @@ func TestFindUtils(t *testing.T) {
 			WithArg("prefix", "bambambambambam"),
 		).
 			AssertWant(t, autogold.Want("false", false))
+	})
+
+	t.Run("hasPrefix should return false if prefix is longer than string", func(t *testing.T) {
+		o.Script("devCheckHasPrefix",
+			WithArg("string", "bam.find"),
+			WithArg("prefix", "bambambambambam"),
+		).
+			AssertWant(t, autogold.Want("false", false))
+	})
+
+	// toUpper
+	t.Run("toUpper should return upper cases", func(t *testing.T) {
+		s := "bam.find"
+		o.Script("devCheckToUpper",
+			WithArg("string", s),
+		).
+			AssertWant(t, autogold.Want("should return upper cases", strings.ToUpper(s)))
+	})
+
+	t.Run("toUpper should return upper cases if they are already upper cases", func(t *testing.T) {
+		s := "bam.find"
+		o.Script("devCheckToUpper",
+			WithArg("string", strings.ToUpper(s)),
+		).
+			AssertWant(t, autogold.Want("if they are already upper cases", strings.ToUpper(s)))
+	})
+
+	// first Upper Letter
+	t.Run("firstUpperLetter should return upper case for first letter", func(t *testing.T) {
+		s := "Bam.find"
+		o.Script("devCheckFirstUpperLetter",
+			WithArg("string", strings.ToLower(s)),
+		).
+			AssertWant(t, autogold.Want("should return upper case for first letter", s))
+	})
+
+	t.Run("firstUpperLetter should returns same if first letter is already upper case", func(t *testing.T) {
+		s := "Bam.find"
+		o.Script("devCheckFirstUpperLetter",
+			WithArg("string", s),
+		).
+			AssertWant(t, autogold.Want("should returns same if first letter is already upper case", s))
+	})
+
+	t.Run("firstUpperLetter should returns same if first letter is not alphabet", func(t *testing.T) {
+		s := ".Bam.find"
+		o.Script("devCheckFirstUpperLetter",
+			WithArg("string", s),
+		).
+			AssertWant(t, autogold.Want("should returns same if first letter is already upper case", s))
 	})
 
 }
