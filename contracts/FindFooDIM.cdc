@@ -297,7 +297,6 @@ pub contract FindFooDIM: NonFungibleToken {
 
 		let contractName = "FindFooDIM" 
 
-		self.nftCollectionDisplay = FindForgeOrder.fulfillForge(contractName)
 
 		// Initialize the total supply
 		self.totalSupply = 0
@@ -318,6 +317,7 @@ pub contract FindFooDIM: NonFungibleToken {
 			target: self.CollectionStoragePath
 		)
 		FindForge.addForgeType(<- create Forge())
+		self.nftCollectionDisplay = FindForge.fulfillForge(contractName, forgeType: Type<@Forge>())
 		emit ContractInitialized()
 	}
 }

@@ -1,7 +1,6 @@
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
-import FindForge from "./FindForge.cdc"
 import FIND from "./FIND.cdc"
 import FindUtils from "./FindUtils.cdc"
 
@@ -27,11 +26,13 @@ pub contract FindForgeOrder {
 		pub let leaseName: String 
 		pub let mintType: String 
 		pub let contractName: String
+		pub let minterCut: UFix64?
 		pub let collectionDisplay : MetadataViews.NFTCollectionDisplay 
 
 		init(
 			lease: String,
 			mintType: String, 
+			minterCut: UFix64?,
 			collectionDisplay : MetadataViews.NFTCollectionDisplay 
 		) {
 			pre{
@@ -42,6 +43,7 @@ pub contract FindForgeOrder {
 			self.leaseName=lease
 			self.mintType=mintType
 			self.contractName="Find".concat(FindUtils.firstUpperLetter(self.leaseName)).concat(mintType)
+			self.minterCut=minterCut
 			self.collectionDisplay = collectionDisplay
 		}
 
@@ -127,9 +129,9 @@ pub contract FindForgeOrder {
 
 	}
 
-	pub fun orderForge(lease: &FIND.Lease, mintType: String, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
-		let leaseName = lease.getName()
-		let order <- create FindForgeOrder.Order(lease: leaseName, mintType: mintType, collectionDisplay: collectionDisplay)
+	access(account) fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
+
+		let order <- create FindForgeOrder.Order(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
 		let c = collectionDisplay
 		let s : {String : String} = {}
 		for social in c.socials.keys {
@@ -141,7 +143,7 @@ pub contract FindForgeOrder {
 		col.deposit(token: <- order)
 	}
 
-	access(account) fun fulfillForge(_ contractName: String) : MetadataViews.NFTCollectionDisplay {
+	access(account) fun fulfillForge(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
 		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
 
 		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
@@ -155,7 +157,8 @@ pub contract FindForgeOrder {
 
 		let completedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
 		completedCol.deposit(token: <- order)
-		return c
+		let ref = completedCol.borrow(id)
+		return ref
 	}
 
 	access(account) fun addMintType(_ mintType: String) {

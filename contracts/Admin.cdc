@@ -86,7 +86,7 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.addContractData(lease: lease, forgeType: forgeType , data: data)
+			FindForge.adminAddContractData(lease: lease, forgeType: forgeType , data: data)
 		}
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
