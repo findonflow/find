@@ -91,8 +91,15 @@ pub fun main(user: String) : Report? {
 		let account=getAccount(address)
 		if account.balance > 0.0 {
 
-			let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow()!
-			let isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
+			var isDapper=false
+			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
+			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
+			} else {
+				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
+					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
+				}
+				isDapper = false
+			}
 
 			let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 			let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
