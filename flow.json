@@ -449,6 +449,7 @@
         "FindAirdropper",
         "FindFurnace",
         "FindUtils",
+        "FindUserStatus",
         "FindThoughts"
       ],
       "mainnet-find-forge": [
@@ -491,7 +492,8 @@
         "FindAirdropper",
         "FindFurnace",
         "FindThoughts",
-        "FindUtils"
+        "FindUtils",
+        "FindUserStatus"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -591,4 +593,3 @@
     }
   }
 }
- 
