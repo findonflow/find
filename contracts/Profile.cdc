@@ -620,6 +620,22 @@ pub contract Profile {
 
 	}
 
+	pub fun findReceiverCapability(address: Address, path: PublicPath, type: Type) : Capability<&{FungibleToken.Receiver}>? {
+		let profileCap = self.findWalletCapability(address)
+		if profileCap.check() {
+			if let profile = getAccount(address).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() {
+				if profile.hasWallet(type.identifier) {
+					return profileCap
+				}
+			}
+		}
+		let cap = getAccount(address).getCapability<&{FungibleToken.Receiver}>(path)
+		if cap.check() {
+			return cap
+		}
+		return nil
+	}
+
 	pub fun findWalletCapability(_ address: Address) : Capability<&{FungibleToken.Receiver}> {
 		return getAccount(address)
 		.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
