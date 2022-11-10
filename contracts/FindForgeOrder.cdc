@@ -138,7 +138,7 @@ pub contract FindForgeOrder {
 			s[social] = c.socials[social]!.url
 		} 
 		emit ForgeOrdered(lease: leaseName, mintType: mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s)
-
+		FindForgeOrder.contractNames[order.contractName] = order.id
 		let col = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
 		col.deposit(token: <- order)
 	}
@@ -204,7 +204,7 @@ pub contract FindForgeOrder {
 
 		// Create a Collection resource and save it to storage
 		let completedCollection <- create Collection()
-		self.account.save(<-completedCollection, to: self.QueuedCollectionStoragePath)
+		self.account.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
 
 		// create a public capability for the collection
 		self.account.link<&FindForgeOrder.Collection{MetadataViews.ResolverCollection}>(

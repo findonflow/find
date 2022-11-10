@@ -145,37 +145,30 @@ pub contract FindForge {
 
 	access(account) fun adminSetMinterPlatform(leaseName: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
-			panic("This forge type is not supported. type : ".concat(forgeType.identifier))
+			FindForge.addPrivateForgeType(name: leaseName, forgeType: forgeType)
 		}
 
 		if description == "" {
 			panic("Description of collection cannot be empty")
 		}
 
-		let name = leaseName
-		if FindForge.minterPlatforms[forgeType]![name] == nil {
-			if !FindForge.publicForges.contains(forgeType) {
-				panic("This forge is not supported publicly. Forge Type : ".concat(forgeType.identifier))
-			}
-		}
-
-		let user = FIND.lookupAddress(leaseName) ?? panic("Cannot find lease owner. Lease : ".concat(name))
-		let leaseCollection = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
+		let user = FIND.lookupAddress(leaseName) ?? panic("Cannot find lease owner. Lease : ".concat(leaseName))
+		let leaseCollection = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(leaseName))
 
 		// If they have a premium forge, platform will not take any royalty
 		if leaseCollection.checkAddon(name: leaseName, addon: "premiumForge") {
 			let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: 0.0, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
+			let minterPlatform = MinterPlatform(name:leaseName, platform:receiverCap, platformPercentCut: 0.0, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
-			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			FindForge.minterPlatforms[forgeType]!.insert(key: leaseName, minterPlatform)
 			return
 		}
 
 		if leaseCollection.checkAddon(name: leaseName, addon: "forge") {
 			let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
+			let minterPlatform = MinterPlatform(name:leaseName, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
-			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			FindForge.minterPlatforms[forgeType]!.insert(key: leaseName, minterPlatform)
 			return
 		}
 

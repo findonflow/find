@@ -309,6 +309,9 @@
     "FTRegistry": "./contracts/FTRegistry.cdc",
     "NFTRegistry": "./contracts/NFTRegistry.cdc",
     "FindForge": "./contracts/FindForge.cdc",
+    "FindForgeOrder": "./contracts/FindForgeOrder.cdc",
+    "FindForgeStruct": "./contracts/FindForgeStruct.cdc",
+    "FindFooDIM": "./contracts/FindFooDIM.cdc",
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "NFGv3": "./contracts/NFGv3.cdc",
     "PartyFavorz": "./contracts/PartyFavorz.cdc",
@@ -439,6 +442,8 @@
         "RelatedAccounts",
         "FTRegistry",
         "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
         "ProfileCache",
         "FindRulesCache",
         "FINDNFTCatalog",
@@ -449,6 +454,7 @@
         "FindAirdropper",
         "FindFurnace",
         "FindUtils",
+        "FindUserStatus",
         "FindThoughts"
       ],
       "mainnet-find-forge": [
@@ -478,6 +484,8 @@
         "RelatedAccounts",
         "FTRegistry",
         "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
@@ -491,7 +499,8 @@
         "FindAirdropper",
         "FindFurnace",
         "FindThoughts",
-        "FindUtils"
+        "FindUtils",
+        "FindUserStatus"
       ],
       "testnet-user1": [
         "NFGv3",
@@ -513,6 +522,8 @@
         "FindToken",
         "FIND",
         "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
         "NonFungibleToken",
         "Clock",
         "Profile",
@@ -591,4 +602,3 @@
     }
   }
 }
- 

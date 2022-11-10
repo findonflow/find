@@ -8,6 +8,7 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
+import FindForgeOrder from "./FindForgeOrder.cdc"
 import FindPack from "./FindPack.cdc"
 import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
@@ -87,6 +88,22 @@ pub contract Admin {
 			}
 
 			FindForge.adminAddContractData(lease: lease, forgeType: forgeType , data: data)
+		}
+
+		pub fun addForgeMintType(_ mintType: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForgeOrder.addMintType(mintType)
+		}
+
+		pub fun fulfillForge(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			return FindForge.fulfillForge(contractName, forgeType: forgeType)
 		}
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
