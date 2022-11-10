@@ -271,7 +271,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		)
 		FindForge.addForgeType(<- create Forge())
 		let admin = FindFooDIM.account.borrow<&FindForge.ForgeAdminProxy>(from: /storage/findForgeAdminProxy)!
-		self.nftCollectionDisplay = admin.fulfillForge(contractName, forgeType: Type<@Forge>())
+		self.nftCollectionDisplay = admin.fulfillForgeOrder(contractName, forgeType: Type<@Forge>())
 		emit ContractInitialized()
 	}
 }

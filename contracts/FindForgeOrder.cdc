@@ -11,6 +11,7 @@ pub contract FindForgeOrder {
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event ForgeOrdered(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String})
 	pub event ForgeOrderCompleted(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String}, contractName: String)
+	pub event ForgeOrderCancelled(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String}, contractName: String)
 
 	pub let QueuedCollectionStoragePath: StoragePath
 	pub let QueuedCollectionPublicPath: PublicPath
@@ -143,7 +144,21 @@ pub contract FindForgeOrder {
 		col.deposit(token: <- order)
 	}
 
-	access(account) fun fulfillForge(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
+	access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
+		let contractName = "Find".concat(FindUtils.firstUpperLetter(leaseName)).concat(mintType)
+		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
+		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+		let order <- queuedCol.withdraw(withdrawID: id) 
+		let c = order.collectionDisplay
+		let s : {String : String} = {}
+		for social in c.socials.keys {
+			s[social] = c.socials[social]!.url
+		} 
+		emit ForgeOrderCancelled(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
+		destroy order
+	}
+
+	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
 		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
 
 		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
@@ -153,7 +168,7 @@ pub contract FindForgeOrder {
 		for social in c.socials.keys {
 			s[social] = c.socials[social]!.url
 		} 
-		emit ForgeOrdered(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s)
+		emit ForgeOrderCompleted(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
 
 		let completedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
 		completedCol.deposit(token: <- order)

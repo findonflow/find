@@ -238,8 +238,10 @@ pub contract FindForge {
 		FindForgeOrder.orderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
 	}
 
-	access(account) fun fulfillForge(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
-		let order = FindForgeOrder.fulfillForge(contractName, forgeType: forgeType)
+	access(account) fun removeForgeOrder()
+
+	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+		let order = FindForgeOrder.fulfillForgeOrder(contractName, forgeType: forgeType)
 		let c = order.collectionDisplay
 		let s : {String : String} = {}
 		for social in c.socials.keys {
@@ -426,12 +428,12 @@ pub contract FindForge {
 			self.capability = cap
 		}
 
-		pub fun fulfillForge(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+		pub fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			return FindForge.fulfillForge(contractName, forgeType: forgeType)
+			return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
 		}
 	}
 
