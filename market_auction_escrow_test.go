@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bjartek/overflow"
@@ -40,10 +41,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("price", price),
-		WithArg("auctionReservePrice", price),
+		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
 		WithArg("auctionExtensionOnLateBid", 60.0),
 		WithArg("minimumBidIncrement", 1.0),
+		WithArg("auctionStartTime", nil),
 		WithArg("auctionValidUntil", otu.currentTime()+10.0),
 	)
 
@@ -837,6 +839,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			overflow.WithArg("auctionDuration", 300.0),
 			overflow.WithArg("auctionExtensionOnLateBid", 60.0),
 			overflow.WithArg("minimumBidIncrement", 1.0),
+			overflow.WithArg("auctionStartTime", nil),
 			overflow.WithArg("auctionValidUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
 
@@ -923,6 +926,106 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertSuccess(t)
 
+	})
+
+	t.Run("Should be able to list a timed auction with future start time", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()+10.0),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t).
+			AssertEvent(otu.T, "FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+				"status":              "inactive_listed",
+				"amount":              price,
+				"startsAt":            otu.currentTime() + 10.0,
+				"auctionReservePrice": price + 5.0,
+				"id":                  id,
+				"seller":              otu.O.Address("user1"),
+			})
+
+		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should be able to list a timed auction with current start time", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t).
+			AssertEvent(otu.T, "FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+				"status":              "active_ongoing",
+				"amount":              price,
+				"startsAt":            otu.currentTime(),
+				"auctionReservePrice": price + 5.0,
+				"id":                  id,
+				"seller":              otu.O.Address("user1"),
+			})
+
+		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should be able to list a timed auction with previous start time", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()-1.0),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t).
+			AssertEvent(otu.T, "FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+				"status":              "active_ongoing",
+				"amount":              price,
+				"startsAt":            otu.currentTime(),
+				"auctionReservePrice": price + 5.0,
+				"id":                  id,
+				"seller":              otu.O.Address("user1"),
+			})
+
+		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should be able to bid a timed auction that is started", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t)
+
+		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
+
+		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should not be able to bid a timed auction that is not yet started", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()+10.0),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("bidMarketAuctionEscrowed",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price+5.0),
+		).
+			AssertFailure(t, fmt.Sprintf("Auction is not yet started, please place your bid after %2f", otu.currentTime()+10.0))
+
+		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
 }

@@ -488,6 +488,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", nil),
 			WithArg("auctionValidUntil", otu.currentTime()+100.0),
 		).AssertSuccess(t).GetIdFromEvent("EnglishAuction", "id")
 
