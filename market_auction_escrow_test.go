@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
 )
 
@@ -824,23 +823,23 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.sendSoulBoundNFT("user1", "account")
 		// set market rules
 		otu.O.Tx("adminSetSellExampleNFTForFlow",
-			overflow.WithSigner("find"),
-			overflow.WithArg("tenant", "account"),
+			WithSigner("find"),
+			WithArg("tenant", "account"),
 		)
 
 		otu.O.Tx("listNFTForAuctionEscrowed",
-			overflow.WithSigner("user1"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			overflow.WithArg("id", 1),
-			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-			overflow.WithArg("price", price),
-			overflow.WithArg("auctionReservePrice", price+5.0),
-			overflow.WithArg("auctionDuration", 300.0),
-			overflow.WithArg("auctionExtensionOnLateBid", 60.0),
-			overflow.WithArg("minimumBidIncrement", 1.0),
-			overflow.WithArg("auctionStartTime", nil),
-			overflow.WithArg("auctionValidUntil", otu.currentTime()+100.0),
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("id", 1),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", nil),
+			WithArg("auctionValidUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
 
 	})
@@ -1026,6 +1025,46 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertFailure(t, fmt.Sprintf("Auction is not yet started, please place your bid after %2f", otu.currentTime()+10.0))
 
 		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should not be able to bid a timed auction that is not yet started", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()+10.0),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("bidMarketAuctionEscrowed",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", price+5.0),
+		).
+			AssertFailure(t, fmt.Sprintf("Auction is not yet started, please place your bid after %2f", otu.currentTime()+10.0))
+
+		otu.delistAllNFTForEscrowedAuction("user1")
+	})
+
+	t.Run("Should be able to sell and buy at auction even the buyer didn't link receiver correctly", func(t *testing.T) {
+
+		listingTx("listNFTForAuctionEscrowed",
+			WithSigner("user1"),
+			WithArg("id", id),
+			WithArg("auctionStartTime", otu.currentTime()),
+			WithArg("auctionValidUntil", nil),
+		).
+			AssertSuccess(t)
+
+		otu.saleItemListed("user1", "active_ongoing", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0).
+			sendDandy("user1", "user2", id)
 	})
 
 }
