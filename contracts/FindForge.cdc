@@ -400,6 +400,41 @@ pub contract FindForge {
 		return (&self.verifier as &Verifier?)!
 	}
 
+	pub fun createForgeAdminProxyClient() : @ForgeAdminProxy {
+		return <- create ForgeAdminProxy()
+	}
+
+	//interface to use for capability receiver pattern
+	pub resource interface ForgeAdminProxyClient {
+		pub fun addCapability(_ cap: Capability<&FIND.Network>)
+	}
+
+	//admin proxy with capability receiver 
+	pub resource ForgeAdminProxy: ForgeAdminProxyClient {
+
+		access(self) var capability: Capability<&FIND.Network>?
+
+		init() {
+			self.capability = nil
+		}
+
+		pub fun addCapability(_ cap: Capability<&FIND.Network>) {
+			pre {
+				cap.check() : "Invalid server capablity"
+				self.capability == nil : "Server already set"
+			}
+			self.capability = cap
+		}
+
+		pub fun fulfillForge(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			return FindForge.fulfillForge(contractName, forgeType: forgeType)
+		}
+	}
+
 	init() {
 		self.minterPlatforms={}
 		self.publicForges=[]

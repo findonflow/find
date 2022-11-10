@@ -137,6 +137,16 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		WithArg("dapperAddress", "account"),
 	).AssertSuccess(otu.T)
 
+	// setup find forge
+	otu.O.Tx("setup_find_forge_1", WithSigner("user4")).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the versus client
+	otu.O.Tx("setup_find_forge_2",
+		saSigner,
+		WithArg("ownerAddress", "user4"),
+	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
 	return otu.tickClock(1.0)
 }
 

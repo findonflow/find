@@ -5,7 +5,6 @@ import FindForge from "./FindForge.cdc"
 import FindForgeOrder from "./FindForgeOrder.cdc"
 import FindForgeStruct from "./FindForgeStruct.cdc"
 import FindUtils from "./FindUtils.cdc"
-import Admin from "./Admin.cdc"
 
 // DIM stands for Direct Immuatble Minting, cannot mutate minted NFT states. So all nfts has to be minted in one go. 
 pub contract FindFooDIM: NonFungibleToken {
@@ -271,8 +270,8 @@ pub contract FindFooDIM: NonFungibleToken {
 			target: self.CollectionStoragePath
 		)
 		FindForge.addForgeType(<- create Forge())
-		let admin = FindFooDIM.account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
-		self.nftCollectionDisplay = admin.fulfillForge(contractName: contractName, forgeType: Type<@Forge>())
+		let admin = FindFooDIM.account.borrow<&FindForge.ForgeAdminProxy>(from: /storage/findForgeAdminProxy)!
+		self.nftCollectionDisplay = admin.fulfillForge(contractName, forgeType: Type<@Forge>())
 		emit ContractInitialized()
 	}
 }
