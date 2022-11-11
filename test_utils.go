@@ -691,6 +691,7 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 		WithArg("auctionDuration", 300.0),
 		WithArg("auctionExtensionOnLateBid", 60.0),
 		WithArg("minimumBidIncrement", 1.0),
+		WithArg("auctionStartTime", nil),
 		WithArg("auctionValidUntil", otu.currentTime()+100.0),
 	).
 		AssertSuccess(otu.T).
@@ -719,6 +720,7 @@ func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id u
 		WithArg("auctionDuration", 300.0),
 		WithArg("auctionExtensionOnLateBid", 60.0),
 		WithArg("minimumBidIncrement", 1.0),
+		WithArg("auctionStartTime", nil),
 		WithArg("auctionValidUntil", otu.currentTime()+100.0),
 	).
 		AssertSuccess(otu.T).
