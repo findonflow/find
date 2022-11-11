@@ -161,7 +161,7 @@ func TestFindThought(t *testing.T) {
 
 	t.Run("Should be able to get thoguht by a script", func(t *testing.T) {
 
-		res, err := otu.O.Script("getFindThoughts",
+		res, err := otu.O.Script("getOwnedFindThoughts",
 			WithArg("user", "user1"),
 		).
 			GetAsJson()

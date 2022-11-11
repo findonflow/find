@@ -663,3 +663,4 @@ pub contract Profile {
 		self.storagePath = /storage/findProfile
 	}
 }
+ 

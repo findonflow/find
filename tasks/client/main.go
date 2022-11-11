@@ -16,7 +16,6 @@ func main() {
 		"^admin*",
 		"^dev*",
 		"clock",
-		"test",
 		"registerAdmin",
 		"transferAllFusd",
 		"fillUpTheChest",

@@ -5,7 +5,8 @@
         "creator": "0x179b6b1cb6755e31",
         "creatorName": "user1",
         "header": "This is new header",
-        "id": 327,
+        "id": 323,
+        "lastUpdated": 1,
         "medias": {
             "ipfs://mediaHash": "mediaType"
         },
