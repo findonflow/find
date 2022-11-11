@@ -238,7 +238,9 @@ pub contract FindForge {
 		FindForgeOrder.orderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
 	}
 
-	access(account) fun removeForgeOrder()
+	access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
+		FindForgeOrder.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
+	}
 
 	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
 		let order = FindForgeOrder.fulfillForgeOrder(contractName, forgeType: forgeType)

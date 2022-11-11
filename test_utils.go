@@ -72,7 +72,7 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(359)
+	otu.setUUID(365)
 	ids := otu.mintThreeExampleDandies()
 	return ids
 }

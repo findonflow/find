@@ -98,12 +98,16 @@ pub contract Admin {
 			FindForgeOrder.addMintType(mintType)
 		}
 
-		pub fun orderForge(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+		pub fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
+			FindForge.adminOrderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+		}
+
+		pub fun cancelForgeOrder(leaseName: String, mintType: String){
+			FindForge.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
 		}
 
 		pub fun fulfillForgeOrder(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {

@@ -277,6 +277,37 @@ func TestFindForge(t *testing.T) {
 			AssertSuccess(t)
 	})
 
+	type MetadataViews_NFTCollectionDisplay struct {
+		Name        string
+		Description string
+		ExternalURL MetadataViews_ExternalURL `cadence:"externalURL"`
+		SquareImage MetadataViews_Media_IPFS  `cadence:"squareImage"`
+		BannerImage MetadataViews_Media_IPFS  `cadence:"bannerImage"`
+		Socials     map[string]MetadataViews_ExternalURL
+	}
+
+	collectionDisplay := MetadataViews_NFTCollectionDisplay{
+		Name:        "notSet",
+		Description: "testing",
+		ExternalURL: MetadataViews_ExternalURL{Url: "testing url"},
+		SquareImage: MetadataViews_Media_IPFS{
+			File: MetadataViews_IPFSFile{
+				Cid:  "testing square",
+				Path: nil,
+			},
+		},
+		BannerImage: MetadataViews_Media_IPFS{
+			File: MetadataViews_IPFSFile{
+				Cid:  "testing banner",
+				Path: nil,
+			},
+		},
+		Socials: map[string]MetadataViews_ExternalURL{
+			"twitter": {Url: "testing twitter"},
+			"discord": {Url: "testing discord"},
+		},
+	}
+
 	t.Run("Should be able to order Forges for contract", func(t *testing.T) {
 
 		testingName := "foo"
@@ -305,44 +336,63 @@ func TestFindForge(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		type MetadataViews_NFTCollectionDisplay struct {
-			Name        string
-			Description string
-			ExternalURL MetadataViews_ExternalURL `cadence:"externalURL"`
-			SquareImage MetadataViews_Media_IPFS  `cadence:"squareImage"`
-			BannerImage MetadataViews_Media_IPFS  `cadence:"bannerImage"`
-			Socials     map[string]MetadataViews_ExternalURL
-		}
+		collectionDisplay.Name = testingName
 
 		otu.O.Tx("orderForge",
 			WithSigner("user1"),
 			WithArg("name", testingName),
 			WithArg("mintType", mintType),
 			WithArg("minterCut", 0.05),
-			WithArg("collectionDisplay", MetadataViews_NFTCollectionDisplay{
-				Name:        testingName,
-				Description: "testing",
-				ExternalURL: MetadataViews_ExternalURL{Url: "testing url"},
-				SquareImage: MetadataViews_Media_IPFS{
-					File: MetadataViews_IPFSFile{
-						Cid:  "testing square",
-						Path: nil,
-					},
-				},
-				BannerImage: MetadataViews_Media_IPFS{
-					File: MetadataViews_IPFSFile{
-						Cid:  "testing banner",
-						Path: nil,
-					},
-				},
-				Socials: map[string]MetadataViews_ExternalURL{
-					"twitter": {Url: "testing twitter"},
-					"discord": {Url: "testing discord"},
-				},
-			}),
+			WithArg("collectionDisplay", collectionDisplay),
 		).
 			Print().
-			AssertSuccess(t)
+			AssertSuccess(t).
+			AssertEvent(t, "ForgeOrdered", map[string]interface{}{
+				"lease":    testingName,
+				"mintType": mintType,
+			})
+	})
+
+	t.Run("Should be able to remove order as Admin", func(t *testing.T) {
+
+		testingName := "foo"
+		mintType := "DIM"
+
+		collectionDisplay.Name = testingName
+
+		otu.O.Tx("adminCancelForgeOrder",
+			WithSigner("find"),
+			WithArg("name", testingName),
+			WithArg("mintType", mintType),
+		).
+			Print().
+			AssertSuccess(t).
+			AssertEvent(t, "ForgeOrderCancelled", map[string]interface{}{
+				"lease":    testingName,
+				"mintType": mintType,
+			})
+	})
+
+	t.Run("Should be able to order as Admin", func(t *testing.T) {
+
+		testingName := "foo"
+		mintType := "DIM"
+
+		collectionDisplay.Name = testingName
+
+		otu.O.Tx("adminOrderForge",
+			WithSigner("find"),
+			WithArg("name", testingName),
+			WithArg("mintType", mintType),
+			WithArg("minterCut", 0.05),
+			WithArg("collectionDisplay", collectionDisplay),
+		).
+			Print().
+			AssertSuccess(t).
+			AssertEvent(t, "ForgeOrdered", map[string]interface{}{
+				"lease":    testingName,
+				"mintType": mintType,
+			})
 	})
 
 	// set User4 as admin, the account as find-forge on emulator (for deploying contracts)
