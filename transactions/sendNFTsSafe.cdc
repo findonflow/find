@@ -1,7 +1,4 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
@@ -13,9 +10,6 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 
 	let authPointers : [FindViews.AuthNFTPointer]
 	let paths : [PublicPath]
-    let flowVault : &FungibleToken.Vault
-    let flowTokenRepayment : Capability<&FlowToken.Vault{FungibleToken.Receiver}>
-    let defaultTokenAvailableBalance : UFix64 
 
 	prepare(account : AuthAccount) {
 
@@ -57,24 +51,10 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			self.authPointers.append(pointer)
 			self.paths.append(path.publicPath)
 		}
-
-        self.flowVault = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
-        self.flowTokenRepayment = account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver) 
-        self.defaultTokenAvailableBalance = FlowStorageFees.defaultTokenAvailableBalance(account.address)
-
 	}
 
 	execute {
 		let addresses : {String : Address} = {} 
-        let estimatedStorageFee = 0.0002 * UFix64(self.authPointers.length) 
-        // we pass in the least amount as possible for storage fee here
-        let tempVault <- self.flowVault.withdraw(amount: 0.0)
-        var vaultRef = &tempVault as &FungibleToken.Vault
-        if self.defaultTokenAvailableBalance <= estimatedStorageFee {
-            vaultRef = self.flowVault as &FungibleToken.Vault
-        } else {
-            tempVault.deposit(from: <- self.flowVault.withdraw(amount: estimatedStorageFee))
-        }
 		for i,  pointer in self.authPointers {
 			let receiver = allReceivers[i]
 			let id = ids[i] 
@@ -88,8 +68,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			}
 
 			// airdrop thru airdropper
-			FindAirdropper.forcedAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message}, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment)
+			FindAirdropper.safeAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message})
 		}
-        self.flowVault.deposit(from: <- tempVault)
 	}
 }

@@ -18,7 +18,7 @@ func TestFindLostAndFound(t *testing.T) {
 		registerExampleNFTInNFTRegistry()
 
 	t.Run("Should be able to send thru sendNFT transaction without account initiated", func(t *testing.T) {
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -112,7 +112,7 @@ func TestFindLostAndFound(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -142,7 +142,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		receiverAddress := otu.O.Address("user1")
 
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["`+receiverAddress+`"]`),
@@ -166,7 +166,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 	t.Run("Should be able to redeem with Collection Public and MetadataViews linked", func(t *testing.T) {
 
-		ticketID, err := otu.O.Tx("sendNFTsLostAndFound",
+		ticketID, err := otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -206,7 +206,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 	t.Run("Should be able to redeem with Receiver and MetadataViews linked", func(t *testing.T) {
 
-		ticketID, err := otu.O.Tx("sendNFTsLostAndFound",
+		ticketID, err := otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -246,7 +246,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 	t.Run("Should be able to redeem with only Collection Public linked", func(t *testing.T) {
 
-		ticketID, err := otu.O.Tx("sendNFTsLostAndFound",
+		ticketID, err := otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -284,7 +284,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 	t.Run("Should be able to redeem with Receiver and MetadataViews linked", func(t *testing.T) {
 
-		ticketID, err := otu.O.Tx("sendNFTsLostAndFound",
+		ticketID, err := otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -322,7 +322,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 	t.Run("Should be able to redeem on behalf of other account", func(t *testing.T) {
 
-		ticketID, err := otu.O.Tx("sendNFTsLostAndFound",
+		ticketID, err := otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -361,7 +361,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 	t.Run("Should be able to redeem on behalf of other account", func(t *testing.T) {
 
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("account"),
 			WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 			WithArg("allReceivers", `["user1"]`),
@@ -416,7 +416,7 @@ func TestFindLostAndFound(t *testing.T) {
 			memos = append(memos, "Msg")
 		}
 
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
 			WithArg("nftIdentifiers", identifiers),
 			WithArg("allReceivers", allReceivers),
@@ -456,7 +456,7 @@ func TestFindLostAndFound(t *testing.T) {
 			memos = append(memos, "Msg")
 		}
 
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
 			WithArg("nftIdentifiers", identifiers),
 			WithArg("allReceivers", allReceivers),
@@ -468,6 +468,62 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiver": otu.O.Address("user2"),
 				"sender":   otu.O.Address("user1"),
 				"type":     "A.f8d6e0586b0a20c7.Dandy.NFT",
+			})
+
+		otu.O.Tx("devRefillStorage",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+	})
+
+	t.Run("Should refill user storage if the receiver account is full by subsidizing", func(t *testing.T) {
+
+		otu.O.Tx("setupDandyCollection",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("devFillUpStorage",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+		otu.O.FillUpStorage("user2")
+
+		amount := 20
+
+		ids := mintDandies(otu, amount)
+
+		identifiers := []string{}
+		allReceivers := []string{}
+		memos := []string{}
+
+		for len(identifiers) < len(ids) {
+			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
+			allReceivers = append(allReceivers, "user2")
+			memos = append(memos, "Msg")
+		}
+
+		otu.O.Tx("sendNFTsSubsidize",
+			WithSigner("user1"),
+			WithArg("nftIdentifiers", identifiers),
+			WithArg("allReceivers", allReceivers),
+			WithArg("ids", ids),
+			WithArg("memos", memos),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
+				"receiver":     otu.O.Address("user2"),
+				"receiverName": "user2",
+				"sender":       otu.O.Address("user1"),
+				"type":         "A.f8d6e0586b0a20c7.Dandy.NFT",
+				"memo":         "Msg",
+			}).
+			AssertEvent(t, "FindLostAndFoundWrapper.UserStorageSubsidized", map[string]interface{}{
+				"receiver":     otu.O.Address("user2"),
+				"receiverName": "user2",
+				"sender":       otu.O.Address("user1"),
 			})
 
 		otu.O.Tx("devRefillStorage",
@@ -495,7 +551,7 @@ func TestFindLostAndFound(t *testing.T) {
 			memos = append(memos, "Msg")
 		}
 
-		otu.O.Tx("sendNFTsLostAndFound",
+		otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
 			WithArg("nftIdentifiers", identifiers),
 			WithArg("allReceivers", allReceivers),

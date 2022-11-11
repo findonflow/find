@@ -28,7 +28,7 @@ func TestFindAirdropper(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 
-		res := otu.O.Tx("sendNFTs",
+		res := otu.O.Tx("sendNFTsSafe",
 			WithSigner("user1"),
 			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
 			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
@@ -99,7 +99,7 @@ func TestFindAirdropper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		res := otu.O.Tx("sendNFTs",
+		res := otu.O.Tx("sendNFTsSafe",
 			WithSigner("user1"),
 			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
 			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
@@ -128,7 +128,7 @@ func TestFindAirdropper(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		user3 := otu.O.Address("user3")
 
-		res := otu.O.Tx("sendNFTs",
+		res := otu.O.Tx("sendNFTsSafe",
 			WithSigner("user1"),
 			WithArg("allReceivers", []string{user3, user3, user3}),
 			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
@@ -162,6 +162,7 @@ func TestFindAirdropper(t *testing.T) {
 				"accountInitialized":     account,
 				"collectionPublicLinked": cplinked,
 				"id":                     id,
+				"isDapper":               false,
 				"message":                fmt.Sprintf("Message %d", index),
 				"nftInPlace":             nftInplace,
 				"ok":                     ok,
