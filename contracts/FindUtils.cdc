@@ -38,7 +38,7 @@ pub contract FindUtils {
     }
 
     pub fun toUpper(_ string: String) : String {
-        let map = FindUtils.getUpperCases()
+        let map = FindUtils.getLowerCaseToUpperCase()
         var res = ""
         var i = 0 
         while i < string.length {
@@ -53,7 +53,7 @@ pub contract FindUtils {
         if string.length < 1 {
             return string
         }
-        let map = FindUtils.getUpperCases()
+        let map = FindUtils.getLowerCaseToUpperCase()
         if let first = map[string[0].toString()] {
             return first.concat(string.slice(from: 1, upTo: string.length))
              
@@ -61,7 +61,60 @@ pub contract FindUtils {
         return string
     }
 
-    pub fun getUpperCases() : {String : String} {
+    pub fun to_snake_case(_ string: String) : String {
+        var res = "" 
+        var i = 0 
+        let map = FindUtils.getUpperCaseToLowerCase()
+        var spaced = false
+        while i < string.length {
+            if string[i] == " " {
+                res = res.concat("_")
+                spaced = true
+                i = i + 1
+                continue 
+            }
+            if let lowerCase = map[string[i].toString()] {
+                if i > 0 && !spaced {
+                    res = res.concat("_")
+                }
+                res = res.concat(lowerCase)
+                i = i + 1
+                spaced == false
+                continue 
+            }
+            res = res.concat(string[i].toString())
+            i = i + 1
+        }
+        return res
+    }
+
+    pub fun toCamelCase(_ string: String) : String {
+        var res = "" 
+        var i = 0 
+        let map = FindUtils.getLowerCaseToUpperCase()
+        var upper = false
+        let string = string.toLower()
+        while i < string.length {
+            if string[i] == " " || string[i] == "_" {
+                upper = true
+                i = i + 1
+                continue 
+            }
+            if upper {
+                if let upperCase = map[string[i].toString()] {
+                    res = res.concat(upperCase)
+                    upper = false 
+                    i = i + 1 
+                    continue
+                }
+            }
+            res = res.concat(string[i].toString())
+            i = i + 1
+        }
+        return res
+    }
+
+    pub fun getLowerCaseToUpperCase() : {String : String} {
         return {
             "a" : "A",
             "b" : "B",
@@ -89,6 +142,37 @@ pub contract FindUtils {
             "x" : "X",
             "y" : "Y",
             "z" : "Z"
+        }
+    }
+
+    pub fun getUpperCaseToLowerCase() : {String : String} {
+        return {
+            "A" : "a",
+            "B" : "b",
+            "C" : "c",
+            "D" : "d",
+            "E" : "e",
+            "F" : "f",
+            "G" : "g",
+            "H" : "h",
+            "I" : "i",
+            "J" : "j",
+            "K" : "k",
+            "L" : "l",
+            "M" : "m",
+            "N" : "n",
+            "O" : "o",
+            "P" : "p",
+            "Q" : "q",
+            "R" : "r",
+            "S" : "s",
+            "T" : "t",
+            "U" : "u",
+            "V" : "v",
+            "W" : "w",
+            "X" : "x",
+            "Y" : "y",
+            "Z" : "z"
         }
     }
     
