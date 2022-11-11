@@ -9,6 +9,7 @@ require (
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.28.0
+	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20221013174805-71f721b956bf
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
 	github.com/sanity-io/litter v1.5.5
 	github.com/stretchr/testify v1.8.1
@@ -112,7 +113,6 @@ require (
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/onflow/atree v0.4.0 // indirect
 	github.com/onflow/cadence-tools/test v0.2.1-0.20221012182900-f46efb551c55 // indirect
-	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20221013174805-71f721b956bf // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v0.11.2-0.20220720151516-797b149ceaaa // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.11.2-0.20220720151516-797b149ceaaa // indirect
 	github.com/onflow/flow-emulator v0.38.1 // indirect
