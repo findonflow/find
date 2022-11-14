@@ -14,7 +14,7 @@ func main() {
 		"^setup_*",
 		"^mint*",
 		"^admin*",
-		"^dev*",
+		"dev",
 		"clock",
 		"registerAdmin",
 		"transferAllFusd",

@@ -1398,6 +1398,77 @@
                   }
                }
             },
+            "deleteFindThoughts": {
+               "code": "import FindThoughts from 0xf8d6e0586b0a20c7\n\ntransaction(ids: [UInt64]) {\n\n    let collection : \u0026FindThoughts.Collection\n\n    prepare(account: AuthAccount) {\n\n        self.collection=account.borrow\u003c\u0026FindThoughts.Collection\u003e(from: FindThoughts.CollectionStoragePath) ?? panic(\"Cannot borrow thoughts reference from path\")\n    }\n\n    execute {\n        for id in ids {\n            self.collection.delete(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "ids"
+                  ],
+                  "parameters": {
+                     "ids": "[UInt64]"
+                  }
+               }
+            },
+            "delistAllLeaseSale": {
+               "code": "import FindLeaseMarketSale from 0xf8d6e0586b0a20c7\nimport FindMarket from 0xf8d6e0586b0a20c7\nimport FindLeaseMarket from 0xf8d6e0586b0a20c7\n\ntransaction() {\n    prepare(account: AuthAccount) {\n        // Get all the saleItems Id\n\n        let tenant = FindMarket.getTenant(FindMarket.getTenantAddress(\"findLease\")!)\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindLeaseMarketSale.SaleItem\u003e())\n        let cap = FindLeaseMarket.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)\n        let ref = cap.borrow() ?? panic(\"Cannot borrow reference to the capability.\")\n\n        let listingType=Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let saleItems= account.borrow\u003c\u0026FindLeaseMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(listingType))!\n        let leases = ref.getNameSales()\n        for lease in leases {\n            saleItems.delist(lease)\n        }\n    }\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
+            "delistAllNFTSale": {
+               "code": "import FindMarketSale from 0xf8d6e0586b0a20c7\nimport FindMarket from 0xf8d6e0586b0a20c7\n\ntransaction(marketplace:Address) {\n\n    let saleItems : \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n        let tenant = FindMarket.getTenant(marketplace)\n        self.saleItems= account.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e())) \n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        let ids = self.saleItems!.getIds()\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "marketplace"
+                  ],
+                  "parameters": {
+                     "marketplace": "Address"
+                  }
+               }
+            },
+            "delistAllNameSale": {
+               "code": "import FIND from 0xf8d6e0586b0a20c7\n\ntransaction() {\n\n    let finLeases : \u0026FIND.LeaseCollection?\n\n    prepare(acct: AuthAccount) {\n        self.finLeases= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        let leases = self.finLeases!.getLeaseInformation()\n        for lease in leases {\n            if lease.salePrice != nil {\n                self.finLeases!.delistSale(lease.name)\n            }\n        }\n    }\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
+            "delistLeaseSale": {
+               "code": "import FindMarket from 0xf8d6e0586b0a20c7\nimport FindLeaseMarketSale from 0xf8d6e0586b0a20c7\n\ntransaction(leases: [String]) {\n    let saleItems : \u0026FindLeaseMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n\n        let tenant=FindMarket.getTenant(FindMarket.getTenantAddress(\"findLease\")!)\n        self.saleItems= account.borrow\u003c\u0026FindLeaseMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()))\n\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for lease in leases {\n            self.saleItems!.delist(lease)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "leases"
+                  ],
+                  "parameters": {
+                     "leases": "[String]"
+                  }
+               }
+            },
+            "delistNFTSale": {
+               "code": "import FindMarket from 0xf8d6e0586b0a20c7\nimport FindMarketSale from 0xf8d6e0586b0a20c7\n\ntransaction(marketplace:Address, ids: [UInt64]) {\n\n    let saleItems : \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "marketplace",
+                     "ids"
+                  ],
+                  "parameters": {
+                     "ids": "[UInt64]",
+                     "marketplace": "Address"
+                  }
+               }
+            },
+            "delistNameSale": {
+               "code": "import FIND from 0xf8d6e0586b0a20c7\n\ntransaction(names: [String]) {\n\n    let finLeases : \u0026FIND.LeaseCollection?\n\n    prepare(acct: AuthAccount) {\n        self.finLeases= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "names"
+                  ],
+                  "parameters": {
+                     "names": "[String]"
+                  }
+               }
+            },
             "editFindThought": {
                "code": "import FindThoughts from 0xf8d6e0586b0a20c7\n\ntransaction(id: UInt64, header: String , body: String, tags: [String]) {\n\n    let collection : \u0026FindThoughts.Collection\n\n    prepare(account: AuthAccount) {\n\n        self.collection=account.borrow\u003c\u0026FindThoughts.Collection\u003e(from: FindThoughts.CollectionStoragePath) ?? panic(\"Cannot borrow thoughts reference from path\")\n    }\n\n    execute {\n        let thought = self.collection.borrow(id)\n        thought.edit(header: header , body: body, tags: tags)\n    }\n}",
                "spec": {
@@ -4324,6 +4395,77 @@
                   }
                }
             },
+            "deleteFindThoughts": {
+               "code": "import FindThoughts from 0x097bafa4e0b48eef\n\ntransaction(ids: [UInt64]) {\n\n    let collection : \u0026FindThoughts.Collection\n\n    prepare(account: AuthAccount) {\n\n        self.collection=account.borrow\u003c\u0026FindThoughts.Collection\u003e(from: FindThoughts.CollectionStoragePath) ?? panic(\"Cannot borrow thoughts reference from path\")\n    }\n\n    execute {\n        for id in ids {\n            self.collection.delete(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "ids"
+                  ],
+                  "parameters": {
+                     "ids": "[UInt64]"
+                  }
+               }
+            },
+            "delistAllLeaseSale": {
+               "code": "import FindLeaseMarketSale from 0x097bafa4e0b48eef\nimport FindMarket from 0x097bafa4e0b48eef\nimport FindLeaseMarket from 0x097bafa4e0b48eef\n\ntransaction() {\n    prepare(account: AuthAccount) {\n        // Get all the saleItems Id\n\n        let tenant = FindMarket.getTenant(FindMarket.getTenantAddress(\"findLease\")!)\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindLeaseMarketSale.SaleItem\u003e())\n        let cap = FindLeaseMarket.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)\n        let ref = cap.borrow() ?? panic(\"Cannot borrow reference to the capability.\")\n\n        let listingType=Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let saleItems= account.borrow\u003c\u0026FindLeaseMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(listingType))!\n        let leases = ref.getNameSales()\n        for lease in leases {\n            saleItems.delist(lease)\n        }\n    }\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
+            "delistAllNFTSale": {
+               "code": "import FindMarketSale from 0x097bafa4e0b48eef\nimport FindMarket from 0x097bafa4e0b48eef\n\ntransaction(marketplace:Address) {\n\n    let saleItems : \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n        let tenant = FindMarket.getTenant(marketplace)\n        self.saleItems= account.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e())) \n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        let ids = self.saleItems!.getIds()\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "marketplace"
+                  ],
+                  "parameters": {
+                     "marketplace": "Address"
+                  }
+               }
+            },
+            "delistAllNameSale": {
+               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction() {\n\n    let finLeases : \u0026FIND.LeaseCollection?\n\n    prepare(acct: AuthAccount) {\n        self.finLeases= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        let leases = self.finLeases!.getLeaseInformation()\n        for lease in leases {\n            if lease.salePrice != nil {\n                self.finLeases!.delistSale(lease.name)\n            }\n        }\n    }\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
+            "delistLeaseSale": {
+               "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FindLeaseMarketSale from 0x097bafa4e0b48eef\n\ntransaction(leases: [String]) {\n    let saleItems : \u0026FindLeaseMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n\n        let tenant=FindMarket.getTenant(FindMarket.getTenantAddress(\"findLease\")!)\n        self.saleItems= account.borrow\u003c\u0026FindLeaseMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()))\n\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for lease in leases {\n            self.saleItems!.delist(lease)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "leases"
+                  ],
+                  "parameters": {
+                     "leases": "[String]"
+                  }
+               }
+            },
+            "delistNFTSale": {
+               "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FindMarketSale from 0x097bafa4e0b48eef\n\ntransaction(marketplace:Address, ids: [UInt64]) {\n\n    let saleItems : \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "marketplace",
+                     "ids"
+                  ],
+                  "parameters": {
+                     "ids": "[UInt64]",
+                     "marketplace": "Address"
+                  }
+               }
+            },
+            "delistNameSale": {
+               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(names: [String]) {\n\n    let finLeases : \u0026FIND.LeaseCollection?\n\n    prepare(acct: AuthAccount) {\n        self.finLeases= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "names"
+                  ],
+                  "parameters": {
+                     "names": "[String]"
+                  }
+               }
+            },
             "editFindThought": {
                "code": "import FindThoughts from 0x097bafa4e0b48eef\n\ntransaction(id: UInt64, header: String , body: String, tags: [String]) {\n\n    let collection : \u0026FindThoughts.Collection\n\n    prepare(account: AuthAccount) {\n\n        self.collection=account.borrow\u003c\u0026FindThoughts.Collection\u003e(from: FindThoughts.CollectionStoragePath) ?? panic(\"Cannot borrow thoughts reference from path\")\n    }\n\n    execute {\n        let thought = self.collection.borrow(id)\n        thought.edit(header: header , body: body, tags: tags)\n    }\n}",
                "spec": {
@@ -7199,6 +7341,77 @@
                   ],
                   "parameters": {
                      "name": "String"
+                  }
+               }
+            },
+            "deleteFindThoughts": {
+               "code": "import FindThoughts from 0x35717efbbce11c74\n\ntransaction(ids: [UInt64]) {\n\n    let collection : \u0026FindThoughts.Collection\n\n    prepare(account: AuthAccount) {\n\n        self.collection=account.borrow\u003c\u0026FindThoughts.Collection\u003e(from: FindThoughts.CollectionStoragePath) ?? panic(\"Cannot borrow thoughts reference from path\")\n    }\n\n    execute {\n        for id in ids {\n            self.collection.delete(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "ids"
+                  ],
+                  "parameters": {
+                     "ids": "[UInt64]"
+                  }
+               }
+            },
+            "delistAllLeaseSale": {
+               "code": "import FindLeaseMarketSale from 0x35717efbbce11c74\nimport FindMarket from 0x35717efbbce11c74\nimport FindLeaseMarket from 0x35717efbbce11c74\n\ntransaction() {\n    prepare(account: AuthAccount) {\n        // Get all the saleItems Id\n\n        let tenant = FindMarket.getTenant(FindMarket.getTenantAddress(\"findLease\")!)\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindLeaseMarketSale.SaleItem\u003e())\n        let cap = FindLeaseMarket.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)\n        let ref = cap.borrow() ?? panic(\"Cannot borrow reference to the capability.\")\n\n        let listingType=Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let saleItems= account.borrow\u003c\u0026FindLeaseMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(listingType))!\n        let leases = ref.getNameSales()\n        for lease in leases {\n            saleItems.delist(lease)\n        }\n    }\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
+            "delistAllNFTSale": {
+               "code": "import FindMarketSale from 0x35717efbbce11c74\nimport FindMarket from 0x35717efbbce11c74\n\ntransaction(marketplace:Address) {\n\n    let saleItems : \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n        let tenant = FindMarket.getTenant(marketplace)\n        self.saleItems= account.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e())) \n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        let ids = self.saleItems!.getIds()\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "marketplace"
+                  ],
+                  "parameters": {
+                     "marketplace": "Address"
+                  }
+               }
+            },
+            "delistAllNameSale": {
+               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction() {\n\n    let finLeases : \u0026FIND.LeaseCollection?\n\n    prepare(acct: AuthAccount) {\n        self.finLeases= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        let leases = self.finLeases!.getLeaseInformation()\n        for lease in leases {\n            if lease.salePrice != nil {\n                self.finLeases!.delistSale(lease.name)\n            }\n        }\n    }\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
+            "delistLeaseSale": {
+               "code": "import FindMarket from 0x35717efbbce11c74\nimport FindLeaseMarketSale from 0x35717efbbce11c74\n\ntransaction(leases: [String]) {\n    let saleItems : \u0026FindLeaseMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n\n        let tenant=FindMarket.getTenant(FindMarket.getTenantAddress(\"findLease\")!)\n        self.saleItems= account.borrow\u003c\u0026FindLeaseMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()))\n\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for lease in leases {\n            self.saleItems!.delist(lease)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "leases"
+                  ],
+                  "parameters": {
+                     "leases": "[String]"
+                  }
+               }
+            },
+            "delistNFTSale": {
+               "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\n\ntransaction(marketplace:Address, ids: [UInt64]) {\n\n    let saleItems : \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: AuthAccount) {\n\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "marketplace",
+                     "ids"
+                  ],
+                  "parameters": {
+                     "ids": "[UInt64]",
+                     "marketplace": "Address"
+                  }
+               }
+            },
+            "delistNameSale": {
+               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let finLeases : \u0026FIND.LeaseCollection?\n\n    prepare(acct: AuthAccount) {\n        self.finLeases= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}",
+               "spec": {
+                  "order": [
+                     "names"
+                  ],
+                  "parameters": {
+                     "names": "[String]"
                   }
                }
             },
