@@ -8,7 +8,13 @@ func main() {
 
 	o := Overflow(
 		WithNetwork("mainnet"),
+		WithPrintResults(),
+		WithPanicOnError(),
 	)
+
+	if o.Error != nil {
+		panic(o.Error)
+	}
 
 	o.Tx("adminAddNFTCatalogDirect",
 		WithSigner("find-admin"),
