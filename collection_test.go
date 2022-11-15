@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,16 +30,16 @@ func TestCollectionScripts(t *testing.T) {
 	otu.setUUID(500)
 
 	otu.O.Tx("devMintDandyTO",
-		overflow.WithSigner("user1"),
-		overflow.WithArg("name", "user1"),
-		overflow.WithArg("maxEdition", 1),
-		overflow.WithArg("artist", "Neo"),
-		overflow.WithArg("nftName", "Motorcycle"),
-		overflow.WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
-		overflow.WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
-		overflow.WithArg("rarity", "rare"),
-		overflow.WithArg("rarityNum", 50.0),
-		overflow.WithArg("to", "user1"),
+		WithSigner("user1"),
+		WithArg("name", "user1"),
+		WithArg("maxEdition", 1),
+		WithArg("artist", "Neo"),
+		WithArg("nftName", "Motorcycle"),
+		WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
+		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("rarity", "rare"),
+		WithArg("rarityNum", 50.0),
+		WithArg("to", "user1"),
 	).
 		AssertSuccess(t)
 
@@ -47,8 +47,8 @@ func TestCollectionScripts(t *testing.T) {
 
 	t.Run("Should be able to get dandies by script", func(t *testing.T) {
 		result, err := otu.O.Script("getNFTCatalogItems",
-			overflow.WithArg("user", "user1"),
-			overflow.WithArg("collectionIDs", `{"A.f8d6e0586b0a20c7.Dandy.NFT" : [504,505,503,506,502,507]}`),
+			WithArg("user", "user1"),
+			WithArg("collectionIDs", `{"A.f8d6e0586b0a20c7.Dandy.NFT" : [504,505,503,506,502,507]}`),
 		).GetWithPointer("/A.f8d6e0586b0a20c7.Dandy.NFT")
 
 		if err != nil {
@@ -64,8 +64,8 @@ func TestCollectionScripts(t *testing.T) {
 		otu.registerExampleNFTInNFTRegistry()
 
 		ids, err := otu.O.Script("getNFTCatalogIDs",
-			overflow.WithArg("user", otu.O.Address("account")),
-			overflow.WithArg("collections", `[]`),
+			WithArg("user", otu.O.Address("account")),
+			WithArg("collections", `[]`),
 		).
 			GetWithPointer("/A.f8d6e0586b0a20c7.ExampleNFT.NFT/extraIDs")
 
@@ -80,8 +80,8 @@ func TestCollectionScripts(t *testing.T) {
 		collectionIDs := fmt.Sprintf(`{"A.f8d6e0586b0a20c7.ExampleNFT.NFT" : [%s]}`, strings.Trim(strings.Replace(fmt.Sprint(typedIds), " ", ",", -1), "[]"))
 
 		result, err := otu.O.Script("getNFTCatalogItems",
-			overflow.WithArg("user", otu.O.Address("account")),
-			overflow.WithArg("collectionIDs", collectionIDs),
+			WithArg("user", otu.O.Address("account")),
+			WithArg("collectionIDs", collectionIDs),
 		).
 			GetWithPointer("/A.f8d6e0586b0a20c7.ExampleNFT.NFT")
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -37,7 +37,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
 		otu.O.Script("getStatus",
-			overflow.WithArg("user", "user1"),
+			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
 			"/FINDReport/itemsForSale",
 			autogold.Want("ghostListing", map[string]interface{}{
@@ -111,7 +111,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
 		otu.O.Script("getStatus",
-			overflow.WithArg("user", "user1"),
+			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
 			"/FINDReport/itemsForSale",
 			autogold.Want("ghostBids", map[string]interface{}{

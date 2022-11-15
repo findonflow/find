@@ -1504,9 +1504,9 @@ type Royalty struct {
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
 
 	var findReport Report
-	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
-		String(name)).
-		RunMarshalAs(&findReport)
+	err := otu.O.Script("getStatus",
+		WithArg("user", name),
+	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
@@ -1521,9 +1521,9 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformation {
 
 	var findReport Report
-	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
-		String(name)).
-		RunMarshalAs(&findReport)
+	err := otu.O.Script("getStatus",
+		WithArg("user", name),
+	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
