@@ -1942,17 +1942,6 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 	return result
 }
 
-func (otu *OverflowTestUtils) getIDFromEvent(events []*OverflowFormatedEvent, eventName, field string) []uint64 {
-	Ids := []uint64{}
-	for _, event := range events {
-		if event.Name == eventName {
-			Ids = append(Ids, event.GetFieldAsUInt64(field))
-		}
-	}
-
-	return Ids
-}
-
 func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *OverflowTestUtils {
 
 	otu.O.Tx("moveNameTO",
