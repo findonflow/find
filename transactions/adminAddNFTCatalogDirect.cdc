@@ -19,9 +19,9 @@ transaction(
     collectionName : String,
     collectionDescription: String,
     externalURL : String,
-    squareImageMediaURL : String,
+    squareImageMediaCID : String,
     squareImageMediaType : String,
-    bannerImageMediaURL : String,
+    bannerImageMediaCID : String,
     bannerImageMediaType : String,
     socials: {String : String},
 ) {
@@ -42,17 +42,19 @@ transaction(
         )
 
         let squareMedia = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(
-                            url: squareImageMediaURL
+                        file: MetadataViews.IPFSFile(
+                            cid: squareImageMediaCID, 
+                            path: nil
                         ),
-                        mediaType: squareImageMediaURL
+                        mediaType: squareImageMediaType
                     )
         
         let bannerMedia = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(
-                            url: bannerImageMediaURL
+                        file: MetadataViews.IPFSFile(
+                            cid: bannerImageMediaCID, 
+                            path: nil
                         ),
-                        mediaType: bannerImageMediaURL
+                        mediaType: bannerImageMediaType
                     )
 
         let socialsStruct : {String : MetadataViews.ExternalURL} = {}
