@@ -107,6 +107,9 @@ pub contract Admin {
 		}
 
 		pub fun cancelForgeOrder(leaseName: String, mintType: String){
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
 			FindForge.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
 		}
 
