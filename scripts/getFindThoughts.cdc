@@ -64,6 +64,7 @@ pub struct Thought {
 	pub var tags: [String]
 	pub var reacted: {String : [User]}
 	pub var reactions: {String : Int}
+	pub var reactedUsers: {String : [String]}
 
 	init(_ t: &{FindThoughts.ThoughtPublic}, profile: &{Profile.Public}?) {
 		self.id = t.id 
@@ -93,22 +94,19 @@ pub struct Thought {
 			self.creatorAvatar = profile!.getAvatar()
 		}
 		let reacted : {String : [User]} = {}
+		let reactedUsers : {String :[String]} = {}
 		for user in t.reacted.keys {
 			let reaction = t.reacted[user]!
 			let allReacted = reacted[reaction] ?? []
-			allReacted.append(User(address: user, reaction: reaction))
+			let u = User(address: user, reaction: reaction)
+			allReacted.append(u)
+			reacted[reaction] = allReacted
+
+			let preReactedUser = reactedUsers[reaction] ?? []
+			preReactedUser.append(u.name ?? u.address.toString())
+			reactedUsers[reaction] = preReactedUser
 		}
 		self.reacted = reacted
+		self.reactedUsers = reactedUsers
 	}
-}
-
-pub fun checkSameContract(collection: Type, nft: Type) : Bool {
-	let colType = collection.identifier
-	let croppedCol = colType.slice(from: 0 , upTo : colType.length - "collection".length)
-	let nftType = nft.identifier
-	let croppedNft = nftType.slice(from: 0 , upTo : nftType.length - "nft".length)
-	if croppedCol == croppedNft {
-		return true
-	}
-	return false
 }
