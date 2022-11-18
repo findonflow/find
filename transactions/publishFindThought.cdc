@@ -1,6 +1,6 @@
 import FindThoughts from "../contracts/FindThoughts.cdc"
 
-transaction(header: String , body: String , tags: [String], mediaHash: String, mediaType: String) {
+transaction(header: String , body: String , tags: [String], mediaHash: String?, mediaType: String?, quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?, quoteCreator: Address?, quoteId: UInt64?) {
 
 	let collection : &FindThoughts.Collection
 
@@ -10,6 +10,6 @@ transaction(header: String , body: String , tags: [String], mediaHash: String, m
 	}
 
 	execute {
-		self.collection.publish(header: header, body: body, tags: tags, mediaHash: mediaHash, mediaType: mediaType)
+		self.collection.publish(header: header, body: body, tags: tags, mediaHash: mediaHash, mediaType: mediaType, quoteNFTOwner: quoteNFTOwner, quoteNFTType: quoteNFTType, quoteNFTId: quoteNFTId, quoteCreator: quoteCreator, quoteId: quoteId)
 	}
 }

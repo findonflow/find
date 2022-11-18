@@ -1,5 +1,6 @@
 import FindViews from "./FindViews.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import FINDNFTCatalog from "./FINDNFTCatalog.cdc"
 import FIND from "./FIND.cdc"
 import Clock from "./Clock.cdc"
 
@@ -13,6 +14,34 @@ pub contract FindThoughts {
 	pub let CollectionStoragePath : StoragePath 
 	pub let CollectionPublicPath : PublicPath 
 	pub let CollectionPrivatePath : PrivatePath 
+
+	pub struct FindThoughtPointer {
+		pub let creator: Address 
+		pub let id: UInt64 
+
+		init(creator: Address, id: UInt64) {
+			self.creator = creator 
+			self.id = id 
+		}
+
+		pub fun borrowThoughtPublic() : &{ThoughtPublic}? {
+			let cap = getAccount(self.creator).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+			if cap.check() {
+				let ref = cap.borrow()!
+				if ref.contains(self.id) {
+					return ref.borrowThoughtPublic(self.id)
+				}
+			}
+			return nil
+		}
+
+		pub fun valid() : Bool {
+			if self.borrowThoughtPublic() != nil {
+				return true
+			}
+			return false
+		}
+	}
 
 	pub resource interface ThoughtPublic {
 		pub let id: UInt64 
@@ -28,6 +57,7 @@ pub contract FindThoughts {
 		pub var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?) 
+		pub fun getQuotedThought() : FindThoughtPointer? 
 	}
 
 	pub resource Thought : ThoughtPublic , MetadataViews.Resolver {
@@ -48,11 +78,11 @@ pub contract FindThoughts {
 
 		// These are here only for future extension
 		pub let nft: [FindViews.ViewReadPointer]
-		pub let stringTags: {String : String} 
-		pub let scalars: {String : UFix64} 
-		pub let extras: {String : AnyStruct} 
+		access(self) let stringTags: {String : String} 
+		access(self) let scalars: {String : UFix64} 
+		access(self) let extras: {String : AnyStruct} 
 
-		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
+		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], quote: FindThoughtPointer?, stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
 			self.id = self.uuid 
 			self.creator = creator
 			self.header = header
@@ -66,6 +96,7 @@ pub contract FindThoughts {
 			self.stringTags = stringTags
 			self.scalars = scalars
 			self.extras = extras
+			extras["quote"] = quote
 
 			self.reacted = {}
 			self.reactions = {}
@@ -83,6 +114,13 @@ pub contract FindThoughts {
 				name = FIND.reverseLookup(address!)
 			}
 			emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
+		}
+
+		pub fun getQuotedThought() : FindThoughtPointer? {
+			if let r = self.extras["quote"] {
+				return r as! FindThoughtPointer
+			}
+			return nil
 		}
 
 		pub fun edit(header: String , body: String, tags: [String]) {
@@ -193,15 +231,40 @@ pub contract FindThoughts {
 			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
 		}
 
-		pub fun publish(header: String , body: String , tags: [String], mediaHash: String, mediaType: String) {
-			let media = MetadataViews.Media(file: MetadataViews.IPFSFile(cid:mediaHash, path: nil), mediaType: mediaType)
+		pub fun publish(header: String , body: String , tags: [String], mediaHash: String?, mediaType: String?, quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?, quoteCreator: Address?, quoteId: UInt64?) {
+			let medias : [MetadataViews.Media] = []
+			if mediaHash != nil {
+				let media = MetadataViews.Media(file: MetadataViews.IPFSFile(cid:mediaHash!, path: nil), mediaType: mediaType!)
+				medias.append(media)
+			}
 			let address = self.owner!.address
-			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: [media], nft: [], stringTags: {}, scalars : {}, extras: {})
+
+			var nft : FindViews.ViewReadPointer? = nil 
+			if quoteNFTOwner != nil {
+				let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
+				let cap = getAccount(quoteNFTOwner!).getCapability<&{MetadataViews.ResolverCollection}>(path)
+				nft = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
+			}
+
+			// If nft is not nil, we try to get the thumbnail and store it.  
+			if nft != nil {
+				medias.append(MetadataViews.Media(file: nft!.getDisplay().thumbnail, mediaType: "image")) // assume that it is image for all thumbnail
+			}
+
+			var thoughtPointer : FindThoughtPointer? = nil
+			if quoteCreator != nil {
+				thoughtPointer = FindThoughtPointer(creator: quoteCreator!, id: quoteId!)
+			}
+			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: thoughtPointer, stringTags: {}, scalars : {}, extras: {})
 
 			self.sequence.append(thought.uuid)
 
 			let creatorName = FIND.reverseLookup(address)
-			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: [media.file.uri()], tags: tags)
+			let m : [String] = []
+			for media in medias {
+				m.append(media.file.uri())
+			}
+			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: m, tags: tags)
 
 			self.ownedThoughts[thought.uuid] <-! thought
 		}

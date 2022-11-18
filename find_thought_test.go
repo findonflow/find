@@ -6,6 +6,7 @@ import (
 
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
+	"github.com/onflow/cadence"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +16,9 @@ func TestFindThought(t *testing.T) {
 		setupFIND().
 		setupDandy("user1").
 		createUser(100.0, "user2").
-		registerUser("user2")
+		registerUser("user2").
+		setProfile("user1").
+		setProfile("user2")
 
 	header := "This is header"
 	body := "This is body"
@@ -24,15 +27,29 @@ func TestFindThought(t *testing.T) {
 	mediaType := "mediaType"
 	var thoguhtId uint64
 
+	cadMediaHash, err := cadence.NewValue(mediaHash)
+	assert.NoError(t, err)
+	cadMediaType, err := cadence.NewValue(mediaType)
+	assert.NoError(t, err)
+
+	cadMediaHash = cadence.NewOptional(cadMediaHash)
+	cadMediaType = cadence.NewOptional(cadMediaType)
+
 	t.Run("Should be able to post a thought", func(t *testing.T) {
 		var err error
+
 		thoguhtId, err = otu.O.Tx("publishFindThought",
 			WithSigner("user1"),
 			WithArg("header", header),
 			WithArg("body", body),
 			WithArg("tags", tags),
-			WithArg("mediaHash", mediaHash),
-			WithArg("mediaType", mediaType),
+			WithArg("mediaHash", cadMediaHash),
+			WithArg("mediaType", cadMediaType),
+			WithArg("quoteNFTOwner", nil),
+			WithArg("quoteNFTType", nil),
+			WithArg("quoteNFTId", nil),
+			WithArg("quoteCreator", nil),
+			WithArg("quoteId", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindThoughts.Published", map[string]interface{}{
@@ -56,8 +73,13 @@ func TestFindThought(t *testing.T) {
 			WithArg("header", header),
 			WithArg("body", body),
 			WithArg("tags", tags),
-			WithArg("mediaHash", mediaHash),
-			WithArg("mediaType", mediaType),
+			WithArg("mediaHash", cadMediaHash),
+			WithArg("mediaType", cadMediaType),
+			WithArg("quoteNFTOwner", nil),
+			WithArg("quoteNFTType", nil),
+			WithArg("quoteNFTId", nil),
+			WithArg("quoteCreator", nil),
+			WithArg("quoteId", nil),
 		).
 			GetIdFromEvent("Published", "id")
 	}
@@ -162,7 +184,7 @@ func TestFindThought(t *testing.T) {
 	t.Run("Should be able to get thoguht by a script", func(t *testing.T) {
 
 		res, err := otu.O.Script("getOwnedFindThoughts",
-			WithArg("user", "user1"),
+			WithArg("address", "user1"),
 		).
 			GetAsJson()
 
