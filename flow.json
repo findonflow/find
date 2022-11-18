@@ -500,16 +500,14 @@
         "FindFurnace",
         "FindThoughts",
         "FindUtils",
-        "FindUserStatus"
+        "FindUserStatus",
+				"FindLostAndFoundWrapper"
       ],
       "testnet-user1": [
         "NFGv3",
         "PartyFavorz",
         "PartyFavorzExtraData",
         "Flomies"
-      ],
-      "testnet-find-lost-and-found-wrapper": [
-        "FindLostAndFoundWrapper"
       ],
       "testnet-emerald-identity": [
         "EmeraldIdentityLilico",
