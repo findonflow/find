@@ -6,9 +6,8 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
+-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketAuctionIOUEscrowed from "../contracts/FindMarketAuctionIOUEscrowed.cdc"
 import FindMarketAuctionIOUDapper from "../contracts/FindMarketAuctionIOUDapper.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
@@ -25,9 +24,6 @@ transaction(tenant: Address, market: String){
 
             case "AuctionSoft" :
                 marketType = [Type<@FindMarketAuctionSoft.SaleItem>()]
-
-            case "AuctionIOUEscrowed" :
-                marketType = [Type<@FindMarketAuctionIOUEscrowed.SaleItem>()]
 
             case "AuctionIOUDapper" :
                 marketType = [Type<@FindMarketAuctionIOUDapper.SaleItem>()]

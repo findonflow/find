@@ -4,6 +4,7 @@ import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
+import IOU from "./IOU.cdc"
 
 pub contract FindMarket {
 	access(account) let  pathMap : {String: String}
@@ -1181,6 +1182,100 @@ pub contract FindMarket {
 		return FindMarket.account.getCapability<&Tenant{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
 	}
 
+
+	access(account) fun payIOU(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, ious: @[IOU.Vault], royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}) {
+		let resolved : {Address : String} = resolvedAddress
+
+		fun resolveName(_ addr: Address ) : String? {
+			if !resolved.containsKey(addr) {
+				let name = resolver(addr)
+				if name != nil {
+					resolved[addr] = name 
+					return name
+				} else {
+					resolved[addr] = "" 
+					return nil
+				}
+			}
+
+			let name = resolved[addr]!
+			if name == "" {
+				return nil
+			}
+			return name
+		}
+
+		let buyer=saleItem.getBuyer()
+		let seller=saleItem.getSeller()
+		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
+
+		
+		let soldFor=vault.balance
+		let ftType=vault.getType()
+
+		/* Residual Royalty */
+		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
+		let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+
+		/* Check the total royalty to prevent changing of royalties */
+		let royalties = royalty.getRoyalties()
+		if royalties.length != 0 {
+			var totalRoyalties : UFix64 = 0.0
+
+			for royaltyItem in royalties {
+				let iou <- ious.removeFirst()
+				totalRoyalties = totalRoyalties + royaltyItem.cut
+				let description=royaltyItem.description
+
+				var cutAmount= soldFor * royaltyItem.cut
+				/*
+				TODO: handle minimum cut
+				if tenant == "onefootball" {
+					//{"onefootball largest of 6% or 0.65": 0.65)}
+					let minAmount = 0.65
+
+					if minAmount > cutAmount {
+						cutAmount = minAmount
+					}
+				}
+				*/
+			  let name = resolveName(iou.receiver.address)
+				/* If the royalty receiver check succeed */
+				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:iou.receiver.address, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+				iou.redeem( <- vault.withdraw(amount: cutAmount))
+				destroy <- iou
+			}
+			if totalRoyalties != saleItem.getTotalRoyalties() {
+				panic("The total Royalties to be paid is changed after listing.")
+			}
+		}
+
+		if let findCut =cuts.findCut {
+			let cutAmount= soldFor * findCut.cut
+			let name = resolveName(findCut.receiver.address)
+			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+
+			let iou <- ious.removeFirst()
+			iou.redeem(<- vault.withdraw(amount: cutAmount))
+			destroy iou
+
+		}
+
+		if let tenantCut =cuts.tenantCut {
+			let cutAmount= soldFor * tenantCut.cut
+			let name = resolveName(tenantCut.receiver.address)
+			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+
+			let iou <- ious.removeFirst()
+			iou.redeem(<- vault.withdraw(amount: cutAmount))
+			destroy iou
+		}
+		let iou <- ious.removeFirst()
+		iou.redeem(<- vault)
+		destroy  iou
+		destroy ious
+
+	}
 
 	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}) {
 		let resolved : {Address : String} = resolvedAddress

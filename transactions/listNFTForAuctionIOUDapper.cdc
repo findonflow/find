@@ -1,5 +1,4 @@
-import IOweYou from "../contracts/IOweYou.cdc"
-import DapperIOweYou from "../contracts/DapperIOweYou.cdc"
+import IOU from "../contracts/IOU.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketAuctionIOUDapper from "../contracts/FindMarketAuctionIOUDapper.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -113,12 +112,6 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 			account.link<&FindMarketAuctionIOUDapper.SaleItemCollection{FindMarketAuctionIOUDapper.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(adiSalePublicPath, target: adiSaleStoragePath)
 		}
 
-		let iouCap = account.getCapability<&DapperIOweYou.Collection{IOweYou.CollectionPublic}>(DapperIOweYou.CollectionPublicPath)
-		if !iouCap.check() {
-			account.save<@DapperIOweYou.Collection>( <- DapperIOweYou.createEmptyCollection(receiverCap) , to: DapperIOweYou.CollectionStoragePath)
-			account.link<&DapperIOweYou.Collection{IOweYou.CollectionPublic}>(DapperIOweYou.CollectionPublicPath, target: DapperIOweYou.CollectionStoragePath)
-		}
-
 		let adiBidType= Type<@FindMarketAuctionIOUDapper.MarketBidCollection>()
 		let adiBidPublicPath=FindMarket.getPublicPath(adiBidType, name: tenant.name)
 		let adiBidStoragePath= FindMarket.getStoragePath(adiBidType, name:tenant.name)
@@ -165,7 +158,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 	}
 
 	pre{
-		IOweYou.DapperCoinTypes.contains(self.vaultType) : "Please use Escrowed contracts for this token type. Type : ".concat(self.vaultType.identifier)
+		IOU.DapperCoinTypes.contains(self.vaultType) : "Please use Escrowed contracts for this token type. Type : ".concat(self.vaultType.identifier)
 		// Ben : panic on some unreasonable inputs in trxn 
 		minimumBidIncrement > 0.0 : "Minimum bid increment should be larger than 0."
 		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment." 

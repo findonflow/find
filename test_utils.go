@@ -717,34 +717,6 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 
 }
 
-func (otu *OverflowTestUtils) listNFTForIOUAuction(name string, id uint64, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("listNFTForAuctionIOU",
-		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("price", price),
-		WithArg("auctionReservePrice", price+5.0),
-		WithArg("auctionDuration", 300.0),
-		WithArg("auctionExtensionOnLateBid", 60.0),
-		WithArg("minimumBidIncrement", 1.0),
-		WithArg("auctionValidUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
-			"status":              "active_listed",
-			"amount":              price,
-			"auctionReservePrice": price + 5.0,
-			"id":                  id,
-			"seller":              otu.O.Address(name),
-		})
-
-	return otu
-
-}
-
 func (otu *OverflowTestUtils) listNFTForIOUAuctionDapper(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("listNFTForAuctionIOUDapper",
@@ -1016,26 +988,6 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 
 }
 
-func (otu *OverflowTestUtils) increaseAuctioBidMarketIOU(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
-
-	otu.O.Tx("increaseBidMarketAuctionIOU",
-		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("id", id),
-		WithArg("amount", price),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
-			"amount": totalPrice,
-			"id":     id,
-			"buyer":  otu.O.Address(name),
-			"status": "active_ongoing",
-		})
-
-	return otu
-
-}
-
 func (otu *OverflowTestUtils) increaseAuctioBidMarketIOUDapper(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
 
 	otu.O.Tx("increaseBidMarketAuctionIOUDapper",
@@ -1133,27 +1085,6 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 			"buyer":  otu.O.Address(name),
 			"status": "active_ongoing",
 		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) auctionBidMarketIOU(name string, seller string, id uint64, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("bidMarketAuctionIOU",
-		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("user", seller),
-		WithArg("id", id),
-		WithArg("amount", price),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
-			"amount": price,
-			"id":     id,
-			"buyer":  otu.O.Address(name),
-			"status": "active_ongoing",
-		}).
-		AssertEmitEventName(otu.T, "IOUCreated")
 
 	return otu
 }
@@ -1552,25 +1483,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrowFromBidder(name string, 
 	return otu
 }
 
-func (otu *OverflowTestUtils) fulfillMarketAuctionIOUFromBidder(name string, id uint64, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("fulfillMarketAuctionIOUFromBidder",
-		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("id", id),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
-			"id":     id,
-			"buyer":  otu.O.Address(name),
-			"amount": price,
-			"status": "sold",
-		}).
-		AssertEmitEventName(otu.T, "IOURedeemed")
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) fulfillMarketAuctionIOUFromBidderDapper(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("fulfillMarketAuctionIOUFromBidderDapper",
@@ -1607,27 +1519,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 			"amount": price,
 			"status": "sold",
 		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) fulfillMarketAuctionIOU(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("fulfillMarketAuctionIOU",
-		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("owner", name),
-		WithArg("id", id),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketAuctionIOUEscrowed.EnglishAuction", map[string]interface{}{
-			"id":     id,
-			"seller": otu.O.Address(name),
-			"buyer":  otu.O.Address(buyer),
-			"amount": price,
-			"status": "sold",
-		}).
-		AssertEmitEventName(otu.T, "IOURedeemed")
 
 	return otu
 }
@@ -3149,4 +3040,3 @@ func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
 // 	}
 // 	return cadence.NewDictionary(mapping)
 // }
- 

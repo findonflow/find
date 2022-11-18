@@ -6,7 +6,7 @@ import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import Profile from "./Profile.cdc"
-import IOweYou from "./IOweYou.cdc"
+import IOU from "./IOU.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionIOUDapper {
@@ -49,7 +49,7 @@ pub contract FindMarketAuctionIOUDapper {
 			return self.pointer.getUUID()
 		}
 
-		pub fun acceptEscrowedBid() : @{IOweYou.IOU} {
+		pub fun acceptEscrowedBid() : @[IOU.Vault] {
 			if !self.offerCallback!.check()  {
 				panic("bidder unlinked the bid collection capability. bidder address : ".concat(self.offerCallback!.address.toString()))
 			}
@@ -252,7 +252,7 @@ pub contract FindMarketAuctionIOUDapper {
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
 
 		//anybody should be able to fulfill an auction as long as it is done
-		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault?) 
+		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) 
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
@@ -505,7 +505,7 @@ pub contract FindMarketAuctionIOUDapper {
 
 
 		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
-		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault?) {
+		pub fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault) {
 			pre{
 				vault != nil : "Please pass in vault of same type and balance of the listed item for Dapper Auction fulfilling" 
 			}
@@ -539,6 +539,7 @@ pub contract FindMarketAuctionIOUDapper {
 				if !saleItem.hasAuctionMetReservePrice() {
 					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
 					// If this is to be cancelled, the DUC fund should go back to find.  
+					//TODO: this is needs looking at
 					let receiver = FindMarketAuctionIOUDapper.account.borrow<&{FungibleToken.Receiver}>(from: /storage/dapperUtilityCoinVault)
 						?? panic("Cannot borrow DUC receiver vault balance from FIND.")
 					receiver.deposit(from: <- vault!)
@@ -560,9 +561,6 @@ pub contract FindMarketAuctionIOUDapper {
 				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: sellerName, amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 				let iou <- saleItem.acceptEscrowedBid()
-				let findIOUCollection = FindMarketAuctionIOUDapper.borrowIOUCollection(iou.getType())
-				let redeemedVault <- findIOUCollection.redeem(token: <- iou, vault: <- vault)
-
 				let resolved : {Address : String} = {}
 				resolved[buyer] = buyerName ?? ""
 				resolved[seller] = sellerName ?? ""
@@ -570,7 +568,8 @@ pub contract FindMarketAuctionIOUDapper {
 				// Have to make sure the tenant always have the valid find name 
 				resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
-				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- redeemedVault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
+				//TODO: we cannot use this pattern here
+				FindMarket.payIOU(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, ious: <- iou, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
 
 				destroy <- self.items.remove(key: id)
 				return 
@@ -582,7 +581,7 @@ pub contract FindMarketAuctionIOUDapper {
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			pre{
-				IOweYou.DapperCoinTypes.contains(vaultType) : "Please use Escrowed contracts for this token type. Type : ".concat(vaultType.identifier)
+				IOU.DapperCoinTypes.contains(vaultType) : "Please use Escrowed contracts for this token type. Type : ".concat(vaultType.identifier)
 			}
 			// ensure it is not a 0 dollar listing
 			if auctionStartPrice <= 0.0 {
@@ -687,14 +686,14 @@ pub contract FindMarketAuctionIOUDapper {
 		access(contract) let itemUUID: UInt64
 
 		//this should reflect on what the above uuid is for
-		access(contract) let iou: @[{IOweYou.IOU}]
+		access(contract) let iou: @[IOU.Vault]
 		access(contract) let vaultType: Type
 		access(contract) var bidAt: UFix64
 		access(contract) let bidExtraField: {String : AnyStruct}
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, iou: @{IOweYou.IOU}, nftCap: Capability<&{NonFungibleToken.Receiver}> , bidExtraField: {String : AnyStruct}) {
-			self.vaultType= iou.vaultType
-			self.iou <- [<- iou]
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, itemUUID: UInt64, iou: @[IOU.Vault], nftCap: Capability<&{NonFungibleToken.Receiver}> , bidExtraField: {String : AnyStruct}) {
+			self.vaultType= iou[0].vaultType
+			self.iou <- iou
 			self.itemUUID=itemUUID
 			self.from=from
 			self.bidAt=Clock.time()
@@ -707,7 +706,14 @@ pub contract FindMarketAuctionIOUDapper {
 		}
 
 		pub fun getBalance() : UFix64 {
-			return self.iou[0].balance
+
+			var balance=0.0
+			var i=0
+			while i < self.iou.length {
+				balance=balance+self.iou[i].balance
+				i=i+1
+			}
+			return balance
 		}
 
 		pub fun getSellerAddress() : Address {
@@ -718,8 +724,15 @@ pub contract FindMarketAuctionIOUDapper {
 			return self.bidExtraField 
 		}
 
-		access(contract) fun withdrawIOU() : @{IOweYou.IOU} {
-			return <- self.iou.remove(at: 0)
+		//TODO; can this really not be done more easily?
+		access(contract) fun withdrawIOU() : @[IOU.Vault] {
+			let iou : @[IOU.Vault] <- []
+			var i=0
+			while i < self.iou.length {
+				iou.append(<- self.iou.removeFirst())
+				i=i+1
+			}
+			return <- iou
 		}
 
 		destroy() {
@@ -730,7 +743,7 @@ pub contract FindMarketAuctionIOUDapper {
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ id: UInt64) : UFix64
 		pub fun containsId(_ id: UInt64): Bool
-		access(contract) fun accept(_ nft: @NonFungibleToken.NFT, path:PublicPath) : @{IOweYou.IOU}
+		access(contract) fun accept(_ nft: @NonFungibleToken.NFT, path:PublicPath) : @[IOU.Vault]
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
 	}
 
@@ -738,13 +751,11 @@ pub contract FindMarketAuctionIOUDapper {
 	pub resource MarketBidCollection: MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic {
 
 		access(contract) var bids : @{UInt64: Bid}
-		access(contract) let receiver: Capability<&{IOweYou.CollectionPublic}>
 		access(contract) let tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>
 
 		//not sure we can store this here anymore. think it needs to be in every bid
-		init(receiver: Capability<&{IOweYou.CollectionPublic}>,tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) {
+		init(tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) {
 			self.bids <- {}
-			self.receiver=receiver
 			self.tenantCapability=tenantCapability
 		}
 
@@ -756,7 +767,7 @@ pub contract FindMarketAuctionIOUDapper {
 		}
 
 		//called from lease when auction is ended
-		access(contract) fun accept(_ nft: @NonFungibleToken.NFT, path:PublicPath) : @{IOweYou.IOU} {
+		access(contract) fun accept(_ nft: @NonFungibleToken.NFT, path:PublicPath) : @[IOU.Vault] {
 			let id= nft.id
 			let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
 			let iou <- bid.withdrawIOU()
@@ -787,7 +798,7 @@ pub contract FindMarketAuctionIOUDapper {
 			return Type<@Bid>()
 		}
 
-		pub fun bid(item: FindViews.ViewReadPointer, iou: @{IOweYou.IOU}, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
+		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
 
 			if self.owner!.address == item.owner() {
 				panic("You cannot bid on your own resource")
@@ -800,9 +811,28 @@ pub contract FindMarketAuctionIOUDapper {
 			}
 
 			let tenant=self.getTenant()
-			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
-			let vaultType=iou.vaultType
+			let owner=getAccount(item.owner())
+			let from=owner.getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+			let vaultType=vault.getType()
 
+			let receiver = owner.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+			//tenant cuts
+			let cuts= tenant.getTenantCut(name: "bid", listingType: Type<@FindMarketAuctionIOUDapper.SaleItem>(), nftType: item.getType(), ftType: vaultType)
+
+			let itemRoyalties= item.getRoyalty().getRoyalties()
+
+			let soldFor=vault.balance
+			if let findCut =cuts.findCut {
+				let cutAmount= soldFor * findCut.cut
+				itemRoyalties.append(MetadataViews.Royalty(receiver:findCut.receiver, cut: cutAmount, description:"find"))
+			}
+
+			if let tenantCut =cuts.tenantCut {
+				let cutAmount= soldFor * tenantCut.cut
+				itemRoyalties.append(MetadataViews.Royalty(receiver:tenantCut.receiver, cut: cutAmount, description:"marketplace"))
+			}
+			let royalties = MetadataViews.Royalties(itemRoyalties)
+			let iou <- IOU.createVaults(vault: <- vault, receiver:receiver, royalties: royalties)
 			let bid <- create Bid(from: from, itemUUID:uuid, iou: <- iou, nftCap: nftCap, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
 
@@ -812,7 +842,7 @@ pub contract FindMarketAuctionIOUDapper {
 			destroy oldToken
 		}
 
-		pub fun fulfillAuction(id:UInt64, vault: @FungibleToken.Vault?) {
+		pub fun fulfillAuction(id:UInt64, vault: @FungibleToken.Vault) {
 
 			if self.bids[id] == nil {
 				panic("You need to have a bid here already")
@@ -841,16 +871,7 @@ pub contract FindMarketAuctionIOUDapper {
 		//called from saleItem when things are cancelled 
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
-			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
-			let iou <- bid.withdrawIOU()
-
-			if !self.receiver.check() {
-				panic("This user does not have receiver vault set up. User: ".concat(self.receiver.address.toString()))
-			}
-			// put nil here, this function will only serve for Escrowed IOUs
-			self.receiver.borrow()!.depositAndRedeemToAccount(token: <- iou, vault: nil)
-			destroy bid
-			return
+			destroy <- self.bids.remove(key: id) ?? panic("missing bid")
 		}
 
 		pub fun borrowBid(_ id: UInt64): &Bid {
@@ -869,7 +890,14 @@ pub contract FindMarketAuctionIOUDapper {
 
 		pub fun getBalance(_ id: UInt64) : UFix64 {
 			let bid= self.borrowBid(id)
-			return bid.iou[0].balance
+
+			var balance=0.0
+			var i=0
+			while i < bid.iou.length {
+				balance=balance+bid.iou[i].balance
+				i=i+1
+			}
+			return balance
 		}
 
 		destroy() {
@@ -882,8 +910,8 @@ pub contract FindMarketAuctionIOUDapper {
 		return <- create SaleItemCollection(tenantCapability)
 	}
 
-	pub fun createEmptyMarketBidCollection(receiver: Capability<&{IOweYou.CollectionPublic}>, tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
-		return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
+	pub fun createEmptyMarketBidCollection(tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
+		return <- create MarketBidCollection(tenantCapability:tenantCapability)
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>? {
@@ -904,13 +932,6 @@ pub contract FindMarketAuctionIOUDapper {
 			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 		}
 		return nil
-	}
-
-	access(contract) fun borrowIOUCollection(_ type: Type) : &{IOweYou.Owner} {
-		let pathIdentifier = IOweYou.IOUTypePathMap[type] ?? panic("Cannot find path with type : ".concat(type.identifier))
-		let path = StoragePath(identifier: pathIdentifier)!
-		let ref = FindMarketAuctionIOUDapper.account.borrow<&{IOweYou.Owner}>(from: path) ?? panic("Cannot borrow reference to find IOweYou collection for type : ".concat(type.identifier))
-		return ref
 	}
 
 	init() {

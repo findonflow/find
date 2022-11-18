@@ -32,11 +32,6 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 	).
 		AssertSuccess(t)
 
-	otu.O.Tx("initIOUCollections",
-		WithSigner("account"),
-	).
-		AssertSuccess(t)
-
 	mintFund("testMintFusd").AssertSuccess(t)
 
 	mintFund("testMintFlow").AssertSuccess(t)
@@ -148,7 +143,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
 			}).
-			GetIdFromEvent("DapperIOweYou.IOUDesposited", "uuid")
+			GetIdFromEvent("IOU.IOUDesposited", "uuid")
 
 		assert.NoError(t, err)
 
@@ -411,7 +406,7 @@ func TestMarketAuctionIOUDapper(t *testing.T) {
 				"amount": 11.0,
 				"status": "cancel_listing",
 			}).
-			GetIdFromEvent("DapperIOweYou.IOUDesposited", "uuid")
+			GetIdFromEvent("IOU.IOUDesposited", "uuid")
 
 		assert.NoError(t, err)
 

@@ -1,5 +1,3 @@
-import IOweYou from "../contracts/IOweYou.cdc"
-import DapperIOweYou from "../contracts/DapperIOweYou.cdc"
 import FindMarketAuctionIOUDapper from "../contracts/FindMarketAuctionIOUDapper.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -24,7 +22,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 	let bidsReference: &FindMarketAuctionIOUDapper.MarketBidCollection?
 	let balanceBeforeBid: UFix64
 	let pointer: FindViews.ViewReadPointer
-	let iouCollection: &DapperIOweYou.Collection
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
 
@@ -123,12 +120,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 			account.link<&FindMarketAuctionIOUDapper.SaleItemCollection{FindMarketAuctionIOUDapper.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(adiSalePublicPath, target: adiSaleStoragePath)
 		}
 
-		let iouCap = account.getCapability<&DapperIOweYou.Collection{IOweYou.CollectionPublic}>(DapperIOweYou.CollectionPublicPath)
-		if !iouCap.check() {
-			account.save<@DapperIOweYou.Collection>( <- DapperIOweYou.createEmptyCollection(receiverCap) , to: DapperIOweYou.CollectionStoragePath)
-			account.link<&DapperIOweYou.Collection{IOweYou.CollectionPublic}>(DapperIOweYou.CollectionPublicPath, target: DapperIOweYou.CollectionStoragePath)
-		}
-
 		let adiBidType= Type<@FindMarketAuctionIOUDapper.MarketBidCollection>()
 		let adiBidPublicPath=FindMarket.getPublicPath(adiBidType, name: tenant.name)
 		let adiBidStoragePath= FindMarket.getStoragePath(adiBidType, name:tenant.name)
@@ -144,7 +135,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 		self.saleItemsCap= FindMarketAuctionIOUDapper.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap. User address : ".concat(address.toString()))
 
-		self.iouCollection = account.borrow<&DapperIOweYou.Collection>(from: DapperIOweYou.CollectionStoragePath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionIOUDapper.SaleItemCollection>())
 		let item = FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 
@@ -192,8 +182,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	execute {
 		let vault <- self.walletReference.withdraw(amount: amount) 
-		let iou <- self.iouCollection.create(<- vault)
-		self.bidsReference!.bid(item:self.pointer, iou: <- iou, nftCap: self.targetCapability, bidExtraField: {})
+		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, bidExtraField: {})
 	}
 
 	post{
