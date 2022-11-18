@@ -3,7 +3,6 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
 	. "github.com/bjartek/overflow"
 )
 
@@ -23,11 +22,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
-	mintFund("testMintFusd").AssertSuccess(t)
+	mintFund("devMintFusd").AssertSuccess(t)
 
-	mintFund("testMintFlow").AssertSuccess(t)
+	mintFund("devMintFlow").AssertSuccess(t)
 
-	mintFund("testMintUsdc").AssertSuccess(t)
+	mintFund("devMintUsdc").AssertSuccess(t)
 
 	otu.setUUID(400)
 
@@ -735,19 +734,19 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.sendSoulBoundNFT("user1", "account")
 		// set market rules
 		otu.O.Tx("adminSetSellExampleNFTForFlow",
-			overflow.WithSigner("find"),
-			overflow.WithArg("tenant", "account"),
+			WithSigner("find"),
+			WithArg("tenant", "account"),
 		)
 
 		otu.O.Tx("bidMarketDirectOfferEscrowed",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("marketplace", "account"),
-			overflow.WithArg("user", "user1"),
-			overflow.WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			overflow.WithArg("id", 1),
-			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-			overflow.WithArg("amount", price),
-			overflow.WithArg("validUntil", otu.currentTime()+100.0),
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("id", 1),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("amount", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
 		).AssertFailure(t, "This item is soul bounded and cannot be traded")
 
 	})

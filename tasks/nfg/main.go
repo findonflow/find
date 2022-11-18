@@ -25,7 +25,7 @@ func main() {
 
 	//setnup NFG
 	o.Tx("createProfile", nameSigner, nameArg)
-	o.Tx("testMintFusd", WithSignerServiceAccount(), WithArg("recipient", "user1"), WithArg("amount", 1000.0))
+	o.Tx("devMintFusd", WithSignerServiceAccount(), WithArg("recipient", "user1"), WithArg("amount", 1000.0))
 	o.Tx("register", nameSigner, nameArg, WithArg("amount", 5.0))
 
 	o.Tx("adminAddForge",
@@ -38,7 +38,7 @@ func main() {
 	/*
 		o.Tx("buyAddon", nameSigner, nameArg, WithArg("addon", "forge"), WithArg("amount", 50.0))
 
-		o.Tx("testSetupNFG", nameSigner, nameArg,
+		o.Tx("devSetupNFG", nameSigner, nameArg,
 			WithArg("minterCut", 0.075),
 			WithArg("collectionDescription", "NonFunGerbils"),
 			WithArg("collectionExternalURL", "http://nonfungerbils.com"),
@@ -55,7 +55,7 @@ func main() {
 
 		//mint NFG, this is example from the file you sent me
 
-		o.Tx("testMintNFG",
+		o.Tx("devMintNFG",
 			nameSigner,
 			nameArg,
 			WithArg("nftName", "Pepe Gerbil"),

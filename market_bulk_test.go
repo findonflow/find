@@ -19,7 +19,7 @@ func TestBulkMarketSale(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
-	otu.O.Tx("testMintFlow", saSigner,
+	otu.O.Tx("devMintFlow", saSigner,
 		WithArg("recipient", "user2"),
 		WithArg("amount", 1000.0),
 	).AssertSuccess(t)

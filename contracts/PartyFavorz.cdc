@@ -2,6 +2,8 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
+import FindPack from "./FindPack.cdc"
+import PartyFavorzExtraData from "./PartyFavorzExtraData.cdc"
 
 pub contract PartyFavorz: NonFungibleToken {
 
@@ -10,6 +12,7 @@ pub contract PartyFavorz: NonFungibleToken {
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
+	pub event Minted(id:UInt64, serial: UInt64, season: UInt64, name: String )
 
 	pub let CollectionStoragePath: StoragePath
 	pub let CollectionPrivatePath: PrivatePath
@@ -44,10 +47,18 @@ pub contract PartyFavorz: NonFungibleToken {
 		pub let info: Info
 
 		init(
-			info: Info
+			info: Info,
+			season: UInt64,
+			royalties: [MetadataViews.Royalty], 
+			squareImage: String, 
+			bannerImage: String
 		) {
 			self.id = self.uuid
 			self.info=info
+
+			PartyFavorzExtraData.setData(id: self.id, field: "season", value: season)
+			PartyFavorzExtraData.setData(id: self.id, field: "royalties", value: royalties)
+			PartyFavorzExtraData.setData(id: self.id, field: "nftCollectionDisplay", value: {"squareImage" : squareImage, "bannerImage" : bannerImage})
 		}
 
 		pub fun getViews(): [Type] {
@@ -58,12 +69,27 @@ pub contract PartyFavorz: NonFungibleToken {
 			Type<MetadataViews.Traits>(),
 			Type<MetadataViews.ExternalURL>(),
 			Type<MetadataViews.NFTCollectionData>(),
-			Type<MetadataViews.NFTCollectionDisplay>()
+			Type<MetadataViews.NFTCollectionDisplay>(), 
+			Type<MetadataViews.Medias>(),
+			Type<FindPack.PackRevealData>()
 			]
 		}
 
 		pub fun resolveView(_ view: Type): AnyStruct? {
+	
+
+			let imageFile = MetadataViews.IPFSFile( cid: self.info.thumbnailHash, path: nil)
+
 			switch view {
+			
+			case Type<FindPack.PackRevealData>():
+				let data : {String : String} = {
+					"nftImage" : imageFile.uri() ,
+					"nftName" : self.info.name,
+					"packType" : "PartyFavorz"
+				}
+				return FindPack.PackRevealData(data)
+
 			case Type<MetadataViews.Display>():
 				return MetadataViews.Display(
 					name: self.info.name,
@@ -73,12 +99,22 @@ pub contract PartyFavorz: NonFungibleToken {
 					)
 				)
 			case Type<MetadataViews.Editions>():
-			  let editionInfo = MetadataViews.Edition(name: "set", number: self.info.edition, max: self.info.maxEdition)
+				let seasonData = PartyFavorzExtraData.getData(id: self.id, field: "season")
+				var season = 1 as UInt64
+				if seasonData != nil {
+					season = seasonData! as! UInt64
+				}
+				let editionInfo = MetadataViews.Edition(name: "season ".concat(season.toString()), number: self.info.edition, max: self.info.maxEdition)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
 					editionList
 				)
 			case Type<MetadataViews.Royalties>():
+				let royaltiesData = PartyFavorzExtraData.getData(id: self.id, field: "royalties")
+				if royaltiesData != nil {
+					let r = royaltiesData! as! [MetadataViews.Royalty]
+					return MetadataViews.Royalties(r)
+				}
 				return MetadataViews.Royalties(PartyFavorz.royalties)
 
 			case Type<MetadataViews.ExternalURL>():
@@ -101,7 +137,7 @@ pub contract PartyFavorz: NonFungibleToken {
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
 
-				let square = MetadataViews.Media(
+				var square = MetadataViews.Media(
 					file: MetadataViews.IPFSFile(
 						cid: "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc",
 						path: nil
@@ -109,7 +145,7 @@ pub contract PartyFavorz: NonFungibleToken {
 					mediaType: "image/png"
 				)
 
-				let banner = MetadataViews.Media(
+				var banner = MetadataViews.Media(
 					file: MetadataViews.IPFSFile(
 						cid: "QmVuMpDyJXHMCK9LnFboemWfPYabcwPNEmXgQMWbtxtGWD",
 						path: nil
@@ -117,20 +153,70 @@ pub contract PartyFavorz: NonFungibleToken {
 					mediaType: "image/png"
 				)
 
+				let nftCollectionDisplayData = PartyFavorzExtraData.getData(id: self.id, field: "nftCollectionDisplay")
+				if nftCollectionDisplayData != nil {
+					let nftCollectionDisplay = nftCollectionDisplayData! as! {String : String}
+
+					square = MetadataViews.Media(
+						file: MetadataViews.IPFSFile(
+							cid: nftCollectionDisplay["squareImage"]!,
+							path: nil
+						),
+						mediaType: "image/png"
+					)
+
+					banner = MetadataViews.Media(
+						file: MetadataViews.IPFSFile(
+							cid: nftCollectionDisplay["bannerImage"]!,
+							path: nil
+						),
+						mediaType: "image/png"
+					)
+
+				}
+
 				return MetadataViews.NFTCollectionDisplay(
 					name: "PartyFavorz",
-					description: "Party Favorz are born to celebrate the first ever official NFTDay by Dapper on Sept 20, 2022",
+					description: "By owning a Party Favorz NFT, you are granted access to the VIP sections of our virtual parties which include, but are not limited to major giveaways, 1 on 1s with artists/project leaders, and some IRL utility that involves partying, down the line. By owning Party Favorz, you are supporting the idea of community coming together for a few goals that include having fun, being positive, learning, and most importantly SUPPORTING ARTISTS.",
 					externalURL: MetadataViews.ExternalURL("https://find.xyz/partyfavorz"),
 					squareImage: square,
 					bannerImage: banner,
 					socials: {
-						"twitter": MetadataViews.ExternalURL("https://twitter.com/findonflow")
+						"twitter": MetadataViews.ExternalURL("https://twitter.com/FlowPartyFavorz"), 
+						"discord" : MetadataViews.ExternalURL("https://discord.gg/bM76F34EnN")
 					}
 				)
 
 			case Type<MetadataViews.Traits>() : 
+				let seasonData = PartyFavorzExtraData.getData(id: self.id, field: "season")
+				var season = 1 as UInt64
+				if seasonData != nil {
+					season = seasonData! as! UInt64
+				}
 				return MetadataViews.Traits([
-					MetadataViews.Trait(name: "Artist", value: self.info.artist, displayType: "String", rarity: nil)
+					MetadataViews.Trait(name: "Artist", value: self.info.artist, displayType: "String", rarity: nil) ,
+					MetadataViews.Trait(name: "Season", value: season, displayType: "Numeric", rarity: nil) 
+				])
+
+			case Type<MetadataViews.Medias>() : 
+				let seasonData = PartyFavorzExtraData.getData(id: self.id, field: "season")
+				var season = 1 as UInt64
+				if seasonData != nil {
+					season = seasonData! as! UInt64
+				}
+
+				var thumbnailMediaType = "image/png"
+				var fullImageMediaType = "image/png"
+
+				switch season {
+					case 2 as UInt64 : 
+						fullImageMediaType = "image/gif"
+
+				}
+
+				return MetadataViews.Medias([
+						MetadataViews.Media(file: MetadataViews.IPFSFile(cid: self.info.thumbnailHash, path: nil), mediaType: thumbnailMediaType),
+						MetadataViews.Media(file: MetadataViews.IPFSFile(cid: self.info.fullsizeHash, path: nil), mediaType: fullImageMediaType)
 				])
 			}
 			return nil
@@ -199,19 +285,21 @@ pub contract PartyFavorz: NonFungibleToken {
 
 	pub resource Forge: FindForge.Forge {
 		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
-			let info = data as? Info ?? panic("The data passed in is not in form of PartyFavorzInfo.")
-			let royalties : [MetadataViews.Royalty] = []
-			royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
-			if platform.minterCut != nil {
-				royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "creator"))
-			}
+			let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form as needed.")
+
+			assert(info.length == 5, message: "Please make sure to pass in `Info, season, royalties, squareImage, bannerImage`")
 
 			// create a new NFT
 			var newNFT <- create NFT(
-				info: info
+				info: info["info"]! as! Info, 
+				season: info["season"]! as! UInt64,
+				royalties: info["royalties"]! as! [MetadataViews.Royalty], 
+				squareImage: info["squareImage"]! as! String, 
+				bannerImage: info["bannerImage"]! as! String
 			)
 
 			PartyFavorz.totalSupply = PartyFavorz.totalSupply + UInt64(1)
+			emit Minted(id:newNFT.id, serial: PartyFavorz.totalSupply, season: info["season"]! as! UInt64 , name: newNFT.info.name )
 			return <- newNFT
 		}
 
@@ -259,3 +347,4 @@ pub contract PartyFavorz: NonFungibleToken {
 	}
 }
 
+ 

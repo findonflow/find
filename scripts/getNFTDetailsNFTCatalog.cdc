@@ -2,20 +2,31 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindViews from "../contracts/FindViews.cdc" 
 import FIND from "../contracts/FIND.cdc" 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-//import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
 pub struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
-	pub let storefront: StorefrontListing?
+	pub let storefront: FindUserStatus.StorefrontListing?
+	pub let storefrontV2: FindUserStatus.StorefrontListing? 
+	pub let flowty: FindUserStatus.FlowtyListing? 
+	pub let flowtyRental: FindUserStatus.FlowtyRental? 
+	pub let flovatar: FindUserStatus.FlovatarListing? 
+	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing? 
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
 	pub let linkedForMarket : Bool?
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: StorefrontListing?, nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
+
+	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
 		self.storefront=storefront
+		self.storefrontV2=storefrontV2
+		self.flowty=flowty
+		self.flowtyRental=flowtyRental
+		self.flovatar=flovatar
+		self.flovatarComponent=flovatarComponent
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
 		self.linkedForMarket = linkedForMarket
@@ -167,20 +178,6 @@ pub struct NFTDetail {
 	}
 }
 
-
-pub struct StoreFrontCut {
-
-	pub let amount:UFix64
-	pub let address: Address
-	pub let findName:String?
-
-	init(amount:UFix64, address:Address){
-		self.amount=amount
-		self.address=address
-		self.findName= reverseLookup(address)
-	}
-}
-
 pub struct ListingRoyalties {
 
 	pub let ftAlias: String?
@@ -206,16 +203,6 @@ pub struct Royalties {
 		self.address=address 
 		self.findName=findName 
 		self.cut=cut
-	}
-}
-
-
-pub struct StorefrontListing {
-	pub let foo:String
-
-	init() {
-
-		self.foo ="bar"
 	}
 }
 
@@ -260,32 +247,6 @@ pub struct NFTCollectionDisplay {
 	}
 }
 
-/*
-pub struct StorefrontListing {
-	pub let nftID:UInt64
-	pub let nftIdentifier: String
-	pub let saleCut: [StoreFrontCut]
-	pub let amount:UFix64
-	pub let ftTypeIdentifier:String
-	pub let storefront:UInt64
-	pub let listingID:UInt64
-
-	init(listingId:UInt64, details: NFTStorefront.ListingDetails) {
-
-		self.saleCut=[]
-		self.nftID=details.nftID
-		self.nftIdentifier=details.nftType.identifier
-		for cutDetails in details.saleCuts {
-			self.saleCut.append(StoreFrontCut(amount:cutDetails.amount, address:cutDetails.receiver.address))
-		}
-		self.amount=details.salePrice
-		self.ftTypeIdentifier=details.salePaymentVaultType.identifier
-		self.storefront=details.storefrontID
-		self.listingID=listingId
-	}
-}
-*/
-
 pub var counter = 0
 
 pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
@@ -320,22 +281,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let findAddress=FindMarket.getFindTenantAddress()
 		let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
-		/*
-		var listings : StorefrontListing? = nil
-		let storefrontCap = account.getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
-
-		if storefrontCap.check() {
-			let storefrontRef=storefrontCap.borrow()!
-			for listingId in storefrontRef.getListingIDs() {
-				let listing = storefrontRef.borrowListing(listingResourceID: listingId)!
-				let nft=listing.borrowNFT()
-				if nft.id==id && !listing.getDetails().purchased {
-					listings = StorefrontListing(listingId: listingId, details: listing.getDetails())
-				}
-			}
-		}
-		*/
-
+		
 		var report : {String : ListingTypeReport} = {}
 
 		// check if that's soulBound, if yes, the report will be nil
@@ -351,7 +297,17 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 				}
 			}
 		}
-		return NFTDetailReport(findMarket:findMarket, storefront:nil, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
+
+		let nftType = pointer.itemType
+		let listingsV1 = FindUserStatus.getStorefrontListing(user: address, id : id, type: nftType)
+		let listingsV2 = FindUserStatus.getStorefrontV2Listing(user: address, id : id, type: nftType)
+		let flowty = FindUserStatus.getFlowtyListing(user: address, id : id, type: nftType)
+		let flowtyRental = FindUserStatus.getFlowtyRentals(user: address, id : id, type: nftType)
+		let flovatar = FindUserStatus.getFlovatarListing(user: address, id : id, type: nftType)
+		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
+
+
+		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
 	}
 	return nil
 

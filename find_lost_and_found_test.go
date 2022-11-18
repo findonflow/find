@@ -188,7 +188,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionCPMV",
+		otu.O.Tx("devsetupExampleNFTCollectionCPMV",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -228,7 +228,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionRMV",
+		otu.O.Tx("devsetupExampleNFTCollectionRMV",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -266,7 +266,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionCP",
+		otu.O.Tx("devsetupExampleNFTCollectionCP",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -304,7 +304,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionR",
+		otu.O.Tx("devsetupExampleNFTCollectionR",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -342,7 +342,7 @@ func TestFindLostAndFound(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		otu.O.Tx("testsetupExampleNFTCollectionR",
+		otu.O.Tx("devsetupExampleNFTCollectionR",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -378,7 +378,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"memo":         "Hello!",
 			})
 
-		otu.O.Tx("testsetupExampleNFTCollectionCP",
+		otu.O.Tx("devsetupExampleNFTCollectionCP",
 			WithSigner("user1"),
 		).
 			AssertSuccess(t)
@@ -435,7 +435,7 @@ func TestFindLostAndFound(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("testFillUpStorage",
+		otu.O.Tx("devFillUpStorage",
 			WithSigner("user2"),
 		).
 			AssertSuccess(t)
@@ -470,7 +470,63 @@ func TestFindLostAndFound(t *testing.T) {
 				"type":     "A.f8d6e0586b0a20c7.Dandy.NFT",
 			})
 
-		otu.O.Tx("testRefillStorage",
+		otu.O.Tx("devRefillStorage",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+	})
+
+	t.Run("Should refill user storage if the receiver account is full by subsidizing", func(t *testing.T) {
+
+		otu.O.Tx("setupDandyCollection",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("devFillUpStorage",
+			WithSigner("user2"),
+		).
+			AssertSuccess(t)
+
+		otu.O.FillUpStorage("user2")
+
+		amount := 20
+
+		ids := mintDandies(otu, amount)
+
+		identifiers := []string{}
+		allReceivers := []string{}
+		memos := []string{}
+
+		for len(identifiers) < len(ids) {
+			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
+			allReceivers = append(allReceivers, "user2")
+			memos = append(memos, "Msg")
+		}
+
+		otu.O.Tx("sendNFTsSubsidize",
+			WithSigner("user1"),
+			WithArg("nftIdentifiers", identifiers),
+			WithArg("allReceivers", allReceivers),
+			WithArg("ids", ids),
+			WithArg("memos", memos),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
+				"receiver":     otu.O.Address("user2"),
+				"receiverName": "user2",
+				"sender":       otu.O.Address("user1"),
+				"type":         "A.f8d6e0586b0a20c7.Dandy.NFT",
+				"memo":         "Msg",
+			}).
+			AssertEvent(t, "FindLostAndFoundWrapper.UserStorageSubsidized", map[string]interface{}{
+				"receiver":     otu.O.Address("user2"),
+				"receiverName": "user2",
+				"sender":       otu.O.Address("user1"),
+			})
+
+		otu.O.Tx("devRefillStorage",
 			WithSigner("user2"),
 		).
 			AssertSuccess(t)
@@ -567,10 +623,10 @@ func resetState(otu *OverflowTestUtils, user string, resetExampleNFT bool) *Over
 		otu.sendExampleNFT("account", user)
 	}
 
-	signWithUser("testDestroyExampleNFTCollection").
+	signWithUser("devDestroyExampleNFTCollection").
 		AssertSuccess(otu.T)
 
-	signWithUser("testDestroyDandyCollection").
+	signWithUser("devDestroyDandyCollection").
 		AssertSuccess(otu.T)
 
 	return otu

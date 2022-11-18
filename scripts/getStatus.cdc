@@ -10,8 +10,11 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import EmeraldIdentity from "../contracts/standard/EmeraldIdentity.cdc"
 import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.cdc"
 import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 pub struct FINDReport{
+	pub let isDapper: Bool
 	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
 	pub let relatedAccounts: { String: Address}
@@ -41,7 +44,8 @@ pub struct FINDReport{
 		 marketBids: {String : FindMarket.BidItemCollectionReport}, 
 		 activatedAccount: Bool, 
 		 lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}, 
-		 emeraldIDAccounts : {String : Address}
+		 emeraldIDAccounts : {String : Address},
+		 isDapper: Bool
 		 ) {
 
 		self.profile=profile
@@ -56,6 +60,7 @@ pub struct FINDReport{
 		self.activatedAccount=activatedAccount
 		self.lostAndFoundTypes=lostAndFoundTypes
 		self.emeraldIDAccounts=emeraldIDAccounts
+		self.isDapper=isDapper
 	}
 }
 
@@ -85,6 +90,17 @@ pub fun main(user: String) : Report? {
 	if let address=FIND.resolve(user) {
 		let account=getAccount(address)
 		if account.balance > 0.0 {
+
+			var isDapper=false
+			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
+			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
+			} else {
+				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
+					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
+				}
+				isDapper = false
+			}
+
 			let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
 			let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
@@ -147,7 +163,8 @@ pub fun main(user: String) : Report? {
 				marketBids: marketBids,
 				activatedAccount: true, 
 				lostAndFoundTypes: types, 
-				emeraldIDAccounts: emeraldIDAccounts
+				emeraldIDAccounts: emeraldIDAccounts,
+				isDapper:isDapper
 			)
 		} else {
 			findReport = FINDReport(
@@ -162,7 +179,8 @@ pub fun main(user: String) : Report? {
 				marketBids: {},
 				activatedAccount: false, 
 				lostAndFoundTypes: {}, 
-				emeraldIDAccounts: {}
+				emeraldIDAccounts: {},
+				isDapper: false
 			)
 		}
 	}
@@ -185,3 +203,4 @@ pub fun main(user: String) : Report? {
 }
 
 
+ 

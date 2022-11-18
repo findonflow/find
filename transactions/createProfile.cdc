@@ -5,6 +5,7 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindPack from "../contracts/FindPack.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
@@ -19,6 +20,7 @@ import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 // import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import FindThoughts from "../contracts/FindThoughts.cdc"
 
 transaction(name: String) {
 	prepare(account: AuthAccount) {
@@ -68,6 +70,24 @@ transaction(name: String) {
 			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPrivatePath,
 				target: Dandy.CollectionStoragePath
+			)
+		}
+
+		let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+		if !thoughtsCap.check() {
+			account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
+			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , MetadataViews.ResolverCollection}>(
+				FindThoughts.CollectionPublicPath,
+				target: FindThoughts.CollectionStoragePath
+			)
+		}
+
+		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(FindPack.CollectionPublicPath)
+		if !findPackCap.check() {
+			account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+			account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				FindPack.CollectionPublicPath,
+				target: FindPack.CollectionStoragePath
 			)
 		}
 
