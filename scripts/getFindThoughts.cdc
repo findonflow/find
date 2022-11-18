@@ -59,9 +59,10 @@ pub struct Thought {
 	pub var tags: [String]
 	pub var reacted: {String : [User]}
 	pub var reactions: {String : Int}
+	pub var reactedUsers: {String : [String]}
 	pub var quotedThought: Thought?
 
-	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, quotedThought: Thought?) {
+	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, reactedUsers: {String : [String]}, quotedThought: Thought?) {
 		self.id = id
 		self.creator = creator
 		self.creatorName = creatorName
@@ -76,6 +77,7 @@ pub struct Thought {
 		self.tags = tags
 		self.reacted = reacted
 		self.reactions = reactions
+		self.reactedUsers = reactedUsers
 		self.quotedThought = quotedThought
 	}
 }
@@ -84,7 +86,7 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}) : Thought {
 
 		var creatorProfileName : String? = nil
 		var creatorAvatar : String? = nil 
-		let profileCap = getAccount(address).getCapability<&{Profile.Public}>(Profile.publicPath)
+		let profileCap = getAccount(t.creator).getCapability<&{Profile.Public}>(Profile.publicPath)
 		if profileCap.check() {
 			creatorProfileName = profileCap.borrow()!.getName()
 			creatorAvatar = profileCap.borrow()!.getAvatar()
@@ -102,11 +104,18 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}) : Thought {
 		}
 
 		let reacted : {String : [User]} = {}
+		let reactedUsers : {String :[String]} = {}
 		for user in t.reacted.keys {
 			let reaction = t.reacted[user]!
 			let allReacted = reacted[reaction] ?? []
-			allReacted.append(User(address: user, reaction: reaction))
+			let u = User(address: user, reaction: reaction)
+
+			allReacted.append(u)
 			reacted[reaction] = allReacted
+
+			let preReactedUser = reactedUsers[reaction] ?? []
+			preReactedUser.append(u.name ?? u.address.toString())
+			reactedUsers[reaction] = preReactedUser
 		}
 
 		var quotedThought : Thought? = nil 
@@ -138,6 +147,7 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}) : Thought {
 					tags: [], 
 					reacted: {}, 
 					reactions: {}, 
+					reactedUsers: {},
 					quotedThought: nil
 				)
 			}
@@ -158,6 +168,7 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}) : Thought {
 			tags: t.tags, 
 			reacted: reacted, 
 			reactions: t.reactions, 
+			reactedUsers: reactedUsers,
 			quotedThought: quotedThought
 		)
 

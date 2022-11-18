@@ -160,6 +160,19 @@ func TestFindThought(t *testing.T) {
 			})
 	})
 
+	t.Run("Should be able to get a list of different thoguhts by a script with reacted list", func(t *testing.T) {
+
+		res, err := otu.O.Script("getFindThoughts",
+			WithAddresses("addresses", "user1"),
+			WithArg("ids", []uint64{thoguhtId}),
+		).
+			GetAsJson()
+
+		assert.NoError(t, err)
+
+		autogold.Equal(t, res)
+	})
+
 	t.Run("Should be able to undo reaction to a thought", func(t *testing.T) {
 
 		otu.O.Tx("reactToFindThoughts",
