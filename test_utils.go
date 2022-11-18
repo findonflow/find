@@ -1504,9 +1504,9 @@ type Royalty struct {
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
 
 	var findReport Report
-	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
-		String(name)).
-		RunMarshalAs(&findReport)
+	err := otu.O.Script("getStatus",
+		WithArg("user", name),
+	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
@@ -1521,9 +1521,9 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformation {
 
 	var findReport Report
-	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
-		String(name)).
-		RunMarshalAs(&findReport)
+	err := otu.O.Script("getStatus",
+		WithArg("user", name),
+	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
@@ -1940,17 +1940,6 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 		counter = counter + 1
 	}
 	return result
-}
-
-func (otu *OverflowTestUtils) getIDFromEvent(events []*OverflowFormatedEvent, eventName, field string) []uint64 {
-	Ids := []uint64{}
-	for _, event := range events {
-		if event.Name == eventName {
-			Ids = append(Ids, event.GetFieldAsUInt64(field))
-		}
-	}
-
-	return Ids
 }
 
 func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *OverflowTestUtils {
