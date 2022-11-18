@@ -88,7 +88,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			}
 
 			// airdrop thru airdropper
-			FindAirdropper.forcedAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message}, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment)
+			FindAirdropper.subsidizedAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message}, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment)
 		}
         self.flowVault.deposit(from: <- tempVault)
 	}
