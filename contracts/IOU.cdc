@@ -2,7 +2,6 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "./standard/FlowUtilityToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "./FindViews.cdc"
 
 // This is a contract that specifies the IOU.Vault resource 
 // IOUs are resources of proof of payments. Payments in an IOU is always sent to the user it was created for regardless who holds it now 
