@@ -741,7 +741,6 @@ func (otu *OverflowTestUtils) listNFTForIOUAuctionDapper(name string, id uint64,
 			"id":                  id,
 			"seller":              otu.O.Address(name),
 		})
-
 	return otu
 
 }

@@ -9,6 +9,7 @@ import Profile from "./Profile.cdc"
 import IOU from "./IOU.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
+import Debug from "../contracts/Debug.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 pub contract FindMarketAuctionIOUDapper {
@@ -537,6 +538,7 @@ pub contract FindMarketAuctionIOUDapper {
 				}
 
 				let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionIOUDapper.SaleItem>(), nftType: nftType, ftType: ftType)
+				//cuts here have a .find cut of 2.5% but we do not have any cut when we add bid?
 
 				if !saleItem.hasAuctionMetReservePrice() {
 					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
@@ -726,13 +728,10 @@ pub contract FindMarketAuctionIOUDapper {
 			return self.bidExtraField 
 		}
 
-		//TODO; can this really not be done more easily?
 		access(contract) fun withdrawIOU() : @[IOU.Vault] {
 			let iou : @[IOU.Vault] <- []
-			var i=0
-			while i < self.iou.length {
+			while self.iou.length != 0 {
 				iou.append(<- self.iou.removeFirst())
-				i=i+1
 			}
 			return <- iou
 		}
@@ -819,10 +818,11 @@ pub contract FindMarketAuctionIOUDapper {
 
 			let receiver = owner.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 			//tenant cuts
+
 			let cuts= tenant.getTenantCut(name: "bid", listingType: Type<@FindMarketAuctionIOUDapper.SaleItem>(), nftType: item.getType(), ftType: vaultType)
+			//TODO: figure out why cut here is different from when we pay
 
 			let itemRoyalties= item.getRoyalty().getRoyalties()
-
 			let soldFor=vault.balance
 			if let findCut =cuts.findCut {
 				let cutAmount= soldFor * findCut.cut
@@ -972,6 +972,9 @@ pub contract FindMarketAuctionIOUDapper {
 
 		/* Check the total royalty to prevent changing of royalties */
 		let royalties = royalty.getRoyalties()
+
+		Debug.log("Royalties length ".concat(royalties.length.toString()))
+		Debug.log("IOUS length ".concat(ious.length.toString()))
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
 
@@ -1003,7 +1006,9 @@ pub contract FindMarketAuctionIOUDapper {
 			}
 		}
 
+		/*
 		if let findCut =cuts.findCut {
+			Debug.log("Find cut is ".concat(findCut.cut.toString()))
 			let cutAmount= soldFor * findCut.cut
 			let name = resolveName(findCut.receiver.address)
 		  FindMarket.emitRoyaltyEvent(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
@@ -1015,6 +1020,7 @@ pub contract FindMarketAuctionIOUDapper {
 		}
 
 		if let tenantCut =cuts.tenantCut {
+			Debug.log("Tenant cut is ".concat(tenantCut.cut.toString()))
 			let cutAmount= soldFor * tenantCut.cut
 			let name = resolveName(tenantCut.receiver.address)
 			FindMarket.emitRoyaltyEvent(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
@@ -1023,6 +1029,7 @@ pub contract FindMarketAuctionIOUDapper {
 			iou.redeem(<- vault.withdraw(amount: cutAmount))
 			destroy iou
 		}
+		*/
 		let iou <- ious.removeFirst()
 		iou.redeem(<- vault)
 		destroy  iou
