@@ -912,7 +912,7 @@ pub contract FindMarketAuctionIOUDapper {
 		return <- create SaleItemCollection(tenantCapability)
 	}
 
-	pub fun createEmptyMarketBidCollection(tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
+	pub fun createEmptyMarketBidCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
 		return <- create MarketBidCollection(tenantCapability:tenantCapability)
 	}
 

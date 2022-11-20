@@ -117,7 +117,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 		let adiBidStoragePath= FindMarket.getStoragePath(adiBidType, name:tenant.name)
 		let adiBidCap= account.getCapability<&FindMarketAuctionIOUDapper.MarketBidCollection{FindMarketAuctionIOUDapper.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(adiBidPublicPath) 
 		if !adiBidCap.check() {
-			account.save<@FindMarketAuctionIOUDapper.MarketBidCollection>(<- FindMarketAuctionIOUDapper.createEmptyMarketBidCollection(receiver: iouCap, tenantCapability:tenantCapability), to: adiBidStoragePath)
+			account.save<@FindMarketAuctionIOUDapper.MarketBidCollection>(<- FindMarketAuctionIOUDapper.createEmptyMarketBidCollection(tenantCapability), to: adiBidStoragePath)
 			account.link<&FindMarketAuctionIOUDapper.MarketBidCollection{FindMarketAuctionIOUDapper.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(adiBidPublicPath, target: adiBidStoragePath)
 		}
 
