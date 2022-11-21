@@ -35,6 +35,7 @@ pub contract IOU {
 		pub fun topUp(_ vault: @FungibleToken.Vault) {
 			pre{
 				self.vaultType == vault.getType() : "The vault type passed in does not match with the redeeming iou. Required vault type : ".concat(self.vaultType.identifier)
+				//TODO: check on expired
 			}
 			emit IOUToppedUp(uuid: self.uuid, by: self.receiver.address, type: self.vaultType.identifier, amount: vault.balance, fromAmount: self.balance, toAmount: self.balance + vault.balance)
 			self.balance = self.balance + vault.balance
@@ -47,6 +48,7 @@ pub contract IOU {
 			pre {
 				self.vaultType == vault.getType() : "Vault passed in is not in type of IOU. Type required : ".concat(self.vaultType.identifier)
 				self.balance == vault.balance : "Vault passed in is not in same balance of IOU. Balance required : ".concat(self.balance.toString())
+				//TODO; add check for expired
 			}
 
 			emit IOURedeemed(uuid: self.uuid, by:self.receiver.address, type: self.vaultType.identifier, amount: self.balance)
@@ -90,8 +92,11 @@ pub contract IOU {
 
 	//The main receiver is _always_ last
 	//TODO; take into consideration minimum ammounts...
+	//TODO: this nees to be in a resource stored in users account
+	//TODO: this also needs to take in a validUntil
 	pub fun createVaults(vault: @FungibleToken.Vault, receiver: Capability<&{FungibleToken.Receiver}>, royalties: MetadataViews.Royalties) : @[IOU.Vault] {
 
+		//TODO: assert balance cannot be 0
 		let vaults : @[IOU.Vault] <- []
 		let amount = vault.balance
 		for key, royalty in royalties.getRoyalties() {
