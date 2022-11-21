@@ -8,6 +8,7 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
+import FindForgeOrder from "./FindForgeOrder.cdc"
 import FindPack from "./FindPack.cdc"
 import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
@@ -86,7 +87,38 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.addContractData(lease: lease, forgeType: forgeType , data: data)
+			FindForge.adminAddContractData(lease: lease, forgeType: forgeType , data: data)
+		}
+
+		pub fun addForgeMintType(_ mintType: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForgeOrder.addMintType(mintType)
+		}
+
+		pub fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForge.adminOrderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+		}
+
+		pub fun cancelForgeOrder(leaseName: String, mintType: String){
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			FindForge.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
+		}
+
+		pub fun fulfillForgeOrder(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
 		}
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {

@@ -72,7 +72,7 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(359)
+	otu.setUUID(365)
 	ids := otu.mintThreeExampleDandies()
 	return ids
 }
@@ -136,6 +136,16 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		findSigner,
 		WithArg("dapperAddress", "account"),
 	).AssertSuccess(otu.T)
+
+	// setup find forge
+	otu.O.Tx("setup_find_forge_1", WithSigner("user4")).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the versus client
+	otu.O.Tx("setup_find_forge_2",
+		saSigner,
+		WithArg("ownerAddress", "user4"),
+	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	return otu.tickClock(1.0)
 }
@@ -1504,9 +1514,9 @@ type Royalty struct {
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
 
 	var findReport Report
-	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
-		String(name)).
-		RunMarshalAs(&findReport)
+	err := otu.O.Script("getStatus",
+		WithArg("user", name),
+	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
@@ -1521,9 +1531,9 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformation {
 
 	var findReport Report
-	err := otu.O.ScriptFromFile("getStatus").Args(otu.O.Arguments().
-		String(name)).
-		RunMarshalAs(&findReport)
+	err := otu.O.Script("getStatus",
+		WithArg("user", name),
+	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
@@ -1940,17 +1950,6 @@ func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string
 		counter = counter + 1
 	}
 	return result
-}
-
-func (otu *OverflowTestUtils) getIDFromEvent(events []*OverflowFormatedEvent, eventName, field string) []uint64 {
-	Ids := []uint64{}
-	for _, event := range events {
-		if event.Name == eventName {
-			Ids = append(Ids, event.GetFieldAsUInt64(field))
-		}
-	}
-
-	return Ids
 }
 
 func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *OverflowTestUtils {
@@ -2431,7 +2430,7 @@ func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64) *O
 }
 
 func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
-	res := otu.O.Tx("sendNFTsLostAndFound",
+	res := otu.O.Tx("sendNFTs",
 		WithSigner("account"),
 		WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
 		WithArg("allReceivers", `["user1"]`),

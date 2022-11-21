@@ -1,4 +1,6 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
@@ -9,7 +11,7 @@ import FindAirdropper from "../contracts/FindAirdropper.cdc"
 pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
 
  	fun logErr(_ i: Int , err: String) : Report {
-		return Report(receiver: allReceivers[i] , type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, err: err)
+		return Report(receiver: allReceivers[i] , isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, err: err)
 	}
 
 		let paths : [PublicPath] = []
@@ -69,6 +71,16 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				user = checkUser!
 			}
 
+			var isDapper=false
+			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
+			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
+			} else {
+				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
+					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
+				}
+				isDapper = false
+			}
+
 			// check receiver account storage 
 			let receiverCap = getAccount(user!).getCapability<&{NonFungibleToken.Receiver}>(path.publicPath)
 			let collectionPublicCap = getAccount(user!).getCapability<&{NonFungibleToken.CollectionPublic}>(path.publicPath)
@@ -79,7 +91,7 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				storageInited = true
 			}
 
-			let r = Report(receiver: allReceivers[i] , type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, err: nil)
+			let r = Report(receiver: allReceivers[i] , isDapper: isDapper, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, err: nil)
 			report.append(r)
 		}
 	
@@ -89,6 +101,7 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 
 pub struct Report {
 	pub let receiver: String 
+	pub let isDapper: Bool?
 	pub let type: String 
 	pub let id: UInt64 
 	pub let message: String 
@@ -99,8 +112,9 @@ pub struct Report {
 	pub let nftInPlace: Bool?
 	pub let err: String?
 
-	init(receiver: String , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, err: String?) {
+	init(receiver: String , isDapper: Bool? , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, err: String?) {
 		self.receiver=receiver
+		self.isDapper=isDapper
 		self.type=type
 		self.id=id
 		self.message=message

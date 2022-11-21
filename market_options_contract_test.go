@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -37,7 +37,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
 		otu.O.Script("getStatus",
-			overflow.WithArg("user", "user1"),
+			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
 			"/FINDReport/itemsForSale",
 			autogold.Want("ghostListing", map[string]interface{}{
@@ -53,7 +53,7 @@ func TestMarketOptionsContract(t *testing.T) {
 					},
 					"ftAlias":               "Flow",
 					"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-					"listingId":             362,
+					"listingId":             368,
 					"listingStatus":         "active",
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					"listingValidUntil":     101,
@@ -61,27 +61,27 @@ func TestMarketOptionsContract(t *testing.T) {
 						"collectionDescription": "Neo Collectibles FIND",
 						"collectionName":        "user1",
 						"editionNumber":         2,
-						"id":                    362,
+						"id":                    368,
 						"name":                  "Neo Motorcycle 2 of 3",
 						"scalars": map[string]interface{}{
 							"Speed":              100,
+							"date.Birthday":      1.660145023e+09,
 							"edition_set_max":    3,
 							"edition_set_number": 2,
-							"date.Birthday":      1.660145023e+09,
 						},
 						"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 						"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 						"totalInEdition": 3,
 						"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
 					},
-					"nftId":         362,
+					"nftId":         368,
 					"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 					"saleType":      "active_listed",
 					"seller":        "0x179b6b1cb6755e31",
 					"sellerName":    "user1",
 				}}},
 				"FindMarketDirectOfferSoft": map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{
-					"id":                    361,
+					"id":                    367,
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				}}},
 			}),
@@ -111,13 +111,13 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
 		otu.O.Script("getStatus",
-			overflow.WithArg("user", "user1"),
+			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
 			"/FINDReport/itemsForSale",
 			autogold.Want("ghostBids", map[string]interface{}{
 				"FindMarketAuctionEscrow": map[string]interface{}{
 					"ghosts": []interface{}{map[string]interface{}{
-						"id":                    361,
+						"id":                    367,
 						"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 					}},
 					"items": []interface{}{map[string]interface{}{
@@ -135,7 +135,7 @@ func TestMarketOptionsContract(t *testing.T) {
 						"bidderName":            "user2",
 						"ftAlias":               "Flow",
 						"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"listingId":             362,
+						"listingId":             368,
 						"listingStatus":         "active",
 						"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 						"listingValidUntil":     301,
@@ -143,20 +143,20 @@ func TestMarketOptionsContract(t *testing.T) {
 							"collectionDescription": "Neo Collectibles FIND",
 							"collectionName":        "user1",
 							"editionNumber":         2,
-							"id":                    362,
+							"id":                    368,
 							"name":                  "Neo Motorcycle 2 of 3",
 							"scalars": map[string]interface{}{
 								"Speed":              100,
+								"date.Birthday":      1.660145023e+09,
 								"edition_set_max":    3,
 								"edition_set_number": 2,
-								"date.Birthday":      1.660145023e+09,
 							},
 							"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 							"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 							"totalInEdition": 3,
 							"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
 						},
-						"nftId":         362,
+						"nftId":         368,
 						"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
 						"saleType":      "active_ongoing",
 						"seller":        "0x179b6b1cb6755e31",
@@ -164,7 +164,7 @@ func TestMarketOptionsContract(t *testing.T) {
 					}},
 				},
 				"FindMarketDirectOfferSoft": map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{
-					"id":                    361,
+					"id":                    367,
 					"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
 				}}},
 			}),

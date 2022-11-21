@@ -2,6 +2,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindForgeOrder from "../contracts/FindForgeOrder.cdc"
 import Profile from "../contracts/Profile.cdc"
 
 
@@ -144,37 +145,30 @@ pub contract FindForge {
 
 	access(account) fun adminSetMinterPlatform(leaseName: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
-			panic("This forge type is not supported. type : ".concat(forgeType.identifier))
+			FindForge.addPrivateForgeType(name: leaseName, forgeType: forgeType)
 		}
 
 		if description == "" {
 			panic("Description of collection cannot be empty")
 		}
 
-		let name = leaseName
-		if FindForge.minterPlatforms[forgeType]![name] == nil {
-			if !FindForge.publicForges.contains(forgeType) {
-				panic("This forge is not supported publicly. Forge Type : ".concat(forgeType.identifier))
-			}
-		}
-
-		let user = FIND.lookupAddress(leaseName) ?? panic("Cannot find lease owner. Lease : ".concat(name))
-		let leaseCollection = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
+		let user = FIND.lookupAddress(leaseName) ?? panic("Cannot find lease owner. Lease : ".concat(leaseName))
+		let leaseCollection = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(leaseName))
 
 		// If they have a premium forge, platform will not take any royalty
 		if leaseCollection.checkAddon(name: leaseName, addon: "premiumForge") {
 			let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: 0.0, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
+			let minterPlatform = MinterPlatform(name:leaseName, platform:receiverCap, platformPercentCut: 0.0, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
-			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			FindForge.minterPlatforms[forgeType]!.insert(key: leaseName, minterPlatform)
 			return
 		}
 
 		if leaseCollection.checkAddon(name: leaseName, addon: "forge") {
 			let receiverCap=FindForge.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
+			let minterPlatform = MinterPlatform(name:leaseName, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
-			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
+			FindForge.minterPlatforms[forgeType]!.insert(key: leaseName, minterPlatform)
 			return
 		}
 
@@ -232,45 +226,43 @@ pub contract FindForge {
 
 	}
 
-	pub fun mint (lease: &FIND.Lease, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
-		if !FindForge.minterPlatforms.containsKey(forgeType) {
-			panic("The minter platform is not set. Please set up properly before mint.")
-		}
-		let leaseName = lease.getName()
-
+	pub fun orderForge(lease: &FIND.Lease, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay){
 		if !lease.checkAddon(addon: "forge") && !lease.checkAddon(addon: "premiumForge") {
-			panic("Please purchase forge addon to start forging. Name: ".concat(leaseName))
+			panic("Please purchase forge addon to start forging. Name: ".concat(lease.getName()))
 		}
 
-		let minterPlatform = FindForge.minterPlatforms[forgeType]![leaseName] ?? panic("The minter platform is not set. Please set up properly before mint.")
+		FindForgeOrder.orderForge(leaseName: lease.getName(), mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+	}
 
-		if minterPlatform.description == "" {
-			panic("Please set up minter platform before mint")
-		}
+	access(account) fun adminOrderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay){
+		FindForgeOrder.orderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+	}
 
-		let verifier = self.borrowVerifier()
+	access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
+		FindForgeOrder.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
+	}
 
-		let forge = FindForge.borrowForge(forgeType) ?? panic("The forge type passed in is not supported. Forge Type : ".concat(forgeType.identifier))
+	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+		let order = FindForgeOrder.fulfillForgeOrder(contractName, forgeType: forgeType)
+		let c = order.collectionDisplay
+		let s : {String : String} = {}
+		for social in c.socials.keys {
+			s[social] = c.socials[social]!.url
+		} 
+		FindForge.adminSetMinterPlatform(leaseName: order.leaseName, 
+							forgeType: forgeType, 
+							minterCut: order.minterCut, 
+							description: c.description, 
+							externalURL: c.externalURL.url, 
+							squareImage: c.squareImage.file.uri(), 
+							bannerImage: c.bannerImage.file.uri(), 
+							socials: s)
+		return c
+	}
 
-		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
-
-		let id = nft.id 
-		let uuid = nft.uuid 
-		let nftType = nft.getType().identifier
-		receiver.deposit(token: <- nft)
-
-		let vr = receiver.borrowViewResolver(id: id)
-		let view = vr.resolveView(Type<MetadataViews.Display>())  ?? panic("The minting nft should implement MetadataViews Display view.") 
-		let display = view as! MetadataViews.Display
-		let nftName = display.name 
-		let thumbnail = display.thumbnail.uri()
-		let to = receiver.owner!.address 
-		let toName = FIND.reverseLookup(to)
-		let new = FIND.reverseLookup(to)
-		let from = lease.owner!.address
-
-		emit Minted(nftType: nftType, id: id, uuid: uuid, nftName: nftName, nftThumbnail: thumbnail, from: from, fromName: leaseName, to: to, toName: toName)
-
+	pub fun mint (lease: &FIND.Lease, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+		let leaseName = lease.getName()
+		FindForge.adminMint(lease: leaseName, forgeType: forgeType , data: data, receiver: receiver)
 	}
 
 	access(account) fun adminMint(lease: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}){
@@ -315,7 +307,11 @@ pub contract FindForge {
 
 	}
 
-	access(account) fun addContractData(lease: String, forgeType: Type , data: AnyStruct) {
+	pub fun addContractData(lease: &FIND.Lease, forgeType: Type , data: AnyStruct) {
+		FindForge.adminAddContractData(lease: lease.getName(), forgeType: forgeType , data: data)
+	}
+
+	access(account) fun adminAddContractData(lease: String, forgeType: Type , data: AnyStruct) {
 
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
 			panic("The minter platform is not set. Please set up properly before adding contract data.")
@@ -406,6 +402,41 @@ pub contract FindForge {
 
 	access(account) fun borrowVerifier() : &Verifier {
 		return (&self.verifier as &Verifier?)!
+	}
+
+	pub fun createForgeAdminProxyClient() : @ForgeAdminProxy {
+		return <- create ForgeAdminProxy()
+	}
+
+	//interface to use for capability receiver pattern
+	pub resource interface ForgeAdminProxyClient {
+		pub fun addCapability(_ cap: Capability<&FIND.Network>)
+	}
+
+	//admin proxy with capability receiver 
+	pub resource ForgeAdminProxy: ForgeAdminProxyClient {
+
+		access(self) var capability: Capability<&FIND.Network>?
+
+		init() {
+			self.capability = nil
+		}
+
+		pub fun addCapability(_ cap: Capability<&FIND.Network>) {
+			pre {
+				cap.check() : "Invalid server capablity"
+				self.capability == nil : "Server already set"
+			}
+			self.capability = cap
+		}
+
+		pub fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
+		}
 	}
 
 	init() {
