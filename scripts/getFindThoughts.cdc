@@ -16,7 +16,7 @@ pub fun main(addresses: [Address], ids: [UInt64]) : [Thought] {
 		}
 		let ref = cap.borrow()! 
 		let t = ref.borrowThoughtPublic(ids[i]) 
-		thoughts.append(getThought(t))
+		thoughts.append(getThought(t, withQuote: true))
 		
 	}
 	return thoughts
@@ -82,7 +82,7 @@ pub struct Thought {
 	}
 }
 
-pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}) : Thought {
+pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Thought {
 
 		var creatorProfileName : String? = nil
 		var creatorAvatar : String? = nil 
@@ -119,37 +119,39 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}) : Thought {
 		}
 
 		var quotedThought : Thought? = nil 
-		if let p = t.getQuotedThought() {
-			if let ref = p.borrowThoughtPublic() {
-				quotedThought = getThought(ref)
-			} else {
+		if withQuote {
+			if let p = t.getQuotedThought() {
+				if let ref = p.borrowThoughtPublic() {
+					quotedThought = getThought(ref, withQuote: false)
+				} else {
+					let creator = p.owner()
+					var qCreatorProfileName : String? = nil
+					var qCreatorAvatar : String? = nil 
+					let qProfileCap = getAccount(creator).getCapability<&{Profile.Public}>(Profile.publicPath)
+					if qProfileCap.check() {
+						qCreatorProfileName = qProfileCap.borrow()!.getName()
+						qCreatorAvatar = qProfileCap.borrow()!.getAvatar()
+					}
 
-				var qCreatorProfileName : String? = nil
-				var qCreatorAvatar : String? = nil 
-				let qProfileCap = getAccount(p.creator).getCapability<&{Profile.Public}>(Profile.publicPath)
-				if qProfileCap.check() {
-					qCreatorProfileName = qProfileCap.borrow()!.getName()
-					qCreatorAvatar = qProfileCap.borrow()!.getAvatar()
+					quotedThought = Thought(
+						id: p.id , 
+						creator: creator  , 
+						creatorName: FIND.reverseLookup(creator) , 
+						creatorProfileName: qCreatorProfileName , 
+						creatorAvatar: qCreatorAvatar, 
+						header: nil, 
+						body: nil , 
+						created: nil, 
+						lastUpdated: nil, 
+						medias: {}, 
+						nft: [], 
+						tags: [], 
+						reacted: {}, 
+						reactions: {}, 
+						reactedUsers: {},
+						quotedThought: nil
+					)
 				}
-
-				quotedThought = Thought(
-					id: p.id , 
-					creator: p.creator  , 
-					creatorName: FIND.reverseLookup(p.creator) , 
-					creatorProfileName: qCreatorProfileName , 
-					creatorAvatar: qCreatorAvatar, 
-					header: nil, 
-					body: nil , 
-					created: nil, 
-					lastUpdated: nil, 
-					medias: {}, 
-					nft: [], 
-					tags: [], 
-					reacted: {}, 
-					reactions: {}, 
-					reactedUsers: {},
-					quotedThought: nil
-				)
 			}
 		}
 

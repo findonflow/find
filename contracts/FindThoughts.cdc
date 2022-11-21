@@ -7,7 +7,7 @@ import Clock from "./Clock.cdc"
 
 pub contract FindThoughts {
 
-	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String])
+	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
 	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
 	pub event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
 	pub event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
@@ -16,19 +16,22 @@ pub contract FindThoughts {
 	pub let CollectionPublicPath : PublicPath 
 	pub let CollectionPrivatePath : PrivatePath 
 
-	pub struct FindThoughtPointer {
-		pub let creator: Address 
+	pub struct ThoughtPointer {
+		pub let cap: Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>
 		pub let id: UInt64 
 
 		init(creator: Address, id: UInt64) {
-			self.creator = creator 
+			let cap = getAccount(creator).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+			if !cap.check() {
+				panic("creator's find thought capability is not valid. Creator : ".concat(creator.toString()))
+			}
+			self.cap = cap
 			self.id = id 
 		}
 
 		pub fun borrowThoughtPublic() : &{ThoughtPublic}? {
-			let cap = getAccount(self.creator).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
-			if cap.check() {
-				let ref = cap.borrow()!
+			if self.cap.check() {
+				let ref = self.cap.borrow()!
 				if ref.contains(self.id) {
 					return ref.borrowThoughtPublic(self.id)
 				}
@@ -41,6 +44,10 @@ pub contract FindThoughts {
 				return true
 			}
 			return false
+		}
+
+		pub fun owner() : Address {
+			return self.cap.address
 		}
 	}
 
@@ -58,7 +65,7 @@ pub contract FindThoughts {
 		pub var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?) 
-		pub fun getQuotedThought() : FindThoughtPointer? 
+		pub fun getQuotedThought() : ThoughtPointer? 
 	}
 
 	pub resource Thought : ThoughtPublic , MetadataViews.Resolver {
@@ -83,7 +90,7 @@ pub contract FindThoughts {
 		access(self) let scalars: {String : UFix64} 
 		access(self) let extras: {String : AnyStruct} 
 
-		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], quote: FindThoughtPointer?, stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
+		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], quote: ThoughtPointer?, stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
 			self.id = self.uuid 
 			self.creator = creator
 			self.header = header
@@ -96,8 +103,8 @@ pub contract FindThoughts {
 			self.nft = nft
 			self.stringTags = stringTags
 			self.scalars = scalars
-			self.extras = extras
 			extras["quote"] = quote
+			self.extras = extras
 
 			self.reacted = {}
 			self.reactions = {}
@@ -117,9 +124,9 @@ pub contract FindThoughts {
 			emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
 		}
 
-		pub fun getQuotedThought() : FindThoughtPointer? {
+		pub fun getQuotedThought() : ThoughtPointer? {
 			if let r = self.extras["quote"] {
-				return r as! FindThoughtPointer
+				return r as! ThoughtPointer
 			}
 			return nil
 		}
@@ -234,52 +241,29 @@ pub contract FindThoughts {
 
 		// TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
 		// So take pointer, thought pointer and media
-		pub fun publish(header: String , body: String , tags: [String], mediaHash: String?, mediaType: String?, quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?, quoteCreator: Address?, quoteId: UInt64?) {
+		pub fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
 			let medias : [MetadataViews.Media] = []
-			if mediaHash != nil {
-				let media = MetadataViews.Media(file: MetadataViews.IPFSFile(cid:mediaHash!, path: nil), mediaType: mediaType!)
-				medias.append(media)
+			let m : [String] = []
+			if media != nil {
+				medias.append(media!)
+				m.append(media!.file.uri())
 			}
 			let address = self.owner!.address
 
-			var nft : FindViews.ViewReadPointer? = nil 
-			if quoteNFTOwner != nil {
-				let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
-				let cap = getAccount(quoteNFTOwner!).getCapability<&{MetadataViews.ResolverCollection}>(path)
-				nft = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
-			}
-
-			var thoughtPointer : FindThoughtPointer? = nil
-			if quoteCreator != nil {
-				thoughtPointer = FindThoughtPointer(creator: quoteCreator!, id: quoteId!)
-			}
-
-			// If nft is not nil, we try to get the Display View, CollectionDisplayView and store it.
 			let nfts : [FindMarket.NFTInfo] = []
 			let extra : {String : AnyStruct} = {}
-			if nft != nil {
-				let rv = nft!.getViewResolver()
-				// These will always succeed
-				let display = MetadataViews.getDisplay(rv)! 
-				let cd = MetadataViews.getNFTCollectionDisplay(rv)!
-
-				extra["nft_display"] = display
-				extra["nft_collection_display"] = cd
-
-				nfts.append(FindMarket.NFTInfo(rv, id: quoteNFTId!, detail: true))
+			if nftPointer != nil {
+				let rv = nftPointer!.getViewResolver()
+				nfts.append(FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true))
 			}
 
-			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: thoughtPointer, stringTags: {}, scalars : {}, extras: extra)
+			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: quote, stringTags: {}, scalars : {}, extras: extra)
 
 			self.sequence.append(thought.uuid)
 
 			let creatorName = FIND.reverseLookup(address)
-			let m : [String] = []
-			for media in medias {
-				m.append(media.file.uri())
-			}
 
-			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: m, nfts: nfts, tags: tags)
+			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: m, nfts: nfts, tags: tags, quoteOwner: quote?.owner(), quoteId: quote?.id)
 
 			self.ownedThoughts[thought.uuid] <-! thought
 		}

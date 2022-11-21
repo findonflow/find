@@ -23,17 +23,17 @@ func TestFindThought(t *testing.T) {
 	header := "This is header"
 	body := "This is body"
 	tags := []string{"tag1", "tag2", "@find"}
-	mediaHash := "mediaHash"
+	mediaHash := "ipfs://mediaHash"
+	mediaUrl := "mediaUrl"
 	mediaType := "mediaType"
 	var thoguhtId uint64
 
-	cadMediaHash, err := cadence.NewValue(mediaHash)
+	cadMediaHash, err := otu.createOptional(mediaHash)
 	assert.NoError(t, err)
-	cadMediaType, err := cadence.NewValue(mediaType)
+	cadMediaUrl, err := otu.createOptional(mediaUrl)
 	assert.NoError(t, err)
-
-	cadMediaHash = cadence.NewOptional(cadMediaHash)
-	cadMediaType = cadence.NewOptional(cadMediaType)
+	cadMediaType, err := otu.createOptional(mediaType)
+	assert.NoError(t, err)
 
 	t.Run("Should be able to post a thought", func(t *testing.T) {
 		var err error
@@ -58,7 +58,7 @@ func TestFindThought(t *testing.T) {
 				"header":      header,
 				"message":     body,
 				"medias": []interface{}{
-					fmt.Sprintf("ipfs://%s", mediaHash),
+					mediaHash,
 				},
 				"tags": []interface{}{"tag1", "tag2", "@find"},
 			}).
@@ -104,7 +104,7 @@ func TestFindThought(t *testing.T) {
 				"header":      newHeader,
 				"message":     newBody,
 				"medias": []interface{}{
-					fmt.Sprintf("ipfs://%s", mediaHash),
+					mediaHash,
 				},
 				"tags": []interface{}{"tag4", "tag5", "@fest"},
 			})
@@ -219,10 +219,186 @@ func TestFindThought(t *testing.T) {
 				"header":      newHeader,
 				"message":     newBody,
 				"medias": []interface{}{
-					fmt.Sprintf("ipfs://%s", mediaHash),
+					mediaHash,
 				},
 				"tags": []interface{}{"tag4", "tag5", "@fest"},
 			})
+	})
+
+	t.Run("Should be able to post a thought with Url", func(t *testing.T) {
+		var err error
+
+		thoguhtId, err = otu.O.Tx("publishFindThought",
+			WithSigner("user1"),
+			WithArg("header", header),
+			WithArg("body", body),
+			WithArg("tags", tags),
+			WithArg("mediaHash", cadMediaUrl),
+			WithArg("mediaType", cadMediaType),
+			WithArg("quoteNFTOwner", nil),
+			WithArg("quoteNFTType", nil),
+			WithArg("quoteNFTId", nil),
+			WithArg("quoteCreator", nil),
+			WithArg("quoteId", nil),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FindThoughts.Published", map[string]interface{}{
+				"creator":     otu.O.Address("user1"),
+				"creatorName": "user1",
+				"header":      header,
+				"message":     body,
+				"medias": []interface{}{
+					mediaUrl,
+				},
+				"tags": []interface{}{"tag1", "tag2", "@find"},
+			}).
+			GetIdFromEvent("Published", "id")
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("Should be able to post a thought with NFT", func(t *testing.T) {
+
+		id := otu.mintThreeExampleDandies()[0]
+		identifier := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "Dandy", "NFT")
+		owner := otu.O.Account("user1").Address().Bytes()
+
+		otu.registerDandyInNFTRegistry()
+
+		inputId, err := otu.createOptional(id)
+		assert.NoError(t, err)
+		inputIdentifier, err := otu.createOptional(identifier)
+		assert.NoError(t, err)
+		Owner := cadence.BytesToAddress(owner)
+		inputOwner := cadence.NewOptional(Owner)
+
+		nftInfo, err := otu.O.Script(`
+		import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+		import FindMarket from "../contracts/FindMarket.cdc"
+		import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+		import FindViews from "../contracts/FindViews.cdc"
+
+		pub fun main(quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?) : FindMarket.NFTInfo? {
+
+			var nftPointer : FindViews.ViewReadPointer? = nil
+			if quoteNFTOwner != nil {
+					let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
+					let cap = getAccount(quoteNFTOwner!).getCapability<&{MetadataViews.ResolverCollection}>(path)
+					nftPointer = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
+					let rv = nftPointer!.getViewResolver()
+					return FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true)
+			}
+			return nil
+		}
+		`,
+			WithArg("quoteNFTOwner", inputOwner),
+			WithArg("quoteNFTType", inputIdentifier),
+			WithArg("quoteNFTId", inputId),
+		).
+			GetAsInterface()
+
+		assert.NoError(t, err)
+
+		otu.O.Tx("publishFindThought",
+			WithSigner("user1"),
+			WithArg("header", header),
+			WithArg("body", body),
+			WithArg("tags", tags),
+			WithArg("mediaHash", nil),
+			WithArg("mediaType", nil),
+			WithArg("quoteNFTOwner", inputOwner),
+			WithArg("quoteNFTType", inputIdentifier),
+			WithArg("quoteNFTId", inputId),
+			WithArg("quoteCreator", nil),
+			WithArg("quoteId", nil),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FindThoughts.Published", map[string]interface{}{
+				"creator":     otu.O.Address("user1"),
+				"creatorName": "user1",
+				"header":      header,
+				"message":     body,
+				"nfts":        []interface{}{nftInfo},
+				"tags":        []interface{}{"tag1", "tag2", "@find"},
+			})
+	})
+
+	var thoughtWithQuote uint64
+
+	t.Run("Should be able to post a thought with quote", func(t *testing.T) {
+
+		owner := otu.O.Account("user1").Address().Bytes()
+		Owner := cadence.BytesToAddress(owner)
+		inputOwner := cadence.NewOptional(Owner)
+
+		inputThoughtId, err := otu.createOptional(thoguhtId)
+		assert.NoError(t, err)
+
+		thought, err := otu.O.Tx("publishFindThought",
+			WithSigner("user1"),
+			WithArg("header", header),
+			WithArg("body", body),
+			WithArg("tags", tags),
+			WithArg("mediaHash", nil),
+			WithArg("mediaType", nil),
+			WithArg("quoteNFTOwner", nil),
+			WithArg("quoteNFTType", nil),
+			WithArg("quoteNFTId", nil),
+			WithArg("quoteCreator", inputOwner),
+			WithArg("quoteId", inputThoughtId),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "FindThoughts.Published", map[string]interface{}{
+				"creator":     otu.O.Address("user1"),
+				"creatorName": "user1",
+				"header":      header,
+				"message":     body,
+				"tags":        []interface{}{"tag1", "tag2", "@find"},
+				"quoteOwner":  otu.O.Address("user1"),
+				"quoteId":     thoguhtId,
+			}).
+			GetIdFromEvent("FindThoughts.Published", "id")
+		assert.NoError(t, err)
+
+		thoughtWithQuote = thought
+	})
+
+	if thoughtWithQuote == 0 {
+		owner := otu.O.Account("user1").Address().Bytes()
+		Owner := cadence.BytesToAddress(owner)
+		inputOwner := cadence.NewOptional(Owner)
+
+		inputThoughtId, _ := otu.createOptional(thoguhtId)
+
+		thought, _ := otu.O.Tx("publishFindThought",
+			WithSigner("user1"),
+			WithArg("header", header),
+			WithArg("body", body),
+			WithArg("tags", tags),
+			WithArg("mediaHash", nil),
+			WithArg("mediaType", nil),
+			WithArg("quoteNFTOwner", nil),
+			WithArg("quoteNFTType", nil),
+			WithArg("quoteNFTId", nil),
+			WithArg("quoteCreator", inputOwner),
+			WithArg("quoteId", inputThoughtId),
+		).
+			GetIdFromEvent("FindThoughts.Published", "id")
+
+		thoughtWithQuote = thought
+	}
+
+	t.Run("Should be able to get a list of different thoguhts with quoted thoughts", func(t *testing.T) {
+
+		res, err := otu.O.Script("getFindThoughts",
+			WithAddresses("addresses", "user1"),
+			WithArg("ids", []uint64{thoughtWithQuote}),
+		).
+			GetAsJson()
+
+		assert.NoError(t, err)
+
+		autogold.Equal(t, res)
 	})
 
 }

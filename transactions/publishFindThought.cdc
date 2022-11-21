@@ -1,4 +1,8 @@
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindThoughts from "../contracts/FindThoughts.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import FindViews from "../contracts/FindViews.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 
 transaction(header: String , body: String , tags: [String], mediaHash: String?, mediaType: String?, quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?, quoteCreator: Address?, quoteId: UInt64?) {
 
@@ -10,6 +14,30 @@ transaction(header: String , body: String , tags: [String], mediaHash: String?, 
 	}
 
 	execute {
-		self.collection.publish(header: header, body: body, tags: tags, mediaHash: mediaHash, mediaType: mediaType, quoteNFTOwner: quoteNFTOwner, quoteNFTType: quoteNFTType, quoteNFTId: quoteNFTId, quoteCreator: quoteCreator, quoteId: quoteId)
+
+		var media : MetadataViews.Media? = nil 
+		if mediaHash != nil {
+			var file : {MetadataViews.File}? = nil  
+			if FindUtils.hasPrefix(mediaHash!, prefix: "ipfs://") {
+				file = MetadataViews.IPFSFile(cid: mediaHash!.slice(from: "ipfs://".length , upTo: mediaHash!.length), path: nil) 
+			} else {
+				file = MetadataViews.HTTPFile(url: mediaHash!) 
+			}
+			media = MetadataViews.Media(file: file!, mediaType: mediaType!)
+		}
+
+		var nftPointer : FindViews.ViewReadPointer? = nil 
+		if quoteNFTOwner != nil {
+				let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
+				let cap = getAccount(quoteNFTOwner!).getCapability<&{MetadataViews.ResolverCollection}>(path)
+				nftPointer = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
+		}
+
+		var quote : FindThoughts.ThoughtPointer? = nil 
+		if quoteCreator != nil {
+			quote = FindThoughts.ThoughtPointer(creator: quoteCreator!, id: quoteId!)
+		}
+
+		self.collection.publish(header: header, body: body, tags: tags, media: media, nftPointer: nftPointer, quote: quote)
 	}
 }

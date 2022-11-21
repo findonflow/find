@@ -2702,6 +2702,15 @@ func (otu *OverflowTestUtils) claimFloat(minter, receiver string, floatId uint64
 	return otu
 }
 
+func (otu *OverflowTestUtils) createOptional(value any) (cadence.Value, error) {
+	val, err := cadence.NewValue(value)
+	if err != nil {
+		return nil, err
+	}
+	opt := cadence.NewOptional(val)
+	return opt, nil
+}
+
 type SaleItem struct {
 	Amount              float64 `json:"amount"`
 	AuctionReservePrice float64 `json:"auctionReservePrice"`
@@ -2880,4 +2889,3 @@ func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
 // 	}
 // 	return cadence.NewDictionary(mapping)
 // }
- 
