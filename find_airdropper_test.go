@@ -39,11 +39,13 @@ func TestFindAirdropper(t *testing.T) {
 
 		for i, id := range ids {
 			res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
-				"from": otu.O.Address("user1"),
-				"to":   otu.O.Address("user2"),
-				"id":   id,
-				"uuid": id,
-				"type": dandyType,
+				"from":     otu.O.Address("user1"),
+				"fromName": "user1",
+				"to":       otu.O.Address("user2"),
+				"toName":   "user2",
+				"id":       id,
+				"uuid":     id,
+				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
 				},
@@ -82,9 +84,10 @@ func TestFindAirdropper(t *testing.T) {
 			AssertSuccess(t)
 
 		res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
-			"from": otu.O.Address("account"),
-			"to":   otu.O.Address("user2"),
-			"type": "A.f8d6e0586b0a20c7.FindPack.NFT",
+			"from":   otu.O.Address("account"),
+			"toName": "user2",
+			"to":     otu.O.Address("user2"),
+			"type":   "A.f8d6e0586b0a20c7.FindPack.NFT",
 			"context": map[string]interface{}{
 				"message": "I can use struct here",
 			},
@@ -110,11 +113,13 @@ func TestFindAirdropper(t *testing.T) {
 
 		for i, id := range ids {
 			res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
-				"from": otu.O.Address("user1"),
-				"to":   otu.O.Address("user2"),
-				"id":   id,
-				"uuid": id,
-				"type": dandyType,
+				"fromName": "user1",
+				"from":     otu.O.Address("user1"),
+				"toName":   "user2",
+				"to":       otu.O.Address("user2"),
+				"id":       id,
+				"uuid":     id,
+				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
 				},
@@ -139,11 +144,12 @@ func TestFindAirdropper(t *testing.T) {
 
 		for i, id := range ids {
 			res.AssertEvent(t, "FindAirdropper.AirdropFailed", map[string]interface{}{
-				"from": otu.O.Address("user1"),
-				"to":   otu.O.Address("user3"),
-				"id":   id,
-				"uuid": id,
-				"type": dandyType,
+				"fromName": "user1",
+				"from":     otu.O.Address("user1"),
+				"to":       otu.O.Address("user3"),
+				"id":       id,
+				"uuid":     id,
+				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
 				},
