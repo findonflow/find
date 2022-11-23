@@ -1,9 +1,11 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import Profile from "../contracts/Profile.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
@@ -11,13 +13,12 @@ import FindAirdropper from "../contracts/FindAirdropper.cdc"
 pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
 
  	fun logErr(_ i: Int , err: String) : Report {
-		return Report(receiver: allReceivers[i] , isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, err: err)
+		return Report(receiver: allReceivers[i] , isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, royalties: nil, err: err)
 	}
 
 		let paths : [PublicPath] = []
 		let contractData : {Type : NFTCatalog.NFTCatalogMetadata} = {}
 		let addresses : {String : Address} = {} 
-		let ownedIds : {Type : [UInt64]} = {}
 
 		let account = getAuthAccount(sender)
 		let report : [Report] = []
@@ -42,19 +43,13 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 
 			let path = data!.collectionData
 
-			var owned = false
-			if ownedIds[type] == nil {
-				let checkCol = account.borrow<&NonFungibleToken.Collection>(from: path.storagePath)
-				if checkCol == nil {
-					report.append(logErr(i, err: "Cannot borrow collection from sender. Type : ".concat(type.identifier)))
-					continue
-				}
-				let ids = checkCol!.getIDs()
-				ownedIds[type] = ids
+			let checkCol = account.borrow<&NonFungibleToken.Collection>(from: path.storagePath)
+			if checkCol == nil {
+				report.append(logErr(i, err: "Cannot borrow collection from sender. Type : ".concat(type.identifier)))
+				continue
 			}
-			if ownedIds[type]!.contains(ids[i]) {
-				owned = true
-			}
+			let ownedNFTs : &{UInt64 : NonFungibleToken.NFT} = &checkCol!.ownedNFTs as &{UInt64 : NonFungibleToken.NFT} 
+			let owned = ownedNFTs.containsKey(ids[i])
 
 			let receiver = allReceivers[i]
 			let id = ids[i] 
@@ -91,7 +86,16 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				storageInited = true
 			}
 
-			let r = Report(receiver: allReceivers[i] , isDapper: isDapper, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, err: nil)
+			var royalties : Royalties? = nil
+			let mv = account.borrow<&{MetadataViews.ResolverCollection}>(from: path.storagePath)
+			if mv != nil {
+				let rv = mv!.borrowViewResolver(id: id)
+				if let r = MetadataViews.getRoyalties(rv) {
+					royalties = Royalties(r)
+				}
+			}
+
+			let r = Report(receiver: allReceivers[i] , isDapper: isDapper, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, royalties:royalties, err: nil)
 			report.append(r)
 		}
 	
@@ -110,9 +114,10 @@ pub struct Report {
 	pub let collectionPublicLinked: Bool?
 	pub let accountInitialized: Bool?
 	pub let nftInPlace: Bool?
+	pub let royalties: Royalties?
 	pub let err: String?
 
-	init(receiver: String , isDapper: Bool? , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, err: String?) {
+	init(receiver: String , isDapper: Bool? , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, royalties: Royalties?, err: String?) {
 		self.receiver=receiver
 		self.isDapper=isDapper
 		self.type=type
@@ -123,12 +128,61 @@ pub struct Report {
 		self.accountInitialized=accountInitialized
 		self.nftInPlace=nftInPlace
 		self.err=err
+		self.royalties=royalties
 		self.ok = false 
 		if accountInitialized == true && nftInPlace == true {
 			if receiverLinked == true || collectionPublicLinked == true {
 				self.ok = true
 			}
 		}
+	}
+}
+
+pub struct Royalties {
+	pub let totalRoyalty: UFix64 
+	pub let royalties: [Royalty]
+
+	init(_ royalties: MetadataViews.Royalties) {
+		var totalR = 0.0 
+		let array : [Royalty] = []
+		for r in royalties.getRoyalties() {
+			array.append(Royalty(r))
+			totalR = totalR + r.cut
+		}
+		self.totalRoyalty = totalR 
+		self.royalties = array 
+	}
+}
+
+pub struct Royalty {
+	pub let name: String? 
+	pub let address: Address 
+	pub let cut: UFix64 
+	pub let acceptTypes: [String]
+	pub let description: String 
+	
+	init(_ r: MetadataViews.Royalty) {
+		self.name = FIND.reverseLookup(r.receiver.address)
+		self.address = r.receiver.address
+		self.cut = r.cut
+		self.description = r.description
+		let acceptTypes : [String] = []
+		if r.receiver.check() {
+			let ref = r.receiver.borrow()!
+			let t = ref.getType()
+			if t.isInstance(Type<@FungibleToken.Vault>()) {
+				acceptTypes.append(t.identifier)
+			} else if t == Type<@TokenForwarding.Forwarder>() {
+				acceptTypes.append(Type<@FlowToken.Vault>().identifier)
+			} else if t == Type<@Profile.User>() {
+				let ref = getAccount(r.receiver.address).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! 
+				let wallets = ref.getWallets()
+				for w in wallets {
+					acceptTypes.append(w.accept.identifier)
+				}
+			} 
+		}
+		self.acceptTypes = acceptTypes
 	}
 }
 
