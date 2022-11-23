@@ -24,6 +24,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -118,6 +120,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -148,6 +152,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["`+receiverAddress+`"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -172,6 +178,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -212,6 +220,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -252,6 +262,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -290,6 +302,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -328,6 +342,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -367,6 +383,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", `["user1"]`),
 			WithArg("ids", []uint64{0}),
 			WithArg("memos", `["Hello!"]`),
+			WithArg("donationTypes", `[nil]`),
+			WithArg("donationAmounts", `[nil]`),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -409,12 +427,16 @@ func TestFindLostAndFound(t *testing.T) {
 		identifiers := []string{}
 		allReceivers := []string{}
 		memos := []string{}
+		nils := `[nil`
 
 		for len(identifiers) < len(ids) {
 			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
 			allReceivers = append(allReceivers, "user2")
 			memos = append(memos, "Msg")
+			nils = nils + `, nil`
 		}
+
+		nils = nils + `]`
 
 		otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
@@ -422,6 +444,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", allReceivers),
 			WithArg("ids", ids),
 			WithArg("memos", memos),
+			WithArg("donationTypes", nils),
+			WithArg("donationAmounts", nils),
 		).
 			AssertSuccess(t)
 
@@ -449,12 +473,15 @@ func TestFindLostAndFound(t *testing.T) {
 		identifiers := []string{}
 		allReceivers := []string{}
 		memos := []string{}
+		nils := `[nil`
 
 		for len(identifiers) < len(ids) {
 			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
 			allReceivers = append(allReceivers, "user2")
 			memos = append(memos, "Msg")
+			nils = nils + `, nil`
 		}
+		nils = nils + `]`
 
 		otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
@@ -462,6 +489,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", allReceivers),
 			WithArg("ids", ids),
 			WithArg("memos", memos),
+			WithArg("donationTypes", nils),
+			WithArg("donationAmounts", nils),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -498,12 +527,15 @@ func TestFindLostAndFound(t *testing.T) {
 		identifiers := []string{}
 		allReceivers := []string{}
 		memos := []string{}
+		nils := `[nil`
 
 		for len(identifiers) < len(ids) {
 			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
 			allReceivers = append(allReceivers, "user2")
 			memos = append(memos, "Msg")
+			nils = nils + `, nil`
 		}
+		nils = nils + `]`
 
 		otu.O.Tx("sendNFTsSubsidize",
 			WithSigner("user1"),
@@ -511,6 +543,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", allReceivers),
 			WithArg("ids", ids),
 			WithArg("memos", memos),
+			WithArg("donationTypes", nils),
+			WithArg("donationAmounts", nils),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -544,12 +578,15 @@ func TestFindLostAndFound(t *testing.T) {
 		identifiers := []string{}
 		allReceivers := []string{}
 		memos := []string{}
+		nils := `[nil`
 
 		for len(identifiers) < len(ids) {
 			identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
 			allReceivers = append(allReceivers, "user2")
 			memos = append(memos, "Msg")
+			nils = nils + `, nil`
 		}
+		nils = nils + `]`
 
 		otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
@@ -557,6 +594,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("allReceivers", allReceivers),
 			WithArg("ids", ids),
 			WithArg("memos", memos),
+			WithArg("donationTypes", nils),
+			WithArg("donationAmounts", nils),
 		).
 			AssertSuccess(t)
 

@@ -18,7 +18,8 @@ func TestFindAirdropper(t *testing.T) {
 		buyForge("user1").
 		createUser(100.0, "user2").
 		registerUser("user2").
-		registerExampleNFTInNFTRegistry()
+		registerExampleNFTInNFTRegistry().
+		registerFtInRegistry()
 
 	dandyType := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "Dandy", "NFT")
 	otu.mintThreeExampleDandies()
@@ -34,6 +35,8 @@ func TestFindAirdropper(t *testing.T) {
 			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
 			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("donationTypes", `[nil, nil, nil]`),
+			WithArg("donationAmounts", `[nil, nil, nil]`),
 		).
 			AssertSuccess(t)
 
@@ -108,6 +111,8 @@ func TestFindAirdropper(t *testing.T) {
 			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
 			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("donationTypes", `[nil, nil, nil]`),
+			WithArg("donationAmounts", `[nil, nil, nil]`),
 		).
 			AssertSuccess(t)
 
@@ -139,6 +144,8 @@ func TestFindAirdropper(t *testing.T) {
 			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 			WithArg("ids", ids),
 			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("donationTypes", `[nil, nil, nil]`),
+			WithArg("donationAmounts", `[nil, nil, nil]`),
 		).
 			AssertSuccess(t)
 
@@ -174,7 +181,34 @@ func TestFindAirdropper(t *testing.T) {
 				"ok":                     ok,
 				"receiver":               receiver,
 				"receiverLinked":         receiverlinked,
-				"type":                   t,
+				"royalties": map[string]interface{}{
+					"royalties": []interface{}{
+						map[string]interface{}{
+							"acceptTypes": []interface{}{
+								fmt.Sprintf("A.%s.%s.Vault", "0ae53cb6e3f42a79", "FlowToken"),
+								fmt.Sprintf("A.%s.%s.Vault", otu.O.Account("account").Address().String(), "FUSD"),
+								fmt.Sprintf("A.%s.%s.Vault", otu.O.Account("account").Address().String(), "FiatToken"),
+							},
+							"address":     otu.O.Address("user1"),
+							"cut":         0.05,
+							"description": "creator",
+							"name":        "user1",
+						},
+						map[string]interface{}{
+							"acceptTypes": []interface{}{
+								fmt.Sprintf("A.%s.%s.Vault", "0ae53cb6e3f42a79", "FlowToken"),
+								fmt.Sprintf("A.%s.%s.Vault", otu.O.Account("account").Address().String(), "FUSD"),
+								fmt.Sprintf("A.%s.%s.Vault", otu.O.Account("account").Address().String(), "FiatToken"),
+							},
+							"address":     otu.O.Address("account"),
+							"cut":         0.025,
+							"description": "find forge",
+						},
+					},
+					"totalRoyalty": 0.075,
+				},
+
+				"type": t,
 			}
 		}
 
@@ -192,6 +226,54 @@ func TestFindAirdropper(t *testing.T) {
 
 		res.AssertWant(t, autogold.Want("sendNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
 
+	})
+
+	t.Run("Should be able to send Airdrop with sending funds to royalty holders", func(t *testing.T) {
+
+		ids := otu.mintThreeExampleDandies()
+		fusd := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "FUSD", "Vault")
+
+		res := otu.O.Tx("sendNFTsSafe",
+			WithSigner("user1"),
+			WithArg("allReceivers", []string{"user2", "user2", "user2"}),
+			WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
+			WithArg("ids", ids),
+			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
+			WithArg("donationTypes", fmt.Sprintf(`["%s" , nil, nil]`, fusd)),
+			WithArg("donationAmounts", fmt.Sprintf(`[%2f , nil, nil]`, 10.0)),
+		).
+			AssertSuccess(t)
+
+		for i, id := range ids {
+			res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
+				"fromName": "user1",
+				"from":     otu.O.Address("user1"),
+				"toName":   "user2",
+				"to":       otu.O.Address("user2"),
+				"id":       id,
+				"uuid":     id,
+				"type":     dandyType,
+				"context": map[string]interface{}{
+					"message": fmt.Sprintf("Message %d", i),
+				},
+				"remark": "Receiver Not Linked",
+			})
+		}
+
+		wants := []map[string]interface{}{
+			{
+				"amount": 6.6666666,
+				"to":     otu.O.Address("user1"),
+			},
+			{
+				"amount": 3.3333333,
+				"to":     otu.O.Address("account"),
+			},
+		}
+
+		for _, want := range wants {
+			res.AssertEvent(t, "FUSD.TokensDeposited", want)
+		}
 	})
 
 }

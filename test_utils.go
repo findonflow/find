@@ -2436,6 +2436,8 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 		WithArg("allReceivers", `["user1"]`),
 		WithArg("ids", []uint64{0}),
 		WithArg("memos", `["Hello!"]`),
+		WithArg("donationTypes", `[nil]`),
+		WithArg("donationAmounts", `[nil]`),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -2879,4 +2881,3 @@ func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
 // 	}
 // 	return cadence.NewDictionary(mapping)
 // }
- 
