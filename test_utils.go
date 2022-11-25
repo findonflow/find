@@ -220,6 +220,27 @@ func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
+	nameAddress := otu.O.Address("account")
+	expireTime := otu.currentTime() + leaseDurationFloat
+
+	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
+
+	otu.O.Tx("register",
+		WithSigner("account"),
+		WithArg("name", "find"),
+		WithArg("amount", 100.0),
+	).AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
+			"validUntil":  expireTime,
+			"lockedUntil": lockedTime,
+			"owner":       nameAddress,
+			"name":        "find",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResult {
 	nameAddress := otu.O.Address(name)
 	expireTime := otu.currentTime() + leaseDurationFloat

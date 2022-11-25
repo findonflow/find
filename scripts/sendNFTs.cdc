@@ -9,11 +9,12 @@ import Profile from "../contracts/Profile.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 
 pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
 
  	fun logErr(_ i: Int , err: String) : Report {
-		return Report(receiver: allReceivers[i] , isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, royalties: nil, err: err)
+		return Report(receiver: allReceivers[i] , inputName: nil, findName: nil, avatar: nil, isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, royalties: nil, err: err)
 	}
 
 		let paths : [PublicPath] = []
@@ -95,7 +96,18 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				}
 			}
 
-			let r = Report(receiver: allReceivers[i] , isDapper: isDapper, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, royalties:royalties, err: nil)
+			var inputName : String? = receiver
+			var findName : String? = FIND.reverseLookup(user!)
+			if FindUtils.hasPrefix(receiver, prefix: "0x") {
+				inputName = nil
+			}
+
+			var avatar : String? = nil
+			if let profile = getAccount(user!).getCapability<&{Profile.Public}>(Profile.publicPath).borrow() {
+				avatar = profile.getAvatar()
+			}
+
+			let r = Report(receiver: allReceivers[i] , inputName: inputName, findName: findName, avatar: avatar, isDapper: isDapper, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: receiverCap.check() , collectionPublicLinked: collectionPublicCap.check() , accountInitialized: storageInited , nftInPlace: owned, royalties:royalties, err: nil)
 			report.append(r)
 		}
 	
@@ -105,6 +117,9 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 
 pub struct Report {
 	pub let receiver: String 
+	pub let inputName: String?
+	pub let findName: String?
+	pub let avatar: String?
 	pub let isDapper: Bool?
 	pub let type: String 
 	pub let id: UInt64 
@@ -117,8 +132,11 @@ pub struct Report {
 	pub let royalties: Royalties?
 	pub let err: String?
 
-	init(receiver: String , isDapper: Bool? , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, royalties: Royalties?, err: String?) {
+	init(receiver: String , inputName: String?, findName: String?, avatar: String?, isDapper: Bool? , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, royalties: Royalties?, err: String?) {
 		self.receiver=receiver
+		self.inputName=inputName
+		self.findName=findName
+		self.avatar=avatar
 		self.isDapper=isDapper
 		self.type=type
 		self.id=id

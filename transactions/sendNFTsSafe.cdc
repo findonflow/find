@@ -8,14 +8,16 @@ import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import Profile from "../contracts/Profile.cdc"
+import Sender from "../contracts/Sender.cdc"
 
-transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String], donationTypes: [String?], donationAmounts: [UFix64?]) {
+transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String], donationTypes: [String?], donationAmounts: [UFix64?], findDonationType: String?, findDonationAmount: UFix64?) {
 
 	let authPointers : [FindViews.AuthNFTPointer]
 	let paths : [PublicPath]
 	let royalties: [MetadataViews.Royalties?] 
 	let totalRoyalties: [UFix64]
 	let vaultRefs: {String : &FungibleToken.Vault}
+	var token : &Sender.Token
 
 	prepare(account : AuthAccount) {
 
@@ -79,6 +81,23 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			self.authPointers.append(pointer)
 			self.paths.append(path.publicPath)
 		}
+
+		// get the vault for find donation
+		if let dt = findDonationType {
+			if self.vaultRefs[dt] == nil {
+				let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
+				let ftPath = info.vaultPath
+				let ref = account.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+				self.vaultRefs[dt] = ref
+			}
+		}
+
+		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+			account.save(<- Sender.create(), to: Sender.storagePath)
+		}
+
+		self.token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
+
 	}
 
 	execute {
@@ -140,6 +159,14 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 
 			assert(totalPaid <= amount, message: "Amount paid is greater than expected" )
 			
+		}
+
+
+		// for donating to find 
+		if findDonationType != nil {
+			let vaultRef = self.vaultRefs[findDonationType!]!
+			let vault <- vaultRef.withdraw(amount: findDonationAmount!)
+			FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
 		}
 	}
 }
