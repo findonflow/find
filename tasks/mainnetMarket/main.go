@@ -115,7 +115,6 @@ func main() {
 		"TouchstoneManekiPlanets": `["A.cf3c77ef638573e8.TouchstoneManekiPlanets.NFT"]`,
 		"ChainmonstersRewards":    `["A.93615d25d14fa337.ChainmonstersRewards.NFT"]`,
 		"TheFootballClub":         `["A.81e95660ab5308e1.TFCItems.NFT"]`,
-		"some.place":              `["A.667a16294a089ef8.SomePlaceCollectible.NFT" , "A.667a16294a089ef8.SomePlaceCollectible.NFT"]`,
 
 		// Delisted
 	}
