@@ -2,7 +2,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-pub fun main(collectionIdentifier : String) : NFTCatalogMetadata? {
+pub fun main(collectionIdentifier : String, type: String) : NFTCatalogMetadata? {
 	if let catalog = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier) {
 		return NFTCatalogMetadata(
 			contractName : catalog.contractName, 
@@ -10,6 +10,20 @@ pub fun main(collectionIdentifier : String) : NFTCatalogMetadata? {
 			nftType: catalog.nftType, 
 			collectionDisplay : catalog.collectionDisplay
 		)
+	}
+
+	if let collections : [String] = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type)?.keys {
+		for ci in collections {
+			let catalog = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : ci)! 
+			if catalog.collectionDisplay.name == collectionIdentifier {
+				return NFTCatalogMetadata(
+					contractName : catalog.contractName, 
+					contractAddress : catalog.contractAddress, 
+					nftType: catalog.nftType, 
+					collectionDisplay : catalog.collectionDisplay
+				)
+			}
+		}
 	}
 	return nil
 }
