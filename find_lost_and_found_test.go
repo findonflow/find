@@ -26,6 +26,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -122,6 +124,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -154,6 +158,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -180,6 +186,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -222,6 +230,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -264,6 +274,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -304,6 +316,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -344,6 +358,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -385,6 +401,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -446,6 +464,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", memos),
 			WithArg("donationTypes", nils),
 			WithArg("donationAmounts", nils),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t)
 
@@ -491,6 +511,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", memos),
 			WithArg("donationTypes", nils),
 			WithArg("donationAmounts", nils),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -545,6 +567,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", memos),
 			WithArg("donationTypes", nils),
 			WithArg("donationAmounts", nils),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
@@ -596,6 +620,8 @@ func TestFindLostAndFound(t *testing.T) {
 			WithArg("memos", memos),
 			WithArg("donationTypes", nils),
 			WithArg("donationAmounts", nils),
+			WithArg("findDonationType", nil),
+			WithArg("findDonationAmount", nil),
 		).
 			AssertSuccess(t)
 
