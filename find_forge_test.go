@@ -53,6 +53,7 @@ func TestFindForge(t *testing.T) {
 			WithArg("collections", `[]`),
 		).AssertWant(t,
 			autogold.Want("collection", map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": map[string]interface{}{
+				"collectionName":     "The Example Collection",
 				"extraIDs":           []interface{}{2},
 				"extraIDsIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
 				"length":             1,
@@ -490,4 +491,3 @@ func TestFindForge(t *testing.T) {
 			})
 	})
 }
- 
