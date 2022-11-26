@@ -21,12 +21,14 @@ import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
         pub let extraIDs : [UInt64]
         pub let shard : String 
         pub let extraIDsIdentifier : String 
+	    pub let collectionName: String
 
-        init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) { 
+        init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
             self.length=length 
             self.extraIDs=extraIDs
             self.shard=shard
             self.extraIDsIdentifier=extraIDsIdentifier
+            self.collectionName=collectionName
         }
     }
 
@@ -61,7 +63,7 @@ import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
                 continue
             }
 
-            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project)
+            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project, collectionName: project)
 
         }
 
