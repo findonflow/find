@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -461,5 +462,24 @@ func TestNFTDetailScript(t *testing.T) {
 		}
 
 		autogold.Equal(t, actual)
+	})
+
+	typ := fmt.Sprintf("A.%s.Dandy.NFT", otu.O.Account("account").Address().String())
+
+	t.Run("Should be able to get collection display by collection Identifier", func(t *testing.T) {
+		otu.O.Script("getCatalogCollectionDisplay",
+			WithArg("collectionIdentifier", typ),
+			WithArg("type", typ),
+		).
+			AssertWithPointerWant(t, "/collectionDisplay/name", autogold.Want("test", "user1"))
+
+	})
+
+	t.Run("Should be able to get collection display by collection Identifier", func(t *testing.T) {
+		otu.O.Script("getCatalogCollectionDisplay",
+			WithArg("collectionIdentifier", "user1"),
+			WithArg("type", typ),
+		).
+			AssertWithPointerWant(t, "/collectionDisplay/name", autogold.Want("test", "user1"))
 	})
 }
