@@ -2904,3 +2904,11 @@ func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
 // 	}
 // 	return cadence.NewDictionary(mapping)
 // }
+
+func OptionalString(input string) cadence.Optional {
+	s, err := cadence.NewString(input)
+	if err != nil {
+		panic(err)
+	}
+	return cadence.NewOptional(s)
+}
