@@ -469,16 +469,16 @@ func TestNFTDetailScript(t *testing.T) {
 	t.Run("Should be able to get collection display by collection Identifier", func(t *testing.T) {
 		otu.O.Script("getCatalogCollectionDisplay",
 			WithArg("collectionIdentifier", typ),
-			WithArg("type", typ),
+			WithArg("type", OptionalString(typ)),
 		).
 			AssertWithPointerWant(t, "/collectionDisplay/name", autogold.Want("test", "user1"))
 
 	})
 
-	t.Run("Should be able to get collection display by collection Identifier", func(t *testing.T) {
+	t.Run("Should be able to get collection display by collection name", func(t *testing.T) {
 		otu.O.Script("getCatalogCollectionDisplay",
 			WithArg("collectionIdentifier", "user1"),
-			WithArg("type", typ),
+			WithArg("type", OptionalString(typ)),
 		).
 			AssertWithPointerWant(t, "/collectionDisplay/name", autogold.Want("test", "user1"))
 	})
