@@ -66,6 +66,11 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				addresses[receiver] = checkUser!
 				user = checkUser!
 			}
+			let checkAcct = getAccount(user!)
+			if checkAcct.balance == 0.0 {
+				report.append(logErr(i, err: "Account is not an activated account"))
+				continue
+			}
 
 			
 			var isDapper=false
