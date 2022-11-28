@@ -92,7 +92,7 @@ import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
                 }
             }
 
-            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project, collectionName: contractItem[0]!.contract.name)
+            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project, collectionName: contractItem[0]?.contract?.name ?? project)
 
         }
 
@@ -100,3 +100,4 @@ import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
 
     }
 
+ 
