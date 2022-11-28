@@ -67,14 +67,14 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				user = checkUser!
 			}
 
+			
 			var isDapper=false
-			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
+			if let receiver =getAccount(user!).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
 			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
 			} else {
-				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
+				if let duc = getAccount(user!).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
 					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
 				}
-				isDapper = false
 			}
 
 			// check receiver account storage 
