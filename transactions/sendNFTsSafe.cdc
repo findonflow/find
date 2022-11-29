@@ -115,7 +115,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			}
 
 			// airdrop thru airdropper
-			FindAirdropper.safeAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message}, devalidation: false)
+			FindAirdropper.safeAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message}, deepValidation: true)
 		}
 
 
