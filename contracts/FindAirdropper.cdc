@@ -14,12 +14,12 @@ pub contract FindAirdropper {
     pub event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, id: UInt64, uuid: UInt64, type: String, title: String?, thumbnail: String?, nftInfo: FindMarket.NFTInfo?, context: {String : String}, reason: String)
 
     // The normal way of airdrop. If the user didn't init account, they cannot receive it
-    pub fun safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}) {
+    pub fun safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, devalidation: Bool) {
 
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
-        if !pointer.valid() {
+        if !devalidation && !pointer.valid() {
             emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nil, thumbnail: nil, nftInfo: nil, context: context, reason: "Invalid NFT Pointer")
             return
         }
@@ -68,13 +68,13 @@ pub contract FindAirdropper {
         pointer.deposit(<- item)
     }
 
-    pub fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>) {
+    pub fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, devalidation: Bool) {
         
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
         
-        if !pointer.valid() {
+        if !devalidation && !pointer.valid() {
             emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nil, thumbnail: nil, nftInfo: nil, context: context, reason: "Invalid NFT Pointer")
             return
         }
@@ -102,13 +102,13 @@ pub contract FindAirdropper {
         emit AirdroppedToLostAndFound(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: nil, ticketID: ticketID!)
     }
 
-    pub fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>) {
+    pub fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, devalidation: Bool) {
         
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
 
-        if !pointer.valid() {
+        if !devalidation && !pointer.valid() {
             emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nil, thumbnail: nil, nftInfo: nil, context: context, reason: "Invalid NFT Pointer")
             return
         }
