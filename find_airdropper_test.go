@@ -284,7 +284,6 @@ func TestFindAirdropper(t *testing.T) {
 					"context": map[string]interface{}{
 						"message": fmt.Sprintf("Message %d", i),
 					},
-					"remark": "Receiver Not Linked",
 				})
 			}
 

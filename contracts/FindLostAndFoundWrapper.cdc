@@ -257,13 +257,6 @@ pub contract FindLostAndFoundWrapper {
         destroy vault
     }
 
-    access(account) fun emitNFTDepositedEvent(receiver: Address, sender: Address, id: UInt64, uuid: UInt64, type: Type, display: MetadataViews.Display, collectionDisplay: MetadataViews.NFTCollectionDisplay?, memo: String?) {
-
-        let senderName = FIND.reverseLookup(sender)
-
-        emit NFTDeposited(receiver: receiver, receiverName: FIND.reverseLookup(receiver), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-    }
-
     access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: &FungibleToken.Vault, sender: Address, uuid: UInt64) : Bool {
         let subsidizeCapacity = requiredStorage - receiverAvailableStorage
         let subsidizeAmount = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(subsidizeCapacity))

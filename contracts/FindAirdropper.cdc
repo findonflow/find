@@ -47,7 +47,6 @@ pub contract FindAirdropper {
         if receiverCap.check() {
 
             emit Airdropped(from: from , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: nil)
-            FindLostAndFoundWrapper.emitNFTDepositedEvent(receiver: receiver, sender: from, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType, display: display, collectionDisplay: collectionDisplay, memo: context["message"])
 
             receiverCap.borrow()!.deposit(token: <- item)
             return 
@@ -57,7 +56,6 @@ pub contract FindAirdropper {
 
                 let from = pointer.owner()
                 emit Airdropped(from: from , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: "Receiver Not Linked")
-                FindLostAndFoundWrapper.emitNFTDepositedEvent(receiver: receiver, sender: from, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType, display: display, collectionDisplay: collectionDisplay, memo: context["message"])
 
                 collectionPublicCap.borrow()!.deposit(token: <- item)
                 return 
@@ -96,7 +94,7 @@ pub contract FindAirdropper {
         )
 
         if ticketID == nil {
-            emit Airdropped(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: "Receiver Not Linked")
+            emit Airdropped(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: nil)
             return
         }
         emit AirdroppedToLostAndFound(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: nil, ticketID: ticketID!)
@@ -130,7 +128,7 @@ pub contract FindAirdropper {
         )
 
         if ticketID == nil {
-            emit Airdropped(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: "Receiver Not Linked")
+            emit Airdropped(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: nil)
             return
         }
         emit AirdroppedToLostAndFound(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context, remark: nil, ticketID: ticketID!)
