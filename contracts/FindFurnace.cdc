@@ -18,5 +18,13 @@ pub contract FindFurnace {
         destroy pointer.withdraw()
     }
 
+    pub fun burnWithoutValidation(pointer: FindViews.AuthNFTPointer, context: {String : String}) {
+        let vr = pointer.getViewResolver()
+        let nftInfo = FindMarket.NFTInfo(vr, id: pointer.id, detail: true)
+
+        emit Burned(from: pointer.owner() , id: pointer.id, uuid: pointer.uuid, type: pointer.itemType.identifier, title: nftInfo.name, thumbnail: nftInfo.thumbnail, nftInfo: nftInfo, context: context)
+        destroy pointer.withdraw()
+    }
+
 }
 
