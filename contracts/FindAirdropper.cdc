@@ -11,7 +11,7 @@ pub contract FindAirdropper {
 
     pub event Airdropped(from: Address ,fromName: String?, to: Address, toName: String?,uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?)
     pub event AirdroppedToLostAndFound(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?, ticketID: UInt64)
-    pub event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo?, context: {String : String}, reason: String)
+    pub event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, id: UInt64, type: String, context: {String : String}, reason: String)
 
     // The normal way of airdrop. If the user didn't init account, they cannot receive it
     pub fun safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, deepValidation: Bool) {
@@ -20,7 +20,7 @@ pub contract FindAirdropper {
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
         if deepValidation && !pointer.valid() {
-            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nil, context: context, reason: "Invalid NFT Pointer")
+            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier,  context: context, reason: "Invalid NFT Pointer")
             return
         }
 
@@ -37,7 +37,7 @@ pub contract FindAirdropper {
         let receiverAvailableStorage = getAccount(receiver).storageCapacity - getAccount(receiver).storageUsed
         // If requiredStorage > receiverAvailableStorage, deposit will not be successful, we will emit fail event and deposit back to the sender's collection
         if receiverAvailableStorage < requiredStorage {
-            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, reason: "Insufficient User Storage")
+            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier, context: context, reason: "Insufficient User Storage")
             pointer.deposit(<- item)
             return
         }
@@ -60,7 +60,7 @@ pub contract FindAirdropper {
             }
         }
     
-        emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, reason: "Invalid Receiver Capability")
+        emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier, context: context, reason: "Invalid Receiver Capability")
         pointer.deposit(<- item)
     }
 
@@ -71,7 +71,7 @@ pub contract FindAirdropper {
         let fromName = FIND.reverseLookup(from)
         
         if deepValidation && !pointer.valid() {
-            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nil, context: context, reason: "Invalid NFT Pointer")
+            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier, context: context, reason: "Invalid NFT Pointer")
             return
         }
 
@@ -105,7 +105,7 @@ pub contract FindAirdropper {
         let fromName = FIND.reverseLookup(from)
 
         if deepValidation && !pointer.valid() {
-            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nil, context: context, reason: "Invalid NFT Pointer")
+            emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier, context: context, reason: "Invalid NFT Pointer")
             return
         }
 
