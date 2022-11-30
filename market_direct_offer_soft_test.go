@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/bjartek/overflow"
@@ -719,7 +718,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		sellers := []string{seller}
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
-		prices := fmt.Sprintf(`[%f`, price)
+		prices := []float64{price}
 
 		for len(ids) < number {
 			id := otu.mintThreeExampleDandies()
@@ -732,7 +731,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sellers = append(sellers, sellers[0])
 			dandy = append(dandy, dandy[0])
 			flow = append(flow, flow[0])
-			prices = prices + fmt.Sprintf(`, %f`, price)
+			prices = append(prices, prices[0])
 		}
 
 		otu.O.Tx("bidMultipleMarketDirectOfferSoft",
@@ -766,7 +765,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		sellers := []string{seller}
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
 		flow := []string{"Flow"}
-		prices := fmt.Sprintf(`[%f`, price)
+		prices := []float64{price}
 
 		for len(ids) < number {
 			id := otu.mintThreeExampleDandies()
@@ -779,7 +778,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			sellers = append(sellers, sellers[0])
 			dandy = append(dandy, dandy[0])
 			flow = append(flow, flow[0])
-			prices = prices + fmt.Sprintf(`, %f`, price)
+			prices = append(prices, prices[0])
 		}
 
 		otu.O.Tx("bidMultipleMarketDirectOfferSoft",
