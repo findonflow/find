@@ -411,7 +411,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.setLeaseTenantRuleFUSD("FlowLeaseSale").
 			removeLeaseTenantRule("FlowLeaseSale", "Flow")
 
-		otu.O.Tx("testSetResidualAddress",
+		otu.O.Tx("devSetResidualAddress",
 			WithSigner("find"),
 			WithArg("address", "user3"),
 		).
@@ -479,7 +479,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       323,
+			"id":       367,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))

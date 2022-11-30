@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -185,7 +186,7 @@ func TestNFTDetailScript(t *testing.T) {
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price)
 
-		otu.O.Tx("testListStorefront",
+		otu.O.Tx("devListStorefront",
 			WithSigner("user1"),
 			WithArg("saleItemID", ids[1]),
 			WithArg("saleItemPrice", 10.0),
@@ -225,7 +226,7 @@ func TestNFTDetailScript(t *testing.T) {
 			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price)
 
-		dandyIds := otu.O.Tx("testMintDandyTO",
+		dandyIds := otu.O.Tx("devMintDandyTO",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
 			WithArg("maxEdition", 1),
@@ -413,7 +414,7 @@ func TestNFTDetailScript(t *testing.T) {
 			directOfferMarketSoft("user2", "user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			listNFTForSoftAuction("user1", ids[1], price).
-			blockDandy("testBlockItem")
+			blockDandy("devBlockItem")
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
@@ -430,7 +431,7 @@ func TestNFTDetailScript(t *testing.T) {
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
-			blockDandy("testBlockItem")
+			blockDandy("devBlockItem")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").
 			GetAsJson()
@@ -451,7 +452,7 @@ func TestNFTDetailScript(t *testing.T) {
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
 			setFlowDandyMarketOption("AuctionSoft").
-			blockDandy("testBlockItemByListingType")
+			blockDandy("devBlockItemByListingType")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").
 			GetAsJson()
@@ -461,5 +462,24 @@ func TestNFTDetailScript(t *testing.T) {
 		}
 
 		autogold.Equal(t, actual)
+	})
+
+	typ := fmt.Sprintf("A.%s.Dandy.NFT", otu.O.Account("account").Address().String())
+
+	t.Run("Should be able to get collection display by collection Identifier", func(t *testing.T) {
+		otu.O.Script("getCatalogCollectionDisplay",
+			WithArg("collectionIdentifier", typ),
+			WithArg("type", OptionalString(typ)),
+		).
+			AssertWithPointerWant(t, "/collectionDisplay/name", autogold.Want("test", "user1"))
+
+	})
+
+	t.Run("Should be able to get collection display by collection name", func(t *testing.T) {
+		otu.O.Script("getCatalogCollectionDisplay",
+			WithArg("collectionIdentifier", "user1"),
+			WithArg("type", OptionalString(typ)),
+		).
+			AssertWithPointerWant(t, "/collectionDisplay/name", autogold.Want("test", "user1"))
 	})
 }

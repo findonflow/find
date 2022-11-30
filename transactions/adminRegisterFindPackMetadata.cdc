@@ -12,7 +12,7 @@ import Admin from "../contracts/Admin.cdc"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
-transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}) {
+transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, itemTypes: [String], startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}) {
 
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
@@ -25,7 +25,10 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		self.royaltyWallet = getAccount(royaltyAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
-		self.itemTypes = [Type<@ExampleNFT.NFT>()]
+		self.itemTypes = []
+		for type in itemTypes {
+			self.itemTypes.append(CompositeType(type)!)
+		}
 		self.providerCaps = {}
 		for type in self.itemTypes {
 			let collection = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type.identifier)

@@ -25,7 +25,7 @@ func TestNameDetailScript(t *testing.T) {
 			listForAuction("user2").
 			bid("user1", "user2", 8.0)
 
-		otu.setUUID(300)
+		otu.setUUID(400)
 
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
@@ -33,7 +33,7 @@ func TestNameDetailScript(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedFlowAccountAdded", map[string]interface{}{
+			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountAdded", map[string]interface{}{
 				"name":    "dapper",
 				"address": "0x179b6b1cb6755e31",
 				"related": "0xf3fcd2c1a78f5eee",

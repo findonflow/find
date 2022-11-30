@@ -374,17 +374,6 @@ func TestAuction(t *testing.T) {
 		).
 			AssertFailure(t, "Increment should be greater than 10.00000000")
 
-		otu.O.Tx("increaseNameBid",
-			WithSigner("user2"),
-		)
-
-		otu.O.Tx("increaseNameBid",
-			WithSigner("user2"),
-			WithArg("name", "user1"),
-			WithArg("amount", 0.0),
-		).
-			AssertFailure(t, "Increment should be greater than 10.00000000")
-
 	})
 
 	t.Run("Should be able to increase auction bid", func(t *testing.T) {

@@ -34,6 +34,76 @@
         "mainnet": "0x4eb8a10cb9f87357"
       }
     },
+    "NFTStorefrontV2": {
+      "source": "./contracts/standard/NFTStorefrontV2.cdc",
+      "aliases": {
+        "testnet": "0x2d55b98eb200daef",
+        "mainnet": "0x4eb8a10cb9f87357"
+      }
+    },
+    "CoatCheck": {
+      "source": "./contracts/community/CoatCheck.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "FlowtyUtils": {
+      "source": "./contracts/community/FlowtyUtils.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "FlowtyRentals": {
+      "source": "./contracts/community/FlowtyRentals.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "Flowty": {
+      "source": "./contracts/community/Flowty.cdc",
+      "aliases": {
+        "testnet": "0xe1d43e0cfc237807",
+        "mainnet": "0x5c57f79c6694797f"
+      }
+    },
+    "Flovatar": {
+      "source": "./contracts/community/Flovatar.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarComponent": {
+      "source": "./contracts/community/FlovatarComponent.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarComponentTemplate": {
+      "source": "./contracts/community/FlovatarComponentTemplate.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarMarketplace": {
+      "source": "./contracts/community/FlovatarMarketplace.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
+    "FlovatarPack": {
+      "source": "./contracts/community/FlovatarPack.cdc",
+      "aliases": {
+        "testnet": "0x9392a4a7c3f49a0b",
+        "mainnet": "0x921ea449dffec68a"
+      }
+    },
     "FungibleToken": {
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
@@ -239,9 +309,13 @@
     "FTRegistry": "./contracts/FTRegistry.cdc",
     "NFTRegistry": "./contracts/NFTRegistry.cdc",
     "FindForge": "./contracts/FindForge.cdc",
+    "FindForgeOrder": "./contracts/FindForgeOrder.cdc",
+    "FindForgeStruct": "./contracts/FindForgeStruct.cdc",
+    "FindFooDIM": "./contracts/FindFooDIM.cdc",
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "NFGv3": "./contracts/NFGv3.cdc",
     "PartyFavorz": "./contracts/PartyFavorz.cdc",
+    "PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc",
     "FindRewardToken": "./contracts/FindRewardToken.cdc",
     "FindToken": "./contracts/FindToken.cdc",
     "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
@@ -253,7 +327,12 @@
     "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
     "FindPack": "./contracts/FindPack.cdc",
     "FindVerifier": "./contracts/FindVerifier.cdc",
-    "Flomies": "./contracts/Flomies.cdc"
+    "Flomies": "./contracts/Flomies.cdc",
+    "FindAirdropper": "./contracts/FindAirdropper.cdc",
+    "FindFurnace": "./contracts/FindFurnace.cdc",
+    "FindUtils": "./contracts/FindUtils.cdc",
+    "FindUserStatus": "./contracts/FindUserStatus.cdc",
+    "FindThoughts": "./contracts/FindThoughts.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -363,17 +442,25 @@
         "RelatedAccounts",
         "FTRegistry",
         "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
         "ProfileCache",
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
         "FindLostAndFoundWrapper",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindUtils",
+        "FindUserStatus",
+        "FindThoughts"
       ],
       "mainnet-find-forge": [
         "NFGv3",
         "PartyFavorz",
+        "PartyFavorzExtraData",
         "Flomies"
       ]
     },
@@ -397,6 +484,8 @@
         "RelatedAccounts",
         "FTRegistry",
         "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
@@ -406,15 +495,19 @@
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindThoughts",
+        "FindUtils",
+        "FindUserStatus",
+				"FindLostAndFoundWrapper"
       ],
       "testnet-user1": [
         "NFGv3",
         "PartyFavorz",
+        "PartyFavorzExtraData",
         "Flomies"
-      ],
-      "testnet-find-lost-and-found-wrapper": [
-        "FindLostAndFoundWrapper"
       ],
       "testnet-emerald-identity": [
         "EmeraldIdentityLilico",
@@ -427,6 +520,8 @@
         "FindToken",
         "FIND",
         "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
         "NonFungibleToken",
         "Clock",
         "Profile",
@@ -450,6 +545,7 @@
         "RelatedAccounts",
         "FTRegistry",
         "NFTStorefront",
+        "NFTStorefrontV2",
         "DapperUtilityCoin",
         "FlowUtilityToken",
         "TokenForwarding",
@@ -475,7 +571,21 @@
         "EmeraldIdentityDapper",
         "EmeraldIdentity",
         "FindPack",
-        "FindVerifier"
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindUtils",
+        "CoatCheck",
+        "Flowty",
+        "FlowtyRentals",
+        "Flovatar",
+        "FlovatarComponent",
+        "FlovatarMarketplace",
+        "FlovatarComponentTemplate",
+        "FlovatarPack",
+        "FlowtyUtils",
+        "FindUserStatus",
+        "FindThoughts"
       ],
       "emulator-find": [],
       "emulator-user1": [],
@@ -483,7 +593,8 @@
       "emulator-user3": [],
       "emulator-user4": [
         "NFGv3",
-        "PartyFavorz"
+        "PartyFavorz",
+        "PartyFavorzExtraData"
       ],
       "emulator-user5-dapper": []
     }

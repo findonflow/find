@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	"github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 )
 
@@ -19,7 +19,7 @@ func TestFTRegistry(t *testing.T) {
 	t.Run("Should be able to registry flow token and get it", func(t *testing.T) {
 
 		result, err := o.Script("getFTInfo",
-			overflow.WithArg("aliasOrIdentifier", "Flow"),
+			WithArg("aliasOrIdentifier", "Flow"),
 		).
 			GetAsJson()
 
@@ -30,7 +30,7 @@ func TestFTRegistry(t *testing.T) {
 		otu.AutoGoldRename("Should be able to registry flow token and get it by alias", result)
 
 		result, err = o.Script("getFTInfo",
-			overflow.WithArg("aliasOrIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault"),
+			WithArg("aliasOrIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault"),
 		).
 			GetAsJson()
 
@@ -44,7 +44,7 @@ func TestFTRegistry(t *testing.T) {
 	t.Run("Should not be able to overrride a ft without removing it first", func(t *testing.T) {
 
 		o.Tx("adminSetFTInfo_flow",
-			overflow.WithSigner("find"),
+			WithSigner("find"),
 		).
 			AssertFailure(t, "This FungibleToken Register already exist")
 
@@ -72,7 +72,7 @@ func TestFTRegistry(t *testing.T) {
 		})
 
 		result, err := o.Script("getFTInfo",
-			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FiatToken.Vault"),
+			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FiatToken.Vault"),
 		).
 			GetAsJson()
 
@@ -90,12 +90,12 @@ func TestFTRegistry(t *testing.T) {
 			registerUser("user2")
 
 		o.Tx("sendFT",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 5.0),
-			overflow.WithArg("ftAliasOrIdentifier", "USDC"),
-			overflow.WithArg("tag", "test"),
-			overflow.WithArg("message", "This is a message"),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 5.0),
+			WithArg("ftAliasOrIdentifier", "USDC"),
+			WithArg("tag", "test"),
+			WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FiatToken.TokensDeposited", map[string]interface{}{
@@ -120,12 +120,12 @@ func TestFTRegistry(t *testing.T) {
 	t.Run("Should be able to send fusd to another name", func(t *testing.T) {
 
 		o.Tx("sendFT",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 5.0),
-			overflow.WithArg("ftAliasOrIdentifier", "FUSD"),
-			overflow.WithArg("tag", "test"),
-			overflow.WithArg("message", "This is a message"),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 5.0),
+			WithArg("ftAliasOrIdentifier", "FUSD"),
+			WithArg("tag", "test"),
+			WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
@@ -150,12 +150,12 @@ func TestFTRegistry(t *testing.T) {
 	t.Run("Should be able to send flow to another name", func(t *testing.T) {
 
 		o.Tx("sendFT",
-			overflow.WithSigner("user2"),
-			overflow.WithArg("name", "user1"),
-			overflow.WithArg("amount", 5.0),
-			overflow.WithArg("ftAliasOrIdentifier", "Flow"),
-			overflow.WithArg("tag", "test"),
-			overflow.WithArg("message", "This is a message"),
+			WithSigner("user2"),
+			WithArg("name", "user1"),
+			WithArg("amount", 5.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", "test"),
+			WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
@@ -190,12 +190,12 @@ func TestFTRegistry(t *testing.T) {
 				})
 
 		o.Script("getFTInfo",
-			overflow.WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FUSD.Vault"),
+			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FUSD.Vault"),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))
 
 		o.Script("getFTInfo",
-			overflow.WithArg("aliasOrIdentifier", "Flow"),
+			WithArg("aliasOrIdentifier", "Flow"),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))
 

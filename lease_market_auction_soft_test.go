@@ -24,20 +24,20 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
-	mintFund("testMintFusd").
+	mintFund("devMintFusd").
 		AssertSuccess(t)
 
-	mintFund("testMintFlow").
+	mintFund("devMintFlow").
 		AssertSuccess(t)
 
-	mintFund("testMintUsdc").
+	mintFund("devMintUsdc").
 		AssertSuccess(t)
 
 	otu.registerUserWithName("user1", "name1").
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
-	otu.setUUID(350)
+	otu.setUUID(400)
 
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 

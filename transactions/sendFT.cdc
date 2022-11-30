@@ -31,3 +31,4 @@ transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: Stri
 	}
 }
 
+ 

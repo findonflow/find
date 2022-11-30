@@ -6,6 +6,7 @@ import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import Sender from "./Sender.cdc"
 import ProfileCache from "./ProfileCache.cdc"
+import FindUtils from "./FindUtils.cdc"
 /*
 
 ///FIND
@@ -102,13 +103,16 @@ pub contract FIND {
 	}
 
 	pub fun resolve(_ input:String) : Address? {
-		if FIND.validateFindName(input) {
-			return FIND.lookupAddress(input)
+
+		let trimmedInput = FIND.trimFindSuffix(input)
+
+		if FIND.validateFindName(trimmedInput) {
+			return FIND.lookupAddress(trimmedInput)
 		}
 
-		var address=input
-		if input.utf8[1] == 120 {
-			address = input.slice(from: 2, upTo: input.length)
+		var address=trimmedInput
+		if trimmedInput.utf8[1] == 120 {
+			address = trimmedInput.slice(from: 2, upTo: trimmedInput.length)
 		}
 		var r:UInt64 = 0 
 		var bytes = address.decodeHex()
@@ -122,12 +126,15 @@ pub contract FIND {
 
 	/// Lookup the address registered for a name
 	pub fun lookupAddress(_ name:String): Address? {
-		if !FIND.validateFindName(name) {
+
+		let trimmedName = FIND.trimFindSuffix(name)
+
+		if !FIND.validateFindName(trimmedName) {
 			panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 		}
 
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-			return network.lookup(name)?.owner?.address
+			return network.lookup(trimmedName)?.owner?.address
 		}
 		panic("Network is not set up")
 	}
@@ -135,15 +142,17 @@ pub contract FIND {
 	/// Lookup the profile registered for a name
 	pub fun lookup(_ input:String): &{Profile.Public}? {
 
-		if FIND.validateFindName(input) {
+		let trimmedInput = FIND.trimFindSuffix(input)
+
+		if FIND.validateFindName(trimmedInput) {
 			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-				return network.lookup(input)
+				return network.lookup(trimmedInput)
 			}
 		}
 
-		var address=input
-		if input.utf8[1] == 120 {
-			address = input.slice(from: 2, upTo: input.length)
+		var address=trimmedInput
+		if trimmedInput.utf8[1] == 120 {
+			address = trimmedInput.slice(from: 2, upTo: trimmedInput.length)
 		}
 		var r:UInt64 = 0 
 		var bytes = address.decodeHex()
@@ -1869,6 +1878,16 @@ pub contract FIND {
 
 	}
 
+	pub fun trimFindSuffix(_ name: String) : String {
+		if FindUtils.containsChar(name, char: "."){
+			if FindUtils.hasSuffix(name, suffix: ".find"){
+				return name.slice(from: 0, upTo: ".find".length)
+			}
+			panic("Please do not pass in invalid character : '.'")
+		}
+		return name
+	}
+
 	access(contract) fun checkMerchantAddress(_ merchAccount: Address) {
 		// If only find can sign the trxns and call this function, then we do not have to check the address passed in.  
 		// Otherwise, would it be wiser if we hard code the address here? 
@@ -1880,7 +1899,7 @@ pub contract FIND {
 			}
 		} else if FIND.account.address == 0x35717efbbce11c74 {
 		// This is for testnet
-			if merchAccount != 0x35717efbbce11c74 {
+			if merchAccount != 0x4748780c8bf65e19{
 				panic("Merch Account address does not match with expected")
 			}
 		} else {

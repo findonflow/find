@@ -8,9 +8,11 @@ import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
+import FindForgeOrder from "./FindForgeOrder.cdc"
 import FindPack from "./FindPack.cdc"
 import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
+import FindViews from "./FindViews.cdc"
 
 pub contract Admin {
 
@@ -85,7 +87,38 @@ pub contract Admin {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			FindForge.addContractData(lease: lease, forgeType: forgeType , data: data)
+			FindForge.adminAddContractData(lease: lease, forgeType: forgeType , data: data)
+		}
+
+		pub fun addForgeMintType(_ mintType: String) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForgeOrder.addMintType(mintType)
+		}
+
+		pub fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindForge.adminOrderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+		}
+
+		pub fun cancelForgeOrder(leaseName: String, mintType: String){
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			FindForge.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
+		}
+
+		pub fun fulfillForgeOrder(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
 		}
 
 		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
@@ -460,6 +493,21 @@ pub contract Admin {
 		/// ===================================================================================
 		// Find Pack
 		/// ===================================================================================
+
+		pub fun getAuthPointer(pathIdentifier: String, id: UInt64) : FindViews.AuthNFTPointer {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+			
+			let privatePath = PrivatePath(identifier: pathIdentifier)! 
+			var cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
+			if !cap.check() {
+				let storagePath = StoragePath(identifier: pathIdentifier)! 
+				Admin.account.link<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath , target: storagePath)
+				cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
+			}
+			return FindViews.AuthNFTPointer(cap: cap, id: id)
+		}
 
 		pub fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
 			pre {

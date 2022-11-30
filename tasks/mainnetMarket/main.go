@@ -105,15 +105,43 @@ func main() {
 		// "FlowverseSocks":               `["A.ce4c02539d1fabe8.FlowverseSocks.NFT"]`,
 		// "Zeedz":                        `["A.62b3063fbe672fc8.ZeedzINO.NFT"]`,
 		// "PartyFavorz": `["A.123cb666996b8432.PartyFavorz.NFT"]`,
+		// "xG":     `["A.c357c8d061353f5f.XGStudio.NFT"]`,
+		// "digiYo": `["A.ae3baa0d314e546b.Digiyo.NFT"]`,
+		//"flovatar":             `["A.921ea449dffec68a.Flovatar.NFT" , "A.921ea449dffec68a.FlovatarComponent.NFT", "A.921ea449dffec68a.Flobot.NFT"]`,
+		//"Emeralds":             `["A.5643fd47a29770e7.Emeralds.NFT"]`,
+		//"FridgeMagnet":         `["A.4e7213d003a3a38a.FridgeMagnet.NFT"]`,
+		//"FlowverseMysteryPass": `["A.9212a87501a8a6a2.FlowversePass.NFT"]`,
+		//"AsobaNFTCollection":      `["A.9eafd89fa6abb1d3.Asoba.NFT"]`,
+		//"IceTraeDiamondHands":     `["A.bb39f0dae1547256.IceTraeDiamondHands.NFT"]`,
+		//"TouchstoneManekiPlanets": `["A.cf3c77ef638573e8.TouchstoneManekiPlanets.NFT"]`,
+		//"ChainmonstersRewards":    `["A.93615d25d14fa337.ChainmonstersRewards.NFT"]`,
+		//"TheFootballClub":         `["A.81e95660ab5308e1.TFCItems.NFT"]`,
+		//"PartyMansion": `["A.34f2bf4a80bb0f69.PartyMansionDrinksContract.NFT", "A.34f2bf4a80bb0f69.GooberXContract.NFT"]`,
 
-		"xG":     `["A.c357c8d061353f5f.XGStudio.NFT"]`,
-		"digiYo": `["A.ae3baa0d314e546b.Digiyo.NFT"]`,
+		// Delisted
 	}
 
 	for name, contracts := range flowNfts {
 		upsertItem(
 			WithArg("nftName", name), //primary key
 			WithArg("nftTypes", contracts),
+		)
+	}
+
+	delistItem := o.TxFileNameFN("adminMainnetRemoveItem",
+		adminSigner,
+		WithArg("tenant", "find"),
+		WithArg("ftName", "flow"),
+		WithArg("listingName", "escrow"),
+	)
+
+	delist := []string{
+		//"FlowverseMysteryPass",
+	}
+
+	for _, name := range delist {
+		delistItem(
+			WithArg("nftName", name),
 		)
 	}
 	/*

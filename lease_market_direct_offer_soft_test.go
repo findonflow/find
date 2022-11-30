@@ -22,17 +22,17 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		setProfile("user2")
 	price := 10.0
 
-	mintFund("testMintFusd").AssertSuccess(t)
+	mintFund("devMintFusd").AssertSuccess(t)
 
-	mintFund("testMintFlow").AssertSuccess(t)
+	mintFund("devMintFlow").AssertSuccess(t)
 
-	mintFund("testMintUsdc").AssertSuccess(t)
+	mintFund("devMintUsdc").AssertSuccess(t)
 
 	otu.registerUserWithName("user1", "name1").
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
-	otu.setUUID(350)
+	otu.setUUID(400)
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 

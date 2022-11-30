@@ -13,12 +13,14 @@ pub fun main(user: String, collections: [String]) : {String : ItemReport} {
         pub let extraIDs : [UInt64]
         pub let shard : String 
         pub let extraIDsIdentifier : String 
+	    pub let collectionName: String
 
-        init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String) {
+        init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
             self.length=length 
             self.extraIDs=extraIDs
             self.shard=shard
             self.extraIDsIdentifier=extraIDsIdentifier
+            self.collectionName=collectionName
         }
     }
 

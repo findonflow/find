@@ -681,7 +681,7 @@ func TestMarketSale(t *testing.T) {
 
 		number := 15
 
-		mintFund("testMintFusd").AssertSuccess(t)
+		mintFund("devMintFusd").AssertSuccess(t)
 
 		ids := otu.mintThreeExampleDandies()
 		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}

@@ -12,7 +12,7 @@ func main() {
 
 	// user := "bjartek"
 
-	// res := o.ScriptFromFile("testFactoryCollectionMainnet").Args(o.Arguments().String(user)).RunReturnsJsonString()
+	// res := o.ScriptFromFile("devFactoryCollectionMainnet").Args(o.Arguments().String(user)).RunReturnsJsonString()
 	// fmt.Println(res)
 
 	o2 := overflow.NewOverflowTestnet().Start()
