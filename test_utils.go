@@ -1887,16 +1887,6 @@ func (otu *OverflowTestUtils) destroyDandyCollection(user string) *OverflowTestU
 	return otu
 }
 
-func (otu *OverflowTestUtils) destroyLeaseCollection(user string) *OverflowTestUtils {
-
-	otu.O.Tx("devDestroyLeaseCollection",
-		WithSigner(user),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) sendDandy(receiver, sender string, id uint64) *OverflowTestUtils {
 
 	otu.O.Tx("sendDandy",
