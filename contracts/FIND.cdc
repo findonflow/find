@@ -111,6 +111,8 @@ pub contract FIND {
 			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 				return network.lookup(trimmedInput)?.owner?.address
 			}
+
+return nil
 		}
 
 		var address=trimmedInput
