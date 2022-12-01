@@ -335,11 +335,28 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to fund users without profile", func(t *testing.T) {
+
+		user := "user1"
+		otu.registerFtInRegistry()
+
+		user3 := otu.O.Address("user3")
+		otu.O.Tx("sendFT",
+			WithSigner(user),
+			WithArg("name", user3),
+			WithArg("amount", 10.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", `""`),
+			WithArg("message", `""`),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FungibleTokenSent")
+	})
+
 	t.Run("Should be able to fund users with profile but without find name", func(t *testing.T) {
 
 		user := "user1"
-		otu.registerFtInRegistry().
-			createUser(1000, "user3")
+		otu.createUser(1000, "user3")
 
 		user3 := otu.O.Address("user3")
 
