@@ -108,7 +108,9 @@ pub contract FIND {
 		let trimmedInput = FIND.trimFindSuffix(input)
 
 		if FIND.validateFindName(trimmedInput) {
-			return FIND.lookupAddress(trimmedInput)
+			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
+				return network.lookup(trimmedInput)?.owner?.address
+			}
 		}
 
 		var address=trimmedInput
@@ -137,35 +139,17 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(trimmedName)?.owner?.address
 		}
-		panic("Not a valid FIND name")
+		return nil
 	}
 
 	/// Lookup the profile registered for a name
 	pub fun lookup(_ input:String): &{Profile.Public}? {
-
-		let trimmedInput = FIND.trimFindSuffix(input)
-
-		if FIND.validateFindName(trimmedInput) {
-			if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
-				return network.lookup(trimmedInput)
+		if let address = FIND.resolve(input) {
+			let account = getAccount(address)
+			let cap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
+			if cap.check() {
+				return cap.borrow()
 			}
-		}
-
-		var address=trimmedInput
-		if trimmedInput.utf8[1] == 120 {
-			address = trimmedInput.slice(from: 2, upTo: trimmedInput.length)
-		}
-		var r:UInt64 = 0 
-		var bytes = address.decodeHex()
-
-		while bytes.length>0{
-			r = r  + (UInt64(bytes.removeFirst()) << UInt64(bytes.length * 8 ))
-		}
-
-		let account = getAccount(Address(r))
-		let cap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if cap.check() {
-			return cap.borrow()
 		}
 		return nil
 	}
@@ -232,34 +216,39 @@ pub contract FIND {
 	/// @param tag: The tag to add to the event 
 	/// @param vault: The vault to send too
 	/// @param from: The sender that sent the funds
-	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token) {
+	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token){
 
 		let fromAddress= from.owner!.address
-		if let profile=FIND.lookup(to) {
-			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
-			profile.deposit(from: <- vault)
+		let maybeAddress = FIND.resolve(to) 
+		if maybeAddress  == nil{
+			 panic("Not a valid .find name or address")
+		 }
+		 let address=maybeAddress!
+
+		let account = getAccount(address)
+			let cap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
+			if cap.check() {
+				let profile= cap.borrow()!
+				emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
+				profile.deposit(from: <- vault)
+				return
+		}
+
+		var path = ""
+		if vault.getType() == Type<@FlowToken.Vault>() {
+			path ="flowTokenReceiver"
+		} else if vault.getType() == Type<@FUSD.Vault>() {
+			path="fusdReceiver"
+    }	
+  	if path != "" {
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
+			account.getCapability<&{FungibleToken.Receiver}>(PublicPath(identifier: path)!).borrow()!.deposit(from: <- vault)
 			return
 		}
+		panic("Could not find a valid receiver for this vault type")
 
-		if let address = FIND.resolve(to) {
-
-			let account=getAccount(address)
-			var path = ""
-			if vault.getType() == Type<@FlowToken.Vault>() {
-				path ="flowTokenReceiver"
-			} else if vault.getType() == Type<@FUSD.Vault>() {
-				path="fusdReceiver"
-	    }	
-   		if path != "" {
-				emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
-				account.getCapability<&{FungibleToken.Receiver}>(PublicPath(identifier: path)!).borrow()!.deposit(from: <- vault)
-				return
-			}
-		}
-
-		panic("Could not deposit to user")
-			
 	}
+
 
 	/// Deposit FT to name
 	/// @param to: The name to send money too
