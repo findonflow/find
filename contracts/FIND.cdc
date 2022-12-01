@@ -1,5 +1,6 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
+import FlowToken from "./standard/FlowToken.cdc"
 import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
@@ -136,7 +137,7 @@ pub contract FIND {
 		if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
 			return network.lookup(trimmedName)?.owner?.address
 		}
-		panic("Network is not set up")
+		panic("Not a valid FIND name")
 	}
 
 	/// Lookup the profile registered for a name
@@ -164,10 +165,9 @@ pub contract FIND {
 		let account = getAccount(Address(r))
 		let cap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if cap.check() {
-			return cap.borrow()!
+			return cap.borrow()
 		}
-
-		panic("Network is not set up")
+		return nil
 	}
 
 
@@ -234,10 +234,31 @@ pub contract FIND {
 	/// @param from: The sender that sent the funds
 	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token) {
 
-		let profile=FIND.lookup(to) ?? panic("Cannot borrow reference to user. Name : ".concat(to))
 		let fromAddress= from.owner!.address
-		emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
-		profile.deposit(from: <- vault)
+		if let profile=FIND.lookup(to) {
+			emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
+			profile.deposit(from: <- vault)
+			return
+		}
+
+		if let address = FIND.resolve(to) {
+
+			let account=getAccount(address)
+			var path = ""
+			if vault.getType() == Type<@FlowToken.Vault>() {
+				path ="flowTokenReceiver"
+			} else if vault.getType() == Type<@FUSD.Vault>() {
+				path="fusdReceiver"
+	    }	
+   		if path != "" {
+				emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier) 
+				account.getCapability<&{FungibleToken.Receiver}>(PublicPath(identifier: path)!).borrow()!.deposit(from: <- vault)
+				return
+			}
+		}
+
+		panic("Could not deposit to user")
+			
 	}
 
 	/// Deposit FT to name
