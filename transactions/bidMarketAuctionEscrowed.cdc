@@ -7,6 +7,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
+import Profile from "../contracts/Profile.cdc"
 
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
@@ -21,6 +22,20 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
+
+		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
+		let tenant = tenantCapability.borrow()!
+		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		/// auctions that escrow ft
+		let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
+
+		let aeBidPublicPath=FindMarket.getPublicPath(aeBidType, name: tenant.name)
+		let aeBidStoragePath= FindMarket.getStoragePath(aeBidType, name:tenant.name)
+		let aeBidCap= account.getCapability<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath) 
+		if !aeBidCap.check() {
+			account.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: aeBidStoragePath)
+			account.link<&FindMarketAuctionEscrow.MarketBidCollection{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath, target: aeBidStoragePath)
+		}
 
 		self.saleItemsCap= FindMarketAuctionEscrow.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap. User address : ".concat(address.toString()))
 
@@ -57,8 +72,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		
-		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
-		let tenant = tenantCapability.borrow()!
 		let bidSstoragePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: bidSstoragePath)

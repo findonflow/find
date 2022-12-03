@@ -25,6 +25,13 @@ type OverflowTestUtils struct {
 	O *OverflowState
 }
 
+type FindMarket_TenantRule struct {
+	Name     string              `json:"name"`
+	Types    []cadence.TypeValue `json:"types"`
+	RuleType string              `json:"ruleType"`
+	Allow    bool                `json:"allow"`
+}
+
 func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 	o := Overflow(
 		WithNetwork("testing"),
@@ -60,6 +67,40 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
+
+	id := otu.mintThreeExampleDandies()[0]
+	return id
+}
+
+func (otu *OverflowTestUtils) setupMarketAndDandyDapper() uint64 {
+	t := otu.T
+
+	otu.setupFIND().
+		createDapperUser("user1").
+		registerDapperUser("user1")
+
+	// works as buyForge
+	otu.O.Tx("adminAddAddon",
+		WithSigner("find"),
+		WithArg("name", "user1"),
+		WithArg("addon", "forge"),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "AddonActivated", map[string]interface{}{
+			"name":  "user1",
+			"addon": "forge",
+		})
+
+	otu.O.Tx("adminAddForge",
+		WithSigner("find"),
+		WithArg("type", "A.f8d6e0586b0a20c7.Dandy.Forge"),
+		WithArg("name", "user1"),
+	).AssertSuccess(t)
+
+	otu.createDapperUser("user2").
+		createDapperUser("user3").
+		registerDapperUser("user2").
+		registerDapperUser("user3")
 
 	id := otu.mintThreeExampleDandies()[0]
 	return id
@@ -775,12 +816,12 @@ func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *Overf
 
 func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listNFTForAuctionSoft",
+	otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -1032,7 +1073,7 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 
 func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidMarketAuctionSoft",
+	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
@@ -1185,13 +1226,13 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) 
 
 func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidMarketDirectOfferSoft",
+	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -1268,7 +1309,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 
 func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("acceptDirectOfferSoft",
+	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("id", id),
@@ -1446,8 +1487,9 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 
 func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillMarketAuctionSoft",
+	otu.O.Tx("fulfillMarketAuctionSoftDapper",
 		WithSigner(name),
+		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1483,8 +1525,9 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name st
 
 func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillMarketDirectOfferSoft",
+	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 		WithSigner(name),
+		WithPayloadSigner("account"),
 		WithArg("marketplace", "account"),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1788,6 +1831,20 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 		WithSigner("find"),
 		WithArg("tenant", "account"),
 		WithArg("cut", cut),
+		WithArg("saleItemName", "findRoyalty"),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
+
+	otu.O.Tx("adminSetFindCut",
+		WithSigner("find"),
+		WithArg("tenant", "account"),
+		WithArg("cut", cut),
+		WithArg("saleItemName", "findFutRoyalty"),
 	).
 		AssertSuccess(otu.T)
 
@@ -2147,7 +2204,12 @@ func (otu *OverflowTestUtils) registerDUCInRegistry() *OverflowTestUtils {
 	otu.registerFTInFtRegistry("duc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
 		"alias":          "DUC",
 		"typeIdentifier": "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
-	}).registerExampleNFTInNFTRegistry()
+	}).
+		registerFTInFtRegistry("fut", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+			"alias":          "FUT",
+			"typeIdentifier": "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault",
+		}).
+		registerExampleNFTInNFTRegistry()
 	return otu
 }
 
@@ -2325,13 +2387,13 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name s
 
 func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("bidMarketDirectOfferSoft",
+	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "DUC"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).

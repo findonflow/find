@@ -20,8 +20,16 @@ transaction(marketplace:Address, address: Address, id: UInt64, amount: UFix64) {
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
-
 		let tenant = tenantCapability.borrow()!
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
+
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		if !saleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+		}
 
 		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())

@@ -1,11 +1,13 @@
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
+import Profile from "../contracts/Profile.cdc"
 
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
@@ -20,6 +22,19 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
+
+		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
+		let tenant = tenantCapability.borrow()!
+		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+
+		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
+		let asBidPublicPath=FindMarket.getPublicPath(asBidType, name: tenant.name)
+		let asBidStoragePath= FindMarket.getStoragePath(asBidType, name:tenant.name)
+		let asBidCap= account.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath) 
+		if !asBidCap.check() {
+			account.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
+			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
+		}
 
 		self.saleItemsCap= FindMarketAuctionSoft.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketAuctionSoft.SaleItemCollection>())
@@ -56,8 +71,6 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		
 		self.ftVaultType = ft.type
 
-		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
-		let tenant = tenantCapability.borrow()!
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())
 
 		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)

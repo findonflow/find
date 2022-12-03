@@ -14,6 +14,19 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 	
 	prepare(account: AuthAccount) {
 
+		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
+		let tenant = tenantCapability.borrow()!
+
+	 	/// auctions that refers FT so 'soft' auction
+		let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
+		let asSalePublicPath=FindMarket.getPublicPath(asSaleType, name: tenant.name)
+		let asSaleStoragePath= FindMarket.getStoragePath(asSaleType, name:tenant.name)
+		let asSaleCap= account.getCapability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(asSalePublicPath) 
+		if !asSaleCap.check() {
+			account.save<@FindMarketAuctionSoft.SaleItemCollection>(<- FindMarketAuctionSoft.createEmptySaleItemCollection(tenantCapability), to: asSaleStoragePath)
+			account.link<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(asSalePublicPath, target: asSaleStoragePath)
+		}
+
 		// Get supported NFT and FT Information from Registries from input alias
 		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier)) 
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
@@ -41,8 +54,6 @@ transaction(marketplace:Address, nftAliasOrIdentifier:String, id: UInt64, ftAlia
 			}
 		}
 		
-		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
-		let tenant = tenantCapability.borrow()!
 		self.saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 		self.vaultType= ft.type

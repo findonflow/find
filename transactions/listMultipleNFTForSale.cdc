@@ -29,6 +29,17 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 		self.vaultTypes= []
 		self.pointers= []
 
+		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
+
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		if !saleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+		}
+
 		var counter = 0
 
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}

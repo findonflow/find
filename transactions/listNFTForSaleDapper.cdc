@@ -19,6 +19,16 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 
 		let tenant = tenantCapability.borrow()!
 
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
+
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		if !saleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+		}
+
 		// Get supported NFT and FT Information from Registries from input alias
 		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier)) 
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 

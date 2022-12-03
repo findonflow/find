@@ -16,6 +16,20 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
+		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
+		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
+
+		let tenant = tenantCapability.borrow()!
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
+
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		if !saleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+		}
+
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {
 			panic("The address input is not a valid name nor address. Input : ".concat(user))
