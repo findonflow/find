@@ -6,37 +6,48 @@ import FTRegistry from 0x35717efbbce11c74
 import FindLeaseMarketSale from 0x35717efbbce11c74
 import FindLeaseMarket from 0x35717efbbce11c74
 
-transaction(dapperAddress: Address, leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
+transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 
-    let saleItems : &FindLeaseMarketSale.SaleItemCollection?
-    let pointer : FindLeaseMarket.AuthLeasePointer
-    let vaultType : Type
+	let saleItems : &FindLeaseMarketSale.SaleItemCollection?
+	let pointer : FindLeaseMarket.AuthLeasePointer
+	let vaultType : Type
 
-    prepare(account: AuthAccount) {
+	prepare(account: AuthAccount) {
 
-        let profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
+		// Get the salesItemRef from tenant
+		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
+		let leaseTenant = leaseTenantCapability.borrow()!
 
-        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
-        // Get the salesItemRef from tenant
-        let leaseTenant = leaseTenantCapability.borrow()!
-        self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseTenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>()))
+		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
+		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
+		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
+		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
+		if !leaseSaleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
+		}
 
-        // Get supported NFT and FT Information from Registries from input alias
-        let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-        self.vaultType= ft.type
+		self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
 
-        let ref=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
+		// Get supported NFT and FT Information from Registries from input alias
+		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
+		self.vaultType= ft.type
 
-        self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
-    }
+		let ref=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 
-    pre{
-        self.saleItems != nil : "Cannot borrow reference to saleItem"
-    }
+		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
+	}
 
-    execute{
-        self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+	pre{
+		self.saleItems != nil : "Cannot borrow reference to saleItem"
+	}
 
-    }
+	execute{
+		self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
+
+	}
 
 }
+
