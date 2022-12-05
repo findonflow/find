@@ -1,3 +1,4 @@
+import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
@@ -32,9 +33,18 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
-		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: bidStoragePath)
+		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
+		let doeBidPublicPath=FindMarket.getPublicPath(doeBidType, name: tenant.name)
+		let doeBidStoragePath= FindMarket.getStoragePath(doeBidType, name:tenant.name)
+		let doeBidCap= account.getCapability<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath) 
+		if !doeBidCap.check() {
+			account.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: doeBidStoragePath)
+			account.link<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath, target: doeBidStoragePath)
+		}
+
+		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: doeBidStoragePath)
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
 
 		/* Check for nftCapability */

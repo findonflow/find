@@ -18,7 +18,18 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auction
 		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
-		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseTenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()))
+
+		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
+		let leaseASPublicPath=FindMarket.getPublicPath(leaseASSaleItemType, name: "findLease")
+		let leaseASStoragePath= FindMarket.getStoragePath(leaseASSaleItemType, name:"findLease")
+		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath) 
+		if !leaseASSaleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
+			account.link<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
+		}
+
+		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
 		let ref = account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
 		self.vaultType= ft.type

@@ -844,10 +844,10 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 
 func (otu *OverflowTestUtils) listLeaseForSoftAuction(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listLeaseForAuctionSoft",
+	otu.O.Tx("listLeaseForAuctionSoftDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -1093,7 +1093,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 
 func (otu *OverflowTestUtils) auctionBidLeaseMarketSoft(buyer string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidLeaseMarketAuctionSoft",
+	otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 		WithSigner(buyer),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
@@ -1249,10 +1249,10 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 
 func (otu *OverflowTestUtils) directOfferLeaseMarketSoft(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidLeaseMarketDirectOfferSoft",
+	otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -1328,7 +1328,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 
 func (otu *OverflowTestUtils) acceptLeaseDirectOfferMarketSoft(buyer, seller string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("acceptLeaseDirectOfferSoft",
+	otu.O.Tx("acceptLeaseDirectOfferSoftDapper",
 		WithSigner(seller),
 		WithArg("leaseName", name),
 	).
@@ -1507,8 +1507,9 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 
 func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+	otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 		WithSigner(user),
+		WithPayloadSigner("account"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
@@ -1545,8 +1546,9 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 
 func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("fulfillLeaseMarketDirectOfferSoft",
+	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 		WithSigner(user),
+		WithPayloadSigner("account"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
@@ -1856,6 +1858,20 @@ func (otu *OverflowTestUtils) setFindLeaseCut(cut float64) *OverflowTestUtils {
 	otu.O.Tx("adminSetFindCut",
 		WithSigner("find"),
 		WithArg("tenant", "user4"),
+		WithArg("saleItemName", "findRoyalty"),
+		WithArg("cut", cut),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUtils {
+
+	otu.O.Tx("adminSetFindCut",
+		WithSigner("find"),
+		WithArg("tenant", "user4"),
+		WithArg("saleItemName", "findFutRoyalty"),
 		WithArg("cut", cut),
 	).
 		AssertSuccess(otu.T)
@@ -2256,12 +2272,12 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, pric
 
 func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("listNFTForAuctionSoft",
+	res := otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "DUC"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),

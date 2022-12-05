@@ -674,8 +674,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.createDapperUser("user1").
 			createDapperUser("user2")
 
-		otu.registerDUCInRegistry().
-			setDUCExampleNFT().
+		otu.setDUCExampleNFT().
 			sendExampleNFT("user1", "account")
 
 		saleItemID := otu.listNFTForSoftAuctionDUC("user1", 0, price)

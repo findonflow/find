@@ -1,5 +1,4 @@
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"

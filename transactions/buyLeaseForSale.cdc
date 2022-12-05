@@ -21,7 +21,19 @@ transaction(leaseName: String, amount: UFix64) {
 		}
 		let address = resolveAddress!
 		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
-		self.saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find lease sale item cap")
+		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
+
+		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
+		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
+		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
+		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
+		if !leaseSaleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
+		}
+
+		self.saleItemsCap= getAccount(address).getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketSale.SaleItemCollection>())
 
 		let item= FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)
