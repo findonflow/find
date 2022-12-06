@@ -321,4 +321,56 @@ pub fun main(string: String) : String {
 			AssertWant(t, autogold.Want("Camel case", "camelCase"))
 	})
 
+	devTrimSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+
+pub fun main(string: String, suffix:String) : String {
+	return FindUtils.trimSuffix(string, suffix:suffix)
+}
+`
+
+	t.Run("trimSuffix should trim bam.find", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "bam.find"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : bam.find", "bam"))
+	})
+
+	t.Run("trimSuffix should not trim christian.fine", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "christian.fine"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : christian.fine", "christian.fine"))
+	})
+
+	t.Run("trimSuffix should not trim bam", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "bam"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : bam", "bam"))
+	})
+
+	// Extra tests on trimFindSuffix on FIND
+
+	devTrimFindSuffix := `import FIND from "../contracts/FIND.cdc"
+
+pub fun main(name: String) : String {
+	return FIND.trimFindSuffix(name)
+}
+`
+	t.Run("trimFindSuffix should trim bam.find", func(t *testing.T) {
+		o.Script(devTrimFindSuffix,
+			WithArg("name", "bam.find"),
+		).
+			AssertWant(t, autogold.Want("trimFindSuffix : bam.find", "bam"))
+	})
+
+	t.Run("trimFindSuffix should return bam", func(t *testing.T) {
+		o.Script(devTrimFindSuffix,
+			WithArg("name", "bam"),
+		).
+			AssertWant(t, autogold.Want("trimFindSuffix : bam", "bam"))
+	})
 }

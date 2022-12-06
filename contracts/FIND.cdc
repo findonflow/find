@@ -1891,13 +1891,7 @@ return nil
 	}
 
 	pub fun trimFindSuffix(_ name: String) : String {
-		if FindUtils.containsChar(name, char: "."){
-			if FindUtils.hasSuffix(name, suffix: ".find"){
-				return name.slice(from: 0, upTo: ".find".length)
-			}
-			panic("Please do not pass in invalid character : '.'")
-		}
-		return name
+		return FindUtils.trimSuffix(name, suffix: ".find")
 	}
 
 	access(contract) fun checkMerchantAddress(_ merchAccount: Address) {

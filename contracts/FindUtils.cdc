@@ -23,6 +23,14 @@ pub contract FindUtils {
         return false
     }
 
+	pub fun trimSuffix(_ name: String, suffix: String) : String {
+		if !self.hasSuffix(name, suffix:suffix) {
+			return name
+		}
+		let pos = name.length - suffix.length
+		return name.slice(from: 0, upTo: pos)
+	}
+
     pub fun hasSuffix(_ string: String, suffix: String) : Bool {
         if suffix.length > string.length {
             return false
