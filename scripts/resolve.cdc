@@ -1,10 +1,7 @@
+import FIND from "../contracts/FIND.cdc"
 
+pub fun main(name:String) : Address?{
 
-pub fun main(name:String) : String?{
-
-
-	let pos = name.length - ".find".length
-
-				return name.slice(from: 0, upTo: pos)
+	return FIND.resolve(name)
 
 }

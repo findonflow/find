@@ -7,6 +7,7 @@ import (
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFindUtils(t *testing.T) {
@@ -328,11 +329,59 @@ pub fun main(string: String, suffix:String) : String {
 }
 `
 
-	t.Run("trimSuffix should trim ", func(t *testing.T) {
+	t.Run("trimSuffix should trim bam.find", func(t *testing.T) {
 		o.Script(devTrimSuffix,
 			WithArg("string", "bam.find"),
 			WithArg("suffix", ".find"),
 		).
-			AssertWant(t, autogold.Want("trimSuffix", "bam"))
+			AssertWant(t, autogold.Want("trimSuffix : bam.find", "bam"))
+	})
+
+	t.Run("trimSuffix should not trim christian.fine", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "christian.fine"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : christian.fine", "christian.fine"))
+	})
+
+	t.Run("trimSuffix should not trim bam", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "bam"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : bam", "bam"))
+	})
+
+	// Extra tests on trimFindSuffix on FIND
+
+	devTrimFindSuffix := `import FIND from "../contracts/FIND.cdc"
+
+pub fun main(name: String) : String {
+	return FIND.trimFindSuffix(name)
+}
+`
+	t.Run("trimFindSuffix should trim bam.find", func(t *testing.T) {
+		o.Script(devTrimFindSuffix,
+			WithArg("name", "bam.find"),
+		).
+			AssertWant(t, autogold.Want("trimFindSuffix : bam.find", "bam"))
+	})
+
+	t.Run("trimFindSuffix should panic on bam.fine", func(t *testing.T) {
+		_, err := o.Script(devTrimFindSuffix,
+			WithArg("name", "bam.fine"),
+		).
+			GetAsInterface()
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "Please do not pass in invalid character : '.'")
+	})
+
+	t.Run("trimFindSuffix should return bam", func(t *testing.T) {
+		o.Script(devTrimFindSuffix,
+			WithArg("name", "bam"),
+		).
+			AssertWant(t, autogold.Want("trimFindSuffix : bam", "bam"))
 	})
 }

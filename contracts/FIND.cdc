@@ -1881,8 +1881,7 @@ pub contract FIND {
 	pub fun trimFindSuffix(_ name: String) : String {
 		if FindUtils.containsChar(name, char: "."){
 			if FindUtils.hasSuffix(name, suffix: ".find"){
-				let pos = name.length - ".find".length
-				return name.slice(from: 0, upTo: pos)
+				return FindUtils.trimSuffix(name, suffix: ".find")
 			}
 			panic("Please do not pass in invalid character : '.'")
 		}

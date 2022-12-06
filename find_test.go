@@ -400,7 +400,7 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to resolve find name without .find", func(t *testing.T) {
 		otu.O.Script("resolve",
-			WithArg("input", "user1.find"),
+			WithArg("name", "user1.find"),
 		).
 			AssertWant(t, autogold.Want("user 1 address", otu.O.Address("user1")))
 
@@ -408,7 +408,7 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should panic if user pass in invalid character '.'", func(t *testing.T) {
 		_, err := otu.O.Script("resolve",
-			WithArg("input", "user1.fn"),
+			WithArg("name", "user1.fn"),
 		).
 			GetAsJson()
 
