@@ -413,7 +413,7 @@ func TestFIND(t *testing.T) {
 			GetAsJson()
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "Please do not pass in invalid character : '.'")
+		assert.Contains(t, err.Error(), "invalid byte in hex string")
 
 	})
 

@@ -7,7 +7,6 @@ import (
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFindUtils(t *testing.T) {
@@ -366,16 +365,6 @@ pub fun main(name: String) : String {
 			WithArg("name", "bam.find"),
 		).
 			AssertWant(t, autogold.Want("trimFindSuffix : bam.find", "bam"))
-	})
-
-	t.Run("trimFindSuffix should panic on bam.fine", func(t *testing.T) {
-		_, err := o.Script(devTrimFindSuffix,
-			WithArg("name", "bam.fine"),
-		).
-			GetAsInterface()
-
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "Please do not pass in invalid character : '.'")
 	})
 
 	t.Run("trimFindSuffix should return bam", func(t *testing.T) {

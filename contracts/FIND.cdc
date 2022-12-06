@@ -1879,13 +1879,7 @@ pub contract FIND {
 	}
 
 	pub fun trimFindSuffix(_ name: String) : String {
-		if FindUtils.containsChar(name, char: "."){
-			if FindUtils.hasSuffix(name, suffix: ".find"){
-				return FindUtils.trimSuffix(name, suffix: ".find")
-			}
-			panic("Please do not pass in invalid character : '.'")
-		}
-		return name
+		return FindUtils.trimSuffix(name, suffix: ".find")
 	}
 
 	access(contract) fun checkMerchantAddress(_ merchAccount: Address) {
