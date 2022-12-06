@@ -321,4 +321,18 @@ pub fun main(string: String) : String {
 			AssertWant(t, autogold.Want("Camel case", "camelCase"))
 	})
 
+	devTrimSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+
+pub fun main(string: String, suffix:String) : String {
+	return FindUtils.trimSuffix(string, suffix:suffix)
+}
+`
+
+	t.Run("trimSuffix should trim ", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "bam.find"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix", "bam"))
+	})
 }
