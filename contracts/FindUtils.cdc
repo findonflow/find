@@ -45,6 +45,17 @@ pub contract FindUtils {
         return string.slice(from: 0, upTo: prefix.length) == prefix
     }
 
+    pub fun splitString(_ string: String, sep: Character) : [String] {
+        if var index = string.utf8.firstIndex(of: sep.toString().utf8[0]) {
+			let first = string.slice(from: 0, upTo: index)
+			let second = string.slice(from: index + 1, upTo: string.length)
+			let res = [first]
+			res.appendAll(self.splitString(second, sep: sep))
+			return res
+        }
+        return [string]
+    }
+
     pub fun toUpper(_ string: String) : String {
         let map = FindUtils.getLowerCaseToUpperCase()
         var res = ""

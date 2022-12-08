@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
+import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
@@ -17,7 +17,7 @@ pub struct FINDReport{
 	pub let isDapper: Bool
 	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
-	pub let relatedAccounts: { String: Address}
+	pub let relatedAccounts: { String: [Address]}
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
 	pub let leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}
@@ -34,7 +34,7 @@ pub struct FINDReport{
 
 
 	init(profile: Profile.UserReport?, 
-		 relatedAccounts: {String: Address}, 
+		 relatedAccounts: {String: [Address]}, 
 		 bids: [FIND.BidInfo], 
 		 leases : [FIND.LeaseInformation], 
 		 privateMode: Bool, 
@@ -153,7 +153,7 @@ pub fun main(user: String) : Report? {
 			
 			findReport = FINDReport(
 				profile: profileReport,
-				relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
+				relatedAccounts: FindRelatedAccounts.findRelatedFlowAccounts(address:address),
 				bids: bidCap.borrow()?.getBids() ?? [],
 				leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 				privateMode: profile?.isPrivateModeEnabled() ?? false,
