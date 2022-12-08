@@ -61,8 +61,9 @@ pub struct Thought {
 	pub var reactions: {String : Int}
 	pub var reactedUsers: {String : [String]}
 	pub var quotedThought: Thought?
+	pub let hidden: Bool?
 
-	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, reactedUsers: {String : [String]}, quotedThought: Thought?) {
+	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, reactedUsers: {String : [String]}, quotedThought: Thought?, hidden: Bool?) {
 		self.id = id
 		self.creator = creator
 		self.creatorName = creatorName
@@ -79,6 +80,7 @@ pub struct Thought {
 		self.reactions = reactions
 		self.reactedUsers = reactedUsers
 		self.quotedThought = quotedThought
+		self.hidden = hidden
 	}
 }
 
@@ -149,7 +151,8 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Though
 						reacted: {}, 
 						reactions: {}, 
 						reactedUsers: {},
-						quotedThought: nil
+						quotedThought: nil, 
+						hidden: nil
 					)
 				}
 			}
@@ -171,7 +174,8 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Though
 			reacted: reacted, 
 			reactions: t.reactions, 
 			reactedUsers: reactedUsers,
-			quotedThought: quotedThought
+			quotedThought: quotedThought,
+			hidden: t.getHide()
 		)
 
 }

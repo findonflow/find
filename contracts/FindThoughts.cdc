@@ -8,7 +8,7 @@ import Clock from "./Clock.cdc"
 pub contract FindThoughts {
 
 	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
-	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
+	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])
 	pub event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
 	pub event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
 
@@ -66,6 +66,7 @@ pub contract FindThoughts {
 
 		access(contract) fun internal_react(user: Address, reaction: String?) 
 		pub fun getQuotedThought() : ThoughtPointer? 
+		pub fun getHide() : Bool
 	}
 
 	pub resource Thought : ThoughtPublic , MetadataViews.Resolver {
@@ -104,6 +105,7 @@ pub contract FindThoughts {
 			self.stringTags = stringTags
 			self.scalars = scalars
 			extras["quote"] = quote
+			extras["hidden"] = false
 			self.extras = extras
 
 			self.reacted = {}
@@ -131,6 +133,22 @@ pub contract FindThoughts {
 			return nil
 		}
 
+		pub fun getHide() : Bool {
+			if let r = self.extras["hidden"] {
+				return r as! Bool
+			}
+			return false
+		}
+
+		pub fun hide(_ hide: Bool) {
+			self.extras["hidden"] = hide
+			let medias : [String] = []
+			for m in self.medias {
+				medias.append(m.file.uri())
+			}
+			emit Edited(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, hide: hide, tags: self.tags)
+		}
+
 		pub fun edit(header: String , body: String, tags: [String]) {
 			self.header = header 
 			self.body = body 
@@ -141,7 +159,7 @@ pub contract FindThoughts {
 				medias.append(m.file.uri())
 			}
 			self.lastUpdated = Clock.time()
-			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, tags: self.tags)
+			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, hide: self.getHide(), tags: self.tags)
 		}
 
 		// To withdraw reaction, pass in nil
@@ -286,6 +304,11 @@ pub contract FindThoughts {
 
 			let thought = ref.borrowThoughtPublic(id)
 			thought.internal_react(user: self.owner!.address, reaction: reaction)
+		}
+
+		pub fun hide(id: UInt64, hide: Bool) {
+			let thought = self.borrow(id)
+			thought.hide(hide)
 		}
 
 	}

@@ -7,16 +7,19 @@ import FIND from "../contracts/FIND.cdc"
 
 pub fun main(address: Address) : [Thought] {
 	let thoughts : [Thought] = [] 
-	let account = getAccount(address) 
-	let cap = account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath) 
-	if !cap.check() {
-		return thoughts
-	}
-	let ref = cap.borrow()! 
-	for id in ref.getIDs() {
-		let t = ref.borrowThoughtPublic(id) 
-		thoughts.append(getThought(t, withQuote: true))
-	}
+
+
+		let account = getAccount(address) 
+		let cap = account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath) 
+		if !cap.check() {
+			return []
+		}
+		let ref = cap.borrow()! 
+		for id in ref.getIDs() {
+			let t = ref.borrowThoughtPublic(id) 
+			thoughts.append(getThought(t, withQuote: true))
+		}
+	
 	return thoughts
 }
 
@@ -57,9 +60,11 @@ pub struct Thought {
 	pub var tags: [String]
 	pub var reacted: {String : [User]}
 	pub var reactions: {String : Int}
+	pub var reactedUsers: {String : [String]}
 	pub var quotedThought: Thought?
+	pub var hidden: Bool?
 
-	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, quotedThought: Thought?) {
+	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, reactedUsers: {String : [String]}, quotedThought: Thought?, hidden: Bool?) {
 		self.id = id
 		self.creator = creator
 		self.creatorName = creatorName
@@ -74,7 +79,9 @@ pub struct Thought {
 		self.tags = tags
 		self.reacted = reacted
 		self.reactions = reactions
+		self.reactedUsers = reactedUsers
 		self.quotedThought = quotedThought
+		self.hidden = hidden
 	}
 }
 
@@ -100,11 +107,18 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Though
 		}
 
 		let reacted : {String : [User]} = {}
+		let reactedUsers : {String :[String]} = {}
 		for user in t.reacted.keys {
 			let reaction = t.reacted[user]!
 			let allReacted = reacted[reaction] ?? []
-			allReacted.append(User(address: user, reaction: reaction))
+			let u = User(address: user, reaction: reaction)
+
+			allReacted.append(u)
 			reacted[reaction] = allReacted
+
+			let preReactedUser = reactedUsers[reaction] ?? []
+			preReactedUser.append(u.name ?? u.address.toString())
+			reactedUsers[reaction] = preReactedUser
 		}
 
 		var quotedThought : Thought? = nil 
@@ -113,7 +127,6 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Though
 				if let ref = p.borrowThoughtPublic() {
 					quotedThought = getThought(ref, withQuote: false)
 				} else {
-
 					let creator = p.owner()
 					var qCreatorProfileName : String? = nil
 					var qCreatorAvatar : String? = nil 
@@ -138,8 +151,10 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Though
 						tags: [], 
 						reacted: {}, 
 						reactions: {}, 
-						quotedThought: nil
-					)
+						reactedUsers: {},
+						quotedThought: nil, 
+						hidden: false
+					)	
 				}
 			}
 		}
@@ -159,7 +174,9 @@ pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Though
 			tags: t.tags, 
 			reacted: reacted, 
 			reactions: t.reactions, 
-			quotedThought: quotedThought
+			reactedUsers: reactedUsers,
+			quotedThought: quotedThought, 
+			hidden: t.getHide()
 		)
 
 }

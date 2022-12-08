@@ -401,4 +401,40 @@ func TestFindThought(t *testing.T) {
 		autogold.Equal(t, res)
 	})
 
+	t.Run("Should be able to hide thoughts", func(t *testing.T) {
+
+		otu.O.Tx("hideFindThoughts",
+			WithSigner("user1"),
+			WithArg("ids", []uint64{thoughtWithQuote}),
+			WithArg("hide", []bool{true}),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "Edited", map[string]interface{}{
+				"id":   thoughtWithQuote,
+				"hide": true,
+			})
+	})
+
+	otu.O.Tx("reactToFindThoughts",
+		WithSigner("user2"),
+		WithArg("users", []string{"user1"}),
+		WithArg("ids", []uint64{thoguhtId}),
+		WithArg("reactions", []string{"fire"}),
+		WithArg("undoReactionUsers", `[]`),
+		WithArg("undoReactionIds", `[]`),
+	).
+		AssertSuccess(t)
+
+	t.Run("Should be able to get a list of owned thoguhts with hidden status", func(t *testing.T) {
+
+		res, err := otu.O.Script("getOwnedFindThoughts",
+			WithArg("address", "user1"),
+		).
+			GetAsJson()
+
+		assert.NoError(t, err)
+
+		autogold.Equal(t, res)
+	})
+
 }

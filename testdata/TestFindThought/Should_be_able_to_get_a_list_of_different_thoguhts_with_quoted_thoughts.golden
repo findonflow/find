@@ -7,6 +7,7 @@
         "creatorName": "user1",
         "creatorProfileName": "user1",
         "header": "This is header",
+        "hidden": false,
         "id": 348,
         "quotedThought": {
             "body": "This is body",
@@ -16,6 +17,7 @@
             "creatorName": "user1",
             "creatorProfileName": "user1",
             "header": "This is header",
+            "hidden": false,
             "id": 339,
             "medias": {
                 "mediaUrl": "mediaType"

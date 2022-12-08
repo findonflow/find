@@ -7,6 +7,7 @@
         "creatorName": "user1",
         "creatorProfileName": "user1",
         "header": "This is new header",
+        "hidden": false,
         "id": 332,
         "lastUpdated": 1,
         "medias": {
