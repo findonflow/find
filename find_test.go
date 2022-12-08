@@ -335,11 +335,28 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to fund users without profile", func(t *testing.T) {
+
+		user := "user1"
+		otu.registerFtInRegistry()
+
+		user3 := otu.O.Address("user3")
+		otu.O.Tx("sendFT",
+			WithSigner(user),
+			WithArg("name", user3),
+			WithArg("amount", 10.0),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("tag", `""`),
+			WithArg("message", `""`),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FungibleTokenSent")
+	})
+
 	t.Run("Should be able to fund users with profile but without find name", func(t *testing.T) {
 
 		user := "user1"
-		otu.registerFtInRegistry().
-			createUser(1000, "user3")
+		otu.createUser(1000, "user3")
 
 		user3 := otu.O.Address("user3")
 
@@ -400,7 +417,7 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to resolve find name without .find", func(t *testing.T) {
 		otu.O.Script("resolve",
-			WithArg("input", "user1.find"),
+			WithArg("name", "user1.find"),
 		).
 			AssertWant(t, autogold.Want("user 1 address", otu.O.Address("user1")))
 
@@ -408,12 +425,12 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should panic if user pass in invalid character '.'", func(t *testing.T) {
 		_, err := otu.O.Script("resolve",
-			WithArg("input", "user1.fn"),
+			WithArg("name", "user1.fn"),
 		).
 			GetAsJson()
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "Please do not pass in invalid character : '.'")
+		assert.Contains(t, err.Error(), "invalid byte in hex string")
 
 	})
 

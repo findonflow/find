@@ -9,12 +9,10 @@ import FindFurnace from "../contracts/FindFurnace.cdc"
 transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
 	let authPointers : [FindViews.AuthNFTPointer]
-	let paths : [PublicPath]
 
 	prepare(account : AuthAccount) {
 
 		self.authPointers = []
-		self.paths = []
 
 		let contractData : {Type : NFTCatalog.NFTCatalogMetadata} = {}
 
@@ -49,7 +47,6 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 			}
 			let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
 			self.authPointers.append(pointer)
-			self.paths.append(path.publicPath)
 		}
 	}
 
@@ -57,10 +54,9 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 		for i,  pointer in self.authPointers {
 			let id = ids[i] 
 			let message = messages[i]
-			let path = self.paths[i]
 
 			// burn thru furnace
-			FindFurnace.burn(pointer: pointer, path: path, context: {"message" : message})
+			FindFurnace.burn(pointer: pointer, context: {"message" : message})
 		}
 	}
 }

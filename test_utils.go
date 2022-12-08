@@ -220,6 +220,27 @@ func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
+	nameAddress := otu.O.Address("account")
+	expireTime := otu.currentTime() + leaseDurationFloat
+
+	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
+
+	otu.O.Tx("register",
+		WithSigner("account"),
+		WithArg("name", "find"),
+		WithArg("amount", 100.0),
+	).AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
+			"validUntil":  expireTime,
+			"lockedUntil": lockedTime,
+			"owner":       nameAddress,
+			"name":        "find",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResult {
 	nameAddress := otu.O.Address(name)
 	expireTime := otu.currentTime() + leaseDurationFloat
@@ -2436,6 +2457,10 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 		WithArg("allReceivers", `["user1"]`),
 		WithArg("ids", []uint64{0}),
 		WithArg("memos", `["Hello!"]`),
+		WithArg("donationTypes", `[nil]`),
+		WithArg("donationAmounts", `[nil]`),
+		WithArg("findDonationType", nil),
+		WithArg("findDonationAmount", nil),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
@@ -2888,3 +2913,11 @@ func createUInt64ToUInt64Array(input map[uint64][]uint64) cadence.Dictionary {
 // 	}
 // 	return cadence.NewDictionary(mapping)
 // }
+
+func OptionalString(input string) cadence.Optional {
+	s, err := cadence.NewString(input)
+	if err != nil {
+		panic(err)
+	}
+	return cadence.NewOptional(s)
+}
