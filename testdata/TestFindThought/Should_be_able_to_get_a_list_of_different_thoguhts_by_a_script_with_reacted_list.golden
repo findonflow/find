@@ -13,6 +13,25 @@
         "medias": {
             "ipfs://mediaHash": "mediaType"
         },
+        "reacted": {
+            "sad": [
+                {
+                    "address": "0xf3fcd2c1a78f5eee",
+                    "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+                    "findName": "user2",
+                    "name": "user2",
+                    "reaction": "sad"
+                }
+            ]
+        },
+        "reactedUsers": {
+            "sad": [
+                "user2"
+            ]
+        },
+        "reactions": {
+            "sad": 1
+        },
         "tags": [
             "tag4",
             "tag5",
