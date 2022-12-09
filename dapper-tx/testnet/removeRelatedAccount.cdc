@@ -23,6 +23,6 @@ transaction(name: String, network: String, address: String){
     }
 
     execute{
-        self.relatedAccounts!.deleteAccount(name: name, network: network, address: address)
+        self.relatedAccounts!.removeRelatedAccount(name: name, network: network, address: address)
     }
 }
