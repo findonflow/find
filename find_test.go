@@ -177,27 +177,31 @@ func TestFIND(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountAdded", map[string]interface{}{
-				"name":    "dapper",
-				"address": "0x179b6b1cb6755e31",
-				"related": "0xf3fcd2c1a78f5eee",
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+				"walletName": "dapper",
+				"user":       otu.O.Address("user1"),
+				"address":    otu.O.Address("user2"),
+				"action":     "add",
 			})
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/FINDReport/relatedAccounts",
-				autogold.Want("getStatus Dapper", map[string]interface{}{"dapper": "0xf3fcd2c1a78f5eee"}))
+				autogold.Want("getStatus Dapper", map[string]interface{}{"Flow_dapper": []interface{}{otu.O.Address("user2")}}))
 
 		otu.O.Tx("removeRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "dapper"),
+			WithArg("network", "Flow"),
+			WithArg("address", otu.O.Address("user2")),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountRemoved", map[string]interface{}{
-				"name":    "dapper",
-				"address": "0x179b6b1cb6755e31",
-				"related": "0xf3fcd2c1a78f5eee",
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+				"walletName": "dapper",
+				"user":       otu.O.Address("user1"),
+				"address":    otu.O.Address("user2"),
+				"action":     "remove",
 			})
 
 		otu.O.Script("getStatus",
