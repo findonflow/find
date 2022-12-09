@@ -2833,6 +2833,15 @@ func (otu *OverflowTestUtils) removeRelatedAccount(user, wallet, network, addres
 	return otu
 }
 
+func (otu *OverflowTestUtils) createOptional(value any) (cadence.Value, error) {
+	val, err := cadence.NewValue(value)
+	if err != nil {
+		return nil, err
+	}
+	opt := cadence.NewOptional(val)
+	return opt, nil
+}
+
 type SaleItem struct {
 	Amount              float64 `json:"amount"`
 	AuctionReservePrice float64 `json:"auctionReservePrice"`
