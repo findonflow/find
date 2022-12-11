@@ -408,11 +408,11 @@
       "address": "c9d218cc626cd7f5",
       "key": "${TESTNET_ACCOUNT}"
     },
-    "testnet-user1": {
+    "testnet-find-forge": {
       "address": "3e5b4c627064625d",
       "key": "${TESTNET_ACCOUNT}"
     },
-    "testnet-user2": {
+    "testnet-user1": {
       "address": "0xffbdace90dd96d40",
       "key": "${TESTNET_ACCOUNT}"
     },
@@ -519,7 +519,7 @@
         "FindUserStatus",
         "FindLostAndFoundWrapper"
       ],
-      "testnet-user1": [
+      "testnet-find-forge": [
         "NFGv3",
         "PartyFavorz",
         "PartyFavorzExtraData",
