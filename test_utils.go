@@ -560,25 +560,6 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) buyForgeDapper(user string) *OverflowTestUtils {
-
-	otu.O.Tx("buyAddonDapper",
-		WithSigner(user),
-		WithPayloadSigner("dapper"),
-		WithArg("merchAccount", "find"),
-		WithArg("name", user),
-		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
-			"name":  user,
-			"addon": "forge",
-		})
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) buyForgeForName(user, name string) *OverflowTestUtils {
 	otu.O.Tx("buyAddon",
 		WithSigner(user),
