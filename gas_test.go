@@ -22,9 +22,9 @@ func TestGas(t *testing.T) {
 
 		otu.O.Tx("devResolveName",
 			WithSigner("user1"),
-			WithArg("user", "179b6b1cb6755e31"),
+			WithArg("user", otu.O.Account("user1").Address().String()),
 		).
-			AssertDebugLog(t, "0x179b6b1cb6755e31").
+			AssertDebugLog(t, otu.O.Address("user1")).
 			AssertComputationLessThenOrEqual(t, 200)
 
 	})

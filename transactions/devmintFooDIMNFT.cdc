@@ -1,5 +1,5 @@
 import FIND from "../contracts/FIND.cdc"
-import FindFooDIM from 0x045a1763c93006ca
+import FindFooDIM from 0xe03daebed8ca0615
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FindForge from "../contracts/FindForge.cdc"

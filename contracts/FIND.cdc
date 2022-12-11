@@ -1910,7 +1910,7 @@ return nil
 			}
 		} else {
 		// otherwise falls into emulator
-			if merchAccount != 0x01cf0e2f2f715450 {
+			if merchAccount != self.account.address {
 				panic("Merch Account address does not match with expected")
 			}
 		}

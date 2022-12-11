@@ -28,7 +28,9 @@ func TestLeaseMarketSale(t *testing.T) {
 		registerUserWithName("user1", "name2").
 		registerUserWithName("user1", "name3")
 
-	otu.setUUID(400)
+	otu.setUUID(500)
+
+	royaltyIdentifier := otu.identifier("FindLeaseMarket", "RoyaltyPaid")
 
 	t.Run("Should be able to list a lease for sale and buy it", func(t *testing.T) {
 
@@ -321,15 +323,15 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
@@ -351,15 +353,15 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
@@ -419,7 +421,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			removeLeaseTenantRule("FlowLeaseSale", "Flow")
 
 		otu.O.Tx("devSetResidualAddress",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("address", "user3"),
 		).
 			AssertSuccess(t)
@@ -433,7 +435,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.destroyFUSDVault("find")
+		otu.destroyFUSDVault("find-admin")
 
 		otu.O.Tx("buyLeaseForSale",
 			WithSigner("user2"),
@@ -441,8 +443,8 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
-				"address":         otu.O.Address("find"),
+			AssertEvent(t, otu.identifier("FindLeaseMarket", "RoyaltyCouldNotBePaid"), map[string]interface{}{
+				"address":         otu.O.Address("find-admin"),
 				"amount":          0.5,
 				"leaseName":       "name1",
 				"royaltyName":     "network",
@@ -482,7 +484,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       367,
+			"id":       420,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))

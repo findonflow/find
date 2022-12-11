@@ -344,28 +344,44 @@
       "address": "f8d6e0586b0a20c7",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
-    "emulator-find": {
+    "emulator-dapper": {
       "address": "01cf0e2f2f715450",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
-    "emulator-user1": {
+    "emulator-find": {
       "address": "179b6b1cb6755e31",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
-    "emulator-user2": {
+    "emulator-find-admin": {
       "address": "f3fcd2c1a78f5eee",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
-    "emulator-user3": {
+    "emulator-find-forge": {
       "address": "e03daebed8ca0615",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-find-lease": {
+      "address": "045a1763c93006ca",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-user1": {
+      "address": "120e725050340cab",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user2": {
+      "address": "f669cb8d41ce0c74",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user3": {
+      "address": "192440c99cb17282",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user4": {
-      "address": "045a1763c93006ca",
+      "address": "fd43f9148d4b725d",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
-    "emulator-user5-dapper": {
-      "address": "120e725050340cab",
+    "emulator-user5": {
+      "address": "eb179c27144f783c",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "testnet-account": {
@@ -376,7 +392,7 @@
       "address": "35717efbbce11c74",
       "key": "${TESTNET_ACCOUNT}"
     },
-    "testnet-findLease": {
+    "testnet-find-lease": {
       "address": "49d14b03d7411f53",
       "key": "${TESTNET_ACCOUNT}"
     },
@@ -412,7 +428,7 @@
       "address": "0x09a86f2493ce2e9d",
       "key": "${MAINNET_FIND_ADMIN}"
     },
-    "mainnet-findLease": {
+    "mainnet-find-lease": {
       "address": "0x8f8767d488332ac7",
       "key": "${MAINNET_FIND_ADMIN}"
     }
@@ -516,65 +532,24 @@
     },
     "emulator": {
       "emulator-account": [
-        "FindRewardToken",
-        "FindToken",
-        "FIND",
-        "FindForge",
-        "FindForgeOrder",
-        "FindForgeStruct",
         "NonFungibleToken",
-        "Clock",
-        "Profile",
-        "Debug",
         "FUSD",
         "FiatToken",
-        "Admin",
-        "CharityNFT",
-        "FindViews",
         "MetadataViews",
-        "Dandy",
-        "ProfileCache",
-        "FindRulesCache",
-        "FindMarket",
-        "FindMarketSale",
-        "FindMarketDirectOfferEscrow",
-        "FindMarketDirectOfferSoft",
-        "FindMarketAuctionEscrow",
-        "FindMarketAuctionSoft",
-        "Sender",
-        "FindRelatedAccounts",
-        "FTRegistry",
         "NFTStorefront",
         "NFTStorefrontV2",
-        "DapperUtilityCoin",
-        "FlowUtilityToken",
         "TokenForwarding",
-        "ExampleNFT",
-        "FindLeaseMarket",
-        "FindLeaseMarketSale",
-        "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft",
         "NFTCatalog",
-        "FINDNFTCatalog",
         "NFTCatalogAdmin",
-        "FINDNFTCatalogAdmin",
-        "FindLostAndFoundWrapper",
         "FeeEstimator",
         "LostAndFound",
         "LostAndFoundHelper",
         "FLOAT",
         "GrantedAccountAccess",
         "FLOATVerifiers",
-        "Bl0x",
-        "Bl0xPack",
         "EmeraldIdentityLilico",
         "EmeraldIdentityDapper",
         "EmeraldIdentity",
-        "FindPack",
-        "FindVerifier",
-        "FindAirdropper",
-        "FindFurnace",
-        "FindUtils",
         "CoatCheck",
         "Flowty",
         "FlowtyRentals",
@@ -583,20 +558,65 @@
         "FlovatarMarketplace",
         "FlovatarComponentTemplate",
         "FlovatarPack",
-        "FlowtyUtils",
+        "FlowtyUtils"
+      ],
+      "emulator-dapper": [
+        "DapperUtilityCoin",
+        "FlowUtilityToken"
+      ],
+      "emulator-find": [
+        "ExampleNFT",
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Admin",
+        "CharityNFT",
+        "FindViews",
+        "Dandy",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "Sender",
+        "FindRelatedAccounts",
+        "FTRegistry",
+        "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
+        "ProfileCache",
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin",
+        "FindLostAndFoundWrapper",
+        "FindPack",
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindUtils",
         "FindUserStatus",
         "FindThoughts"
       ],
-      "emulator-find": [],
+      "emulator-find-admin": [],
+      "emulator-find-forge": [
+        "NFGv3",
+        "PartyFavorz",
+        "PartyFavorzExtraData",
+        "Bl0x",
+        "Bl0xPack"
+      ],
+      "emulator-find-lease": [],
       "emulator-user1": [],
       "emulator-user2": [],
       "emulator-user3": [],
-      "emulator-user4": [
-        "NFGv3",
-        "PartyFavorz",
-        "PartyFavorzExtraData"
-      ],
-      "emulator-user5-dapper": []
+      "emulator-user4": [],
+      "emulator-user5": []
     }
   }
 }

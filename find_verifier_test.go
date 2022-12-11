@@ -21,7 +21,7 @@ func TestFindVerifier(t *testing.T) {
 	// Has One FLOAT
 	t.Run("Should return false if user have no float", func(t *testing.T) {
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		otu.O.Script("devFindVerifierHasOneFLOAT",
 			WithArg("user", otu.O.Address(user)),
@@ -47,9 +47,9 @@ func TestFindVerifier(t *testing.T) {
 
 	t.Run("Should return true if user has one of the float", func(t *testing.T) {
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
-		otu.claimFloat("account", user, floatID)
+		otu.claimFloat("find", user, floatID)
 
 		otu.O.Script("devFindVerifierHasOneFLOAT",
 			WithArg("user", otu.O.Address(user)),
@@ -63,10 +63,10 @@ func TestFindVerifier(t *testing.T) {
 
 	t.Run("Should return false if user doesn't have float contained", func(t *testing.T) {
 
-		claimedFloatID := otu.createFloatEvent("account")
-		notClaimedFloatID := otu.createFloatEvent("account")
+		claimedFloatID := otu.createFloatEvent("find")
+		notClaimedFloatID := otu.createFloatEvent("find")
 
-		otu.claimFloat("account", user, claimedFloatID)
+		otu.claimFloat("find", user, claimedFloatID)
 
 		otu.O.Script("devFindVerifierHasOneFLOAT",
 			WithArg("user", otu.O.Address(user)),
@@ -81,11 +81,11 @@ func TestFindVerifier(t *testing.T) {
 	// Has All FLOAT
 	t.Run("Should return true if user has all of the float", func(t *testing.T) {
 
-		floatID := otu.createFloatEvent("account")
-		floatID2 := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
+		floatID2 := otu.createFloatEvent("find")
 
-		otu.claimFloat("account", user, floatID)
-		otu.claimFloat("account", user, floatID2)
+		otu.claimFloat("find", user, floatID)
+		otu.claimFloat("find", user, floatID2)
 
 		otu.O.Script("devFindVerifierHasAllFLOAT",
 			WithArg("user", otu.O.Address(user)),
@@ -99,11 +99,11 @@ func TestFindVerifier(t *testing.T) {
 
 	t.Run("Should return false if user doesn't have all float contained", func(t *testing.T) {
 
-		floatID := otu.createFloatEvent("account")
-		floatID2 := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
+		floatID2 := otu.createFloatEvent("find")
 
-		otu.claimFloat("account", user, floatID)
-		otu.claimFloat("account", user, floatID2)
+		otu.claimFloat("find", user, floatID)
+		otu.claimFloat("find", user, floatID2)
 
 		otu.O.Script("devFindVerifierHasAllFLOAT",
 			WithArg("user", otu.O.Address(user)),
@@ -134,7 +134,7 @@ func TestFindVerifier(t *testing.T) {
 			WithAddresses("addresses", user, "user2", "user3"),
 		).
 			AssertWant(t, autogold.Want("whitelabel, true", map[string]interface{}{
-				"description": "Only these wallet addresses are verified : 0x179b6b1cb6755e31, 0xf3fcd2c1a78f5eee, 0xe03daebed8ca0615",
+				"description": fmt.Sprintf("Only these wallet addresses are verified : %s, %s, %s", otu.O.Address(user), otu.O.Address("user2"), otu.O.Address("user3")),
 				"result":      true,
 			}))
 	})
@@ -146,7 +146,7 @@ func TestFindVerifier(t *testing.T) {
 			WithAddresses("addresses", "user2", "user3"),
 		).
 			AssertWant(t, autogold.Want("whitelabel, false", map[string]interface{}{
-				"description": "Only these wallet addresses are verified : 0xf3fcd2c1a78f5eee, 0xe03daebed8ca0615",
+				"description": fmt.Sprintf("Only these wallet addresses are verified : %s, %s", otu.O.Address("user2"), otu.O.Address("user3")),
 				"result":      false,
 			}))
 	})
@@ -215,7 +215,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should return true if user has no of NFTs equal to threshold", func(t *testing.T) {
 
 		otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 2),
 		).
@@ -228,7 +228,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should return true if user has no of NFTs more than threshold", func(t *testing.T) {
 
 		otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 1),
 		).
@@ -241,7 +241,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should return false if user has no of NFTs less than threshold", func(t *testing.T) {
 
 		otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 3),
 		).
@@ -254,7 +254,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should panic if 0 threshold is specified", func(t *testing.T) {
 
 		_, err := otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 0),
 		).
@@ -280,7 +280,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should return true if user has nft with specified rarity", func(t *testing.T) {
 
 		otu.O.Script("devFindVerifierHasNFTsWithRarity",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("rarityA", true),
 			WithArg("rarityB", true),
@@ -294,7 +294,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should return false if user does not have nft with specified rarity", func(t *testing.T) {
 
 		otu.O.Script("devFindVerifierHasNFTsWithRarity",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("rarityA", false),
 			WithArg("rarityB", true),
@@ -308,7 +308,7 @@ func TestFindVerifier(t *testing.T) {
 	t.Run("Should panic if no rarity is specified", func(t *testing.T) {
 
 		_, err := otu.O.Script("devFindVerifierHasNFTsWithRarity",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("rarityA", false),
 			WithArg("rarityB", false),

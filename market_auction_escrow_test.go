@@ -31,12 +31,15 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	mintFund("devMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(400)
+	otu.setUUID(500)
+
+	eventIdentifier := otu.identifier("FindMarketAuctionEscrow", "EnglishAuction")
+	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("price", price),
@@ -70,7 +73,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
@@ -125,11 +128,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
@@ -146,9 +149,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", 0.0),
@@ -166,8 +169,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("marketplace", "find"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", price),
@@ -185,9 +188,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx(
 			"listNFTForAuctionSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", "Dandy"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", price),
@@ -221,7 +224,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -238,7 +241,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -261,12 +264,12 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", name),
 			WithArg("id", id),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address(name),
 				"buyer":  otu.O.Address(buyer),
@@ -285,11 +288,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address(name),
 				"amount": 10.0,
@@ -310,14 +313,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertFailure(t, "Cannot cancel finished auction, fulfill it instead")
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", name),
 			WithArg("id", id),
 		).
@@ -334,7 +337,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", id),
 		).
@@ -346,7 +349,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", id),
 		).
@@ -369,11 +372,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address(name),
 				"buyer":  otu.O.Address(buyer),
@@ -405,7 +408,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 0.1),
 		).
@@ -438,7 +441,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -447,7 +450,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+10.0),
 		).
@@ -457,7 +460,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
@@ -477,7 +480,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
@@ -505,7 +508,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -518,7 +521,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+10.0),
 		).
@@ -530,7 +533,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
@@ -540,7 +543,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
@@ -557,7 +560,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 1.0),
@@ -576,7 +579,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user3"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 5.0),
@@ -606,18 +609,18 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -625,8 +628,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"royaltyName": "creator",
 				"tenant":      "find",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find forge",
@@ -649,18 +652,18 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.35,
 				"id":          id,
 				"royaltyName": "find",
 				"tenant":      "find",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.5,
 				"findName":    "user1",
@@ -668,8 +671,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"royaltyName": "creator",
 				"tenant":      "find",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find forge",
@@ -701,7 +704,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[1]),
 			WithArg("amount", price),
@@ -710,7 +713,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", ids[0]),
 		).
@@ -718,7 +721,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{ids[1]}),
 		).
 			AssertSuccess(t)
@@ -728,7 +731,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", ids[0]),
 		).
@@ -748,7 +751,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[1]),
 			WithArg("amount", price),
@@ -757,7 +760,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", ids[0]),
 		).
@@ -768,7 +771,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", ids[0]),
 		).
@@ -785,13 +788,13 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user3"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 20.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount":        20.0,
 				"id":            id,
 				"buyer":         otu.O.Address("user3"),
@@ -806,7 +809,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.registerDUCInRegistry().
 			setDUCExampleNFT().
-			sendExampleNFT("user1", "account")
+			sendExampleNFT("user1", "find")
 
 		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
 
@@ -820,17 +823,17 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	})
 
 	t.Run("Should not be able to list soul bound items", func(t *testing.T) {
-		otu.sendSoulBoundNFT("user1", "account")
+		otu.sendSoulBoundNFT("user1", "find")
 		// set market rules
 		otu.O.Tx("adminSetSellExampleNFTForFlow",
 			WithSigner("find"),
-			WithArg("tenant", "account"),
+			WithArg("tenant", "find"),
 		)
 
 		otu.O.Tx("listNFTForAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("marketplace", "find"),
+			WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
 			WithArg("id", 1),
 			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("price", price),
@@ -857,7 +860,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", saleItem[0]),
 		).
@@ -865,11 +868,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{saleItem[0]}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"status": "cancel_royalties_changed",
 			})
 
@@ -887,7 +890,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -898,7 +901,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("relistMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)
@@ -909,7 +912,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -920,7 +923,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("cancelMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)
@@ -1017,7 +1020,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
@@ -1039,7 +1042,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),

@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -21,12 +22,14 @@ func TestFindForge(t *testing.T) {
 
 	t.Run("Should be able to mint Example NFT and then get it by script", func(t *testing.T) {
 
+		exampleNFTIdentifier := exampleNFTType(otu)
+
 		otu.O.Tx("adminAddNFTCatalog",
-			WithSigner("find"),
-			WithArg("collectionIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			WithArg("contractName", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			WithArg("contractAddress", "account"),
-			WithArg("addressWithNFT", "account"),
+			WithSigner("find-admin"),
+			WithArg("collectionIdentifier", exampleNFTIdentifier),
+			WithArg("contractName", exampleNFTIdentifier),
+			WithArg("contractAddress", "find"),
+			WithArg("addressWithNFT", "find"),
 			WithArg("nftID", 0),
 			WithArg("publicPathIdentifier", "exampleNFTCollection"),
 		).
@@ -52,10 +55,10 @@ func TestFindForge(t *testing.T) {
 			WithArg("user", "user1"),
 			WithArg("collections", `[]`),
 		).AssertWant(t,
-			autogold.Want("collection", map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": map[string]interface{}{
+			autogold.Want("collection", map[string]interface{}{exampleNFTIdentifier: map[string]interface{}{
 				"collectionName":     "The Example Collection",
 				"extraIDs":           []interface{}{2},
-				"extraIDsIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+				"extraIDsIdentifier": exampleNFTIdentifier,
 				"length":             1,
 				"shard":              "NFTCatalog",
 			}}),
@@ -63,10 +66,12 @@ func TestFindForge(t *testing.T) {
 
 	})
 
+	exampleNFTForge := otu.identifier("ExampleNFT", "Forge")
 	t.Run("Should be able to add allowed names to private forges", func(t *testing.T) {
+
 		otu.O.Tx("adminRemoveForge",
-			WithSigner("find"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			WithSigner("find-admin"),
+			WithArg("type", exampleNFTForge),
 		).AssertSuccess(t)
 
 		otu.O.Tx("devMintExampleNFT",
@@ -81,11 +86,11 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionExternalURL", "Example NFT external url"),
 			WithArg("collectionSquareImage", "Example NFT square image"),
 			WithArg("collectionBannerImage", "Example NFT banner image"),
-		).AssertFailure(t, "This forge type is not supported. type : A.f8d6e0586b0a20c7.ExampleNFT.Forge")
+		).AssertFailure(t, fmt.Sprintf("This forge type is not supported. type : %s", exampleNFTForge))
 
 		otu.O.Tx("adminAddForge",
-			WithSigner("find"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			WithSigner("find-admin"),
+			WithArg("type", exampleNFTForge),
 			WithArg("name", "user1"),
 		).AssertSuccess(t)
 
@@ -119,11 +124,11 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionExternalURL", "Example NFT external url"),
 			WithArg("collectionSquareImage", "Example NFT square image"),
 			WithArg("collectionBannerImage", "Example NFT banner image"),
-		).AssertFailure(t, "This forge is not supported publicly. Forge Type : A.f8d6e0586b0a20c7.ExampleNFT.Forge")
+		).AssertFailure(t, fmt.Sprintf("This forge is not supported publicly. Forge Type : %s", exampleNFTForge))
 
 		otu.O.Tx("adminAddForge",
-			WithSigner("find"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			WithSigner("find-admin"),
+			WithArg("type", exampleNFTForge),
 			WithArg("name", "user2"),
 		).AssertSuccess(t)
 
@@ -146,13 +151,13 @@ func TestFindForge(t *testing.T) {
 	t.Run("Should be able to add allowed names to private forges", func(t *testing.T) {
 
 		otu.O.Tx("adminRemoveForge",
-			WithSigner("find"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			WithSigner("find-admin"),
+			WithArg("type", exampleNFTForge),
 		).AssertSuccess(t)
 
 		otu.O.Tx("adminAddForge",
-			WithSigner("find"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			WithSigner("find-admin"),
+			WithArg("type", exampleNFTForge),
 			WithArg("name", "user1"),
 		).AssertSuccess(t)
 
@@ -162,7 +167,7 @@ func TestFindForge(t *testing.T) {
 			WithArg("addon", "premiumForge"),
 			WithArg("amount", 1000.0),
 		).AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.AddonActivated",
+			AssertEvent(t, otu.identifier("FIND", "AddonActivated"),
 				map[string]interface{}{
 					"name":  "user1",
 					"addon": "premiumForge",
@@ -190,11 +195,11 @@ func TestFindForge(t *testing.T) {
 
 		otu.O.Script("getNFTView",
 			WithArg("user", "user1"),
-			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("aliasOrIdentifier", exampleNFTType(otu)),
 			WithArg("id", id),
-			WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
+			WithArg("identifier", otu.identifier("MetadataViews", "Royalties")),
 		).AssertWant(t,
-			autogold.Want("royalty", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.05, "description": "creator", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"}}}),
+			autogold.Want("royalty", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.05, "description": "creator", "receiver": fmt.Sprintf("Capability<&AnyResource{%s}>(address: %s, path: /public/findProfileReceiver)", otu.identifier("FungibleToken", "Receiver"), otu.O.Address("user1"))}}}),
 		)
 
 	})
@@ -220,7 +225,7 @@ func TestFindForge(t *testing.T) {
 	t.Run("Should be able register traits to Example NFT and then mint", func(t *testing.T) {
 
 		otu.O.Tx("devAddTraitsExampleNFT",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 		).
 			AssertSuccess(t)
@@ -246,7 +251,7 @@ func TestFindForge(t *testing.T) {
 		otu.registerUserWithName("user1", "testingname")
 
 		otu.O.Tx("adminAddAddon",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("name", "testingname"),
 			WithArg("addon", "premiumForge"),
 		).
@@ -257,13 +262,13 @@ func TestFindForge(t *testing.T) {
 			})
 
 		otu.O.Tx("adminAddForge",
-			WithSigner("find"),
-			WithArg("type", "A.f8d6e0586b0a20c7.ExampleNFT.Forge"),
+			WithSigner("find-admin"),
+			WithArg("type", exampleNFTForge),
 			WithArg("name", "testingname"),
 		).AssertSuccess(t)
 
 		otu.O.Tx("devadminMintExampleNFT",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("name", "testingname"),
 			WithArg("artist", "Bam"),
 			WithArg("nftName", "ExampleNFT"),
@@ -332,7 +337,7 @@ func TestFindForge(t *testing.T) {
 			})
 
 		otu.O.Tx("adminAddForgeMintType",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("mintType", mintType),
 		).
 			AssertSuccess(t)
@@ -362,7 +367,7 @@ func TestFindForge(t *testing.T) {
 		collectionDisplay.Name = testingName
 
 		otu.O.Tx("adminCancelForgeOrder",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("name", testingName),
 			WithArg("mintType", mintType),
 		).
@@ -382,7 +387,7 @@ func TestFindForge(t *testing.T) {
 		collectionDisplay.Name = testingName
 
 		otu.O.Tx("adminOrderForge",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("name", testingName),
 			WithArg("mintType", mintType),
 			WithArg("minterCut", 0.05),
@@ -397,13 +402,13 @@ func TestFindForge(t *testing.T) {
 	})
 
 	// set User4 as admin, the account as find-forge on emulator (for deploying contracts)
-	otu.O.Tx("setup_fin_1_create_client", WithSigner("user4")).
+	otu.O.Tx("setup_fin_1_create_client", WithSigner("find-forge")).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the versus client
 	otu.O.Tx("setup_fin_2_register_client",
-		saSigner,
-		WithArg("ownerAddress", "user4"),
+		findSigner,
+		WithArg("ownerAddress", "find-forge"),
 	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	t.Run("Should be able to deploy Forge recipe contract and fulfill the order", func(t *testing.T) {
@@ -416,7 +421,7 @@ func TestFindForge(t *testing.T) {
 			Filename: "./contracts/FindFooDIM.cdc",
 			Network:  "emulator",
 		}
-		_, err = otu.O.Services.Accounts.AddContract(otu.O.Account("user4"), &contract, false)
+		_, err = otu.O.Services.Accounts.AddContract(otu.O.Account("find-forge"), &contract, false)
 		assert.NoError(t, err)
 	})
 
@@ -474,7 +479,7 @@ func TestFindForge(t *testing.T) {
 			Extras: map[string]interface{}{},
 		}
 
-		otu.O.Tx("mintFooDIMNFT",
+		otu.O.Tx("devmintFooDIMNFT",
 			WithSigner("user1"),
 			WithArg("name", "foo"),
 			WithArg("receivers", []string{"user1"}),

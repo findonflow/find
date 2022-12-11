@@ -2,7 +2,6 @@ package test_main
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	. "github.com/bjartek/overflow"
@@ -48,8 +47,8 @@ func TestCollectionScripts(t *testing.T) {
 	t.Run("Should be able to get dandies by script", func(t *testing.T) {
 		result, err := otu.O.Script("getNFTCatalogItems",
 			WithArg("user", "user1"),
-			WithArg("collectionIDs", `{"A.f8d6e0586b0a20c7.Dandy.NFT" : [504,505,503,506,502,507]}`),
-		).GetWithPointer("/A.f8d6e0586b0a20c7.Dandy.NFT")
+			WithArg("collectionIDs", map[string][]uint64{dandyNFTType(otu): {504, 505, 503, 506, 502, 507}}),
+		).GetWithPointer(fmt.Sprintf("/%s", dandyNFTType(otu)))
 
 		if err != nil {
 			panic(err)
@@ -63,11 +62,13 @@ func TestCollectionScripts(t *testing.T) {
 
 		otu.registerExampleNFTInNFTRegistry()
 
+		exampleNFTIden := exampleNFTType(otu)
+
 		ids, err := otu.O.Script("getNFTCatalogIDs",
-			WithArg("user", otu.O.Address("account")),
+			WithArg("user", otu.O.Address("find")),
 			WithArg("collections", `[]`),
 		).
-			GetWithPointer("/A.f8d6e0586b0a20c7.ExampleNFT.NFT/extraIDs")
+			GetWithPointer(fmt.Sprintf("/%s/extraIDs", exampleNFTIden))
 
 		assert.NoError(t, err)
 
@@ -77,13 +78,11 @@ func TestCollectionScripts(t *testing.T) {
 			panic(ids)
 		}
 
-		collectionIDs := fmt.Sprintf(`{"A.f8d6e0586b0a20c7.ExampleNFT.NFT" : [%s]}`, strings.Trim(strings.Replace(fmt.Sprint(typedIds), " ", ",", -1), "[]"))
-
 		result, err := otu.O.Script("getNFTCatalogItems",
-			WithArg("user", otu.O.Address("account")),
-			WithArg("collectionIDs", collectionIDs),
+			WithArg("user", otu.O.Address("find")),
+			WithArg("collectionIDs", map[string]interface{}{exampleNFTIden: typedIds}),
 		).
-			GetWithPointer("/A.f8d6e0586b0a20c7.ExampleNFT.NFT")
+			GetWithPointer(fmt.Sprintf("/%s", exampleNFTIden))
 
 		if err != nil {
 			panic(err)
