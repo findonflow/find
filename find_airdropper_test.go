@@ -71,6 +71,7 @@ func TestFindAirdropper(t *testing.T) {
 				"uuid":     id,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
 				"nftInfo": mockField,
 			})
@@ -123,6 +124,7 @@ func TestFindAirdropper(t *testing.T) {
 			"to":     otu.O.Address("user2"),
 			"context": map[string]interface{}{
 				"message": "I can use struct here",
+				"tenant":  "find",
 			},
 			"nftInfo": mockField,
 		})
@@ -174,6 +176,7 @@ func TestFindAirdropper(t *testing.T) {
 				"uuid":     id,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
 				"remark":  "Receiver Not Linked",
 				"nftInfo": mockField,
@@ -210,6 +213,7 @@ func TestFindAirdropper(t *testing.T) {
 				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
 				"reason": "Invalid Receiver Capability",
 			})
@@ -337,6 +341,7 @@ func TestFindAirdropper(t *testing.T) {
 					"uuid":     id,
 					"context": map[string]interface{}{
 						"message": fmt.Sprintf("Message %d", i),
+						"tenant":  "find",
 					},
 					"nftInfo": mockField,
 				})
@@ -401,6 +406,7 @@ func TestFindAirdropper(t *testing.T) {
 					"uuid":     id,
 					"context": map[string]interface{}{
 						"message": fmt.Sprintf("Message %d", i),
+						"tenant":  "find",
 					},
 					"nftInfo": mockField,
 				})

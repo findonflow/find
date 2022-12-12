@@ -50,6 +50,7 @@ func TestFindFurnace(t *testing.T) {
 				"uuid": id,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
 				"nftInfo": mockField,
 			})

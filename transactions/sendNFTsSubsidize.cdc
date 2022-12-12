@@ -122,10 +122,15 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
         } else {
             tempVault.deposit(from: <- self.flowVault.withdraw(amount: estimatedStorageFee))
         }
+
+		let ctx : {String : String} = {
+			"tenant" : "find"
+		}
+
 		for i,  pointer in self.authPointers {
 			let receiver = allReceivers[i]
 			let id = ids[i] 
-			let message = memos[i]
+			ctx["message"] = memos[i]
 			let path = self.paths[i]
 
 			var user = addresses[receiver]
@@ -135,7 +140,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			}
 
 			// airdrop thru airdropper
-			FindAirdropper.subsidizedAirdrop(pointer: pointer, receiver: user!, path: path, context: {"message" : message}, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment, deepValidation: true)
+			FindAirdropper.subsidizedAirdrop(pointer: pointer, receiver: user!, path: path, context: ctx, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment, deepValidation: true)
 		}
         self.flowVault.deposit(from: <- tempVault)
 
