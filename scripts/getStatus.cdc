@@ -67,10 +67,18 @@ pub struct FINDReport{
 pub struct NameReport {
 	pub let status: String 
 	pub let cost: UFix64 
+	pub let owner: Address? 
+	pub let validUntil: UFix64? 
+	pub let lockedUntil: UFix64? 
+	pub let registeredTime: UFix64? 
 
-	init(status: String, cost: UFix64) {
+	init(status: String, cost: UFix64, owner: Address?, validUntil: UFix64?, lockedUntil: UFix64?, registeredTime: UFix64? ) {
 		self.status=status 
 		self.cost=cost
+		self.owner=owner
+		self.validUntil=validUntil
+		self.lockedUntil=lockedUntil
+		self.registeredTime=registeredTime
 	}
 }
 
@@ -195,12 +203,13 @@ pub fun main(user: String) : Report? {
 		} else if status.status == FIND.LeaseStatus.LOCKED {
 			s="LOCKED"
 		}
-		nameReport = NameReport(status: s, cost: cost)
+		let findAddr = FIND.getFindNetworkAddress() 
+		let network = getAuthAccount(findAddr).borrow<&FIND.Network>(from: FIND.NetworkStoragePath)!
+		let lease =  network.getLease(user)
+		nameReport = NameReport(status: s, cost: cost, owner: lease?.address, validUntil: lease?.validUntil, lockedUntil: lease?.lockedUntil, registeredTime: lease?.registeredTime)
 	}
 	
 
 	return Report(FINDReport: findReport, NameReport: nameReport)
 }
 
-
- 
