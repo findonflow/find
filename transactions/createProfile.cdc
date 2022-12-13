@@ -16,11 +16,7 @@ import FindThoughts from "../contracts/FindThoughts.cdc"
 
 transaction(name: String) {
 	prepare(account: AuthAccount) {
-		//if we do not have a profile it might be stored under a different address so we will just remove it
-		let profileCapFirst = account.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if profileCapFirst.check() {
-			return 
-		}
+
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
 		//Add exising FUSD or create a new one and add it
@@ -83,49 +79,6 @@ transaction(name: String) {
 			)
 		}
 
-		var created=false
-		var updated=false
-		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if !profileCap.check() {
-			let profile <-Profile.createUser(name:name, createdAt: "find")
-			account.save(<-profile, to: Profile.storagePath)
-			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
-			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
-			created=true
-		}
-
-		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
-
-		if !profile.hasWallet("Flow") {
-			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), tags: ["flow"])
-	
-			profile.addWallet(flowWallet)
-			updated=true
-		}
-		if !profile.hasWallet("FUSD") {
-			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), tags: ["fusd", "stablecoin"]))
-			updated=true
-		}
-
-		if !profile.hasWallet("USDC") {
-			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), tags: ["usdc", "stablecoin"]))
-			updated=true
-		}
-
- 		//If find name not set and we have a profile set it.
-		if profile.getFindName() == "" {
-			if let findName = FIND.reverseLookup(account.address) {
-				profile.setFindName(findName)
-				// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
-				updated=false
-			}
-		}
-
-		if created {
-			profile.emitCreatedEvent()
-		} else if updated {
-			profile.emitUpdatedEvent()
-		}
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
@@ -181,6 +134,56 @@ transaction(name: String) {
 		}
 
 		//SYNC with register
+
+		//if we do not have a profile it might be stored under a different address so we will just remove it
+		let profileCapFirst = account.getCapability<&{Profile.Public}>(Profile.publicPath)
+		if profileCapFirst.check() {
+			return 
+		}
+
+		var created=false
+		var updated=false
+		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
+		if !profileCap.check() {
+			let profile <-Profile.createUser(name:name, createdAt: "find")
+			account.save(<-profile, to: Profile.storagePath)
+			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
+			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+			created=true
+		}
+
+		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
+
+		if !profile.hasWallet("Flow") {
+			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), tags: ["flow"])
+	
+			profile.addWallet(flowWallet)
+			updated=true
+		}
+		if !profile.hasWallet("FUSD") {
+			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), tags: ["fusd", "stablecoin"]))
+			updated=true
+		}
+
+		if !profile.hasWallet("USDC") {
+			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), tags: ["usdc", "stablecoin"]))
+			updated=true
+		}
+
+ 		//If find name not set and we have a profile set it.
+		if profile.getFindName() == "" {
+			if let findName = FIND.reverseLookup(account.address) {
+				profile.setFindName(findName)
+				// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
+				updated=false
+			}
+		}
+
+		if created {
+			profile.emitCreatedEvent()
+		} else if updated {
+			profile.emitUpdatedEvent()
+		}
 
 	}
 }
