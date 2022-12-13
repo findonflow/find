@@ -9,7 +9,14 @@ transaction(header: String , body: String , tags: [String], mediaHash: String?, 
 	let collection : &FindThoughts.Collection
 
 	prepare(account: AuthAccount) {
-
+		let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+		if !thoughtsCap.check() {
+			account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
+			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , MetadataViews.ResolverCollection}>(
+				FindThoughts.CollectionPublicPath,
+				target: FindThoughts.CollectionStoragePath
+			)
+		}
 		self.collection=account.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
 	}
 
