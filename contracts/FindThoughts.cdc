@@ -1,18 +1,55 @@
 import FindViews from "./FindViews.cdc"
+import FindMarket from "./FindMarket.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import FINDNFTCatalog from "./FINDNFTCatalog.cdc"
 import FIND from "./FIND.cdc"
 import Clock from "./Clock.cdc"
 
 pub contract FindThoughts {
 
-	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
-	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
+	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
+	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])
 	pub event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
 	pub event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
 
 	pub let CollectionStoragePath : StoragePath 
 	pub let CollectionPublicPath : PublicPath 
 	pub let CollectionPrivatePath : PrivatePath 
+
+	pub struct ThoughtPointer {
+		pub let cap: Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>
+		pub let id: UInt64 
+
+		init(creator: Address, id: UInt64) {
+			let cap = getAccount(creator).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+			if !cap.check() {
+				panic("creator's find thought capability is not valid. Creator : ".concat(creator.toString()))
+			}
+			self.cap = cap
+			self.id = id 
+		}
+
+		pub fun borrowThoughtPublic() : &{ThoughtPublic}? {
+			if self.cap.check() {
+				let ref = self.cap.borrow()!
+				if ref.contains(self.id) {
+					return ref.borrowThoughtPublic(self.id)
+				}
+			}
+			return nil
+		}
+
+		pub fun valid() : Bool {
+			if self.borrowThoughtPublic() != nil {
+				return true
+			}
+			return false
+		}
+
+		pub fun owner() : Address {
+			return self.cap.address
+		}
+	}
 
 	pub resource interface ThoughtPublic {
 		pub let id: UInt64 
@@ -28,6 +65,8 @@ pub contract FindThoughts {
 		pub var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?) 
+		pub fun getQuotedThought() : ThoughtPointer? 
+		pub fun getHide() : Bool
 	}
 
 	pub resource Thought : ThoughtPublic , MetadataViews.Resolver {
@@ -48,11 +87,11 @@ pub contract FindThoughts {
 
 		// These are here only for future extension
 		pub let nft: [FindViews.ViewReadPointer]
-		pub let stringTags: {String : String} 
-		pub let scalars: {String : UFix64} 
-		pub let extras: {String : AnyStruct} 
+		access(self) let stringTags: {String : String} 
+		access(self) let scalars: {String : UFix64} 
+		access(self) let extras: {String : AnyStruct} 
 
-		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
+		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], quote: ThoughtPointer?, stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
 			self.id = self.uuid 
 			self.creator = creator
 			self.header = header
@@ -65,6 +104,8 @@ pub contract FindThoughts {
 			self.nft = nft
 			self.stringTags = stringTags
 			self.scalars = scalars
+			extras["quote"] = quote
+			extras["hidden"] = false
 			self.extras = extras
 
 			self.reacted = {}
@@ -85,6 +126,29 @@ pub contract FindThoughts {
 			emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
 		}
 
+		pub fun getQuotedThought() : ThoughtPointer? {
+			if let r = self.extras["quote"] {
+				return r as! ThoughtPointer
+			}
+			return nil
+		}
+
+		pub fun getHide() : Bool {
+			if let r = self.extras["hidden"] {
+				return r as! Bool
+			}
+			return false
+		}
+
+		pub fun hide(_ hide: Bool) {
+			self.extras["hidden"] = hide
+			let medias : [String] = []
+			for m in self.medias {
+				medias.append(m.file.uri())
+			}
+			emit Edited(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, hide: hide, tags: self.tags)
+		}
+
 		pub fun edit(header: String , body: String, tags: [String]) {
 			self.header = header 
 			self.body = body 
@@ -95,7 +159,7 @@ pub contract FindThoughts {
 				medias.append(m.file.uri())
 			}
 			self.lastUpdated = Clock.time()
-			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, tags: self.tags)
+			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, hide: self.getHide(), tags: self.tags)
 		}
 
 		// To withdraw reaction, pass in nil
@@ -193,15 +257,31 @@ pub contract FindThoughts {
 			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
 		}
 
-		pub fun publish(header: String , body: String , tags: [String], mediaHash: String, mediaType: String) {
-			let media = MetadataViews.Media(file: MetadataViews.IPFSFile(cid:mediaHash, path: nil), mediaType: mediaType)
+		// TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
+		// So take pointer, thought pointer and media
+		pub fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
+			let medias : [MetadataViews.Media] = []
+			let m : [String] = []
+			if media != nil {
+				medias.append(media!)
+				m.append(media!.file.uri())
+			}
 			let address = self.owner!.address
-			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: [media], nft: [], stringTags: {}, scalars : {}, extras: {})
+
+			let nfts : [FindMarket.NFTInfo] = []
+			let extra : {String : AnyStruct} = {}
+			if nftPointer != nil {
+				let rv = nftPointer!.getViewResolver()
+				nfts.append(FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true))
+			}
+
+			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: quote, stringTags: {}, scalars : {}, extras: extra)
 
 			self.sequence.append(thought.uuid)
 
 			let creatorName = FIND.reverseLookup(address)
-			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: [media.file.uri()], tags: tags)
+
+			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: m, nfts: nfts, tags: tags, quoteOwner: quote?.owner(), quoteId: quote?.id)
 
 			self.ownedThoughts[thought.uuid] <-! thought
 		}
@@ -226,6 +306,11 @@ pub contract FindThoughts {
 			thought.internal_react(user: self.owner!.address, reaction: reaction)
 		}
 
+		pub fun hide(id: UInt64, hide: Bool) {
+			let thought = self.borrow(id)
+			thought.hide(hide)
+		}
+
 	}
 
 	pub fun createEmptyCollection() : @FindThoughts.Collection {
@@ -243,4 +328,5 @@ pub contract FindThoughts {
 	}
 
 }
+ 
  

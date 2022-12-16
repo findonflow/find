@@ -33,10 +33,10 @@ func TestNameDetailScript(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.RelatedAccounts.RelatedAccountAdded", map[string]interface{}{
-				"name":    "dapper",
-				"address": "0x179b6b1cb6755e31",
-				"related": "0xf3fcd2c1a78f5eee",
+			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+				"walletName": "dapper",
+				"user":       otu.O.Address("user1"),
+				"address":    otu.O.Address("user2"),
 			})
 
 		otu.O.Script("getNameDetails",
@@ -44,7 +44,7 @@ func TestNameDetailScript(t *testing.T) {
 		).AssertWithPointerWant(t, "/userReport/bids/0",
 			autogold.Want("getNameDetailsBids", map[string]interface{}{
 				"amount": 8, "lease": map[string]interface{}{
-					"address": "0xf3fcd2c1a78f5eee", "auctionEnds": 86401,
+					"address": otu.O.Address("user2"), "auctionEnds": 86401,
 					"auctionReservePrice": 20,
 					"auctionStartPrice":   5,
 					"cost":                5,

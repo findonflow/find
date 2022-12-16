@@ -51,12 +51,15 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 	}
 
 	execute {
+		let ctx : {String : String} = {
+			"tenant" : "find"
+		}
 		for i,  pointer in self.authPointers {
 			let id = ids[i] 
-			let message = messages[i]
+			ctx["message"] = messages[i]
 
 			// burn thru furnace
-			FindFurnace.burn(pointer: pointer, context: {"message" : message})
+			FindFurnace.burn(pointer: pointer, context: ctx)
 		}
 	}
 }

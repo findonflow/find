@@ -25,7 +25,7 @@ transaction(packInfo: FindPack.AirdropInfo) {
 			let uAccount = getAccount(address!)
 			let userPacks=uAccount.getCapability<&FindPack.Collection{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath).borrow() ?? panic("Could not find userPacks for ".concat(user))
 			let pointer = adminRef.getAuthPointer(pathIdentifier: pathIdentifier, id: id)
-			let ctx : {String : String } = {"message" : packInfo.message}
+			let ctx : {String : String } = {"message" : packInfo.message, "tenant" : "find"}
 			FindAirdropper.safeAirdrop(pointer: pointer, receiver: address!, path: FindPack.CollectionPublicPath, context: ctx , deepValidation: true)
 		}
 	}

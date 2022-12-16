@@ -23,6 +23,14 @@ pub contract FindUtils {
         return false
     }
 
+	pub fun trimSuffix(_ name: String, suffix: String) : String {
+		if !self.hasSuffix(name, suffix:suffix) {
+			return name
+		}
+		let pos = name.length - suffix.length
+		return name.slice(from: 0, upTo: pos)
+	}
+
     pub fun hasSuffix(_ string: String, suffix: String) : Bool {
         if suffix.length > string.length {
             return false
@@ -35,6 +43,17 @@ pub contract FindUtils {
             return false
         }
         return string.slice(from: 0, upTo: prefix.length) == prefix
+    }
+
+    pub fun splitString(_ string: String, sep: Character) : [String] {
+        if var index = string.utf8.firstIndex(of: sep.toString().utf8[0]) {
+			let first = string.slice(from: 0, upTo: index)
+			let second = string.slice(from: index + 1, upTo: string.length)
+			let res = [first]
+			res.appendAll(self.splitString(second, sep: sep))
+			return res
+        }
+        return [string]
     }
 
     pub fun toUpper(_ string: String) : String {

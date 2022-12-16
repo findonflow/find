@@ -7,6 +7,7 @@ import (
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
+	"github.com/sanity-io/litter"
 )
 
 func TestFindUtils(t *testing.T) {
@@ -319,6 +320,98 @@ pub fun main(string: String) : String {
 			WithArg("string", s),
 		).
 			AssertWant(t, autogold.Want("Camel case", "camelCase"))
+	})
+
+	devTrimSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+
+pub fun main(string: String, suffix:String) : String {
+	return FindUtils.trimSuffix(string, suffix:suffix)
+}
+`
+
+	t.Run("trimSuffix should trim bam.find", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "bam.find"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : bam.find", "bam"))
+	})
+
+	t.Run("trimSuffix should not trim christian.fine", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "christian.fine"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : christian.fine", "christian.fine"))
+	})
+
+	t.Run("trimSuffix should not trim bam", func(t *testing.T) {
+		o.Script(devTrimSuffix,
+			WithArg("string", "bam"),
+			WithArg("suffix", ".find"),
+		).
+			AssertWant(t, autogold.Want("trimSuffix : bam", "bam"))
+	})
+
+	// Extra tests on trimFindSuffix on FIND
+
+	devTrimFindSuffix := `import FIND from "../contracts/FIND.cdc"
+
+pub fun main(name: String) : String {
+	return FIND.trimFindSuffix(name)
+}
+`
+	t.Run("trimFindSuffix should trim bam.find", func(t *testing.T) {
+		o.Script(devTrimFindSuffix,
+			WithArg("name", "bam.find"),
+		).
+			AssertWant(t, autogold.Want("trimFindSuffix : bam.find", "bam"))
+	})
+
+	t.Run("trimFindSuffix should return bam", func(t *testing.T) {
+		o.Script(devTrimFindSuffix,
+			WithArg("name", "bam"),
+		).
+			AssertWant(t, autogold.Want("trimFindSuffix : bam", "bam"))
+	})
+
+	// splitString
+	devSplitString := `import FindUtils from "../contracts/FindUtils.cdc"
+
+	pub fun main(string: String, sep: Character) : [String] {
+		return FindUtils.splitString(string, sep:sep)
+	}
+	`
+	t.Run("splitString should split Hello_World_And_All", func(t *testing.T) {
+		o.Script(devSplitString,
+			WithArg("string", "Hello_World_And_All"),
+			WithArg("sep", cadence.Character("_")),
+		).
+			AssertWant(t, autogold.Want("splitString : Hello_World_And_All", litter.Sdump([]interface{}{"Hello", "World", "And", "All"})))
+	})
+
+	t.Run("splitString should split Hello_World.And_All", func(t *testing.T) {
+		o.Script(devSplitString,
+			WithArg("string", "Hello_World.And_All"),
+			WithArg("sep", cadence.Character("_")),
+		).
+			AssertWant(t, autogold.Want("splitString : Hello_World.And_All", litter.Sdump([]interface{}{"Hello", "World.And", "All"})))
+	})
+
+	t.Run("splitString should not split Hello.World.And.All", func(t *testing.T) {
+		o.Script(devSplitString,
+			WithArg("string", "Hello.World.And.All"),
+			WithArg("sep", cadence.Character("_")),
+		).
+			AssertWant(t, autogold.Want("splitString : Hello.World.And.All", litter.Sdump([]interface{}{"Hello.World.And.All"})))
+	})
+
+	t.Run("splitString should not split HelloWorldAndAll", func(t *testing.T) {
+		o.Script(devSplitString,
+			WithArg("string", "HelloWorldAndAll"),
+			WithArg("sep", cadence.Character("_")),
+		).
+			AssertWant(t, autogold.Want("splitString : HelloWorldAndAll", litter.Sdump([]interface{}{"HelloWorldAndAll"})))
 	})
 
 }

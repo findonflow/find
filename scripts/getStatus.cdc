@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
+import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
@@ -17,7 +17,7 @@ pub struct FINDReport{
 	pub let isDapper: Bool
 	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
-	pub let relatedAccounts: { String: Address}
+	pub let relatedAccounts: { String: [Address]}
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
 	pub let leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}
@@ -34,7 +34,7 @@ pub struct FINDReport{
 
 
 	init(profile: Profile.UserReport?, 
-		 relatedAccounts: {String: Address}, 
+		 relatedAccounts: {String: [Address]}, 
 		 bids: [FIND.BidInfo], 
 		 leases : [FIND.LeaseInformation], 
 		 privateMode: Bool, 
@@ -67,10 +67,18 @@ pub struct FINDReport{
 pub struct NameReport {
 	pub let status: String 
 	pub let cost: UFix64 
+	pub let owner: Address? 
+	pub let validUntil: UFix64? 
+	pub let lockedUntil: UFix64? 
+	pub let registeredTime: UFix64? 
 
-	init(status: String, cost: UFix64) {
+	init(status: String, cost: UFix64, owner: Address?, validUntil: UFix64?, lockedUntil: UFix64?, registeredTime: UFix64? ) {
 		self.status=status 
 		self.cost=cost
+		self.owner=owner
+		self.validUntil=validUntil
+		self.lockedUntil=lockedUntil
+		self.registeredTime=registeredTime
 	}
 }
 
@@ -153,7 +161,7 @@ pub fun main(user: String) : Report? {
 			
 			findReport = FINDReport(
 				profile: profileReport,
-				relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
+				relatedAccounts: FindRelatedAccounts.findRelatedFlowAccounts(address:address),
 				bids: bidCap.borrow()?.getBids() ?? [],
 				leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 				privateMode: profile?.isPrivateModeEnabled() ?? false,
@@ -195,12 +203,13 @@ pub fun main(user: String) : Report? {
 		} else if status.status == FIND.LeaseStatus.LOCKED {
 			s="LOCKED"
 		}
-		nameReport = NameReport(status: s, cost: cost)
+		let findAddr = FIND.getFindNetworkAddress() 
+		let network = getAuthAccount(findAddr).borrow<&FIND.Network>(from: FIND.NetworkStoragePath)!
+		let lease =  network.getLease(user)
+		nameReport = NameReport(status: s, cost: cost, owner: lease?.address, validUntil: lease?.validUntil, lockedUntil: lease?.lockedUntil, registeredTime: lease?.registeredTime)
 	}
 	
 
 	return Report(FINDReport: findReport, NameReport: nameReport)
 }
 
-
- 

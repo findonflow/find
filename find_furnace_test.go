@@ -30,14 +30,30 @@ func TestFindFurnace(t *testing.T) {
 			AssertSuccess(t)
 
 		for i, id := range ids {
+
+			events := res.GetEventsWithName("FindFurnace.Burned")
+			mockField := map[string]interface{}{}
+			for _, e := range events {
+				field, exist := e.Fields["nftInfo"].(map[string]interface{})
+				if exist {
+					mockId := field["id"].(uint64)
+					if id == mockId {
+						field["id"] = id
+						field["type"] = dandyType
+						mockField = field
+					}
+				}
+			}
+
 			res.AssertEvent(t, "FindFurnace.Burned", map[string]interface{}{
-				"from": otu.O.Address("user1"),
-				"id":   id,
-				"uuid": id,
-				"type": dandyType,
+				"from":     otu.O.Address("user1"),
+				"fromName": "user1",
+				"uuid":     id,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
+				"nftInfo": mockField,
 			})
 		}
 	})

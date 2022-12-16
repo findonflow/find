@@ -48,17 +48,32 @@ func TestFindAirdropper(t *testing.T) {
 			AssertSuccess(t)
 
 		for i, id := range ids {
+
+			events := res.GetEventsWithName("FindAirdropper.Airdropped")
+			mockField := map[string]interface{}{}
+			for _, e := range events {
+				field, exist := e.Fields["nftInfo"].(map[string]interface{})
+				if exist {
+					mockId := field["id"].(uint64)
+					if id == mockId {
+						field["id"] = id
+						field["type"] = dandyType
+						mockField = field
+					}
+				}
+			}
+
 			res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
 				"from":     otu.O.Address("user1"),
 				"fromName": "user1",
 				"to":       otu.O.Address("user2"),
 				"toName":   "user2",
-				"id":       id,
 				"uuid":     id,
-				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
+				"nftInfo": mockField,
 			})
 		}
 	})
@@ -93,15 +108,27 @@ func TestFindAirdropper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
+		events := res.GetEventsWithName("FindAirdropper.Airdropped")
+		mockField := map[string]interface{}{}
+		for _, e := range events {
+			field, exist := e.Fields["nftInfo"].(map[string]interface{})
+			if exist {
+				field["type"] = "A.f8d6e0586b0a20c7.FindPack.NFT"
+				mockField = field
+			}
+		}
+
 		res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
 			"from":   otu.O.Address("account"),
 			"toName": "user2",
 			"to":     otu.O.Address("user2"),
-			"type":   "A.f8d6e0586b0a20c7.FindPack.NFT",
 			"context": map[string]interface{}{
 				"message": "I can use struct here",
+				"tenant":  "find",
 			},
+			"nftInfo": mockField,
 		})
+
 	})
 
 	t.Run("Should be able to send Airdrop with only collection public linked", func(t *testing.T) {
@@ -126,18 +153,33 @@ func TestFindAirdropper(t *testing.T) {
 			AssertSuccess(t)
 
 		for i, id := range ids {
+
+			events := res.GetEventsWithName("FindAirdropper.Airdropped")
+			mockField := map[string]interface{}{}
+			for _, e := range events {
+				field, exist := e.Fields["nftInfo"].(map[string]interface{})
+				if exist {
+					mockId := field["id"].(uint64)
+					if id == mockId {
+						field["id"] = id
+						field["type"] = dandyType
+						mockField = field
+					}
+				}
+			}
+
 			res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
 				"fromName": "user1",
 				"from":     otu.O.Address("user1"),
 				"toName":   "user2",
 				"to":       otu.O.Address("user2"),
-				"id":       id,
 				"uuid":     id,
-				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
-				"remark": "Receiver Not Linked",
+				"remark":  "Receiver Not Linked",
+				"nftInfo": mockField,
 			})
 		}
 	})
@@ -161,6 +203,7 @@ func TestFindAirdropper(t *testing.T) {
 			AssertSuccess(t)
 
 		for i, id := range ids {
+
 			res.AssertEvent(t, "FindAirdropper.AirdropFailed", map[string]interface{}{
 				"fromName": "user1",
 				"from":     otu.O.Address("user1"),
@@ -170,9 +213,11 @@ func TestFindAirdropper(t *testing.T) {
 				"type":     dandyType,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
 				"reason": "Invalid Receiver Capability",
 			})
+
 		}
 	})
 
@@ -273,18 +318,34 @@ func TestFindAirdropper(t *testing.T) {
 				AssertSuccess(t)
 
 			for i, id := range ids {
+
+				events := res.GetEventsWithName("FindAirdropper.Airdropped")
+				mockField := map[string]interface{}{}
+				for _, e := range events {
+					field, exist := e.Fields["nftInfo"].(map[string]interface{})
+					if exist {
+						mockId := field["id"].(uint64)
+						if id == mockId {
+							field["id"] = id
+							field["type"] = dandyType
+							mockField = field
+						}
+					}
+				}
+
 				res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
 					"fromName": "user1",
 					"from":     otu.O.Address("user1"),
 					"toName":   "user2",
 					"to":       otu.O.Address("user2"),
-					"id":       id,
 					"uuid":     id,
-					"type":     dandyType,
 					"context": map[string]interface{}{
 						"message": fmt.Sprintf("Message %d", i),
+						"tenant":  "find",
 					},
+					"nftInfo": mockField,
 				})
+
 			}
 
 			wants := []map[string]interface{}{
@@ -322,18 +383,34 @@ func TestFindAirdropper(t *testing.T) {
 				AssertSuccess(t)
 
 			for i, id := range ids {
+
+				events := res.GetEventsWithName("FindAirdropper.Airdropped")
+				mockField := map[string]interface{}{}
+				for _, e := range events {
+					field, exist := e.Fields["nftInfo"].(map[string]interface{})
+					if exist {
+						mockId := field["id"].(uint64)
+						if id == mockId {
+							field["id"] = id
+							field["type"] = dandyType
+							mockField = field
+						}
+					}
+				}
+
 				res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
 					"from":     otu.O.Address("user1"),
 					"fromName": "user1",
 					"to":       otu.O.Address("user2"),
 					"toName":   "user2",
-					"id":       id,
 					"uuid":     id,
-					"type":     dandyType,
 					"context": map[string]interface{}{
 						"message": fmt.Sprintf("Message %d", i),
+						"tenant":  "find",
 					},
+					"nftInfo": mockField,
 				})
+
 			}
 
 			res.AssertEvent(t, "FIND.FungibleTokenSent", map[string]interface{}{

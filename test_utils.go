@@ -2793,6 +2793,122 @@ func (otu *OverflowTestUtils) claimFloat(minter, receiver string, floatId uint64
 	return otu
 }
 
+func (otu *OverflowTestUtils) addRelatedAccount(user, wallet, network, address string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	var res *OverflowResult
+	if network == "Flow" {
+
+		res = o.Tx("addRelatedFlowAccount",
+			WithSigner(user),
+			WithArg("name", wallet),
+			WithArg("address", address),
+		)
+		address = o.Address(address)
+	} else {
+		res = o.Tx("addRelatedAccount",
+			WithSigner(user),
+			WithArg("name", wallet),
+			WithArg("network", network),
+			WithArg("address", address),
+		)
+	}
+
+	res.AssertSuccess(t).
+		AssertEvent(t, "RelatedAccount", map[string]interface{}{
+			"user":       otu.O.Address(user),
+			"walletId":   fmt.Sprintf("%s_%s_%s", network, wallet, address),
+			"walletName": wallet,
+			"address":    address,
+			"network":    network,
+			"action":     "add",
+		})
+	return otu
+}
+
+func (otu *OverflowTestUtils) updateRelatedAccount(user, wallet, network, oldAddress, address string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	var res *OverflowResult
+	if network == "Flow" {
+
+		res = o.Tx("updateRelatedFlowAccount",
+			WithSigner(user),
+			WithArg("name", wallet),
+			WithArg("oldAddress", oldAddress),
+			WithArg("address", address),
+		)
+		address = o.Address(address)
+		oldAddress = o.Address(oldAddress)
+	} else {
+		res = o.Tx("updateRelatedAccount",
+			WithSigner(user),
+			WithArg("name", wallet),
+			WithArg("network", network),
+			WithArg("oldAddress", oldAddress),
+			WithArg("address", address),
+		)
+	}
+
+	res.AssertSuccess(t).
+		AssertEvent(t, "RelatedAccount", map[string]interface{}{
+			"walletId":   fmt.Sprintf("%s_%s_%s", network, wallet, address),
+			"walletName": wallet,
+			"address":    address,
+			"network":    network,
+			"action":     "add",
+		}).
+		AssertEvent(t, "RelatedAccount", map[string]interface{}{
+			"user":       otu.O.Address(user),
+			"walletId":   fmt.Sprintf("%s_%s_%s", network, wallet, oldAddress),
+			"walletName": wallet,
+			"address":    oldAddress,
+			"network":    network,
+			"action":     "remove",
+		})
+	return otu
+}
+
+func (otu *OverflowTestUtils) removeRelatedAccount(user, wallet, network, address string) *OverflowTestUtils {
+	o := otu.O
+	t := otu.T
+
+	var res *OverflowResult
+
+	if network == "Flow" {
+		address = o.Address(address)
+	}
+
+	res = o.Tx("removeRelatedAccount",
+		WithSigner(user),
+		WithArg("name", wallet),
+		WithArg("network", network),
+		WithArg("address", address),
+	)
+
+	res.AssertSuccess(t).
+		AssertEvent(t, "RelatedAccount", map[string]interface{}{
+			"user":       otu.O.Address(user),
+			"walletId":   fmt.Sprintf("%s_%s_%s", network, wallet, address),
+			"walletName": wallet,
+			"address":    address,
+			"network":    network,
+			"action":     "remove",
+		})
+	return otu
+}
+
+func (otu *OverflowTestUtils) createOptional(value any) (cadence.Value, error) {
+	val, err := cadence.NewValue(value)
+	if err != nil {
+		return nil, err
+	}
+	opt := cadence.NewOptional(val)
+	return opt, nil
+}
+
 type SaleItem struct {
 	Amount              float64 `json:"amount"`
 	AuctionReservePrice float64 `json:"auctionReservePrice"`

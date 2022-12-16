@@ -1,17 +1,17 @@
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
-import RelatedAccounts from "../contracts/RelatedAccounts.cdc"
+import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 
 pub struct FINDReport {
 	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
-	pub let relatedAccounts: { String: Address}
+	pub let relatedAccounts: { String: [Address]}
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
 	pub let activatedAccount: Bool 
 
 
-	init(profile: Profile.UserReport?, relatedAccounts: {String: Address}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, activatedAccount: Bool ) {
+	init(profile: Profile.UserReport?, relatedAccounts: { String: [Address]}, bids: [FIND.BidInfo], leases : [FIND.LeaseInformation], privateMode: Bool, activatedAccount: Bool ) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
@@ -67,7 +67,7 @@ pub fun main(user: String) : NameReport? {
 
 			findReport = FINDReport(
 				profile: profileReport,
-				relatedAccounts: RelatedAccounts.findRelatedFlowAccounts(address:address),
+				relatedAccounts: FindRelatedAccounts.findRelatedFlowAccounts(address:address),
 				bids: bidCap.borrow()?.getBids() ?? [],
 				leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 				privateMode: profile?.isPrivateModeEnabled() ?? false, 
