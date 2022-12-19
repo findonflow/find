@@ -10,32 +10,18 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 	otu := NewOverflowTest(t)
 
-	mintFund := otu.O.TxFN(
-		WithSigner("account"),
-		WithArg("amount", 10000.0),
-		WithArg("recipient", "user2"),
-	)
-
 	price := 10.0
 	preIncrement := 5.0
-	otu.setupMarketAndDandy()
-	otu.registerFtInRegistry().
+	otu.setupMarketAndDandyDapper()
+	otu.registerDUCInRegistry().
 		setFlowLeaseMarketOption("AuctionSoft").
 		setProfile("user1").
-		setProfile("user2")
+		setProfile("user2").
+		createDapperUser("find")
 
-	mintFund("devMintFusd").
-		AssertSuccess(t)
-
-	mintFund("devMintFlow").
-		AssertSuccess(t)
-
-	mintFund("devMintUsdc").
-		AssertSuccess(t)
-
-	otu.registerUserWithName("user1", "name1").
-		registerUserWithName("user1", "name2").
-		registerUserWithName("user1", "name3")
+	otu.registerDapperUserWithName("user1", "name1").
+		registerDapperUserWithName("user1", "name2").
+		registerDapperUserWithName("user1", "name3")
 
 	otu.setUUID(400)
 
@@ -44,10 +30,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price)
 
-		otu.O.Tx("listLeaseForAuctionSoft",
+		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -64,19 +50,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
-			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-			tickClock(400.0).
-			saleLeaseListed("user1", "finished_completed", price+5.0).
-			fulfillLeaseMarketAuctionSoft("user2", "name1", 15.0)
-
-		otu.moveNameTo("user2", "user1", "name1")
-	})
-
-	t.Run("Should be able to sell and buy at auction even buyer is without the collection.", func(t *testing.T) {
-
-		otu.listLeaseForSoftAuction("user1", "name1", price).
-			saleLeaseListed("user1", "active_listed", price).
-			destroyLeaseCollection("user2").
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
 			tickClock(400.0).
 			saleLeaseListed("user1", "finished_completed", price+5.0).
@@ -112,10 +85,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with price 0", func(t *testing.T) {
 
 		otu.O.Tx(
-			"listLeaseForAuctionSoft",
+			"listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", 0.0),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -130,10 +103,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
 
 		otu.O.Tx(
-			"listLeaseForAuctionSoft",
+			"listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price-5.0),
 			WithArg("auctionDuration", 300.0),
@@ -148,10 +121,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
 		otu.O.Tx(
-			"listLeaseForAuctionSoft",
+			"listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -182,7 +155,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_listed", price).
 			tickClock(1000.0)
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
@@ -197,7 +170,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price)
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
@@ -256,8 +229,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(100.0)
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -312,10 +286,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("AuctionSoft", "deprecate")
 
-		otu.O.Tx("listLeaseForAuctionSoft",
+		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+preIncrement),
 			WithArg("auctionDuration", 300.0),
@@ -339,7 +313,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("amount", price),
 		)
 
-		bitTx("bidLeaseMarketAuctionSoft").
+		bitTx("bidLeaseMarketAuctionSoftDapper").
 			AssertSuccess(t)
 
 		bitTx("increaseBidLeaseMarketAuctionSoft",
@@ -349,17 +323,18 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		bitTx("fulfillLeaseMarketAuctionSoft",
+		bitTx("fulfillLeaseMarketAuctionSoftDapper",
+			WithPayloadSigner("account"),
 			WithArg("amount", 30.0),
 		).
 			AssertSuccess(t)
 
 		otu.alterLeaseMarketOption("AuctionSoft", "enable")
 
-		otu.O.Tx("listLeaseForAuctionSoft",
+		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -386,10 +361,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("AuctionSoft", "stop")
 
-		otu.O.Tx("listLeaseForAuctionSoft",
+		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -403,7 +378,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			listLeaseForSoftAuction("user1", "name1", price).
 			alterLeaseMarketOption("AuctionSoft", "stop")
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
@@ -431,8 +406,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -441,8 +417,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		/* Reset */
 		otu.alterLeaseMarketOption("AuctionSoft", "enable")
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -455,7 +432,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price)
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 1.0),
@@ -471,7 +448,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0)
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user3"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 5.0),
@@ -497,14 +474,15 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			}).
@@ -524,18 +502,19 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-			setFindLeaseCut(0.035)
+			setFindLeaseCutDapper(0.035)
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.35,
 				"royaltyName": "find",
 			}).
@@ -557,10 +536,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			leaseProfileBan("user1")
 
-		otu.O.Tx("listLeaseForAuctionSoft",
+		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("leaseName", "name3"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -570,15 +549,16 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("leaseName", "name2"),
 			WithArg("amount", price),
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -592,8 +572,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.removeLeaseProfileBan("user1")
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -612,15 +593,16 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			leaseProfileBan("user2")
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("leaseName", "name2"),
 			WithArg("amount", price),
 		).
 			AssertFailure(t, "Buyer banned by Tenant")
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -629,8 +611,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		/* Reset */
 		otu.removeLeaseProfileBan("user2")
 
-		otu.O.Tx("fulfillLeaseMarketAuctionSoft",
+		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -648,7 +631,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
 			saleLeaseListed("user1", "active_ongoing", price+5.0)
 
-		otu.O.Tx("bidLeaseMarketAuctionSoft",
+		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user3"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 20.0),
@@ -667,8 +650,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
 
-		otu.registerDUCInRegistry().
-			setDUCLease()
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
+		otu.setDUCLease()
 
 		otu.listLeaseForSoftAuctionDUC("user1", "name1", price)
 

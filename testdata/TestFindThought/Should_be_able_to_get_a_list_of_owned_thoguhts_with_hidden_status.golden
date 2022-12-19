@@ -7,8 +7,24 @@
         "creatorName": "user1",
         "creatorProfileName": "user1",
         "header": "This is header",
+        "hidden": false,
+        "id": 294,
+        "tags": [
+            "tag1",
+            "tag2",
+            "@find"
+        ]
+    },
+    {
+        "body": "This is body",
+        "created": 1,
+        "creator": "0x179b6b1cb6755e31",
+        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+        "creatorName": "user1",
+        "creatorProfileName": "user1",
+        "header": "This is header",
         "hidden": true,
-        "id": 348,
+        "id": 296,
         "quotedThought": {
             "body": "This is body",
             "created": 1,
@@ -18,7 +34,7 @@
             "creatorProfileName": "user1",
             "header": "This is header",
             "hidden": false,
-            "id": 339,
+            "id": 287,
             "medias": {
                 "mediaUrl": "mediaType"
             },
@@ -62,7 +78,7 @@
         "creatorProfileName": "user1",
         "header": "This is header",
         "hidden": false,
-        "id": 339,
+        "id": 287,
         "medias": {
             "mediaUrl": "mediaType"
         },
@@ -85,22 +101,6 @@
         "reactions": {
             "fire": 1
         },
-        "tags": [
-            "tag1",
-            "tag2",
-            "@find"
-        ]
-    },
-    {
-        "body": "This is body",
-        "created": 1,
-        "creator": "0x179b6b1cb6755e31",
-        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-        "creatorName": "user1",
-        "creatorProfileName": "user1",
-        "header": "This is header",
-        "hidden": false,
-        "id": 346,
         "tags": [
             "tag1",
             "tag2",

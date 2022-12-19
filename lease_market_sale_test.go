@@ -43,13 +43,6 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to list a lease for sale and buy it without the collection", func(t *testing.T) {
-		otu.listLeaseForSale("user1", "name1", price).
-			destroyLeaseCollection("user2").
-			buyLeaseForMarketSale("user2", "user1", "name1", price).
-			moveNameTo("user2", "user1", "name1")
-	})
-
 	t.Run("Should not be able to list with price $0", func(t *testing.T) {
 
 		otu.O.Tx("listLeaseForSale",
@@ -148,7 +141,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
 
-		otu.cancelAllNFTForSale("user1")
+		otu.cancelAllLeaseForSale("user1")
 	})
 
 	t.Run("Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
@@ -450,13 +443,17 @@ func TestLeaseMarketSale(t *testing.T) {
 				"residualAddress": otu.O.Address("user3"),
 			})
 
-		otu.cancelAllNFTForSale("user1").
+		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
 		// createUser(100, "find")
 
 	})
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
 		otu.registerDUCInRegistry().
 			setDUCLease()
 
@@ -482,12 +479,12 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       367,
+			"id":       302,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))
 
-		otu.cancelAllNFTForSale("user1")
+		otu.cancelAllLeaseForSale("user1")
 
 	})
 

@@ -34,40 +34,6 @@
             "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
             "status": "active"
         },
-        "FindMarketAuctionSoft": {
-            "ListingDetails": [
-                {
-                    "ftAlias": "Flow",
-                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "royalties": [
-                        {
-                            "address": "0xf8d6e0586b0a20c7",
-                            "cut": 0.025,
-                            "royaltyName": "find"
-                        },
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.05,
-                            "findName": "user1",
-                            "royaltyName": "creator"
-                        },
-                        {
-                            "address": "0xf8d6e0586b0a20c7",
-                            "cut": 0.025,
-                            "royaltyName": "find forge"
-                        }
-                    ]
-                }
-            ],
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
-            "status": "active"
-        },
         "FindMarketDirectOfferEscrow": {
             "ListingDetails": [
                 {
@@ -102,40 +68,6 @@
             "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.SaleItem",
             "status": "active"
         },
-        "FindMarketDirectOfferSoft": {
-            "ListingDetails": [
-                {
-                    "ftAlias": "Flow",
-                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "royalties": [
-                        {
-                            "address": "0xf8d6e0586b0a20c7",
-                            "cut": 0.025,
-                            "royaltyName": "find"
-                        },
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.05,
-                            "findName": "user1",
-                            "royaltyName": "creator"
-                        },
-                        {
-                            "address": "0xf8d6e0586b0a20c7",
-                            "cut": 0.025,
-                            "royaltyName": "find forge"
-                        }
-                    ]
-                }
-            ],
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.SaleItem",
-            "status": "active"
-        },
         "FindMarketSale": {
             "ListingDetails": [
                 {
@@ -159,13 +91,35 @@
                             "royaltyName": "find forge"
                         }
                     ]
+                },
+                {
+                    "ftIdentifier": "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0x01cf0e2f2f715450",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "creator"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find forge"
+                        }
+                    ]
                 }
             ],
             "ftAlias": [
                 "Flow"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
             "status": "active"
@@ -197,7 +151,7 @@
             }
         ],
         "externalViewURL": "https://www.ufcstrike.com/ID2",
-        "id": 955,
+        "id": 953,
         "media": {
             "ipfs://QmdDJUobzSaFfg8PwZZcCB3cPwbZ8pthRf1x6XiR9xwS3U": "video/mp4",
             "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR": "image;display=thumbnail"
@@ -222,7 +176,7 @@
             }
         ],
         "type": "A.f8d6e0586b0a20c7.Dandy.NFT",
-        "uuid": 955,
+        "uuid": 953,
         "views": [
             "checked",
             "checked",

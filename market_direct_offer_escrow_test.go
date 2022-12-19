@@ -82,20 +82,6 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
-	t.Run("Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
-
-		otu.destroyDandyCollection("user2").
-			directOfferMarketEscrowed("user2", "user1", id, price)
-
-		otu.saleItemListed("user1", "active_ongoing", price)
-		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
-
-		otu.sendDandy("user1", "user2", id).
-			sendFT("user1", "user2", "Flow", price)
-
-		otu.cancelAllDirectOfferMarketEscrowed("user1")
-	})
-
 	t.Run("Should not be able to offer with price 0", func(t *testing.T) {
 
 		bidTx("bidMarketDirectOfferEscrowed",
@@ -757,7 +743,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 			WithSigner("user1"),
@@ -783,7 +769,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),

@@ -122,14 +122,10 @@ func TestNFTDetailScript(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price).
-			directOfferMarketSoft("user2", "user1", ids[0], price).
-			listNFTForEscrowedAuction("user1", ids[1], price).
-			listNFTForSoftAuction("user1", ids[1], price)
+			listNFTForEscrowedAuction("user1", ids[1], price)
 
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
@@ -180,10 +176,8 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(700)
 		ids := otu.mintThreeExampleDandies()
 		otu.setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price)
 
 		otu.O.Tx("devListStorefront",
@@ -220,10 +214,8 @@ func TestNFTDetailScript(t *testing.T) {
 			registerUserWithNameAndForge("user1", "goatedgoats").
 			registerUserWithNameAndForge("user1", "klktn").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price)
 
 		dandyIds := otu.O.Tx("devMintDandyTO",
@@ -330,24 +322,18 @@ func TestNFTDetailScript(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price).
-			directOfferMarketSoft("user2", "user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
-			listNFTForSoftAuction("user1", ids[1], price).
 			directOfferMarketEscrowed("user2", "user1", ids[0], price).
 			alterMarketOption("Sale", "stop").
-			alterMarketOption("AuctionSoft", "stop").
 			alterMarketOption("AuctionEscrow", "stop").
-			alterMarketOption("DirectOfferSoft", "stop").
 			alterMarketOption("DirectOfferEscrow", "stop")
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
-		).Print().AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionSoft/items/0",
+		).Print().AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/items/0",
 			autogold.Want("Should not be fetching NFTInfo if stopped", map[string]interface{}{
 				"amount": 10, "auction": map[string]interface{}{
 					"currentPrice": 10, "extentionOnLateBid": 60, "minimumBidIncrement": 1,
@@ -359,7 +345,7 @@ func TestNFTDetailScript(t *testing.T) {
 				"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				"listingId":             1103,
 				"listingStatus":         "stopped",
-				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.SaleItem",
+				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil":     101,
 				"nftId":                 1103,
 				"nftIdentifier":         "A.f8d6e0586b0a20c7.Dandy.NFT",
@@ -376,17 +362,12 @@ func TestNFTDetailScript(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price).
-			directOfferMarketSoft("user2", "user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
-			listNFTForSoftAuction("user1", ids[1], price).
 			directOfferMarketEscrowed("user2", "user1", ids[0], price).
 			alterMarketOption("Sale", "stop").
-			alterMarketOption("AuctionSoft", "stop").
 			alterMarketOption("AuctionEscrow", "stop")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").
@@ -406,14 +387,10 @@ func TestNFTDetailScript(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			listNFTForSale("user1", ids[1], price).
-			directOfferMarketSoft("user2", "user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
-			listNFTForSoftAuction("user1", ids[1], price).
 			blockDandy("devBlockItem")
 
 		otu.O.Script("getStatus",
@@ -427,10 +404,8 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			blockDandy("devBlockItem")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").
@@ -448,10 +423,8 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("DirectOfferSoft").
 			setFlowDandyMarketOption("Sale").
 			setFlowDandyMarketOption("AuctionEscrow").
-			setFlowDandyMarketOption("AuctionSoft").
 			blockDandy("devBlockItemByListingType")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").

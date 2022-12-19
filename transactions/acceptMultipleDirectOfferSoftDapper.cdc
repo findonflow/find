@@ -6,32 +6,13 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import Profile from "../contracts/Profile.cdc"
 
-transaction(dapperAddress: Address, marketplace:Address, ids: [UInt64]) {
+transaction(marketplace:Address, ids: [UInt64]) {
 
 	let market : &FindMarketDirectOfferSoft.SaleItemCollection
 	let pointer : [FindViews.AuthNFTPointer]
 
 	prepare(account: AuthAccount) {
-
-		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		if !ducReceiver.check() {
-			let dapper = getAccount(dapperAddress)
-			// Create a new Forwarder resource for DUC and store it in the new account's storage
-			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
-			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
-			// Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
-			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinReceiver)
-		}
-
-		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
-		if !profile.hasWallet("DUC") {
-			profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:getAccount(dapperAddress).getCapability<&{FungibleToken.Balance}>(/public/dapperUtilityCoinBalance), accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
-			profile.emitUpdatedEvent()
-		}
 
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())

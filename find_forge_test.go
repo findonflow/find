@@ -24,7 +24,7 @@ func TestFindForge(t *testing.T) {
 		otu.O.Tx("adminAddNFTCatalog",
 			WithSigner("find"),
 			WithArg("collectionIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-			WithArg("contractName", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("contractName", "ExampleNFT"),
 			WithArg("contractAddress", "account"),
 			WithArg("addressWithNFT", "account"),
 			WithArg("nftID", 0),
@@ -52,7 +52,7 @@ func TestFindForge(t *testing.T) {
 			WithArg("user", "user1"),
 			WithArg("collections", `[]`),
 		).AssertWant(t,
-			autogold.Want("collection", map[string]interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT": map[string]interface{}{
+			autogold.Want("collection", map[string]interface{}{"ExampleNFT": map[string]interface{}{
 				"collectionName":     "The Example Collection",
 				"extraIDs":           []interface{}{2},
 				"extraIDsIdentifier": "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
