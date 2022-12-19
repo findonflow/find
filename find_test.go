@@ -427,4 +427,43 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to getStatus of an FREE lease", func(t *testing.T) {
+		res := otu.O.Script("getStatus",
+			WithArg("user", "lease"),
+		).
+			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, FREE", map[string]interface{}{"cost": 5, "status": "FREE"}))
+
+		assert.NoError(t, res.Err)
+	})
+
+	t.Run("Should be able to getStatus of an TAKEN lease", func(t *testing.T) {
+		otu.registerUserWithName("user1", "lease")
+		res := otu.O.Script("getStatus",
+			WithArg("user", "lease"),
+		).
+			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, TAKEN", map[string]interface{}{
+				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x179b6b1cb6755e31",
+				"registeredTime": 9.4608005e+07,
+				"status":         "TAKEN",
+				"validUntil":     1.26144005e+08,
+			}))
+		assert.NoError(t, res.Err)
+	})
+
+	t.Run("Should be able to getStatus of an LOCKED lease", func(t *testing.T) {
+		otu.expireLease()
+		res := otu.O.Script("getStatus",
+			WithArg("user", "lease"),
+		).
+			Print().
+			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, LOCKED", map[string]interface{}{
+				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x179b6b1cb6755e31",
+				"registeredTime": 9.4608005e+07,
+				"status":         "LOCKED",
+				"validUntil":     1.26144005e+08,
+			}))
+		assert.NoError(t, res.Err)
+	})
+
 }
+ 

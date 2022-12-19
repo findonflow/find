@@ -112,7 +112,7 @@ pub contract FIND {
 				return network.lookup(trimmedInput)?.owner?.address
 			}
 
-return nil
+			return nil
 		}
 
 		var address=trimmedInput
@@ -1370,6 +1370,9 @@ return nil
 			self.publicEnabled=publicEnabled
 		}
 
+		pub fun getLease(_ name: String) : NetworkLease? {
+			return self.profiles[name]
+		}
 
 		pub fun setAddonPrice(name:String, price:UFix64) {
 			self.addonPrices[name]=price
@@ -1626,6 +1629,9 @@ return nil
 		}
 	}
 
+	pub fun getFindNetworkAddress() : Address {
+		return self.account.address
+	}
 
 
 	/*
@@ -1943,3 +1949,4 @@ return nil
 
 	}
 }
+ 

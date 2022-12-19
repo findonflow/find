@@ -23,11 +23,9 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 	id := otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("DirectOfferSoft").
 		setFlowDandyMarketOption("DirectOfferEscrow").
 		setFlowDandyMarketOption("Sale").
 		setFlowDandyMarketOption("AuctionEscrow").
-		setFlowDandyMarketOption("AuctionSoft").
 		setProfile("user1").
 		setProfile("user2")
 
@@ -310,13 +308,12 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.setUUID(1000)
 
-		otu.directOfferMarketSoft("user2", "user1", id, price)
+		otu.listNFTForSale("user1", id, price)
 
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 2, len(itemsForSale))
 
-		otu.acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			fulfillMarketDirectOfferSoft("user2", id, price)
+		otu.buyNFTForMarketSale("user2", "user1", id, price)
 
 		otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 			WithSigner("user1"),
@@ -331,7 +328,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 	})
 
-	t.Run("Should not be able to make Direct Offer Soft if item was already sold in other form", func(t *testing.T) {
+	t.Run("Should not be able to make Direct Offer Escrowed if item was already sold in other form", func(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 
@@ -410,17 +407,14 @@ func TestMarketGhostlistingTest(t *testing.T) {
 	t.Run("Should be able to return ghost listings with script getStatus", func(t *testing.T) {
 		otu.setUUID(1400)
 		ids := otu.mintThreeExampleDandies()
-		otu.directOfferMarketSoft("user2", "user1", ids[0], price).
-			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
+		otu.listNFTForSale("user1", ids[0], price).
 			setFlowDandyMarketOption("AuctionEscrow").
-			listNFTForEscrowedAuction("user1", ids[1], price)
-
-		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
+			listNFTForEscrowedAuction("user1", ids[0], price)
 
 		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 3, len(itemsForSale))
+		assert.Equal(t, 2, len(itemsForSale))
 
-		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
+		otu.buyNFTForMarketSale("user2", "user1", ids[0], price)
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
@@ -436,8 +430,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 	t.Run("Should be able to return ghost bids with script getStatus", func(t *testing.T) {
 		otu.setUUID(1800)
 		ids := otu.mintThreeExampleDandies()
-		otu.directOfferMarketSoft("user2", "user1", ids[0], price).
-			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
+		otu.listNFTForSale("user1", ids[0], price).
 			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForEscrowedAuction("user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
@@ -449,7 +442,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		itemsForSale := otu.getItemsForSale("user1")
 		assert.Equal(t, 4, len(itemsForSale))
 
-		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
+		otu.buyNFTForMarketSale("user2", "user1", ids[0], price)
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user2"),
@@ -525,6 +518,152 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
 				autogold.Want("Bid", otu.identifier("FindMarketAuctionEscrow", "Bid")),
 			)
+	})
+
+	// reset for Dapper tests
+	otu = NewOverflowTest(t)
+
+	id = otu.setupMarketAndDandyDapper()
+	otu.registerDUCInRegistry().
+		registerDandyInNFTRegistry().
+		setFlowDandyMarketOption("DirectOfferSoft").
+		setFlowDandyMarketOption("Sale").
+		setFlowDandyMarketOption("AuctionSoft").
+		setProfile("user1").
+		setProfile("user2").
+		createDapperUser("find")
+
+	/* MarketAuction Soft */
+	t.Run("Should not be able to bid Auction if item was already sold on direct offer", func(t *testing.T) {
+
+		otu.listNFTForSoftAuction("user1", id, price)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.directOfferMarketSoft("user2", "user1", id, 15.0)
+
+		itemsForSale = otu.getItemsForSale("user1")
+		assert.Equal(t, 2, len(itemsForSale))
+
+		otu.sendDandy("user2", "user1", id)
+
+		otu.O.Tx("bidMarketAuctionSoftDapper",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("user", "user1"),
+			WithArg("id", id),
+			WithArg("amount", bidPrice),
+		).
+			AssertFailure(t, "this is a ghost listing")
+
+		otu.sendDandy("user1", "user2", id).
+			delistAllNFT("user1")
+
+	})
+
+	t.Run("Should not be able to increase bid in Auction Soft if item was already sold on direct offer", func(t *testing.T) {
+
+		otu.listNFTForSoftAuction("user1", id, price).
+			auctionBidMarketSoft("user2", "user1", id, bidPrice)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_ongoing", itemsForSale[0].SaleType)
+
+		otu.directOfferMarketSoft("user2", "user1", id, 15.0)
+
+		itemsForSale = otu.getItemsForSale("user1")
+		assert.Equal(t, 2, len(itemsForSale))
+
+		otu.sendDandy("user2", "user1", id)
+
+		otu.O.Tx("increaseBidMarketAuctionSoft",
+			WithSigner("user2"),
+			WithArg("marketplace", "account"),
+			WithArg("id", id),
+			WithArg("amount", bidPrice+1.0),
+		).
+			AssertFailure(t, "this is a ghost listing")
+
+		otu.sendDandy("user1", "user2", id).
+			delistAllNFT("user1")
+
+	})
+
+	t.Run("Should not be able to fulfill bid in Auction if item was already sold on direct offer", func(t *testing.T) {
+
+		otu.listNFTForSoftAuction("user1", id, price).
+			auctionBidMarketSoft("user2", "user1", id, bidPrice).
+			tickClock(700)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "finished_completed", itemsForSale[0].SaleType)
+
+		otu.directOfferMarketSoft("user2", "user1", id, 15.0)
+
+		itemsForSale = otu.getItemsForSale("user1")
+		assert.Equal(t, 2, len(itemsForSale))
+
+		otu.sendDandy("user2", "user1", id)
+
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("marketplace", "account"),
+			WithArg("id", id),
+			WithArg("amount", 15.0),
+		).
+			AssertFailure(t, "this is a ghost listing")
+
+		otu.sendDandy("user1", "user2", id).
+			delistAllNFT("user1")
+	})
+
+	t.Run("Should not be able to accept Direct Offer Soft if item was already sold in other form", func(t *testing.T) {
+
+		otu.directOfferMarketSoft("user2", "user1", id, price)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+
+		otu.sendDandy("user2", "user1", id)
+
+		otu.O.Tx("acceptDirectOfferSoftDapper",
+			WithSigner("user1"),
+			WithArg("marketplace", "account"),
+			WithArg("id", id),
+		).
+			AssertFailure(t, "this is a ghost listing")
+
+		otu.sendDandy("user1", "user2", id).
+			delistAllNFT("user1")
+
+	})
+
+	t.Run("Should not be able to fulfill Direct Offer Soft if item was already sold in other form", func(t *testing.T) {
+
+		otu.directOfferMarketSoft("user2", "user1", id, price).
+			acceptDirectOfferMarketSoft("user1", id, "user2", price)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+
+		otu.sendDandy("user2", "user1", id)
+
+		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("account"),
+			WithArg("marketplace", "account"),
+			WithArg("id", id),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "this is a ghost listing")
+
+		otu.sendDandy("user1", "user2", id).
+			delistAllNFT("user1")
 	})
 
 }

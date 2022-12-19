@@ -7,8 +7,28 @@
         "creatorName": "user1",
         "creatorProfileName": "user1",
         "header": "This is header",
+        "hidden": false,
+        "id": 294,
+        "tags": [
+            "tag1",
+            "tag2",
+            "@find"
+        ]
+    },
+    {
+        "body": "This is body",
+        "created": 1,
+        "creator": "0x179b6b1cb6755e31",
+        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+        "creatorName": "user1",
+        "creatorProfileName": "user1",
+        "header": "This is header",
         "hidden": true,
+<<<<<<< HEAD
         "id": 401,
+=======
+        "id": 296,
+>>>>>>> main
         "quotedThought": {
             "body": "This is body",
             "created": 1,
@@ -18,7 +38,11 @@
             "creatorProfileName": "user1",
             "header": "This is header",
             "hidden": false,
+<<<<<<< HEAD
             "id": 392,
+=======
+            "id": 287,
+>>>>>>> main
             "medias": {
                 "mediaUrl": "mediaType"
             },
@@ -62,6 +86,7 @@
         "creatorProfileName": "user1",
         "header": "This is header",
         "hidden": false,
+<<<<<<< HEAD
         "id": 399,
         "tags": [
             "tag1",
@@ -79,6 +104,9 @@
         "header": "This is header",
         "hidden": false,
         "id": 392,
+=======
+        "id": 287,
+>>>>>>> main
         "medias": {
             "mediaUrl": "mediaType"
         },

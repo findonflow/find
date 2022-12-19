@@ -32,11 +32,21 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 		let fts : {String : FTRegistry.FTInfo} = {}
 		let saleItems : {Address : &FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}} = {}
 
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
+		let saleItemType = Type<@FindMarketSale.SaleItemCollection>()
+		let marketOption = FindMarket.getMarketOptionFromType(saleItemType)
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
-		let publicPath=FindMarket.getPublicPath(Type<@FindMarketSale.SaleItemCollection>(), name: tenant.name)
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
+
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		if !saleItemCap.check() {
+			//The link here has to be a capability not a tenant, because it can change.
+			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+		}
+
 		var vaultType : Type? = nil
 
 		self.totalPrice = 0.0

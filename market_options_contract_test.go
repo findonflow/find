@@ -19,9 +19,6 @@ func TestMarketOptionsContract(t *testing.T) {
 	ids := otu.setupMarketAndMintDandys()
 	otu.registerFtInRegistry().
 		setFlowDandyMarketOption("DirectOfferEscrow").
-		setFlowDandyMarketOption("DirectOfferSoft").
-		directOfferMarketSoft("user2", "user1", ids[0], price).
-		acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
 		setFlowDandyMarketOption("AuctionEscrow").
 		listNFTForEscrowedAuction("user1", ids[1], price).
 		setProfile("user1").
@@ -32,7 +29,7 @@ func TestMarketOptionsContract(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
 		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 3, len(itemsForSale))
+		assert.Equal(t, 2, len(itemsForSale))
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
@@ -95,10 +92,7 @@ func TestMarketOptionsContract(t *testing.T) {
 
 	t.Run("Should be able to return ghost bids with script addressStatus and nameStatus", func(t *testing.T) {
 
-		otu.directOfferMarketSoft("user2", "user1", ids[0], price).
-			acceptDirectOfferMarketSoft("user1", ids[0], "user2", price).
-			setFlowDandyMarketOption("AuctionEscrow").
-			listNFTForEscrowedAuction("user1", ids[0], price).
+		otu.listNFTForEscrowedAuction("user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			auctionBidMarketEscrow("user2", "user1", ids[0], bidPrice).
 			auctionBidMarketEscrow("user2", "user1", ids[1], bidPrice).
@@ -106,7 +100,7 @@ func TestMarketOptionsContract(t *testing.T) {
 
 		itemsForSale := otu.getItemsForSale("user1")
 		fmt.Println(itemsForSale)
-		assert.Equal(t, 4, len(itemsForSale))
+		assert.Equal(t, 3, len(itemsForSale))
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 

@@ -46,10 +46,12 @@ func TestFindFurnace(t *testing.T) {
 			}
 
 			res.AssertEvent(t, "FindFurnace.Burned", map[string]interface{}{
-				"from": otu.O.Address("user1"),
-				"uuid": id,
+				"from":     otu.O.Address("user1"),
+				"fromName": "user1",
+				"uuid":     id,
 				"context": map[string]interface{}{
 					"message": fmt.Sprintf("Message %d", i),
+					"tenant":  "find",
 				},
 				"nftInfo": mockField,
 			})

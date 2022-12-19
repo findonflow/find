@@ -34,6 +34,7 @@
       "listingType": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
       "status": "active",
     },
+<<<<<<< HEAD
     "FindMarketAuctionSoft": map[string]interface {}{
       "ListingDetails": []interface {}{
         map[string]interface {}{
@@ -68,6 +69,8 @@
       "listingType": "A.179b6b1cb6755e31.FindMarketAuctionSoft.SaleItem",
       "status": "active",
     },
+=======
+>>>>>>> main
     "FindMarketDirectOfferEscrow": map[string]interface {}{
       "ListingDetails": []interface {}{
         map[string]interface {}{
@@ -102,6 +105,7 @@
       "listingType": "A.179b6b1cb6755e31.FindMarketDirectOfferEscrow.SaleItem",
       "status": "active",
     },
+<<<<<<< HEAD
     "FindMarketDirectOfferSoft": map[string]interface {}{
       "ListingDetails": []interface {}{
         map[string]interface {}{
@@ -136,6 +140,8 @@
       "listingType": "A.179b6b1cb6755e31.FindMarketDirectOfferSoft.SaleItem",
       "status": "active",
     },
+=======
+>>>>>>> main
     "FindMarketSale": map[string]interface {}{
       "ListingDetails": []interface {}{
         map[string]interface {}{
@@ -160,12 +166,34 @@
             },
           },
         },
+        map[string]interface {}{
+          "ftIdentifier": "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault",
+          "royalties": []interface {}{
+            map[string]interface {}{
+              "address": "0x01cf0e2f2f715450",
+              "cut": 0.025,
+              "royaltyName": "find",
+            },
+            map[string]interface {}{
+              "address": "0x179b6b1cb6755e31",
+              "cut": 0.05,
+              "findName": "user1",
+              "royaltyName": "creator",
+            },
+            map[string]interface {}{
+              "address": "0xf8d6e0586b0a20c7",
+              "cut": 0.025,
+              "royaltyName": "find forge",
+            },
+          },
+        },
       },
       "ftAlias": []interface {}{
         "Flow",
       },
       "ftIdentifiers": []interface {}{
         "A.0ae53cb6e3f42a79.FlowToken.Vault",
+        "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault",
       },
       "listingType": "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
       "status": "active",
@@ -259,8 +287,14 @@
       },
     },
     "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+<<<<<<< HEAD
     "listingId": 1213,
     "nftId": 1203,
     "nftIdentifier": "A.179b6b1cb6755e31.Dandy.NFT",
+=======
+    "listingId": 711,
+    "nftId": 703,
+    "nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+>>>>>>> main
   },
 }`
