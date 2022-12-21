@@ -5,8 +5,7 @@ import DapperUtilityCoin from 0x82ec283f88a62e65
 import FindLeaseMarketSale from 0x35717efbbce11c74
 import FindLeaseMarket from 0x35717efbbce11c74
 
-//TODO: test, and rename to Dapper, repeat for other tx
-transaction(leaseName: String, amount: UFix64) {
+transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 
     let to : Address
     let saleItemsCap: Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>
@@ -18,6 +17,11 @@ transaction(leaseName: String, amount: UFix64) {
         let profile=account.borrow<&Profile.User>(from: Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
     
         let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
+
+        if address != sellerAccount {
+            panic("address does not resolve to seller")
+        }
+
         let leaseMarketplace = FindMarket.getTenantAddress("findLease") ?? panic("Cannot find findLease tenant")
         self.saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for findLease")
 
