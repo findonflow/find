@@ -147,7 +147,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	otu.O.Tx("setup_find_market_1", saSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	//link in the server in the versus client
 	otu.O.Tx("setup_find_market_2",
 		findSigner,
 		WithArg("tenantAddress", "account"),
@@ -158,10 +157,18 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		WithSigner("user4")).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
+	//Merchant account
+	otu.O.Tx("initDapperAccount",
+		WithSigner("user5-dapper"),
+		WithArg("dapperAddress", "account"),
+	).AssertSuccess(otu.T)
+
 	//link in the server in the client
-	otu.O.Tx("setup_find_lease_market_2",
+	//TODO: need to use _dapper method and send to our merchantAccount at dapper
+	otu.O.Tx("setup_find_lease_market_2_dapper",
 		WithSigner("find"),
 		WithArg("tenantAddress", "user4"),
+		WithArg("merchantAddress", "user5-dapper"),
 	).AssertSuccess(otu.T)
 
 	otu.createUser(100.0, "account")
@@ -172,12 +179,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		findSigner,
 		WithArg("address", "find"),
 	).AssertSuccess(otu.T)
-
-	otu.O.Tx("adminInitDapper",
-		findSigner,
-		WithArg("dapperAddress", "account"),
-	).AssertSuccess(otu.T)
-
 	// setup find forge
 	otu.O.Tx("setup_find_forge_1", WithSigner("user4")).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
@@ -319,7 +320,7 @@ func (otu *OverflowTestUtils) registerDapperUser(name string) *OverflowTestUtils
 	otu.O.Tx("registerDapper",
 		WithSigner(name),
 		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithArg("merchAccount", "user5-dapper"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
 	).AssertSuccess(otu.T).
@@ -346,7 +347,7 @@ func (otu *OverflowTestUtils) registerDapperUserWithName(buyer, name string) *Ov
 	otu.O.Tx("registerDapper",
 		WithSigner(buyer),
 		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithArg("merchAccount", "user5-dapper"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
 	).AssertSuccess(otu.T).
@@ -376,7 +377,7 @@ func (otu *OverflowTestUtils) renewDapperUserWithName(user, name string) *Overfl
 	otu.O.Tx("renewNameDapper",
 		WithSigner(user),
 		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithArg("merchAccount", "user5-dapper"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
 	)
@@ -2198,6 +2199,11 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 
 func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
 
+	amount := price * 0.05
+	if amount < 0.065 {
+		amount = 0.065
+
+	}
 	otu.O.Tx("buyLeaseForSaleDapper",
 		WithSigner(buyer),
 		WithPayloadSigner("account"),
@@ -2211,6 +2217,13 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			"seller":    otu.O.Address(seller),
 			"buyer":     otu.O.Address(buyer),
 			"status":    "sold",
+		}).
+		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
+			"amount":      amount,
+			"leaseName":   name,
+			"address":     otu.O.Address(buyer),
+			"royaltyName": "find",
+			"tenant":      "findLease",
 		})
 
 	return otu

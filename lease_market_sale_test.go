@@ -10,35 +10,36 @@ import (
 
 func TestLeaseMarketSale(t *testing.T) {
 
+	//We need to rework these tests, need to call setup_find_lease_market_2_dapper.cdc
+	//we cannot sign using the address that should receive royalty
+
 	otu := NewOverflowTest(t).
 		setupFIND().
-		createUser(100.0, "user1").
-		registerUser("user1").
-		createUser(100.0, "user2").
-		registerUser("user2").
-		createUser(100.0, "user3").
-		registerUser("user3").
-		registerFtInRegistry().
-		setFlowLeaseMarketOption("Sale").
+		registerDUCInRegistry().
+		createDapperUser("user1").
+		registerDapperUser("user1").
+		createDapperUser("user2").
+		registerDapperUser("user2").
+		createDapperUser("user3").
+		registerDapperUser("user3").
+		setDUCLease().
 		setProfile("user1").
 		setProfile("user2")
+
 	price := 10.0
-
-	otu.registerUserWithName("user1", "name1").
-		registerUserWithName("user1", "name2").
-		registerUserWithName("user1", "name3")
-
 	otu.setUUID(400)
+
+	otu.registerDapperUserWithName("user1", "name1")
 
 	t.Run("Should be able to list a lease for sale and buy it", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.buyLeaseForMarketSale("user2", "user1", "name1", price).
+		otu.buyLeaseForMarketSaleDUC("user2", "user1", "name1", price).
 			moveNameTo("user2", "user1", "name1")
 
 	})
@@ -299,7 +300,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.cancelAllLeaseForSale("user1")
 	})
 
-	/* Testing on Royalties */
+	// Testing on Royalties
 
 	// network 0.05
 	// find 0.025

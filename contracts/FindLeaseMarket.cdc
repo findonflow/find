@@ -453,39 +453,13 @@ pub contract FindLeaseMarket {
 		let receiver = network.getWallet().address
 		let name = FIND.reverseLookup(receiver)
 
-		var walletCheck = true 
-		if !network.getWallet().check() { 
-			// if the capability is not valid, royalty cannot be paid
-			walletCheck = false 
-		} else if network.getWallet().borrow()!.isInstance(Type<@Profile.User>()){ 
-			// if the capability is valid -> it is a User resource -> check if the wallet is set up.
-			let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
-			walletCheck = ref.hasWallet(ftType.identifier)
-		} else if !network.getWallet().borrow()!.isInstance(ftType){ 
-			// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
-			walletCheck = false 
-		}
-
-		/* If the royalty receiver check failed */
-		if !walletCheck {
-
-			if let receivingVault = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath).borrow() {
-				receivingVault.deposit(from: <- vault.withdraw(amount: networkCutAmount))
-				emit RoyaltyPaid(tenant:tenant, leaseName: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
-			} else {
-				emit RoyaltyCouldNotBePaid(tenant:tenant, leaseName: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo, residualAddress: FindMarket.residualAddress)
-				residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: networkCutAmount))
-			}
-
-		} else {
-			/* If the royalty receiver check succeed */
-			emit RoyaltyPaid(tenant:tenant, leaseName: leaseName, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: "network", amount: networkCutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
-			network.getWallet().borrow()!.deposit(from: <- vault.withdraw(amount: networkCutAmount))
-		}
-
-
 		if let findCut =cuts.findCut {
-			let cutAmount= soldFor * findCut.cut
+			var cutAmount= soldFor * findCut.cut
+			let minAmount = 0.65
+
+			if minAmount > cutAmount {
+				cutAmount = minAmount
+			}
 			let name = FIND.reverseLookup(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
