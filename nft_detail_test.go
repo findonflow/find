@@ -348,7 +348,7 @@ func TestNFTDetailScript(t *testing.T) {
 				"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				"listingId":             2003,
 				"listingStatus":         "stopped",
-				"listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionSoft.SaleItem",
+				"listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil":     101,
 				"nftId":                 2003,
 				"nftIdentifier":         "A.179b6b1cb6755e31.Dandy.NFT",

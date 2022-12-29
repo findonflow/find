@@ -14,7 +14,8 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		setFlowLeaseMarketOption("DirectOfferSoft").
 		setProfile("user1").
 		setProfile("user2").
-		createDapperUser("find")
+		createDapperUser("find").
+		createDapperUser("find-admin")
 
 	price := 10.0
 
@@ -247,7 +248,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -258,7 +259,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -372,13 +373,13 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find"),
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
@@ -407,13 +408,13 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find"),
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
@@ -455,7 +456,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -496,7 +497,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).

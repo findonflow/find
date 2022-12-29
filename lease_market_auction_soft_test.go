@@ -17,7 +17,8 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		setFlowLeaseMarketOption("AuctionSoft").
 		setProfile("user1").
 		setProfile("user2").
-		createDapperUser("find")
+		createDapperUser("find").
+		createDapperUser("find-admin")
 
 	otu.registerDapperUserWithName("user1", "name1").
 		registerDapperUserWithName("user1", "name2").
@@ -234,7 +235,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -327,7 +328,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.tickClock(500.0)
 
 		bitTx("fulfillLeaseMarketAuctionSoftDapper",
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("amount", 30.0),
 		).
 			AssertSuccess(t)
@@ -411,7 +412,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -422,7 +423,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -479,13 +480,13 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find"),
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			}).
@@ -511,13 +512,13 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find"),
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.35,
 				"royaltyName": "find",
 			}).
@@ -561,7 +562,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -577,7 +578,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -605,7 +606,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).
@@ -616,7 +617,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price+5.0),
 		).

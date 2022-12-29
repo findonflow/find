@@ -4,13 +4,14 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketDUCRoyalty(t *testing.T) {
 
 	otu := NewOverflowTest(t)
 
-	setupDapper(otu).
+	otu.setupDapper().
 		setupDandy("user1").
 		createUser(100.0, "user2").
 		registerUser("user2").
@@ -60,7 +61,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("merchantAddress", "dapper"),
 			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
@@ -95,7 +95,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("merchantAddress", "dapper"),
 			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
@@ -268,7 +267,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("listNFTForSaleDapper",
 			WithSigner(name),
 			WithArg("marketplace", "find"),
-			WithArg("dapperAddress", "dapper"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", DUCType),
@@ -279,7 +277,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("listNFTForAuctionSoftDapper",
 			WithSigner(name),
-			WithArg("dapperAddress", "dapper"),
 			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
@@ -293,14 +290,16 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		).
 			AssertFailure(t, "Auction start price should be greater than 0.65")
 
+		ftIdentifier, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+		assert.NoError(t, err)
+
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("dapperAddress", "dapper"),
 			WithArg("marketplace", "find"),
 			WithArg("user", name),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+			WithArg("ftAliasOrIdentifier", ftIdentifier),
 			WithArg("amount", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -309,72 +308,12 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 }
 
-func setupDapper(otu *OverflowTestUtils) *OverflowTestUtils {
-	//first step create the adminClient as the fin user
-
-	dapperSigner := WithSigner("dapper")
-	findSigner := WithSigner("find-admin")
-	saSigner := WithSigner("find")
-
-	otu.O.Tx("setup_fin_1_create_client", findSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the versus client
-	otu.O.Tx("setup_fin_2_register_client",
-		saSigner,
-		WithArg("ownerAddress", "find-admin"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//set up fin network as the fin user
-	otu.O.Tx("setup_fin_3_create_network", findSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	otu.O.Tx("setup_find_market_1", dapperSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the versus client
-	otu.O.Tx("setup_find_dapper_market",
-		findSigner,
-		WithArg("adminAddress", "dapper"),
-		WithArg("tenantAddress", "find"),
-		WithArg("name", "onefootball"),
-	).AssertSuccess(otu.T)
-
-	// Setup Lease Market
-	otu.O.Tx("setup_find_market_1",
-		WithSigner("find-forge")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the client
-	otu.O.Tx("setup_find_lease_market_2",
-		WithSigner("find-admin"),
-		WithArg("tenantAddress", "find-forge"),
-	).AssertSuccess(otu.T)
-
-	otu.createDapperUser("find")
-	otu.createDapperUser("find-forge")
-
-	//link in the server in the versus client
-	otu.O.Tx("devSetResidualAddress",
-		findSigner,
-		WithArg("address", "find"),
-	).AssertSuccess(otu.T)
-
-	otu.O.Tx("adminInitDapper",
-		dapperSigner,
-		WithArg("dapperAddress", "find"),
-	).AssertSuccess(otu.T)
-
-	return otu.tickClock(1.0)
-}
-
 func listNFTForSaleDUC(otu *OverflowTestUtils, name string, id uint64, price float64) *OverflowTestUtils {
 
 	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
 		WithArg("marketplace", "find"),
-		WithArg("dapperAddress", "dapper"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", DUCType),
@@ -397,7 +336,6 @@ func listNFTForSoftAuction(otu *OverflowTestUtils, name string, id uint64, price
 	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "dapper"),
 		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
@@ -426,7 +364,6 @@ func auctionBidMarketSoft(otu *OverflowTestUtils, name string, seller string, id
 
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "dapper"),
 		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
@@ -448,7 +385,6 @@ func directOfferMarketSoft(otu *OverflowTestUtils, name string, seller string, i
 	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "dapper"),
 		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
@@ -472,7 +408,6 @@ func acceptDirectOfferMarketSoft(otu *OverflowTestUtils, name string, id uint64,
 
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "dapper"),
 		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).

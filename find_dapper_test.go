@@ -225,150 +225,150 @@ func TestFINDDapper(t *testing.T) {
 
 	})
 
-	// t.Run("Should be able to set private mode", func(t *testing.T) {
+	t.Run("Should be able to set private mode", func(t *testing.T) {
 
-	// 	otu.O.Tx("setPrivateModeDapper",
-	// 		WithSigner("user1"),
-	// 		WithArg("mode", true),
-	// 	).AssertSuccess(t)
+		otu.O.Tx("setPrivateModeDapper",
+			WithSigner("user1"),
+			WithArg("mode", true),
+		).AssertSuccess(t)
 
-	// 	otu.O.Script("getStatus",
-	// 		WithArg("user", "user1"),
-	// 	).
-	// 		AssertWithPointerWant(t, "/FINDReport/privateMode",
-	// 			autogold.Want("privatemode true", true),
-	// 		)
+		otu.O.Script("getStatus",
+			WithArg("user", "user1"),
+		).
+			AssertWithPointerWant(t, "/FINDReport/privateMode",
+				autogold.Want("privatemode true", true),
+			)
 
-	// 	otu.O.Tx("setPrivateModeDapper",
-	// 		WithSigner("user1"),
-	// 		WithArg("mode", false),
-	// 	).AssertSuccess(t)
+		otu.O.Tx("setPrivateModeDapper",
+			WithSigner("user1"),
+			WithArg("mode", false),
+		).AssertSuccess(t)
 
-	// 	otu.O.Script("getStatus",
-	// 		WithArg("user", "user1"),
-	// 	).
-	// 		AssertWithPointerWant(t, "/FINDReport/privateMode",
-	// 			autogold.Want("privatemode false", false),
-	// 		)
+		otu.O.Script("getStatus",
+			WithArg("user", "user1"),
+		).
+			AssertWithPointerWant(t, "/FINDReport/privateMode",
+				autogold.Want("privatemode false", false),
+			)
 
-	// })
+	})
 
-	// t.Run("Should be able to getStatus of new user", func(t *testing.T) {
+	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
 
-	// 	nameAddress := otu.O.Address("user3")
-	// 	otu.O.Script("getStatus",
-	// 		WithArg("user", nameAddress),
-	// 	).AssertWithPointerWant(t,
-	// 		"/FINDReport",
-	// 		autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "isDapper": false, "privateMode": false}),
-	// 	)
-	// })
+		nameAddress := otu.O.Address("user3")
+		otu.O.Script("getStatus",
+			WithArg("user", nameAddress),
+		).AssertWithPointerWant(t,
+			"/FINDReport",
+			autogold.Want("getStatus", map[string]interface{}{"activatedAccount": true, "isDapper": false, "privateMode": false}),
+		)
+	})
 
-	// t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
+	t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
 
-	// 	nameAddress := otu.O.Address("user2")
-	// 	otu.moveNameTo("user2", "user1", "user2")
-	// 	otu.O.Script("getStatus",
-	// 		WithArg("user", nameAddress),
-	// 	).AssertWithPointerError(t,
-	// 		"/FINDReport/profile/findName",
-	// 		"Object has no key 'findName'",
-	// 	)
-	// })
+		nameAddress := otu.O.Address("user2")
+		otu.moveNameTo("user2", "user1", "user2")
+		otu.O.Script("getStatus",
+			WithArg("user", nameAddress),
+		).AssertWithPointerError(t,
+			"/FINDReport/profile/findName",
+			"Object has no key 'findName'",
+		)
+	})
 
-	// t.Run("Should be able to create and edit the social link", func(t *testing.T) {
+	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
 
-	// 	otu.O.Tx("editProfileDapper",
-	// 		WithSigner("user1"),
-	// 		WithArg("name", "user1"),
-	// 		WithArg("description", "This is description"),
-	// 		WithArg("avatar", "This is avatar"),
-	// 		WithArg("tags", `["This is tag"]`),
-	// 		WithArg("allowStoringFollowers", true),
-	// 		WithArg("linkTitles", map[string]string{"CryptoTwitter": "0xBjartek", "FindTwitter": "find"}),
-	// 		WithArg("linkTypes", map[string]string{"CryptoTwitter": "Twitter", "FindTwitter": "Twitter"}),
-	// 		WithArg("linkUrls", map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}),
-	// 		WithArg("removeLinks", "[]"),
-	// 	).
-	// 		AssertSuccess(t)
+		otu.O.Tx("editProfileDapper",
+			WithSigner("user1"),
+			WithArg("name", "user1"),
+			WithArg("description", "This is description"),
+			WithArg("avatar", "This is avatar"),
+			WithArg("tags", `["This is tag"]`),
+			WithArg("allowStoringFollowers", true),
+			WithArg("linkTitles", map[string]string{"CryptoTwitter": "0xBjartek", "FindTwitter": "find"}),
+			WithArg("linkTypes", map[string]string{"CryptoTwitter": "Twitter", "FindTwitter": "Twitter"}),
+			WithArg("linkUrls", map[string]string{"CryptoTwitter": "https://twitter.com/0xBjartek", "FindTwitter": "https://twitter.com/findonflow"}),
+			WithArg("removeLinks", "[]"),
+		).
+			AssertSuccess(t)
 
-	// 	otu.O.Script("getStatus",
-	// 		WithArg("user", "user1"),
-	// 	).AssertWithPointerWant(t,
-	// 		"/FINDReport/profile/links/FindTwitter",
-	// 		autogold.Want("getStatus Find twitter", map[string]interface{}{
-	// 			"title": "find",
-	// 			"type":  "Twitter",
-	// 			"url":   "https://twitter.com/findonflow",
-	// 		}),
-	// 	)
+		otu.O.Script("getStatus",
+			WithArg("user", "user1"),
+		).AssertWithPointerWant(t,
+			"/FINDReport/profile/links/FindTwitter",
+			autogold.Want("getStatus Find twitter", map[string]interface{}{
+				"title": "find",
+				"type":  "Twitter",
+				"url":   "https://twitter.com/findonflow",
+			}),
+		)
 
-	// 	otu.O.Tx("editProfileDapper",
-	// 		WithSigner("user1"),
-	// 		WithArg("name", "user1"),
-	// 		WithArg("description", "This is description"),
-	// 		WithArg("avatar", "This is avatar"),
-	// 		WithArg("tags", `["This is tag"]`),
-	// 		WithArg("allowStoringFollowers", true),
-	// 		WithArg("linkTitles", "{}"),
-	// 		WithArg("linkTypes", "{}"),
-	// 		WithArg("linkUrls", "{}"),
-	// 		WithArg("removeLinks", `["FindTwitter"]`),
-	// 	).
-	// 		AssertSuccess(t)
+		otu.O.Tx("editProfileDapper",
+			WithSigner("user1"),
+			WithArg("name", "user1"),
+			WithArg("description", "This is description"),
+			WithArg("avatar", "This is avatar"),
+			WithArg("tags", `["This is tag"]`),
+			WithArg("allowStoringFollowers", true),
+			WithArg("linkTitles", "{}"),
+			WithArg("linkTypes", "{}"),
+			WithArg("linkUrls", "{}"),
+			WithArg("removeLinks", `["FindTwitter"]`),
+		).
+			AssertSuccess(t)
 
-	// 	otu.O.Script("getStatus",
-	// 		WithArg("user", "user1"),
-	// 	).AssertWithPointerError(t,
-	// 		"/FINDReport/profile/links/FindTwitter",
-	// 		"Object has no key 'FindTwitter'",
-	// 	)
+		otu.O.Script("getStatus",
+			WithArg("user", "user1"),
+		).AssertWithPointerError(t,
+			"/FINDReport/profile/links/FindTwitter",
+			"Object has no key 'FindTwitter'",
+		)
 
-	// })
+	})
 
-	// t.Run("Should get expected output for buyAddon script", func(t *testing.T) {
+	t.Run("Should get expected output for buyAddon script", func(t *testing.T) {
 
-	// 	otu.O.Script("getMetadataForBuyAddonDapper",
-	// 		WithArg("merchAccount", "find"),
-	// 		WithArg("name", "name1"),
-	// 		WithArg("addon", "forge"),
-	// 		WithArg("amount", 10.0),
-	// 	).AssertWant(t, autogold.Want("getMetadataForBuyAddonDapper", map[string]interface{}{
-	// 		"amount": 10, "description": "Purchase addon forge for name :name1 for Dapper Credit 10.00000000",
-	// 		"id":       0,
-	// 		"imageURL": "https://i.imgur.com/8W8NoO1.png",
-	// 		"name":     "name1",
-	// 	}))
-	// })
+		otu.O.Script("getMetadataForBuyAddonDapper",
+			WithArg("merchAccount", "find"),
+			WithArg("name", "name1"),
+			WithArg("addon", "forge"),
+			WithArg("amount", 10.0),
+		).AssertWant(t, autogold.Want("getMetadataForBuyAddonDapper", map[string]interface{}{
+			"amount": 10, "description": "Purchase addon forge for name :name1 for Dapper Credit 10.00000000",
+			"id":       0,
+			"imageURL": "https://i.imgur.com/8W8NoO1.png",
+			"name":     "name1",
+		}))
+	})
 
-	// t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
+	t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
 
-	// 	user := "user1"
+		user := "user1"
 
-	// 	otu.buyForgeDapper(user)
+		otu.buyForgeDapper(user)
 
-	// 	/* Should not be able to buy addons with wrong balance */
-	// 	otu.O.Tx("buyAddonDapper",
-	// 		WithSigner("user1"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("merchAccount", "find"),
-	// 		WithArg("name", "name1"),
-	// 		WithArg("addon", "forge"),
-	// 		WithArg("amount", 10.0),
-	// 	).
-	// 		AssertFailure(t, "Expect 50.00000000 Dapper Credit for forge addon")
+		/* Should not be able to buy addons with wrong balance */
+		otu.O.Tx("buyAddonDapper",
+			WithSigner("user1"),
+			WithPayloadSigner("dapper"),
+			WithArg("merchAccount", "find"),
+			WithArg("name", "name1"),
+			WithArg("addon", "forge"),
+			WithArg("amount", 10.0),
+		).
+			AssertFailure(t, "Expect 50.00000000 Dapper Credit for forge addon")
 
-	// 	/* Should not be able to buy addons that does not exist */
-	// 	otu.O.Tx("buyAddonDapper",
-	// 		WithSigner(user),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("merchAccount", "find"),
-	// 		WithArg("name", user),
-	// 		WithArg("addon", dandyNFTType(otu)),
-	// 		WithArg("amount", 10.0),
-	// 	).
-	// 		AssertFailure(t, "This addon is not available.")
+		/* Should not be able to buy addons that does not exist */
+		otu.O.Tx("buyAddonDapper",
+			WithSigner(user),
+			WithPayloadSigner("dapper"),
+			WithArg("merchAccount", "find"),
+			WithArg("name", user),
+			WithArg("addon", dandyNFTType(otu)),
+			WithArg("amount", 10.0),
+		).
+			AssertFailure(t, "This addon is not available.")
 
-	// })
+	})
 
 }

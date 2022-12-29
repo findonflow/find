@@ -175,3 +175,4 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 		}
 	}
 }
+ 

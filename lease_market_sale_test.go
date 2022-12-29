@@ -451,6 +451,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	})
 
+	otu.createDapperUser("user3")
+	otu.createDapperUser("find-admin")
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 
 		otu.createDapperUser("user1").
@@ -481,7 +483,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       420,
+			"id":       340,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))

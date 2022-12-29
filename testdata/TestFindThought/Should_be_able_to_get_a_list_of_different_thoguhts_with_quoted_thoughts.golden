@@ -8,11 +8,7 @@
         "creatorProfileName": "user1",
         "header": "This is header",
         "hidden": false,
-<<<<<<< HEAD
-        "id": 401,
-=======
-        "id": 296,
->>>>>>> main
+        "id": 334,
         "quotedThought": {
             "body": "This is body",
             "created": 1,
@@ -22,11 +18,7 @@
             "creatorProfileName": "user1",
             "header": "This is header",
             "hidden": false,
-<<<<<<< HEAD
-            "id": 392,
-=======
-            "id": 287,
->>>>>>> main
+            "id": 325,
             "medias": {
                 "mediaUrl": "mediaType"
             },

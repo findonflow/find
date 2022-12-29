@@ -8,11 +8,7 @@
         "creatorProfileName": "user1",
         "header": "This is new header",
         "hidden": false,
-<<<<<<< HEAD
-        "id": 385,
-=======
-        "id": 280,
->>>>>>> main
+        "id": 318,
         "lastUpdated": 1,
         "medias": {
             "ipfs://mediaHash": "mediaType"
