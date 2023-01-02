@@ -10,34 +10,26 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	otu := NewOverflowTest(t)
 
-	mintFund := otu.O.TxFN(
-		WithSigner("account"),
-		WithArg("amount", 10000.0),
-		WithArg("recipient", "user2"),
-	)
-
 	price := 10.0
 	preIncrement := 5.0
-	id := otu.setupMarketAndDandy()
-	otu.registerFtInRegistry().
+
+	id := otu.setupMarketAndDandyDapper()
+	otu.registerDandyInNFTRegistry().
+		registerDUCInRegistry().
 		setFlowDandyMarketOption("AuctionSoft").
 		setProfile("user1").
-		setProfile("user2")
-
-	mintFund("devMintFusd").AssertSuccess(t)
-
-	mintFund("devMintFlow").AssertSuccess(t)
-
-	mintFund("devMintUsdc").AssertSuccess(t)
+		setProfile("user2").
+		createDapperUser("find")
 
 	otu.setUUID(400)
 
-	listingTx := otu.O.TxFN(
+	listingTx := otu.O.TxFileNameFN(
+		"listNFTForAuctionSoftDapper",
 		WithSigner("user1"),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price),
 		WithArg("auctionDuration", 300.0),
@@ -50,7 +42,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction listing for this item is already created.")
@@ -114,7 +106,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should not be able to list with price 0", func(t *testing.T) {
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithArg("price", 0.0),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
@@ -123,7 +115,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price-5.0),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
@@ -133,7 +125,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithArg("auctionReservePrice", price),
 			WithArg("auctionValidUntil", 10.0),
 		).
@@ -160,7 +152,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			tickClock(200.0)
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -177,7 +169,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -243,8 +235,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(100.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
@@ -303,7 +296,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
@@ -316,7 +309,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.alterMarketOption("AuctionSoft", "deprecate")
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -335,8 +328,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 			WithArg("amount", 30.0),
@@ -345,7 +339,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.alterMarketOption("AuctionSoft", "enable")
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithSigner("user2"),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
@@ -371,7 +365,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.alterMarketOption("AuctionSoft", "stop")
 
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithSigner("user1"),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
@@ -381,7 +375,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			listNFTForSoftAuction("user1", id, price).
 			alterMarketOption("AuctionSoft", "stop")
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -406,8 +400,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
@@ -417,8 +412,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		/* Reset */
 		otu.alterMarketOption("AuctionSoft", "enable")
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
@@ -432,7 +428,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -450,7 +446,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0)
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user3"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -478,15 +474,16 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			}).
@@ -511,19 +508,20 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.listNFTForSoftAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			setFindCut(0.035)
+			setFindCutDapper(0.035)
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", id),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.35,
 				"royaltyName": "find",
 			}).
@@ -554,12 +552,12 @@ func TestMarketAuctionSoft(t *testing.T) {
 			profileBan("user1")
 
 		// Should not be able to list
-		listingTx("listNFTForAuctionSoft",
+		listingTx(
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -568,8 +566,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
@@ -585,8 +584,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.removeProfileBan("user1")
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
@@ -609,7 +609,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			profileBan("user2")
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -618,8 +618,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Buyer banned by Tenant")
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
@@ -629,8 +630,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		/* Reset */
 		otu.removeProfileBan("user2")
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
@@ -648,7 +650,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
 			saleItemListed("user1", "active_ongoing", 15.0)
 
-		otu.O.Tx("bidMarketAuctionSoft",
+		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user3"),
 			WithArg("marketplace", "account"),
 			WithArg("user", "user1"),
@@ -669,8 +671,10 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
 
-		otu.registerDUCInRegistry().
-			setDUCExampleNFT().
+		otu.createDapperUser("user1").
+			createDapperUser("user2")
+
+		otu.setDUCExampleNFT().
 			sendExampleNFT("user1", "account")
 
 		saleItemID := otu.listNFTForSoftAuctionDUC("user1", 0, price)
@@ -700,17 +704,17 @@ func TestMarketAuctionSoft(t *testing.T) {
 	t.Run("Should not be able to list soul bound items", func(t *testing.T) {
 		otu.sendSoulBoundNFT("user1", "account")
 		// set market rules
-		otu.O.Tx("adminSetSellExampleNFTForFlow",
+		otu.O.Tx("adminSetSellExampleNFTForFUT",
 			WithSigner("find"),
 			WithArg("tenant", "account"),
 		)
 
-		otu.O.Tx("listNFTForAuctionSoft",
+		otu.O.Tx("listNFTForAuctionSoftDapper",
 			WithSigner("user1"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
 			WithArg("id", 1),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -730,10 +734,11 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
-		otu.O.Tx("fulfillMarketAuctionSoft",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
 			WithArg("id", saleItemID[0]),
 			WithArg("amount", 15.0),
@@ -761,7 +766,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),
@@ -783,7 +788,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
-		otu.changeRoyaltyExampleNFT("user1", 0)
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("marketplace", "account"),

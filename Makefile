@@ -59,6 +59,7 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.buyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/buyAddon.cdc
 	jq ".networks.mainnet.transactions.editProfileDapper.code" lib/find.json -r > dapper-tx/mainnet/editProfile.cdc
 	jq ".networks.mainnet.transactions.listLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listLeaseForSale.cdc
+	jq ".networks.mainnet.transactions.delistLeaseSale.code" lib/find.json -r > dapper-tx/mainnet/delistLeaseSale.cdc
 	jq ".networks.mainnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/mainnet/moveNameTo.cdc 
 	jq ".networks.mainnet.transactions.registerDapper.code" lib/find.json -r > dapper-tx/mainnet/register.cdc
 	jq ".networks.mainnet.transactions.removeRelatedAccountDapper.code" lib/find.json -r > dapper-tx/mainnet/removeRelatedAccount.cdc

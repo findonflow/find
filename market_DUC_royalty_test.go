@@ -21,6 +21,10 @@ func TestMarketDUCRoyalty(t *testing.T) {
 	price := 10.0
 
 	otu.setUUID(400)
+	otu.createDapperUser("find").
+		createDapperUser("user1").
+		createDapperUser("user2").
+		createDapperUser("user3")
 
 	id := otu.mintThreeExampleDandies()[0]
 
@@ -50,10 +54,9 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		listNFTForSaleDUC(otu, "user1", id, price)
 
-		otu.O.Tx("buyNFTForSaleDUC",
+		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
-			WithArg("merchantAddress", "user5-dapper"),
 			WithArg("marketplace", "account"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
@@ -85,10 +88,9 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		listNFTForSaleDUC(otu, "user1", id, price)
 
-		otu.O.Tx("buyNFTForSaleDUC",
+		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
-			WithArg("merchantAddress", "user5-dapper"),
 			WithArg("marketplace", "account"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
@@ -124,7 +126,7 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoftDUC",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
@@ -158,7 +160,7 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoftDUC",
+		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
@@ -190,7 +192,7 @@ func TestMarketDUCRoyalty(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price)
 		acceptDirectOfferMarketSoft(otu, "user1", id, "user2", price)
 
-		otu.O.Tx("fulfillMarketDirectOfferSoftDUC",
+		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
@@ -226,7 +228,7 @@ func TestMarketDUCRoyalty(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price)
 		acceptDirectOfferMarketSoft(otu, "user1", id, "user2", price)
 
-		otu.O.Tx("fulfillMarketDirectOfferSoftDUC",
+		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("account"),
 			WithArg("marketplace", "account"),
@@ -258,23 +260,23 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		price = 0.5
 		name := "user1"
-		otu.O.Tx("listNFTForSaleDUC",
+		otu.O.Tx("listNFTForSaleDapper",
 			WithSigner(name),
 			WithArg("marketplace", "account"),
-			WithArg("dapperAddress", "user5-dapper"),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Listing price should be greater than 0.65")
 
-		otu.O.Tx("listNFTForAuctionSoftDUC",
+		otu.O.Tx("listNFTForAuctionSoftDapper",
 			WithSigner(name),
-			WithArg("dapperAddress", "user5-dapper"),
 			WithArg("marketplace", "account"),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -284,13 +286,13 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		).
 			AssertFailure(t, "Auction start price should be greater than 0.65")
 
-		otu.O.Tx("bidMarketDirectOfferSoftDUC",
+		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("dapperAddress", "user5-dapper"),
 			WithArg("marketplace", "account"),
 			WithArg("user", name),
 			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", id),
+			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 			WithArg("amount", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -350,7 +352,7 @@ func setupDapper(otu *OverflowTestUtils) *OverflowTestUtils {
 		WithArg("address", "find"),
 	).AssertSuccess(otu.T)
 
-	otu.O.Tx("adminInitDUC",
+	otu.O.Tx("adminInitDapper",
 		dapperSigner,
 		WithArg("dapperAddress", "account"),
 	).AssertSuccess(otu.T)
@@ -360,12 +362,12 @@ func setupDapper(otu *OverflowTestUtils) *OverflowTestUtils {
 
 func listNFTForSaleDUC(otu *OverflowTestUtils, name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listNFTForSaleDUC",
+	otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
 		WithArg("marketplace", "account"),
-		WithArg("dapperAddress", "user5-dapper"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -382,12 +384,12 @@ func listNFTForSaleDUC(otu *OverflowTestUtils, name string, id uint64, price flo
 
 func listNFTForSoftAuction(otu *OverflowTestUtils, name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listNFTForAuctionSoftDUC",
+	otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "user5-dapper"),
 		WithArg("marketplace", "account"),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -410,9 +412,8 @@ func listNFTForSoftAuction(otu *OverflowTestUtils, name string, id uint64, price
 
 func auctionBidMarketSoft(otu *OverflowTestUtils, name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidMarketAuctionSoftDUC",
+	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "user5-dapper"),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
 		WithArg("id", id),
@@ -431,13 +432,13 @@ func auctionBidMarketSoft(otu *OverflowTestUtils, name string, seller string, id
 
 func directOfferMarketSoft(otu *OverflowTestUtils, name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("bidMarketDirectOfferSoftDUC",
+	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "user5-dapper"),
 		WithArg("marketplace", "account"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 		WithArg("id", id),
+		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -454,9 +455,8 @@ func directOfferMarketSoft(otu *OverflowTestUtils, name string, seller string, i
 
 func acceptDirectOfferMarketSoft(otu *OverflowTestUtils, name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("acceptDirectOfferSoftDUC",
+	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("dapperAddress", "user5-dapper"),
 		WithArg("marketplace", "account"),
 		WithArg("id", id),
 	).

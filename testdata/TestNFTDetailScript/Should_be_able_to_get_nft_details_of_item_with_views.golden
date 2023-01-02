@@ -23,13 +23,35 @@
                             "royaltyName": "find forge"
                         }
                     ]
+                },
+                {
+                    "ftIdentifier": "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault",
+                    "royalties": [
+                        {
+                            "address": "0x01cf0e2f2f715450",
+                            "cut": 0.025,
+                            "royaltyName": "find"
+                        },
+                        {
+                            "address": "0x179b6b1cb6755e31",
+                            "cut": 0.05,
+                            "findName": "user1",
+                            "royaltyName": "creator"
+                        },
+                        {
+                            "address": "0xf8d6e0586b0a20c7",
+                            "cut": 0.025,
+                            "royaltyName": "find forge"
+                        }
+                    ]
                 }
             ],
             "ftAlias": [
                 "Flow"
             ],
             "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
+                "A.0ae53cb6e3f42a79.FlowToken.Vault",
+                "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault"
             ],
             "listingType": "A.f8d6e0586b0a20c7.FindMarketSale.SaleItem",
             "status": "active"

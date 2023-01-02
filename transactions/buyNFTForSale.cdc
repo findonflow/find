@@ -5,12 +5,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
-
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
@@ -20,76 +15,8 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
-		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
-		//SYNC with register
-		//Add exising FUSD or create a new one and add it
-		let name = account.address.toString()
-		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
-			account.save(<- fusd, to: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-		}
-
-		let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-		if !usdcCap.check() {
-				account.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
-				account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
-		}
-
-		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		if !leaseCollection.check() {
-			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
-			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
-		}
-
-		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
-		if !bidCollection.check() {
-			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
-			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
-		}
-
-		var created=false
-		var updated=false
-		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if !profileCap.check() {
-			let profile <-Profile.createUser(name:name, createdAt: "find")
-			account.save(<-profile, to: Profile.storagePath)
-			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
-			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
-			created=true
-		}
-
-		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
-
-		if !profile.hasWallet("Flow") {
-			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), tags: ["flow"])
-	
-			profile.addWallet(flowWallet)
-			updated=true
-		}
-		if !profile.hasWallet("FUSD") {
-			profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fusdReceiver, balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance), accept: Type<@FUSD.Vault>(), tags: ["fusd", "stablecoin"]))
-			updated=true
-		}
-
-		if !profile.hasWallet("USDC") {
-			profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.getCapability<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), tags: ["usdc", "stablecoin"]))
-			updated=true
-		}
-
-		if created {
-			profile.emitCreatedEvent()
-		} else if updated {
-			profile.emitUpdatedEvent()
-		}
-
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
+		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 
 		let tenant = tenantCapability.borrow()!
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
