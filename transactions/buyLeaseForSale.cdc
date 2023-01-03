@@ -7,7 +7,6 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, amount: UFix64) {
 
-	let targetCapability : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 	let walletReference : &FungibleToken.Vault
 
 	let saleItemsCap: Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>
@@ -39,8 +38,6 @@ transaction(leaseName: String, amount: UFix64) {
 		let item= FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-
-		self.targetCapability= account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.buyer = account.address

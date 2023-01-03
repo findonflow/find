@@ -42,7 +42,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
 		if !saleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
@@ -60,7 +60,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			if saleItems[address] == nil {
 				let saleItem = getAccount(address).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath).borrow() ?? panic("cannot find sale item cap")
 				self.saleItems.append(saleItem)
-				saleItems[address] = saleItem 
+				saleItems[address] = saleItem
 			} else {
 				self.saleItems.append(saleItems[address]!)
 			}
@@ -80,8 +80,8 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftIdentifier] = nft
 			}
@@ -90,7 +90,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 				ft = fts[ftIdentifier]
 			} else {
 				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
-				fts[ftIdentifier] = ft 
+				fts[ftIdentifier] = ft
 			}
 
 			let dapperVault = dapper.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault : ".concat(ft!.type.identifier))
@@ -144,7 +144,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			counter = counter + 1
 		}
 
-		// post 
+		// post
 		for vault in self.walletReference {
 			if vault.balance != self.walletBalance[vault.getType()] {
 				panic("Dapper Coin Leakage : ".concat(vault.getType().identifier))
