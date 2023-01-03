@@ -2201,6 +2201,7 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 	otu.O.Tx("buyLeaseForSaleDapper",
 		WithSigner(buyer),
 		WithPayloadSigner("account"),
+		WithArg("sellerAccount", seller),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
