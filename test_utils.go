@@ -952,26 +952,6 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 
 }
 
-func (otu *OverflowTestUtils) buyLeaseForMarketSale(buyer string, seller string, name string, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("buyLeaseForSale",
-		WithSigner(buyer),
-		WithArg("leaseName", name),
-		WithArg("amount", price),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindLeaseMarketSale.Sale", map[string]interface{}{
-			"amount":    price,
-			"leaseName": name,
-			"seller":    otu.O.Address(seller),
-			"buyer":     otu.O.Address(buyer),
-			"status":    "sold",
-		})
-
-	return otu
-
-}
-
 func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
 
 	otu.O.Tx("increaseBidMarketAuctionEscrowed",
@@ -2223,7 +2203,7 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			"leaseName":   name,
 			"address":     otu.O.Address(buyer),
 			"royaltyName": "find",
-			"tenant":      "findLease",
+			"tenant":      "findLeas",
 		})
 
 	return otu

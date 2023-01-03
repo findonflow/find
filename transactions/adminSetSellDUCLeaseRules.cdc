@@ -18,8 +18,5 @@ transaction(tenant: Address) {
 
         adminRef.setMarketOption(tenant: tenant, saleItem: ducExample)
 
-//        let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
- //       adminRef.addFindCut(tenant: tenant, FindCutName: "findDapperRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.02, description: "find"), rules: rules, status: "active")
-
     }
 }
