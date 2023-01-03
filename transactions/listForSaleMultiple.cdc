@@ -1,8 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
@@ -13,10 +12,10 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
 
 	let saleItems : &FindMarketSale.SaleItemCollection?
-	let leaseSaleItems : &FindLeaseMarketSale.SaleItemCollection?
 	let pointers : [FindViews.AuthNFTPointer]
-	let leasePointers : [FindLeaseMarket.AuthLeasePointer]
+	let leaseNames : [String]
 	let vaultTypes : [Type]
+	let finLeases : &FIND.LeaseCollection
 
 	prepare(account: AuthAccount) {
 
@@ -24,7 +23,8 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruc
 		let tenant = tenantCapability.borrow()!
 		self.vaultTypes= []
 		self.pointers= []
-		self.leasePointers= []
+		self.leaseNames= []
+		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection")
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
@@ -37,22 +37,6 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruc
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
 		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: storagePath)!
-
-		// Get the salesItemRef from tenant
-		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
-		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
-		let leaseTenant = leaseTenantCapability.borrow()!
-
-		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
-		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
-		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
-		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
-		if !leaseSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
-		}
-		self.leaseSaleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
 
 		var counter = 0
 
@@ -73,8 +57,10 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruc
 				if nftAliasOrIdentifiers[counter] != Type<@FIND.Lease>().identifier {
 					panic("Lease does not match with identifiers")
 				}
-				let lease=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
-				self.leasePointers.append(FindLeaseMarket.AuthLeasePointer(ref:lease, name: name))
+				if ftAliasOrIdentifiers[counter] != Type<@FUSD.Vault>().identifier {
+					panic("Listing of leases only supports FUSD at the moment")
+				}
+				self.leaseNames.append(name)
 			}
 
 			if let id = ids[counter] as? UInt64 {
@@ -124,7 +110,7 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruc
 		for identifier in nftAliasOrIdentifiers {
 			let vc = counter + nameCounter
 			if identifier == Type<@FIND.Lease>().identifier {
-				self.leaseSaleItems!.listForSale(pointer: self.leasePointers[nameCounter], vaultType: self.vaultTypes[vc], directSellPrice: directSellPrices[vc], validUntil: validUntil, extraField: {})
+				self.finLeases.listForSale(name: self.leaseNames[nameCounter],  directSellPrice:directSellPrices[vc])
 				nameCounter = nameCounter + 1
 				continue
 			}

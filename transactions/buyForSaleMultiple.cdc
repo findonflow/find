@@ -1,3 +1,4 @@
+import FUSD from "../contracts/standard/FUSD.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
@@ -7,8 +8,6 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 
@@ -16,7 +15,8 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 	var walletReference : [&FungibleToken.Vault]
 
 	let saleItems: [&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}]
-	let leaseSaleItems: [&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}]
+	let leaseNames: [String]
+	let leaseBidReference: &FIND.BidCollection
 	var totalPrice : UFix64
 	let prices : [UFix64]
 	let buyer : Address
@@ -30,13 +30,11 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 		var counter = 0
 		self.walletReference= []
 		self.targetCapability = []
-		self.leaseSaleItems = []
 
 		self.saleItems = []
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
 		let saleItems : {Address : &FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}} = {}
-		let leaseSaleItems : {Address : &FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}} = {}
 
 		let saleItemType = Type<@FindMarketSale.SaleItemCollection>()
 		let marketOption = FindMarket.getMarketOptionFromType(saleItemType)
@@ -53,20 +51,9 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
 
-		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
-		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
-
-		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
-		let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
-		let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
-		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
-		if !leaseSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
-		}
-
 		self.buyer = account.address
+		self.leaseNames = []
+		self.leaseBidReference = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath) ?? panic("Could not borrow reference to the bid collection!" )
 
 		var vaultType : Type? = nil
 
@@ -78,33 +65,17 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 			let address=users[counter]
 
 			if let name = ids[counter] as? String {
-				if leaseSaleItems[address] == nil {
-					let saleItem = getAccount(address).getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath).borrow() ?? panic("cannot find target sale item cap. Name : ".concat(name))
-					self.leaseSaleItems.append(saleItem)
-					leaseSaleItems[address] = saleItem
-				} else {
-					self.leaseSaleItems.append(leaseSaleItems[address]!)
-				}
-
-				let item=leaseSaleItems[address]!.borrowSaleItem(name)
-
-				self.prices.append(item.getBalance())
-				self.totalPrice = self.totalPrice + self.prices[counter]
-
-				var ft : FTRegistry.FTInfo? = nil
-				let ftIdentifier = item.getFtType().identifier
-
-				if fts[ftIdentifier] != nil {
-					ft = fts[ftIdentifier]
-				} else {
-					ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
-					fts[ftIdentifier] = ft
-				}
+				let targetAddress = FIND.lookupAddress(name) ?? panic("Cannot look up address for name : ".concat(name))
+				let leaseCap = getAccount(targetAddress).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+				let leaseRef = leaseCap.borrow() ?? panic("Cannot borrow reference from name owner. Name : ".concat(name))
+				let nameInfo = leaseRef.getLease(name)!
+				let price = nameInfo.salePrice ?? panic("Name is not listed for sale. Name : ".concat(name))
+				self.prices.append(price)
+				self.leaseNames.append(name)
 
 				self.walletReference.append(
-					account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+					account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No suitable wallet linked for this account")
 				)
-
 			}
 
 			if let id = ids[counter] as? UInt64 {
@@ -168,8 +139,6 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 				}
 				self.targetCapability.append(targetCapability)
 			}
-
-
 			counter = counter + 1
 		}
 
@@ -189,8 +158,8 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 					panic("Your wallet does not have enough funds to pay for this name. Required : ".concat(self.prices[i].toString()).concat(" . Name : ".concat(name)))
 				}
 
-				self.leaseSaleItems[nameCounter].buy(name: name, vault: <- self.walletReference[i].withdraw(amount: amounts[i])
-				, to: self.buyer)
+				let vault <- self.walletReference[i].withdraw(amount: self.prices[i]) as! @FUSD.Vault
+				self.leaseBidReference.bid(name: name, vault: <- vault)
 				nameCounter = nameCounter + 1
 				continue
 			}

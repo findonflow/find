@@ -16,7 +16,6 @@ func TestMarketAndLeaseSale(t *testing.T) {
 		registerUser("user2").
 		createUser(100.0, "user3").
 		registerUser("user3").
-		setFlowLeaseMarketOption("Sale").
 		setFlowDandyMarketOption("Sale").
 		setProfile("user1").
 		setProfile("user2")
@@ -24,6 +23,14 @@ func TestMarketAndLeaseSale(t *testing.T) {
 	otu.setUUID(400)
 
 	ids := otu.mintThreeExampleDandies()
+	names := []string{
+		"name1",
+		"name2",
+	}
+
+	for _, name := range names {
+		otu.registerUserWithName("user1", name)
+	}
 
 	listingTx := otu.O.TxFileNameFN(
 		"listForSaleMultiple",
@@ -34,6 +41,9 @@ func TestMarketAndLeaseSale(t *testing.T) {
 	)
 
 	otu.registerFtInRegistry()
+
+	fusdIdentifier, err := otu.O.QualifiedIdentifier("FUSD", "Vault")
+	assert.NoError(t, err)
 
 	ftIdentifier, err := otu.O.QualifiedIdentifier("FlowToken", "Vault")
 	assert.NoError(t, err)
@@ -47,10 +57,10 @@ func TestMarketAndLeaseSale(t *testing.T) {
 	t.Run("Should be able to list dandy and lease for sale", func(t *testing.T) {
 
 		res := listingTx(
-			WithArg("nftAliasOrIdentifiers", []string{nftIdentifier, nftIdentifier, nftIdentifier, leaseIdentifier}),
-			WithArg("ids", []interface{}{ids[0], ids[1], ids[2], "user1"}),
-			WithArg("ftAliasOrIdentifiers", []string{ftIdentifier, ftIdentifier, ftIdentifier, ftIdentifier}),
-			WithArg("directSellPrices", []float64{1.0, 2.0, 3.0, 4.0}),
+			WithArg("nftAliasOrIdentifiers", []string{nftIdentifier, nftIdentifier, nftIdentifier, leaseIdentifier, leaseIdentifier}),
+			WithArg("ids", []interface{}{ids[0], ids[1], ids[2], names[0], names[1]}),
+			WithArg("ftAliasOrIdentifiers", []string{ftIdentifier, ftIdentifier, ftIdentifier, fusdIdentifier, fusdIdentifier}),
+			WithArg("directSellPrices", []float64{1.0, 2.0, 3.0, 4.0, 5.0}),
 		)
 
 		res.AssertSuccess(t)
@@ -69,15 +79,16 @@ func TestMarketAndLeaseSale(t *testing.T) {
 			})
 		}
 
-		res.AssertEvent(t, "FindLeaseMarketSale.Sale", map[string]interface{}{
-			"tenant":     "findLease",
-			"leaseName":  "user1",
-			"seller":     otu.O.Address("user1"),
-			"sellerName": "user1",
-			"amount":     4.0,
-			"status":     status,
-			"vaultType":  ftIdentifier,
-		})
+		for i, name := range names {
+			res.AssertEvent(t, "FIND.Sale", map[string]interface{}{
+				"name":       name,
+				"seller":     otu.O.Address("user1"),
+				"sellerName": "user1",
+				"amount":     4.0 + float64(i),
+				"status":     status,
+				"vaultType":  fusdIdentifier,
+			})
+		}
 
 	})
 
@@ -87,9 +98,9 @@ func TestMarketAndLeaseSale(t *testing.T) {
 			"buyForSaleMultiple",
 			WithSigner("user2"),
 			WithArg("marketplace", "account"),
-			WithAddresses("users", "user1", "user1", "user1", "user1"),
-			WithArg("ids", []interface{}{ids[0], ids[1], ids[2], "user1"}),
-			WithArg("amounts", []float64{1.0, 2.0, 3.0, 4.0}),
+			WithAddresses("users", "user1", "user1", "user1", "user1", "user1"),
+			WithArg("ids", []interface{}{ids[0], ids[1], ids[2], names[0], names[1]}),
+			WithArg("amounts", []float64{1.0, 2.0, 3.0, 4.0, 5.0}),
 		)
 
 		res.AssertSuccess(t)
@@ -107,14 +118,16 @@ func TestMarketAndLeaseSale(t *testing.T) {
 			})
 		}
 
-		res.AssertEvent(t, "FindLeaseMarketSale.Sale", map[string]interface{}{
-			"tenant":    "findLease",
-			"leaseName": "user1",
-			"seller":    otu.O.Address("user1"),
-			"amount":    4.0,
-			"status":    status,
-			"vaultType": ftIdentifier,
-		})
+		for i, name := range names {
+			res.AssertEvent(t, "FIND.Sale", map[string]interface{}{
+				"name":       name,
+				"seller":     otu.O.Address("user1"),
+				"sellerName": "user1",
+				"amount":     4.0 + float64(i),
+				"status":     status,
+				"vaultType":  fusdIdentifier,
+			})
+		}
 
 	})
 
