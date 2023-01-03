@@ -479,6 +479,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		otu.O.Script("getMetadataForBuyLeaseForSaleDapper",
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
