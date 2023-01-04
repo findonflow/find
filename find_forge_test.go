@@ -410,11 +410,13 @@ func TestFindForge(t *testing.T) {
 		file, err := os.ReadFile("./contracts/FindFooDIM.cdc")
 		assert.NoError(t, err)
 		contract := services.Contract{
-			Name:     "FindFooDIM",
-			Source:   file,
-			Args:     []cadence.Value{},
-			Filename: "./contracts/FindFooDIM.cdc",
-			Network:  "emulator",
+			Name: "FindFooDIM",
+			Script: &services.Script{
+				Code:     file,
+				Args:     []cadence.Value{},
+				Filename: "./contracts/FindFooDIM.cdc",
+			},
+			Network: "emulator",
 		}
 		_, err = otu.O.Services.Accounts.AddContract(otu.O.Account("user4"), &contract, false)
 		assert.NoError(t, err)

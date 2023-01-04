@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	g := overflow.NewOverflow().ExistingEmulator().Start()
+	g := overflow.Overflow(overflow.WithExistingEmulator())
 
 	res, err := g.ParseAllWithConfig(true, []string{
 		"^setup_*",

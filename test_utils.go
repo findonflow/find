@@ -10,6 +10,7 @@ import (
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -37,6 +38,7 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 		WithNetwork("testing"),
 		WithFlowForNewUsers(100.0),
 	)
+	require.NoError(t, o.Error)
 	return &OverflowTestUtils{
 		T: t,
 		O: o,

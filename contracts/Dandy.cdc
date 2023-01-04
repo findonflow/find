@@ -1,8 +1,8 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import NonFungibleToken from "./standard/NonFungibleToken.cdc"
+import FungibleToken from "./standard/FungibleToken.cdc"
+import MetadataViews from "./standard/MetadataViews.cdc"
+import FindViews from "./FindViews.cdc"
+import FindForge from "./FindForge.cdc"
 
 pub contract Dandy: NonFungibleToken {
 
