@@ -4,10 +4,7 @@ go 1.18
 
 require (
 	github.com/bjartek/overflow v1.1.0
-	github.com/davecgh/go-spew v1.1.1
 	github.com/hexops/autogold v1.3.0
-	github.com/hexops/gotextdiff v1.0.3
-	github.com/meirf/gopart v0.0.0-20180520194036-37e9492a85a8
 	github.com/onflow/cadence v0.30.0
 	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20221216181912-916369eaf1cf
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
@@ -35,6 +32,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
 	github.com/dgraph-io/ristretto v0.0.3-0.20200630154024-f66de99634de // indirect
@@ -69,6 +67,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/hexops/valast v1.4.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
