@@ -13,8 +13,8 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	price := 10.0
 	preIncrement := 5.0
 	otu.setupMarketAndDandyDapper()
-	otu.registerDUCInRegistry().
-		setFlowLeaseMarketOption("AuctionSoft").
+	otu.setFlowLeaseMarketOption("AuctionSoft").
+		registerDUCInRegistry().
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find")
@@ -482,14 +482,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.25,
+				"address":     otu.O.Address("user5-dapper"),
+				"amount":      0.65,
 				"royaltyName": "find",
-			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.5,
-				"royaltyName": "network",
 			})
 
 		otu.moveNameTo("user2", "user1", "name1")
@@ -502,7 +497,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-			setFindLeaseCutDapper(0.035)
+			setFindLeaseCutDapper(0.1)
 
 		otu.tickClock(500.0)
 
@@ -514,14 +509,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.35,
+				"address":     otu.O.Address("user5-dapper"),
+				"amount":      1.0,
 				"royaltyName": "find",
-			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.5,
-				"royaltyName": "network",
 			})
 
 		otu.moveNameTo("user2", "user1", "name1")

@@ -341,6 +341,7 @@ func setupDapper(otu *OverflowTestUtils) *OverflowTestUtils {
 	otu.O.Tx("setup_find_lease_market_2",
 		WithSigner("find"),
 		WithArg("tenantAddress", "user4"),
+		WithArg("merchantAddress", "user4"),
 	).AssertSuccess(otu.T)
 
 	otu.createUser(100.0, "account")

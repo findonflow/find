@@ -22,7 +22,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		registerDapperUser("user2").
 		createDapperUser("user3").
 		registerDapperUser("user3").
-		setDUCLease().
+		setFlowLeaseMarketOption("Sale").
 		setProfile("user1").
 		setProfile("user2")
 
@@ -30,6 +30,11 @@ func TestLeaseMarketSale(t *testing.T) {
 	otu.setUUID(400)
 
 	otu.registerDapperUserWithName("user1", "name1")
+	otu.registerDapperUserWithName("user1", "name2")
+	otu.registerDapperUserWithName("user1", "name3")
+
+	ftIden, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+	assert.NoError(otu.T, err)
 
 	t.Run("Should be able to list a lease for sale and buy it", func(t *testing.T) {
 
@@ -49,7 +54,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", 0.0),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -61,7 +66,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", 0.0),
 		).
@@ -70,7 +75,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price).
+		otu.listLeaseForSaleDUC("user1", "name1", price).
 			moveNameTo("user1", "user2", "name1")
 
 		otu.O.Tx("delistLeaseSale",
@@ -84,10 +89,10 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to change price of lease", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		newPrice := 15.0
-		otu.listLeaseForSale("user1", "name1", newPrice)
+		otu.listLeaseForSaleDUC("user1", "name1", newPrice)
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, newPrice, itemsForSale[0].Amount)
@@ -98,22 +103,25 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should not be able to buy your own listing", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user1"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertFailure(t, "You cannot buy your own listing")
+
 	})
 
 	t.Run("Should not be able to buy expired listing", func(t *testing.T) {
 
 		otu.tickClock(200.0)
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -124,7 +132,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to cancel sale", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		otu.cancelLeaseForSale("user1", "name1")
 		itemsForSale := otu.getLeasesForSale("user1")
@@ -133,10 +141,11 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should not be able to buy if too low price", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 5.0),
 		).
@@ -145,12 +154,12 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.cancelAllLeaseForSale("user1")
 	})
 
-	t.Run("Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
+	t.Run("Should be able to list it in FUT but not DUC.", func(t *testing.T) {
 
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "FUSD"),
+			WithArg("ftAliasOrIdentifier", "DUC"),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -159,9 +168,9 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able cancel all listing", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
-		otu.listLeaseForSale("user1", "name2", price)
-		otu.listLeaseForSale("user1", "name3", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name2", price)
+		otu.listLeaseForSaleDUC("user1", "name3", price)
 
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 3, len(itemsForSale))
@@ -177,7 +186,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -189,14 +198,15 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name2"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -204,7 +214,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.alterLeaseMarketOption("Sale", "enable")
 
-		otu.listLeaseForSale("user1", "name2", price)
+		otu.listLeaseForSaleDUC("user1", "name2", price)
 
 		otu.alterLeaseMarketOption("Sale", "deprecate")
 
@@ -223,7 +233,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to list it, stop it and cannot list another again, nor buy but able to delist.", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -235,14 +245,15 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name2"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -261,7 +272,7 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to purchase, list and delist items after enabled market option", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		itemsForSale := otu.getLeasesForSale("user1")
 		assert.Equal(t, 1, len(itemsForSale))
@@ -271,14 +282,15 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name2"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -287,7 +299,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -307,26 +319,20 @@ func TestLeaseMarketSale(t *testing.T) {
 	// tenant nil
 	t.Run("Royalties should be sent to correspondence upon buy action", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
-				"amount":      0.25,
+				"address":     otu.O.Address("user5-dapper"),
+				"amount":      0.65,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
-			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.5,
-				"leaseName":   "name1",
-				"royaltyName": "network",
 				"tenant":      "findLease",
 			})
 
@@ -336,51 +342,48 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
 
-		otu.setFindLeaseCut(0.035)
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.setFindLeaseCutDapper(0.1)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
-				"amount":      0.35,
+				"address":     otu.O.Address("user5-dapper"),
+				"amount":      1.0,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
-			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.5,
-				"leaseName":   "name1",
-				"royaltyName": "network",
 				"tenant":      "findLease",
 			})
 
 		otu.cancelAllLeaseForSale("user1").
-			moveNameTo("user2", "user1", "name1")
+			moveNameTo("user2", "user1", "name1").
+			setFindLeaseCutDapper(0.025)
+
 	})
 
 	/* Honour Banning */
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 		otu.leaseProfileBan("user1")
 
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
 			WithArg("leaseName", "name2"),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("ftAliasOrIdentifier", ftIden),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -392,11 +395,12 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	t.Run("Should be able to ban user, user cannot buy NFT.", func(t *testing.T) {
 
-		otu.listLeaseForSale("user1", "name1", price)
+		otu.listLeaseForSaleDUC("user1", "name1", price)
 		otu.leaseProfileBan("user2")
 
-		otu.O.Tx("buyLeaseForSale",
+		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
+			WithPayloadSigner("account"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -407,58 +411,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			removeLeaseProfileBan("user2")
 	})
 
-	t.Run("Royalties should be sent to residual account if royalty receiver is not working", func(t *testing.T) {
-
-		otu.setLeaseTenantRuleFUSD("FlowLeaseSale").
-			removeLeaseTenantRule("FlowLeaseSale", "Flow")
-
-		otu.O.Tx("devSetResidualAddress",
-			WithSigner("find"),
-			WithArg("address", "user3"),
-		).
-			AssertSuccess(t)
-
-		otu.O.Tx("listLeaseForSale",
-			WithSigner("user1"),
-			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "FUSD"),
-			WithArg("directSellPrice", price),
-			WithArg("validUntil", otu.currentTime()+100.0),
-		).
-			AssertSuccess(t)
-
-		otu.destroyFUSDVault("find")
-
-		otu.O.Tx("buyLeaseForSale",
-			WithSigner("user2"),
-			WithArg("leaseName", "name1"),
-			WithArg("amount", price),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyCouldNotBePaid", map[string]interface{}{
-				"address":         otu.O.Address("find"),
-				"amount":          0.5,
-				"leaseName":       "name1",
-				"royaltyName":     "network",
-				"tenant":          "findLease",
-				"residualAddress": otu.O.Address("user3"),
-			})
-
-		otu.cancelAllLeaseForSale("user1").
-			moveNameTo("user2", "user1", "name1")
-		// createUser(100, "find")
-
-	})
-
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
-
-		otu.createDapperUser("user1").
-			createDapperUser("user2")
-
-		otu.registerDUCInRegistry().
-			setDUCLease()
-
-		otu.createDapperUser("user1")
 
 		otu.listLeaseForSaleDUC("user1", "name1", price)
 
@@ -480,7 +433,7 @@ func TestLeaseMarketSale(t *testing.T) {
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       302,
+			"id":       403,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))

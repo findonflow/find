@@ -597,7 +597,7 @@ func (otu *OverflowTestUtils) buyForgeDapper(user string) *OverflowTestUtils {
 	otu.O.Tx("buyAddonDapper",
 		WithSigner(user),
 		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithArg("merchAccount", "user5-dapper"),
 		WithArg("name", user),
 		WithArg("addon", "forge"),
 		WithArg("amount", 50.0),
@@ -1721,6 +1721,7 @@ func (otu *OverflowTestUtils) setFlowLeaseMarketOption(marketType string) *Overf
 		WithSigner("find"),
 		WithArg("tenant", "user4"),
 		WithArg("market", marketType),
+		WithArg("merchAddress", "user5-dapper"),
 	).
 		AssertSuccess(otu.T)
 
@@ -2090,6 +2091,7 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 	otu.O.Tx("adminSetSellExampleNFTRules",
 		WithSigner("find"),
 		WithArg("tenant", "account"),
+		WithArg("merchAddress", "user5-dapper"),
 	).
 		AssertSuccess(otu.T)
 
@@ -2126,10 +2128,13 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 
 func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, price float64) *OverflowTestUtils {
 
+	ftIden, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("listLeaseForSaleDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2180,8 +2185,8 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
 
 	amount := price * 0.05
-	if amount < 0.065 {
-		amount = 0.065
+	if amount < 0.65 {
+		amount = 0.65
 
 	}
 	otu.O.Tx("buyLeaseForSaleDapper",
@@ -2201,7 +2206,7 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
 			"amount":      amount,
 			"leaseName":   name,
-			"address":     otu.O.Address(buyer),
+			"address":     otu.O.Address("user5-dapper"),
 			"royaltyName": "find",
 			"tenant":      "findLeas",
 		})
