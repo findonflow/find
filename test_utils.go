@@ -2208,7 +2208,7 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			"leaseName":   name,
 			"address":     otu.O.Address("user5-dapper"),
 			"royaltyName": "find",
-			"tenant":      "findLeas",
+			"tenant":      "findLease",
 		})
 
 	return otu
