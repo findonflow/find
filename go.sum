@@ -108,8 +108,8 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/bits-and-blooms/bitset v1.3.0 h1:h7mv5q31cthBTd7V4kLAZaIThj1e8vPGcSqpPue9KVI=
 github.com/bits-and-blooms/bitset v1.3.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=
-github.com/bjartek/overflow v1.1.0 h1:ogVgoKxEilzYsBIjyNpMdntJQx5e4fdxtSdwqOuKtR8=
-github.com/bjartek/overflow v1.1.0/go.mod h1:Uaa4g5v4QtOWuYuYW/nf3zAi/1TW4TmxM8OrFl+hmq8=
+github.com/bjartek/overflow v1.1.2 h1:GkhZCZB4fWtcnylgsp+IFQwUmLAgzWaiBMuyhjwzR2c=
+github.com/bjartek/overflow v1.1.2/go.mod h1:Uaa4g5v4QtOWuYuYW/nf3zAi/1TW4TmxM8OrFl+hmq8=
 github.com/btcsuite/btcd v0.20.1-beta/go.mod h1:wVuoA8VJLEcwgqHBwHmzLRazpKxTv13Px/pDuV7OomQ=
 github.com/btcsuite/btcd v0.22.1 h1:CnwP9LM/M9xuRrGSCGeMVs9iv09uMqwsVX7EeIpgV2c=
 github.com/btcsuite/btcd v0.22.1/go.mod h1:wqgTSL29+50LRkmOVknEdmt8ZojIzhuWvgu/iptuN7Y=

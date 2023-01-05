@@ -6,13 +6,10 @@ import (
 
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFindPack(t *testing.T) {
-
-	packTypeId := uint64(1)
-	salt := "find"
-	buyer := "user1"
 
 	otu := NewOverflowTest(t).
 		setupFIND().
@@ -21,6 +18,10 @@ func TestFindPack(t *testing.T) {
 		registerUser("user1").
 		buyForge("user1").
 		registerExampleNFTInNFTRegistry()
+
+	packTypeId := uint64(1)
+	salt := "find"
+	buyer := "user1"
 
 	singleType := []string{exampleNFTType}
 	t.Run("Should be able to mint Example NFTs", func(t *testing.T) {
@@ -183,24 +184,10 @@ func TestFindPack(t *testing.T) {
 
 		// try to fill that up with Example NFT
 
-		for {
-			res := otu.O.Tx("devMintExampleNFT",
-				WithSigner("user1"),
-				WithArg("name", "user1"),
-				WithArg("artist", "Bam"),
-				WithArg("nftName", "ExampleNFT"),
-				WithArg("nftDescription", "This is an ExampleNFT"),
-				WithArg("nftUrl", "This is an exampleNFT url"),
-				WithArg("traits", []uint64{1, 2, 3}),
-				WithArg("collectionDescription", "Example NFT FIND"),
-				WithArg("collectionExternalURL", "Example NFT external url"),
-				WithArg("collectionSquareImage", "Example NFT square image"),
-				WithArg("collectionBannerImage", "Example NFT banner image"),
-			)
-			if res.Err != nil {
-				break
-			}
-		}
+		res := otu.O.FillUpStorage(buyer)
+		require.NoError(t, res.Error)
+
+		fmt.Println(otu.O.GetFreeCapacity(buyer))
 
 		pid := map[uint64][]uint64{packId: ids}
 		types := map[uint64][]string{packId: {exampleNFTType}}
@@ -225,7 +212,7 @@ func TestFindPack(t *testing.T) {
 
 	})
 
-	// /* Tests on Float implementation */
+	//  Tests on Float implementation
 	t.Run("Should be able to buy nft if the user has the float and with a whitelist.", func(t *testing.T) {
 
 		id1 := otu.mintExampleNFTs()
@@ -294,6 +281,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": freeMintFloat, "pre-sale": whiteListFloat})),
 			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 0.0, "pre-sale": 4.2, "public sale": 4.2})),
 			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{"whiteList": 1, "pre-sale": 20})),
+			WithArg("storageRequirement", 50000),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
@@ -318,7 +306,7 @@ func TestFindPack(t *testing.T) {
 		packTypeId++
 	})
 
-	/* Tests on Royalty implementation */
+	// Tests on Royalty implementation
 	t.Run("Should have 0.15 cut to find", func(t *testing.T) {
 
 		totalAmount := 4.2

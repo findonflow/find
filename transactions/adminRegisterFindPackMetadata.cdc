@@ -12,7 +12,7 @@ import Admin from "../contracts/Admin.cdc"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
-transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, itemTypes: [String], startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}) {
+transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, itemTypes: [String], startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, storageRequirement: UInt64) {
 
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
@@ -99,7 +99,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			itemTypes: self.itemTypes,
 			providerCaps: self.providerCaps, 
 			requiresReservation:requiresReservation,
-			storageRequirement:10000, 
+			storageRequirement:storageRequirement, 
 			saleInfos: saleInfo, 
 			primarySaleRoyalties: packRoyalty,
 			royalties: royalties, 

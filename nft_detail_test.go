@@ -58,12 +58,13 @@ func TestNFTDetailScript(t *testing.T) {
 			WithArg("user", "user1"),
 			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
 			WithArg("id", ids[1]),
-			WithArg("views", `[
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",]`),
+			WithArg("views", []string{
+				"A.f8d6e0586b0a20c7.FindViews.Nounce",
+				"A.f8d6e0586b0a20c7.MetadataViews.Traits",
+				"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+				"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
+				"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
+			}),
 		).
 			GetAsJson()
 

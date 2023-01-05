@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v1.1.0
+	github.com/bjartek/overflow v1.1.2
 	github.com/hexops/autogold v1.3.0
 	github.com/onflow/cadence v0.30.0
 	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20221216181912-916369eaf1cf
