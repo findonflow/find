@@ -207,7 +207,7 @@ pub contract FindMarket {
 		var report : {String : FindMarket.SaleItemInformation} = {}
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
-			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo, getRoyaltyChanged: false )
+			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo, getRoyaltyChanged: true )
 			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
 				report[marketOption] = returnedReport.items[0]
 			}
