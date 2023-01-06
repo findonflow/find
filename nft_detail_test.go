@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -24,7 +23,7 @@ func TestNFTDetailScript(t *testing.T) {
 		createUser(1000.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(400)
+	otu.setUUID(600)
 	ids := otu.mintThreeExampleDandies()
 	otu.registerFtInRegistry().
 		setFlowDandyMarketOption("Sale")
@@ -35,7 +34,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
 			WithArg("user", "user1"),
-			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", ids[1]),
 			WithArg("views", `[]`),
 		).
@@ -54,17 +53,19 @@ func TestNFTDetailScript(t *testing.T) {
 
 		otu.listNFTForSale("user1", ids[1], price)
 
+		viewList := []string{
+			otu.identifier("FindViews", "Nounce"),
+			otu.identifier("MetadataViews", "Traits"),
+			otu.identifier("MetadataViews", "Royalties"),
+			otu.identifier("MetadataViews", "ExternalURL"),
+			otu.identifier("FindViews", "CreativeWork"),
+		}
+
 		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
 			WithArg("user", "user1"),
-			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", ids[1]),
-			WithArg("views", []string{
-				"A.f8d6e0586b0a20c7.FindViews.Nounce",
-				"A.f8d6e0586b0a20c7.MetadataViews.Traits",
-				"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-				"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-				"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			}),
+			WithArg("views", viewList),
 		).
 			GetAsJson()
 
@@ -80,8 +81,8 @@ func TestNFTDetailScript(t *testing.T) {
 	t.Run("Should be able to get nft details of item if listed in rule with no listing type", func(t *testing.T) {
 
 		otu.O.Tx("adminSetSellDandyRules",
-			WithSigner("find"),
-			WithArg("tenant", "account"),
+			WithSigner("find-admin"),
+			WithArg("tenant", "find"),
 		).
 			AssertSuccess(t)
 
@@ -89,7 +90,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
 			WithArg("user", "user1"),
-			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", ids[1]),
 			WithArg("views", `[]`),
 		).
@@ -105,13 +106,13 @@ func TestNFTDetailScript(t *testing.T) {
 
 		// Remove these general rule for later testing
 		otu.O.Tx("removeMarketOption",
-			WithSigner("account"),
+			WithSigner("find"),
 			WithArg("saleItemName", "FUSDDandy"),
 		).
 			AssertSuccess(t)
 
 		otu.O.Tx("removeMarketOption",
-			WithSigner("account"),
+			WithSigner("find"),
 			WithArg("saleItemName", "FlowDandy"),
 		).
 			AssertSuccess(t)
@@ -119,7 +120,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should be able to get all listings of a person by a script", func(t *testing.T) {
-		otu.setUUID(500)
+		otu.setUUID(800)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
@@ -142,15 +143,15 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"ftAlias":               "Flow",
 				"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId":             503,
+				"listingId":             803,
 				"listingStatus":         "active",
-				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
+				"listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil":     101,
 				"nft": map[string]interface{}{
 					"collectionDescription": "Neo Collectibles FIND",
 					"collectionName":        "user1",
 					"editionNumber":         2,
-					"id":                    503,
+					"id":                    803,
 					"name":                  "Neo Motorcycle 2 of 3",
 					"scalars": map[string]interface{}{
 						"Speed":              100,
@@ -161,12 +162,12 @@ func TestNFTDetailScript(t *testing.T) {
 					"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
 					"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"totalInEdition": 3,
-					"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"type":           "A.179b6b1cb6755e31.Dandy.NFT",
 				},
-				"nftId":         503,
-				"nftIdentifier": "A.f8d6e0586b0a20c7.Dandy.NFT",
+				"nftId":         803,
+				"nftIdentifier": "A.179b6b1cb6755e31.Dandy.NFT",
 				"saleType":      "active_listed",
-				"seller":        "0x179b6b1cb6755e31",
+				"seller":        "0x120e725050340cab",
 				"sellerName":    "user1",
 			}),
 		)
@@ -174,7 +175,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should be able to get storefront listings of an NFT by a script", func(t *testing.T) {
-		otu.setUUID(700)
+		otu.setUUID(1200)
 		ids := otu.mintThreeExampleDandies()
 		otu.setFlowDandyMarketOption("DirectOfferEscrow").
 			setFlowDandyMarketOption("Sale").
@@ -190,7 +191,7 @@ func TestNFTDetailScript(t *testing.T) {
 
 		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
 			WithArg("user", "user1"),
-			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", ids[1]),
 			WithArg("views", `[]`),
 		).
@@ -204,7 +205,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should be able to get media with thumbnail", func(t *testing.T) {
-		otu.setUUID(900)
+		otu.setUUID(1600)
 		ids := otu.mintThreeExampleDandies()
 		otu.registerUserWithNameAndForge("user1", "neomotorcycle").
 			registerUserWithNameAndForge("user1", "xtingles").
@@ -232,11 +233,11 @@ func TestNFTDetailScript(t *testing.T) {
 			WithArg("to", "user1"),
 		).
 			AssertSuccess(t).
-			GetIdsFromEvent("A.f8d6e0586b0a20c7.Dandy.Deposit", "id")
+			GetIdsFromEvent(otu.identifier("Dandy", "Deposit"), "id")
 
 		nftDetail := otu.O.ScriptFN(
 			WithArg("user", "user1"),
-			WithArg("project", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", dandyIds[0]),
 			WithArg("views", `[]`),
 		)
@@ -253,14 +254,15 @@ func TestNFTDetailScript(t *testing.T) {
 		actual1 = otu.replaceID(actual1, dandyIds)
 
 		viewList := []string{
-			"A.f8d6e0586b0a20c7.FindViews.Nounce",
-			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-			"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-			"A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-			"A.f8d6e0586b0a20c7.MetadataViews.Traits",
-			"A.f8d6e0586b0a20c7.MetadataViews.Rarity",
+			otu.identifier("FindViews", "Nounce"),
+			otu.identifier("MetadataViews", "NFTCollectionData"),
+			otu.identifier("MetadataViews", "Royalties"),
+			otu.identifier("MetadataViews", "ExternalURL"),
+			otu.identifier("FindViews", "CreativeWork"),
+			otu.identifier("MetadataViews", "Traits"),
+			otu.identifier("MetadataViews", "Rarity"),
 		}
+
 		for _, item := range viewList {
 			actual1 = strings.Replace(actual1, item, "checked", -1)
 		}
@@ -319,7 +321,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should not be fetching NFTInfo when item is stopped", func(t *testing.T) {
-		otu.setUUID(1100)
+		otu.setUUID(2000)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
@@ -344,14 +346,14 @@ func TestNFTDetailScript(t *testing.T) {
 				},
 				"ftAlias":               "Flow",
 				"ftTypeIdentifier":      "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"listingId":             1103,
+				"listingId":             2003,
 				"listingStatus":         "stopped",
-				"listingTypeIdentifier": "A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.SaleItem",
+				"listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
 				"listingValidUntil":     101,
-				"nftId":                 1103,
-				"nftIdentifier":         "A.f8d6e0586b0a20c7.Dandy.NFT",
+				"nftId":                 2003,
+				"nftIdentifier":         "A.179b6b1cb6755e31.Dandy.NFT",
 				"saleType":              "active_listed",
-				"seller":                "0x179b6b1cb6755e31",
+				"seller":                "0x120e725050340cab",
 				"sellerName":            "user1",
 			}),
 		)
@@ -359,7 +361,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should return all blocked NFTs by type", func(t *testing.T) {
-		otu.setUUID(1300)
+		otu.setUUID(2400)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
@@ -384,7 +386,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should not fetch NFTInfo if blocked by find", func(t *testing.T) {
-		otu.setUUID(1500)
+		otu.setUUID(2800)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
@@ -401,7 +403,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should return all blocked NFTs if blocked by find.", func(t *testing.T) {
-		otu.setUUID(1700)
+		otu.setUUID(3200)
 		otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
@@ -420,7 +422,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should return all blocked NFTs if blocked by find by listing type.", func(t *testing.T) {
-		otu.setUUID(1900)
+		otu.setUUID(3600)
 		otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
 			setFlowDandyMarketOption("DirectOfferEscrow").
@@ -438,7 +440,7 @@ func TestNFTDetailScript(t *testing.T) {
 		autogold.Equal(t, actual)
 	})
 
-	typ := fmt.Sprintf("A.%s.Dandy.NFT", otu.O.Account("account").Address().String())
+	typ := dandyNFTType(otu)
 
 	t.Run("Should be able to get collection display by collection Identifier", func(t *testing.T) {
 		otu.O.Script("getCatalogCollectionDisplay",

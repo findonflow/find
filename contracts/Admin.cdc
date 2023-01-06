@@ -135,6 +135,13 @@ pub contract Admin {
 			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules, findRoyalty:findRoyalty)
 		}
 
+		pub fun createFindMarketDapper(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findRoyalty: MetadataViews.Royalty) : Capability<&FindMarket.Tenant> {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules, findRoyalty:findRoyalty)
+		}
+
 		/// Set the wallet used for the network
 		/// @param _ The FT receiver to send the money to
 		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {

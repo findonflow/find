@@ -9,11 +9,11 @@ import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 
-transaction(tenant: Address, market: String){
+transaction(tenant: Address, market: String, merchAddress: Address){
     prepare(account: AuthAccount){
         let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
-		let tenantRef = adminRef.getTenantRef(tenant) 
+		let tenantRef = adminRef.getTenantRef(tenant)
 
         var marketType : [Type] = [Type<@FindLeaseMarketSale.SaleItem>()]
 		var ftTyp : [Type] = [Type<@FlowToken.Vault>()]
@@ -22,11 +22,11 @@ transaction(tenant: Address, market: String){
             FindMarket.TenantRule(name:"FUT", types:[Type<@FlowUtilityToken.Vault>()], ruleType: "ft", allow: true)
             ]
         switch market {
-			case "Sale" : 
+			case "Sale" :
 				ftTyp = [Type<@FlowToken.Vault>(), Type<@FlowUtilityToken.Vault>()]
 				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketAuctionSoft.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
 				if items.findCut == nil {
-					let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+					let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}
 
@@ -38,7 +38,7 @@ transaction(tenant: Address, market: String){
 				ftTyp = [Type<@FlowUtilityToken.Vault>()]
 				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketAuctionSoft.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
 				if items.findCut == nil {
-					let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+					let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}
             // case "DirectOfferEscrow" :
@@ -49,7 +49,7 @@ transaction(tenant: Address, market: String){
 				ftTyp = [Type<@FlowUtilityToken.Vault>()]
 				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketAuctionSoft.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
 				if items.findCut == nil {
-					let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+					let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}
         }
@@ -58,7 +58,7 @@ transaction(tenant: Address, market: String){
             FindMarket.TenantRule(name:"Flow", types:ftTyp, ruleType: "ft", allow: true),
             FindMarket.TenantRule(name:"Lease", types:[Type<@FIND.Lease>()], ruleType: "nft", allow: true),
             FindMarket.TenantRule(name: market, types:marketType, ruleType: "listing", allow: true)
-            ], 
+            ],
             status: "active"
         )
 

@@ -14,11 +14,18 @@ import (
 )
 
 var (
-	findSigner     = WithSigner("find")
-	saSigner       = WithSignerServiceAccount()
-	user1Signer    = WithSigner("user1")
-	exampleNFTType = "A.f8d6e0586b0a20c7.ExampleNFT.NFT"
-	dandyNFTType   = "A.f8d6e0586b0a20c7.Dandy.NFT"
+	findAdminSigner = WithSigner("find-admin")
+	findSigner      = WithSigner("find")
+	user1Signer     = WithSigner("user1")
+
+	exampleNFTType = func(otu *OverflowTestUtils) string {
+		res, _ := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+		return res
+	}
+	dandyNFTType = func(otu *OverflowTestUtils) string {
+		res, _ := otu.O.QualifiedIdentifier("Dandy", "NFT")
+		return res
+	}
 )
 
 type OverflowTestUtils struct {
@@ -77,13 +84,13 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 func (otu *OverflowTestUtils) setupMarketAndDandyDapper() uint64 {
 	t := otu.T
 
-	otu.setupFIND().
+	otu.setupDapper().
 		createDapperUser("user1").
 		registerDapperUser("user1")
 
 	// works as buyForge
 	otu.O.Tx("adminAddAddon",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("name", "user1"),
 		WithArg("addon", "forge"),
 	).
@@ -93,9 +100,11 @@ func (otu *OverflowTestUtils) setupMarketAndDandyDapper() uint64 {
 			"addon": "forge",
 		})
 
+	forge, _ := otu.O.QualifiedIdentifier("Dandy", "Forge")
+
 	otu.O.Tx("adminAddForge",
-		WithSigner("find"),
-		WithArg("type", "A.f8d6e0586b0a20c7.Dandy.Forge"),
+		WithSigner("find-admin"),
+		WithArg("type", forge),
 		WithArg("name", "user1"),
 	).AssertSuccess(t)
 
@@ -115,7 +124,7 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(365)
+	otu.setUUID(600)
 	ids := otu.mintThreeExampleDandies()
 	return ids
 }
@@ -133,41 +142,114 @@ pub fun main(name: String) :  Address? {
 func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	//first step create the adminClient as the fin user
 
+	otu.O.Tx("setup_fin_1_create_client", findAdminSigner).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the versus client
+	otu.O.Tx("setup_fin_2_register_client",
+		findSigner,
+		WithArg("ownerAddress", "find-admin"),
+	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//set up fin network as the fin user
+	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	otu.O.Tx("setup_find_market_1", findSigner).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the versus client
+	otu.O.Tx("setup_find_market_2",
+		findAdminSigner,
+		WithArg("tenantAddress", "find"),
+	).AssertSuccess(otu.T)
+
+	// Setup Lease Market
+	otu.O.Tx("setup_find_market_1",
+		WithSigner("find-lease")).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the client
+	otu.O.Tx("setup_find_lease_market_2",
+		findAdminSigner,
+		WithArg("tenantAddress", "find-lease"),
+		WithArg("merchantAddress", "dapper"),
+	).AssertSuccess(otu.T)
+
+	otu.createUser(100.0, "find")
+	otu.createUser(100.0, "find-admin")
+	otu.createUser(100.0, "find-lease")
+
+	//link in the server in the versus client
+	otu.O.Tx("devSetResidualAddress",
+		findAdminSigner,
+		WithArg("address", "find-admin"),
+	).AssertSuccess(otu.T)
+
+	otu.O.Tx("adminInitDapper",
+		findSigner,
+		WithArg("dapperAddress", "dapper"),
+	).AssertSuccess(otu.T)
+
+	// setup find forge
+	otu.O.Tx("setup_find_forge_1", WithSigner("find-forge")).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the versus client
+	otu.O.Tx("setup_find_forge_2",
+		findSigner,
+		WithArg("ownerAddress", "find-forge"),
+	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	return otu.tickClock(1.0)
+}
+
+func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
+	//first step create the adminClient as the fin user
+
+	dapperSigner := WithSigner("dapper")
+	findSigner := WithSigner("find-admin")
+	saSigner := WithSigner("find")
+
 	otu.O.Tx("setup_fin_1_create_client", findSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the versus client
 	otu.O.Tx("setup_fin_2_register_client",
 		saSigner,
-		WithArg("ownerAddress", "find"),
+		WithArg("ownerAddress", "find-admin"),
 	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//set up fin network as the fin user
 	otu.O.Tx("setup_fin_3_create_network", findSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	otu.O.Tx("setup_find_market_1", saSigner).
+	otu.O.Tx("setup_find_market_1", dapperSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the versus client
-	otu.O.Tx("setup_find_market_2",
+	otu.O.Tx("setup_find_dapper_market",
 		findSigner,
-		WithArg("tenantAddress", "account"),
+		WithArg("adminAddress", "dapper"),
+		WithArg("tenantAddress", "find"),
+		WithArg("name", "onefootball"),
 	).AssertSuccess(otu.T)
 
 	// Setup Lease Market
 	otu.O.Tx("setup_find_market_1",
-		WithSigner("user4")).
+		WithSigner("find-lease")).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the client
-	otu.O.Tx("setup_find_lease_market_2",
-		WithSigner("find"),
-		WithArg("tenantAddress", "user4"),
+	//TODO: need to use _dapper method and send to our merchantAccount at dapper
+	otu.O.Tx("setup_find_lease_market_2_dapper",
+		WithSigner("find-admin"),
+		WithArg("tenantAddress", "find-lease"),
+		WithArg("merchantAddress", "dapper"),
 	).AssertSuccess(otu.T)
 
-	otu.createUser(100.0, "account")
-	otu.createUser(100.0, "user4")
+	otu.createDapperUser("find")
+	otu.createDapperUser("find-lease")
 
 	//link in the server in the versus client
 	otu.O.Tx("devSetResidualAddress",
@@ -176,26 +258,16 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	).AssertSuccess(otu.T)
 
 	otu.O.Tx("adminInitDapper",
-		findSigner,
-		WithArg("dapperAddress", "account"),
+		dapperSigner,
+		WithArg("dapperAddress", "find"),
 	).AssertSuccess(otu.T)
-
-	// setup find forge
-	otu.O.Tx("setup_find_forge_1", WithSigner("user4")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the versus client
-	otu.O.Tx("setup_find_forge_2",
-		saSigner,
-		WithArg("ownerAddress", "user4"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	return otu.tickClock(1.0)
 }
 
 func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
 	otu.O.Tx("devClock",
-		findSigner,
+		findAdminSigner,
 		WithArg("clock", time),
 	).AssertSuccess(otu.T)
 	return otu
@@ -211,12 +283,11 @@ func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTes
 	otu.O.Tx("createProfile", nameSigner, nameArg).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
-			"account":   nameAddress,
 			"userName":  name,
 			"createdAt": "find",
 		})
 
-	mintFn := otu.O.TxFN(saSigner,
+	mintFn := otu.O.TxFN(WithSigner("account"),
 		WithArg("recipient", name),
 		WithArg("amount", fusd),
 	)
@@ -240,9 +311,7 @@ func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
 	nameSigner := WithSigner(name)
 	nameArg := WithArg("name", name)
 
-	nameAddress := otu.O.Address(name)
-
-	otu.O.Tx("initDapperAccount", nameSigner, WithArg("dapperAddress", "account")).
+	otu.O.Tx("initDapperAccount", nameSigner, WithArg("dapperAddress", "dapper")).
 		AssertSuccess(otu.T)
 
 	otu.O.Tx("createProfileDapper",
@@ -250,7 +319,6 @@ func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
 		nameArg).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
-			"account":   nameAddress,
 			"userName":  name,
 			"createdAt": "find",
 		})
@@ -264,13 +332,13 @@ func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 }
 
 func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
-	nameAddress := otu.O.Address("account")
+	nameAddress := otu.O.Address("find-admin")
 	expireTime := otu.currentTime() + leaseDurationFloat
 
 	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
 
 	otu.O.Tx("register",
-		WithSigner("account"),
+		WithSigner("find-admin"),
 		WithArg("name", "find"),
 		WithArg("amount", 100.0),
 	).AssertSuccess(otu.T).
@@ -303,7 +371,7 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResul
 		}).
 		AssertEvent(otu.T, "FUSD.TokensDeposited", map[string]interface{}{
 			"amount": 5.0,
-			"to":     "0x01cf0e2f2f715450",
+			"to":     otu.O.Address("find-admin"),
 		}).
 		AssertEvent(otu.T, "FUSD.TokensWithdrawn", map[string]interface{}{
 			"amount": 5.0,
@@ -320,8 +388,8 @@ func (otu *OverflowTestUtils) registerDapperUser(name string) *OverflowTestUtils
 
 	otu.O.Tx("registerDapper",
 		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
 	).AssertSuccess(otu.T).
@@ -331,8 +399,9 @@ func (otu *OverflowTestUtils) registerDapperUser(name string) *OverflowTestUtils
 			"owner":       nameAddress,
 			"name":        name,
 		}).
-		AssertEvent(otu.T, "TokenForwarding.ForwardedDeposit", map[string]interface{}{
+		AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
 			"amount": 5.0,
+			"to":     otu.O.Address("dapper"),
 		})
 
 	return otu
@@ -347,8 +416,8 @@ func (otu *OverflowTestUtils) registerDapperUserWithName(buyer, name string) *Ov
 
 	otu.O.Tx("registerDapper",
 		WithSigner(buyer),
-		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
 	).AssertSuccess(otu.T).
@@ -358,8 +427,9 @@ func (otu *OverflowTestUtils) registerDapperUserWithName(buyer, name string) *Ov
 			"owner":       nameAddress,
 			"name":        name,
 		}).
-		AssertEvent(otu.T, "TokenForwarding.ForwardedDeposit", map[string]interface{}{
+		AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
 			"amount": 5.0,
+			"to":     otu.O.Address("dapper"),
 		})
 
 	return otu
@@ -377,11 +447,12 @@ func (otu *OverflowTestUtils) renewUserWithName(user, name string) *OverflowTest
 func (otu *OverflowTestUtils) renewDapperUserWithName(user, name string) *OverflowTestUtils {
 	otu.O.Tx("renewNameDapper",
 		WithSigner(user),
-		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
 		WithArg("name", name),
 		WithArg("amount", 5.0),
-	)
+	).
+		AssertSuccess(otu.T)
 	return otu
 }
 
@@ -414,7 +485,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 		}).
 		AssertEvent(otu.T, "FUSD.TokensDeposited", map[string]interface{}{
 			"amount": 5.0,
-			"to":     "0x01cf0e2f2f715450",
+			"to":     otu.O.Address("find-admin"),
 		}).
 		AssertEvent(otu.T, "FUSD.TokensWithdrawn", map[string]interface{}{
 			"amount": 5.0,
@@ -597,8 +668,8 @@ func (otu *OverflowTestUtils) buyForgeDapper(user string) *OverflowTestUtils {
 
 	otu.O.Tx("buyAddonDapper",
 		WithSigner(user),
-		WithPayloadSigner("account"),
-		WithArg("merchAccount", "find"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
 		WithArg("name", user),
 		WithArg("addon", "forge"),
 		WithArg("amount", 50.0),
@@ -638,7 +709,7 @@ func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *Overflow
 
 	otu.O.Tx("delistNFTSale",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("ids", []uint64{id}),
 	).
 		AssertSuccess(otu.T).
@@ -671,7 +742,7 @@ func (otu *OverflowTestUtils) cancelAllNFTForSale(name string) *OverflowTestUtil
 
 	otu.O.Tx("delistAllNFTSale",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -682,7 +753,7 @@ func (otu *OverflowTestUtils) cancelAllLeaseForSale(name string) *OverflowTestUt
 
 	otu.O.Tx("delistAllLeaseSale",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -692,10 +763,13 @@ func (otu *OverflowTestUtils) cancelAllLeaseForSale(name string) *OverflowTestUt
 
 func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float64) *OverflowTestUtils {
 
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("listNFTForSale",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("directSellPrice", price),
@@ -713,40 +787,25 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 }
 
-func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("listLeaseForSale",
-		WithSigner(user),
-		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("directSellPrice", price),
-		WithArg("validUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindLeaseMarketSale.Sale", map[string]interface{}{
-			"status":    "active_listed",
-			"amount":    price,
-			"leaseName": name,
-			"seller":    otu.O.Address(user),
-		})
-
-	return otu
-
-}
-
 func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, price float64) []uint64 {
+
+	typ, err := otu.O.QualifiedIdentifier("FindMarketSale", "Sale")
+	assert.NoError(otu.T, err)
+
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
 
 	res := otu.O.Tx("listNFTForSale",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
 		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
+		GetIdsFromEvent(typ, "id")
 
 	return res
 
@@ -754,10 +813,13 @@ func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, pric
 
 func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("listNFTForAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("price", price),
@@ -783,10 +845,16 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 
 func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id uint64, price float64) []uint64 {
 
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionEscrow", "EnglishAuction")
+	assert.NoError(otu.T, err)
+
 	res := otu.O.Tx("listNFTForAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("price", price),
@@ -798,7 +866,7 @@ func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id u
 		WithArg("auctionValidUntil", otu.currentTime()+100.0),
 	).
 		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketAuctionEscrow.EnglishAuction", "id")
+		GetIdsFromEvent(eventIden, "id")
 
 	return res
 
@@ -808,7 +876,7 @@ func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *Overf
 
 	otu.O.Tx("cancelAllMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -818,10 +886,13 @@ func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *Overf
 
 func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
 
-	otu.O.Tx("listNFTForAuctionSoftDapper",
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+
+	otu.O.Tx("listNFTForAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("price", price),
@@ -874,7 +945,7 @@ func (otu *OverflowTestUtils) delistAllNFT(name string) *OverflowTestUtils {
 
 	otu.O.Tx("cancelAllMarketListings",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -886,7 +957,7 @@ func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowT
 
 	otu.O.Tx("cancelAllMarketAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -908,12 +979,15 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 	/* Ben : Should we rename the check royalty script name? */
 	var royalty Royalty
 
-	err := otu.O.Script("getCheckRoyalty",
+	royaltyIden, err := otu.O.QualifiedIdentifier("MetadataViews", "Royalties")
+	assert.NoError(otu.T, err)
+
+	err = otu.O.Script("getCheckRoyalty",
 		WithSigner(name),
 		WithArg("name", name),
 		WithArg("id", id),
 		WithArg("nftAliasOrIdentifier", nftAlias),
-		WithArg("viewIdentifier", "A.f8d6e0586b0a20c7.MetadataViews.Royalties"),
+		WithArg("viewIdentifier", royaltyIden),
 	).
 		MarshalAs(&royalty)
 
@@ -935,7 +1009,7 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 
 	otu.O.Tx("buyNFTForSale",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -953,31 +1027,11 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 
 }
 
-func (otu *OverflowTestUtils) buyLeaseForMarketSale(buyer string, seller string, name string, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("buyLeaseForSale",
-		WithSigner(buyer),
-		WithArg("leaseName", name),
-		WithArg("amount", price),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindLeaseMarketSale.Sale", map[string]interface{}{
-			"amount":    price,
-			"leaseName": name,
-			"seller":    otu.O.Address(seller),
-			"buyer":     otu.O.Address(buyer),
-			"status":    "sold",
-		})
-
-	return otu
-
-}
-
 func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint64, price float64, totalPrice float64) *OverflowTestUtils {
 
 	otu.O.Tx("increaseBidMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -997,7 +1051,7 @@ func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint6
 
 	otu.O.Tx("increaseBidMarketAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1057,7 +1111,7 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 
 	otu.O.Tx("bidMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1077,7 +1131,7 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1116,7 +1170,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 
 	otu.O.Tx("increaseBidMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1135,7 +1189,7 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 
 	otu.O.Tx("increaseBidMarketDirectOfferSoft",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1171,11 +1225,14 @@ func (otu *OverflowTestUtils) increaseDirectOfferLeaseMarketSoft(user, name stri
 
 func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("bidMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("amount", price),
@@ -1194,11 +1251,17 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 
 func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
 
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketDirectOfferEscrow", "DirectOffer")
+	assert.NoError(otu.T, err)
+
 	res := otu.O.Tx("bidMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("amount", price),
@@ -1209,7 +1272,7 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, s
 			"amount": price,
 			"buyer":  otu.O.Address(name),
 		}).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferEscrow.DirectOffer", "id")
+		GetIdsFromEvent(eventIden, "id")
 
 	return res
 }
@@ -1218,7 +1281,7 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) 
 
 	otu.O.Tx("cancelAllMarketDirectOfferEscrowed",
 		WithSigner(signer),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1228,11 +1291,14 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) 
 
 func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("amount", price),
@@ -1272,7 +1338,7 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *Ove
 
 	otu.O.Tx("cancelAllMarketDirectOfferSoft",
 		WithSigner(signer),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1283,7 +1349,7 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferLeaseMarketSoft(signer string)
 
 	otu.O.Tx("cancelAllLeaseMarketDirectOfferSoft",
 		WithSigner(signer),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1294,7 +1360,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 
 	otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1313,7 +1379,7 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1350,7 +1416,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 
 	otu.O.Tx("cancelMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("ids", []uint64{id}),
 	).
 		AssertSuccess(otu.T).
@@ -1368,7 +1434,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller stri
 
 	otu.O.Tx("retractOfferMarketDirectOfferEscrowed",
 		WithSigner(buyer),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1385,7 +1451,7 @@ func (otu *OverflowTestUtils) rejectDirectOfferSoft(name string, id uint64, pric
 
 	otu.O.Tx("cancelMarketDirectOfferSoft",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("ids", []uint64{id}),
 	).
 		AssertSuccess(otu.T).
@@ -1420,7 +1486,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, 
 
 	otu.O.Tx("retractOfferMarketDirectOfferSoft",
 		WithSigner(buyer),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1453,7 +1519,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrowFromBidder(name string, 
 
 	otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1471,7 +1537,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 
 	otu.O.Tx("fulfillMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("owner", name),
 		WithArg("id", id),
 	).
@@ -1491,8 +1557,8 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 
 	otu.O.Tx("fulfillMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("marketplace", "account"),
+		WithPayloadSigner("dapper"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1511,7 +1577,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name st
 
 	otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 		WithSigner(user),
-		WithPayloadSigner("account"),
+		WithPayloadSigner("dapper"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
@@ -1530,8 +1596,8 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 
 	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("marketplace", "account"),
+		WithPayloadSigner("dapper"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1550,7 +1616,7 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name strin
 
 	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 		WithSigner(user),
-		WithPayloadSigner("account"),
+		WithPayloadSigner("dapper"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
@@ -1613,7 +1679,7 @@ func swallowErr(err error) {
 func (otu *OverflowTestUtils) registerFTInFtRegistry(alias string, eventName string, eventResult map[string]interface{}) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetFTInfo_"+alias,
-		WithSigner("find"),
+		WithSigner("find-admin"),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, eventName, eventResult)
@@ -1630,7 +1696,7 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 	}
 
 	otu.O.Tx(transactionFile,
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		arg,
 	).
 		AssertSuccess(otu.T).
@@ -1640,6 +1706,9 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 }
 
 func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
+
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
 
 	result, _ := otu.O.Script("getDandiesIDsFor",
 		WithArg("user", "user1"),
@@ -1667,10 +1736,10 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 	}
 
 	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find"),
-		WithArg("collectionIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-		WithArg("contractName", "A.f8d6e0586b0a20c7.Dandy.NFT"),
-		WithArg("contractAddress", "account"),
+		WithSigner("find-admin"),
+		WithArg("collectionIdentifier", nftIden),
+		WithArg("contractName", nftIden),
+		WithArg("contractAddress", "find"),
 		WithArg("addressWithNFT", "user1"),
 		WithArg("nftID", id),
 		WithArg("publicPathIdentifier", "findDandy"),
@@ -1681,13 +1750,15 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 }
 
 func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUtils {
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
 
 	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find"),
-		WithArg("collectionIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-		WithArg("contractName", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
-		WithArg("contractAddress", "account"),
-		WithArg("addressWithNFT", "account"),
+		WithSigner("find-admin"),
+		WithArg("collectionIdentifier", nftIden),
+		WithArg("contractName", nftIden),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "find"),
 		WithArg("nftID", 0),
 		WithArg("publicPathIdentifier", "exampleNFTCollection"),
 	).
@@ -1697,19 +1768,27 @@ func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUti
 }
 
 func (otu *OverflowTestUtils) registerFtInRegistry() *OverflowTestUtils {
-	otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-		"alias":          "FUSD",
-		"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-	}).
-		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "Flow",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		}).
-		registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "USDC",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-		}).
-		registerDandyInNFTRegistry()
+
+	eventIden, err := otu.O.QualifiedIdentifier("FTRegistry", "FTInfoRegistered")
+	assert.NoError(otu.T, err)
+
+	tokens := map[string]string{
+		"Flow": "FlowToken",
+		"FUSD": "FUSD",
+		"USDC": "FiatToken",
+	}
+
+	for alias, token := range tokens {
+		tokenIden, err := otu.O.QualifiedIdentifier(token, "Vault")
+		assert.NoError(otu.T, err)
+
+		otu.registerFTInFtRegistry(strings.ToLower(alias), eventIden, map[string]interface{}{
+			"alias":          alias,
+			"typeIdentifier": tokenIden,
+		})
+	}
+
+	otu.registerDandyInNFTRegistry()
 	return otu
 }
 
@@ -1727,8 +1806,8 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetSellDandyForFlow",
-		WithSigner("find"),
-		WithArg("tenant", "account"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find"),
 		WithArg("market", marketType),
 	).
 		AssertSuccess(otu.T)
@@ -1739,9 +1818,10 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *Overf
 func (otu *OverflowTestUtils) setFlowLeaseMarketOption(marketType string) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetSellLeaseForFlow",
-		WithSigner("find"),
-		WithArg("tenant", "user4"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find-lease"),
 		WithArg("market", marketType),
+		WithArg("merchAddress", "dapper"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1751,7 +1831,19 @@ func (otu *OverflowTestUtils) setFlowLeaseMarketOption(marketType string) *Overf
 func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterMarketOption",
-		WithSigner("account"),
+		WithSigner("find"),
+		WithArg("market", marketType),
+		WithArg("action", ruleName),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) alterMarketOptionDapper(marketType, ruleName string) *OverflowTestUtils {
+
+	otu.O.Tx("devAlterMarketOption",
+		WithSigner("dapper"),
 		WithArg("market", marketType),
 		WithArg("action", ruleName),
 	).
@@ -1763,7 +1855,7 @@ func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *Ov
 func (otu *OverflowTestUtils) alterLeaseMarketOption(marketType, ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterLeaseMarketOption",
-		WithSigner("user4"),
+		WithSigner("find-lease"),
 		WithArg("market", marketType),
 		WithArg("action", ruleName),
 	).
@@ -1775,7 +1867,7 @@ func (otu *OverflowTestUtils) alterLeaseMarketOption(marketType, ruleName string
 func (otu *OverflowTestUtils) removeMarketOption(marketType string) *OverflowTestUtils {
 
 	otu.O.Tx("removeMarketOption",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("saleItemName", marketType),
 	).
 		AssertSuccess(otu.T)
@@ -1786,19 +1878,7 @@ func (otu *OverflowTestUtils) removeMarketOption(marketType string) *OverflowTes
 func (otu *OverflowTestUtils) removeTenantRule(optionName, tenantRuleName string) *OverflowTestUtils {
 
 	otu.O.Tx("removeTenantRule",
-		WithSigner("account"),
-		WithArg("optionName", optionName),
-		WithArg("tenantRuleName", tenantRuleName),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) removeLeaseTenantRule(optionName, tenantRuleName string) *OverflowTestUtils {
-
-	otu.O.Tx("removeTenantRule",
-		WithSigner("user4"),
+		WithSigner("find"),
 		WithArg("optionName", optionName),
 		WithArg("tenantRuleName", tenantRuleName),
 	).
@@ -1810,18 +1890,7 @@ func (otu *OverflowTestUtils) removeLeaseTenantRule(optionName, tenantRuleName s
 func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTestUtils {
 
 	otu.O.Tx("setTenantRuleFUSD",
-		WithSigner("account"),
-		WithArg("optionName", optionName),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setLeaseTenantRuleFUSD(optionName string) *OverflowTestUtils {
-
-	otu.O.Tx("setTenantRuleFUSD",
-		WithSigner("user4"),
+		WithSigner("find"),
 		WithArg("optionName", optionName),
 	).
 		AssertSuccess(otu.T)
@@ -1832,10 +1901,10 @@ func (otu *OverflowTestUtils) setLeaseTenantRuleFUSD(optionName string) *Overflo
 func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetFindCut",
-		WithSigner("find"),
-		WithArg("tenant", "account"),
-		WithArg("cut", cut),
+		WithSigner("find-admin"),
 		WithArg("saleItemName", "findRoyalty"),
+		WithArg("tenant", "find"),
+		WithArg("cut", cut),
 	).
 		AssertSuccess(otu.T)
 
@@ -1845,22 +1914,9 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetFindCut",
-		WithSigner("find"),
-		WithArg("tenant", "account"),
-		WithArg("cut", cut),
+		WithSigner("find-admin"),
 		WithArg("saleItemName", "findFutRoyalty"),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setFindLeaseCut(cut float64) *OverflowTestUtils {
-
-	otu.O.Tx("adminSetFindCut",
-		WithSigner("find"),
-		WithArg("tenant", "user4"),
-		WithArg("saleItemName", "findRoyalty"),
+		WithArg("tenant", "find"),
 		WithArg("cut", cut),
 	).
 		AssertSuccess(otu.T)
@@ -1871,8 +1927,8 @@ func (otu *OverflowTestUtils) setFindLeaseCut(cut float64) *OverflowTestUtils {
 func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetFindCut",
-		WithSigner("find"),
-		WithArg("tenant", "user4"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find-lease"),
 		WithArg("saleItemName", "findFutRoyalty"),
 		WithArg("cut", cut),
 	).
@@ -1884,8 +1940,8 @@ func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUt
 func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 
 	otu.O.Tx(script,
-		WithSigner("find"),
-		WithArg("tenant", "account"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1992,7 +2048,7 @@ func (otu *OverflowTestUtils) sendFT(receiver, sender, ft string, amount float64
 func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetProfileBan",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("user", user),
 	).
 		AssertSuccess(otu.T)
@@ -2003,7 +2059,7 @@ func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 func (otu *OverflowTestUtils) leaseProfileBan(user string) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetProfileBan",
-		WithSigner("user4"),
+		WithSigner("find-lease"),
 		WithArg("user", user),
 	).
 		AssertSuccess(otu.T)
@@ -2014,7 +2070,7 @@ func (otu *OverflowTestUtils) leaseProfileBan(user string) *OverflowTestUtils {
 func (otu *OverflowTestUtils) removeProfileBan(user string) *OverflowTestUtils {
 
 	otu.O.Tx("adminRemoveProfileBan",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("user", user),
 	).
 		AssertSuccess(otu.T)
@@ -2025,7 +2081,7 @@ func (otu *OverflowTestUtils) removeProfileBan(user string) *OverflowTestUtils {
 func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUtils {
 
 	otu.O.Tx("adminRemoveProfileBan",
-		WithSigner("user4"),
+		WithSigner("find-lease"),
 		WithArg("user", user),
 	).
 		AssertSuccess(otu.T)
@@ -2109,8 +2165,9 @@ func (otu *OverflowTestUtils) sendSoulBoundNFT(receiver, sender string) *Overflo
 func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 
 	otu.O.Tx("adminSetSellExampleNFTRules",
-		WithSigner("find"),
-		WithArg("tenant", "account"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find"),
+		WithArg("merchAddress", "dapper"),
 	).
 		AssertSuccess(otu.T)
 
@@ -2120,8 +2177,8 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 func (otu *OverflowTestUtils) setDUCLease() *OverflowTestUtils {
 
 	otu.O.Tx("adminSetSellDUCLeaseRules",
-		WithSigner("find"),
-		WithArg("tenant", "user4"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find-lease"),
 	).
 		AssertSuccess(otu.T)
 
@@ -2130,27 +2187,39 @@ func (otu *OverflowTestUtils) setDUCLease() *OverflowTestUtils {
 
 func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price float64) []uint64 {
 
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketSale", "Sale")
+	assert.NoError(otu.T, err)
+
 	res := otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
 		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketSale.Sale", "id")
+		GetIdsFromEvent(eventIden, "id")
 
 	return res
 }
 
 func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, price float64) *OverflowTestUtils {
 
+	ftIden, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("listLeaseForSaleDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2163,8 +2232,8 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, price float64) *OverflowTestUtils {
 
 	result, err := otu.O.Script("getMetadataForSaleItem",
-		WithArg("merchantAddress", "account"),
-		WithArg("marketplace", "account"),
+		WithArg("merchantAddress", "find"),
+		WithArg("marketplace", "find"),
 		WithArg("address", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -2178,16 +2247,19 @@ func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, pric
 }
 func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketSale", "Sale")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("buyNFTForSaleDapper",
 		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("marketplace", "account"),
+		WithPayloadSigner("dapper"),
+		WithArg("marketplace", "find"),
 		WithArg("address", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"amount": price,
 			"id":     id,
 			"seller": otu.O.Address(seller),
@@ -2200,46 +2272,81 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 
 func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
 
+	amount := price * 0.05
+	if amount < 0.65 {
+		amount = 0.65
+
+	}
+	eventIden, err := otu.O.QualifiedIdentifier("FindLeaseMarketSale", "Sale")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("buyLeaseForSaleDapper",
 		WithSigner(buyer),
-		WithPayloadSigner("account"),
+		WithPayloadSigner("dapper"),
 		WithArg("sellerAccount", seller),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindLeaseMarketSale.Sale", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"amount":    price,
 			"leaseName": name,
 			"seller":    otu.O.Address(seller),
 			"buyer":     otu.O.Address(buyer),
 			"status":    "sold",
+		}).
+		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
+			"amount":      amount,
+			"leaseName":   name,
+			"address":     otu.O.Address("dapper"),
+			"royaltyName": "find",
+			"tenant":      "findLease",
 		})
 
 	return otu
 }
 
 func (otu *OverflowTestUtils) registerDUCInRegistry() *OverflowTestUtils {
-	otu.registerFTInFtRegistry("duc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+
+	eventIden, err := otu.O.QualifiedIdentifier("FTRegistry", "FTInfoRegistered")
+	assert.NoError(otu.T, err)
+
+	tokenIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+
+	futTokenIden, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+	assert.NoError(otu.T, err)
+
+	otu.registerFTInFtRegistry("duc", eventIden, map[string]interface{}{
 		"alias":          "DUC",
-		"typeIdentifier": "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
-	}).
-		registerFTInFtRegistry("fut", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "FUT",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FlowUtilityToken.Vault",
-		}).
-		registerExampleNFTInNFTRegistry()
+		"typeIdentifier": tokenIden,
+	})
+
+	otu.registerFTInFtRegistry("fut", eventIden, map[string]interface{}{
+		"alias":          "FUT",
+		"typeIdentifier": futTokenIden,
+	})
+
+	otu.registerExampleNFTInNFTRegistry()
 	return otu
 }
 
 func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, price float64) []uint64 {
+	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
+	assert.NoError(otu.T, err)
 
 	res := otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -2248,7 +2355,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 		WithArg("auctionValidUntil", otu.currentTime()+10.0),
 	).
 		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "id")
+		GetIdsFromEvent(eventIden, "id")
 
 	return res
 
@@ -2256,10 +2363,13 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 
 func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, price float64) *OverflowTestUtils {
 
+	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("listLeaseForAuctionSoftDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -2275,10 +2385,16 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, pric
 
 func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint64, price float64) []uint64 {
 
-	res := otu.O.Tx("listNFTForAuctionSoftDapper",
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
+	assert.NoError(otu.T, err)
+
+	res := otu.O.Tx("listNFTForAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "DUC"),
 		WithArg("price", price),
@@ -2289,7 +2405,7 @@ func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint6
 		WithArg("auctionValidUntil", otu.currentTime()+10.0),
 	).
 		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", "id")
+		GetIdsFromEvent(eventIden, "id")
 
 	return res
 
@@ -2297,15 +2413,18 @@ func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint6
 
 func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"amount": price,
 			"id":     id,
 			"buyer":  otu.O.Address(name),
@@ -2317,13 +2436,16 @@ func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string
 
 func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name string, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindLeaseMarketAuctionSoft", "EnglishAuction")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"amount":    price,
 			"leaseName": name,
 			"buyer":     otu.O.Address(user),
@@ -2335,14 +2457,17 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name str
 
 func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name string, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindLeaseMarketAuctionSoft", "EnglishAuction")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 		WithSigner(user),
-		WithPayloadSigner("account"),
+		WithPayloadSigner("dapper"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"leaseName": name,
 			"buyer":     otu.O.Address(user),
 			"amount":    price,
@@ -2354,15 +2479,18 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name
 
 func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("fulfillMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("marketplace", "account"),
+		WithPayloadSigner("dapper"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"id":     id,
 			"buyer":  otu.O.Address(name),
 			"amount": price,
@@ -2374,13 +2502,19 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64
 
 func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller string, id uint64, price float64) []uint64 {
 
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	DUC, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+
 	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", DUC),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2392,10 +2526,13 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 
 func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name string, price float64) *OverflowTestUtils {
 
+	DUC, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 		WithSigner(buyer),
 		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", DUC),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -2406,31 +2543,40 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name s
 
 func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
 
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketDirectOfferSoft", "DirectOffer")
+	assert.NoError(otu.T, err)
+
 	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "DUC"),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
 		AssertSuccess(otu.T).
-		GetIdsFromEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
+		GetIdsFromEvent(eventIden, "id")
 
 	return res
 }
 
 func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketDirectOfferSoft", "DirectOffer")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"id":     id,
 			"seller": otu.O.Address(name),
 			"buyer":  otu.O.Address(buyer),
@@ -2443,12 +2589,15 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uin
 
 func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller string, name string, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindLeaseMarketDirectOfferSoft", "DirectOffer")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("acceptLeaseDirectOfferSoftDapper",
 		WithSigner(seller),
 		WithArg("leaseName", name),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"leaseName": name,
 			"seller":    otu.O.Address(seller),
 			"buyer":     otu.O.Address(buyer),
@@ -2461,15 +2610,18 @@ func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller 
 
 func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindMarketDirectOfferSoft", "DirectOffer")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithPayloadSigner("account"),
-		WithArg("marketplace", "account"),
+		WithPayloadSigner("dapper"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"id":     id,
 			"buyer":  otu.O.Address(name),
 			"amount": price,
@@ -2481,14 +2633,17 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id ui
 
 func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name string, price float64) *OverflowTestUtils {
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindLeaseMarketDirectOfferSoft", "DirectOffer")
+	assert.NoError(otu.T, err)
+
 	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 		WithSigner(user),
-		WithPayloadSigner("account"),
+		WithPayloadSigner("dapper"),
 		WithArg("leaseName", name),
 		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+		AssertEvent(otu.T, eventIden, map[string]interface{}{
 			"leaseName": name,
 			"buyer":     otu.O.Address(user),
 			"amount":    price,
@@ -2521,9 +2676,13 @@ func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64, ch
 }
 
 func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
+
+	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
 	res := otu.O.Tx("sendNFTs",
-		WithSigner("account"),
-		WithArg("nftIdentifiers", `["A.f8d6e0586b0a20c7.ExampleNFT.NFT"]`),
+		WithSigner("find"),
+		WithArg("nftIdentifiers", []string{nftIden}),
 		WithArg("allReceivers", `["user1"]`),
 		WithArg("ids", []uint64{0}),
 		WithArg("memos", `["Hello!"]`),
@@ -2536,8 +2695,8 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 		AssertEvent(otu.T, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
 			"receiver":     otu.O.Address("user1"),
 			"receiverName": "user1",
-			"sender":       otu.O.Address("account"),
-			"type":         "A.f8d6e0586b0a20c7.ExampleNFT.NFT",
+			"sender":       otu.O.Address("find"),
+			"type":         nftIden,
 			"id":           0,
 			"memo":         "Hello!",
 			"name":         "DUCExampleNFT",
@@ -2571,13 +2730,13 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 		GetIdFromEvent("ExampleNFT.Deposit", "id")
 
 	otu.O.Tx("setupExampleNFTCollection",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 	).
 		AssertSuccess(t)
 
 	otu.O.Tx("sendExampleNFT",
 		WithSigner("user1"),
-		WithArg("user", otu.O.Address("find")),
+		WithArg("user", otu.O.Address("find-admin")),
 		WithArg("id", res),
 	).
 		AssertSuccess(t)
@@ -2592,6 +2751,9 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 	o := otu.O
 	t := otu.T
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
+	assert.NoError(otu.T, err)
+
 	o.Tx("setupFindPackMinterPlatform",
 		WithSigner(user),
 		WithArg("lease", user),
@@ -2599,7 +2761,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 		AssertSuccess(t)
 
 	o.Tx("adminRegisterFindPackMetadata",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("lease", user),
 		WithArg("typeId", packTypeId),
 		WithArg("thumbnailHash", "thumbnailHash"),
@@ -2617,7 +2779,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 		WithArg("storageRequirement", 50000),
 	).
 		AssertSuccess(t).
-		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+		AssertEvent(t, eventIden, map[string]interface{}{
 			"packTypeId": packTypeId,
 		})
 
@@ -2631,26 +2793,29 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 
 	packHash := utils.CreateSha3Hash(input, types, salt)
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "%s")
+	assert.NoError(otu.T, err)
+
 	res, err := o.Tx("adminMintFindPack",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("packTypeName", minter),
 		WithArg("typeId", packTypeId),
 		WithArg("hashes", []string{packHash}),
 	).
 		AssertSuccess(t).
-		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Minted", map[string]interface{}{
+		AssertEvent(t, fmt.Sprintf(eventIden, "Minted"), map[string]interface{}{
 			"typeId": packTypeId,
 		}).
-		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
+		GetIdFromEvent(fmt.Sprintf(eventIden, "Deposit"), "id")
 
 	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
 
 	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("collectionIdentifier", minter+" season#"+fmt.Sprint(packTypeId)),
-		WithArg("contractName", "A.f8d6e0586b0a20c7.FindPack.NFT"),
-		WithArg("contractAddress", "account"),
-		WithArg("addressWithNFT", "account"),
+		WithArg("contractName", fmt.Sprintf(eventIden, "NFT")),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "find"),
 		WithArg("nftID", res),
 		WithArg("publicPathIdentifier", publicPathIdentifier),
 	).
@@ -2667,21 +2832,24 @@ func (otu *OverflowTestUtils) mintPackWithSignature(minter string, packTypeId ui
 
 	packHash := utils.CreateSha3Hash(input, types, salt)
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "%s")
+	assert.NoError(otu.T, err)
+
 	res, err := o.Tx("adminMintFindPack",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("packTypeName", minter),
 		WithArg("typeId", packTypeId),
 		WithArg("hashes", []string{packHash}),
 	).
 		AssertSuccess(t).
-		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Minted", map[string]interface{}{
+		AssertEvent(t, fmt.Sprintf(eventIden, "Minted"), map[string]interface{}{
 			"typeId": packTypeId,
 		}).
-		GetIdFromEvent("A.f8d6e0586b0a20c7.FindPack.Deposit", "id")
+		GetIdFromEvent(fmt.Sprintf(eventIden, "Deposit"), "id")
 
 	assert.NoError(t, err)
 
-	signature, err := o.SignUserMessage("account", packHash)
+	signature, err := o.SignUserMessage("find", packHash)
 	assert.NoError(otu.T, err)
 
 	return res, signature
@@ -2692,6 +2860,9 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 	o := otu.O
 	t := otu.T
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "Purchased")
+	assert.NoError(otu.T, err)
+
 	o.Tx("buyFindPack",
 		WithSigner(user),
 		WithArg("packTypeName", packTypeName),
@@ -2700,7 +2871,7 @@ func (otu *OverflowTestUtils) buyPack(user, packTypeName string, packTypeId uint
 		WithArg("totalAmount", amount),
 	).
 		AssertSuccess(t).
-		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
+		AssertEvent(t, eventIden, map[string]interface{}{
 			"amount":  amount,
 			"address": otu.O.Address(user),
 			"packFields": map[string]interface{}{
@@ -2716,12 +2887,15 @@ func (otu *OverflowTestUtils) openPack(user string, packId uint64) *OverflowTest
 	o := otu.O
 	t := otu.T
 
+	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "Opened")
+	assert.NoError(otu.T, err)
+
 	o.Tx("openFindPack",
 		WithSigner(user),
 		WithArg("packId", packId),
 	).
 		AssertSuccess(t).
-		AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Opened", map[string]interface{}{
+		AssertEvent(t, eventIden, map[string]interface{}{
 			"packId":  packId,
 			"address": otu.O.Address(user),
 			"packFields": map[string]interface{}{
@@ -2738,9 +2912,9 @@ func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt stri
 	t := otu.T
 
 	o.Tx("adminFulfillFindPack",
-		WithSigner("find"),
+		WithSigner("find-admin"),
 		WithArg("packId", packId),
-		WithArg("typeIdentifiers", []string{exampleNFTType}),
+		WithArg("typeIdentifiers", []string{exampleNFTType(otu)}),
 		WithArg("rewardIds", ids),
 		WithArg("salt", salt),
 	).
@@ -2755,6 +2929,9 @@ func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt stri
 func (otu *OverflowTestUtils) createFloatEvent(minter string) uint64 {
 	o := otu.O
 	t := otu.T
+
+	eventIden, err := otu.O.QualifiedIdentifier("FLOAT", "FLOATEventCreated")
+	assert.NoError(otu.T, err)
 
 	floatId, err := o.Tx("devfloatCreateEvent",
 		WithSigner(minter),
@@ -2777,7 +2954,7 @@ func (otu *OverflowTestUtils) createFloatEvent(minter string) uint64 {
 		WithArg("flowTokenCost", 0.0),
 	).
 		AssertSuccess(t).
-		GetIdFromEvent("A.f8d6e0586b0a20c7.FLOAT.FLOATEventCreated", "eventId")
+		GetIdFromEvent(eventIden, "eventId")
 
 	assert.NoError(t, err)
 	return floatId
@@ -2911,6 +3088,12 @@ func (otu *OverflowTestUtils) createOptional(value any) (cadence.Value, error) {
 	}
 	opt := cadence.NewOptional(val)
 	return opt, nil
+}
+
+func (otu *OverflowTestUtils) identifier(contract, structName string) string {
+	s, err := otu.O.QualifiedIdentifier(contract, structName)
+	assert.NoError(otu.T, err)
+	return s
 }
 
 type SaleItem struct {
