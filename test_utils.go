@@ -785,27 +785,6 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 }
 
-func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price float64) *OverflowTestUtils {
-
-	otu.O.Tx("listLeaseForSale",
-		WithSigner(user),
-		WithArg("leaseName", name),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("directSellPrice", price),
-		WithArg("validUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindLeaseMarketSale.Sale", map[string]interface{}{
-			"status":    "active_listed",
-			"amount":    price,
-			"leaseName": name,
-			"seller":    otu.O.Address(user),
-		})
-
-	return otu
-
-}
-
 func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, price float64) []uint64 {
 
 	typ, err := otu.O.QualifiedIdentifier("FindMarketSale", "Sale")
@@ -1906,33 +1885,10 @@ func (otu *OverflowTestUtils) removeTenantRule(optionName, tenantRuleName string
 	return otu
 }
 
-func (otu *OverflowTestUtils) removeLeaseTenantRule(optionName, tenantRuleName string) *OverflowTestUtils {
-
-	otu.O.Tx("removeTenantRule",
-		WithSigner("find-lease"),
-		WithArg("optionName", optionName),
-		WithArg("tenantRuleName", tenantRuleName),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTestUtils {
 
 	otu.O.Tx("setTenantRuleFUSD",
 		WithSigner("find"),
-		WithArg("optionName", optionName),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setLeaseTenantRuleFUSD(optionName string) *OverflowTestUtils {
-
-	otu.O.Tx("setTenantRuleFUSD",
-		WithSigner("find-lease"),
 		WithArg("optionName", optionName),
 	).
 		AssertSuccess(otu.T)
@@ -1959,19 +1915,6 @@ func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
 		WithSigner("find-admin"),
 		WithArg("saleItemName", "findFutRoyalty"),
 		WithArg("tenant", "find"),
-		WithArg("cut", cut),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setFindLeaseCut(cut float64) *OverflowTestUtils {
-
-	otu.O.Tx("adminSetFindCut",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find-lease"),
-		WithArg("saleItemName", "findRoyalty"),
 		WithArg("cut", cut),
 	).
 		AssertSuccess(otu.T)
