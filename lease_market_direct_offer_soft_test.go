@@ -379,17 +379,10 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
-				"amount":      0.25,
+				"address":     otu.O.Address("dapper"),
+				"amount":      0.65,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
-			}).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
-				"amount":      0.5,
-				"leaseName":   "name1",
-				"royaltyName": "network",
 				"tenant":      "findLease",
 			})
 
@@ -404,7 +397,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
-			setFindLeaseCutDapper(0.035)
+			setFindLeaseCutDapper(0.1)
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -414,17 +407,9 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
-				"amount":      0.35,
+				"amount":      1.0,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
-			}).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
-				"amount":      0.5,
-				"leaseName":   "name1",
-				"royaltyName": "network",
 				"tenant":      "findLease",
 			})
 

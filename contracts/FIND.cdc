@@ -1906,7 +1906,7 @@ pub contract FIND {
 
 		if FIND.account.address == 0x097bafa4e0b48eef {
 		// This is for mainnet
-			if merchAccount != 0x097bafa4e0b48eef {
+			if merchAccount != 0x55459409d30274ee {
 				panic("Merch Account address does not match with expected")
 			}
 		} else if FIND.account.address == 0x35717efbbce11c74 {
@@ -1915,9 +1915,9 @@ pub contract FIND {
 				panic("Merch Account address does not match with expected")
 			}
 		} else {
-		// otherwise falls into emulator
-			if merchAccount != self.account.address {
-				panic("Merch Account address does not match with expected")
+		// otherwise falls into emulator and user dapper
+			if merchAccount != 0x01cf0e2f2f715450{
+				panic("Merch Account address does not match with expected ".concat(merchAccount.toString()))
 			}
 		}
 	}
