@@ -71,14 +71,14 @@ pub contract MetadataViews {
     ///
     pub struct Display {
 
-        /// The name of the object. 
+        /// The name of the object.
         ///
         /// This field will be displayed in lists and therefore should
         /// be short an concise.
         ///
         pub let name: String
 
-        /// A written description of the object. 
+        /// A written description of the object.
         ///
         /// This field will be displayed in a detailed view of the object,
         /// so can be more verbose (e.g. a paragraph instead of a single line).
@@ -121,7 +121,7 @@ pub contract MetadataViews {
         pub fun uri(): String
     }
 
-    /// HTTPFile is a file that is accessible at an HTTP (or HTTPS) URL. 
+    /// HTTPFile is a file that is accessible at an HTTP (or HTTPS) URL.
     ///
     pub struct HTTPFile: File {
         pub let url: String
@@ -177,12 +177,12 @@ pub contract MetadataViews {
     }
 
     /// Editions is an optional view for collections that issues multiple objects
-    /// with the same or similar metadata, for example an X of 100 set. This information is 
+    /// with the same or similar metadata, for example an X of 100 set. This information is
     /// useful for wallets and marketplaes.
     ///
     /// An NFT might be part of multiple editions, which is why the edition information
     /// is returned as an arbitrary sized array
-    /// 
+    ///
     pub struct Editions {
 
         /// An arbitrary-sized list for any number of editions
@@ -214,16 +214,16 @@ pub contract MetadataViews {
 
         /// The edition number of the object.
         ///
-        /// For an "24 of 100 (#24/100)" item, the number is 24. 
+        /// For an "24 of 100 (#24/100)" item, the number is 24.
         ///
         pub let number: UInt64
 
         /// The max edition number of this type of objects.
-        /// 
+        ///
         /// This field should only be provided for limited-editioned objects.
         /// For an "24 of 100 (#24/100)" item, max is 100.
         /// For an item with unlimited edition, max should be set to nil.
-        /// 
+        ///
         pub let max: UInt64?
 
         init(name: String?, number: UInt64, max: UInt64?) {
@@ -265,7 +265,7 @@ pub contract MetadataViews {
     *  Defines the composable royalty standard that gives marketplaces a unified interface
     *  to support NFT royalties.
     *
-    *  Marketplaces can query this `Royalties` struct from NFTs 
+    *  Marketplaces can query this `Royalties` struct from NFTs
     *  and are expected to pay royalties based on these specifications.
     *
     */
@@ -312,7 +312,7 @@ pub contract MetadataViews {
         pub let receiver: Capability<&AnyResource{FungibleToken.Receiver}>
 
         /// Multiplier used to calculate the amount of sale value transferred to royalty receiver.
-        /// Note - It should be between 0.0 and 1.0 
+        /// Note - It should be between 0.0 and 1.0
         /// Ex - If the sale value is x and multiplier is 0.56 then the royalty value would be 0.56 * x.
         ///
         /// Generally percentage get represented in terms of basis points
@@ -381,7 +381,7 @@ pub contract MetadataViews {
 
     /// A license according to https://spdx.org/licenses/
     ///
-    /// This view can be used if the content of an NFT is licensed. 
+    /// This view can be used if the content of an NFT is licensed.
     pub struct License {
         pub let spdxIdentifier: String
 
@@ -666,4 +666,3 @@ pub contract MetadataViews {
     }
 
 }
- 

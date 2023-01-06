@@ -3279,3 +3279,4 @@ func OptionalString(input string) cadence.Optional {
 	}
 	return cadence.NewOptional(s)
 }
+ 
