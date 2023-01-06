@@ -156,8 +156,12 @@ func TestNFTDetailScript(t *testing.T) {
 						"date.Birthday":      1.660145023e+09,
 						"edition_set_max":    3,
 						"edition_set_number": 2,
+						"uuid":               503,
 					},
-					"tags":           map[string]interface{}{"NeoMotorCycleTag": "Tag1"},
+					"tags": map[string]interface{}{
+						"NeoMotorCycleTag": "Tag1",
+						"external_url":     "https://find.xyz/collection/user1/dandy/503",
+					},
 					"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"totalInEdition": 3,
 					"type":           "A.f8d6e0586b0a20c7.Dandy.NFT",
