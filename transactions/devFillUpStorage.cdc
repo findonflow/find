@@ -10,7 +10,7 @@ transaction() {
 
         let storageUsed = acct.storageUsed 
         let storageCapacity = acct.storageCapacity 
-        let extraFlowBalance = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(storageCapacity - storageUsed) - 0.1) // 0.1 Mb extra here for fillup
+        let extraFlowBalance = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(storageCapacity - storageUsed) - 0.2) // 0.1 Mb extra here for fillup
 
         let vault <- sender.withdraw(amount: extraFlowBalance)
 

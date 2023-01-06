@@ -1,8 +1,8 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import NonFungibleToken from "./standard/NonFungibleToken.cdc"
+import FungibleToken from "./standard/FungibleToken.cdc"
+import MetadataViews from "./standard/MetadataViews.cdc"
+import FindViews from "./FindViews.cdc"
+import FindForge from "./FindForge.cdc"
 
 pub contract Dandy: NonFungibleToken {
 
@@ -171,16 +171,6 @@ pub contract Dandy: NonFungibleToken {
 				return MetadataViews.NFTCollectionDisplay(name: minterPlatform.name, description: minterPlatform.description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socialMap)
 			}
 
-			if type == Type<MetadataViews.NFTCollectionData>() {
-				return MetadataViews.NFTCollectionData(storagePath: Dandy.CollectionStoragePath,
-				publicPath: Dandy.CollectionPublicPath,
-				providerPath: Dandy.CollectionPrivatePath,
-				publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-				publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-				providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()}
-				)
-			}
 
 			if type == Type<FindViews.Nounce>() {
 				return FindViews.Nounce(self.nounce)
@@ -198,6 +188,17 @@ pub contract Dandy: NonFungibleToken {
 				return self.schemas[type.identifier]!.result
 			}
 
+			if type == Type<MetadataViews.NFTCollectionData>() {
+				return MetadataViews.NFTCollectionData(
+					storagePath: Dandy.CollectionStoragePath,
+					publicPath: Dandy.CollectionPublicPath,
+					providerPath: Dandy.CollectionPrivatePath,
+					publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+					publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+					providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+					createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()}
+				)
+			}
 			//Viewconverter: This is an example on how you as the last step in resolveView can check if there are converters for your type and run them
 			// for converterValue in Dandy.viewConverters.keys {
 			// 	for converter in Dandy.viewConverters[converterValue]! {

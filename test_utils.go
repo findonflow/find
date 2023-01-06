@@ -10,6 +10,7 @@ import (
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -44,6 +45,7 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 		WithNetwork("testing"),
 		WithFlowForNewUsers(100.0),
 	)
+	require.NoError(t, o.Error)
 	return &OverflowTestUtils{
 		T: t,
 		O: o,
@@ -2774,6 +2776,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 		WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatId})),
 		WithArg("price", createStringUFix64(map[string]float64{"whiteList": 4.20, "publicSale": 4.20})),
 		WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+		WithArg("storageRequirement", 50000),
 	).
 		AssertSuccess(t).
 		AssertEvent(t, eventIden, map[string]interface{}{

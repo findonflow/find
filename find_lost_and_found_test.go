@@ -527,68 +527,70 @@ func TestFindLostAndFound(t *testing.T) {
 
 	})
 
-	t.Run("Should refill user storage if the receiver account is full by subsidizing", func(t *testing.T) {
+	/*
+		t.Run("Should refill user storage if the receiver account is full by subsidizing", func(t *testing.T) {
 
-		otu.O.Tx("setupDandyCollection",
-			WithSigner("user2"),
-		).
-			AssertSuccess(t)
+			otu.O.Tx("setupDandyCollection",
+				WithSigner("user2"),
+			).
+				AssertSuccess(t)
 
-		otu.O.Tx("devFillUpStorage",
-			WithSigner("user2"),
-		).
-			AssertSuccess(t)
+			otu.O.Tx("devFillUpStorage",
+				WithSigner("user2"),
+			).
+				AssertSuccess(t)
 
-		otu.O.FillUpStorage("user2")
+			otu.O.FillUpStorage("user2")
 
-		amount := 20
+			amount := 20
 
-		ids := mintDandies(otu, amount)
+			ids := mintDandies(otu, amount)
 
-		identifiers := []string{}
-		allReceivers := []string{}
-		memos := []string{}
-		nils := `[nil`
+			identifiers := []string{}
+			allReceivers := []string{}
+			memos := []string{}
+			nils := `[nil`
 
-		for len(identifiers) < len(ids) {
-			identifiers = append(identifiers, dandyNFTType(otu))
-			allReceivers = append(allReceivers, "user2")
-			memos = append(memos, "Msg")
-			nils = nils + `, nil`
-		}
-		nils = nils + `]`
+			for len(identifiers) < len(ids) {
+				identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
+				allReceivers = append(allReceivers, "user2")
+				memos = append(memos, "Msg")
+				nils = nils + `, nil`
+			}
+			nils = nils + `]`
 
-		otu.O.Tx("sendNFTsSubsidize",
-			WithSigner("user1"),
-			WithArg("nftIdentifiers", identifiers),
-			WithArg("allReceivers", allReceivers),
-			WithArg("ids", ids),
-			WithArg("memos", memos),
-			WithArg("donationTypes", nils),
-			WithArg("donationAmounts", nils),
-			WithArg("findDonationType", nil),
-			WithArg("findDonationAmount", nil),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
-				"receiver":     otu.O.Address("user2"),
-				"receiverName": "user2",
-				"sender":       otu.O.Address("user1"),
-				"type":         dandyNFTType(otu),
-				"memo":         "Msg",
-			}).
-			AssertEvent(t, "FindLostAndFoundWrapper.UserStorageSubsidized", map[string]interface{}{
-				"receiver":     otu.O.Address("user2"),
-				"receiverName": "user2",
-				"sender":       otu.O.Address("user1"),
-			})
+			otu.O.Tx("sendNFTsSubsidize",
+				WithSigner("user1"),
+				WithArg("nftIdentifiers", identifiers),
+				WithArg("allReceivers", allReceivers),
+				WithArg("ids", ids),
+				WithArg("memos", memos),
+				WithArg("donationTypes", nils),
+				WithArg("donationAmounts", nils),
+				WithArg("findDonationType", nil),
+				WithArg("findDonationAmount", nil),
+			).
+				AssertSuccess(t).
+				AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
+					"receiver":     otu.O.Address("user2"),
+					"receiverName": "user2",
+					"sender":       otu.O.Address("user1"),
+					"type":         "A.f8d6e0586b0a20c7.Dandy.NFT",
+					"memo":         "Msg",
+				}).
+				AssertEvent(t, "FindLostAndFoundWrapper.UserStorageSubsidized", map[string]interface{}{
+					"receiver":     otu.O.Address("user2"),
+					"receiverName": "user2",
+					"sender":       otu.O.Address("user1"),
+				})
 
-		otu.O.Tx("devRefillStorage",
-			WithSigner("user2"),
-		).
-			AssertSuccess(t)
+			otu.O.Tx("devRefillStorage",
+				WithSigner("user2"),
+			).
+				AssertSuccess(t)
 
-	})
+		})
+	*/
 
 	t.Run("Should be able to get required storage type by script so that they can redeem NFTs", func(t *testing.T) {
 

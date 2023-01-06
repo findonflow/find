@@ -2,23 +2,11 @@ package main
 
 import (
 	"github.com/bjartek/overflow"
-	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
 
-	o := overflow.NewOverflowMainnet().Start()
-
-	funds := []string{
-		"0x8630fa754bf11151",
-		"0x3fd034c13156a6ce",
-		"0x368b4f175831543a",
-		"0x196c1869b10635b1",
-		"0x081f897e8b5dc9f9",
-		"0x5a16175a09403578",
-		"0x9627d55ad751fdf3",
-		"0xe24b9226f4fc1ffa",
-	}
+	o := overflow.Overflow(overflow.WithNetwork("mainnet"))
 
 	addresses := map[string]string{
 
@@ -37,12 +25,11 @@ func main() {
 		"0x5159075e4cd4324c": "arceus",
 	}
 
-	spew.Dump(funds)
 	for account, name := range addresses {
-		o.TransactionFromFile("registerAdmin").
-			SignProposeAndPayAs("find-admin").
-			Args(o.Arguments().StringArray(name).RawAccount(account)).
-			RunPrintEventsFull()
-
+		o.Tx("adminRegisterName",
+			overflow.WithSigner("find-admin"),
+			overflow.WithArg("names", []string{name}),
+			overflow.WithArg("user", account),
+		).Print()
 	}
 }
