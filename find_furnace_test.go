@@ -13,7 +13,7 @@ func TestFindFurnace(t *testing.T) {
 		setupFIND().
 		setupDandy("user1")
 
-	dandyType := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "Dandy", "NFT")
+	dandyType := otu.identifier("Dandy", "NFT")
 	otu.mintThreeExampleDandies()
 	otu.registerDandyInNFTRegistry()
 
