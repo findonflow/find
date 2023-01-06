@@ -21,17 +21,8 @@ func TestFIND(t *testing.T) {
 	t.Run("Should be able to register a name", func(t *testing.T) {
 
 		// Can fix this with pointerWant
-		otu.O.Script("getLeases").AssertWant(t,
-			autogold.Want("allLeases", `[]interface {}{
-  map[string]interface {}{
-    "address": "0x179b6b1cb6755e31",
-    "lockedUntil": 39312001.0,
-    "name": "user1",
-    "profile": "Capability<&AnyResource{A.f8d6e0586b0a20c7.Profile.Public}>(address: 0x179b6b1cb6755e31, path: /public/findProfile)",
-    "registeredTime": 1.0,
-    "validUntil": 31536001.0,
-  },
-}`),
+		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
+			autogold.Want("allLeases", "user1"),
 		)
 	})
 
@@ -93,7 +84,7 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Should be able to lookup address", func(t *testing.T) {
 
-		otu.assertLookupAddress("user1", "0x179b6b1cb6755e31")
+		otu.assertLookupAddress("user1", otu.O.Address("user1"))
 	})
 
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
@@ -110,15 +101,13 @@ func TestFIND(t *testing.T) {
 
 	t.Run("Admin should be able to register without paying FUSD", func(t *testing.T) {
 
-		otu.createUser(10.0, "find")
-
 		otu.O.Tx("adminRegisterName",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("names", `["find-admin"]`),
 			WithArg("user", "find"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FIND", "Register"), map[string]interface{}{
 				"name": "find-admin",
 			})
 
@@ -136,7 +125,7 @@ func TestFIND(t *testing.T) {
 			WithArg("receiver", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FIND", "Moved"), map[string]interface{}{
 				"name": "user1",
 			})
 
@@ -177,7 +166,7 @@ func TestFIND(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindRelatedAccounts", "RelatedAccount"), map[string]interface{}{
 				"walletName": "dapper",
 				"user":       otu.O.Address("user1"),
 				"address":    otu.O.Address("user2"),
@@ -197,7 +186,7 @@ func TestFIND(t *testing.T) {
 			WithArg("address", otu.O.Address("user2")),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindRelatedAccounts", "RelatedAccount"), map[string]interface{}{
 				"walletName": "dapper",
 				"user":       otu.O.Address("user1"),
 				"address":    otu.O.Address("user2"),
@@ -332,7 +321,7 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("buyAddon",
 			WithSigner(user),
 			WithArg("name", user),
-			WithArg("addon", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("addon", dandyNFTType(otu)),
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "This addon is not available.")
@@ -453,7 +442,7 @@ func TestFIND(t *testing.T) {
 			WithArg("user", "lease"),
 		).
 			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, TAKEN", map[string]interface{}{
-				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x179b6b1cb6755e31",
+				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x120e725050340cab",
 				"registeredTime": 9.4608005e+07,
 				"status":         "TAKEN",
 				"validUntil":     1.26144005e+08,
@@ -468,7 +457,7 @@ func TestFIND(t *testing.T) {
 		).
 			Print().
 			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, LOCKED", map[string]interface{}{
-				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x179b6b1cb6755e31",
+				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x120e725050340cab",
 				"registeredTime": 9.4608005e+07,
 				"status":         "LOCKED",
 				"validUntil":     1.26144005e+08,
@@ -477,4 +466,3 @@ func TestFIND(t *testing.T) {
 	})
 
 }
- 

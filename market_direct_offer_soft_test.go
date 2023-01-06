@@ -16,18 +16,22 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		setFlowDandyMarketOption("DirectOfferSoft").
 		setProfile("user1").
 		setProfile("user2").
-		createDapperUser("find")
+		createDapperUser("find").
+		createDapperUser("find-admin")
 
 	price := 10.0
 
-	otu.setUUID(400)
+	otu.setUUID(600)
+
+	eventIdentifier := otu.identifier("FindMarketDirectOfferSoft", "DirectOffer")
+	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 
 	bidTx := otu.O.TxFN(
 		WithSigner("user2"),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", "user1"),
 		WithArg("nftAliasOrIdentifier", "Dandy"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "FUT"),
 		WithArg("amount", 0.0),
@@ -82,11 +86,11 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			sendDandy("user2", "user1", id)
 
-		otu.setUUID(600)
+		otu.setUUID(1000)
 
 		otu.O.Tx("cancelMarketDirectOfferSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
@@ -100,11 +104,11 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			sendDandy("user2", "user1", id)
 
-		otu.setUUID(900)
+		otu.setUUID(1400)
 
 		otu.O.Tx("retractOfferMarketDirectOfferSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
@@ -153,7 +157,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("acceptDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertFailure(t, "This direct offer is already expired")
@@ -164,7 +168,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferSoft", "deprecate")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "deprecate")
 
 		bidTx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -172,18 +176,18 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOption("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
 	})
 
 	t.Run("Should not be able to increase bid but able to fulfill offer when deprecated", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferSoft", "deprecate")
+			alterMarketOptionDapper("DirectOfferSoft", "deprecate")
 
 		otu.O.Tx("increaseBidMarketDirectOfferSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
@@ -193,7 +197,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoft("user2", id, price)
 
-		otu.alterMarketOption("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
 			sendDandy("user1", "user2", id)
 
 	})
@@ -202,21 +206,21 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferSoft", "deprecate").
+			alterMarketOptionDapper("DirectOfferSoft", "deprecate").
 			rejectDirectOfferSoft("user1", id, 10.0)
 
-		otu.alterMarketOption("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
 	})
 
 	t.Run("Should not be able to add direct offer after stopped", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferSoft", "stop")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "stop")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price),
@@ -224,18 +228,18 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
 	})
 
 	t.Run("Should not be able to increase bid nor accept offer after stopped", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferSoft", "stop")
+			alterMarketOptionDapper("DirectOfferSoft", "stop")
 
 		otu.O.Tx("increaseBidMarketDirectOfferSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
@@ -243,12 +247,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("acceptDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 
@@ -258,23 +262,23 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
 			saleItemListed("user1", "active_finished", price).
-			alterMarketOption("DirectOfferSoft", "stop")
+			alterMarketOptionDapper("DirectOfferSoft", "stop")
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
 			/* Reset */
-		otu.alterMarketOption("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
@@ -285,8 +289,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferSoft", "stop").
-			alterMarketOption("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "stop").
+			alterMarketOptionDapper("DirectOfferSoft", "enable").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
@@ -298,8 +302,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to reject offer after enabled", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferSoft", "stop").
-			alterMarketOption("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "stop").
+			alterMarketOptionDapper("DirectOfferSoft", "enable").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferSoft("user1", id, 10.0)
@@ -309,13 +313,13 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferSoft", "deprecate")
+			alterMarketOptionDapper("DirectOfferSoft", "deprecate")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price+10.0),
@@ -323,13 +327,13 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOption("DirectOfferSoft", "stop")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "stop")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price+10.0),
@@ -337,7 +341,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 
@@ -346,12 +350,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
 
-		otu.alterMarketOption("DirectOfferSoft", "stop")
+		otu.alterMarketOptionDapper("DirectOfferSoft", "stop")
 
-		otu.alterMarketOption("DirectOfferSoft", "deprecate").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "deprecate").
 			retractOfferDirectOfferSoft("user2", "user1", id)
 
-		otu.alterMarketOption("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 
@@ -371,33 +375,33 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
-				"tenant":      "find",
+				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
-				"amount":      0.5,
+				"amount":      0.65,
 				"findName":    "user1",
 				"id":          id,
 				"royaltyName": "creator",
-				"tenant":      "find",
+				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
-				"amount":      0.25,
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
+				"amount":      0.65,
 				"id":          id,
 				"royaltyName": "find forge",
-				"tenant":      "find",
+				"tenant":      "onefootball",
 			})
 
 		otu.sendDandy("user1", "user2", id)
@@ -415,33 +419,33 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.35,
 				"id":          id,
 				"royaltyName": "find",
-				"tenant":      "find",
+				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
-				"amount":      0.5,
+				"amount":      0.65,
 				"findName":    "user1",
 				"id":          id,
 				"royaltyName": "creator",
-				"tenant":      "find",
+				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
-				"amount":      0.25,
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
+				"amount":      0.65,
 				"id":          id,
 				"royaltyName": "find forge",
-				"tenant":      "find",
+				"tenant":      "onefootball",
 			})
 
 		otu.sendDandy("user1", "user2", id)
@@ -459,9 +463,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", ids[2]),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price),
@@ -472,7 +476,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			// Should not be able to accept offer
 		otu.O.Tx("acceptDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", ids[1]),
 		).
 			AssertFailure(t, "Seller banned by Tenant")
@@ -480,8 +484,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			// Should not be able to fulfill offer
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
 		).
@@ -490,7 +494,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		//Should be able to cancel(reject) offer
 		otu.O.Tx("cancelMarketDirectOfferSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids[1:2]),
 		).
 			AssertSuccess(t)
@@ -511,9 +515,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", ids[2]),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price),
@@ -524,7 +528,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			// Should not be able to accept offer
 		otu.O.Tx("acceptDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("id", ids[1]),
 		).
 			AssertFailure(t, "Buyer banned by Tenant")
@@ -532,8 +536,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			// Should not be able to fulfill offer
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
 		).
@@ -556,16 +560,16 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		newPrice := 11.0
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", newPrice),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount":        newPrice,
 				"id":            id,
 				"buyer":         otu.O.Address("user3"),
@@ -579,7 +583,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 
 		otu.setDUCExampleNFT().
-			sendExampleNFT("user1", "account")
+			sendExampleNFT("user1", "find")
 
 		saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)
 
@@ -609,26 +613,26 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("bidMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("users", []string{"user1", "user1", "user1"}),
-			WithArg("nftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT", "A.f8d6e0586b0a20c7.Dandy.NFT"}),
+			WithArg("nftAliasOrIdentifiers", []string{dandyNFTType(otu), dandyNFTType(otu), dandyNFTType(otu)}),
 			WithArg("ids", ids),
 			WithArg("ftAliasOrIdentifiers", []string{"FUT", "FUT", "FUT"}),
 			WithArg("amounts", []float64{price, price, price}),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount": price,
 				"id":     ids[0],
 				"buyer":  otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount": price,
 				"id":     ids[1],
 				"buyer":  otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount": price,
 				"id":     ids[2],
 				"buyer":  otu.O.Address("user2"),
@@ -636,25 +640,25 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("acceptMultipleDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     ids[0],
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     ids[1],
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "active_accepted",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     ids[2],
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
@@ -664,25 +668,25 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 			WithArg("amounts", []float64{price, price, price}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     ids[0],
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     ids[1],
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"id":     ids[2],
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
@@ -691,6 +695,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	})
 
+	ftIden, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+	assert.NoError(t, err)
 	t.Run("Should be able to multiple offer to 10 items in one go", func(t *testing.T) {
 
 		number := 10
@@ -700,8 +706,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		seller := "user1"
 
 		sellers := []string{seller}
-		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
-		flow := []string{"FUT"}
+		dandy := []string{dandyNFTType(otu)}
+		duc := []string{ftIden}
 		prices := []float64{price}
 
 		for len(ids) < number {
@@ -714,17 +720,17 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		for len(sellers) < len(ids) {
 			sellers = append(sellers, sellers[0])
 			dandy = append(dandy, dandy[0])
-			flow = append(flow, flow[0])
+			duc = append(duc, duc[0])
 			prices = append(prices, prices[0])
 		}
 
 		otu.O.Tx("bidMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("users", sellers),
 			WithArg("nftAliasOrIdentifiers", dandy),
 			WithArg("ids", ids),
-			WithArg("ftAliasOrIdentifiers", flow),
+			WithArg("ftAliasOrIdentifiers", duc),
 			WithArg("amounts", prices),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -740,8 +746,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		seller := "user1"
 
 		sellers := []string{seller}
-		dandy := []string{"A.f8d6e0586b0a20c7.Dandy.NFT"}
-		flow := []string{"FUT"}
+		dandy := []string{dandyNFTType(otu)}
+		duc := []string{ftIden}
 		prices := []float64{price}
 
 		for len(ids) < number {
@@ -754,17 +760,17 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		for len(sellers) < len(ids) {
 			sellers = append(sellers, sellers[0])
 			dandy = append(dandy, dandy[0])
-			flow = append(flow, flow[0])
+			duc = append(duc, duc[0])
 			prices = append(prices, prices[0])
 		}
 
 		otu.O.Tx("bidMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("users", sellers),
 			WithArg("nftAliasOrIdentifiers", dandy),
 			WithArg("ids", ids),
-			WithArg("ftAliasOrIdentifiers", flow),
+			WithArg("ftAliasOrIdentifiers", duc),
 			WithArg("amounts", prices),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -772,15 +778,15 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("acceptMultipleDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)
 
 		otu.O.Tx("fulfillMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 			WithArg("amounts", prices),
 		).
@@ -790,29 +796,30 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to list an NFT for sale and buy it with DUC with multiple direct offer transaction", func(t *testing.T) {
 
-		saleItemID, err := otu.O.Tx("bidMultipleMarketDirectOfferSoftDapper",
+		ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+		assert.NoError(t, err)
+
+		saleItemID := otu.O.Tx("bidMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("users", []string{"user1"}),
-			WithArg("nftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"}),
+			WithArg("nftAliasOrIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("ids", []uint64{0}),
-			WithArg("ftAliasOrIdentifiers", []string{"A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"}),
+			WithArg("ftAliasOrIdentifiers", []string{ftIden}),
 			WithArg("amounts", `[10.0]`),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertSuccess(t).
-			GetIdFromEvent("A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", "id")
-
-		assert.NoError(t, err)
+			GetIdsFromEvent(eventIdentifier, "id")
 
 		otu.O.Tx("acceptMultipleDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
-			WithArg("ids", []uint64{saleItemID}),
+			WithArg("marketplace", "find"),
+			WithArg("ids", saleItemID),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     saleItemID,
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
+				"id":     saleItemID[0],
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
@@ -821,14 +828,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillMultipleMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
-			WithArg("amounts", `[10.0]`),
-			WithArg("ids", []uint64{saleItemID}),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("ids", saleItemID[:1]),
+			WithArg("amounts", []float64{price}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-				"id":     saleItemID,
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
+				"id":     saleItemID[0],
 				"buyer":  otu.O.Address("user2"),
 				"amount": price,
 				"status": "sold",
@@ -837,18 +844,18 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to make offer on soul bound items", func(t *testing.T) {
-		otu.sendSoulBoundNFT("user1", "account")
+		otu.sendSoulBoundNFT("user1", "find")
 		// set market rules
 		otu.O.Tx("adminSetSellExampleNFTForFUT",
 			WithSigner("find"),
-			WithArg("tenant", "account"),
+			WithArg("tenant", "find"),
 		)
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.ExampleNFT.NFT"),
+			WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
 			WithArg("id", 1),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price),
@@ -867,8 +874,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", saleItemID[0]),
 			WithArg("amount", price),
 		).
@@ -876,11 +883,11 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketDirectOfferSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", saleItemID[0:1]),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"status": "cancel_rejected",
 			})
 
@@ -895,7 +902,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -906,7 +913,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)

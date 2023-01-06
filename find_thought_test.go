@@ -1,7 +1,6 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/bjartek/overflow"
@@ -260,7 +259,7 @@ func TestFindThought(t *testing.T) {
 	t.Run("Should be able to post a thought with NFT", func(t *testing.T) {
 
 		id := otu.mintThreeExampleDandies()[0]
-		identifier := fmt.Sprintf("A.%s.%s.%s", otu.O.Account("account").Address().String(), "Dandy", "NFT")
+		identifier := dandyNFTType(otu)
 		owner := otu.O.Account("user1").Address().Bytes()
 
 		otu.registerDandyInNFTRegistry()

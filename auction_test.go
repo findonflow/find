@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -16,7 +17,19 @@ func TestAuction(t *testing.T) {
 		createUser(100.0, "user1").
 		registerUser("user1")
 
-	otu.setUUID(300)
+	otu.setUUID(400)
+
+	findSaleEvent, err := otu.O.QualifiedIdentifier("FIND", "Sale")
+	assert.NoError(t, err)
+
+	findAuctionEvent, err := otu.O.QualifiedIdentifier("FIND", "EnglishAuction")
+	assert.NoError(t, err)
+
+	findDOEvent, err := otu.O.QualifiedIdentifier("FIND", "DirectOffer")
+	assert.NoError(t, err)
+
+	FUSDDepositEvent, err := otu.O.QualifiedIdentifier("FUSD", "TokensDeposited")
+	assert.NoError(t, err)
 
 	t.Run("Should list a name for sale", func(t *testing.T) {
 
@@ -38,17 +51,17 @@ func TestAuction(t *testing.T) {
 			WithArg("names", `["user1","name1"]`),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertEvent(t, findSaleEvent, map[string]interface{}{
 				"amount":     10.0,
 				"name":       "name1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"status":     "cancel",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertEvent(t, findSaleEvent, map[string]interface{}{
 				"amount":     10.0,
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"status":     "cancel",
 			})
@@ -64,24 +77,24 @@ func TestAuction(t *testing.T) {
 			WithSigner("user1"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertEvent(t, findSaleEvent, map[string]interface{}{
 				"amount":     10.0,
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"status":     "cancel",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertEvent(t, findSaleEvent, map[string]interface{}{
 				"amount":     10.0,
 				"name":       "name1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"status":     "cancel",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Sale", map[string]interface{}{
+			AssertEvent(t, findSaleEvent, map[string]interface{}{
 				"amount":     10.0,
 				"name":       "name2",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"status":     "cancel",
 			})
@@ -104,7 +117,7 @@ func TestAuction(t *testing.T) {
 			WithArg("name", "user1"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+			AssertEvent(t, findDOEvent, map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.O.Address("user1"),
 				"sellerName":  "name1",
@@ -112,13 +125,13 @@ func TestAuction(t *testing.T) {
 				"buyerName":   "user2",
 				"status":      "sold",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 3.8,
-				"to":     "0x179b6b1cb6755e31",
+				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 0.2,
-				"to":     "0x01cf0e2f2f715450",
+				"to":     otu.O.Address("find-admin"),
 			})
 
 	})
@@ -140,7 +153,7 @@ func TestAuction(t *testing.T) {
 			WithArg("name", "user1"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.O.Address("user1"),
 				"sellerName":  "name1",
@@ -150,13 +163,13 @@ func TestAuction(t *testing.T) {
 				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
 				"buyerName":   "user3",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 19.0,
-				"to":     "0x179b6b1cb6755e31",
+				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 1.0,
-				"to":     "0x01cf0e2f2f715450",
+				"to":     otu.O.Address("find-admin"),
 			})
 
 	})
@@ -193,7 +206,7 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", amount),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+			AssertEvent(t, findDOEvent, map[string]interface{}{
 				"name":        "user1",
 				"seller":      otu.O.Address("user1"),
 				"sellerName":  "name1",
@@ -203,13 +216,13 @@ func TestAuction(t *testing.T) {
 				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
 				"buyerName":   buyer,
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 10.45,
-				"to":     "0x179b6b1cb6755e31",
+				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 0.55,
-				"to":     "0x01cf0e2f2f715450",
+				"to":     otu.O.Address("find-admin"),
 			})
 
 		otu.moveNameTo(buyer, name, name)
@@ -281,7 +294,7 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":      "user1",
 				"seller":    otu.O.Address("user1"),
 				"amount":    14.0,
@@ -308,7 +321,7 @@ func TestAuction(t *testing.T) {
 			WithArg("owner", "user1"),
 			WithArg("name", "user1"),
 		).AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
+			AssertEvent(t, findAuctionEvent,
 				map[string]interface{}{
 					"amount":              20.0,
 					"auctionReservePrice": 20.0,
@@ -355,9 +368,9 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":      "user1",
-				"seller":    "0x179b6b1cb6755e31",
+				"seller":    otu.O.Address("user1"),
 				"amount":    14.0,
 				"status":    "active_ongoing",
 				"buyerName": "user2",
@@ -384,9 +397,9 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"status":     "active_ongoing",
 				"buyerName":  "user2",
@@ -405,9 +418,9 @@ func TestAuction(t *testing.T) {
 			WithArg("name", "user1"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":      "user1",
-				"seller":    "0x179b6b1cb6755e31",
+				"seller":    otu.O.Address("user1"),
 				"amount":    4.0,
 				"status":    "active_ongoing",
 				"buyerName": "user2",
@@ -427,9 +440,9 @@ func TestAuction(t *testing.T) {
 			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+			AssertEvent(t, findDOEvent, map[string]interface{}{
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"amount":     4.0,
 				"status":     "cancel_rejected",
@@ -451,9 +464,9 @@ func TestAuction(t *testing.T) {
 			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+			AssertEvent(t, findDOEvent, map[string]interface{}{
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"amount":     4.0,
 				"status":     "cancel_rejected",
@@ -491,13 +504,13 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 15.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 5.0,
-				"to":     "0xf3fcd2c1a78f5eee",
+				"to":     otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":          "user1",
-				"seller":        "0x179b6b1cb6755e31",
+				"seller":        otu.O.Address("user1"),
 				"sellerName":    "user1",
 				"amount":        15.0,
 				"status":        "active_ongoing",
@@ -521,13 +534,13 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 15.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 5.0,
-				"to":     "0xf3fcd2c1a78f5eee",
+				"to":     otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"amount":     15.0,
 				"status":     "active_ongoing",
@@ -548,13 +561,13 @@ func TestAuction(t *testing.T) {
 			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
 				"amount": 5.0,
-				"to":     "0xf3fcd2c1a78f5eee",
+				"to":     otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":       "user1",
-				"seller":     "0x179b6b1cb6755e31",
+				"seller":     otu.O.Address("user1"),
 				"sellerName": "user1",
 				"amount":     5.0,
 				"status":     "cancel_listing",
@@ -591,7 +604,7 @@ func TestAuction(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("names", `["user1"]`),
 		).AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction",
+			AssertEvent(t, findAuctionEvent,
 				map[string]interface{}{
 					"amount":              15.0,
 					"auctionReservePrice": 20.0,
@@ -649,19 +662,19 @@ func TestAuction(t *testing.T) {
 			WithArg("auctionDuration", auctionDurationFloat),
 			WithArg("auctionExtensionOnLateBid", 300.0),
 		).AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.EnglishAuction", map[string]interface{}{
+			AssertEvent(t, findAuctionEvent, map[string]interface{}{
 				"name":       name,
 				"seller":     otu.O.Address(name),
 				"sellerName": name,
 				"amount":     5.0,
 				"status":     "active_listed",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer", map[string]interface{}{
+			AssertEvent(t, findDOEvent, map[string]interface{}{
 				"name":       name,
 				"seller":     otu.O.Address(name),
 				"sellerName": name,
 				"amount":     5.0,
-				"buyer":      "0xf3fcd2c1a78f5eee",
+				"buyer":      otu.O.Address("user2"),
 				"buyerName":  "user2",
 				"status":     "rejected",
 			})
@@ -680,7 +693,7 @@ func TestAuction(t *testing.T) {
 			WithArg("name", "user1"),
 			WithArg("amount", 10.0),
 		).AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.DirectOffer",
+			AssertEvent(t, findDOEvent,
 				map[string]interface{}{
 					"amount": 10.0,
 					"buyer":  otu.O.Address("user3"),

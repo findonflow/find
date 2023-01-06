@@ -14,7 +14,8 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		setFlowLeaseMarketOption("DirectOfferSoft").
 		setProfile("user1").
 		setProfile("user2").
-		createDapperUser("find")
+		createDapperUser("find").
+		createDapperUser("find-admin")
 
 	price := 10.0
 
@@ -22,7 +23,10 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		registerDapperUserWithName("user1", "name2").
 		registerDapperUserWithName("user1", "name3")
 
-	otu.setUUID(400)
+	otu.setUUID(500)
+
+	eventIdentifier := otu.identifier("FindLeaseMarketDirectOfferSoft", "DirectOffer")
+	royaltyIdentifier := otu.identifier("FindLeaseMarket", "RoyaltyPaid")
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
 
@@ -244,7 +248,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -255,7 +259,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -369,20 +373,20 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
@@ -404,20 +408,20 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.35,
 				"leaseName":   "name1",
 				"royaltyName": "find",
 				"tenant":      "findLease",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("find"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find-admin"),
 				"amount":      0.5,
 				"leaseName":   "name1",
 				"royaltyName": "network",
@@ -452,7 +456,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -493,7 +497,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -523,7 +527,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount":        newPrice,
 				"leaseName":     "name1",
 				"buyer":         otu.O.Address("user3"),
