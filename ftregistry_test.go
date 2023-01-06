@@ -9,11 +9,12 @@ import (
 
 func TestFTRegistry(t *testing.T) {
 	otu := NewOverflowTest(t).
-		setupFIND().
-		registerFTInFtRegistry("flow", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
-			"alias":          "Flow",
-			"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-		})
+		setupFIND()
+
+	otu.registerFTInFtRegistry("flow", otu.identifier("FTRegistry", "FTInfoRegistered"), map[string]interface{}{
+		"alias":          "Flow",
+		"typeIdentifier": otu.identifier("FlowToken", "Vault"),
+	})
 
 	o := otu.O
 	t.Run("Should be able to registry flow token and get it", func(t *testing.T) {
@@ -30,7 +31,7 @@ func TestFTRegistry(t *testing.T) {
 		otu.AutoGoldRename("Should be able to registry flow token and get it by alias", result)
 
 		result, err = o.Script("getFTInfo",
-			WithArg("aliasOrIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault"),
+			WithArg("aliasOrIdentifier", otu.identifier("FlowToken", "Vault")),
 		).
 			GetAsJson()
 
@@ -44,16 +45,16 @@ func TestFTRegistry(t *testing.T) {
 	t.Run("Should not be able to overrride a ft without removing it first", func(t *testing.T) {
 
 		o.Tx("adminSetFTInfo_flow",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 		).
 			AssertFailure(t, "This FungibleToken Register already exist")
 
 	})
 
 	t.Run("Should be able to registry flow token, fusd token and get list from it", func(t *testing.T) {
-		otu.registerFTInFtRegistry("fusd", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+		otu.registerFTInFtRegistry("fusd", otu.identifier("FTRegistry", "FTInfoRegistered"), map[string]interface{}{
 			"alias":          "FUSD",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+			"typeIdentifier": otu.identifier("FUSD", "Vault"),
 		})
 
 		result, err := o.Script("getFTInfoAll").GetAsJson()
@@ -66,13 +67,13 @@ func TestFTRegistry(t *testing.T) {
 	})
 
 	t.Run("Should be able to registry usdc token and get it", func(t *testing.T) {
-		otu.registerFTInFtRegistry("usdc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+		otu.registerFTInFtRegistry("usdc", otu.identifier("FTRegistry", "FTInfoRegistered"), map[string]interface{}{
 			"alias":          "USDC",
-			"typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
+			"typeIdentifier": otu.identifier("FiatToken", "Vault"),
 		})
 
 		result, err := o.Script("getFTInfo",
-			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FiatToken.Vault"),
+			WithArg("aliasOrIdentifier", otu.identifier("FiatToken", "Vault")),
 		).
 			GetAsJson()
 
@@ -98,18 +99,18 @@ func TestFTRegistry(t *testing.T) {
 			WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FiatToken.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FiatToken", "TokensDeposited"), map[string]interface{}{
 				"amount": 5.0,
-				"to":     "0x179b6b1cb6755e31",
+				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FiatToken.TokensWithdrawn", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FiatToken", "TokensWithdrawn"), map[string]interface{}{
 				"amount": 5.0,
-				"from":   "0xf3fcd2c1a78f5eee",
+				"from":   otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
-				"from":      "0xf3fcd2c1a78f5eee",
+			AssertEvent(t, otu.identifier("FIND", "FungibleTokenSent"), map[string]interface{}{
+				"from":      otu.O.Address("user2"),
 				"fromName":  "user2",
-				"toAddress": "0x179b6b1cb6755e31",
+				"toAddress": otu.O.Address("user1"),
 				"amount":    5.0,
 				"name":      "user1",
 				"tag":       "test",
@@ -128,18 +129,18 @@ func TestFTRegistry(t *testing.T) {
 			WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FUSD", "TokensDeposited"), map[string]interface{}{
 				"amount": 5.0,
-				"to":     "0x179b6b1cb6755e31",
+				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FUSD.TokensWithdrawn", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FUSD", "TokensWithdrawn"), map[string]interface{}{
 				"amount": 5.0,
-				"from":   "0xf3fcd2c1a78f5eee",
+				"from":   otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
-				"from":      "0xf3fcd2c1a78f5eee",
+			AssertEvent(t, otu.identifier("FIND", "FungibleTokenSent"), map[string]interface{}{
+				"from":      otu.O.Address("user2"),
 				"fromName":  "user2",
-				"toAddress": "0x179b6b1cb6755e31",
+				"toAddress": otu.O.Address("user1"),
 				"amount":    5.0,
 				"name":      "user1",
 				"tag":       "test",
@@ -158,18 +159,18 @@ func TestFTRegistry(t *testing.T) {
 			WithArg("message", "This is a message"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FlowToken", "TokensDeposited"), map[string]interface{}{
 				"amount": 5.0,
-				"to":     "0x179b6b1cb6755e31",
+				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensWithdrawn", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FlowToken", "TokensWithdrawn"), map[string]interface{}{
 				"amount": 5.0,
-				"from":   "0xf3fcd2c1a78f5eee",
+				"from":   otu.O.Address("user2"),
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.FungibleTokenSent", map[string]interface{}{
-				"from":      "0xf3fcd2c1a78f5eee",
+			AssertEvent(t, otu.identifier("FIND", "FungibleTokenSent"), map[string]interface{}{
+				"from":      otu.O.Address("user2"),
 				"fromName":  "user2",
-				"toAddress": "0x179b6b1cb6755e31",
+				"toAddress": otu.O.Address("user1"),
 				"amount":    5.0,
 				"name":      "user1",
 				"tag":       "test",
@@ -179,18 +180,18 @@ func TestFTRegistry(t *testing.T) {
 
 	t.Run("Should be able to registry and remove them", func(t *testing.T) {
 		otu.removeFTInFtRegistry("adminRemoveFTInfoByAlias", "FUSD",
-			"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
+			otu.identifier("FTRegistry", "FTInfoRemoved"), map[string]interface{}{
 				"alias":          "FUSD",
-				"typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
+				"typeIdentifier": otu.identifier("FUSD", "Vault"),
 			}).
-			removeFTInFtRegistry("adminRemoveFTInfoByTypeIdentifier", "A.0ae53cb6e3f42a79.FlowToken.Vault",
-				"A.f8d6e0586b0a20c7.FTRegistry.FTInfoRemoved", map[string]interface{}{
+			removeFTInFtRegistry("adminRemoveFTInfoByTypeIdentifier", otu.identifier("FlowToken", "Vault"),
+				otu.identifier("FTRegistry", "FTInfoRemoved"), map[string]interface{}{
 					"alias":          "Flow",
-					"typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+					"typeIdentifier": otu.identifier("FlowToken", "Vault"),
 				})
 
 		o.Script("getFTInfo",
-			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.FUSD.Vault"),
+			WithArg("aliasOrIdentifier", otu.identifier("FUSD", "Vault")),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))
 

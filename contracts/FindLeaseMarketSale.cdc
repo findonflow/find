@@ -24,7 +24,7 @@ pub contract FindLeaseMarketSale {
 
 		//this field is set if this is a saleItem
 		access(contract) var salePrice: UFix64
-		access(contract) var validUntil: UFix64? 
+		access(contract) var validUntil: UFix64?
 		access(contract) let saleItemExtraField: {String : AnyStruct}
 
 		init(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, price:UFix64, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
@@ -101,7 +101,7 @@ pub contract FindLeaseMarketSale {
 		}
 
 		pub fun getValidUntil() : UFix64? {
-			return self.validUntil 
+			return self.validUntil
 		}
 
 		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo {
@@ -115,14 +115,15 @@ pub contract FindLeaseMarketSale {
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
-		
+
 	}
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getNameSales(): [String]
 		pub fun containsNameSale(_ name: String): Bool
-		pub fun buy(name: String, vault: @FungibleToken.Vault, to: Address) 
+		pub fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem}
+		pub fun buy(name: String, vault: @FungibleToken.Vault, to: Address)
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic {
@@ -174,7 +175,7 @@ pub contract FindLeaseMarketSale {
 			}
 
 			let cuts= self.getTenant().getTenantCut(name: actionResult.name, listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
-			
+
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
 			let leaseInfo= saleItem.toLeaseInfo()
@@ -205,7 +206,7 @@ pub contract FindLeaseMarketSale {
 				panic("Valid until is before current time")
 			}
 
-			// What happends if we relist  
+			// What happends if we relist
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
 			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name:"list lease for sale"), seller: self.owner!.address, buyer: nil)
@@ -256,7 +257,7 @@ pub contract FindLeaseMarketSale {
 		pub fun containsNameSale(_ name: String): Bool {
 			return self.items.containsKey(name)
 		}
-		
+
 		pub fun borrow(_ name: String): &SaleItem {
 			return (&self.items[name] as &SaleItem?)!
 		}

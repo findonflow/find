@@ -24,8 +24,8 @@ func TestMarketOptions(t *testing.T) {
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", ids[1]),
 		WithArg("ftAliasOrIdentifier", "Flow"),
 		WithArg("directSellPrice", price),
@@ -76,7 +76,7 @@ func TestMarketOptions(t *testing.T) {
 		/* Should success on listing MarketSale with FUSD */
 		listingTx("listNFTForSale").
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindMarketSale", "Sale"), map[string]interface{}{
 				"status": "active_listed",
 				"amount": price,
 				"id":     ids[1],
@@ -108,7 +108,7 @@ func TestMarketOptions(t *testing.T) {
 		/* Should success on listing MarketSale with FUSD */
 		listingTx("listNFTForSale").
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarketSale.Sale", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindMarketSale", "Sale"), map[string]interface{}{
 				"status": "active_listed",
 				"amount": price,
 				"id":     ids[1],

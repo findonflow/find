@@ -27,7 +27,10 @@ func TestLeaseMarketSale(t *testing.T) {
 		setProfile("user2")
 
 	price := 10.0
-	otu.setUUID(400)
+
+	otu.setUUID(500)
+
+	royaltyIdentifier := otu.identifier("FindLeaseMarket", "RoyaltyPaid")
 
 	otu.registerDapperUserWithName("user1", "name1")
 	otu.registerDapperUserWithName("user1", "name2")
@@ -107,7 +110,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user1"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -121,7 +125,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -145,7 +150,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", 5.0),
 		).
@@ -206,7 +212,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -253,7 +260,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -290,7 +298,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -323,13 +332,14 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("user5-dapper"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("dapper"),
 				"amount":      0.65,
 				"leaseName":   "name1",
 				"royaltyName": "find",
@@ -347,13 +357,14 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindLeaseMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("user5-dapper"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("dapper"),
 				"amount":      1.0,
 				"leaseName":   "name1",
 				"royaltyName": "find",
@@ -383,7 +394,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -400,7 +412,8 @@ func TestLeaseMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyLeaseForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).
@@ -429,11 +442,12 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.listLeaseForSaleDUC("user1", "name1", price)
 
 		otu.O.Script("getMetadataForBuyLeaseForSaleDapper",
+			WithArg("sellerAccount", "user1"),
 			WithArg("leaseName", "name1"),
 			WithArg("amount", price),
 		).AssertWant(t, autogold.Want("getMetadataForBuyLeaseForSaleDapper", map[string]interface{}{
 			"amount": 10, "description": "Name :name1 for Dapper Credit 10.00000000",
-			"id":       403,
+			"id":       503,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
 		}))

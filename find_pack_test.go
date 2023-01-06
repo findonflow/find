@@ -11,7 +11,7 @@ import (
 func TestFindPack(t *testing.T) {
 
 	packTypeId := uint64(1)
-	salt := "find"
+	salt := "find-admin"
 	buyer := "user1"
 
 	otu := NewOverflowTest(t).
@@ -22,14 +22,14 @@ func TestFindPack(t *testing.T) {
 		buyForge("user1").
 		registerExampleNFTInNFTRegistry()
 
-	singleType := []string{exampleNFTType}
+	singleType := []string{exampleNFTType(otu)}
 	t.Run("Should be able to mint Example NFTs", func(t *testing.T) {
 		otu.mintExampleNFTs()
 	})
 
 	t.Run("Should be able to register pack data", func(t *testing.T) {
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packTypeId++
 	})
 
@@ -37,7 +37,7 @@ func TestFindPack(t *testing.T) {
 
 		id1 := otu.mintExampleNFTs()
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account").
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find").
 			mintPack("user1", packTypeId, []uint64{id1}, singleType, salt)
 		packTypeId++
 
@@ -48,7 +48,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -61,7 +61,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -75,7 +75,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -89,7 +89,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack("user2", buyer, packTypeId, 1, 4.20)
@@ -103,21 +103,21 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
 
 		otu.O.Tx("adminFulfillFindPack",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("packId", packId),
-			WithArg("typeIdentifiers", []string{exampleNFTType}),
+			WithArg("typeIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("rewardIds", ids),
 			WithArg("salt", "wrong salt"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.FulfilledError", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
 				"packId":  packId,
 				"address": otu.O.Address(buyer),
 				"reason":  "The content of the pack was not verified with the hash provided at mint",
@@ -131,7 +131,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 2.0, 2.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 2.0, 2.0, false, 0, "find-admin", "find")
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.O.Tx("buyFindPack",
@@ -151,7 +151,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 2.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 2.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -170,7 +170,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -203,16 +203,16 @@ func TestFindPack(t *testing.T) {
 		}
 
 		pid := map[uint64][]uint64{packId: ids}
-		types := map[uint64][]string{packId: {exampleNFTType}}
+		types := map[uint64][]string{packId: {exampleNFTType(otu)}}
 
 		otu.O.Tx("adminFulfillPacks",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("types", createUInt64ToString64Array(types)),
 			WithArg("rewards", createUInt64ToUInt64Array(pid)),
 			WithArg("salts", createUInt64ToString(map[uint64]string{packId: "wrong salt"})),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.FulfilledError", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
 				"packId":  packId,
 				"address": otu.O.Address(buyer),
 				"reason":  "Not enough flow to hold the content of the pack. Please top up your account"})
@@ -231,11 +231,11 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
-		otu.claimFloat("account", buyer, floatID)
+		otu.claimFloat("find", buyer, floatID)
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find-admin", "find")
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -247,10 +247,10 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		// in the test, 0.0 whitelist time -> no whitelist
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find-admin", "find")
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.O.Tx("buyFindPack",
@@ -272,23 +272,23 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		freeMintFloat := otu.createFloatEvent("account")
-		whiteListFloat := otu.createFloatEvent("account")
+		freeMintFloat := otu.createFloatEvent("find")
+		whiteListFloat := otu.createFloatEvent("find")
 
-		otu.claimFloat("account", buyer, freeMintFloat)
-		otu.claimFloat("account", buyer, whiteListFloat)
+		otu.claimFloat("find", buyer, freeMintFloat)
+		otu.claimFloat("find", buyer, whiteListFloat)
 
 		otu.O.Tx("adminRegisterFindPackMetadata",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", buyer),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 1.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("itemTypes", []string{exampleNFTType}),
+			WithArg("itemTypes", []string{exampleNFTType(otu)}),
 			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 10.0, "pre-sale": 20.0, "public sale": 30.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 20.0, "pre-sale": 30.0})),
 			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": freeMintFloat, "pre-sale": whiteListFloat})),
@@ -296,7 +296,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{"whiteList": 1, "pre-sale": 20})),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
@@ -326,9 +326,9 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find-admin", "find")
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		otu.O.Tx("buyFindPack",
@@ -339,9 +339,9 @@ func TestFindPack(t *testing.T) {
 			WithArg("totalAmount", 4.2),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.0ae53cb6e3f42a79.FlowToken.TokensDeposited", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FlowToken", "TokensDeposited"), map[string]interface{}{
 				"amount": totalAmount * 0.15,
-				"to":     otu.O.Address("account"),
+				"to":     otu.O.Address("find"),
 			})
 		packTypeId++
 	})
@@ -351,18 +351,18 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		// buyer should have find name "user1" and float
 		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 2.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
 			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{})),
@@ -372,7 +372,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("checkAll", true),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
@@ -389,7 +389,7 @@ func TestFindPack(t *testing.T) {
 			AssertFailure(t, "Cannot buy the pack now")
 
 		// should be able to buy with user1 name and float
-		otu.claimFloat("account", buyer, floatID)
+		otu.claimFloat("find", buyer, floatID)
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.2)
 
 		packTypeId++
@@ -401,18 +401,18 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		// buyer should have find name "user1" or float
 		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 2.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
 			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{})),
@@ -422,7 +422,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
@@ -440,18 +440,18 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		// buyer should have find name "user1" or float
 		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 2.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
 			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{})),
@@ -461,14 +461,14 @@ func TestFindPack(t *testing.T) {
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		// should be able to buy with float only
-		otu.claimFloat("account", "user2", floatID)
+		otu.claimFloat("find", "user2", floatID)
 		otu.buyPack("user2", buyer, packTypeId, 1, 4.2)
 
 		packTypeId++
@@ -480,18 +480,18 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		// buyer should have find name "user1" or float
 		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 2.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
 			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 0.0, "pre-sale": 0.0, "public sale": 0.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{})),
@@ -501,14 +501,14 @@ func TestFindPack(t *testing.T) {
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
 		otu.mintPack("user1", packTypeId, ids, singleType, salt)
 
 		// should be able to buy with float only
-		otu.claimFloat("account", buyer, floatID)
+		otu.claimFloat("find", buyer, floatID)
 		otu.buyPack(buyer, buyer, packTypeId, 1, 1.1)
 
 		packTypeId++
@@ -521,7 +521,7 @@ func TestFindPack(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
-		otu.registerPackType("user1", packTypeId, singleType, 0.0, 0.0, 15.0, true, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, singleType, 0.0, 0.0, 15.0, true, 0, "find-admin", "find")
 		packId, signature := otu.mintPackWithSignature("user1", packTypeId, ids, singleType, salt)
 
 		otu.O.Tx("buyFindPackWithReservation",
@@ -534,7 +534,7 @@ func TestFindPack(t *testing.T) {
 		).
 			Print().
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.Purchased", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "Purchased"), map[string]interface{}{
 				"packId": packId,
 			})
 
@@ -544,18 +544,18 @@ func TestFindPack(t *testing.T) {
 	// Scripts - ways to return useful sales
 	t.Run("should return sale details for user", func(t *testing.T) {
 
-		floatID := otu.createFloatEvent("account")
+		floatID := otu.createFloatEvent("find")
 
 		// buyer should have find name "user1" or float
 		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 2.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
 			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 2.0, "pre-sale": 3.0, "public sale": 4.0})),
@@ -565,7 +565,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
@@ -588,7 +588,7 @@ func TestFindPack(t *testing.T) {
 					},
 				},
 				"description":         "user1 season #19",
-				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"itemTypes":           []interface{}{exampleNFTType(otu)},
 				"name":                "user1 season #19",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -632,26 +632,26 @@ func TestFindPack(t *testing.T) {
 				},
 				"storageRequirement": 10000,
 				"thumbnailHash":      "thumbnailHash",
-				"walletType":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				"walletType":         otu.identifier("FlowToken", "Vault"),
 			}))
 		packTypeId++
 	})
-	floatID := otu.createFloatEvent("account")
+	floatID := otu.createFloatEvent("find")
 
 	t.Run("Should get the running sale for user with the lowest price -> 2.2", func(t *testing.T) {
 
-		otu.claimFloat("account", buyer, floatID)
+		otu.claimFloat("find", buyer, floatID)
 
 		// buyer should have find name "user1" or float
 		otu.O.Tx("devadminRegisterFindPackMetadataWithMultipleVerifier",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
-			WithArg("wallet", "find"),
+			WithArg("wallet", "find-admin"),
 			WithArg("openTime", 2.0),
 			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "account"),
+			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
 			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0})),
 			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 2.0})),
@@ -661,7 +661,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindPack.MetadataRegistered", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
 				"packTypeId": packTypeId,
 			})
 
@@ -686,7 +686,7 @@ func TestFindPack(t *testing.T) {
 					},
 				},
 				"description":         "user1 season #20",
-				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"itemTypes":           []interface{}{exampleNFTType(otu)},
 				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -730,7 +730,7 @@ func TestFindPack(t *testing.T) {
 					"startTime":          2,
 					"userPurchaseRecord": 0,
 				},
-				"walletType": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				"walletType": otu.identifier("FlowToken", "Vault"),
 			}))
 		// no need to bump packTypeId here
 	})
@@ -758,7 +758,7 @@ func TestFindPack(t *testing.T) {
 					},
 				},
 				"description":         "user1 season #20",
-				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"itemTypes":           []interface{}{exampleNFTType(otu)},
 				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -802,7 +802,7 @@ func TestFindPack(t *testing.T) {
 					"startTime":          3,
 					"userPurchaseRecord": 0,
 				},
-				"walletType": "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				"walletType": otu.identifier("FlowToken", "Vault"),
 			}))
 
 	})
@@ -828,7 +828,7 @@ func TestFindPack(t *testing.T) {
 					},
 				},
 				"description":         "user1 season #20",
-				"itemTypes":           []interface{}{"A.f8d6e0586b0a20c7.ExampleNFT.NFT"},
+				"itemTypes":           []interface{}{exampleNFTType(otu)},
 				"name":                "user1 season #20",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
@@ -866,22 +866,21 @@ func TestFindPack(t *testing.T) {
 				},
 				"storageRequirement": 10000,
 				"thumbnailHash":      "thumbnailHash",
-				"walletType":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				"walletType":         otu.identifier("FlowToken", "Vault"),
 			}))
 		packTypeId++
 	})
 
 	// Tests with 2 NFT Types
-	doubleTypes := []string{exampleNFTType, dandyNFTType}
+	doubleTypes := []string{exampleNFTType(otu), dandyNFTType(otu)}
 	otu.mintThreeExampleDandies()
 	otu.registerFtInRegistry()
-	otu.createUser(100, "find")
 
-	find := otu.O.Address("find")
+	find := otu.O.Address("find-admin")
 
 	t.Run("Should be able to register pack data with 2 NFT Types", func(t *testing.T) {
 
-		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packTypeId++
 	})
 
@@ -891,7 +890,7 @@ func TestFindPack(t *testing.T) {
 		dandy := otu.mintThreeExampleDandies()[0]
 		otu.sendDandy(find, "user1", dandy)
 
-		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find", "account").
+		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find").
 			mintPack("user1", packTypeId, []uint64{example, dandy}, doubleTypes, salt)
 		packTypeId++
 
@@ -904,7 +903,7 @@ func TestFindPack(t *testing.T) {
 		otu.sendDandy(find, "user1", dandy)
 		ids := []uint64{example, dandy}
 
-		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		otu.mintPack("user1", packTypeId, ids, doubleTypes, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -919,7 +918,7 @@ func TestFindPack(t *testing.T) {
 		otu.sendDandy(find, "user1", dandy)
 		ids := []uint64{example, dandy}
 
-		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, doubleTypes, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -935,7 +934,7 @@ func TestFindPack(t *testing.T) {
 		otu.sendDandy(find, "user1", dandy)
 		ids := []uint64{example, dandy}
 
-		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find", "account")
+		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packId := otu.mintPack("user1", packTypeId, ids, doubleTypes, salt)
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
@@ -943,7 +942,7 @@ func TestFindPack(t *testing.T) {
 		// otu.fulfillPack(packId, ids, salt)
 
 		otu.O.Tx("adminFulfillFindPack",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("packId", packId),
 			WithArg("typeIdentifiers", doubleTypes),
 			WithArg("rewardIds", ids),

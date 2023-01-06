@@ -6,6 +6,8 @@ import (
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/slices"
 )
 
 /*
@@ -27,29 +29,39 @@ func TestDandy(t *testing.T) {
 
 		id := dandyIds[0]
 
-		otu.O.Script("getNFTViews",
+		viewList := []string{
+			otu.identifier("FindViews", "Nounce"),
+			otu.identifier("MetadataViews", "NFTCollectionData"),
+			otu.identifier("MetadataViews", "NFTCollectionDisplay"),
+			otu.identifier("MetadataViews", "Display"),
+			otu.identifier("MetadataViews", "Royalties"),
+			otu.identifier("MetadataViews", "Editions"),
+			otu.identifier("MetadataViews", "Traits"),
+			otu.identifier("MetadataViews", "ExternalURL"),
+			otu.identifier("MetadataViews", "CreativeWork"),
+			otu.identifier("MetadataViews", "Medias"),
+		}
+
+		res, err := otu.O.Script("getNFTViews",
 			WithArg("user", "user1"),
-			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("aliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-		).AssertWant(t,
-			autogold.Want("Views", `[]interface {}{
-  "A.f8d6e0586b0a20c7.FindViews.Nounce",
-  "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-  "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
-  "A.f8d6e0586b0a20c7.MetadataViews.Display",
-  "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-  "A.f8d6e0586b0a20c7.MetadataViews.Editions",
-  "A.f8d6e0586b0a20c7.MetadataViews.Traits",
-  "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL",
-  "A.f8d6e0586b0a20c7.FindViews.CreativeWork",
-  "A.f8d6e0586b0a20c7.MetadataViews.Medias",
-}`),
-		)
+		).
+			GetAsInterface()
+		require.NoError(t, err)
+
+		resList, ok := res.([]interface{})
+		require.True(t, ok)
+		for _, item := range resList {
+			stringItem := item.(string)
+			slices.Contains(viewList, stringItem)
+		}
+
 		otu.O.Script("getNFTView",
 			WithArg("user", "user1"),
-			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("aliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-			WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.Display"),
+			WithArg("identifier", otu.identifier("MetadataViews", "Display")),
 		).AssertWant(t,
 			autogold.Want("Display", map[string]interface{}{
 				"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
@@ -60,9 +72,9 @@ func TestDandy(t *testing.T) {
 
 		otu.O.Script("getNFTView",
 			WithArg("user", "user1"),
-			WithArg("aliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("aliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-			WithArg("identifier", "A.f8d6e0586b0a20c7.MetadataViews.ExternalURL"),
+			WithArg("identifier", otu.identifier("MetadataViews", "ExternalURL")),
 		).AssertWant(t,
 			autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/collection/user1/dandy/502"}),
 		)

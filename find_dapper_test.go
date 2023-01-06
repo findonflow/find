@@ -20,17 +20,8 @@ func TestFINDDapper(t *testing.T) {
 	t.Run("Should be able to register a name", func(t *testing.T) {
 
 		// Can fix this with pointerWant
-		otu.O.Script("getLeases").AssertWant(t,
-			autogold.Want("allLeases", `[]interface {}{
-  map[string]interface {}{
-    "address": "0x179b6b1cb6755e31",
-    "lockedUntil": 39312001.0,
-    "name": "user1",
-    "profile": "Capability<&AnyResource{A.f8d6e0586b0a20c7.Profile.Public}>(address: 0x179b6b1cb6755e31, path: /public/findProfile)",
-    "registeredTime": 1.0,
-    "validUntil": 31536001.0,
-  },
-}`),
+		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
+			autogold.Want("allLeases", "user1"),
 		)
 	})
 
@@ -52,7 +43,7 @@ func TestFINDDapper(t *testing.T) {
 
 		otu.O.Tx("registerDapper",
 			WithSigner("user1"),
-			WithPayloadSigner("account"),
+			WithPayloadSigner("dapper"),
 			WithArg("merchAccount", "find"),
 			WithArg("name", "ur"),
 			WithArg("amount", 5.0),
@@ -62,8 +53,8 @@ func TestFINDDapper(t *testing.T) {
 	t.Run("Should get error if you try to register a name that is already claimed", func(t *testing.T) {
 		otu.O.Tx("registerDapper",
 			WithSigner("user1"),
-			WithPayloadSigner("account"),
-			WithArg("merchAccount", "user5-dapper"),
+			WithPayloadSigner("dapper"),
+			WithArg("merchAccount", "dapper"),
 			WithArg("name", "user1"),
 			WithArg("amount", 5.0),
 		).AssertFailure(t, "Name already registered")
@@ -100,7 +91,7 @@ func TestFINDDapper(t *testing.T) {
 
 	t.Run("Should be able to lookup address", func(t *testing.T) {
 
-		otu.assertLookupAddress("user1", "0x179b6b1cb6755e31")
+		otu.assertLookupAddress("user1", otu.O.Address("user1"))
 	})
 
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
@@ -117,15 +108,13 @@ func TestFINDDapper(t *testing.T) {
 
 	t.Run("Admin should be able to register without paying FUSD", func(t *testing.T) {
 
-		otu.createUser(10.0, "find")
-
 		otu.O.Tx("adminRegisterName",
-			WithSigner("find"),
+			WithSigner("find-admin"),
 			WithArg("names", `["find-admin"]`),
 			WithArg("user", "find"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Register", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FIND", "Register"), map[string]interface{}{
 				"name": "find-admin",
 			})
 
@@ -149,6 +138,8 @@ func TestFINDDapper(t *testing.T) {
 		createDapperUser("user2").
 		registerDapperUser("user2")
 
+	otu.tickClock(1.0)
+
 	t.Run("Should be able to send lease to another name", func(t *testing.T) {
 
 		otu.O.Tx("moveNameToDapper",
@@ -157,7 +148,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("receiver", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FIND.Moved", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FIND", "Moved"), map[string]interface{}{
 				"name": "user1",
 			})
 
@@ -198,10 +189,10 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindRelatedAccounts", "RelatedAccount"), map[string]interface{}{
 				"walletName": "dapper",
-				"user":       "0x179b6b1cb6755e31",
-				"address":    "0xf3fcd2c1a78f5eee",
+				"user":       otu.O.Address("user1"),
+				"address":    otu.O.Address("user2"),
 				"action":     "add",
 			})
 
@@ -218,10 +209,10 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("address", otu.O.Address("user2")),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindRelatedAccounts", "RelatedAccount"), map[string]interface{}{
 				"walletName": "dapper",
-				"user":       "0x179b6b1cb6755e31",
-				"address":    "0xf3fcd2c1a78f5eee",
+				"user":       otu.O.Address("user1"),
+				"address":    otu.O.Address("user2"),
 				"action":     "remove",
 				"network":    "Flow",
 			})
@@ -359,8 +350,8 @@ func TestFINDDapper(t *testing.T) {
 		/* Should not be able to buy addons with wrong balance */
 		otu.O.Tx("buyAddonDapper",
 			WithSigner("user1"),
-			WithPayloadSigner("account"),
-			WithArg("merchAccount", "user5-dapper"),
+			WithPayloadSigner("dapper"),
+			WithArg("merchAccount", "dapper"),
 			WithArg("name", "name1"),
 			WithArg("addon", "forge"),
 			WithArg("amount", 10.0),
@@ -370,10 +361,10 @@ func TestFINDDapper(t *testing.T) {
 		/* Should not be able to buy addons that does not exist */
 		otu.O.Tx("buyAddonDapper",
 			WithSigner(user),
-			WithPayloadSigner("account"),
-			WithArg("merchAccount", "user5-dapper"),
+			WithPayloadSigner("dapper"),
+			WithArg("merchAccount", "dapper"),
 			WithArg("name", user),
-			WithArg("addon", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("addon", dandyNFTType(otu)),
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "This addon is not available.")

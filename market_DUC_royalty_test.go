@@ -4,13 +4,14 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMarketDUCRoyalty(t *testing.T) {
 
 	otu := NewOverflowTest(t)
 
-	setupDapper(otu).
+	otu.setupDapper().
 		setupDandy("user1").
 		createUser(100.0, "user2").
 		registerUser("user2").
@@ -26,21 +27,24 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		createDapperUser("user2").
 		createDapperUser("user3")
 
+	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
+	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
+
 	id := otu.mintThreeExampleDandies()[0]
 
-	otu.registerFTInFtRegistry("duc", "A.f8d6e0586b0a20c7.FTRegistry.FTInfoRegistered", map[string]interface{}{
+	otu.registerFTInFtRegistry("duc", otu.identifier("FTRegistry", "FTInfoRegistered"), map[string]interface{}{
 		"alias":          "DUC",
-		"typeIdentifier": "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault",
+		"typeIdentifier": DUCType,
 	}).
 		registerDandyInNFTRegistry()
 
 	otu.O.Tx("adminMainnetAddItem",
-		WithSigner("find"),
-		WithArg("tenant", "account"),
+		WithSigner("find-admin"),
+		WithArg("tenant", "find"),
 		WithArg("ftName", "duc"),
-		WithArg("ftTypes", `["A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"]`),
+		WithArg("ftTypes", []string{DUCType}),
 		WithArg("nftName", "dandy"),
-		WithArg("nftTypes", `["A.f8d6e0586b0a20c7.Dandy.NFT"]`),
+		WithArg("nftTypes", []string{dandyNFTType(otu)}),
 		WithArg("listingName", "all"),
 		WithArg("listingTypes", `[]`),
 	).
@@ -56,14 +60,14 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.65,
 				"findName":    "user1",
@@ -71,8 +75,8 @@ func TestMarketDUCRoyalty(t *testing.T) {
 				"royaltyName": "creator",
 				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.65,
 				"id":          id,
 				"royaltyName": "find forge",
@@ -90,14 +94,14 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      50.0,
 				"findName":    "user1",
@@ -105,8 +109,8 @@ func TestMarketDUCRoyalty(t *testing.T) {
 				"royaltyName": "creator",
 				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      25.0,
 				"id":          id,
 				"royaltyName": "find forge",
@@ -128,20 +132,20 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.65,
 				"royaltyName": "creator",
 				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.65,
 				"royaltyName": "find forge",
 				"tenant":      "onefootball",
@@ -162,20 +166,20 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      50.25,
 				"royaltyName": "creator",
 				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      25.125,
 				"royaltyName": "find forge",
 				"tenant":      "onefootball",
@@ -194,13 +198,13 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      0.65,
 				"findName":    "user1",
@@ -208,8 +212,8 @@ func TestMarketDUCRoyalty(t *testing.T) {
 				"royaltyName": "creator",
 				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      0.65,
 				"id":          id,
 				"royaltyName": "find forge",
@@ -230,13 +234,13 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithPayloadSigner("account"),
-			WithArg("marketplace", "account"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
 				"amount":      50.0,
 				"findName":    "user1",
@@ -244,8 +248,8 @@ func TestMarketDUCRoyalty(t *testing.T) {
 				"royaltyName": "creator",
 				"tenant":      "onefootball",
 			}).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindMarket.RoyaltyPaid", map[string]interface{}{
-				"address":     otu.O.Address("account"),
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
 				"amount":      25.0,
 				"id":          id,
 				"royaltyName": "find forge",
@@ -262,10 +266,10 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		name := "user1"
 		otu.O.Tx("listNFTForSaleDapper",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("marketplace", "find"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+			WithArg("ftAliasOrIdentifier", DUCType),
 			WithArg("directSellPrice", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -273,10 +277,10 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("listNFTForAuctionSoftDapper",
 			WithSigner(name),
-			WithArg("marketplace", "account"),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("marketplace", "find"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+			WithArg("ftAliasOrIdentifier", DUCType),
 			WithArg("price", price),
 			WithArg("auctionReservePrice", price+5.0),
 			WithArg("auctionDuration", 300.0),
@@ -286,13 +290,16 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		).
 			AssertFailure(t, "Auction start price should be greater than 0.65")
 
+		ftIdentifier, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+		assert.NoError(t, err)
+
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "account"),
+			WithArg("marketplace", "find"),
 			WithArg("user", name),
-			WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+			WithArg("ftAliasOrIdentifier", ftIdentifier),
 			WithArg("amount", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
@@ -301,74 +308,15 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 }
 
-func setupDapper(otu *OverflowTestUtils) *OverflowTestUtils {
-	//first step create the adminClient as the fin user
-
-	dapperSigner := WithSigner("user5-dapper")
-	findSigner := WithSigner("find")
-	saSigner := WithSigner("account")
-
-	otu.O.Tx("setup_fin_1_create_client", findSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the versus client
-	otu.O.Tx("setup_fin_2_register_client",
-		saSigner,
-		WithArg("ownerAddress", "find"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//set up fin network as the fin user
-	otu.O.Tx("setup_fin_3_create_network", findSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	otu.O.Tx("setup_find_market_1", dapperSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the versus client
-	otu.O.Tx("setup_find_dapper_market",
-		findSigner,
-		WithArg("adminAddress", "user5-dapper"),
-		WithArg("tenantAddress", "account"),
-		WithArg("name", "onefootball"),
-	).AssertSuccess(otu.T)
-
-	// Setup Lease Market
-	otu.O.Tx("setup_find_market_1",
-		WithSigner("user4")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	//link in the server in the client
-	otu.O.Tx("setup_find_lease_market_2",
-		WithSigner("find"),
-		WithArg("tenantAddress", "user4"),
-		WithArg("merchantAddress", "user4"),
-	).AssertSuccess(otu.T)
-
-	otu.createUser(100.0, "account")
-	otu.createUser(100.0, "user4")
-
-	//link in the server in the versus client
-	otu.O.Tx("devSetResidualAddress",
-		findSigner,
-		WithArg("address", "find"),
-	).AssertSuccess(otu.T)
-
-	otu.O.Tx("adminInitDapper",
-		dapperSigner,
-		WithArg("dapperAddress", "account"),
-	).AssertSuccess(otu.T)
-
-	return otu.tickClock(1.0)
-}
-
 func listNFTForSaleDUC(otu *OverflowTestUtils, name string, id uint64, price float64) *OverflowTestUtils {
 
+	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", DUCType),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -385,12 +333,13 @@ func listNFTForSaleDUC(otu *OverflowTestUtils, name string, id uint64, price flo
 
 func listNFTForSoftAuction(otu *OverflowTestUtils, name string, id uint64, price float64) *OverflowTestUtils {
 
+	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("marketplace", "find"),
+		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", DUCType),
 		WithArg("price", price),
 		WithArg("auctionReservePrice", price+5.0),
 		WithArg("auctionDuration", 300.0),
@@ -415,7 +364,7 @@ func auctionBidMarketSoft(otu *OverflowTestUtils, name string, seller string, id
 
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -433,13 +382,14 @@ func auctionBidMarketSoft(otu *OverflowTestUtils, name string, seller string, id
 
 func directOfferMarketSoft(otu *OverflowTestUtils, name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
+	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", "A.f8d6e0586b0a20c7.Dandy.NFT"),
+		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "A.f8d6e0586b0a20c7.DapperUtilityCoin.Vault"),
+		WithArg("ftAliasOrIdentifier", DUCType),
 		WithArg("amount", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
 	).
@@ -458,7 +408,7 @@ func acceptDirectOfferMarketSoft(otu *OverflowTestUtils, name string, id uint64,
 
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "account"),
+		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).

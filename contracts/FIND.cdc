@@ -1915,8 +1915,8 @@ pub contract FIND {
 				panic("Merch Account address does not match with expected")
 			}
 		} else {
-		// otherwise falls into emulator and user user5-dapper
-			if merchAccount != 0x120e725050340cab{
+		// otherwise falls into emulator and user dapper
+			if merchAccount != 0x01cf0e2f2f715450{
 				panic("Merch Account address does not match with expected ".concat(merchAccount.toString()))
 			}
 		}

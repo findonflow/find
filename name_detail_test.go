@@ -33,7 +33,7 @@ func TestNameDetailScript(t *testing.T) {
 			WithArg("target", "user2"),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, "A.f8d6e0586b0a20c7.FindRelatedAccounts.RelatedAccount", map[string]interface{}{
+			AssertEvent(t, otu.identifier("FindRelatedAccounts", "RelatedAccount"), map[string]interface{}{
 				"walletName": "dapper",
 				"user":       otu.O.Address("user1"),
 				"address":    otu.O.Address("user2"),
@@ -51,7 +51,7 @@ func TestNameDetailScript(t *testing.T) {
 					"currentTime":         1,
 					"extensionOnLateBid":  300,
 					"latestBid":           8,
-					"latestBidBy":         "0x179b6b1cb6755e31",
+					"latestBidBy":         otu.O.Address("user1"),
 					"lockedUntil":         3.9312001e+07,
 					"name":                "user2",
 					"status":              "TAKEN",
