@@ -1268,7 +1268,26 @@ pub contract FindMarket {
 				royaltyReceiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 			if totalRoyalties != saleItem.getTotalRoyalties() {
-				panic("The total Royalties to be paid is changed after listing.")
+				var contractAddress = "f8d6e0586b0a20c7"
+
+				switch FindMarket.account.address {
+					// testnet
+					case Address(0x35717efbbce11c74) :
+						contractAddress = "46625f59708ec2f8"
+
+					// mainnet
+					case Address(0x097bafa4e0b48eef) :
+						contractAddress = "30cf5dcf6ea8d379"
+				}
+				//mainnet
+				var aeraTypes : [String] = [
+					"A.".concat(contractAddress).concat(".AeraPanels.NFT"),
+					"A.".concat(contractAddress).concat(".AeraRewards.NFT")
+				]
+				// If the changed types are not in the list, then reject the function call
+				if !aeraTypes.contains(nftInfo.type) {
+					panic("The total Royalties to be paid is changed after listing.")
+				}
 			}
 		}
 
