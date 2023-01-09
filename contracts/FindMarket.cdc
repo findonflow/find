@@ -1269,6 +1269,7 @@ pub contract FindMarket {
 			}
 			if totalRoyalties != saleItem.getTotalRoyalties() {
 				var contractAddress = "f8d6e0586b0a20c7"
+				var aeraTypes : [String] = []
 
 				switch FindMarket.account.address {
 					// testnet
@@ -1278,12 +1279,13 @@ pub contract FindMarket {
 					// mainnet
 					case Address(0x097bafa4e0b48eef) :
 						contractAddress = "30cf5dcf6ea8d379"
+
 				}
 				//mainnet
-				var aeraTypes : [String] = [
+				aeraTypes.appendAll( [
 					"A.".concat(contractAddress).concat(".AeraPanels.NFT"),
 					"A.".concat(contractAddress).concat(".AeraRewards.NFT")
-				]
+				])
 				// If the changed types are not in the list, then reject the function call
 				if !aeraTypes.contains(nftInfo.type) {
 					panic("The total Royalties to be paid is changed after listing.")

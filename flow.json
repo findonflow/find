@@ -292,6 +292,7 @@
 		"CollectionFactory": "./contracts/CollectionFactory.cdc",
 		"Dandy": "./contracts/Dandy.cdc",
 		"FindRulesCache": "./contracts/FindRulesCache.cdc",
+		"Dev": "./contracts/Dev.cdc",
 		"FindMarket": "./contracts/FindMarket.cdc",
 		"FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
 		"FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
@@ -601,7 +602,8 @@
 				"FindFurnace",
 				"FindUtils",
 				"FindUserStatus",
-				"FindThoughts"
+				"FindThoughts",
+				"Dev"
 			],
 			"emulator-find-admin": [],
 			"emulator-find-forge": [

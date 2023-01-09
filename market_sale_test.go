@@ -922,4 +922,41 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("should be able to buy Aera NFTs even royalties changed", func(t *testing.T) {
+		otu.listExampleNFTForSale("user1", 0, price)
+
+		type FindMarket_NFTInfo struct {
+			ID                    uint64            `json:"id"`
+			Name                  string            `json:"name"`
+			Thumbnail             string            `json:"thumbnail"`
+			Type                  string            `json:"type"`
+			Rarity                *string           `json:"rarity"`
+			EditionNumber         *uint64           `json:"editionNumber"`
+			TotalInEdition        *uint64           `json:"totalInEdition"`
+			Scalars               map[string]uint64 `json:"scalars"`
+			Tags                  map[string]string `json:"tags"`
+			CollectionName        *string           `json:"collectionName"`
+			CollectionDescription *string           `json:"collectionDescription"`
+		}
+
+		otu.O.Tx(`
+			import Dev from "../contracts/Dev.cdc"
+			import FindMarket from "../contracts/FindMarket.cdc"
+
+			transaction(nft: FindMarket.NFTInfo) {
+				prepare(account: AuthAccount){
+					Dev.TestRoyaltyChangedPayFunction(addr: account.address, nftInfo: nft)
+				}
+			}
+		`,
+			WithSigner("user1"),
+			WithArg("nft", FindMarket_NFTInfo{
+				ID:   1,
+				Type: "A.f8d6e0586b0a20c7.AeraPanels.NFT",
+			}),
+		).
+			AssertSuccess(t)
+
+	})
+
 }
