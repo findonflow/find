@@ -117,6 +117,9 @@ func main() {
 		//"ChainmonstersRewards":    `["A.93615d25d14fa337.ChainmonstersRewards.NFT"]`,
 		//"TheFootballClub":         `["A.81e95660ab5308e1.TFCItems.NFT"]`,
 		//"PartyMansion": `["A.34f2bf4a80bb0f69.PartyMansionDrinksContract.NFT", "A.34f2bf4a80bb0f69.GooberXContract.NFT"]`,
+		"YoungBoysBern": `["A.20187093790b9aef.YoungBoysBern.NFT"]`,
+		"PharaohCats":   `["A.9d21537544d9123d.Momentables.NFT"]`,
+		"DalleOnFlow":   `["A.58d08685febcfea5.DalleOnFlow.NFT"]`,
 
 		// Delisted
 	}
