@@ -1,5 +1,16 @@
 pub contract FindUtils {
 
+	pub fun joinMapToString( _ map:{String:String}) : String {
+		var message=""
+		for i, key in map.keys {
+			if i > 0 {
+				message=message.concat(" ")
+			}
+			message=message.concat(key.concat("=").concat(map[key]!))
+		}
+		return message
+	}
+
     pub fun containsChar(_ string: String, char: Character) : Bool {
         if var index = string.utf8.firstIndex(of: char.toString().utf8[0]) {
             return true
@@ -9,7 +20,7 @@ pub contract FindUtils {
 
     pub fun contains(_ string: String, element: String) : Bool {
         if element.length == 0 {
-            return true 
+            return true
         }
         if var index = string.utf8.firstIndex(of: element.utf8[0]) {
             while index <= ( string.length - element.length) {
@@ -19,7 +30,7 @@ pub contract FindUtils {
                 index = index + 1
             }
         }
-        
+
         return false
     }
 
@@ -59,7 +70,7 @@ pub contract FindUtils {
     pub fun toUpper(_ string: String) : String {
         let map = FindUtils.getLowerCaseToUpperCase()
         var res = ""
-        var i = 0 
+        var i = 0
         while i < string.length {
             let c = map[string[i].toString()] ?? string[i].toString()
             res = res.concat(c)
@@ -75,14 +86,14 @@ pub contract FindUtils {
         let map = FindUtils.getLowerCaseToUpperCase()
         if let first = map[string[0].toString()] {
             return first.concat(string.slice(from: 1, upTo: string.length))
-             
+
         }
         return string
     }
 
     pub fun to_snake_case(_ string: String) : String {
-        var res = "" 
-        var i = 0 
+        var res = ""
+        var i = 0
         let map = FindUtils.getUpperCaseToLowerCase()
         var spaced = false
         while i < string.length {
@@ -90,7 +101,7 @@ pub contract FindUtils {
                 res = res.concat("_")
                 spaced = true
                 i = i + 1
-                continue 
+                continue
             }
             if let lowerCase = map[string[i].toString()] {
                 if i > 0 && !spaced {
@@ -99,7 +110,7 @@ pub contract FindUtils {
                 res = res.concat(lowerCase)
                 i = i + 1
                 spaced == false
-                continue 
+                continue
             }
             res = res.concat(string[i].toString())
             i = i + 1
@@ -108,8 +119,8 @@ pub contract FindUtils {
     }
 
     pub fun toCamelCase(_ string: String) : String {
-        var res = "" 
-        var i = 0 
+        var res = ""
+        var i = 0
         let map = FindUtils.getLowerCaseToUpperCase()
         var upper = false
         let string = string.toLower()
@@ -117,13 +128,13 @@ pub contract FindUtils {
             if string[i] == " " || string[i] == "_" {
                 upper = true
                 i = i + 1
-                continue 
+                continue
             }
             if upper {
                 if let upperCase = map[string[i].toString()] {
                     res = res.concat(upperCase)
-                    upper = false 
-                    i = i + 1 
+                    upper = false
+                    i = i + 1
                     continue
                 }
             }
@@ -194,7 +205,6 @@ pub contract FindUtils {
             "Z" : "z"
         }
     }
-    
+
 }
- 
- 
+
