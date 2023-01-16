@@ -16,7 +16,7 @@ pub contract FindViews {
 		}
 
 		pub fun uri(): String {
-			return self.content
+			return "data:".concat(self.mediaType).concat(",").concat(self.content)
 		}
 	}
 
@@ -36,7 +36,7 @@ pub contract FindViews {
 		}
 
 		pub fun uri(): String {
-			let media = self.pointer.resolveView(Type<OnChainFile>()) 
+			let media = self.pointer.resolveView(Type<OnChainFile>())
 			if media == nil {
 				return ""
 			}
@@ -45,7 +45,7 @@ pub contract FindViews {
 	}
 
 	pub resource interface VaultViews {
-        pub var balance: UFix64 
+        pub var balance: UFix64
 
         pub fun getViews() : [Type]
         pub fun resolveView(_ view: Type): AnyStruct?
@@ -64,7 +64,7 @@ pub contract FindViews {
         pub let createEmptyVault: ((): @FungibleToken.Vault)
 
         init(
-            tokenAlias: String, 
+            tokenAlias: String,
             storagePath: StoragePath,
             receiverPath: PublicPath,
             balancePath: PublicPath,
@@ -115,20 +115,20 @@ pub contract FindViews {
 		pub fun resolveView(_ type: Type) : AnyStruct?
 		pub fun getUUID() :UInt64
 		pub fun getViews() : [Type]
-		pub fun owner() : Address 
-		pub fun valid() : Bool 
-		pub fun getItemType() : Type 
+		pub fun owner() : Address
+		pub fun valid() : Bool
+		pub fun getItemType() : Type
 		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver}
 
 		//There are just convenience functions for shared views in the standard
 		pub fun getRoyalty() : MetadataViews.Royalties
 		pub fun getTotalRoyaltiesCut() : UFix64
 
-		//Requred views 
+		//Requred views
 		pub fun getDisplay() : MetadataViews.Display
 		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 
-		pub fun checkSoulBound() : Bool 
+		pub fun checkSoulBound() : Bool
 
 	}
 
@@ -139,9 +139,9 @@ pub contract FindViews {
 
 	pub struct ViewReadPointer : Pointer {
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
-		pub let id: UInt64 
-		pub let uuid: UInt64 
-		pub let itemType: Type 
+		pub let id: UInt64
+		pub let uuid: UInt64
+		pub let itemType: Type
 
 		init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
 			self.cap=cap
@@ -237,7 +237,7 @@ pub contract FindViews {
 		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		pub let id: UInt64
 		pub let nounce: UInt64
-		pub let uuid: UInt64 
+		pub let uuid: UInt64
 		pub let itemType: Type
 
 		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
@@ -333,7 +333,7 @@ pub contract FindViews {
 		pub fun owner() : Address {
 			return self.cap.address
 		}
-		
+
 		pub fun getItemType() : Type {
 			return self.itemType
 		}
@@ -376,4 +376,3 @@ pub contract FindViews {
 		return false
 	}
 }
- 
