@@ -57,8 +57,10 @@ pub contract FindRelatedAccounts {
 			if let wallets = self.networks[network] {
 				for wallet in wallets {
 					let ws = self.wallets[wallet]! 
-					if ws.contains(address) {
-						return true
+					for wss in ws {
+						if wss.toLower() == address.toLower() {
+							return true
+						}
 					}
 				}
 			}
