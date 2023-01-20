@@ -25,24 +25,24 @@ pub contract FindRelatedAccounts {
 	}
 
 	pub resource interface Public{
-		pub fun getFlowAccounts() : {String: [Address]} 
-		pub fun getRelatedAccounts(_ network: String) : {String : [String]} 
-		pub fun getAllRelatedAccounts() : {String : {String : [String]}} 
-		pub fun getAllRelatedAccountInfo() : {String : AccountInformation} 
-		pub fun verify(network: String, address: String) : Bool 
+		pub fun getFlowAccounts() : {String: [Address]}
+		pub fun getRelatedAccounts(_ network: String) : {String : [String]}
+		pub fun getAllRelatedAccounts() : {String : {String : [String]}}
+		pub fun getAllRelatedAccountInfo() : {String : AccountInformation}
+		pub fun verify(network: String, address: String) : Bool
 		pub fun getIdentifier(name: String, network: String, address: String) : String
 	}
 
 	/// This is just an empty resource we create in storage, you can safely send a reference to it to obtain msg.sender
 	pub resource Accounts: Public {
 
-		// { ETH : ETH_Blocto }  
+		// { ETH : ETH_Blocto }
 		access(self) let networks: {String : [String]}
 		// { ETH_Blocto : [Address] }
 		access(self) let wallets : {String : [String]}
 		// { ETH_Blocto_Address : AccountInformation }
 		access(self) let accounts : {String : AccountInformation}
-		
+
 		init() {
 			self.networks={}
 			self.wallets={}
@@ -56,7 +56,7 @@ pub contract FindRelatedAccounts {
 		pub fun verify(network: String, address: String) : Bool {
 			if let wallets = self.networks[network] {
 				for wallet in wallets {
-					let ws = self.wallets[wallet]! 
+					let ws = self.wallets[wallet]!
 					for wss in ws {
 						if wss.toLower() == address.toLower() {
 							return true
@@ -72,7 +72,7 @@ pub contract FindRelatedAccounts {
 			let tempItems : {String: [Address]} ={}
 			if let wallets = self.networks[network] {
 				for wallet in wallets {
-					let ws = self.wallets[wallet]! 
+					let ws = self.wallets[wallet]!
 					for addr in ws {
 						let id = wallet.concat("_").concat(addr)
 						let info = self.accounts[id]!
@@ -80,9 +80,9 @@ pub contract FindRelatedAccounts {
 						let tempArray = tempItems[wallet] ?? []
 						tempArray.append(info.address!)
 						tempItems[wallet] = tempArray
-					} 
+					}
 				}
-			} 
+			}
 			return tempItems
 		}
 
@@ -117,9 +117,9 @@ pub contract FindRelatedAccounts {
 				let tempItems : {String: [String]} = tempRes[n] ?? {}
 				if let wallets = self.networks[n] {
 					for wallet in wallets {
-						let ws = self.wallets[wallet]! 
+						let ws = self.wallets[wallet]!
 						let tempArray = tempItems[wallet] ?? []
-						tempArray.appendAll(ws) 
+						tempArray.appendAll(ws)
 						tempItems[wallet] = tempArray
 					}
 				}
@@ -132,7 +132,7 @@ pub contract FindRelatedAccounts {
 			let network = "Flow"
 			let id = self.getIdentifier(name: name, network: network, address: address.toString())
 			if self.accounts[id] != nil {
-				panic(network.concat(" address already added as related account : ").concat(address.toString()))
+				return
 			}
 			self.internal_add(id: id, acct: AccountInformation(name: name, address:address, network: network, otherAddress:nil))
 			emit RelatedAccount(user: self.owner!.address, walletId: id, walletName: name, address: address.toString(), network: network, action: "add")
@@ -141,7 +141,7 @@ pub contract FindRelatedAccounts {
 		pub fun addRelatedAccount(name: String, network: String, address: String) {
 			let id = self.getIdentifier(name: name, network: network, address: address)
 			if self.accounts[id] != nil {
-				panic(network.concat(" address already added as related account : ").concat(address))
+				return
 			}
 			self.internal_add(id: id, acct: AccountInformation(name: name, address:nil, network: network, otherAddress:address))
 			emit RelatedAccount(user: self.owner!.address, walletId: id, walletName: name, address: address, network: network, action: "add")
@@ -190,16 +190,16 @@ pub contract FindRelatedAccounts {
 			if tempWallets.length > 0 {
 				self.wallets[walletName] = tempWallets
 				return
-			} 
+			}
 			self.wallets.remove(key: walletName)
-			
-			let tempNetwork = self.networks[acct.network]! 
+
+			let tempNetwork = self.networks[acct.network]!
 			tempNetwork.remove(at: tempNetwork.firstIndex(of: walletName)!)
 			if tempNetwork.length > 0 {
 				self.networks[acct.network] = tempNetwork
 				return
-			} 
-			self.networks.remove(key: acct.network)	
+			}
+			self.networks.remove(key: acct.network)
 		}
 	}
 
@@ -225,4 +225,4 @@ pub contract FindRelatedAccounts {
 }
 
 
- 
+
