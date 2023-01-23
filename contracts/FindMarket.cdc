@@ -1358,12 +1358,6 @@ pub contract FindMarket {
 
 				for trait in traits {
 
-					if singleTrait != nil {
-						if singleTrait!.name == trait.name {
-							continue
-						}
-					}
-
 					let name = trait.name
 					let display = trait.displayType ?? "String"
 
