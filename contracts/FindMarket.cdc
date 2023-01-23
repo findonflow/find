@@ -1413,11 +1413,6 @@ pub contract FindMarket {
 				}
 
 				for edition in editions {
-					if singleEdition != nil {
-						if singleEdition!.name == edition.name {
-							continue
-						}
-					}
 
 					if edition.name == nil {
 						self.editionNumber=edition.number
