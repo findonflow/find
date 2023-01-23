@@ -145,7 +145,7 @@ pub contract FindRelatedAccounts {
 			let network = "Flow"
 			let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address.toString())
 			if self.accounts[id] != nil {
-				panic(network.concat(" address already added as related account : ").concat(address.toString()))
+				return
 			}
 			self.internal_add(id: id, acct: AccountInformation(name: name, address:address, network: network, otherAddress:nil))
 			emit RelatedAccount(user: self.owner!.address, walletId: id, walletName: name, address: address.toString(), network: network, action: "add")
@@ -154,7 +154,7 @@ pub contract FindRelatedAccounts {
 		pub fun addRelatedAccount(name: String, network: String, address: String) {
 			let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address)
 			if self.accounts[id] != nil {
-				panic(network.concat(" address already added as related account : ").concat(address))
+				return
 			}
 			self.internal_add(id: id, acct: AccountInformation(name: name, address:nil, network: network, otherAddress:address))
 			emit RelatedAccount(user: self.owner!.address, walletId: id, walletName: name, address: address, network: network, action: "add")
@@ -254,5 +254,3 @@ pub contract FindRelatedAccounts {
 	}
 
 }
-
-

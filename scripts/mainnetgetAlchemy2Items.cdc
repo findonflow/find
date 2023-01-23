@@ -1,5 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 
 // /* Alchemy Mainnet Wrapper */
 // import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
@@ -18,13 +19,13 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 }
 
     pub struct CollectionReport {
-        pub let items : {String : [MetadataCollectionItem]} 
-        pub let collections : {String : Int} // mapping of collection to no. of ids 
-        pub let extraIDs : {String : [UInt64]} 
+        pub let items : {String : [MetadataCollectionItem]}
+        pub let collections : {String : Int} // mapping of collection to no. of ids
+        pub let extraIDs : {String : [UInt64]}
 
         init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
-            self.items=items 
-            self.collections=collections 
+            self.items=items
+            self.collections=collections
             self.extraIDs=extraIDs
         }
     }
@@ -37,22 +38,22 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
         pub let nftDetailIdentifier: String
 
         pub let media  : String
-        pub let mediaType : String 
-        pub let source : String 
+        pub let mediaType : String
+        pub let source : String
 
         init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
             self.id=id
-            self.name=name 
-            self.collection=collection 
-            self.subCollection=subCollection 
-            self.media=media 
-            self.mediaType=mediaType 
+            self.name=name
+            self.collection=collection
+            self.subCollection=subCollection
+            self.media=media
+            self.mediaType=mediaType
             self.source=source
             self.nftDetailIdentifier=nftDetailIdentifier
         }
     }
 
-    // Helper function 
+    // Helper function
 
     pub fun resolveAddress(user: String) : PublicAccount? {
 	    let address = FIND.resolve(user)
@@ -75,7 +76,7 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 	    }
 
         let items : {String : [MetadataCollectionItem]} = {}
-        
+
         let fetchingIDs = collectionIDs
 
         for project in fetchingIDs.keys {
@@ -110,11 +111,11 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
                     id: nft!.id,
                     name: nft!.title ?? "",
                     collection: project,
-                    subCollection: nil, 
+                    subCollection: nil,
                     media: media,
                     mediaType: mediaType,
-                    source: source, 
-                    nftDetailIdentifier: project 
+                    source: source,
+                    nftDetailIdentifier: project
                 )
                 collectionItems.append(item)
             }
@@ -129,11 +130,10 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 
     pub fun rename(_ name: String) : String {
 
-			let mslength = "MintStoreItem".length
-			
-			if name.length > mslength  && name.slice(from: 0, upTo: mslength) == "MintStoreItem" {
-        return "MintStoreItem"
-      }
-      return name
+		if FindUtils.contains(name, element: "MintStoreItem") {
+			return "MintStoreItem"
+		}
+		return name
+
     }
-    
+

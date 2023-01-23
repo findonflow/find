@@ -1,6 +1,7 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 // /* Alchemy Mainnet Wrapper */
 // import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
@@ -23,14 +24,14 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
     pub let NFTCatalogContracts : [String] = getNFTCatalogContracts()
 
     pub struct ItemReport {
-        pub let length : Int // mapping of collection to no. of ids 
+        pub let length : Int // mapping of collection to no. of ids
         pub let extraIDs : [UInt64]
-        pub let shard : String 
-        pub let extraIDsIdentifier : String 
+        pub let shard : String
+        pub let extraIDsIdentifier : String
 	    pub let collectionName: String
 
         init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
-            self.length=length 
+            self.length=length
             self.extraIDs=extraIDs
             self.shard=shard
             self.extraIDsIdentifier=extraIDsIdentifier
@@ -38,7 +39,7 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
         }
     }
 
-    // Helper function 
+    // Helper function
 
     pub fun resolveAddress(user: String) : Address? {
 	    return FIND.resolve(user)
@@ -68,7 +69,7 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
                 extraIDs.remove(key: project)
                 continue
             }
-            
+
             let collectionLength = extraIDs[project]!.length
 
             // by pass if this is not the target collection
@@ -83,8 +84,8 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
                     continue
                 }
             }
-            
-            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: project, collectionName: contractItem[0]?.contract?.name ?? project)
+
+            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: rename(project), collectionName: contractItem[0]?.contract?.name ?? project)
 
         }
 
@@ -94,10 +95,9 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
 
     pub fun rename(_ name: String) : String {
 
-			let mslength = "MintStoreItem".length
-			
-			if name.length > mslength  && name.slice(from: 0, upTo: mslength) == "MintStoreItem" {
-        return "MintStoreItem"
-      }
-      return name
+		if FindUtils.contains(name, element: "MintStoreItem") {
+			return "MintStoreItem"
+		}
+		return name
+
     }
