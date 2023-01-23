@@ -465,4 +465,133 @@ func TestFIND(t *testing.T) {
 		assert.NoError(t, res.Err)
 	})
 
+	user1Address := otu.O.Address("user1")
+	user2Address := otu.O.Address("user2")
+	user3Address := otu.O.Address("user3")
+	otu.expireLease().tickClock(2.0)
+	otu.registerUser("user1")
+	t.Run("Should be able to register related account and mutually link it for trust", func(t *testing.T) {
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user1"),
+			WithArg("name", "link"),
+			WithArg("target", user2Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Script("devgetLinked",
+			WithArg("user", "user1"),
+			WithArg("name", "link"),
+			WithArg("address", user2Address),
+		).
+			AssertWant(t, autogold.Want("should be false, not linked", false))
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user2"),
+			WithArg("name", "wrongName"),
+			WithArg("target", user1Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Script("devgetLinked",
+			WithArg("user", "user1"),
+			WithArg("name", "link"),
+			WithArg("address", user2Address),
+		).
+			AssertWant(t, autogold.Want("should be false, wrong name", false))
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user2"),
+			WithArg("name", "link"),
+			WithArg("target", user1Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Script("devgetLinked",
+			WithArg("user", "user1"),
+			WithArg("name", "link"),
+			WithArg("address", user2Address),
+		).
+			AssertWant(t, autogold.Want("should be true", true))
+
+		otu.O.Tx("removeRelatedAccount",
+			WithSigner("user2"),
+			WithArg("name", "link"),
+			WithArg("network", "Flow"),
+			WithArg("address", user1Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Script("devgetLinked",
+			WithArg("user", "user1"),
+			WithArg("name", "link"),
+			WithArg("address", user2Address),
+		).
+			AssertWant(t, autogold.Want("should be false, removed link", false))
+
+		otu.O.Tx("removeRelatedAccount",
+			WithSigner("user1"),
+			WithArg("name", "link"),
+			WithArg("network", "Flow"),
+			WithArg("address", user2Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("removeRelatedAccount",
+			WithSigner("user2"),
+			WithArg("name", "wrongName"),
+			WithArg("network", "Flow"),
+			WithArg("address", user1Address),
+		).
+			AssertSuccess(t)
+
+	})
+
+	t.Run("Should be able to getStatus for trusted accounts", func(t *testing.T) {
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user1"),
+			WithArg("name", "link"),
+			WithArg("target", user2Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user1"),
+			WithArg("name", "notLink"),
+			WithArg("target", user3Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Tx("setRelatedAccount",
+			WithSigner("user2"),
+			WithArg("name", "link"),
+			WithArg("target", user1Address),
+		).
+			AssertSuccess(t)
+
+		otu.O.Script("getStatus",
+			WithArg("user", "user1"),
+		).
+			Print().
+			AssertWithPointerWant(t, "/FINDReport/accounts",
+				autogold.Want("with accounts", `[]interface {}{
+  map[string]interface {}{
+    "address": "0xf669cb8d41ce0c74",
+    "name": "link",
+    "network": "Flow",
+    "node": "FindRelatedAccounts",
+    "trusted": true,
+  },
+  map[string]interface {}{
+    "address": "0x192440c99cb17282",
+    "name": "notLink",
+    "network": "Flow",
+    "node": "FindRelatedAccounts",
+    "trusted": false,
+  },
+}`))
+
+	})
+
 }

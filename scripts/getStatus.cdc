@@ -17,35 +17,42 @@ pub struct FINDReport{
 	pub let isDapper: Bool
 	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
-	pub let relatedAccounts: { String: [Address]}
+
 	pub let leases: [FIND.LeaseInformation]
 	pub let privateMode: Bool
 	pub let leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}
 	pub let leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}
 	pub let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
 	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
-	pub let activatedAccount: Bool 
+	pub let activatedAccount: Bool
 
 	// NFT Catalog outputs
 	pub let lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}
 
-	// EmeraldID Account Linkage 
+	// This is deprecating, moving to accounts
+	pub let relatedAccounts: { String: [Address]}
+
+	// This is deprecating, moving to accounts
+	// EmeraldID Account Linkage
 	pub let emeraldIDAccounts : {String : Address}
 
+	pub let accounts : [AccountInformation]?
 
-	init(profile: Profile.UserReport?, 
-		 relatedAccounts: {String: [Address]}, 
-		 bids: [FIND.BidInfo], 
-		 leases : [FIND.LeaseInformation], 
-		 privateMode: Bool, 
-		 leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport}, 
-		 leasesBids: {String : FindLeaseMarket.BidItemCollectionReport}, 
-		 itemsForSale: {String : FindMarket.SaleItemCollectionReport}, 
-		 marketBids: {String : FindMarket.BidItemCollectionReport}, 
-		 activatedAccount: Bool, 
-		 lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}, 
+
+	init(profile: Profile.UserReport?,
+		 relatedAccounts: {String: [Address]},
+		 bids: [FIND.BidInfo],
+		 leases : [FIND.LeaseInformation],
+		 privateMode: Bool,
+		 leasesForSale: {String : FindLeaseMarket.SaleItemCollectionReport},
+		 leasesBids: {String : FindLeaseMarket.BidItemCollectionReport},
+		 itemsForSale: {String : FindMarket.SaleItemCollectionReport},
+		 marketBids: {String : FindMarket.BidItemCollectionReport},
+		 activatedAccount: Bool,
+		 lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData},
 		 emeraldIDAccounts : {String : Address},
-		 isDapper: Bool
+		 isDapper: Bool,
+		 accounts: [AccountInformation]?
 		 ) {
 
 		self.profile=profile
@@ -61,19 +68,36 @@ pub struct FINDReport{
 		self.lostAndFoundTypes=lostAndFoundTypes
 		self.emeraldIDAccounts=emeraldIDAccounts
 		self.isDapper=isDapper
+		self.accounts=accounts
+	}
+}
+
+pub struct AccountInformation {
+	pub let name: String
+	pub let address: String
+	pub let network: String
+	pub let trusted: Bool
+	pub let node: String
+
+	init(name: String, address: String, network: String, trusted: Bool, node: String) {
+		self.name = name
+		self.address = address
+		self.network = network
+		self.trusted = trusted
+		self.node = node
 	}
 }
 
 pub struct NameReport {
-	pub let status: String 
-	pub let cost: UFix64 
-	pub let owner: Address? 
-	pub let validUntil: UFix64? 
-	pub let lockedUntil: UFix64? 
-	pub let registeredTime: UFix64? 
+	pub let status: String
+	pub let cost: UFix64
+	pub let owner: Address?
+	pub let validUntil: UFix64?
+	pub let lockedUntil: UFix64?
+	pub let registeredTime: UFix64?
 
 	init(status: String, cost: UFix64, owner: Address?, validUntil: UFix64?, lockedUntil: UFix64?, registeredTime: UFix64? ) {
-		self.status=status 
+		self.status=status
 		self.cost=cost
 		self.owner=owner
 		self.validUntil=validUntil
@@ -87,7 +111,7 @@ pub struct Report {
 	pub let NameReport: NameReport?
 
 	init(FINDReport: FINDReport?, NameReport: NameReport?) {
-		self.FINDReport=FINDReport 
+		self.FINDReport=FINDReport
 		self.NameReport=NameReport
 	}
 }
@@ -123,7 +147,7 @@ pub fun main(user: String) : Report? {
 
 			let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:findLease, address: address, getLeaseInfo:true)
 
-			var profileReport = profile?.asReport() 
+			var profileReport = profile?.asReport()
 			if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
 				profileReport = Profile.UserReport(
 					findName: "",
@@ -134,7 +158,7 @@ pub fun main(user: String) : Report? {
 					tags: profileReport!.tags,
 					avatar: profileReport!.avatar,
 					links: profileReport!.links,
-					wallets: profileReport!.wallets, 
+					wallets: profileReport!.wallets,
 					following: profileReport!.following,
 					followers: profileReport!.followers,
 					allowStoringFollowers: profileReport!.allowStoringFollowers,
@@ -142,15 +166,15 @@ pub fun main(user: String) : Report? {
 				)
 			}
 
-			// NFTCatalog Output 
+			// NFTCatalog Output
 			let nftCatalogTypes = FINDNFTCatalog.getCatalogTypeData()
 			let types : {String : NFTCatalog.NFTCollectionData} = {}
 			for type in FindLostAndFoundWrapper.getSpecificRedeemableTypes(user: address, specificType: Type<@NonFungibleToken.NFT>()) {
 				types[type.identifier] = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: type.identifier)
 			}
 
-			let discordID = EmeraldIdentity.getDiscordFromAccount(account: address) 
-									?? EmeraldIdentityDapper.getDiscordFromAccount(account: address) 
+			let discordID = EmeraldIdentity.getDiscordFromAccount(account: address)
+									?? EmeraldIdentityDapper.getDiscordFromAccount(account: address)
 									?? EmeraldIdentityLilico.getDiscordFromAccount(account: address)
 									?? ""
 
@@ -158,21 +182,58 @@ pub fun main(user: String) : Report? {
 			emeraldIDAccounts["blocto"] = EmeraldIdentity.getAccountFromDiscord(discordID: discordID)
 			emeraldIDAccounts["lilico"] = EmeraldIdentityLilico.getAccountFromDiscord(discordID: discordID)
 			emeraldIDAccounts["dapper"] = EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID)
-			
+
+			let accounts : [AccountInformation] = []
+			for wallet in ["blocto", "lilico", "dapper"] {
+				if let w = emeraldIDAccounts[wallet] {
+					accounts.append(
+						AccountInformation(
+							name: wallet,
+							address: w.toString(),
+							network: "Flow",
+							trusted: true,
+							node: "EmeraldID")
+					)
+				}
+			}
+
+			let allAcctsCap = FindRelatedAccounts.getCapability(address)
+			if allAcctsCap.check() {
+				let allAcctsRef = allAcctsCap.borrow()!
+				let allAccts = allAcctsRef.getAllRelatedAccountInfo()
+				for acct in allAccts.values {
+					// We only verify flow accounts that are mutually linked
+					var trusted = false
+					if acct.address != nil {
+						trusted = allAcctsRef.linked(name: acct.name, network: acct.network, address: acct.address!)
+					}
+					accounts.append(
+						AccountInformation(
+							name: acct.name,
+							address: acct.stringAddress!,
+							network: acct.network,
+							trusted: trusted,
+							node: "FindRelatedAccounts")
+					)
+				}
+			}
+
+
 			findReport = FINDReport(
 				profile: profileReport,
 				relatedAccounts: FindRelatedAccounts.findRelatedFlowAccounts(address:address),
 				bids: bidCap.borrow()?.getBids() ?? [],
 				leases: leaseCap.borrow()?.getLeaseInformation() ?? [],
 				privateMode: profile?.isPrivateModeEnabled() ?? false,
-				leasesForSale: leasesSale, 
+				leasesForSale: leasesSale,
 				leasesBids: leasesBids,
 				itemsForSale: items,
 				marketBids: marketBids,
-				activatedAccount: true, 
-				lostAndFoundTypes: types, 
+				activatedAccount: true,
+				lostAndFoundTypes: types,
 				emeraldIDAccounts: emeraldIDAccounts,
-				isDapper:isDapper
+				isDapper:isDapper,
+				accounts: accounts
 			)
 		} else {
 			findReport = FINDReport(
@@ -181,34 +242,35 @@ pub fun main(user: String) : Report? {
 				bids: [],
 				leases: [],
 				privateMode: false,
-				leasesForSale: {}, 
+				leasesForSale: {},
 				leasesBids: {},
 				itemsForSale: {},
 				marketBids: {},
-				activatedAccount: false, 
-				lostAndFoundTypes: {}, 
+				activatedAccount: false,
+				lostAndFoundTypes: {},
 				emeraldIDAccounts: {},
-				isDapper: false
+				isDapper: false,
+				accounts: nil
 			)
 		}
 	}
 
-	var nameReport : NameReport? = nil 
+	var nameReport : NameReport? = nil
 	if FIND.validateFindName(user) {
 		let status = FIND.status(user)
 		let cost=FIND.calculateCost(user)
-		var s="TAKEN"	
+		var s="TAKEN"
 		if status.status == FIND.LeaseStatus.FREE {
 			s="FREE"
 		} else if status.status == FIND.LeaseStatus.LOCKED {
 			s="LOCKED"
 		}
-		let findAddr = FIND.getFindNetworkAddress() 
+		let findAddr = FIND.getFindNetworkAddress()
 		let network = getAuthAccount(findAddr).borrow<&FIND.Network>(from: FIND.NetworkStoragePath)!
 		let lease =  network.getLease(user)
 		nameReport = NameReport(status: s, cost: cost, owner: lease?.address, validUntil: lease?.validUntil, lockedUntil: lease?.lockedUntil, registeredTime: lease?.registeredTime)
 	}
-	
+
 
 	return Report(FINDReport: findReport, NameReport: nameReport)
 }

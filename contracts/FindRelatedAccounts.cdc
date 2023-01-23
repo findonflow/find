@@ -29,8 +29,12 @@ pub contract FindRelatedAccounts {
 		pub fun getRelatedAccounts(_ network: String) : {String : [String]}
 		pub fun getAllRelatedAccounts() : {String : {String : [String]}}
 		pub fun getAllRelatedAccountInfo() : {String : AccountInformation}
+		// verify ensure this wallet address exist under the network
 		pub fun verify(network: String, address: String) : Bool
-		pub fun getIdentifier(name: String, network: String, address: String) : String
+		// linked ensure this wallet is linked in both wallet with the same name (but not socially linked only)
+		// only supports flow for now
+		pub fun linked(name: String, network: String, address: Address) : Bool
+		pub fun getAccount(name: String, network: String, address: String) : AccountInformation?
 	}
 
 	/// This is just an empty resource we create in storage, you can safely send a reference to it to obtain msg.sender
@@ -49,18 +53,22 @@ pub contract FindRelatedAccounts {
 			self.accounts={}
 		}
 
-		pub fun getIdentifier(name: String, network: String, address: String) : String {
-			return network.concat("_").concat(name).concat("_").concat(address)
+		pub fun linked(name: String, network: String, address: Address) : Bool {
+			let cap = FindRelatedAccounts.getCapability(address)
+			if cap.check() {
+				if let acct = cap.borrow()!.getAccount(name: name, network: network, address: self.owner!.address.toString()) {
+					return true
+				}
+			}
+			return false
 		}
 
 		pub fun verify(network: String, address: String) : Bool {
 			if let wallets = self.networks[network] {
 				for wallet in wallets {
 					let ws = self.wallets[wallet]!
-					for wss in ws {
-						if wss.toLower() == address.toLower() {
-							return true
-						}
+					if ws.contains(address) {
+						return true
 					}
 				}
 			}
@@ -98,6 +106,11 @@ pub contract FindRelatedAccounts {
 			return self.accounts
 		}
 
+		pub fun getAccount(name: String, network: String, address: String) : AccountInformation? {
+			let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address)
+			return self.accounts[id]
+		}
+
 		access(contract) fun internal_getRelatedAccounts(_ network: String?) : {String : {String : [String]}} {
 
 			var isNil = network == nil
@@ -130,7 +143,7 @@ pub contract FindRelatedAccounts {
 
 		pub fun addFlowAccount(name: String, address:Address) {
 			let network = "Flow"
-			let id = self.getIdentifier(name: name, network: network, address: address.toString())
+			let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address.toString())
 			if self.accounts[id] != nil {
 				return
 			}
@@ -139,7 +152,7 @@ pub contract FindRelatedAccounts {
 		}
 
 		pub fun addRelatedAccount(name: String, network: String, address: String) {
-			let id = self.getIdentifier(name: name, network: network, address: address)
+			let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address)
 			if self.accounts[id] != nil {
 				return
 			}
@@ -158,7 +171,7 @@ pub contract FindRelatedAccounts {
 		}
 
 		pub fun removeRelatedAccount(name: String, network: String, address: String) {
-			let id = self.getIdentifier(name: name, network: network, address: address)
+			let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address)
 			if self.accounts[id] == nil {
 				panic(network.concat(" address is not added as related account : ").concat(address))
 			}
@@ -207,13 +220,31 @@ pub contract FindRelatedAccounts {
 		return <- create Accounts()
 	}
 
+	pub fun getIdentifier(name: String, network: String, address: String) : String {
+		return network.concat("_").concat(name).concat("_").concat(address)
+	}
+
+	pub fun getCapability(_ addr: Address) : Capability<&Accounts{Public}> {
+		return getAccount(addr).getCapability<&Accounts{Public}>(self.publicPath)
+
+	}
+
 	pub fun findRelatedFlowAccounts(address:Address) : {String: [Address]} {
-		let cap = getAccount(address).getCapability<&Accounts{Public}>(self.publicPath)
+		let cap = self.getCapability(address)
 		if !cap.check(){
 			return {}
 		}
 
 		return cap.borrow()!.getFlowAccounts()
+	}
+
+	pub fun findRelatedAccounts(address:Address) : {String: {String: [String]}} {
+		let cap = self.getCapability(address)
+		if !cap.check(){
+			return {}
+		}
+
+		return cap.borrow()!.getAllRelatedAccounts()
 	}
 
 	init() {
@@ -223,6 +254,3 @@ pub contract FindRelatedAccounts {
 	}
 
 }
-
-
-
