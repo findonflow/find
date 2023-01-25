@@ -391,7 +391,7 @@ pub contract FIND {
 
 		access(contract) fun move(profile: Capability<&{Profile.Public}>) {
 			let network= self.networkCap.borrow() ?? panic("The network is not up")
-			let senderAddress= network.profiles[self.name]!.address
+			let senderAddress= network.profiles[self.name]!.profile.address
 			network.move(name: self.name, profile: profile)
 
 
@@ -1288,6 +1288,7 @@ pub contract FIND {
 		pub var validUntil: UFix64
 		pub var lockedUntil: UFix64
 		pub(set) var profile: Capability<&{Profile.Public}>
+		// This address is wrong for some account and can never be refered
 		pub var address: Address
 		pub var name: String
 

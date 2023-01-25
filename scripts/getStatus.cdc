@@ -268,7 +268,7 @@ pub fun main(user: String) : Report? {
 		let findAddr = FIND.getFindNetworkAddress()
 		let network = getAuthAccount(findAddr).borrow<&FIND.Network>(from: FIND.NetworkStoragePath)!
 		let lease =  network.getLease(user)
-		nameReport = NameReport(status: s, cost: cost, owner: lease?.address, validUntil: lease?.validUntil, lockedUntil: lease?.lockedUntil, registeredTime: lease?.registeredTime)
+		nameReport = NameReport(status: s, cost: cost, owner: lease?.profile?.address, validUntil: lease?.validUntil, lockedUntil: lease?.lockedUntil, registeredTime: lease?.registeredTime)
 	}
 
 
