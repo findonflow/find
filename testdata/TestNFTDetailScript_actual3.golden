@@ -162,6 +162,7 @@
             "max": 100,
             "score": 50
         },
+        "soulBounded": false,
         "thumbnail": "ipfs://QmeDLGnYNyunkTjd23yx36sHviWyR9L2shHshjwe1qBCqR",
         "traits": [
             {
