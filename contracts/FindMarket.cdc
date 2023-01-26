@@ -1137,12 +1137,15 @@ pub contract FindMarket {
 		self.tenantAddressName[address]=name
 		self.tenantNameAddress[name]=address
 
-		tenant.addSaleItem(TenantSaleItem(
-			name:"findRoyalty",
-			cut:findRoyalty,
-			rules: defaultCutRules,
-			status:"active"
-		), type: "cut")
+		if findRoyalty != nil {
+			tenant.addSaleItem(TenantSaleItem(
+				name:"findRoyalty",
+				cut:findRoyalty,
+				rules: defaultCutRules,
+				status:"active"
+			), type: "cut")
+		}
+
 		//end do on outside
 
 		let tenantPath=self.getTenantPathForName(name)

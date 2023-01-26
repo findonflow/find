@@ -1,6 +1,6 @@
-import FindMarket from "../contracts/FindMarket.cdc" 
-import FindViews from "../contracts/FindViews.cdc" 
-import FIND from "../contracts/FIND.cdc" 
+import FindMarket from "../contracts/FindMarket.cdc"
+import FindViews from "../contracts/FindViews.cdc"
+import FIND from "../contracts/FIND.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
@@ -8,19 +8,22 @@ import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
 pub struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
+	pub let dapperMarket: {String : FindMarket.SaleItemInformation}
 	pub let storefront: FindUserStatus.StorefrontListing?
-	pub let storefrontV2: FindUserStatus.StorefrontListing? 
-	pub let flowty: FindUserStatus.FlowtyListing? 
-	pub let flowtyRental: FindUserStatus.FlowtyRental? 
-	pub let flovatar: FindUserStatus.FlovatarListing? 
-	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing? 
+	pub let storefrontV2: FindUserStatus.StorefrontListing?
+	pub let flowty: FindUserStatus.FlowtyListing?
+	pub let flowtyRental: FindUserStatus.FlowtyRental?
+	pub let flovatar: FindUserStatus.FlovatarListing?
+	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
+	pub let dapperAllowedListingActions: {String : ListingTypeReport}
 	pub let linkedForMarket : Bool?
 
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
+	init(findMarket:{String : FindMarket.SaleItemInformation}, dapperMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, dapperAllowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
+		self.dapperMarket=dapperMarket
 		self.storefront=storefront
 		self.storefrontV2=storefrontV2
 		self.flowty=flowty
@@ -29,30 +32,31 @@ pub struct NFTDetailReport {
 		self.flovatarComponent=flovatarComponent
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
+		self.dapperAllowedListingActions=dapperAllowedListingActions
 		self.linkedForMarket = linkedForMarket
 	}
 }
 
 
 pub struct ListingTypeReport {
-	pub let ftAlias: [String] 
+	pub let ftAlias: [String]
 	pub let ftIdentifiers: [String]
-	pub let listingType: String 
-	pub let status: String 
+	pub let listingType: String
+	pub let status: String
 	pub let ListingDetails: [ListingRoyalties]
 
 	init(listingType: String, ftAlias: [String], ftIdentifiers: [String],  status: String , ListingDetails: [ListingRoyalties]) {
-		self.listingType=listingType 
+		self.listingType=listingType
 		self.status=status
 		self.ListingDetails=ListingDetails
-		self.ftAlias=ftAlias 
+		self.ftAlias=ftAlias
 		self.ftIdentifiers=ftIdentifiers
 	}
 }
 
 pub struct NFTDetail {
-	pub let id: UInt64 
-	pub let uuid: UInt64 
+	pub let id: UInt64
+	pub let uuid: UInt64
 	pub let name:String
 	pub let description:String
 	pub let thumbnail:String
@@ -64,7 +68,7 @@ pub struct NFTDetail {
 	pub var traits: [MetadataViews.Trait]
 	pub var media : {String: String} //url to mediaType
 	pub var collection : NFTCollectionDisplay?
-	pub var license : String? 
+	pub var license : String?
 	pub var data: {String : AnyStruct?}
 	pub var views :[String]
 
@@ -74,7 +78,7 @@ pub struct NFTDetail {
 		self.id=pointer.id
 		self.uuid=pointer.getUUID()
 
-		// Display 
+		// Display
 		let display = views["Display"] ?? panic("Could not find display")
 		let d = display as! MetadataViews.Display
 		self.name=d.name
@@ -82,8 +86,8 @@ pub struct NFTDetail {
 		self.thumbnail=d.thumbnail.uri()
 		views.remove(key: "Display")
 
-		// External URL 
-		self.externalViewURL = nil 
+		// External URL
+		self.externalViewURL = nil
 		if let externalURL = views["ExternalURL"] {
 			if let e = externalURL as? MetadataViews.ExternalURL {
 				self.externalViewURL = e.url
@@ -92,7 +96,7 @@ pub struct NFTDetail {
 		views.remove(key: "ExternalURL")
 
 		// Edition
-		self.editions=[] 
+		self.editions=[]
 		if let editions = views["Editions"] {
 			if let e = editions as? MetadataViews.Editions {
 				if e.infoList.length > 0 {
@@ -120,12 +124,12 @@ pub struct NFTDetail {
 		}
 		views.remove(key: "NFTCollectionDisplay")
 
-		// Medias 
+		// Medias
 		self.media={}
 		if let medias= views["Medias"] {
 			if let ms = medias as? MetadataViews.Medias {
 				for m in ms.items {
-					let url = m.file.uri() 
+					let url = m.file.uri()
 					let type = m.mediaType
 					self.media[url] = type
 				}
@@ -133,7 +137,7 @@ pub struct NFTDetail {
 		}
 		views.remove(key: "Medias")
 
-		// Rarity 
+		// Rarity
 		self.rarity=nil
 		if let rarity= views["Rarity"] {
 			if let r = rarity as? MetadataViews.Rarity {
@@ -143,7 +147,7 @@ pub struct NFTDetail {
 		views.remove(key: "Rarity")
 
 		// Traits
-		self.traits=[] 
+		self.traits=[]
 		if let traits = views["Traits"] {
 			if let t = traits as? MetadataViews.Traits {
 				if t.traits.length > 0 {
@@ -153,8 +157,8 @@ pub struct NFTDetail {
 		}
 		views.remove(key: "Traits")
 
-		// License 
-		self.license= nil 
+		// License
+		self.license= nil
 		if let license= views["License"] {
 			if let l = license as? MetadataViews.License {
 				self.license = l.spdxIdentifier
@@ -185,23 +189,23 @@ pub struct ListingRoyalties {
 	pub let royalties: [Royalties]
 
 	init(ftAlias: String?, ftIdentifier: String, royalties: [Royalties]) {
-		self.ftAlias=ftAlias 
+		self.ftAlias=ftAlias
 		self.ftIdentifier=ftIdentifier
-		self.royalties=royalties 
+		self.royalties=royalties
 	}
 }
 
 pub struct Royalties {
 
-	pub let royaltyName: String 
-	pub let address: Address 
-	pub let findName: String? 
-	pub let cut: UFix64 
+	pub let royaltyName: String
+	pub let address: Address
+	pub let findName: String?
+	pub let cut: UFix64
 
 	init(royaltyName: String , address: Address, findName: String?, cut: UFix64) {
-		self.royaltyName=royaltyName 
-		self.address=address 
-		self.findName=findName 
+		self.royaltyName=royaltyName
+		self.address=address
+		self.findName=findName
 		self.cut=cut
 	}
 }
@@ -250,13 +254,13 @@ pub struct NFTCollectionDisplay {
 pub var counter = 0
 
 pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
-	let resolveAddress = FIND.resolve(user) 
+	let resolveAddress = FIND.resolve(user)
 	if resolveAddress == nil {
 		return nil
 	}
 	let address = resolveAddress!
 
-	let account = getAuthAccount(address) 
+	let account = getAuthAccount(address)
 
 	if account.balance > 0.0 {
 		// check link for market
@@ -281,19 +285,30 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let findAddress=FindMarket.getFindTenantAddress()
 		let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
-		
+		let dapperAddress=FindMarket.getTenantAddress("find_dapper")!
+		let dapperMarket=FindMarket.getNFTListing(tenant:dapperAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
+
+
 		var report : {String : ListingTypeReport} = {}
+		var dapperReport : {String : ListingTypeReport} = {}
 
 		// check if that's soulBound, if yes, the report will be nil
 		if !pointer.checkSoulBound() {
 			let tenantCap = FindMarket.getTenantCapability(findAddress)!
 			let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
 
+			let dapperTenantCap = FindMarket.getTenantCapability(dapperAddress)!
+			let dapperTenantRef = dapperTenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(dapperTenantCap.address.toString()))
+
+
 			let marketTypes = FindMarket.getSaleItemTypes()
 
 			for marketType in marketTypes {
 				if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
 					report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
+				}
+				if let allowedListing = dapperTenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
+					dapperReport[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: dapperTenantRef)
 				}
 			}
 		}
@@ -307,7 +322,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
 
 
-		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, linkedForMarket : linkedForMarket)
+		return NFTDetailReport(findMarket:findMarket, dapperMarket:dapperMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions : dapperReport,  linkedForMarket : linkedForMarket)
 	}
 	return nil
 
@@ -326,7 +341,7 @@ pub fun reverseLookup(_ addr: Address) : String? {
 			return name
 		}
 	}
-	let name = FIND.reverseLookup(addr) 
+	let name = FIND.reverseLookup(addr)
 	if name == nil {
 		resolvedAddresses[addr] = ""
 	} else {
@@ -357,7 +372,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 
 
 	for runTimeType in defaultViews {
-		// Resolve arrayed views to ensure we didn't miss any stuff 
+		// Resolve arrayed views to ensure we didn't miss any stuff
 		if runTimeType == Type<MetadataViews.Editions>() {
 			if let editions = MetadataViews.getEditions(viewResolver) {
 				if let edition = getEdition(viewResolver) {
@@ -370,13 +385,13 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 					}
 					// If the edition does not exist in editions, add it in
 					if !check {
-						let array = editions.infoList 
+						let array = editions.infoList
 						array.append(edition)
 						nftViews["Editions"] = MetadataViews.Editions(array)
 						resolvedViews.append(runTimeType)
 						continue
 					}
-				} 
+				}
 				// If edition does not exist OR edition is already in editions , append it to views and continue
 				nftViews["Editions"] = editions
 				resolvedViews.append(runTimeType)
@@ -391,18 +406,18 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 					nftViews["Editions"] = MetadataViews.Editions([edition])
 					resolvedViews.append(runTimeType)
 				}
-			} 
+			}
 			continue
 		}
 
 		if runTimeType == Type<MetadataViews.Medias>() {
 			if let medias = MetadataViews.getMedias(viewResolver) {
 				if let media = getMedia(viewResolver) {
-					var check = false 
+					var check = false
 					let uri = media.file.uri()
 					for item in medias.items {
 						if item.file.uri() == uri {
-							check = true 
+							check = true
 							break
 						}
 						if !check {
@@ -413,7 +428,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 							continue
 						}
 					}
-				} 
+				}
 				nftViews["Medias"] = medias
 				resolvedViews.append(runTimeType)
 				continue
@@ -433,10 +448,10 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 		if runTimeType == Type<MetadataViews.Traits>() {
 			if let traits = MetadataViews.getTraits(viewResolver) {
 				if let trait = getTrait(viewResolver) {
-					var check = false 
+					var check = false
 					for item in traits.traits {
 						if item.name == trait.name {
-							check = true 
+							check = true
 							break
 						}
 						if !check {
@@ -448,7 +463,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 							continue
 						}
 					}
-				} 
+				}
 				nftViews["Traits"] = cleanUpTraits(traits.traits)
 				resolvedViews.append(runTimeType)
 				continue
@@ -461,7 +476,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 					nftViews["Traits"] = MetadataViews.Traits([trait])
 					resolvedViews.append(runTimeType)
 				}
-			} 
+			}
 			continue
 		}
 
@@ -470,7 +485,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 			resolvedViews.append(runTimeType)
 		}
 	}
-	
+
 	return NFTDetail(pointer, views: nftViews, resolvedViews: resolvedViews)
 
 
@@ -526,7 +541,7 @@ pub fun resolveFindRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPubl
 	if cuts.tenantCut != nil {
 		royalties.append(Royalties(royaltyName: cuts.tenantCut!.description, address: cuts.tenantCut!.receiver.address, findName: reverseLookup(cuts.tenantCut!.receiver.address), cut: cuts.tenantCut!.cut))
 	}
-	
+
 	return royalties
 }
 
@@ -543,8 +558,8 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, poi
 			ftAlias.append(ftInfo.alias)
 		}
 
-		// getRoyalties 
-		var nftR = nftRoyalties 
+		// getRoyalties
+		var nftR = nftRoyalties
 		if nftR == nil {
 			nftRoyalties = resolveRoyalties(pointer)
 			nftR = nftRoyalties
@@ -555,49 +570,49 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, poi
 
 		listingDetails.append(ListingRoyalties(ftAlias: alias, ftIdentifier: ft.identifier, royalties: findR))
 	}
-	
+
 	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status , ListingDetails: listingDetails)
 }
 
 pub fun defaultViews() : [Type] {
 	return [
 	Type<MetadataViews.Display>() ,
-	Type<MetadataViews.Editions>() , 
+	Type<MetadataViews.Editions>() ,
 	Type<MetadataViews.Edition>() ,
-	Type<MetadataViews.Serial>() , 
+	Type<MetadataViews.Serial>() ,
 	Type<MetadataViews.Medias>() ,
 	Type<MetadataViews.Media>() ,
-	Type<MetadataViews.License>() , 
-	Type<MetadataViews.ExternalURL>() , 
-	Type<MetadataViews.NFTCollectionDisplay>() , 
-	Type<MetadataViews.Traits>() , 
+	Type<MetadataViews.License>() ,
+	Type<MetadataViews.ExternalURL>() ,
+	Type<MetadataViews.NFTCollectionDisplay>() ,
+	Type<MetadataViews.Traits>() ,
 	Type<MetadataViews.Trait>() ,
-	Type<MetadataViews.Rarity>() 
+	Type<MetadataViews.Rarity>()
 	]
 }
 
 pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		return collection.collectionData.storagePath
 	}
 
 	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
 		return collection.collectionData.storagePath
 	}
-	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
 }
 
 pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		return collection.collectionData.publicPath
 	}
 
 	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
 		return collection.collectionData.publicPath
 	}
-	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
+	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
 }
 
 pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
