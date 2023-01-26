@@ -6,11 +6,11 @@ setup: deploy
 	go run ./tasks/setup/main.go
 
 lint:
-	golangci-lint run 
+	golangci-lint run
 
 #this goal deployes all the contracts to emulator
 deploy:
-	flow project deploy 
+	flow project deploy
 
 emulator:
 	flow emulator -v
@@ -21,7 +21,7 @@ test:
 dev:
 	gotestsum -f testname --watch
 
-gen-client: 
+gen-client:
 	go run tasks/client/main.go > lib/find.json
 
 publish:
@@ -48,6 +48,8 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.renewNameDapper.code" lib/find.json -r > dapper-tx/testnet/renewName.cdc
 	jq ".networks.testnet.transactions.setPrivateModeDapper.code" lib/find.json -r > dapper-tx/testnet/setPrivateMode.cdc
 	jq ".networks.testnet.transactions.setRelatedAccountDapper.code" lib/find.json -r > dapper-tx/testnet/setRelatedAccount.cdc
+	jq ".networks.testnet.transactions.buyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/buyNFTForSaleDapper.cdc
+	jq ".networks.testnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/listNFTForSaleDapper.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyAddon.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyLeaseForSale.cdc
 	jq ".networks.testnet.scripts.getMetadataForRegisterDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForRegister.cdc
@@ -60,12 +62,14 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.editProfileDapper.code" lib/find.json -r > dapper-tx/mainnet/editProfile.cdc
 	jq ".networks.mainnet.transactions.listLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listLeaseForSale.cdc
 	jq ".networks.mainnet.transactions.delistLeaseSale.code" lib/find.json -r > dapper-tx/mainnet/delistLeaseSale.cdc
-	jq ".networks.mainnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/mainnet/moveNameTo.cdc 
+	jq ".networks.mainnet.transactions.moveNameToDapper.code" lib/find.json -r > dapper-tx/mainnet/moveNameTo.cdc
 	jq ".networks.mainnet.transactions.registerDapper.code" lib/find.json -r > dapper-tx/mainnet/register.cdc
 	jq ".networks.mainnet.transactions.removeRelatedAccountDapper.code" lib/find.json -r > dapper-tx/mainnet/removeRelatedAccount.cdc
 	jq ".networks.mainnet.transactions.renewNameDapper.code" lib/find.json -r > dapper-tx/mainnet/renewName.cdc
 	jq ".networks.mainnet.transactions.setPrivateModeDapper.code" lib/find.json -r > dapper-tx/mainnet/setPrivateMode.cdc
 	jq ".networks.mainnet.transactions.setRelatedAccountDapper.code" lib/find.json -r > dapper-tx/mainnet/setRelatedAccount.cdc
+	jq ".networks.mainnet.transactions.buyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/buyNFTForSaleDapper.cdc
+	jq ".networks.mainnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listNFTForSaleDapper.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyAddon.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyLeaseForSale.cdc
 	jq ".networks.mainnet.scripts.getMetadataForRegisterDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForRegister.cdc
