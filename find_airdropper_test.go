@@ -226,9 +226,10 @@ func TestFindAirdropper(t *testing.T) {
 		ids := otu.mintThreeExampleDandies()
 		user3 := otu.O.Address("user3")
 
-		makeResult := func(account, cplinked bool, id, index uint64, nftInplace, ok bool, receiver string, receiverlinked bool, t string, hasProfile bool) map[string]interface{} {
+		makeResult := func(account, cplinked bool, id, index uint64, nftInplace, ok bool, receiver, receiverAddress string, receiverlinked bool, t string, hasProfile bool) map[string]interface{} {
 			res := map[string]interface{}{
 				"accountInitialized":     account,
+				"address":                receiverAddress,
 				"collectionPublicLinked": cplinked,
 				"id":                     id,
 				"isDapper":               false,
@@ -284,9 +285,9 @@ func TestFindAirdropper(t *testing.T) {
 			WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
 		)
 
-		user1Res := makeResult(true, true, ids[0], 0, true, true, "user1", true, dandyType, true)
-		user2Res := makeResult(true, true, ids[1], 1, true, true, "user2", false, dandyType, true)
-		user3Res := makeResult(false, false, ids[2], 2, true, false, otu.O.Address("user3"), false, dandyType, false)
+		user1Res := makeResult(true, true, ids[0], 0, true, true, "user1", otu.O.Address("user1"), true, dandyType, true)
+		user2Res := makeResult(true, true, ids[1], 1, true, true, "user2", otu.O.Address("user2"), false, dandyType, true)
+		user3Res := makeResult(false, false, ids[2], 2, true, false, otu.O.Address("user3"), otu.O.Address("user3"), false, dandyType, false)
 
 		res.AssertWant(t, autogold.Want("sendNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
 
