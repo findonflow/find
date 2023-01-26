@@ -6,16 +6,20 @@ import (
 
 func main() {
 
-	o := Overflow(WithNetwork("testnet"), WithGlobalPrintOptions())
+	o := Overflow(WithNetwork("mainnet"), WithGlobalPrintOptions())
 
 	name := "find-dapper"
-	tenantAddress := "695502f4d2ccd475"
-	merchAddress := "0x4748780c8bf65e19"
+	// merchAddress := "0x55459409d30274ee"
 
 	o.Tx("adminSendFlow",
-		WithSigner("account"),
+		WithSigner("find"),
 		WithArg("receiver", "find-dapper"),
-		WithArg("amount", 10.0),
+		WithArg("amount", 0.1),
+	)
+
+	o.Tx("createProfile",
+		WithSigner(name),
+		WithArg("name", "find-dapper"),
 	)
 
 	o.Tx("setup_find_market_1",
@@ -24,26 +28,26 @@ func main() {
 
 	o.Tx("setup_find_dapper_market",
 		WithSigner("find-admin"),
-		WithArg("adminAddress", tenantAddress),
-		WithArg("tenantAddress", tenantAddress),
+		WithArg("adminAddress", name),
+		WithArg("tenantAddress", name),
 		WithArg("name", "find_dapper"),
 	)
 
-	o.Tx("adminSetSellLeaseDapper",
-		WithSigner(name),
-		WithArg("market", "Sale"),
-		WithArg("merchAddress", merchAddress),
-	)
+	// o.Tx("adminSetSellLeaseDapper",
+	// 	WithSigner(name),
+	// 	WithArg("market", "Sale"),
+	// 	WithArg("merchAddress", merchAddress),
+	// )
 
 	// o.Tx("adminRemoveSetSellDapperDUC",
 	// 	WithSigner(name),
 	// 	WithArg("market", "Sale"),
 	// )
 
-	o.Tx("adminSetSellDapperFUT",
-		WithSigner(name),
-		WithArg("market", "Sale"),
-		WithArg("merchAddress", merchAddress),
-	)
+	// o.Tx("adminSetSellDapperFUT",
+	// 	WithSigner(name),
+	// 	WithArg("market", "Sale"),
+	// 	WithArg("merchAddress", merchAddress),
+	// )
 
 }
