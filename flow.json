@@ -412,11 +412,15 @@
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-emerald-identity": {
-			"address": "c9d218cc626cd7f5",
+			"address": "c9setup_find_dapper_marketd218cc626cd7f5",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-find-forge": {
 			"address": "3e5b4c627064625d",
+			"key": "${TESTNET_ACCOUNT}"
+		},
+		"testnet-find-dapper": {
+			"address": "695502f4d2ccd475",
 			"key": "${TESTNET_ACCOUNT}"
 		},
 		"testnet-user1": {

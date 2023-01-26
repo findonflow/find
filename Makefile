@@ -50,6 +50,7 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.setRelatedAccountDapper.code" lib/find.json -r > dapper-tx/testnet/setRelatedAccount.cdc
 	jq ".networks.testnet.transactions.buyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/buyNFTForSaleDapper.cdc
 	jq ".networks.testnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/listNFTForSaleDapper.cdc
+	jq ".networks.testnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/testnet/setProfile.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyAddon.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyLeaseForSale.cdc
@@ -71,6 +72,7 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.setRelatedAccountDapper.code" lib/find.json -r > dapper-tx/mainnet/setRelatedAccount.cdc
 	jq ".networks.mainnet.transactions.buyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/buyNFTForSaleDapper.cdc
 	jq ".networks.mainnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listNFTForSaleDapper.cdc
+	jq ".networks.mainnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/mainnet/setProfile.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyAddon.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyLeaseForSale.cdc
