@@ -6,7 +6,7 @@ transaction(market: String){
         let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
 
 
-        clientRef.removeMarketOption(name: "DapperDUCWearables".concat(market))
+        clientRef.removeMarketOption(name: "DapperFUT".concat(market))
     }
 }
 
