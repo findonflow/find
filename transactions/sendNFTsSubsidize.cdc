@@ -18,9 +18,9 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 	let paths : [PublicPath]
     let flowVault : &FungibleToken.Vault
     let flowTokenRepayment : Capability<&FlowToken.Vault{FungibleToken.Receiver}>
-    let defaultTokenAvailableBalance : UFix64 
+    let defaultTokenAvailableBalance : UFix64
 
-	let royalties: [MetadataViews.Royalties?] 
+	let royalties: [MetadataViews.Royalties?]
 	let totalRoyalties: [UFix64]
 	let vaultRefs: {String : &FungibleToken.Vault}
 	var token : &Sender.Token
@@ -54,7 +54,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 					target: path.storagePath
 				)
 				if newCap == nil {
-					// If linking is not successful, we link it using finds custom link 
+					// If linking is not successful, we link it using finds custom link
 					let pathIdentifier = path.privatePath.toString()
 					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
 					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
@@ -89,7 +89,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 		}
 
         self.flowVault = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
-        self.flowTokenRepayment = account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver) 
+        self.flowTokenRepayment = account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         self.defaultTokenAvailableBalance = FlowStorageFees.defaultTokenAvailableBalance(account.address)
 
 		// get the vault for find donation
@@ -112,8 +112,8 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 	}
 
 	execute {
-		let addresses : {String : Address} = {} 
-        let estimatedStorageFee = 0.0002 * UFix64(self.authPointers.length) 
+		let addresses : {String : Address} = {}
+        let estimatedStorageFee = 0.0002 * UFix64(self.authPointers.length)
         // we pass in the least amount as possible for storage fee here
         let tempVault <- self.flowVault.withdraw(amount: 0.0)
         var vaultRef = &tempVault as &FungibleToken.Vault
@@ -129,7 +129,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 
 		for i,  pointer in self.authPointers {
 			let receiver = allReceivers[i]
-			let id = ids[i] 
+			let id = ids[i]
 			ctx["message"] = memos[i]
 			let path = self.paths[i]
 
@@ -154,10 +154,11 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			let totalRoyalties = self.totalRoyalties[i]
 			let vaultRef = self.vaultRefs[type!]!
 			if totalRoyalties == 0.0 {
-				panic("This item does not contains information on royalties")
+				let vault <- vaultRef.withdraw(amount: findDonationAmount!)
+				FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
 			}
 
-			let balance = vaultRef.balance 
+			let balance = vaultRef.balance
 			var totalPaid = 0.0
 
 			for j, r in royalties.getRoyalties() {
@@ -184,11 +185,11 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			}
 
 			assert(totalPaid <= amount, message: "Amount paid is greater than expected" )
-			
+
 		}
 
 
-		// for donating to find 
+		// for donating to find
 		if findDonationType != nil {
 			vaultRef = self.vaultRefs[findDonationType!]!
 			let vault <- vaultRef.withdraw(amount: findDonationAmount!)
