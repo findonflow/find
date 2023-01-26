@@ -8,6 +8,7 @@ import (
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/sanity-io/litter"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFindAirdropper(t *testing.T) {
@@ -429,4 +430,39 @@ func TestFindAirdropper(t *testing.T) {
 		})
 	}
 
+	t.Run("Should be able to send Airdrop if royalty is not there, donate to find", func(t *testing.T) {
+
+		id, err := otu.mintRoyaltylessNFT("user1")
+		require.NoError(t, err)
+		optional := cadence.NewOptional(cadence.String(fusd))
+		fusdAmount := 11.0
+
+		res := otu.O.Tx("sendNFTs",
+			WithSigner("user1"),
+			WithArg("allReceivers", []string{"user2"}),
+			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
+			WithArg("ids", []uint64{id}),
+			WithArg("memos", []string{"Message 0"}),
+			WithArg("donationTypes", []*string{&fusd}),
+			WithArg("donationAmounts", []*float64{&fusdAmount}),
+			WithArg("findDonationType", optional),
+			WithArg("findDonationAmount", "10.0"),
+		).
+			AssertSuccess(t)
+
+		res.AssertEvent(t, "FIND.FungibleTokenSent", map[string]interface{}{
+			"from":      otu.O.Address("user1"),
+			"fromName":  "user1",
+			"toAddress": otu.O.Address("find-admin"),
+			"message":   "donation to .find",
+			"tag":       "donation",
+			"amount":    21.0,
+			"ftType":    fusd,
+		})
+
+		res.AssertEvent(t, "FUSD.TokensDeposited", map[string]interface{}{
+			"to":     otu.O.Address("find-admin"),
+			"amount": 21.0,
+		})
+	})
 }

@@ -143,6 +143,9 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 		}
         self.flowVault.deposit(from: <- tempVault)
 
+		// This is hard coded for spliting at the front end for now. So if there are no royalties, all goes to find
+		// AND This does not support different ft types for now.
+		var goesToFindFund = 0.0
 		for i , type in donationTypes {
 			if type == nil {
 				continue
@@ -153,8 +156,8 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			let vaultRef = self.vaultRefs[type!]!
 			var noRoyalty = false
 			if totalRoyalties == 0.0 {
-				let vault <- vaultRef.withdraw(amount: findDonationAmount!)
-				FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
+				goesToFindFund = goesToFindFund + amount
+				continue
 			}
 
 			let balance = vaultRef.balance
@@ -190,7 +193,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 		// for donating to find
 		if findDonationType != nil {
 			vaultRef = self.vaultRefs[findDonationType!]!
-			let vault <- vaultRef.withdraw(amount: findDonationAmount!)
+			let vault <- vaultRef.withdraw(amount: findDonationAmount! + goesToFindFund)
 			FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
 		}
 	}

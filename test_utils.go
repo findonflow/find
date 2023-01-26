@@ -3096,6 +3096,27 @@ func (otu *OverflowTestUtils) identifier(contract, structName string) string {
 	return s
 }
 
+func (otu *OverflowTestUtils) mintRoyaltylessNFT(user string) (uint64, error) {
+
+	otu.O.Tx("setupExampleNFTCollection",
+		WithSigner(user),
+	).
+		AssertSuccess(otu.T)
+
+	return otu.O.Tx("mintExampleNFT",
+		WithSigner(user),
+		WithArg("user", user),
+		WithArg("name", "sample"),
+		WithArg("description", "sample description"),
+		WithArg("thumbnail", "sample thumbnail"),
+		WithArg("soulBound", false),
+		WithArg("traits", []uint64{}),
+	).
+		AssertSuccess(otu.T).
+		GetIdFromEvent("Deposit", "id")
+
+}
+
 type SaleItem struct {
 	Amount              float64 `json:"amount"`
 	AuctionReservePrice float64 `json:"auctionReservePrice"`
@@ -3282,4 +3303,3 @@ func OptionalString(input string) cadence.Optional {
 	}
 	return cadence.NewOptional(s)
 }
- 
