@@ -7,17 +7,19 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import DapperStorageRent from "../contracts/standard/DapperStorageRent.cdc"
 
 //first argument is the address to the merchant that gets the funds
 transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
 
 	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
+	let receiver : Address
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
 	let balanceBeforeTransfer: UFix64
 	prepare(dapper: AuthAccount, account: AuthAccount) {
-
+		self.receiver=account.address
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
@@ -65,6 +67,7 @@ transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
 	execute {
 		let vault <- self.walletReference.withdraw(amount: amount)
 		self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
+		DapperStorageRent.tryRefill(self.receiver)
 	}
 
 	// Check that all dapper Coin was routed back to Dapper

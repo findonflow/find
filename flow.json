@@ -20,6 +20,13 @@
 				"testnet": "0x631e88ae7f1d7c20"
 			}
 		},
+		"DapperStorageRent": {
+			"source": "./contracts/standard/DapperStorageRent.cdc",
+			"aliases": {
+				"testnet": "0x43ee8c22fcf94ea3",
+				"mainnet": "0xa08e88e23f332538"
+			}
+		},
 		"FUSD": {
 			"source": "./contracts/standard/FUSD.cdc",
 			"aliases": {
@@ -558,7 +565,8 @@
 				"FlovatarMarketplace",
 				"FlovatarComponentTemplate",
 				"FlovatarPack",
-				"FlowtyUtils"
+				"FlowtyUtils",
+				"DapperStorageRent"
 			],
 			"emulator-dapper": [
 				"DapperUtilityCoin",
