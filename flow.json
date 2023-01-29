@@ -445,7 +445,7 @@
 		},
 		"mainnet-find-dapper": {
 			"address": "0x46b99041da7235e9",
-			"key": "${MAINNET_FIND_ADMIN_REAL}"
+			"key": "${MAINNET_FIND_ADMIN}"
 		}
 	},
 	"deployments": {

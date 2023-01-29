@@ -9,6 +9,7 @@ import (
 	"github.com/sanity-io/litter"
 )
 
+//TODO: we need to fix this test so that we can also test using dapper market
 func TestNFTDetailScript(t *testing.T) {
 
 	price := 10.00

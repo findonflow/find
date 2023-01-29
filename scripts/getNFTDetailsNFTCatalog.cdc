@@ -293,8 +293,15 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let findAddress=FindMarket.getFindTenantAddress()
 		let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
-		let dapperAddress=FindMarket.getTenantAddress("find_dapper")!
-		let dapperMarket=FindMarket.getNFTListing(tenant:dapperAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
+
+
+		var dapperMarket : {String : FindMarket.SaleItemInformation}={}
+
+		let dapperAddress=FindMarket.getTenantAddress("find_dapper") 
+
+		if dapperAddress !=nil {
+			 dapperMarket=FindMarket.getNFTListing(tenant:dapperAddress!, address: address, id: nftDetail!.uuid, getNFTInfo:false)
+		}
 
 		var report : {String : ListingTypeReport} = {}
 		var dapperReport : {String : ListingTypeReport} = {}
@@ -304,8 +311,11 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 			let tenantCap = FindMarket.getTenantCapability(findAddress)!
 			let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
 
-			let dapperTenantCap = FindMarket.getTenantCapability(dapperAddress)!
-			let dapperTenantRef = dapperTenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(dapperTenantCap.address.toString()))
+			var dapperTenantRef : &FindMarket.Tenant{FindMarket.TenantPublic}? =nil
+			if dapperAddress != nil {
+				let dapperTenantCap = FindMarket.getTenantCapability(dapperAddress!)!
+				dapperTenantRef = dapperTenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(dapperTenantCap.address.toString()))
+			}
 
 
 			let marketTypes = FindMarket.getSaleItemTypes()
@@ -314,8 +324,11 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 				if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
 					report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
 				}
-				if let allowedListing = dapperTenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-					dapperReport[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: dapperTenantRef)
+
+				if dapperTenantRef != nil {
+				if let allowedListing = dapperTenantRef!.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
+					dapperReport[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: dapperTenantRef!)
+				}
 				}
 			}
 		}
