@@ -442,6 +442,10 @@
 		"mainnet-find-lease": {
 			"address": "0x8f8767d488332ac7",
 			"key": "${MAINNET_FIND_ADMIN}"
+		},
+		"mainnet-find-dapper": {
+			"address": "0x46b99041da7235e9",
+			"key": "${MAINNET_FIND_ADMIN}"
 		}
 	},
 	"deployments": {

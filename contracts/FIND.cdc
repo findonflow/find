@@ -1923,6 +1923,22 @@ pub contract FIND {
 		}
 	}
 
+	access(account) fun getMerchantAddress() : Address {
+		// If only find can sign the trxns and call this function, then we do not have to check the address passed in.
+		// Otherwise, would it be wiser if we hard code the address here?
+
+		if FIND.account.address == 0x097bafa4e0b48eef {
+		// This is for mainnet
+			return 0x55459409d30274ee
+		} else if FIND.account.address == 0x35717efbbce11c74 {
+		// This is for testnet
+			return 0x4748780c8bf65e19
+		} else {
+		// otherwise falls into emulator and user dapper
+			return 0x01cf0e2f2f715450
+		}
+	}
+
 	init() {
 		self.NetworkPrivatePath= /private/FIND
 		self.NetworkStoragePath= /storage/FIND

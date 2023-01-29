@@ -24,7 +24,7 @@ transaction(tenant: Address, market: String, merchAddress: Address){
         switch market {
 			case "Sale" :
 				ftTyp = [Type<@FlowToken.Vault>(), Type<@FlowUtilityToken.Vault>()]
-				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketAuctionSoft.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
+				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
 				if items.findCut == nil {
 					let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
@@ -47,7 +47,7 @@ transaction(tenant: Address, market: String, merchAddress: Address){
             case "DirectOfferSoft" :
                 marketType = [Type<@FindLeaseMarketDirectOfferSoft.SaleItem>()]
 				ftTyp = [Type<@FlowUtilityToken.Vault>()]
-				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketAuctionSoft.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
+				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketDirectOfferSoft.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
 				if items.findCut == nil {
 					let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
