@@ -14,7 +14,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 
 	let authPointers : [FindViews.AuthNFTPointer]
 	let paths : [PublicPath]
-	let royalties: [MetadataViews.Royalties?] 
+	let royalties: [MetadataViews.Royalties?]
 	let totalRoyalties: [UFix64]
 	let vaultRefs: {String : &FungibleToken.Vault}
 	var token : &Sender.Token
@@ -48,7 +48,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 					target: path.storagePath
 				)
 				if newCap == nil {
-					// If linking is not successful, we link it using finds custom link 
+					// If linking is not successful, we link it using finds custom link
 					let pathIdentifier = path.privatePath.toString()
 					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
 					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
@@ -77,7 +77,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 				self.totalRoyalties.append(0.0)
 			}
 
-	
+
 			self.authPointers.append(pointer)
 			self.paths.append(path.publicPath)
 		}
@@ -101,7 +101,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 	}
 
 	execute {
-		let addresses : {String : Address} = {} 
+		let addresses : {String : Address} = {}
 
 		let ctx : {String : String} = {
 			"tenant" : "find"
@@ -109,7 +109,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 
 		for i,  pointer in self.authPointers {
 			let receiver = allReceivers[i]
-			let id = ids[i] 
+			let id = ids[i]
 			ctx["message"] = memos[i]
 			let path = self.paths[i]
 
@@ -124,6 +124,9 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 		}
 
 
+		// This is hard coded for spliting at the front end for now. So if there are no royalties, all goes to find
+		// AND This does not support different ft types for now.
+		var goesToFindFund = 0.0
 		for i , type in donationTypes {
 			if type == nil {
 				continue
@@ -133,10 +136,11 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			let totalRoyalties = self.totalRoyalties[i]
 			let vaultRef = self.vaultRefs[type!]!
 			if totalRoyalties == 0.0 {
-				panic("This item does not contains information on royalties")
+				goesToFindFund = goesToFindFund + amount
+				continue
 			}
 
-			let balance = vaultRef.balance 
+			let balance = vaultRef.balance
 			var totalPaid = 0.0
 
 			for j, r in royalties.getRoyalties() {
@@ -163,16 +167,15 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			}
 
 			assert(totalPaid <= amount, message: "Amount paid is greater than expected" )
-			
+
 		}
 
 
-		// for donating to find 
+		// for donating to find
 		if findDonationType != nil {
 			let vaultRef = self.vaultRefs[findDonationType!]!
-			let vault <- vaultRef.withdraw(amount: findDonationAmount!)
+			let vault <- vaultRef.withdraw(amount: findDonationAmount! + goesToFindFund)
 			FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
 		}
 	}
 }
- 
