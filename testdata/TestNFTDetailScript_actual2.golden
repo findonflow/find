@@ -161,6 +161,7 @@
             "max": 100,
             "score": 50
         },
+        "soulBounded": false,
         "thumbnail": "https://nft.blocto.app/xtingles/preview-xBloctopus.png",
         "traits": [
             {

@@ -91,6 +91,15 @@
             }
         },
         "data": {
+            "CreativeWork": {
+                "artist": "Neo",
+                "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+                "name": "Neo Motorcycle",
+                "type": "image"
+            },
+            "Nounce": {
+                "nounce": 1
+            },
             "Royalties": {
                 "cutInfos": [
                     {
@@ -104,15 +113,6 @@
                         "receiver": "Capability\u003c\u0026AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}\u003e(address: 0x179b6b1cb6755e31, path: /public/findProfileReceiver)"
                     }
                 ]
-            },
-            "ce": {
-                "nounce": 1
-            },
-            "tiveWork": {
-                "artist": "Neo",
-                "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
-                "name": "Neo Motorcycle",
-                "type": "image"
             }
         },
         "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
@@ -133,6 +133,7 @@
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
         "name": "Neo Motorcycle 2 of 3",
+        "soulBounded": false,
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "traits": [
             {
