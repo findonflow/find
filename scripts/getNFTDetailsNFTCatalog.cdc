@@ -1,5 +1,6 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindViews from "../contracts/FindViews.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 import FIND from "../contracts/FIND.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
@@ -70,6 +71,7 @@ pub struct NFTDetail {
 	pub var collection : NFTCollectionDisplay?
 	pub var license : String?
 	pub var data: {String : AnyStruct?}
+	pub var soulBounded: Bool
 	pub var views :[String]
 
 	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}, resolvedViews: [Type]){
@@ -165,6 +167,12 @@ pub struct NFTDetail {
 			}
 		}
 		views.remove(key: "License")
+
+		self.soulBounded = false
+		if let soulBound= views["SoulBound"] {
+			self.soulBounded = true
+		}
+		views.remove(key: "SoulBound")
 
 		self.views=[]
 
@@ -287,7 +295,6 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 		let dapperAddress=FindMarket.getTenantAddress("find_dapper")!
 		let dapperMarket=FindMarket.getNFTListing(tenant:dapperAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
-
 
 		var report : {String : ListingTypeReport} = {}
 		var dapperReport : {String : ListingTypeReport} = {}
@@ -481,7 +488,8 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 		}
 
 		if let view = pointer.resolveView(runTimeType) {
-			nftViews[runTimeType.identifier.slice(from: "A.1d7e57aa55817448.MetadataViews.".length, upTo: runTimeType.identifier.length)] = view
+			let name = FindUtils.splitString(runTimeType.identifier, sep: ".")[3]
+			nftViews[name] = view
 			resolvedViews.append(runTimeType)
 		}
 	}
@@ -587,7 +595,8 @@ pub fun defaultViews() : [Type] {
 	Type<MetadataViews.NFTCollectionDisplay>() ,
 	Type<MetadataViews.Traits>() ,
 	Type<MetadataViews.Trait>() ,
-	Type<MetadataViews.Rarity>()
+	Type<MetadataViews.Rarity>(),
+	Type<FindViews.SoulBound>()
 	]
 }
 

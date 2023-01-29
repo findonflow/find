@@ -4,6 +4,7 @@
 
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import ProfileCache from "../contracts/ProfileCache.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 
 pub contract Profile {
 	pub let publicPath: PublicPath
@@ -22,7 +23,7 @@ pub contract Profile {
 	pub event Created(account:Address, userName:String, findName:String, createdAt:String)
 	pub event Updated(account:Address, userName:String, findName:String, thumbnail:String)
 
-	/* 
+	/*
 	Represents a Fungible token wallet with a name and a supported type.
 	*/
 	pub struct Wallet {
@@ -104,7 +105,7 @@ pub contract Profile {
 
 		init(follower: Address, following:Address, tags: [String]) {
 			self.follower=follower
-			self.following=following 
+			self.following=following
 			self.tags= tags
 		}
 	}
@@ -113,11 +114,11 @@ pub contract Profile {
 		pub let name: String
 		pub let balance: UFix64
 		pub let accept:  String
-		pub let tags: [String] 
+		pub let tags: [String]
 
 		init(_ wallet: Wallet) {
 			self.name=wallet.name
-			self.balance=wallet.balance.borrow()?.balance ?? 0.0 
+			self.balance=wallet.balance.borrow()?.balance ?? 0.0
 			self.accept=wallet.accept.identifier
 			self.tags=wallet.tags
 		}
@@ -144,9 +145,9 @@ pub contract Profile {
 			address: Address,
 			name: String,
 			gender: String,
-			description: String, 
+			description: String,
 			tags: [String],
-			avatar: String, 
+			avatar: String,
 			links: {String:Link},
 			wallets: [WalletProfile],
 			following: [FriendStatus],
@@ -194,9 +195,9 @@ pub contract Profile {
 			address: Address,
 			name: String,
 			gender: String,
-			description: String, 
+			description: String,
 			tags: [String],
-			avatar: String, 
+			avatar: String,
 			links: [Link],
 			wallets: [WalletProfile],
 			collections: [CollectionProfile],
@@ -231,12 +232,12 @@ pub contract Profile {
 		pub fun getDescription(): String
 		pub fun getTags(): [String]
 		pub fun getAvatar(): String
-		pub fun getCollections(): [ResourceCollection] 
+		pub fun getCollections(): [ResourceCollection]
 		pub fun follows(_ address: Address) : Bool
 		pub fun getFollowers(): [FriendStatus]
 		pub fun getFollowing(): [FriendStatus]
 		pub fun getWallets() : [Wallet]
-		pub fun hasWallet(_ name: String) : Bool 
+		pub fun hasWallet(_ name: String) : Bool
 		pub fun getLinks() : [Link]
 		pub fun deposit(from: @FungibleToken.Vault)
 		pub fun supportedFungigleTokenTypes() : [Type]
@@ -246,7 +247,7 @@ pub contract Profile {
 		pub fun isPrivateModeEnabled() : Bool
 
 		access(contract) fun internal_addFollower(_ val: FriendStatus)
-		access(contract) fun internal_removeFollower(_ address: Address) 
+		access(contract) fun internal_removeFollower(_ address: Address)
 		access(account) fun setFindName(_ val: String)
 	}
 
@@ -273,7 +274,7 @@ pub contract Profile {
 			pre {
 				Profile.verifyTags(tags: val, tagLength:64, tagSize:32) : "cannot have more then 32 tags of length 64"
 			}
-		}   
+		}
 
 		//validate length of description to be 255 or something?
 		pub fun setDescription(_ val: String) {
@@ -292,17 +293,17 @@ pub contract Profile {
 		pub fun removeCollection(_ val: String)
 		pub fun addCollection(_ val: ResourceCollection)
 
-		pub fun addWallet(_ val : Wallet) 
+		pub fun addWallet(_ val : Wallet)
 		pub fun removeWallet(_ val: String)
 		pub fun setWallets(_ val: [Wallet])
-		pub fun hasWallet(_ name: String) : Bool 
+		pub fun hasWallet(_ name: String) : Bool
 		pub fun addLink(_ val: Link)
 		pub fun addLinkWithName(name:String, link:Link)
 
 		pub fun removeLink(_ val: String)
 
 		//Verify that this user has signed something.
-		pub fun verify(_ val:String) 
+		pub fun verify(_ val:String)
 
 		//A user must be able to remove a follower since this data in your account is added there by another user
 		pub fun removeFollower(_ val: Address)
@@ -344,7 +345,7 @@ pub contract Profile {
 			self.createdAt=createdAt
 			self.name = name
 			self.findName=""
-			self.gender="" 
+			self.gender=""
 			self.description=""
 			self.tags=[]
 			self.avatar = "https://find.xyz/assets/img/avatars/avatar".concat(randomNumber.toString()).concat(".png")
@@ -413,7 +414,7 @@ pub contract Profile {
 				tags: self.getTags(),
 				avatar: self.getAvatar(),
 				links: self.getLinksMap(),
-				wallets: wallets, 
+				wallets: wallets,
 				following: self.getFollowing(),
 				followers: self.getFollowers(),
 				allowStoringFollowers: self.allowStoringFollowers,
@@ -445,7 +446,7 @@ pub contract Profile {
 				tags: self.getTags(),
 				avatar: self.getAvatar(),
 				links: self.getLinks(),
-				wallets: wallets, 
+				wallets: wallets,
 				collections: collections,
 				following: self.getFollowing(),
 				followers: self.getFollowers(),
@@ -474,7 +475,7 @@ pub contract Profile {
 			self.links.remove(key: val)
 		}
 
-		pub fun supportedFungigleTokenTypes() : [Type] { 
+		pub fun supportedFungigleTokenTypes() : [Type] {
 			let types: [Type] =[]
 			for w in self.wallets {
 				if !types.contains(w.accept) {
@@ -501,19 +502,23 @@ pub contract Profile {
 					ref.deposit(from: <- from)
 					return
 				}
-			} 
+			}
 			let identifier=from.getType().identifier
 
 			// Try borrow that in a standard way. Only work for flow, usdc and fusd
 			// Check the vault type
 			var ref : &{FungibleToken.Receiver}? = nil
-			if identifier.slice(from: identifier.length - "FlowToken.Vault".length, upTo: identifier.length ) == "FlowToken.Vault" {
+			if FindUtils.contains(identifier, element: "FlowToken.Vault") {
 				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow()
-			} else if identifier.slice(from: identifier.length - "FiatToken.Vault".length, upTo: identifier.length ) == "FiatToken.Vault" {
+			} else if FindUtils.contains(identifier, element: "FiatToken.Vault") {
 				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/USDCVaultReceiver).borrow()
-			} else if identifier.slice(from: identifier.length - "FUSD.Vault".length, upTo: identifier.length ) == "FUSD.Vault" {
+			} else if FindUtils.contains(identifier, element: "FUSD.Vault") {
 				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver).borrow()
-			} 
+			} else if FindUtils.contains(identifier, element: "FlowUtilityToken.Vault") {
+				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver).borrow()
+			} else if FindUtils.contains(identifier, element: "DapperUtilityCoin.Vault") {
+				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow()
+			}
 
 			if ref != nil {
 				ref!.deposit(from: <- from)
@@ -551,8 +556,8 @@ pub contract Profile {
 			}
 		}
 
-		pub fun setWallets(_ val: [Wallet]) { 
-			self.wallets=val 
+		pub fun setWallets(_ val: [Wallet]) {
+			self.wallets=val
 			ProfileCache.resetWalletIndexCache(address: self.owner!.address)
 			}
 
@@ -575,10 +580,10 @@ pub contract Profile {
 		pub fun getFollowing(): [FriendStatus] { return self.following.values }
 
 		pub fun setName(_ val: String) { self.name = val }
-		pub fun setFindName(_ val: String) { 
+		pub fun setFindName(_ val: String) {
 			emit Updated(account:self.owner!.address, userName:self.name, findName:val, thumbnail:self.avatar)
 			ProfileCache.resetLeaseCache(address: self.owner!.address, leaseName: self.findName)
-			self.findName = val 
+			self.findName = val
 		}
 		pub fun setGender(_ val: String) { self.gender = val }
 		pub fun setAvatar(_ val: String) { self.avatar = val }
@@ -679,4 +684,3 @@ pub contract Profile {
 		self.storagePath = /storage/findProfile
 	}
 }
- 

@@ -1,4 +1,4 @@
-/* 
+/*
 *
 *  This is an example implementation of a Flow Non-Fungible Token
 *  It is not part of the official standard but it assumed to be
@@ -6,7 +6,7 @@
 *
 *  This contract does not implement any sophisticated classification
 *  system for its NFTs. It defines a simple NFT with minimal metadata.
-*   
+*
 */
 
 import NonFungibleToken from "./NonFungibleToken.cdc"
@@ -34,14 +34,14 @@ pub contract ExampleNFT: NonFungibleToken {
     pub struct ExampleNFTInfo {
         pub let name: String
         pub let description: String
-        pub let soulBound: Bool 
+        pub let soulBound: Bool
         pub let traits : [UInt64]
         pub let thumbnail: String
 
         init(name: String, description: String, soulBound: Bool, traits : [UInt64], thumbnail: String) {
-            self.name=name 
-            self.description=description 
-            self.thumbnail=thumbnail 
+            self.name=name
+            self.description=description
+            self.thumbnail=thumbnail
             self.traits=traits
             self.soulBound=soulBound
         }
@@ -54,7 +54,7 @@ pub contract ExampleNFT: NonFungibleToken {
         pub let description: String
         pub let thumbnail: String
         pub var soulBound: Bool
-        // For testing 
+        // For testing
         pub let traits : [UInt64]
         access(self) let royalties: MetadataViews.Royalties
 
@@ -65,7 +65,7 @@ pub contract ExampleNFT: NonFungibleToken {
             name: String,
             description: String,
             thumbnail: String,
-            soulBound: Bool, 
+            soulBound: Bool,
             traits : [UInt64],
             royalties: MetadataViews.Royalties
         ) {
@@ -92,7 +92,7 @@ pub contract ExampleNFT: NonFungibleToken {
         pub fun changeRoyalties(_ bool: Bool) {
             self.changedRoyalties = bool
         }
-    
+
         pub fun getViews(): [Type] {
             let views = [
                 Type<MetadataViews.Display>(),
@@ -101,7 +101,7 @@ pub contract ExampleNFT: NonFungibleToken {
                 Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>(),
-                Type<MetadataViews.Serial>(), 
+                Type<MetadataViews.Serial>(),
                 Type<MetadataViews.Rarity>()
             ]
 
@@ -137,7 +137,7 @@ pub contract ExampleNFT: NonFungibleToken {
                 case Type<MetadataViews.Royalties>():
                     if !self.changedRoyalties {
                         return self.royalties
-                    } 
+                    }
                     return MetadataViews.Royalties([MetadataViews.Royalty(receiver:ExampleNFT.account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), cut: 0.99, description: "cheater")])
                 case Type<MetadataViews.ExternalURL>():
                     return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
@@ -179,7 +179,7 @@ pub contract ExampleNFT: NonFungibleToken {
                          "This NFT is soulbound."
                     )
 
-                case Type<MetadataViews.Rarity>() : 
+                case Type<MetadataViews.Rarity>() :
                     return MetadataViews.Rarity(score: 1.0, max: 2.0, description: "rarity description")
 
             }
@@ -242,7 +242,7 @@ pub contract ExampleNFT: NonFungibleToken {
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
- 
+
         pub fun borrowExampleNFT(id: UInt64): &ExampleNFT.NFT? {
             if self.ownedNFTs[id] != nil {
                 // Create an authorized reference to allow downcasting
@@ -273,7 +273,7 @@ pub contract ExampleNFT: NonFungibleToken {
     /* Find Forge Specific code  */
     // mintNFT mints a new NFT with a new ID
     // and deposit it in the recipients collection using their collection reference
-    access(account) fun mintNFT(
+    pub fun mintNFT(
         name: String,
         description: String,
         thumbnail: String,
@@ -289,8 +289,8 @@ pub contract ExampleNFT: NonFungibleToken {
             name: name,
             description: description,
             thumbnail: thumbnail,
-            soulBound: soulBound, 
-            traits: traits, 
+            soulBound: soulBound,
+            traits: traits,
             royalties: royalties
         )
 
@@ -317,11 +317,11 @@ pub contract ExampleNFT: NonFungibleToken {
 		}
 
         pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
-            let type = data.getType() 
+            let type = data.getType()
 
             switch type {
-                case Type<{UInt64 : MetadataViews.Trait}>() : 
-                    // for duplicated indexes, the new one will replace the old one 
+                case Type<{UInt64 : MetadataViews.Trait}>() :
+                    // for duplicated indexes, the new one will replace the old one
                     let typedData = data as! {UInt64 : MetadataViews.Trait}
                     for key in typedData.keys {
                         ExampleNFT.traits[key] = ExampleNFT.traits[key] ?? typedData[key]
@@ -351,8 +351,8 @@ pub contract ExampleNFT: NonFungibleToken {
         self.MinterStoragePath = /storage/exampleNFTMinter
 
         self.traits={
-            1 : MetadataViews.Trait(name: "head", value: "hat", displayType: "string", rarity: nil), 
-            2 : MetadataViews.Trait(name: "shoulder", value: "shoulder pad", displayType: "string", rarity: MetadataViews.Rarity(score: nil, max: nil, description: "Common")), 
+            1 : MetadataViews.Trait(name: "head", value: "hat", displayType: "string", rarity: nil),
+            2 : MetadataViews.Trait(name: "shoulder", value: "shoulder pad", displayType: "string", rarity: MetadataViews.Rarity(score: nil, max: nil, description: "Common")),
             3 : MetadataViews.Trait(name: "knees", value: "knee pad", displayType: "string", rarity: nil)
         }
 
@@ -391,4 +391,3 @@ pub contract ExampleNFT: NonFungibleToken {
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft2)
     }
 }
- 

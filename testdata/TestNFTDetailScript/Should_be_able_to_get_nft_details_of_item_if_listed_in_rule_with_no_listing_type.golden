@@ -222,6 +222,7 @@
             "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
         },
         "name": "Neo Motorcycle 2 of 3",
+        "soulBounded": false,
         "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
         "traits": [
             {
