@@ -419,6 +419,10 @@
 			"address": "3e5b4c627064625d",
 			"key": "${TESTNET_ACCOUNT}"
 		},
+		"testnet-find-dapper": {
+			"address": "695502f4d2ccd475",
+			"key": "${TESTNET_ACCOUNT}"
+		},
 		"testnet-user1": {
 			"address": "0xffbdace90dd96d40",
 			"key": "${TESTNET_ACCOUNT}"
