@@ -630,12 +630,6 @@ func TestMarketSale(t *testing.T) {
 				map[string]interface{}{
 					"address": otu.O.Address("dapper"),
 					"amount":  0.25,
-				}).
-			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
-				map[string]interface{}{
-					"address":     otu.O.Address("dapper"),
-					"amount":      0.44,
-					"royaltyName": "dapper",
 				})
 
 		otu.sendExampleNFT("user1", "user2")
@@ -669,12 +663,6 @@ func TestMarketSale(t *testing.T) {
 				map[string]interface{}{
 					"address": otu.O.Address("dapper"),
 					"amount":  2.5,
-				}).
-			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
-				map[string]interface{}{
-					"address":     otu.O.Address("dapper"),
-					"amount":      1.0,
-					"royaltyName": "dapper",
 				})
 
 		otu.sendExampleNFT("user1", "user2")

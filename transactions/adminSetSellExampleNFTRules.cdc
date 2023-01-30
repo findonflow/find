@@ -29,7 +29,7 @@ transaction(tenant: Address, merchAddress: Address) {
         adminRef.setMarketOption(tenant: tenant, saleItem: flowExample)
 
         let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        adminRef.addFindCut(tenant: tenant, FindCutName: "findDapperRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.02, description: "find"), rules: rules, status: "active")
+        adminRef.addFindCut(tenant: tenant, FindCutName: "findDapperRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 
     }
 }

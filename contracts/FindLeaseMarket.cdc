@@ -447,12 +447,10 @@ pub contract FindLeaseMarket {
 
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
 
-		var payInFUT = false
 		var payInDUC = false
 		var residualAddress = FindMarket.residualAddress
 		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
 			residualAddress = dapperMerchAddress
-			payInFUT = true
 		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
 			residualAddress = dapperMerchAddress
 			payInDUC = true

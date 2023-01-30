@@ -1,6 +1,7 @@
 
 
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import Admin from "../contracts/Admin.cdc"
 
@@ -12,14 +13,15 @@ transaction(
     nftID: UInt64,
     publicPathIdentifier: String
 ) {
-    
+
     let adminResource: &Admin.AdminProxy
-    
+
     prepare(acct: AuthAccount) {
         self.adminResource = acct.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
     }
-    
+
     execute {
+
         let nftAccount = getAccount(addressWithNFT)
         let pubPath = PublicPath(identifier: publicPathIdentifier)!
         let collectionCap = nftAccount.getCapability<&AnyResource{MetadataViews.ResolverCollection}>(pubPath)
@@ -27,9 +29,15 @@ transaction(
         let collectionRef = collectionCap.borrow()!
         assert(collectionRef.getIDs().length > 0, message: "No NFTs exist in this collection.")
         let nftResolver = collectionRef.borrowViewResolver(id: nftID)
-        
+
+		// return early if already in catalog
+		if FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: nftResolver.getType().identifier) != nil {
+			return
+		}
+
+
         let metadataCollectionData = MetadataViews.getNFTCollectionData(nftResolver)!
-        
+
         let collectionData = NFTCatalog.NFTCollectionData(
             storagePath: metadataCollectionData.storagePath,
             publicPath: metadataCollectionData.publicPath,

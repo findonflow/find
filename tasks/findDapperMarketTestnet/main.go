@@ -8,21 +8,29 @@ func main() {
 
 	o := Overflow(WithNetwork("mainnet"), WithGlobalPrintOptions())
 
-	name := "find-dapper"
-	merchAddress := "0x55459409d30274ee"
-	if o.Network == "testnet" {
+	coin := "FUT"
+
+	name := "dapper"
+	merchAddress := "0x01cf0e2f2f715450"
+	switch o.Network {
+	case "testnet":
 		merchAddress = "0x4748780c8bf65e19"
+		name = "find-dapper"
+
+	case "mainnet":
+		merchAddress = "0x55459409d30274ee"
+		name = "find-dapper"
 	}
 
 	o.Tx("adminSendFlow",
 		WithSigner("find"),
-		WithArg("receiver", "find-dapper"),
+		WithArg("receiver", name),
 		WithArg("amount", 0.1),
 	)
 
 	o.Tx("createProfile",
 		WithSigner(name),
-		WithArg("name", "find-dapper"),
+		WithArg("name", name),
 	)
 
 	o.Tx("setup_find_market_1",
@@ -38,14 +46,23 @@ func main() {
 
 	o.Tx("adminAddFindCutDapper",
 		WithSigner("find-admin"),
-		WithArg("tenant", "find_dapper"),
+		WithArg("tenant", name),
 		WithArg("merchAddress", merchAddress),
 	)
 
-	o.Tx("adminSetSellDapperFUT",
-		WithSigner(name),
-		WithArg("market", "Sale"),
-		WithArg("merchAddress", merchAddress),
-	)
+	if coin == "DUC" {
+		o.Tx("adminSetSellDapperDUC",
+			WithSigner(name),
+			WithArg("market", "Sale"),
+			WithArg("merchAddress", merchAddress),
+		)
+	}
+	if coin == "FUT" {
+		o.Tx("adminSetSellDapperFUT",
+			WithSigner(name),
+			WithArg("market", "Sale"),
+			WithArg("merchAddress", merchAddress),
+		)
+	}
 
 }

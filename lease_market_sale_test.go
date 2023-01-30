@@ -351,7 +351,7 @@ func TestLeaseMarketSale(t *testing.T) {
 				"leaseName":   "name1",
 				"royaltyName": "dapper",
 				"tenant":      "findLease",
-			}).Print()
+			})
 
 		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
