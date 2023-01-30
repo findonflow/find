@@ -9,7 +9,10 @@ func main() {
 	o := Overflow(WithNetwork("mainnet"), WithGlobalPrintOptions())
 
 	name := "find-dapper"
-	// merchAddress := "0x55459409d30274ee"
+	merchAddress := "0x55459409d30274ee"
+	if o.Network == "testnet" {
+		merchAddress = "0x4748780c8bf65e19"
+	}
 
 	o.Tx("adminSendFlow",
 		WithSigner("find"),
@@ -33,21 +36,16 @@ func main() {
 		WithArg("name", "find_dapper"),
 	)
 
-	// o.Tx("adminSetSellLeaseDapper",
-	// 	WithSigner(name),
-	// 	WithArg("market", "Sale"),
-	// 	WithArg("merchAddress", merchAddress),
-	// )
+	o.Tx("adminAddFindCutDapper",
+		WithSigner("find-admin"),
+		WithArg("tenant", "find_dapper"),
+		WithArg("merchAddress", merchAddress),
+	)
 
-	// o.Tx("adminRemoveSetSellDapperDUC",
-	// 	WithSigner(name),
-	// 	WithArg("market", "Sale"),
-	// )
-
-	// o.Tx("adminSetSellDapperFUT",
-	// 	WithSigner(name),
-	// 	WithArg("market", "Sale"),
-	// 	WithArg("merchAddress", merchAddress),
-	// )
+	o.Tx("adminSetSellDapperFUT",
+		WithSigner(name),
+		WithArg("market", "Sale"),
+		WithArg("merchAddress", merchAddress),
+	)
 
 }

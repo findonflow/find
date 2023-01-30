@@ -28,10 +28,10 @@ pub contract FindAirdropper {
         let nftInfo = FindMarket.NFTInfo(vr, id: pointer.id, detail: true)
 
         let receiverCap = getAccount(receiver).getCapability<&{NonFungibleToken.Receiver}>(path)
-        // calculate the required storage and check sufficient balance 
+        // calculate the required storage and check sufficient balance
         let senderStorageBeforeSend = getAccount(from).storageUsed
 
-        let item <- pointer.withdraw() 
+        let item <- pointer.withdraw()
 
         let requiredStorage = senderStorageBeforeSend - getAccount(from).storageUsed
         let receiverAvailableStorage = getAccount(receiver).storageCapacity - getAccount(receiver).storageUsed
@@ -47,7 +47,7 @@ pub contract FindAirdropper {
             emit Airdropped(from: from , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, remark: nil)
 
             receiverCap.borrow()!.deposit(token: <- item)
-            return 
+            return
         } else {
             let collectionPublicCap = getAccount(receiver).getCapability<&{NonFungibleToken.CollectionPublic}>(path)
             if collectionPublicCap.check() {
@@ -56,20 +56,20 @@ pub contract FindAirdropper {
                 emit Airdropped(from: from , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid,  nftInfo: nftInfo, context: context, remark: "Receiver Not Linked")
 
                 collectionPublicCap.borrow()!.deposit(token: <- item)
-                return 
+                return
             }
         }
-    
+
         emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier, context: context, reason: "Invalid Receiver Capability")
         pointer.deposit(<- item)
     }
 
     pub fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, deepValidation: Bool) {
-        
+
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
-        
+
         if deepValidation && !pointer.valid() {
             emit AirdropFailed(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, id: pointer.id, type: pointer.itemType.identifier, context: context, reason: "Invalid NFT Pointer")
             return
@@ -87,7 +87,7 @@ pub contract FindAirdropper {
             item: pointer,
             memo: context["message"],
             storagePayment: storagePayment,
-            flowTokenRepayment: flowTokenRepayment, 
+            flowTokenRepayment: flowTokenRepayment,
             subsidizeReceiverStorage: false
         )
 
@@ -99,7 +99,7 @@ pub contract FindAirdropper {
     }
 
     pub fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, deepValidation: Bool) {
-        
+
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
@@ -121,7 +121,7 @@ pub contract FindAirdropper {
             item: pointer,
             memo: context["message"],
             storagePayment: storagePayment,
-            flowTokenRepayment: flowTokenRepayment, 
+            flowTokenRepayment: flowTokenRepayment,
             subsidizeReceiverStorage: true
         )
 
@@ -135,4 +135,3 @@ pub contract FindAirdropper {
 
 }
 
- 

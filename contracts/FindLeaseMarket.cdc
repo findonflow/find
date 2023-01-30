@@ -462,11 +462,6 @@ pub contract FindLeaseMarket {
 		if let findCut =cuts.findCut {
 
 			var cutAmount= soldFor * findCut.cut
-			// For DUC and FUT, we only take 0.025 royalties as find
-			if payInFUT || payInDUC {
-				cutAmount = soldFor * 0.025
-			}
-
 			let name = FIND.reverseLookup(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))

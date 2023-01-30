@@ -34,7 +34,7 @@ pub contract Admin {
 		pub fun addCapability(_ cap: Capability<&FIND.Network>)
 	}
 
-	//admin proxy with capability receiver 
+	//admin proxy with capability receiver
 	pub resource AdminProxy: AdminProxyClient {
 
 		access(self) var capability: Capability<&FIND.Network>?
@@ -162,7 +162,7 @@ pub contract Admin {
       		return Admin.account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Find market tenant client Reference.")
 		}
 
-		/// Enable or disable public registration 
+		/// Enable or disable public registration
 		pub fun setPublicEnabled(_ enabled: Bool) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -256,7 +256,7 @@ pub contract Admin {
 		*/
 
 		/// ===================================================================================
-		// Fungible Token Registry 
+		// Fungible Token Registry
 		/// ===================================================================================
 
 		// Registry FungibleToken Information
@@ -286,62 +286,62 @@ pub contract Admin {
 		}
 
 		/// ===================================================================================
-		// Find Market Options 
+		// Find Market Options
 		/// ===================================================================================
 		pub fun addSaleItemType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.addSaleItemType(type) 
+			FindMarket.addSaleItemType(type)
 		}
 
 		pub fun addMarketBidType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.addMarketBidType(type) 
+			FindMarket.addMarketBidType(type)
 		}
 
 		pub fun addSaleItemCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.addSaleItemCollectionType(type) 
+			FindMarket.addSaleItemCollectionType(type)
 		}
 
 		pub fun addMarketBidCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.addMarketBidCollectionType(type) 
+			FindMarket.addMarketBidCollectionType(type)
 		}
 
 		pub fun removeSaleItemType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.removeSaleItemType(type) 
+			FindMarket.removeSaleItemType(type)
 		}
 
 		pub fun removeMarketBidType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.removeMarketBidType(type) 
+			FindMarket.removeMarketBidType(type)
 		}
 
 		pub fun removeSaleItemCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.removeSaleItemCollectionType(type) 
+			FindMarket.removeSaleItemCollectionType(type)
 		}
 
 		pub fun removeMarketBidCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			FindMarket.removeMarketBidCollectionType(type) 
+			FindMarket.removeMarketBidCollectionType(type)
 		}
 
 		/// ===================================================================================
@@ -380,20 +380,20 @@ pub contract Admin {
 			let tenant = self.getTenantRef(tenant)
 			let oldCut = tenant.removeSaleItem(saleItemName, type: "cut")
 
-			var newCut = oldCut.cut! 
+			var newCut = oldCut.cut!
 			if cut != nil {
 				newCut = MetadataViews.Royalty(receiver: oldCut.cut!.receiver, cut: cut!, description: oldCut.cut!.description)
 			}
 
-			var newRules = oldCut.rules 
+			var newRules = oldCut.rules
 			if rules != nil {
 				newRules = rules!
 			}
 
 			let newSaleItem = FindMarket.TenantSaleItem(
-				name: oldCut.name, 
+				name: oldCut.name,
 				cut: newCut ,
-				rules: newRules, 
+				rules: newRules,
 				status: status
 			)
 			tenant.addSaleItem(newSaleItem, type: "cut")
@@ -413,19 +413,19 @@ pub contract Admin {
 			}
 
 			let newSaleItem = FindMarket.TenantSaleItem(
-				name: FindCutName, 
+				name: FindCutName,
 				cut: rayalty ,
-				rules: rules, 
+				rules: rules,
 				status: status
 			)
 			tenant.addSaleItem(newSaleItem, type: "cut")
 		}
 
-		/* 
+		/*
 		tenant.addSaleItem(TenantSaleItem(
-			name:"findRoyalty", 
-			cut:findRoyalty, 
-			rules: defaultCutRules, 
+			name:"findRoyalty",
+			cut:findRoyalty,
+			rules: defaultCutRules,
 			status:"active"
 		), type: "cut")
 		 */
@@ -433,7 +433,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			let tenant = self.getTenantRef(tenant) 
+			let tenant = self.getTenantRef(tenant)
 			tenant.addSaleItem(saleItem, type: "tenant")
 			//Emit Event here
 		}
@@ -442,7 +442,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			let tenant = self.getTenantRef(tenant) 
+			let tenant = self.getTenantRef(tenant)
 			tenant.removeSaleItem(name, type: "tenant")
 		}
 
@@ -450,7 +450,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			let tenant = self.getTenantRef(tenant) 
+			let tenant = self.getTenantRef(tenant)
 			tenant.alterMarketOption(name: name, status: "active")
 		}
 
@@ -458,7 +458,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			let tenant = self.getTenantRef(tenant) 
+			let tenant = self.getTenantRef(tenant)
 			tenant.alterMarketOption(name: name, status: "deprecated")
 		}
 
@@ -466,7 +466,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			let tenant = self.getTenantRef(tenant) 
+			let tenant = self.getTenantRef(tenant)
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
@@ -505,11 +505,11 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			
-			let privatePath = PrivatePath(identifier: pathIdentifier)! 
+
+			let privatePath = PrivatePath(identifier: pathIdentifier)!
 			var cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
 			if !cap.check() {
-				let storagePath = StoragePath(identifier: pathIdentifier)! 
+				let storagePath = StoragePath(identifier: pathIdentifier)!
 				Admin.account.link<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath , target: storagePath)
 				cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
 			}
@@ -520,7 +520,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			return Admin.account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)	
+			return Admin.account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)
 		}
 
 		pub fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
@@ -554,7 +554,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			
+
 			return Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		}
 
@@ -566,7 +566,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			
+
 			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
         	FINDCatalogAdmin.addCatalogEntry(collectionIdentifier : collectionIdentifier, metadata : metadata)
 		}
@@ -575,7 +575,7 @@ pub contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			
+
 			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
         	FINDCatalogAdmin.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
 		}
@@ -595,4 +595,4 @@ pub contract Admin {
 	}
 
 }
- 
+
