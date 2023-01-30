@@ -13,13 +13,23 @@ transaction(market: String, merchAddress: Address){
     prepare(account: AuthAccount){
         let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
 
+		// emulator
+		var identifier = "A.f8d6e0586b0a20c7.Wearables.NFT"
+		if merchAddress== 0x097bafa4e0b48eef {
+		// This is for mainnet
+			identifier = "A.e81193c424cfd3fb.Wearables.NFT"
+		} else if merchAddress == 0x35717efbbce11c74 {
+		// This is for testnet
+			identifier = "A.1e0493ee604e7598.Wearables.NFT"
+		}
+
         var marketType : [Type] = [Type<@FindMarketSale.SaleItem>()]
 		var ftTyp : [Type] = [
 			// Type<@FlowUtilityToken.Vault>()
 			Type<@DapperUtilityCoin.Vault>()
 			]
 		var nftTyp: [Type] = [
-			CompositeType("A.1e0493ee604e7598.Wearables.NFT")!
+			CompositeType(identifier)!
 		]
 
         switch market {
@@ -37,7 +47,7 @@ transaction(market: String, merchAddress: Address){
         }
 
 		let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		let r = MetadataViews.Royalty(receiver: cap, cut: 0.06, description: "find")
+		let r = MetadataViews.Royalty(receiver: cap, cut: 0.01, description: "find")
 
 		let rules = [
             FindMarket.TenantRule(name:"DapperDUC", types:ftTyp, ruleType: "ft", allow: true),

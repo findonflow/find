@@ -408,49 +408,50 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	})
 
-	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
+	// Find take 2.5% which is hard coded in the code now, this test does not make sense at the moment
+	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
 
-		price = 10.0
+	// 	price = 10.0
 
-		otu.directOfferMarketSoft("user2", "user1", id, price).
-			saleItemListed("user1", "active_ongoing", price).
-			acceptDirectOfferMarketSoft("user1", id, "user2", price).
-			setFindCutDapper(0.035)
+	// 	otu.directOfferMarketSoft("user2", "user1", id, price).
+	// 		saleItemListed("user1", "active_ongoing", price).
+	// 		acceptDirectOfferMarketSoft("user1", id, "user2", price).
+	// 		setFindCutDapper(0.035)
 
-		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
-			WithSigner("user2"),
-			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
-			WithArg("id", id),
-			WithArg("amount", price),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
-				"amount":      0.35,
-				"id":          id,
-				"royaltyName": "find",
-				"tenant":      "onefootball",
-			}).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("user1"),
-				"amount":      0.65,
-				"findName":    "user1",
-				"id":          id,
-				"royaltyName": "creator",
-				"tenant":      "onefootball",
-			}).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.65,
-				"id":          id,
-				"royaltyName": "find forge",
-				"tenant":      "onefootball",
-			})
+	// 	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
+	// 		WithSigner("user2"),
+	// 		WithPayloadSigner("dapper"),
+	// 		WithArg("marketplace", "find"),
+	// 		WithArg("id", id),
+	// 		WithArg("amount", price),
+	// 	).
+	// 		AssertSuccess(t).
+	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+	// 			"address":     otu.O.Address("find-admin"),
+	// 			"amount":      0.35,
+	// 			"id":          id,
+	// 			"royaltyName": "find",
+	// 			"tenant":      "onefootball",
+	// 		}).
+	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+	// 			"address":     otu.O.Address("user1"),
+	// 			"amount":      0.65,
+	// 			"findName":    "user1",
+	// 			"id":          id,
+	// 			"royaltyName": "creator",
+	// 			"tenant":      "onefootball",
+	// 		}).
+	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+	// 			"address":     otu.O.Address("find"),
+	// 			"amount":      0.65,
+	// 			"id":          id,
+	// 			"royaltyName": "find forge",
+	// 			"tenant":      "onefootball",
+	// 		})
 
-		otu.sendDandy("user1", "user2", id)
+	// 	otu.sendDandy("user1", "user2", id)
 
-	})
+	// })
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 

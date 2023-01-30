@@ -16,7 +16,7 @@ transaction(tenantAddress: Address, merchantAddress:Address) {
 
 		let receiver=getAccount(merchantAddress).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 
-		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.05,  description: "find")
+		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025,  description: "find")
 
 		//We create a tenant that has both auctions and direct offers
 		let tenantCap= adminClient.createFindMarketDapper(name: "findLease", address: tenantAddress, defaultCutRules: cut, findRoyalty:findRoyalty)

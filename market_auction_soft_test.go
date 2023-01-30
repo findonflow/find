@@ -505,43 +505,44 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.sendDandy("user1", "user2", id)
 	})
 
-	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
+	// Find take 2.5% which is hard coded in the code now, this test does not make sense at the moment
+	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
 
-		price = 5.0
+	// 	price = 5.0
 
-		otu.listNFTForSoftAuction("user1", id, price).
-			saleItemListed("user1", "active_listed", price).
-			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			setFindCutDapper(0.035)
+	// 	otu.listNFTForSoftAuction("user1", id, price).
+	// 		saleItemListed("user1", "active_listed", price).
+	// 		auctionBidMarketSoft("user2", "user1", id, price+5.0).
+	// 		setFindCutDapper(0.035)
 
-		otu.tickClock(500.0)
+	// 	otu.tickClock(500.0)
 
-		otu.O.Tx("fulfillMarketAuctionSoftDapper",
-			WithSigner("user2"),
-			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
-			WithArg("id", id),
-			WithArg("amount", 10.0),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
-				"amount":      0.35,
-				"royaltyName": "find",
-			}).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("user1"),
-				"amount":      0.65,
-				"royaltyName": "creator",
-			}).
-			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find"),
-				"amount":      0.65,
-				"royaltyName": "find forge",
-			})
+	// 	otu.O.Tx("fulfillMarketAuctionSoftDapper",
+	// 		WithSigner("user2"),
+	// 		WithPayloadSigner("dapper"),
+	// 		WithArg("marketplace", "find"),
+	// 		WithArg("id", id),
+	// 		WithArg("amount", 10.0),
+	// 	).
+	// 		AssertSuccess(t).
+	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+	// 			"address":     otu.O.Address("find-admin"),
+	// 			"amount":      0.35,
+	// 			"royaltyName": "find",
+	// 		}).
+	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+	// 			"address":     otu.O.Address("user1"),
+	// 			"amount":      0.65,
+	// 			"royaltyName": "creator",
+	// 		}).
+	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+	// 			"address":     otu.O.Address("find"),
+	// 			"amount":      0.65,
+	// 			"royaltyName": "find forge",
+	// 		})
 
-		otu.sendDandy("user1", "user2", id)
-	})
+	// 	otu.sendDandy("user1", "user2", id)
+	// })
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 

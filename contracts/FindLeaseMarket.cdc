@@ -446,25 +446,39 @@ pub contract FindLeaseMarket {
 		let ftType=vault.getType()
 
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
+
+		var payInDUC = false
 		var residualAddress = FindMarket.residualAddress
 		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
 			residualAddress = dapperMerchAddress
 		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
 			residualAddress = dapperMerchAddress
+			payInDUC = true
 		}
 		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 
 		if let findCut =cuts.findCut {
-			var cutAmount= soldFor * findCut.cut
-			let minAmount = 0.65
 
-			if minAmount > cutAmount {
-				cutAmount = minAmount
-			}
+			var cutAmount= soldFor * findCut.cut
 			let name = FIND.reverseLookup(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
 			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
+
+			// Dapper charges extra 1 % or 0.44 whichever is higher
+			if payInDUC {
+				cutAmount = soldFor * 0.01
+				if cutAmount < 0.44 {
+					cutAmount = 0.44
+				}
+
+				if vault.balance < cutAmount {
+					panic("The listed price is too low and could not afford for dapper transaction charges.")
+				}
+
+				emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: nil , royaltyName: "dapper", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
+				vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
+			}
 		}
 
 		oldProfile.deposit(from: <- vault)

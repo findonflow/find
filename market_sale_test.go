@@ -603,6 +603,72 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("Should be able to list an NFT for sale and buy it with DUC, royalties should be paid to merch account", func(t *testing.T) {
+
+		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
+
+		otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.getNFTForMarketSale("user1", saleItemID[0], price)
+
+		name := "user2"
+		seller := "user1"
+		otu.O.Tx("buyNFTForSaleDapper",
+			WithSigner(name),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("address", seller),
+			WithArg("id", saleItemID[0]),
+			WithArg("amount", price),
+		).
+			AssertSuccess(otu.T).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address": otu.O.Address("dapper"),
+					"amount":  0.25,
+				})
+
+		otu.sendExampleNFT("user1", "user2")
+
+	})
+
+	t.Run("Should be able to list an NFT for sale and buy it with DUC, royalties should be paid to merch account if royalty is higher than 0.44", func(t *testing.T) {
+
+		saleItemID := otu.listNFTForSaleDUC("user1", 0, 100.0)
+
+		otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.getNFTForMarketSale("user1", saleItemID[0], 100.0)
+
+		name := "user2"
+		seller := "user1"
+		otu.O.Tx("buyNFTForSaleDapper",
+			WithSigner(name),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("address", seller),
+			WithArg("id", saleItemID[0]),
+			WithArg("amount", 100.0),
+		).
+			AssertSuccess(otu.T).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address": otu.O.Address("dapper"),
+					"amount":  2.5,
+				})
+
+		otu.sendExampleNFT("user1", "user2")
+
+	})
+
 	t.Run("Royalties should be sent to dapper residual account if royalty receiver is not working", func(t *testing.T) {
 
 		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)

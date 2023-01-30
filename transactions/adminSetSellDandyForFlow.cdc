@@ -15,7 +15,7 @@ transaction(tenant: Address, market: String){
     prepare(account: AuthAccount){
         let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
-		let tenantRef = adminRef.getTenantRef(tenant) 
+		let tenantRef = adminRef.getTenantRef(tenant)
 
         var marketType : [Type] = [Type<@FindMarketSale.SaleItem>()]
 		var ftTyp : [Type] = [Type<@FlowToken.Vault>()]
@@ -23,9 +23,9 @@ transaction(tenant: Address, market: String){
         let rules = [
             FindMarket.TenantRule(name:"FUT", types:[Type<@FlowUtilityToken.Vault>()], ruleType: "ft", allow: true)
             ]
-		
+
         switch market {
-			case "Sale" : 
+			case "Sale" :
 				ftTyp = [Type<@FlowToken.Vault>(), Type<@FlowUtilityToken.Vault>()]
 				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
 				if items.findCut == nil {
@@ -62,7 +62,7 @@ transaction(tenant: Address, market: String){
             FindMarket.TenantRule(name:"Flow", types:ftTyp, ruleType: "ft", allow: true),
             FindMarket.TenantRule(name:"Dandy", types:[Type<@Dandy.NFT>()], ruleType: "nft", allow: true),
             FindMarket.TenantRule(name: market, types:marketType, ruleType: "listing", allow: true)
-            ], 
+            ],
             status: "active"
         )
 

@@ -1937,31 +1937,31 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
+// func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
 
-	otu.O.Tx("adminSetFindCut",
-		WithSigner("find-admin"),
-		WithArg("saleItemName", "findFutRoyalty"),
-		WithArg("tenant", "find"),
-		WithArg("cut", cut),
-	).
-		AssertSuccess(otu.T)
+// 	otu.O.Tx("adminSetFindCut",
+// 		WithSigner("find-admin"),
+// 		WithArg("saleItemName", "findFutRoyalty"),
+// 		WithArg("tenant", "find"),
+// 		WithArg("cut", cut),
+// 	).
+// 		AssertSuccess(otu.T)
 
-	return otu
-}
+// 	return otu
+// }
 
-func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUtils {
+// func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUtils {
 
-	otu.O.Tx("adminSetFindCut",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find-lease"),
-		WithArg("saleItemName", "findFutRoyalty"),
-		WithArg("cut", cut),
-	).
-		AssertSuccess(otu.T)
+// 	otu.O.Tx("adminSetFindCut",
+// 		WithSigner("find-admin"),
+// 		WithArg("tenant", "find-lease"),
+// 		WithArg("saleItemName", "findFutRoyalty"),
+// 		WithArg("cut", cut),
+// 	).
+// 		AssertSuccess(otu.T)
 
-	return otu
-}
+// 	return otu
+// }
 
 func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 
@@ -2259,7 +2259,7 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 
 func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, price float64) *OverflowTestUtils {
 
-	ftIden, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
 	assert.NoError(otu.T, err)
 
 	otu.O.Tx("listLeaseForSaleDapper",
@@ -2318,10 +2318,10 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 
 func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name string, price float64) *OverflowTestUtils {
 
-	amount := price * 0.05
-	if amount < 0.65 {
-		amount = 0.65
-
+	amount := price * 0.025
+	dapperAmount := price * 0.01
+	if dapperAmount < 0.44 {
+		dapperAmount = 0.44
 	}
 	eventIden, err := otu.O.QualifiedIdentifier("FindLeaseMarketSale", "Sale")
 	assert.NoError(otu.T, err)
@@ -2346,6 +2346,13 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			"leaseName":   name,
 			"address":     otu.O.Address("dapper"),
 			"royaltyName": "find",
+			"tenant":      "findLease",
+		}).
+		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
+			"amount":      dapperAmount,
+			"leaseName":   name,
+			"address":     otu.O.Address("dapper"),
+			"royaltyName": "dapper",
 			"tenant":      "findLease",
 		})
 

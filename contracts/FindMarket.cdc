@@ -1215,12 +1215,16 @@ pub contract FindMarket {
 		let ftType=vault.getType()
 
 		/* Residual Royalty */
+		var payInFUT = false
+		var payInDUC = false
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
 		var residualAddress = FindMarket.residualAddress
 		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
 			residualAddress = dapperMerchAddress
+			payInFUT = true
 		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
 			residualAddress = dapperMerchAddress
+			payInDUC = true
 		}
 		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 
@@ -1291,7 +1295,7 @@ pub contract FindMarket {
 		}
 
 		if let findCut =cuts.findCut {
-			let cutAmount= soldFor * findCut.cut
+			var cutAmount= soldFor * findCut.cut
 			let name = resolveName(findCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
@@ -1299,9 +1303,22 @@ pub contract FindMarket {
 		}
 
 		if let tenantCut =cuts.tenantCut {
-			let cutAmount= soldFor * tenantCut.cut
+			// Dapper charges extra 1 % or 0.44 whichever is higher
+			var cutAmount= soldFor * tenantCut.cut
+			var royaltyName= "marketplace"
+			if payInDUC {
+				if cutAmount < 0.44 {
+					cutAmount = 0.44
+				}
+
+				if vault.balance < cutAmount {
+					panic("The listed price is too low and could not afford for dapper transaction charges.")
+				}
+				royaltyName = "dapper"
+			}
+
 			let name = resolveName(tenantCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: "marketplace", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: royaltyName, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
 			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}

@@ -1,6 +1,7 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Admin from "../contracts/Admin.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
@@ -18,15 +19,18 @@ transaction(tenant: Address, market: String, merchAddress: Address){
         var marketType : [Type] = [Type<@FindLeaseMarketSale.SaleItem>()]
 		var ftTyp : [Type] = [Type<@FlowToken.Vault>()]
 
-        let rules = [
+        var rules = [
             FindMarket.TenantRule(name:"FUT", types:[Type<@FlowUtilityToken.Vault>()], ruleType: "ft", allow: true)
             ]
         switch market {
 			case "Sale" :
-				ftTyp = [Type<@FlowToken.Vault>(), Type<@FlowUtilityToken.Vault>()]
-				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@FlowUtilityToken.Vault>())
+				ftTyp = [Type<@FlowToken.Vault>(), Type<@DapperUtilityCoin.Vault>()]
+				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType:Type<@FIND.Lease>(), ftType:Type<@DapperUtilityCoin.Vault>())
 				if items.findCut == nil {
 					let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+					rules = [
+						FindMarket.TenantRule(name:"DUC", types:[Type<@DapperUtilityCoin.Vault>()], ruleType: "ft", allow: true)
+					]
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}
 
