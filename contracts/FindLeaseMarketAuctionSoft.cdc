@@ -42,7 +42,7 @@ pub contract FindLeaseMarketAuctionSoft {
 		}
 
 		//Here we do not get a vault back, it is sent in to the method itself
-		pub fun acceptNonEscrowedBid() { 
+		pub fun acceptNonEscrowedBid() {
 			pre{
 				self.offerCallback != nil : "There is no bid offer to the item."
 				self.offerCallback!.check() : "Bidder unlinked bid collection capability."
@@ -151,11 +151,11 @@ pub contract FindLeaseMarketAuctionSoft {
 				if self.hasAuctionEnded() {
 					if self.hasAuctionMetReservePrice() {
 						return "finished_completed"
-					} 
+					}
 					return "finished_failed"
 				}
 				return "active_ongoing"
-			} 
+			}
 			return "active_listed"
 		}
 
@@ -176,10 +176,10 @@ pub contract FindLeaseMarketAuctionSoft {
 		}
 
 		pub fun getAuction(): FindLeaseMarket.AuctionItem? {
-			return FindLeaseMarket.AuctionItem(startPrice: self.auctionStartPrice, 
+			return FindLeaseMarket.AuctionItem(startPrice: self.auctionStartPrice,
 			currentPrice: self.getBalance(),
 			minimumBidIncrement: self.auctionMinBidIncrement ,
-			reservePrice: self.auctionReservePrice, 
+			reservePrice: self.auctionReservePrice,
 			extentionOnLateBid: self.auctionExtensionOnLateBid ,
 			auctionEndsAt: self.auctionEndsAt ,
 			timestamp: Clock.time())
@@ -214,13 +214,13 @@ pub contract FindLeaseMarketAuctionSoft {
 		//fetch all the tokens in the collection
 		pub fun getNameSales(): [String]
 		pub fun containsNameSale(_ name: String): Bool
-		access(contract) fun registerIncreasedBid(_ name: String, oldBalance: UFix64) 
+		access(contract) fun registerIncreasedBid(_ name: String, oldBalance: UFix64)
 
 		//place a bid on a token
 		access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
 
 		//only buyer can fulfill auctions since he needs to send funds for this type
-		access(contract) fun fulfillAuction(name: String, vault: @FungibleToken.Vault) 
+		access(contract) fun fulfillAuction(name: String, vault: @FungibleToken.Vault)
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic  {
@@ -253,7 +253,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			if saleItem.checkPointer() {
 				leaseInfo=saleItem.toLeaseInfo()
 			}
-			
+
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
 				previousBuyerName = FIND.reverseLookup(pb)
@@ -408,7 +408,7 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil)
 
-			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() { 
+			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(name)
 			}
 
@@ -453,7 +453,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			saleItem.acceptNonEscrowedBid()
 
-			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
+			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts, dapperMerchAddress: FIND.getMerchantAddress())
 
 			destroy <- self.items.remove(key: name)
 
@@ -623,7 +623,7 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[name] <- bid
-			saleItemCollection.registerBid(name: name, callback: callbackCapability, vaultType: vaultType) 
+			saleItemCollection.registerBid(name: name, callback: callbackCapability, vaultType: vaultType)
 			destroy oldToken
 		}
 
@@ -643,7 +643,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			}
 			let bid =self.borrowBid(name)
 
-			let oldBalance=bid.balance 
+			let oldBalance=bid.balance
 
 			bid.setBidAt(Clock.time())
 			bid.setBalance(bid.balance + increaseBy)
@@ -654,7 +654,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			bid.from.borrow()!.registerIncreasedBid(name, oldBalance: oldBalance)
 		}
 
-		//called from saleItem when things are cancelled 
+		//called from saleItem when things are cancelled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancelBidFromSaleItem(_ name: String) {
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")

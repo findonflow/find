@@ -25,7 +25,7 @@ pub contract FindMarketAuctionEscrow {
 		access(contract) var auctionValidUntil: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
-		access(contract) let totalRoyalties: UFix64 
+		access(contract) let totalRoyalties: UFix64
 		access(contract) let saleItemExtraField: {String : AnyStruct}
 
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionDuration: UFix64, extentionOnLateBid:UFix64, minimumBidIncrement:UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
@@ -113,7 +113,7 @@ pub contract FindMarketAuctionEscrow {
 			return false
 		}
 
-		pub fun hasAuctionEnded() : Bool {      
+		pub fun hasAuctionEnded() : Bool {
 			if let ends = self.auctionEndsAt {
 				return ends < Clock.time()
 			}
@@ -161,11 +161,11 @@ pub contract FindMarketAuctionEscrow {
 				if self.hasAuctionEnded() {
 					if self.hasAuctionMetReservePrice() {
 						return "finished_completed"
-					} 
+					}
 					return "finished_failed"
 				}
 				return "active_ongoing"
-			} 
+			}
 			return "active_listed"
 		}
 
@@ -187,12 +187,12 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun getAuction(): FindMarket.AuctionItem? {
-			return FindMarket.AuctionItem(startPrice: self.auctionStartPrice, 
+			return FindMarket.AuctionItem(startPrice: self.auctionStartPrice,
 			currentPrice: self.getBalance(),
 			minimumBidIncrement: self.auctionMinBidIncrement ,
-			reservePrice: self.auctionReservePrice, 
+			reservePrice: self.auctionReservePrice,
 			extentionOnLateBid: self.auctionExtensionOnLateBid ,
-			auctionEndsAt: self.auctionEndsAt , 
+			auctionEndsAt: self.auctionEndsAt ,
 			timestamp: Clock.time())
 		}
 
@@ -222,7 +222,7 @@ pub contract FindMarketAuctionEscrow {
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
-		
+
 		pub fun getTotalRoyalties() : UFix64 {
 			return self.totalRoyalties
 		}
@@ -245,13 +245,13 @@ pub contract FindMarketAuctionEscrow {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
 		pub fun containsId(_ id: UInt64): Bool
-		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) 
+		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64)
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
 
 		//anybody should be able to fulfill an auction as long as it is done
-		pub fun fulfillAuction(_ id: UInt64) 
+		pub fun fulfillAuction(_ id: UInt64)
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
@@ -385,7 +385,7 @@ pub contract FindMarketAuctionEscrow {
 				return
 			}
 
-			// If the auction is not started but the start time is set, it falls in here 
+			// If the auction is not started but the start time is set, it falls in here
 			if let startTime = saleItem.auctionStartedAt {
 				panic("Auction is not yet started, please place your bid after ".concat(startTime.toString()))
 			}
@@ -451,7 +451,7 @@ pub contract FindMarketAuctionEscrow {
 			} else {
 				status = "cancel_ghostlisting"
 			}
-			
+
 			self.internalCancelAuction(saleItem: saleItem, status: status)
 
 		}
@@ -491,7 +491,7 @@ pub contract FindMarketAuctionEscrow {
 
 			let tenant=self.getTenant()
 
-			var nftInfo:FindMarket.NFTInfo?=nil 
+			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(false)
 			}
@@ -565,18 +565,18 @@ pub contract FindMarketAuctionEscrow {
 				let resolved : {Address : String} = {}
 				resolved[buyer] = buyerName ?? ""
 				resolved[seller] = sellerName ?? ""
-				resolved[FindMarketAuctionEscrow.account.address] =  "find" 
-				// Have to make sure the tenant always have the valid find name 
+				resolved[FindMarketAuctionEscrow.account.address] =  "find"
+				// Have to make sure the tenant always have the valid find name
 				resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
-				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
+				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved, dapperMerchAddress: FIND.getMerchantAddress())
 
 				destroy <- self.items.remove(key: id)
-				return 
+				return
 			}
 			panic("This auction is not live")
 
-		} 
+		}
 
 		pub fun listForAuction(pointer: FindViews.AuthNFTPointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionStartTime: UFix64?, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
@@ -603,14 +603,14 @@ pub contract FindMarketAuctionEscrow {
 				auctionStartTime = currentTime
 			}
 
-			// check soul bound 
+			// check soul bound
 			if pointer.checkSoulBound() {
 				panic("This item is soul bounded and cannot be traded")
 			}
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionDuration: auctionDuration, extentionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement:minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
-			// if startTime is set, start the auction at the specified time with intended auction duration 
+			// if startTime is set, start the auction at the specified time with intended auction duration
 			if auctionStartTime != nil {
 				saleItem.setAuctionStarted(auctionStartTime!)
 				let endTime = auctionStartTime! + auctionDuration
@@ -619,13 +619,13 @@ pub contract FindMarketAuctionEscrow {
 
 			let tenant=self.getTenant()
 
-			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC) 
+			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC)
 			if tenant.name == "onefootball" {
 				// ensure it is not a 0 dollar listing
 				if auctionStartPrice <= 0.65 {
 					panic("Auction start price should be greater than 0.65")
 				}
-			} 
+			}
 
 			let nftType= saleItem.getItemType()
 			let ftType= saleItem.getFtType()
@@ -664,7 +664,7 @@ pub contract FindMarketAuctionEscrow {
 		pub fun getIds(): [UInt64] {
 			return self.items.keys
 		}
-		
+
 		pub fun getRoyaltyChangedIds(): [UInt64] {
 			let ids : [UInt64] = []
 			for id in self.getIds() {
@@ -733,7 +733,7 @@ pub contract FindMarketAuctionEscrow {
 		}
 
 		pub fun getBidExtraField() : {String : AnyStruct} {
-			return self.bidExtraField 
+			return self.bidExtraField
 		}
 
 		destroy() {
@@ -823,7 +823,7 @@ pub contract FindMarketAuctionEscrow {
 
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[uuid] <- bid
-			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType) 
+			saleItemCollection.registerBid(item: item, callback: callbackCapability, vaultType: vaultType)
 			destroy oldToken
 		}
 
@@ -853,7 +853,7 @@ pub contract FindMarketAuctionEscrow {
 			bid.from.borrow()!.registerIncreasedBid(id, oldBalance:oldBalance)
 		}
 
-		//called from saleItem when things are cancelled 
+		//called from saleItem when things are cancelled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
 			let bid <- self.bids.remove(key: id) ?? panic("missing bid")
@@ -925,4 +925,3 @@ pub contract FindMarketAuctionEscrow {
 		FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
 	}
 }
- 

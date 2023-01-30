@@ -4,6 +4,7 @@ import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 
 pub contract FindMarket {
 	access(account) let  pathMap : {String: String}
@@ -1185,7 +1186,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}, dapperMerchAddress: Address) {
 		let resolved : {Address : String} = resolvedAddress
 
 		fun resolveName(_ addr: Address ) : String? {
@@ -1215,7 +1216,13 @@ pub contract FindMarket {
 
 		/* Residual Royalty */
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-		let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		var residualAddress = FindMarket.residualAddress
+		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
+			residualAddress = dapperMerchAddress
+		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
+			residualAddress = dapperMerchAddress
+		}
+		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 
 		/* Check the total royalty to prevent changing of royalties */
 		let royalties = royalty.getRoyalties()
@@ -1236,7 +1243,15 @@ pub contract FindMarket {
 					}
 				}
 
-				let receiver = royaltyItem.receiver.address
+				var receiver = royaltyItem.receiver.address
+
+				// This is set on testnet only to fix testnet doodles creator royalty
+				if FindMarket.account.address == 0x35717efbbce11c74 {
+					if receiver == 0xe03daebed8ca0615 {
+						receiver = 0x4748780c8bf65e19
+					}
+				}
+
 				let name = resolveName(royaltyItem.receiver.address)
 
 				var walletCheck = true
@@ -1261,7 +1276,7 @@ pub contract FindMarket {
 
 				/* If the royalty receiver check failed */
 				if !walletCheck {
-					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: FindMarket.residualAddress)
+					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: residualVault.address)
 					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
 					continue
 				}

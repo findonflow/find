@@ -18,9 +18,9 @@ pub contract FindMarketDirectOfferEscrow {
 		access(contract) var pointer: AnyStruct{FindViews.Pointer}
 
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>
-		access(contract) var validUntil: UFix64? 
+		access(contract) var validUntil: UFix64?
 		access(contract) var saleItemExtraField: {String : AnyStruct}
-		access(contract) let totalRoyalties: UFix64 
+		access(contract) let totalRoyalties: UFix64
 
 		init(pointer: AnyStruct{FindViews.Pointer}, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.pointer=pointer
@@ -71,7 +71,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 		pub fun getBuyerName() : String? {
 			if let name = FIND.reverseLookup(self.offerCallback.address) {
-				return name 
+				return name
 			}
 			return nil
 		}
@@ -120,7 +120,7 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun getValidUntil() : UFix64? {
-			return self.validUntil 
+			return self.validUntil
 		}
 
 		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
@@ -142,7 +142,7 @@ pub contract FindMarketDirectOfferEscrow {
 		access(contract) fun setSaleItemExtraField(_ field: {String : AnyStruct}) {
 			self.saleItemExtraField = field
 		}
-		
+
 		pub fun getTotalRoyalties() : UFix64 {
 			return self.totalRoyalties
 		}
@@ -165,9 +165,9 @@ pub contract FindMarketDirectOfferEscrow {
 		//fetch all the tokens in the collection
 		pub fun getIds(): [UInt64]
 		pub fun containsId(_ id: UInt64): Bool
-		access(contract)fun cancelBid(_ id: UInt64) 
+		access(contract)fun cancelBid(_ id: UInt64)
 
-		access(contract) fun registerIncreasedBid(_ id: UInt64) 
+		access(contract) fun registerIncreasedBid(_ id: UInt64)
 
 		//place a bid on a token
 		access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct})
@@ -213,13 +213,13 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = Profile.find(buyer)
 
-			var nftInfo:FindMarket.NFTInfo?=nil 
+			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
-		
+
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -232,7 +232,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let saleItem=self.borrow(id)
 
 			let tenant=self.getTenant()
-			let nftType= saleItem.getItemType() 
+			let nftType= saleItem.getItemType()
 			let ftType= saleItem.getFtType()
 
 			let actionResult=tenant.allowedAction(listingType: Type<@FindMarketDirectOfferEscrow.SaleItem>(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:true, name: "add bid in direct offer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
@@ -273,7 +273,7 @@ pub contract FindMarketDirectOfferEscrow {
 				if !actionResult.allowed {
 					panic(actionResult.message)
 				}
-				
+
 				self.items[id] <-! saleItem
 				let saleItemRef=self.borrow(id)
 
@@ -287,8 +287,8 @@ pub contract FindMarketDirectOfferEscrow {
 				let nftInfo=saleItemRef.toNFTInfo(true)
 
 				emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItemRef.validUntil, previousBuyer:nil, previousBuyerName:nil)
-	
-				return 
+
+				return
 			}
 
 			let saleItem=self.borrow(id)
@@ -332,7 +332,7 @@ pub contract FindMarketDirectOfferEscrow {
 			let previousBuyerName = FIND.reverseLookup(previousBuyer)
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-		
+
 
 		}
 
@@ -356,19 +356,19 @@ pub contract FindMarketDirectOfferEscrow {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = Profile.find(buyer)
 
-			var nftInfo:FindMarket.NFTInfo?=nil 
+			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(false)
 			}
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
-		
+
 			saleItem.offerCallback.borrow()!.cancelBidFromSaleItem(id)
 			destroy <- self.items.remove(key: id)
 		}
 
 		pub fun acceptDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
-			
+
 			let id = pointer.getUUID()
 			if !self.items.containsKey(id) {
 				panic("Invalid id=".concat(pointer.getUUID().toString()))
@@ -406,17 +406,17 @@ pub contract FindMarketDirectOfferEscrow {
 			let profile = Profile.find(buyer)
 
 			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: sellerName , amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
-		
+
 			let vault <- saleItem.acceptEscrowedBid()
 
 			let resolved : {Address : String} = {}
 			resolved[buyer] = buyerName ?? ""
 			resolved[owner] = sellerName ?? ""
-			resolved[FindMarketDirectOfferEscrow.account.address] =  "find" 
-			// Have to make sure the tenant always have the valid find name 
+			resolved[FindMarketDirectOfferEscrow.account.address] =  "find"
+			// Have to make sure the tenant always have the valid find name
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
-			FindMarket.pay(tenant: tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
+			FindMarket.pay(tenant: tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved, dapperMerchAddress: FIND.getMerchantAddress())
 			destroy <- self.items.remove(key: id)
 		}
 
@@ -565,7 +565,7 @@ pub contract FindMarketDirectOfferEscrow {
 		}
 
 		pub fun bid(item: FindViews.ViewReadPointer, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
-			
+
 			// ensure it is not a 0 dollar listing
 			if vault.balance <= 0.0 {
 				panic("Offer price should be greater than 0")
@@ -576,7 +576,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic("Valid until is before current time")
 			}
 
-			// check soul bound 
+			// check soul bound
 			if item.checkSoulBound() {
 				panic("This item is soul bounded and cannot be traded")
 			}
@@ -592,13 +592,13 @@ pub contract FindMarketDirectOfferEscrow {
 			}
 			let tenant=self.getTenant()
 
-			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC) 
+			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC)
 			if tenant.name == "onefootball" {
 				// ensure it is not a 0 dollar listing
 				if vault.balance <= 0.65 {
 					panic("Offer price should be greater than 0.65")
 				}
-			} 
+			}
 
 			let from=getAccount(item.owner()).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 

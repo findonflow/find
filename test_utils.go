@@ -1978,6 +1978,26 @@ func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) unlinkDUCVaultReceiver(user string) *OverflowTestUtils {
+
+	otu.O.Tx("unlinkDUCVaultReceiver",
+		WithSigner(user),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) linkDUCVaultReceiver(user string) *OverflowTestUtils {
+
+	otu.O.Tx("linkDUCVaultReceiver",
+		WithSigner(user),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) initFUSDVault(user string) *OverflowTestUtils {
 
 	otu.O.Tx("testInitFUSDVault",

@@ -603,6 +603,37 @@ func TestMarketSale(t *testing.T) {
 
 	})
 
+	t.Run("Royalties should be sent to dapper residual account if royalty receiver is not working", func(t *testing.T) {
+
+		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
+
+		otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
+
+		otu.unlinkDUCVaultReceiver("find")
+		otu.O.Tx("buyNFTForSaleDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("address", "user1"),
+			WithArg("id", saleItemID[0]),
+			WithArg("amount", price),
+		).
+			AssertSuccess(t).
+			AssertEvent(t,
+				"FindMarket.RoyaltyCouldNotBePaid",
+				map[string]interface{}{
+					"address":         otu.O.Address("find"),
+					"amount":          0.1,
+					"findName":        "find",
+					"residualAddress": otu.O.Address("dapper"),
+					"royaltyName":     "creator",
+				},
+			)
+
+		otu.linkDUCVaultReceiver("find")
+		otu.sendExampleNFT("user1", "user2")
+	})
+
 	t.Run("Should be able to list an NFT for sale and buy it. where id != uuid", func(t *testing.T) {
 		saleItem := otu.listExampleNFTForSale("user1", 0, price)
 
