@@ -1937,31 +1937,31 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
+// func (otu *OverflowTestUtils) setFindCutDapper(cut float64) *OverflowTestUtils {
 
-	otu.O.Tx("adminSetFindCut",
-		WithSigner("find-admin"),
-		WithArg("saleItemName", "findFutRoyalty"),
-		WithArg("tenant", "find"),
-		WithArg("cut", cut),
-	).
-		AssertSuccess(otu.T)
+// 	otu.O.Tx("adminSetFindCut",
+// 		WithSigner("find-admin"),
+// 		WithArg("saleItemName", "findFutRoyalty"),
+// 		WithArg("tenant", "find"),
+// 		WithArg("cut", cut),
+// 	).
+// 		AssertSuccess(otu.T)
 
-	return otu
-}
+// 	return otu
+// }
 
-func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUtils {
+// func (otu *OverflowTestUtils) setFindLeaseCutDapper(cut float64) *OverflowTestUtils {
 
-	otu.O.Tx("adminSetFindCut",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find-lease"),
-		WithArg("saleItemName", "findFutRoyalty"),
-		WithArg("cut", cut),
-	).
-		AssertSuccess(otu.T)
+// 	otu.O.Tx("adminSetFindCut",
+// 		WithSigner("find-admin"),
+// 		WithArg("tenant", "find-lease"),
+// 		WithArg("saleItemName", "findFutRoyalty"),
+// 		WithArg("cut", cut),
+// 	).
+// 		AssertSuccess(otu.T)
 
-	return otu
-}
+// 	return otu
+// }
 
 func (otu *OverflowTestUtils) blockDandy(script string) *OverflowTestUtils {
 
@@ -2346,6 +2346,13 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			"leaseName":   name,
 			"address":     otu.O.Address("dapper"),
 			"royaltyName": "find",
+			"tenant":      "findLease",
+		}).
+		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
+			"amount":      dapperAmount,
+			"leaseName":   name,
+			"address":     otu.O.Address("dapper"),
+			"royaltyName": "dapper",
 			"tenant":      "findLease",
 		})
 
