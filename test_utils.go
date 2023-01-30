@@ -330,7 +330,7 @@ func (otu *OverflowTestUtils) createWearableUser(name string) *OverflowTestUtils
 
 	nameSigner := WithSigner(name)
 
-	otu.O.Tx("setupWearables",
+	otu.O.Tx("initWearables",
 		nameSigner,
 	).
 		AssertSuccess(otu.T)
