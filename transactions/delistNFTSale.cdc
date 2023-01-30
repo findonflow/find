@@ -1,6 +1,7 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
+//Remove one or more listings from a marketplace
 transaction(marketplace:Address, ids: [UInt64]) {
 
 	let saleItems : &FindMarketSale.SaleItemCollection?

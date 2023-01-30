@@ -1,6 +1,7 @@
 import FindMarket from 0x35717efbbce11c74
 import FindMarketSale from 0x35717efbbce11c74
 
+//Remove one or more listings from a marketplace
 transaction(marketplace:Address, ids: [UInt64]) {
 
     let saleItems : &FindMarketSale.SaleItemCollection?
