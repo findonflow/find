@@ -39,7 +39,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 		}
 
 		//Here we do not get a vault back, it is sent in to the method itself
-		pub fun acceptNonEscrowedBid() { 
+		pub fun acceptNonEscrowedBid() {
 			pre{
 				self.offerCallback.check() : "Bidder unlinked the bid collection capability."
 				self.pointer != nil : "Please accept offer"
@@ -109,7 +109,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 
 		pub fun getBuyerName() : String? {
 			if let name = FIND.reverseLookup(self.offerCallback.address) {
-				return name 
+				return name
 			}
 			return nil
 		}
@@ -123,7 +123,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 		}
 
 		pub fun getValidUntil() : UFix64? {
-			return self.validUntil 
+			return self.validUntil
 		}
 
 		pub fun setPointer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
@@ -145,15 +145,15 @@ pub contract FindLeaseMarketDirectOfferSoft {
 		access(contract) fun setSaleItemExtraField(_ field: {String : AnyStruct}) {
 			self.saleItemExtraField = field
 		}
-		
+
 	}
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getNameSales(): [String]
 		pub fun containsNameSale(_ name: String): Bool
-		access(contract) fun cancelBid(_ name: String) 
-		access(contract) fun registerIncreasedBid(_ name: String) 
+		access(contract) fun cancelBid(_ name: String)
+		access(contract) fun registerIncreasedBid(_ name: String)
 
 		//place a bid on a token
 		access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct})
@@ -207,7 +207,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
-			
+
 			self.emitEvent(saleItem: saleItem, status: "cancel", previousBuyer: nil)
 			destroy <- self.items.remove(key: name)
 		}
@@ -221,10 +221,10 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			let buyerName=FIND.reverseLookup(buyer)
 			let profile = FIND.lookup(buyer.toString())
 
-			var leaseInfo:FindLeaseMarket.LeaseInfo?=nil 
+			var leaseInfo:FindLeaseMarket.LeaseInfo?=nil
 			if saleItem.checkPointer() {
 				leaseInfo=saleItem.toLeaseInfo()
-			} 
+			}
 
 			var previousBuyerName : String?=nil
 			if let pb= previousBuyer {
@@ -267,7 +267,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 				self.items[name] <-! saleItem
 				let saleItemRef=self.borrow(name)
 				self.emitEvent(saleItem: saleItemRef, status: "active_offered", previousBuyer:nil)
-				return 
+				return
 			}
 
 
@@ -362,7 +362,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 				panic("The FT vault sent in to fulfill does not match the required type. Required Type : ".concat(saleItem.getFtType().identifier).concat(" . Sent-in vault type : ".concat(vault.getType().identifier)))
 			}
 			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"fulfill directOffer"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
-			
+
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
@@ -372,7 +372,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			let leaseInfo=saleItem.toLeaseInfo()
 			saleItem.acceptNonEscrowedBid()
-			FindLeaseMarket.pay(tenant: self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo: leaseInfo, cuts:cuts)
+			FindLeaseMarket.pay(tenant: self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo: leaseInfo, cuts:cuts, dapperMerchAddress: FIND.getMerchantAddress())
 
 			destroy <- self.items.remove(key: name)
 		}
@@ -446,7 +446,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 		}
 
 		pub fun getBidExtraField() : {String : AnyStruct} {
-			return self.bidExtraField 
+			return self.bidExtraField
 		}
 	}
 
@@ -565,7 +565,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			self.cancelBidFromSaleItem(name)
 		}
 
-		//called from saleItem when things are cancelled 
+		//called from saleItem when things are cancelled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancelBidFromSaleItem(_ name: String) {
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")

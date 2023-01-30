@@ -7,6 +7,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
+import FindUtils from "../contracts/FindUtils.cdc"
 
 pub contract FindLeaseMarket {
 
@@ -437,7 +438,7 @@ pub contract FindLeaseMarket {
 
 	}
 
-	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindRulesCache.TenantCuts) {
+	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindRulesCache.TenantCuts, dapperMerchAddress: Address) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -445,7 +446,13 @@ pub contract FindLeaseMarket {
 		let ftType=vault.getType()
 
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-		let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		var residualAddress = FindMarket.residualAddress
+		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
+			residualAddress = dapperMerchAddress
+		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
+			residualAddress = dapperMerchAddress
+		}
+		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 
 		if let findCut =cuts.findCut {
 			var cutAmount= soldFor * findCut.cut
@@ -747,4 +754,3 @@ pub contract FindLeaseMarket {
 	}
 
 }
- 

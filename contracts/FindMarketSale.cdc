@@ -26,10 +26,10 @@ pub contract FindMarketSale {
 
 		//this field is set if this is a saleItem
 		access(contract) var salePrice: UFix64
-		access(contract) var validUntil: UFix64? 
+		access(contract) var validUntil: UFix64?
 		access(contract) let saleItemExtraField: {String : AnyStruct}
 
-		access(contract) let totalRoyalties: UFix64 
+		access(contract) let totalRoyalties: UFix64
 		init(pointer: FindViews.AuthNFTPointer, vaultType: Type, price:UFix64, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
 			self.pointer=pointer
@@ -109,7 +109,7 @@ pub contract FindMarketSale {
 		}
 
 		pub fun getValidUntil() : UFix64? {
-			return self.validUntil 
+			return self.validUntil
 		}
 
 		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
@@ -127,7 +127,7 @@ pub contract FindMarketSale {
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
-		
+
 		pub fun getTotalRoyalties() : UFix64 {
 			return self.totalRoyalties
 		}
@@ -150,7 +150,7 @@ pub contract FindMarketSale {
 		pub fun getIds(): [UInt64]
 		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} //TODO: look if this is safe
 		pub fun containsId(_ id: UInt64): Bool
-		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) 
+		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>)
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
@@ -184,7 +184,7 @@ pub contract FindMarketSale {
 				panic("You cannot buy your own listing")
 			}
 
-		
+
 			let saleItem=self.borrow(id)
 
 
@@ -228,11 +228,11 @@ pub contract FindMarketSale {
 			resolved[buyer] = buyerName ?? ""
 			resolved[self.owner!.address] = sellerName ?? ""
 			resolved[FindMarketSale.account.address] = "find"
-			// Have to make sure the tenant always have the valid find name 
+			// Have to make sure the tenant always have the valid find name
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] = tenant.name
 
-			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
-			
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved, dapperMerchAddress: FIND.getMerchantAddress())
+
 
 			if !nftCap.check() {
 				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.CollectionPublic}>(saleItem.getNFTCollectionData().publicPath)
@@ -260,23 +260,23 @@ pub contract FindMarketSale {
 				panic("Valid until is before current time")
 			}
 
-			// check soul bound 
+			// check soul bound
 			if pointer.checkSoulBound() {
 				panic("This item is soul bounded and cannot be traded")
 			}
 
-			// What happends if we relist  
+			// What happends if we relist
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, price: directSellPrice, validUntil: validUntil, saleItemExtraField:extraField)
 
 			let tenant=self.getTenant()
 
-			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC) 
+			// Check if it is onefootball. If so, listing has to be at least $0.65 (DUC)
 			if tenant.name == "onefootball" {
 				// ensure it is not a 0 dollar listing
 				if directSellPrice <= 0.65 {
 					panic("Listing price should be greater than 0.65")
 				}
-			} 
+			}
 
 			let nftType=saleItem.getItemType()
 			let ftType=saleItem.getFtType()
@@ -350,7 +350,7 @@ pub contract FindMarketSale {
 		pub fun containsId(_ id: UInt64): Bool {
 			return self.items.containsKey(id)
 		}
-		
+
 		pub fun borrow(_ id: UInt64): &SaleItem {
 			return (&self.items[id] as &SaleItem?)!
 		}
