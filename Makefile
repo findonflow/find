@@ -52,6 +52,8 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/listNFTForSaleDapper.cdc
 	jq ".networks.testnet.transactions.delistNFTSale.code" lib/find.json -r > dapper-tx/testnet/delistNFTSale.cdc
 	jq ".networks.testnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/testnet/setProfile.cdc
+	jq ".networks.testnet.transactions.setupWearables.code" lib/find.json -r > dapper-tx/testnet/setupWearables.cdc
+	jq ".networks.testnet.transactions.sendWearables.code" lib/find.json -r > dapper-tx/testnet/sendWearables.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyAddon.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyLeaseForSale.cdc
@@ -75,6 +77,8 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listNFTForSaleDapper.cdc
 	jq ".networks.mainnet.transactions.delistNFTSale.code" lib/find.json -r > dapper-tx/mainnet/delistNFTSale.cdc
 	jq ".networks.mainnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/mainnet/setProfile.cdc
+	jq ".networks.mainnet.transactions.setupWearables.code" lib/find.json -r > dapper-tx/mainnet/setupWearables.cdc
+	jq ".networks.mainnet.transactions.sendWearables.code" lib/find.json -r > dapper-tx/mainnet/sendWearables.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyAddon.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyLeaseForSale.cdc

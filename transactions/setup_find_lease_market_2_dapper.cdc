@@ -11,9 +11,9 @@ transaction(tenantAddress: Address, merchantAddress:Address) {
 
 		// pass in the default cut rules here
 		let cut = [
-			FindMarket.TenantRule( name:"standard ft", types:[Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:true) 
+			FindMarket.TenantRule( name:"standard ft", types:[Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:true)
 		]
-		
+
 		let receiver=getAccount(merchantAddress).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 
 		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.05,  description: "find")
