@@ -293,10 +293,8 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 		let dapperAddress=FindMarket.getTenantAddress("find_dapper") 
 
-		if dapperAddress !=nil {
-if findMarket.length == 0 {
+		if dapperAddress !=nil && findMarket.length == 0 {
 			 findMarket=FindMarket.getNFTListing(tenant:dapperAddress!, address: address, id: nftDetail!.uuid, getNFTInfo:false)
-			 }
 		}
 
 		var report : {String : ListingTypeReport} = {}
