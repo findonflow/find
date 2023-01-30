@@ -5,6 +5,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import EmeraldIdentity from "../contracts/standard/EmeraldIdentity.cdc"
@@ -12,6 +13,7 @@ import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.c
 import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import Wearables from "../contracts/community/Wearables.cdc"
 
 pub struct FINDReport{
 	pub let isDapper: Bool
@@ -38,6 +40,7 @@ pub struct FINDReport{
 
 	pub let accounts : [AccountInformation]?
 
+	pub let readyForWearables : Bool?
 
 	init(profile: Profile.UserReport?,
 		 relatedAccounts: {String: [Address]},
@@ -52,7 +55,8 @@ pub struct FINDReport{
 		 lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData},
 		 emeraldIDAccounts : {String : Address},
 		 isDapper: Bool,
-		 accounts: [AccountInformation]?
+		 accounts: [AccountInformation]?,
+		 readyForWearables: Bool?
 		 ) {
 
 		self.profile=profile
@@ -69,6 +73,7 @@ pub struct FINDReport{
 		self.emeraldIDAccounts=emeraldIDAccounts
 		self.isDapper=isDapper
 		self.accounts=accounts
+		self.readyForWearables=readyForWearables
 	}
 }
 
@@ -218,6 +223,22 @@ pub fun main(user: String) : Report? {
 				}
 			}
 
+			let wearableAccount = getAuthAccount(address)
+			var readyForWearables = true
+			let wearablesRef= wearableAccount.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
+			if wearablesRef == nil {
+				readyForWearables = false
+			}
+
+			let wearablesCap= wearableAccount.getCapability<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Wearables.CollectionPublicPath)
+			if !wearablesCap.check() {
+				readyForWearables = false
+			}
+
+			let wearablesProviderCap= wearableAccount.getCapability<&Wearables.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Wearables.CollectionPrivatePath)
+			if !wearablesCap.check() {
+				readyForWearables = false
+			}
 
 			findReport = FINDReport(
 				profile: profileReport,
@@ -233,7 +254,8 @@ pub fun main(user: String) : Report? {
 				lostAndFoundTypes: types,
 				emeraldIDAccounts: emeraldIDAccounts,
 				isDapper:isDapper,
-				accounts: accounts
+				accounts: accounts,
+				readyForWearables: readyForWearables
 			)
 		} else {
 			findReport = FINDReport(
@@ -250,7 +272,8 @@ pub fun main(user: String) : Report? {
 				lostAndFoundTypes: {},
 				emeraldIDAccounts: {},
 				isDapper: false,
-				accounts: nil
+				accounts: nil,
+				readyForWearables: nil
 			)
 		}
 	}

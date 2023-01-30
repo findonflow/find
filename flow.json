@@ -294,6 +294,20 @@
 				"testnet": "0xe8124d8428980aa6"
 			}
 		},
+		"Wearables": {
+			"source": "./contracts/community/Wearables.cdc",
+			"aliases": {
+				"mainnet": "0xe81193c424cfd3fb",
+				"testnet": "0x1e0493ee604e7598"
+			}
+		},
+		"Templates": {
+			"source": "./contracts/community/Templates.cdc",
+			"aliases": {
+				"mainnet": "0xe81193c424cfd3fb",
+				"testnet": "0x1e0493ee604e7598"
+			}
+		},
 		"ProfileCache": "./contracts/ProfileCache.cdc",
 		"FIND": "./contracts/FIND.cdc",
 		"CollectionFactory": "./contracts/CollectionFactory.cdc",
@@ -339,7 +353,8 @@
 		"FindFurnace": "./contracts/FindFurnace.cdc",
 		"FindUtils": "./contracts/FindUtils.cdc",
 		"FindUserStatus": "./contracts/FindUserStatus.cdc",
-		"FindThoughts": "./contracts/FindThoughts.cdc"
+		"FindThoughts": "./contracts/FindThoughts.cdc",
+		"WearablesDev": "./contracts/community/WearablesDev.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -574,7 +589,10 @@
 				"FlovatarComponentTemplate",
 				"FlovatarPack",
 				"FlowtyUtils",
-				"DapperStorageRent"
+				"DapperStorageRent",
+				"Templates",
+				"Wearables",
+				"WearablesDev"
 			],
 			"emulator-dapper": [
 				"DapperUtilityCoin",
