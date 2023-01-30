@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/hexops/autogold"
 )
 
-func TestFindWearablesDropper(t *testing.T) {
+func TestFindWearables(t *testing.T) {
 
 	otu := NewOverflowTest(t).
 		setupFIND().
@@ -16,11 +17,11 @@ func TestFindWearablesDropper(t *testing.T) {
 	id2 := otu.mintWearables("user1")
 	id3 := otu.mintWearables("user1")
 
+	user2 := otu.O.Address("user2")
+	user3 := otu.O.Address("user3")
+
 	t.Run("Should be able to send Wearables using Airdrop", func(t *testing.T) {
 		otu.createWearableUser("user2")
-
-		user2 := otu.O.Address("user2")
-		user3 := otu.O.Address("user3")
 
 		res := otu.O.Tx(
 			"sendWearables",
@@ -61,6 +62,28 @@ func TestFindWearablesDropper(t *testing.T) {
 			},
 			"reason": "Invalid Receiver Capability",
 		})
+	})
+
+	t.Run("Should be able to getStatus with user that has wearables set", func(t *testing.T) {
+		otu.createUser(10.0, "user2")
+
+		otu.O.Script(
+			"getStatus",
+			WithArg("user", user2),
+		).
+			AssertWithPointerWant(t, "/FINDReport/readyForWearables", autogold.Want("should be ready", true))
+
+	})
+
+	t.Run("Should be able to getStatus with user that doesnt has wearables set", func(t *testing.T) {
+		otu.createUser(10.0, "user3")
+
+		otu.O.Script(
+			"getStatus",
+			WithArg("user", user3),
+		).
+			AssertWithPointerWant(t, "/FINDReport/readyForWearables", autogold.Want("should be not ready", false))
+
 	})
 
 }
