@@ -326,6 +326,32 @@ func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
 	return otu
 }
 
+func (otu *OverflowTestUtils) createWearableUser(name string) *OverflowTestUtils {
+
+	nameSigner := WithSigner(name)
+
+	otu.O.Tx("setupWearables",
+		nameSigner,
+	).
+		AssertSuccess(otu.T)
+	return otu
+}
+
+func (otu *OverflowTestUtils) mintWearables(name string) uint64 {
+
+	nameSigner := WithSigner(name)
+
+	id, err := otu.O.Tx("devmintWearables",
+		nameSigner,
+		WithArg("receiver", name),
+	).
+		AssertSuccess(otu.T).
+		GetIdFromEvent("Minted", "id")
+
+	require.NoError(otu.T, err)
+	return id
+}
+
 func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 	otu.registerUserTransaction(name)
 	return otu

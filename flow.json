@@ -339,7 +339,10 @@
 		"FindFurnace": "./contracts/FindFurnace.cdc",
 		"FindUtils": "./contracts/FindUtils.cdc",
 		"FindUserStatus": "./contracts/FindUserStatus.cdc",
-		"FindThoughts": "./contracts/FindThoughts.cdc"
+		"FindThoughts": "./contracts/FindThoughts.cdc",
+		"Templates": "./contracts/community/Templates.cdc",
+		"Wearables": "./contracts/community/Wearables.cdc",
+		"WearablesDev": "./contracts/community/WearablesDev.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -574,7 +577,10 @@
 				"FlovatarComponentTemplate",
 				"FlovatarPack",
 				"FlowtyUtils",
-				"DapperStorageRent"
+				"DapperStorageRent",
+				"Templates",
+				"Wearables",
+				"WearablesDev"
 			],
 			"emulator-dapper": [
 				"DapperUtilityCoin",
