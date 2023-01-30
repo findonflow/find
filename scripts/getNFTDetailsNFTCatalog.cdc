@@ -9,7 +9,6 @@ import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
 pub struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
-	pub let dapperMarket: {String : FindMarket.SaleItemInformation}
 	pub let storefront: FindUserStatus.StorefrontListing?
 	pub let storefrontV2: FindUserStatus.StorefrontListing?
 	pub let flowty: FindUserStatus.FlowtyListing?
@@ -22,9 +21,8 @@ pub struct NFTDetailReport {
 	pub let linkedForMarket : Bool?
 
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, dapperMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, dapperAllowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
+	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, dapperAllowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
-		self.dapperMarket=dapperMarket
 		self.storefront=storefront
 		self.storefrontV2=storefrontV2
 		self.flowty=flowty
@@ -291,16 +289,12 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 
 		let findAddress=FindMarket.getFindTenantAddress()
-		let findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
-
-
-
-		var dapperMarket : {String : FindMarket.SaleItemInformation}={}
+		var findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
 		let dapperAddress=FindMarket.getTenantAddress("find_dapper") 
 
-		if dapperAddress !=nil {
-			 dapperMarket=FindMarket.getNFTListing(tenant:dapperAddress!, address: address, id: nftDetail!.uuid, getNFTInfo:false)
+		if dapperAddress !=nil && findMarket.length == 0 {
+			 findMarket=FindMarket.getNFTListing(tenant:dapperAddress!, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 		}
 
 		var report : {String : ListingTypeReport} = {}
@@ -342,7 +336,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
 
 
-		return NFTDetailReport(findMarket:findMarket, dapperMarket:dapperMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions : dapperReport,  linkedForMarket : linkedForMarket)
+		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions : dapperReport,  linkedForMarket : linkedForMarket)
 	}
 	return nil
 
