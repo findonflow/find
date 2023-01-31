@@ -134,8 +134,9 @@ pub fun main(user: String) : Report? {
 			} else {
 				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
 					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
+				} else {
+					isDapper = false
 				}
-				isDapper = false
 			}
 
 			let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
@@ -144,9 +145,21 @@ pub fun main(user: String) : Report? {
 
 			let find= FindMarket.getFindTenantAddress()
 			let findLease= FindMarket.getTenantAddress("findLease")!
-			let items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
+			var items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
-			let marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
+			if items.length == 0 {
+				if let findDapper= FindMarket.getTenantAddress("find_dapper") {
+					items = FindMarket.getSaleItemReport(tenant:findDapper, address: address, getNFTInfo:true)
+				}
+			}
+
+			var marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
+
+			if marketBids.length == 0 {
+				if let findDapper = FindMarket.getTenantAddress("find_dapper") {
+					marketBids = FindMarket.getBidsReport(tenant:findDapper, address: address, getNFTInfo:true)
+				}
+			}
 
 			let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:findLease, address: address, getLeaseInfo:true)
 
