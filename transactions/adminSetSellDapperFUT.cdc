@@ -15,10 +15,10 @@ transaction(market: String, merchAddress: Address, tenantCut: UFix64){
 
 		// emulator
 		var identifier = "A.f8d6e0586b0a20c7.Wearables.NFT"
-		if merchAddress== 0x097bafa4e0b48eef {
+		if merchAddress== 0x55459409d30274ee {
 		// This is for mainnet
 			identifier = "A.e81193c424cfd3fb.Wearables.NFT"
-		} else if merchAddress == 0x35717efbbce11c74 {
+		} else if merchAddress == 0x4748780c8bf65e19 {
 		// This is for testnet
 			identifier = "A.1e0493ee604e7598.Wearables.NFT"
 		}

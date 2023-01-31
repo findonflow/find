@@ -6,7 +6,7 @@ import (
 
 func main() {
 
-	o := Overflow(WithNetwork("mainnet"), WithGlobalPrintOptions())
+	o := Overflow(WithNetwork("testnet"), WithGlobalPrintOptions())
 
 	coin := "FUT"
 	findCut := 0.025
