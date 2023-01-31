@@ -9,6 +9,8 @@ func main() {
 	o := Overflow(WithNetwork("mainnet"), WithGlobalPrintOptions())
 
 	coin := "FUT"
+	findCut := 0.025
+	tenantCut := 0.01
 
 	name := "dapper"
 	merchAddress := "0x01cf0e2f2f715450"
@@ -16,6 +18,17 @@ func main() {
 	case "testnet":
 		merchAddress = "0x4748780c8bf65e19"
 		name = "find-dapper"
+
+		o.Tx(
+			"remove_find_market_1",
+			WithSigner("find-admin"),
+			WithArg("tenant", name),
+		)
+
+		o.Tx(
+			"remove_find_market_2",
+			WithSigner(name),
+		)
 
 	case "mainnet":
 		merchAddress = "0x55459409d30274ee"
@@ -48,6 +61,7 @@ func main() {
 		WithSigner("find-admin"),
 		WithArg("tenant", name),
 		WithArg("merchAddress", merchAddress),
+		WithArg("findCut", findCut),
 	)
 
 	if coin == "DUC" {
@@ -55,6 +69,7 @@ func main() {
 			WithSigner(name),
 			WithArg("market", "Sale"),
 			WithArg("merchAddress", merchAddress),
+			WithArg("tenantCut", tenantCut),
 		)
 	}
 	if coin == "FUT" {
@@ -62,6 +77,7 @@ func main() {
 			WithSigner(name),
 			WithArg("market", "Sale"),
 			WithArg("merchAddress", merchAddress),
+			WithArg("tenantCut", tenantCut),
 		)
 	}
 

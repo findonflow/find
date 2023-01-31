@@ -9,7 +9,7 @@ import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 
-transaction(market: String, merchAddress: Address){
+transaction(market: String, merchAddress: Address, tenantCut: UFix64){
     prepare(account: AuthAccount){
         let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
 
@@ -47,7 +47,7 @@ transaction(market: String, merchAddress: Address){
         }
 
 		let cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		let r = MetadataViews.Royalty(receiver: cap, cut: 0.01, description: "dapper")
+		let r = MetadataViews.Royalty(receiver: cap, cut: tenantCut, description: "dapper")
 
 		let rules = [
             FindMarket.TenantRule(name:"DapperFUT", types:ftTyp, ruleType: "ft", allow: true),
