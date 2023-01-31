@@ -19,6 +19,7 @@ pub contract FindMarket {
 	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
 	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+	pub event FindTenantRemoved(tenant: String, address: Address)
 
 	//Residual Royalty
 	pub var residualAddress : Address
@@ -1126,6 +1127,29 @@ pub contract FindMarket {
 
 			return self.capability!.borrow()!
 		}
+	}
+
+	access(account) fun removeFindMarketTenant(tenant: Address) {
+
+		if let name = self.tenantAddressName[tenant]  {
+			FindRulesCache.resetTenantFindRulesCache(name)
+			FindRulesCache.resetTenantTenantRulesCache(name)
+			FindRulesCache.resetTenantCutCache(name)
+
+			let account=FindMarket.account
+			let tenantPath=self.getTenantPathForName(name)
+			let sp=StoragePath(identifier: tenantPath)!
+			let pp=PrivatePath(identifier: tenantPath)!
+			let pubp=PublicPath(identifier:tenantPath)!
+			destroy account.load<@Tenant>(from: sp)
+			account.unlink(pp)
+			account.unlink(pubp)
+
+			self.tenantAddressName.remove(key: tenant)
+			self.tenantNameAddress.remove(key: name)
+			emit FindTenantRemoved(tenant: name, address: tenant)
+		}
+
 	}
 
 	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule], findRoyalty: MetadataViews.Royalty?) : Capability<&Tenant> {

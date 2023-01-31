@@ -17,6 +17,17 @@ func main() {
 		merchAddress = "0x4748780c8bf65e19"
 		name = "find-dapper"
 
+		o.Tx(
+			"remove_find_market_1",
+			WithSigner("find-admin"),
+			WithArg("tenant", name),
+		)
+
+		o.Tx(
+			"remove_find_market_2",
+			WithSigner(name),
+		)
+
 	case "mainnet":
 		merchAddress = "0x55459409d30274ee"
 		name = "find-dapper"

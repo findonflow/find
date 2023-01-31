@@ -135,6 +135,14 @@ pub contract Admin {
 			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules, findRoyalty:findRoyalty)
 		}
 
+		pub fun removeFindMarketTenant(tenant: Address) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+
+			FindMarket.removeFindMarketTenant(tenant: tenant)
+		}
+
 		pub fun createFindMarketDapper(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findRoyalty: MetadataViews.Royalty) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"

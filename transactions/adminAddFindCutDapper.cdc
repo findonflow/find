@@ -5,13 +5,13 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
-transaction(tenant: Address, merchAddress: Address){
+transaction(tenant: Address, merchAddress: Address, findCut: UFix64){
     prepare(account: AuthAccount){
         let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		// Set up DUC cut
 		var cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		var r = MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find")
+		var r = MetadataViews.Royalty(receiver: cap, cut: findCut, description: "find")
 
 		var cut = [
 			FindMarket.TenantRule( name:"DUC", types:[Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:true)
@@ -21,7 +21,7 @@ transaction(tenant: Address, merchAddress: Address){
 
 		// Set up FUT cut
 		cap = getAccount(merchAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		r = MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find")
+		r = MetadataViews.Royalty(receiver: cap, cut: findCut, description: "find")
 
 		cut = [
 			FindMarket.TenantRule( name:"FUT", types:[Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)
