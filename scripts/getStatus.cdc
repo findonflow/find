@@ -148,15 +148,17 @@ pub fun main(user: String) : Report? {
 			var items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
 			if items.length == 0 {
-				let findDapper= FindMarket.getTenantAddress("find_dapper")!
-				items = FindMarket.getSaleItemReport(tenant:findDapper, address: address, getNFTInfo:true)
+				if let findDapper= FindMarket.getTenantAddress("find_dapper") {
+					items = FindMarket.getSaleItemReport(tenant:findDapper, address: address, getNFTInfo:true)
+				}
 			}
 
 			var marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
 			if marketBids.length == 0 {
-				let findDapper= FindMarket.getTenantAddress("find_dapper")!
-				marketBids = FindMarket.getBidsReport(tenant:findDapper, address: address, getNFTInfo:true)
+				if let findDapper = FindMarket.getTenantAddress("find_dapper") {
+					marketBids = FindMarket.getBidsReport(tenant:findDapper, address: address, getNFTInfo:true)
+				}
 			}
 
 			let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:findLease, address: address, getLeaseInfo:true)
