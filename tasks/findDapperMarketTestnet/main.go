@@ -8,7 +8,7 @@ func main() {
 
 	o := Overflow(WithNetwork("testnet"), WithGlobalPrintOptions())
 
-	coin := "FUT"
+	coin := "DUC"
 	findCut := 0.025
 	tenantCut := 0.01
 
