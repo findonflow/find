@@ -54,6 +54,11 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/testnet/setProfile.cdc
 	jq ".networks.testnet.transactions.initWearables.code" lib/find.json -r > dapper-tx/testnet/initWearables.cdc
 	jq ".networks.testnet.transactions.sendWearables.code" lib/find.json -r > dapper-tx/testnet/sendWearables.cdc
+	jq ".networks.testnet.transactions.deleteFindThoughts.code" lib/find.json -r > dapper-tx/testnet/deleteFindThoughts.cdc
+	jq ".networks.testnet.transactions.hideFindThoughts.code" lib/find.json -r > dapper-tx/testnet/hideFindThoughts.cdc
+	jq ".networks.testnet.transactions.reactToFindThoughts.code" lib/find.json -r > dapper-tx/testnet/reactToFindThoughts.cdc
+	jq ".networks.testnet.transactions.editFindThought.code" lib/find.json -r > dapper-tx/testnet/editFindThought.cdc
+	jq ".networks.testnet.transactions.publishFindThought.code" lib/find.json -r > dapper-tx/testnet/publishFindThought.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyAddon.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyLeaseForSale.cdc
@@ -79,6 +84,11 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/mainnet/setProfile.cdc
 	jq ".networks.mainnet.transactions.initWearables.code" lib/find.json -r > dapper-tx/mainnet/initWearables.cdc
 	jq ".networks.mainnet.transactions.sendWearables.code" lib/find.json -r > dapper-tx/mainnet/sendWearables.cdc
+	jq ".networks.mainnet.transactions.deleteFindThoughts.code" lib/find.json -r > dapper-tx/mainnet/deleteFindThoughts.cdc
+	jq ".networks.mainnet.transactions.hideFindThoughts.code" lib/find.json -r > dapper-tx/mainnet/hideFindThoughts.cdc
+	jq ".networks.mainnet.transactions.reactToFindThoughts.code" lib/find.json -r > dapper-tx/mainnet/reactToFindThoughts.cdc
+	jq ".networks.mainnet.transactions.editFindThought.code" lib/find.json -r > dapper-tx/mainnet/editFindThought.cdc
+	jq ".networks.mainnet.transactions.publishFindThought.code" lib/find.json -r > dapper-tx/mainnet/publishFindThought.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyAddon.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyLeaseForSale.cdc
