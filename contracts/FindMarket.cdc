@@ -1330,6 +1330,10 @@ pub contract FindMarket {
 			// Dapper charges extra 1 % or 0.44 whichever is higher
 			var cutAmount= soldFor * tenantCut.cut
 			var royaltyName= "marketplace"
+			var tenantReceiver = tenantCut.receiver
+
+			// Tenant rules for dapper are set as DUC & FUT, with receiver being in FUT
+			// if royalties are paid in DUC, we would change the royalty receiver to DUC below
 			if payInDUC {
 				if cutAmount < 0.44 {
 					cutAmount = 0.44
@@ -1339,11 +1343,12 @@ pub contract FindMarket {
 					panic("The listed price is too low and could not afford for dapper transaction charges.")
 				}
 				royaltyName = "dapper"
+				tenantReceiver = getAccount(tenantReceiver.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 			}
 
 			let name = resolveName(tenantCut.receiver.address)
 			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: royaltyName, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = tenantCut.receiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
+			let vaultRef = tenantReceiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
 			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 

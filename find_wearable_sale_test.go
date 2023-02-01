@@ -307,24 +307,24 @@ func setupDapperMarketForWearables(otu *OverflowTestUtils, coin string, findCut,
 	).
 		AssertSuccess(t)
 
-	if coin == "DUC" {
-		o.Tx("adminSetSellDapperDUC",
-			WithSigner(name),
-			WithArg("market", "Sale"),
-			WithArg("merchAddress", merchAddress),
-			WithArg("tenantCut", tenantCut),
-		).
-			AssertSuccess(t)
-	}
-	if coin == "FUT" {
-		o.Tx("adminSetSellDapperFUT",
-			WithSigner(name),
-			WithArg("market", "Sale"),
-			WithArg("merchAddress", merchAddress),
-			WithArg("tenantCut", tenantCut),
-		).
-			AssertSuccess(t)
-	}
+		// if coin == "DUC" {
+	o.Tx("adminSetSellDapper",
+		WithSigner(name),
+		WithArg("market", "Sale"),
+		WithArg("merchAddress", merchAddress),
+		WithArg("tenantCut", tenantCut),
+	).
+		AssertSuccess(t)
+	// }
+	// if coin == "FUT" {
+	// 	o.Tx("adminSetSellDapperFUT",
+	// 		WithSigner(name),
+	// 		WithArg("market", "Sale"),
+	// 		WithArg("merchAddress", merchAddress),
+	// 		WithArg("tenantCut", tenantCut),
+	// 	).
+	// 		AssertSuccess(t)
+	// }
 
 	return otu
 }
