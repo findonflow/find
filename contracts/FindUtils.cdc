@@ -1,5 +1,16 @@
 pub contract FindUtils {
 
+	pub fun joinString(_ arr:[String], sep: String) : String {
+		var message=""
+		for i, key in arr {
+			if i > 0 {
+				message=message.concat(sep)
+			}
+			message=message.concat(key)
+		}
+		return message
+	}
+
 	pub fun joinMapToString( _ map:{String:String}) : String {
 		var message=""
 		for i, key in map.keys {
