@@ -4,6 +4,9 @@ import FindMarketCut from "../contracts/FindMarketCut.cdc"
 
 pub contract FindMarketInfrastructureCut : FindMarketCutInterface {
 
+	pub let contractName: String
+	pub let category: String
+
 	// tenant to {ruleId to cut}
 	access(contract) let cuts : {String : {String : FindMarketCutStruct.Cuts}}
 	access(contract) let cutsCache : {String : {String : FindMarketCutStruct.Cuts}}
@@ -85,6 +88,9 @@ pub contract FindMarketInfrastructureCut : FindMarketCutInterface {
 	init() {
 		self.cuts = {}
 		self.cutsCache = {}
+
+		self.contractName = "FindMarketInfrastructureCut"
+		self.category = "infrastructure"
 	}
 
 }

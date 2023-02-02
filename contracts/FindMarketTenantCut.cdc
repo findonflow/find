@@ -3,7 +3,7 @@ import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindMarketCut from "../contracts/FindMarketCut.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-pub contract FindMarketFindCut : FindMarketCutInterface {
+pub contract FindMarketTenantCut : FindMarketCutInterface {
 
 	pub let contractName: String
 	pub let category: String
@@ -21,7 +21,7 @@ pub contract FindMarketFindCut : FindMarketCutInterface {
 		}
 
 		let tenantRef = self.getTenant(tenant)
-		let cuts = tenantRef.getFindCut(name: "", listingType: listingType, nftType:nftType, ftType:ftType)
+		let cuts = tenantRef.getTenantCut(name: "", listingType: listingType, nftType:nftType, ftType:ftType)
 
 		if cuts != nil {
 			// set cache if not already
@@ -66,14 +66,16 @@ pub contract FindMarketFindCut : FindMarketCutInterface {
 		let pid = FindMarket.getTenantPathForName(tenant)
 		let storagePath = StoragePath(identifier: pid)!
 
-		return FindMarketFindCut.account.borrow<&FindMarket.Tenant>(from: storagePath) ?? panic("Cannot borrow Tenant : ".concat(tenant))
+		return FindMarketTenantCut.account.borrow<&FindMarket.Tenant>(from: storagePath) ?? panic("Cannot borrow Tenant : ".concat(tenant))
 	}
 
 
 	init() {
 		self.cutsCache = {}
-		self.contractName = "FindMarketFindCut"
-		self.category = "find"
+		self.contractName = "FindMarketTenantCut"
+		self.category = "tenant"
+
+
 	}
 
 }

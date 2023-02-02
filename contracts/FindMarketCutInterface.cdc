@@ -2,6 +2,9 @@ import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 
 pub contract interface FindMarketCutInterface {
 
+	pub let contractName: String
+	pub let category: String
+
 	pub event Cut(tenant: String, type: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
 
 	access(account) fun setTenantCuts(tenant: String, types: [Type], cuts: FindMarketCutStruct.Cuts)
