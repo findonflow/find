@@ -8,7 +8,7 @@ func main() {
 
 	o := Overflow(WithNetwork("testnet"), WithGlobalPrintOptions())
 
-	coin := "DUC"
+	// coin := "DUC"
 	findCut := 0.025
 	tenantCut := 0.01
 
@@ -64,21 +64,28 @@ func main() {
 		WithArg("findCut", findCut),
 	)
 
-	if coin == "DUC" {
-		o.Tx("adminSetSellDapperDUC",
-			WithSigner(name),
-			WithArg("market", "Sale"),
-			WithArg("merchAddress", merchAddress),
-			WithArg("tenantCut", tenantCut),
-		)
-	}
-	if coin == "FUT" {
-		o.Tx("adminSetSellDapperFUT",
-			WithSigner(name),
-			WithArg("market", "Sale"),
-			WithArg("merchAddress", merchAddress),
-			WithArg("tenantCut", tenantCut),
-		)
-	}
+	// if coin == "DUC" {
+	// 	o.Tx("adminSetSellDapperDUC",
+	// 		WithSigner(name),
+	// 		WithArg("market", "Sale"),
+	// 		WithArg("merchAddress", merchAddress),
+	// 		WithArg("tenantCut", tenantCut),
+	// 	)
+	// }
+	// if coin == "FUT" {
+	// 	o.Tx("adminSetSellDapperFUT",
+	// 		WithSigner(name),
+	// 		WithArg("market", "Sale"),
+	// 		WithArg("merchAddress", merchAddress),
+	// 		WithArg("tenantCut", tenantCut),
+	// 	)
+	// }
+
+	o.Tx("adminSetSellDapper",
+		WithSigner(name),
+		WithArg("market", "Sale"),
+		WithArg("merchAddress", merchAddress),
+		WithArg("tenantCut", tenantCut),
+	)
 
 }
