@@ -644,8 +644,6 @@
 				"FindMarketCut",
 				"FindMarketCutStruct",
 				"FindMarketCutInterface",
-				"FindMarketFindCut",
-				"FindMarketTenantCut",
 				"FindMarketInfrastructureCut"
 			],
 			"emulator-find-admin": [],

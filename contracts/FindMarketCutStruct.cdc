@@ -107,7 +107,7 @@ pub contract FindMarketCutStruct {
 
 		pub fun getPayableLogic() : ((UFix64) : UFix64?) {
 			return fun(_ salePrice : UFix64) : UFix64? {
-				return salePrice
+				return salePrice * self.cut
 			}
 		}
 	}
@@ -155,10 +155,11 @@ pub contract FindMarketCutStruct {
 
 		pub fun getPayableLogic() : ((UFix64) : UFix64?) {
 			return fun(_ salePrice : UFix64) : UFix64? {
-				if self.minimumPayment != nil && salePrice < self.minimumPayment! {
+				let rPayable = salePrice * self.cut
+				if self.minimumPayment != nil && rPayable < self.minimumPayment! {
 					return self.minimumPayment!
 				}
-				return salePrice
+				return rPayable
 			}
 		}
 	}

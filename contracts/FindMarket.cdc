@@ -682,7 +682,7 @@ pub contract FindMarket {
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			FindMarket.resetTenantCutCache(self.name)
+			FindRulesCache.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
@@ -698,7 +698,7 @@ pub contract FindMarket {
 			*/
 			self.tenantSaleItems[optionName]!.addRules(tenantRule)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			FindMarket.resetTenantCutCache(self.name)
+			FindRulesCache.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
@@ -717,22 +717,48 @@ pub contract FindMarket {
 			}
 			self.tenantSaleItems[optionName]!.removeRules(counter)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			FindMarket.resetTenantCutCache(self.name)
+			FindRulesCache.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
 		pub fun getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts} {
 
-			return FindMarketCut.getCuts(tenant: self.name, listingType: listingType, nftType: nftType, ftType: ftType)
+			let cuts = FindMarketCut.getCuts(tenant: self.name, listingType: listingType, nftType: nftType, ftType: ftType)
 
+			cuts["find"] = self.getFindCut(name: name, listingType: listingType, nftType: nftType, ftType: ftType)
+
+			cuts["tenant"] = self.getTenantCut(name: name, listingType: listingType, nftType: nftType, ftType: ftType)
+
+			return cuts
 		}
 
 		pub fun getFindCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
 			let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
+			let findRuleId = ruleId.concat("-find")
+			if let cache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: findRuleId) {
+				var returningCut : FindMarketCutStruct.Cuts? = nil
+				if let findCut = cache.findCut {
+					returningCut = FindMarketCutStruct.Cuts(
+						[
+							FindMarketCutStruct.GeneralCut(
+								name : findCut.description,
+								cap: findCut.receiver,
+								cut: findCut.cut,
+								description: findCut.description
+							)
+						]
+					)
+				}
+				return returningCut
+			}
+
+			var cacheFindCut : MetadataViews.Royalty? = nil
+			var returningCut : FindMarketCutStruct.Cuts? = nil
 			for findCut in self.findCuts.values {
 				let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 				if valid && findCut.cut != nil {
-					let cut = FindMarketCutStruct.Cuts(
+					cacheFindCut = findCut.cut
+					returningCut = FindMarketCutStruct.Cuts(
 						[
 							FindMarketCutStruct.GeneralCut(
 								name : findCut.name,
@@ -742,19 +768,48 @@ pub contract FindMarket {
 							)
 						]
 					)
-					return cut
+					break
 				}
 			}
-			return nil
+
+			// store that to cache
+			let cacheCut = FindRulesCache.TenantCuts(
+				findCut: cacheFindCut,
+				tenantCut: nil,
+			)
+			FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: findRuleId, cut: cacheCut)
+
+			return returningCut
 		}
 
 		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
 			let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
+			let tenantRuleId = ruleId.concat("-tenant")
+			if let cache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: tenantRuleId) {
+				var returningCut : FindMarketCutStruct.Cuts? = nil
+				if let tenantCut = cache.tenantCut {
+					returningCut = FindMarketCutStruct.Cuts(
+						[
+							FindMarketCutStruct.GeneralCut(
+								name : tenantCut.description,
+								cap: tenantCut.receiver,
+								cut: tenantCut.cut,
+								description: tenantCut.description
+							)
+						]
+					)
+				}
+				return returningCut
+			}
+
+			var cacheTenantCut : MetadataViews.Royalty? = nil
+			var returningCut : FindMarketCutStruct.Cuts? = nil
 			for item in self.tenantSaleItems.values {
 				let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 
 				if valid && item.cut != nil{
-					let cut = FindMarketCutStruct.Cuts(
+					cacheTenantCut = item.cut
+					returningCut = FindMarketCutStruct.Cuts(
 						[
 							FindMarketCutStruct.GeneralCut(
 								name : item.name,
@@ -764,27 +819,33 @@ pub contract FindMarket {
 							)
 						]
 					)
-					return cut
+					break
 				}
 			}
-			return nil
+
+			// store that to cache
+			let cacheCut = FindRulesCache.TenantCuts(
+				findCut: nil,
+				tenantCut: cacheTenantCut,
+			)
+			FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: tenantRuleId, cut: cacheCut)
+
+			return returningCut
 		}
 
 		access(account) fun addSaleItem(_ item: TenantSaleItem, type:String) {
 			if type=="find" {
 				self.findSaleItems[item.name]=item
 				FindRulesCache.resetTenantFindRulesCache(self.name)
-				FindMarket.resetFindCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "find", status: nil)
 			} else if type=="tenant" {
 				self.tenantSaleItems[item.name]=item
 				FindRulesCache.resetTenantTenantRulesCache(self.name)
-				FindMarket.resetTenantCutCache(self.name)
+				FindRulesCache.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "tenant", status: nil)
 			} else if type=="cut" {
 				self.findCuts[item.name]=item
 				FindRulesCache.resetTenantCutCache(self.name)
-				FindMarket.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "cut", status: nil)
 			} else{
 				panic("Not valid type to add sale item for")
@@ -795,19 +856,17 @@ pub contract FindMarket {
 			if type=="find" {
 				let item = self.findSaleItems.remove(key: name) ?? panic("This Find Sale Item does not exist. SaleItem : ".concat(name))
 				FindRulesCache.resetTenantFindRulesCache(self.name)
-				FindMarket.resetFindCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "find", status: "remove")
 				return item
 			} else if type=="tenant" {
 				let item = self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
 				FindRulesCache.resetTenantTenantRulesCache(self.name)
-				FindMarket.resetTenantCutCache(self.name)
+				FindRulesCache.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "tenant", status: "remove")
 				return item
 			} else if type=="cut" {
 				let item = self.findCuts.remove(key: name)?? panic("This Find Cut does not exist. Cut : ".concat(name))
 				FindRulesCache.resetTenantCutCache(self.name)
-				FindMarket.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "cut", status: "remove")
 				return item
 			}
@@ -1146,22 +1205,12 @@ pub contract FindMarket {
 		}
 	}
 
-	access(contract) fun resetFindCutCache(_ tenant: String) {
-		FindMarketCut.resetTenantRulesCache(tenant: tenant, category: "find")
-	}
-
-	access(contract) fun resetTenantCutCache(_ tenant: String) {
-		FindMarketCut.resetTenantRulesCache(tenant: tenant, category: "tenant")
-	}
-
 	access(account) fun removeFindMarketTenant(tenant: Address) {
 
 		if let name = self.tenantAddressName[tenant]  {
 			FindRulesCache.resetTenantFindRulesCache(name)
 			FindRulesCache.resetTenantTenantRulesCache(name)
 			FindRulesCache.resetTenantCutCache(name)
-			FindMarket.resetFindCutCache(name)
-			FindMarket.resetTenantCutCache(name)
 
 			let account=FindMarket.account
 			let tenantPath=self.getTenantPathForName(name)
