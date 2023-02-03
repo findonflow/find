@@ -56,7 +56,6 @@ func main() {
 		"Hoodlums":                         "[`A.427ceada271aa0b1.SturdyItems.NFT`]",
 		"SportsIconCollection":             "[`A.8de96244f54db422.SportsIconCollectible.NFT`]",
 		"SturdyExchange":                   "[`A.427ceada271aa0b1.SturdyTokens.NFT`]",
-		"TheDooverseNFTCollection":         "[`A.66ad29c7d7465437.DooverseItems.NFT`]",
 		"TheNFTDayTreasureChestCollection": "[`A.117396d8a72ad372.NFTDayTreasureChest.NFT`]",
 		"TouchstoneFLOWFREAKS":             "[`A.cf0c62932f6ff1eb.TouchstoneFLOWFREAKS.NFT`]",
 		"TouchstoneTheGritIron":            "[`A.84e5586a3fae8ff3.TouchstoneTheGritIron.NFT`]",
@@ -72,10 +71,10 @@ func main() {
 
 	// Dapper Tenant Items to be listed
 	dapperNFTs := map[string]string{
-		"Flunks":                                `["A.807c3d470888cc48.Flunks.NFT"]`,
-		"NBATopShot":                            `["A.0b2a3299cc857e29.TopShot.NFT"]`,
-		"Aera":                                  "[`A.30cf5dcf6ea8d379.AeraNFT.NFT`]",
-		"AeraRewards":                           "[`A.30cf5dcf6ea8d379.AeraRewards.NFT`]",
+		"Flunks":     `["A.807c3d470888cc48.Flunks.NFT"]`,
+		"NBATopShot": `["A.0b2a3299cc857e29.TopShot.NFT"]`,
+		// "Aera":                                  "[`A.30cf5dcf6ea8d379.AeraNFT.NFT`]",
+		// "AeraRewards":                           "[`A.30cf5dcf6ea8d379.AeraRewards.NFT`]",
 		"Analogs":                               "[`A.427ceada271aa0b1.Analogs.NFT`]",
 		"Backpack":                              "[`A.807c3d470888cc48.Backpack.NFT`]",
 		"BarterYardClub_Werewolves":             "[`A.28abb9f291cadaf2.BarterYardClubWerewolf.NFT`]",
