@@ -13,6 +13,9 @@ func main() {
 		WithGlobalPrintOptions(),
 	)
 
+	// Items added to Dapper will also be added to non-Dapper tenant.
+	// While removing, if you would like to remove from both tenants, you have to do it explicitly in both delist maps
+
 	// Non-Dapper Tenant Items to be listed
 	flowNfts := map[string]string{
 		// "SoulMade": `["A.9a57dfe5c8ce609c.SoulMadeComponent.NFT", "A.9a57dfe5c8ce609c.SoulMadeMain.NFT","A.9a57dfe5c8ce609c.SoulMadePack.NFT"]`,
@@ -156,6 +159,11 @@ func main() {
 
 	for name, contracts := range dapperNFTs {
 		upsertDapperItem(
+			WithArg("nftName", name), //primary key
+			WithArg("nftTypes", contracts),
+		)
+
+		upsertItem(
 			WithArg("nftName", name), //primary key
 			WithArg("nftTypes", contracts),
 		)
