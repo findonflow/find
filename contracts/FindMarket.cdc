@@ -664,14 +664,6 @@ pub contract FindMarket {
 			self.findCuts= {}
 		}
 
-		access(account) fun checkFindSaleItem(_ saleItemName: String) : Bool {
-			return self.findSaleItems.containsKey(saleItemName)
-		}
-
-		access(account) fun checkTenantSaleItem(_ saleItemName: String) : Bool {
-			return self.tenantSaleItems.containsKey(saleItemName)
-		}
-
 		access(account) fun checkFindCuts(_ cutName: String) : Bool {
 			return self.findCuts.containsKey(cutName)
 		}
@@ -1181,16 +1173,6 @@ pub contract FindMarket {
 		pub fun stopMarketOption(_ name: String) {
 			let tenant = self.getTenantRef()
 			tenant.alterMarketOption(name: name, status: "stopped")
-		}
-
-		pub fun setTenantRule(optionName: String, tenantRule: TenantRule) {
-			let tenantRef = self.getTenantRef()
-			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
-		}
-
-		pub fun removeTenantRule(optionName: String, tenantRuleName: String) {
-			let tenantRef = self.getTenantRef()
-			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
 		}
 
 		pub fun getTenantRef() : &Tenant {
