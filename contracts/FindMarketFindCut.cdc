@@ -74,6 +74,8 @@ pub contract FindMarketFindCut : FindMarketCutInterface {
 		self.cutsCache = {}
 		self.contractName = "FindMarketFindCut"
 		self.category = "find"
+
+		FindMarketCut.setCategory(category: self.category, contractName: self.contractName)
 	}
 
 }

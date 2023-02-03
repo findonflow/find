@@ -338,7 +338,12 @@
 		"PartyFavorz": "./contracts/PartyFavorz.cdc",
 		"PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc",
 		"FindRewardToken": "./contracts/FindRewardToken.cdc",
-		"FindToken": "./contracts/FindToken.cdc",
+		"FindMarketCut": "./contracts/FindMarketCut.cdc",
+		"FindMarketCutStruct": "./contracts/FindMarketCutStruct.cdc",
+		"FindMarketCutInterface": "./contracts/FindMarketCutInterface.cdc",
+		"FindMarketFindCut": "./contracts/FindMarketFindCut.cdc",
+		"FindMarketTenantCut": "./contracts/FindMarketTenantCut.cdc",
+		"FindMarketInfrastructureCut": "./contracts/FindMarketInfrastructureCut.cdc",
 		"FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
 		"FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
 		"FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
@@ -635,7 +640,13 @@
 				"FindFurnace",
 				"FindUtils",
 				"FindUserStatus",
-				"FindThoughts"
+				"FindThoughts",
+				"FindMarketCut",
+				"FindMarketCutStruct",
+				"FindMarketCutInterface",
+				"FindMarketFindCut",
+				"FindMarketTenantCut",
+				"FindMarketInfrastructureCut"
 			],
 			"emulator-find-admin": [],
 			"emulator-find-forge": [

@@ -367,7 +367,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTenantCut(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= self.getTenant().getCuts(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			let leaseInfo=saleItem.toLeaseInfo()

@@ -682,6 +682,7 @@ pub contract FindMarket {
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindMarket.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
@@ -697,6 +698,7 @@ pub contract FindMarket {
 			*/
 			self.tenantSaleItems[optionName]!.addRules(tenantRule)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindMarket.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
@@ -715,6 +717,7 @@ pub contract FindMarket {
 			}
 			self.tenantSaleItems[optionName]!.removeRules(counter)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindMarket.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
 		}
 
@@ -966,8 +969,12 @@ pub contract FindMarket {
 			}
 
 			// Tenant Rules have to be allow rules
+			var returningFTTypes : [Type] = []
 			for item in self.tenantSaleItems.values {
 				var allowedFTTypes : [Type] = []
+				if item.status != "active" {
+					continue
+				}
 				for rule in item.rules {
 					if rule.ruleType == "ft"{
 						allowedFTTypes = rule.types
@@ -980,13 +987,17 @@ pub contract FindMarket {
 					}
 				}
 				if containsListingType && containsNFTType {
-					return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
+					returningFTTypes.appendAll(allowedFTTypes)
 				}
 
 				containsNFTType = false
 				containsListingType = true
 			}
-			return nil
+
+			if returningFTTypes.length == 0 {
+				return nil
+			}
+			return AllowedListing(listingType: marketType, ftTypes: returningFTTypes, status: "active")
 		}
 
 		pub fun getBlockedNFT(marketType: Type) : [Type] {
@@ -1149,6 +1160,8 @@ pub contract FindMarket {
 			FindRulesCache.resetTenantFindRulesCache(name)
 			FindRulesCache.resetTenantTenantRulesCache(name)
 			FindRulesCache.resetTenantCutCache(name)
+			FindMarket.resetFindCutCache(name)
+			FindMarket.resetTenantCutCache(name)
 
 			let account=FindMarket.account
 			let tenantPath=self.getTenantPathForName(name)
@@ -1224,7 +1237,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}, dapperMerchAddress: Address) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:{String : FindMarketCutStruct.Cuts}, resolver: ((Address) : String?), resolvedAddress: {Address: String}, dapperMerchAddress: Address) {
 		let resolved : {Address : String} = resolvedAddress
 
 		fun resolveName(_ addr: Address ) : String? {
@@ -1332,38 +1345,16 @@ pub contract FindMarket {
 			}
 		}
 
-		if let findCut =cuts.findCut {
-			var cutAmount= soldFor * findCut.cut
-			let name = resolveName(findCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
-			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
-		}
-
-		if let tenantCut =cuts.tenantCut {
-			// Dapper charges extra 1 % or 0.44 whichever is higher
-			var cutAmount= soldFor * tenantCut.cut
-			var royaltyName= "marketplace"
-			var tenantReceiver = tenantCut.receiver
-
-			// Tenant rules for dapper are set as DUC & FUT, with receiver being in FUT
-			// if royalties are paid in DUC, we would change the royalty receiver to DUC below
-			if payInDUC {
-				if cutAmount < 0.44 {
-					cutAmount = 0.44
+		for key in cuts.keys {
+			let allCuts = cuts[key]!
+			for cut in allCuts.cuts {
+				if var cutAmount= cut.getAmountPayable(soldFor) {
+					let findName = resolveName(cut.getAddress())
+					emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:cut.getAddress(), findName: findName , royaltyName: cut.getName(), amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()))
+					vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-
-				if vault.balance < cutAmount {
-					panic("The listed price is too low and could not afford for dapper transaction charges.")
-				}
-				royaltyName = "dapper"
-				tenantReceiver = getAccount(tenantReceiver.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 			}
-
-			let name = resolveName(tenantCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: royaltyName, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = tenantReceiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
-			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		oldProfile.deposit(from: <- vault)

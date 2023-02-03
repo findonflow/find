@@ -212,7 +212,7 @@ pub contract FindMarketSale {
 				panic(actionResult.message)
 			}
 
-			let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType)
+			let cuts= tenant.getCuts(name: actionResult.name, listingType: Type<@FindMarketSale.SaleItem>(), nftType: nftType, ftType: ftType)
 
 			let nftInfo= saleItem.toNFTInfo(true)
 			saleItem.setBuyer(nftCap.address)

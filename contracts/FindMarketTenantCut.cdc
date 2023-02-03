@@ -75,7 +75,7 @@ pub contract FindMarketTenantCut : FindMarketCutInterface {
 		self.contractName = "FindMarketTenantCut"
 		self.category = "tenant"
 
-
+		FindMarketCut.setCategory(category: self.category, contractName: self.contractName)
 	}
 
 }

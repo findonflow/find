@@ -174,7 +174,7 @@ pub contract FindLeaseMarketSale {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTenantCut(name: actionResult.name, listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= self.getTenant().getCuts(name: actionResult.name, listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()

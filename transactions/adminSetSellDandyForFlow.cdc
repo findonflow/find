@@ -27,8 +27,8 @@ transaction(tenant: Address, market: String){
         switch market {
 			case "Sale" :
 				ftTyp = [Type<@FlowToken.Vault>(), Type<@FlowUtilityToken.Vault>()]
-				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
-				if items.findCut == nil {
+				let items = tenantRef.getCuts(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
+				if items["find"] == nil {
 					let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}
@@ -39,8 +39,8 @@ transaction(tenant: Address, market: String){
             case "AuctionSoft" :
                 marketType = [Type<@FindMarketAuctionSoft.SaleItem>()]
 				ftTyp = [Type<@FlowUtilityToken.Vault>()]
-				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
-				if items.findCut == nil {
+				let items = tenantRef.getCuts(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
+				if items["find"] == nil {
 					let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}
@@ -51,8 +51,8 @@ transaction(tenant: Address, market: String){
             case "DirectOfferSoft" :
                 marketType = [Type<@FindMarketDirectOfferSoft.SaleItem>()]
 				ftTyp = [Type<@FlowUtilityToken.Vault>()]
-				let items = tenantRef.getTenantCut(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
-				if items.findCut == nil {
+				let items = tenantRef.getCuts(name:"findFutRoyalty", listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType:Type<@Dandy.NFT>(), ftType:Type<@FlowUtilityToken.Vault>())
+				if items["find"] == nil {
 					let cap = getAccount(account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 					adminRef.addFindCut(tenant: tenant, FindCutName: "findFutRoyalty", rayalty: MetadataViews.Royalty(receiver: cap, cut: 0.025, description: "find"), rules: rules, status: "active")
 				}

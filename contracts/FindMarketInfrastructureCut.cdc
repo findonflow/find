@@ -91,6 +91,7 @@ pub contract FindMarketInfrastructureCut : FindMarketCutInterface {
 
 		self.contractName = "FindMarketInfrastructureCut"
 		self.category = "infrastructure"
+		FindMarketCut.setCategory(category: self.category, contractName: self.contractName)
 	}
 
 }

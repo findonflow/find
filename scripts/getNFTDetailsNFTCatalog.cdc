@@ -291,7 +291,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let findAddress=FindMarket.getFindTenantAddress()
 		var findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
-		let dapperAddress=FindMarket.getTenantAddress("find_dapper") 
+		let dapperAddress=FindMarket.getTenantAddress("find_dapper")
 
 		if dapperAddress !=nil && findMarket.length == 0 {
 			 findMarket=FindMarket.getNFTListing(tenant:dapperAddress!, address: address, id: nftDetail!.uuid, getNFTInfo:false)
@@ -544,17 +544,16 @@ pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	return array
 }
 
-pub fun resolveFindRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
+pub fun resolveMarketplaceRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
 
-	let cuts = tenantRef.getTenantCut(name:"", listingType: listing, nftType:nft, ftType:ft)
+	let cuts = tenantRef.getCuts(name:"", listingType: listing, nftType:nft, ftType:ft)
 
 	let royalties :[Royalties] = []
-	if cuts.findCut != nil {
-		royalties.append(Royalties(royaltyName: cuts.findCut!.description, address: cuts.findCut!.receiver.address, findName: reverseLookup(cuts.findCut!.receiver.address), cut: cuts.findCut!.cut))
-	}
 
-	if cuts.tenantCut != nil {
-		royalties.append(Royalties(royaltyName: cuts.tenantCut!.description, address: cuts.tenantCut!.receiver.address, findName: reverseLookup(cuts.tenantCut!.receiver.address), cut: cuts.tenantCut!.cut))
+	for allCuts in cuts.values {
+		for cut in allCuts.cuts {
+			royalties.append(Royalties(royaltyName: cut.getName(), address: cut.getAddress(), findName: reverseLookup(cut.getAddress()), cut: cut.getCut()))
+		}
 	}
 
 	return royalties
@@ -580,7 +579,7 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, poi
 			nftR = nftRoyalties
 		}
 
-		let findR = resolveFindRoyalties(tenantRef: tenantRef, listing: allowedListing.listingType , nft: pointer.getItemType(), ft: ft)
+		let findR = resolveMarketplaceRoyalties(tenantRef: tenantRef, listing: allowedListing.listingType , nft: pointer.getItemType(), ft: ft)
 		findR.appendAll(nftR!)
 
 		listingDetails.append(ListingRoyalties(ftAlias: alias, ftIdentifier: ft.identifier, royalties: findR))

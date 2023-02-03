@@ -7,6 +7,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
+import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 
 pub contract FindLeaseMarket {
@@ -438,7 +439,7 @@ pub contract FindLeaseMarket {
 
 	}
 
-	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:FindRulesCache.TenantCuts, dapperMerchAddress: Address) {
+	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:{String : FindMarketCutStruct.Cuts}, dapperMerchAddress: Address) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
 		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
@@ -457,29 +458,18 @@ pub contract FindLeaseMarket {
 		}
 		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 
-		if let findCut =cuts.findCut {
-
-			var cutAmount= soldFor * findCut.cut
-			let name = FIND.reverseLookup(findCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
-			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
-			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
-
-			// Dapper charges extra 1 % or 0.44 whichever is higher
-			if payInDUC {
-				cutAmount = soldFor * 0.01
-				if cutAmount < 0.44 {
-					cutAmount = 0.44
+		for key in cuts.keys {
+			let allCuts = cuts[key]!
+			for cut in allCuts.cuts {
+				if var cutAmount= cut.getAmountPayable(soldFor) {
+					let findName = FIND.reverseLookup(cut.getAddress())
+					emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:cut.getAddress(), findName: findName , royaltyName: cut.getName(), amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
+					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()))
+					vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-
-				if vault.balance < cutAmount {
-					panic("The listed price is too low and could not afford for dapper transaction charges.")
-				}
-
-				emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:findCut.receiver.address, findName: nil , royaltyName: "dapper", amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
-				vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 		}
+
 
 		oldProfile.deposit(from: <- vault)
 	}

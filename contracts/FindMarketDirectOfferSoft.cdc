@@ -459,7 +459,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: nftType, ftType: ftType)
+			let cuts= tenant.getCuts(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: nftType, ftType: ftType)
 
 
 			let status="sold"

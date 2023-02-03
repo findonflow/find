@@ -51,10 +51,9 @@ pub contract FindMarketCutStruct {
 			return MetadataViews.Royalty(receiver: cap, cut: self.getCut(), description: self.getName())
 		}
 
-		pub fun getRoyaltyPayable(_ salePrice: UFix64) : MetadataViews.Royalty? {
+		pub fun getAmountPayable(_ salePrice: UFix64) : UFix64? {
 			if let cut = self.getPayableLogic()(salePrice) {
-				let cap = self.getReceiverCap()
-				return MetadataViews.Royalty(receiver: cap, cut: cut, description: self.getName())
+				return cut
 			}
 			return nil
 		}
