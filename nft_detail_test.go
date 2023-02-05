@@ -9,7 +9,7 @@ import (
 	"github.com/sanity-io/litter"
 )
 
-//TODO: we need to fix this test so that we can also test using dapper market
+// TODO: we need to fix this test so that we can also test using dapper market
 func TestNFTDetailScript(t *testing.T) {
 
 	price := 10.00
@@ -27,7 +27,7 @@ func TestNFTDetailScript(t *testing.T) {
 	otu.setUUID(600)
 	ids := otu.mintThreeExampleDandies()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("Sale")
+		setFlowDandyMarketOption()
 
 	t.Run("Should be able to get nft details of item with script", func(t *testing.T) {
 
@@ -124,9 +124,6 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(800)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForSale("user1", ids[1], price).
 			listNFTForEscrowedAuction("user1", ids[1], price)
 
@@ -182,10 +179,7 @@ func TestNFTDetailScript(t *testing.T) {
 	t.Run("Should be able to get storefront listings of an NFT by a script", func(t *testing.T) {
 		otu.setUUID(1200)
 		ids := otu.mintThreeExampleDandies()
-		otu.setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
-			listNFTForSale("user1", ids[1], price)
+		otu.listNFTForSale("user1", ids[1], price)
 
 		otu.O.Tx("devListStorefront",
 			WithSigner("user1"),
@@ -220,9 +214,6 @@ func TestNFTDetailScript(t *testing.T) {
 			registerUserWithNameAndForge("user1", "bitku").
 			registerUserWithNameAndForge("user1", "goatedgoats").
 			registerUserWithNameAndForge("user1", "klktn").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForSale("user1", ids[1], price)
 
 		dandyIds := otu.O.Tx("devMintDandyTO",
@@ -329,15 +320,10 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(2000)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForSale("user1", ids[1], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			directOfferMarketEscrowed("user2", "user1", ids[0], price).
-			alterMarketOption("Sale", "stop").
-			alterMarketOption("AuctionEscrow", "stop").
-			alterMarketOption("DirectOfferEscrow", "stop")
+			alterMarketOption("stop")
 
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
@@ -369,14 +355,10 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(2400)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForSale("user1", ids[1], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			directOfferMarketEscrowed("user2", "user1", ids[0], price).
-			alterMarketOption("Sale", "stop").
-			alterMarketOption("AuctionEscrow", "stop")
+			alterMarketOption("stop")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").
 			GetAsJson()
@@ -394,9 +376,6 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(2800)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			listNFTForSale("user1", ids[1], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			blockDandy("devBlockItem")
@@ -411,9 +390,6 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(3200)
 		otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			blockDandy("devBlockItem")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").
@@ -430,9 +406,6 @@ func TestNFTDetailScript(t *testing.T) {
 		otu.setUUID(3600)
 		otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
-			setFlowDandyMarketOption("DirectOfferEscrow").
-			setFlowDandyMarketOption("Sale").
-			setFlowDandyMarketOption("AuctionEscrow").
 			blockDandy("devBlockItemByListingType")
 
 		actual, err := otu.O.Script("getMarketBlockedNFT").

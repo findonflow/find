@@ -7,6 +7,7 @@ import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
 import FindMarket from "./FindMarket.cdc"
+import FindMarketCutStruct from "./FindMarketCutStruct.cdc"
 import FindForge from "./FindForge.cdc"
 import FindForgeOrder from "./FindForgeOrder.cdc"
 import FindPack from "./FindPack.cdc"
@@ -121,18 +122,12 @@ pub contract Admin {
 			return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
 		}
 
-		pub fun createFindMarket(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findCut: UFix64?) : Capability<&FindMarket.Tenant> {
+		pub fun createFindMarket(name: String, address:Address, findCutSaleItem: FindMarket.TenantSaleItem?) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
-			var findRoyalty:MetadataViews.Royalty?=nil
-			if let cut = findCut{
-				let receiver=Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-				findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: cut,  description: "find")
-			}
-
-			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules, findRoyalty:findRoyalty)
+			return  FindMarket.createFindMarket(name:name, address:address, findCutSaleItem: findCutSaleItem)
 		}
 
 		pub fun removeFindMarketTenant(tenant: Address) {
@@ -141,13 +136,6 @@ pub contract Admin {
 			}
 
 			FindMarket.removeFindMarketTenant(tenant: tenant)
-		}
-
-		pub fun createFindMarketDapper(name: String, address:Address, defaultCutRules: [FindMarket.TenantRule], findRoyalty: MetadataViews.Royalty) : Capability<&FindMarket.Tenant> {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			return  FindMarket.createFindMarket(name:name, address:address, defaultCutRules: defaultCutRules, findRoyalty:findRoyalty)
 		}
 
 		/// Set the wallet used for the network
@@ -381,62 +369,22 @@ pub contract Admin {
 			tenant.removeSaleItem(name, type: "find")
 		}
 
-		pub fun setFindCut(tenant: Address, saleItemName: String, cut: UFix64?, rules: [FindMarket.TenantRule]?, status: String) {
+		pub fun setFindCut(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			let tenant = self.getTenantRef(tenant)
-			let oldCut = tenant.removeSaleItem(saleItemName, type: "cut")
-
-			var newCut = oldCut.cut!
-			if cut != nil {
-				newCut = MetadataViews.Royalty(receiver: oldCut.cut!.receiver, cut: cut!, description: oldCut.cut!.description)
-			}
-
-			var newRules = oldCut.rules
-			if rules != nil {
-				newRules = rules!
-			}
-
-			let newSaleItem = FindMarket.TenantSaleItem(
-				name: oldCut.name,
-				cut: newCut ,
-				rules: newRules,
-				status: status
-			)
-			tenant.addSaleItem(newSaleItem, type: "cut")
+			tenant.addSaleItem(saleItem, type: "cut")
 		}
 
-		pub fun addFindCut(tenant: Address, FindCutName: String, rayalty: MetadataViews.Royalty, rules: [FindMarket.TenantRule], status: String) {
+		pub fun setExtraCut(tenant: Address, types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
-			if !(rules.length > 0) {
-				panic("Rules cannot be empty array")
-			}
 			let tenant = self.getTenantRef(tenant)
-
-			if tenant.checkFindCuts(FindCutName) {
-				panic("This find cut already exist. FindCut rule Name : ".concat(FindCutName))
-			}
-
-			let newSaleItem = FindMarket.TenantSaleItem(
-				name: FindCutName,
-				cut: rayalty ,
-				rules: rules,
-				status: status
-			)
-			tenant.addSaleItem(newSaleItem, type: "cut")
+			tenant.setExtraCut(types: types, category: category, cuts: cuts)
 		}
 
-		/*
-		tenant.addSaleItem(TenantSaleItem(
-			name:"findRoyalty",
-			cut:findRoyalty,
-			rules: defaultCutRules,
-			status:"active"
-		), type: "cut")
-		 */
 		pub fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
@@ -476,22 +424,6 @@ pub contract Admin {
 			}
 			let tenant = self.getTenantRef(tenant)
 			tenant.alterMarketOption(name: name, status: "stopped")
-		}
-
-		pub fun setTenantRule(tenant: Address, optionName: String, tenantRule: FindMarket.TenantRule) {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			let tenantRef = self.getTenantRef(tenant)
-			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
-		}
-
-		pub fun removeTenantRule(tenant: Address, optionName: String, tenantRuleName: String) {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-			let tenantRef = self.getTenantRef(tenant)
-			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
 		}
 
 		/// ===================================================================================

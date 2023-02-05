@@ -1,5 +1,30 @@
 pub contract FindUtils {
 
+	pub fun deDupTypeArray(_ arr:[Type]) : [Type] {
+
+		let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
+			var i = arr.firstIndex(of: element)
+			let firstIndex = i
+			while i != nil {
+				arr.remove(at: i!)
+				i = arr.firstIndex(of: element)
+			}
+			if firstIndex != nil {
+				arr.insert(at: firstIndex!, element)
+			}
+			return arr
+		}
+
+		var arr = arr
+		var c = 0
+		while c < arr.length - 1 {
+			arr = removeElement(arr, arr[c])
+			c = c + 1
+		}
+		return arr
+
+	}
+
 	pub fun joinString(_ arr:[String], sep: String) : String {
 		var message=""
 		for i, key in arr {

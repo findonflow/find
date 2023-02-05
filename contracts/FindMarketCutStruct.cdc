@@ -120,10 +120,10 @@ pub contract FindMarketCutStruct {
 		// This is the description to the cut that can be visible to give detail on detail page
 		pub let description: String
 		pub let publicPath: String
-		pub let minimumPayment: UFix64?
+		pub let minimumPayment: UFix64
 		access(self) let extra : {String : AnyStruct}
 
-		init(name : String , address: Address , cut: UFix64 , description: String , publicPath: String, minimumPayment: UFix64?) {
+		init(name : String , address: Address , cut: UFix64 , description: String , publicPath: String, minimumPayment: UFix64) {
 			self.name = name
 			self.address = address
 			self.cut = cut
@@ -156,8 +156,8 @@ pub contract FindMarketCutStruct {
 		pub fun getPayableLogic() : ((UFix64) : UFix64?) {
 			return fun(_ salePrice : UFix64) : UFix64? {
 				let rPayable = salePrice * self.cut
-				if self.minimumPayment != nil && rPayable < self.minimumPayment! {
-					return self.minimumPayment!
+				if rPayable < self.minimumPayment {
+					return self.minimumPayment
 				}
 				return rPayable
 			}

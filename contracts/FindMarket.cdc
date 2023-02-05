@@ -678,39 +678,8 @@ pub contract FindMarket {
 			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
-		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
-			pre{
-				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
-			}
-			/*
-			let rules = self.tenantSaleItems[optionName]!.rules
-			for rule in rules {
-				assert(rule.name == tenantRule.name, message: "Rule with same name already exist. Name: ".concat(rule.name))
-			}
-			*/
-			self.tenantSaleItems[optionName]!.addRules(tenantRule)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			FindRulesCache.resetTenantCutCache(self.name)
-			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
-		}
-
-		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
-			pre{
-				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
-			}
-			let rules : [TenantRule] = self.tenantSaleItems[optionName]!.rules
-			var counter = 0
-			while counter < rules.length {
-				if rules[counter]!.name == tenantRuleName {
-					break
-				}
-				counter = counter + 1
-				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
-			}
-			self.tenantSaleItems[optionName]!.removeRules(counter)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			FindRulesCache.resetTenantCutCache(self.name)
-			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
+		access(account) fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+			FindMarketCut.setTenantCuts(tenant: self.name, types: types, category: category, cuts: cuts)
 		}
 
 		pub fun getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts} {
@@ -1048,6 +1017,7 @@ pub contract FindMarket {
 			if returningFTTypes.length == 0 {
 				return nil
 			}
+			returningFTTypes = FindUtils.deDupTypeArray(returningFTTypes)
 			return AllowedListing(listingType: marketType, ftTypes: returningFTTypes, status: "active")
 		}
 
@@ -1145,14 +1115,9 @@ pub contract FindMarket {
 			self.capability = nil
 		}
 
-		pub fun setMarketOption(name: String, cut: MetadataViews.Royalty?, rules: [TenantRule]) {
+		pub fun setMarketOption(saleItem: TenantSaleItem) {
 			let tenant = self.getTenantRef()
-			tenant.addSaleItem(TenantSaleItem(
-				name: name,
-				cut: cut,
-				rules: rules,
-				status:"active"
-			), type: "tenant")
+			tenant.addSaleItem(saleItem, type: "tenant")
 		}
 
 		pub fun removeMarketOption(name: String) {
@@ -1185,6 +1150,11 @@ pub contract FindMarket {
 
 			return self.capability!.borrow()!
 		}
+
+		pub fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+			let tenant = self.getTenantRef()
+			tenant.setExtraCut(types: types, category: category, cuts: cuts)
+		}
 	}
 
 	access(account) fun removeFindMarketTenant(tenant: Address) {
@@ -1210,7 +1180,7 @@ pub contract FindMarket {
 
 	}
 
-	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule], findRoyalty: MetadataViews.Royalty?) : Capability<&Tenant> {
+	access(account) fun createFindMarket(name: String, address:Address, findCutSaleItem: TenantSaleItem?) : Capability<&Tenant> {
 		let account=FindMarket.account
 
 		let tenant <- create Tenant(name)
@@ -1220,13 +1190,8 @@ pub contract FindMarket {
 		self.tenantAddressName[address]=name
 		self.tenantNameAddress[name]=address
 
-		if findRoyalty != nil {
-			tenant.addSaleItem(TenantSaleItem(
-				name:"findRoyalty",
-				cut:findRoyalty,
-				rules: defaultCutRules,
-				status:"active"
-			), type: "cut")
+		if findCutSaleItem != nil {
+			tenant.addSaleItem(findCutSaleItem!, type: "cut")
 		}
 
 		//end do on outside

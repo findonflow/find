@@ -21,7 +21,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	preIncrement := 5.0
 	id := otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("AuctionEscrow").
+		setFlowDandyMarketOption().
 		setProfile("user1").
 		setProfile("user2")
 
@@ -409,7 +409,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
 
-		otu.alterMarketOption("AuctionEscrow", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		listingTx("listNFTForAuctionEscrowed",
 			WithSigner("user1"),
@@ -418,14 +418,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOption("AuctionEscrow", "enable")
+		otu.alterMarketOption("enable")
 	})
 
 	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
 
 		otu.listNFTForEscrowedAuction("user1", id, price)
 
-		otu.alterMarketOption("AuctionEscrow", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
@@ -453,7 +453,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOption("AuctionEscrow", "enable")
+		otu.alterMarketOption("enable")
 
 		listingTx("listNFTForAuctionEscrowed",
 			WithSigner("user2"),
@@ -464,7 +464,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.auctionBidMarketEscrow("user1", "user2", id, price+5.0)
 
-		otu.alterMarketOption("AuctionEscrow", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user2"),
@@ -473,7 +473,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOption("AuctionEscrow", "enable")
+		otu.alterMarketOption("enable")
 		otu.delistAllNFTForEscrowedAuction("user2").
 			sendDandy("user1", "user2", id)
 
@@ -481,7 +481,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction after stopped", func(t *testing.T) {
 
-		otu.alterMarketOption("AuctionEscrow", "stop")
+		otu.alterMarketOption("stop")
 
 		listingTx("listNFTForAuctionEscrowed",
 			WithSigner("user1"),
@@ -490,9 +490,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("AuctionEscrow", "enable").
+		otu.alterMarketOption("enable").
 			listNFTForEscrowedAuction("user1", id, price).
-			alterMarketOption("AuctionEscrow", "stop")
+			alterMarketOption("stop")
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
@@ -503,9 +503,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("AuctionEscrow", "enable").
+		otu.alterMarketOption("enable").
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
-			alterMarketOption("AuctionEscrow", "stop")
+			alterMarketOption("stop")
 
 		otu.O.Tx("increaseBidMarketAuctionEscrowed",
 			WithSigner("user2"),
@@ -515,7 +515,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("AuctionEscrow", "stop")
+		otu.alterMarketOption("stop")
 
 		otu.tickClock(500.0)
 
@@ -527,7 +527,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 			/* Reset */
-		otu.alterMarketOption("AuctionEscrow", "enable")
+		otu.alterMarketOption("enable")
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 			WithSigner("user2"),

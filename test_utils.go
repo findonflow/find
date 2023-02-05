@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/findonflow/find/findGo"
 	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
@@ -155,8 +156,11 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	otu.O.Tx("setup_find_market_1", findSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+	otu.O.Tx("setup_find_market_1_dapper",
+		findSigner,
+		WithArg("dapperAddress", "dapper"),
+	).
+		AssertSuccess(otu.T)
 
 	//link in the server in the versus client
 	otu.O.Tx("setup_find_market_2",
@@ -164,17 +168,22 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		WithArg("tenantAddress", "find"),
 	).AssertSuccess(otu.T)
 
+	otu.setupInfrastructureCut("find")
+
 	// Setup Lease Market
-	otu.O.Tx("setup_find_market_1",
-		WithSigner("find-lease")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+	otu.O.Tx("setup_find_market_1_dapper",
+		WithSigner("find-lease"),
+		WithArg("dapperAddress", "dapper"),
+	).
+		AssertSuccess(otu.T)
 
 	//link in the server in the client
 	otu.O.Tx("setup_find_lease_market_2",
 		findAdminSigner,
 		WithArg("tenantAddress", "find-lease"),
-		WithArg("merchantAddress", "dapper"),
 	).AssertSuccess(otu.T)
+
+	otu.setupInfrastructureCut("find-lease")
 
 	otu.createUser(100.0, "find")
 	otu.createUser(100.0, "find-admin")
@@ -224,8 +233,11 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 	otu.O.Tx("setup_fin_3_create_network", findSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	otu.O.Tx("setup_find_market_1", dapperSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+	otu.O.Tx("setup_find_market_1_dapper",
+		dapperSigner,
+		WithArg("dapperAddress", "dapper"),
+	).
+		AssertSuccess(otu.T)
 
 	//link in the server in the versus client
 	otu.O.Tx("setup_find_dapper_market",
@@ -235,18 +247,23 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 		WithArg("name", "onefootball"),
 	).AssertSuccess(otu.T)
 
+	otu.setupInfrastructureCut("tenant")
+
 	// Setup Lease Market
-	otu.O.Tx("setup_find_market_1",
-		WithSigner("find-lease")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+	otu.O.Tx("setup_find_market_1_dapper",
+		WithSigner("find-lease"),
+		WithArg("dapperAddress", "dapper"),
+	).
+		AssertSuccess(otu.T)
 
 	//link in the server in the client
 	//TODO: need to use _dapper method and send to our merchantAccount at dapper
-	otu.O.Tx("setup_find_lease_market_2_dapper",
+	otu.O.Tx("setup_find_lease_market_2",
 		WithSigner("find-admin"),
 		WithArg("tenantAddress", "find-lease"),
-		WithArg("merchantAddress", "dapper"),
 	).AssertSuccess(otu.T)
+
+	otu.setupInfrastructureCut("find-lease")
 
 	otu.createDapperUser("find")
 	otu.createDapperUser("find-lease")
@@ -1829,12 +1846,14 @@ func (otu *OverflowTestUtils) setProfile(user string) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *OverflowTestUtils {
-
-	otu.O.Tx("adminSetSellDandyForFlow",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find"),
-		WithArg("market", marketType),
+func (otu *OverflowTestUtils) setFlowDandyMarketOption() *OverflowTestUtils {
+	id, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+	otu.O.Tx("tenantsetMarketOption",
+		WithSigner("find"),
+		WithArg("nftName", "Dandy"),
+		WithArg("nftType", id),
+		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
 
@@ -1843,22 +1862,23 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(marketType string) *Overf
 
 func (otu *OverflowTestUtils) setFlowLeaseMarketOption(marketType string) *OverflowTestUtils {
 
-	otu.O.Tx("adminSetSellLeaseForFlow",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find-lease"),
-		WithArg("market", marketType),
-		WithArg("merchAddress", "dapper"),
+	id, err := otu.O.QualifiedIdentifier("FIND", "Lease")
+	assert.NoError(otu.T, err)
+	otu.O.Tx("tenantsetMarketOptionDapper",
+		WithSigner("find-lease"),
+		WithArg("nftName", "Lease"),
+		WithArg("nftType", id),
+		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
 
 	return otu
 }
 
-func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) alterMarketOption(ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterMarketOption",
 		WithSigner("find"),
-		WithArg("market", marketType),
 		WithArg("action", ruleName),
 	).
 		AssertSuccess(otu.T)
@@ -1866,11 +1886,10 @@ func (otu *OverflowTestUtils) alterMarketOption(marketType, ruleName string) *Ov
 	return otu
 }
 
-func (otu *OverflowTestUtils) alterMarketOptionDapper(marketType, ruleName string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) alterMarketOptionDapper(ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterMarketOption",
 		WithSigner("dapper"),
-		WithArg("market", marketType),
 		WithArg("action", ruleName),
 	).
 		AssertSuccess(otu.T)
@@ -1878,11 +1897,10 @@ func (otu *OverflowTestUtils) alterMarketOptionDapper(marketType, ruleName strin
 	return otu
 }
 
-func (otu *OverflowTestUtils) alterLeaseMarketOption(marketType, ruleName string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) alterLeaseMarketOption(ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterLeaseMarketOption",
 		WithSigner("find-lease"),
-		WithArg("market", marketType),
 		WithArg("action", ruleName),
 	).
 		AssertSuccess(otu.T)
@@ -1895,29 +1913,6 @@ func (otu *OverflowTestUtils) removeMarketOption(marketType string) *OverflowTes
 	otu.O.Tx("removeMarketOption",
 		WithSigner("find"),
 		WithArg("saleItemName", marketType),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) removeTenantRule(optionName, tenantRuleName string) *OverflowTestUtils {
-
-	otu.O.Tx("removeTenantRule",
-		WithSigner("find"),
-		WithArg("optionName", optionName),
-		WithArg("tenantRuleName", tenantRuleName),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setTenantRuleFUSD(optionName string) *OverflowTestUtils {
-
-	otu.O.Tx("setTenantRuleFUSD",
-		WithSigner("find"),
-		WithArg("optionName", optionName),
 	).
 		AssertSuccess(otu.T)
 
@@ -2210,21 +2205,29 @@ func (otu *OverflowTestUtils) sendSoulBoundNFT(receiver, sender string) *Overflo
 
 func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 
-	otu.O.Tx("adminSetSellExampleNFTRules",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find"),
-		WithArg("merchAddress", "dapper"),
+	id, err := otu.O.QualifiedIdentifier("Example", "NFT")
+	assert.NoError(otu.T, err)
+	otu.O.Tx("tenantsetMarketOptionDapper",
+		WithSigner("find"),
+		WithArg("nftName", "Example"),
+		WithArg("nftType", id),
+		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
 
 	return otu
+
 }
 
 func (otu *OverflowTestUtils) setDUCLease() *OverflowTestUtils {
 
-	otu.O.Tx("adminSetSellDUCLeaseRules",
-		WithSigner("find-admin"),
-		WithArg("tenant", "find-lease"),
+	id, err := otu.O.QualifiedIdentifier("FIND", "Lease")
+	assert.NoError(otu.T, err)
+	otu.O.Tx("tenantsetMarketOptionDapper",
+		WithSigner("find-lease"),
+		WithArg("nftName", "Lease"),
+		WithArg("nftType", id),
+		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
 
@@ -3168,6 +3171,30 @@ func (otu *OverflowTestUtils) mintRoyaltylessNFT(user string) (uint64, error) {
 		AssertSuccess(otu.T).
 		GetIdFromEvent("Deposit", "id")
 
+}
+
+func (otu *OverflowTestUtils) setupInfrastructureCut(tenant string) *OverflowTestUtils {
+	id, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	assert.NoError(otu.T, err)
+	otu.O.Tx(
+		"tenantsetExtraCut",
+		WithSigner(tenant),
+		WithArg("ftTypes", []string{id}),
+		WithArg("category", "infrastructure"),
+		WithArg("cuts", []findGo.FindMarketCutStruct_ThresholdCut{
+			{
+				Name:           "Dapper",
+				Address:        otu.O.Address("dapper"),
+				Cut:            0.01,
+				Description:    "Dapper takes 0.01% or 0.44 dollars, whichever is higher",
+				PublicPath:     "GenericFTReceiver",
+				MinimumPayment: 0.44,
+			},
+		}),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
 }
 
 type SaleItem struct {

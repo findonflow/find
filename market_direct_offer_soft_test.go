@@ -13,7 +13,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	id := otu.setupMarketAndDandyDapper()
 	otu.registerDandyInNFTRegistry().
 		registerDUCInRegistry().
-		setFlowDandyMarketOption("DirectOfferSoft").
+		setFlowDandyMarketOption().
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find").
@@ -168,7 +168,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "deprecate")
+		otu.alterMarketOptionDapper("deprecate")
 
 		bidTx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -176,14 +176,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 	})
 
 	t.Run("Should not be able to increase bid but able to fulfill offer when deprecated", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOptionDapper("DirectOfferSoft", "deprecate")
+			alterMarketOptionDapper("deprecate")
 
 		otu.O.Tx("increaseBidMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -197,7 +197,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoft("user2", id, price)
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			sendDandy("user1", "user2", id)
 
 	})
@@ -206,15 +206,15 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOptionDapper("DirectOfferSoft", "deprecate").
+			alterMarketOptionDapper("deprecate").
 			rejectDirectOfferSoft("user1", id, 10.0)
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 	})
 
 	t.Run("Should not be able to add direct offer after stopped", func(t *testing.T) {
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "stop")
+		otu.alterMarketOptionDapper("stop")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -228,14 +228,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 	})
 
 	t.Run("Should not be able to increase bid nor accept offer after stopped", func(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOptionDapper("DirectOfferSoft", "stop")
+			alterMarketOptionDapper("stop")
 
 		otu.O.Tx("increaseBidMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -252,7 +252,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 
@@ -262,7 +262,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
 			saleItemListed("user1", "active_finished", price).
-			alterMarketOptionDapper("DirectOfferSoft", "stop")
+			alterMarketOptionDapper("stop")
 
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -274,7 +274,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 			/* Reset */
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
@@ -289,8 +289,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "stop").
-			alterMarketOptionDapper("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("stop").
+			alterMarketOptionDapper("enable").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user1", id, "user2", price).
@@ -302,8 +302,8 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to reject offer after enabled", func(t *testing.T) {
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "stop").
-			alterMarketOptionDapper("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("stop").
+			alterMarketOptionDapper("enable").
 			directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferSoft("user1", id, 10.0)
@@ -313,7 +313,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOptionDapper("DirectOfferSoft", "deprecate")
+			alterMarketOptionDapper("deprecate")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
@@ -327,7 +327,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "stop")
+		otu.alterMarketOptionDapper("stop")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
@@ -341,7 +341,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 
@@ -350,12 +350,12 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.directOfferMarketSoft("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "stop")
+		otu.alterMarketOptionDapper("stop")
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "deprecate").
+		otu.alterMarketOptionDapper("deprecate").
 			retractOfferDirectOfferSoft("user2", "user1", id)
 
-		otu.alterMarketOptionDapper("DirectOfferSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			cancelAllDirectOfferMarketSoft("user1")
 	})
 

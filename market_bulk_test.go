@@ -15,7 +15,7 @@ func TestBulkMarketSale(t *testing.T) {
 		registerUser("user2").
 		createUser(1000.0, "user3").
 		registerUser("user3").
-		setFlowDandyMarketOption("Sale").
+		setFlowDandyMarketOption().
 		setProfile("user1").
 		setProfile("user2")
 

@@ -1,16 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
-//Transaction that is signed by find to create a find market tenant for find
-transaction() {
+transaction(dapperAddress: Address?) {
 	prepare(account: AuthAccount) {
-		//in finds case the
-		account.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
-		account.link<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)
 
 		let ftCaps : [Capability<&{FungibleToken.Receiver}>] = []
 
@@ -39,6 +34,14 @@ transaction() {
 				account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
 		}
 		ftCaps.append(usdcCap)
+
+		if dapperAddress != nil {
+			let dapper=getAccount(dapperAddress!)
+			let ducReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+			ftCaps.append(ducReceiver)
+			let futReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+			ftCaps.append(futReceiver)
+		}
 
 		// setup switch board
 		var checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)

@@ -18,8 +18,7 @@ func TestMarketOptionsContract(t *testing.T) {
 
 	ids := otu.setupMarketAndMintDandys()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("DirectOfferEscrow").
-		setFlowDandyMarketOption("AuctionEscrow").
+		setFlowDandyMarketOption().
 		listNFTForEscrowedAuction("user1", ids[1], price).
 		setProfile("user1").
 		setProfile("user2")

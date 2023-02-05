@@ -3,23 +3,32 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
-transaction(tenantAddress: Address, merchantAddress:Address) {
+transaction(tenantAddress: Address) {
 	//versus account
 	prepare(account: AuthAccount) {
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
-
 		// pass in the default cut rules here
 		let cut = [
 			FindMarket.TenantRule( name:"standard ft", types:[Type<@DapperUtilityCoin.Vault>()], ruleType:"ft", allow:true)
 		]
 
-		let receiver=getAccount(merchantAddress).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		let royalty = MetadataViews.Royalty(
+			receiver: account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath),
+			cut: 0.025,
+			description: "find"
+		)
 
-		let findRoyalty=MetadataViews.Royalty(receiver: receiver, cut: 0.025,  description: "find")
+		let saleItem = FindMarket.TenantSaleItem(
+			name: "FindRoyalty",
+			cut: royalty,
+			rules : cut,
+			status: "active",
+		)
 
 		//We create a tenant that has both auctions and direct offers
-		let tenantCap= adminClient.createFindMarketDapper(name: "findLease", address: tenantAddress, defaultCutRules: cut, findRoyalty:findRoyalty)
+		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+		let tenantCap= adminClient.createFindMarket(name: "findLease", address: tenantAddress, findCutSaleItem: saleItem)
 
 		let tenantAccount=getAccount(tenantAddress)
 		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!

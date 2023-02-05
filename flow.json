@@ -119,6 +119,13 @@
 				"mainnet": "0xf233dcee88fe0abe"
 			}
 		},
+		"FungibleTokenSwitchboard": {
+			"source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
+			"aliases": {
+				"testnet": "9a0766d93b6608b7",
+				"mainnet": "0xf233dcee88fe0abe"
+			}
+		},
 		"FlowToken": {
 			"source": "./contracts/standard/FlowToken.cdc",
 			"aliases": {
@@ -597,7 +604,8 @@
 				"DapperStorageRent",
 				"Templates",
 				"Wearables",
-				"WearablesDev"
+				"WearablesDev",
+				"FungibleTokenSwitchboard"
 			],
 			"emulator-dapper": [
 				"DapperUtilityCoin",

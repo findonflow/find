@@ -17,7 +17,7 @@ func TestMarketSale(t *testing.T) {
 		registerUser("user2").
 		createUser(100.0, "user3").
 		registerUser("user3").
-		setFlowDandyMarketOption("Sale").
+		setFlowDandyMarketOption().
 		setProfile("user1").
 		setProfile("user2")
 	price := 10.0
@@ -228,7 +228,7 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.alterMarketOption("Sale", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		listingTx("listNFTForSale",
 			WithArg("ftAliasOrIdentifier", "Flow"),
@@ -246,11 +246,11 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOption("Sale", "enable")
+		otu.alterMarketOption("enable")
 
 		otu.listNFTForSale("user1", ids[1], price)
 
-		otu.alterMarketOption("Sale", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		otu.O.Tx("delistNFTSale",
 			WithSigner("user1"),
@@ -259,7 +259,7 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOption("Sale", "enable")
+		otu.alterMarketOption("enable")
 
 		otu.O.Tx("delistAllNFTSale",
 			WithSigner("user1"),
@@ -279,7 +279,7 @@ func TestMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.alterMarketOption("Sale", "stop")
+		otu.alterMarketOption("stop")
 
 		listingTx("listNFTForSale",
 			WithArg("id", ids[1]),
@@ -296,7 +296,7 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("Sale", "enable")
+		otu.alterMarketOption("enable")
 		otu.cancelAllNFTForSale("user1")
 
 	})
@@ -467,16 +467,13 @@ func TestMarketSale(t *testing.T) {
 	})
 
 	t.Run("Royalties should try to borrow vault in standard way if profile wallet is unlinked", func(t *testing.T) {
-		otu.setTenantRuleFUSD("FlowDandySale").
-			removeTenantRule("FlowDandySale", "Flow")
-
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
 
 		listingTx("listNFTForSale",
 			WithSigner("user3"),
 			WithArg("id", ids[0]),
-			WithArg("ftAliasOrIdentifier", "FUSD"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertSuccess(t)

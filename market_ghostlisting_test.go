@@ -23,9 +23,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 	id := otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("DirectOfferEscrow").
-		setFlowDandyMarketOption("Sale").
-		setFlowDandyMarketOption("AuctionEscrow").
+		setFlowDandyMarketOption().
 		setProfile("user1").
 		setProfile("user2")
 
@@ -259,7 +257,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.setUUID(1400)
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price).
-			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption().
 			listNFTForEscrowedAuction("user1", ids[0], price)
 
 		itemsForSale := otu.getItemsForSale("user1")
@@ -282,7 +280,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.setUUID(1800)
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price).
-			setFlowDandyMarketOption("AuctionEscrow").
+			setFlowDandyMarketOption().
 			listNFTForEscrowedAuction("user1", ids[0], price).
 			auctionBidMarketEscrow("user2", "user1", ids[0], bidPrice)
 
@@ -375,9 +373,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 	id = otu.setupMarketAndDandyDapper()
 	otu.registerDUCInRegistry().
 		registerDandyInNFTRegistry().
-		setFlowDandyMarketOption("DirectOfferSoft").
-		setFlowDandyMarketOption("Sale").
-		setFlowDandyMarketOption("AuctionSoft").
+		setFlowDandyMarketOption().
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find")
