@@ -1277,6 +1277,8 @@ pub contract FindMarket {
 		var payInFUT = false
 		var payInDUC = false
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
+
+		//TODO: make this switchboard or our profile?
 		var residualAddress = FindMarket.residualAddress
 		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
 			residualAddress = dapperMerchAddress
@@ -1285,10 +1287,21 @@ pub contract FindMarket {
 			residualAddress = dapperMerchAddress
 			payInDUC = true
 		}
+
 		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 
 		/* Check the total royalty to prevent changing of royalties */
 		let royalties = royalty.getRoyalties()
+
+		//we know the ftReceiver path
+		// valid options
+		// profile with type registered
+		// switchboard with type registered
+		// receiver with that path for the address in the capability
+
+		// what if this is a an switchboard?
+		// what if the path is for a wrong type?
+		// or what if it is forwarder?
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
 
@@ -1326,11 +1339,15 @@ pub contract FindMarket {
 					// if the capability is valid -> it is a User resource -> check if the wallet is set up.
 					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
 					walletCheck = ref.hasWallet(ftType.identifier)
+				//this does not work with forwarders
 				} else if !royaltyItem.receiver.borrow()!.isInstance(ftType){
 					// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
 					walletCheck = false
 				}
 
+				//what if this is true, but the types does not match?
+
+				// what if we want pay in DUC but the royalty vault is /flowTokenReceiver?
 				// if wallet check fails, try to borrow it the standard way
 				if !walletCheck{
 					royaltyReceiver = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
