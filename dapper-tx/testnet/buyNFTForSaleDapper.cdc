@@ -8,6 +8,7 @@ import NonFungibleToken from 0x631e88ae7f1d7c20
 import MetadataViews from 0x631e88ae7f1d7c20
 import FungibleToken from 0x9a0766d93b6608b7
 import DapperStorageRent from 0x43ee8c22fcf94ea3
+import TopShot from 0x877931736ee77cff
 
 //first argument is the address to the merchant that gets the funds
 transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
@@ -48,12 +49,19 @@ transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
 
         if !self.targetCapability.check() {
             let cd = item.getNFTCollectionData()
-            if account.borrow<&AnyResource>(from: cd.storagePath) != nil {
-                panic("This collection public link is not set up properly.")
+            if let storage = account.borrow<&AnyResource>(from: cd.storagePath) {
+                if let st = account.borrow<&TopShot.Collection>(from: cd.storagePath) {
+                    // here means the topShot is not linked in the way it should be. We can relink that for our use
+                    account.unlink(cd.publicPath)
+                    account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+                } else {
+                    panic("This collection public link is not set up properly.")
+                }
+            } else {
+                account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+                account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+                account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
             }
-            account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-            account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-            account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
         }
 
         self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
