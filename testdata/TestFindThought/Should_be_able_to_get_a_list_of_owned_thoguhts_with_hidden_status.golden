@@ -8,23 +8,7 @@
         "creatorProfileName": "user1",
         "header": "This is header",
         "hidden": false,
-        "id": 338,
-        "tags": [
-            "tag1",
-            "tag2",
-            "@find"
-        ]
-    },
-    {
-        "body": "This is body",
-        "created": 1,
-        "creator": "0x120e725050340cab",
-        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-        "creatorName": "user1",
-        "creatorProfileName": "user1",
-        "header": "This is header",
-        "hidden": false,
-        "id": 331,
+        "id": 333,
         "medias": {
             "mediaUrl": "mediaType"
         },
@@ -62,7 +46,7 @@
         "creatorProfileName": "user1",
         "header": "This is header",
         "hidden": true,
-        "id": 340,
+        "id": 342,
         "quotedThought": {
             "body": "This is body",
             "created": 1,
@@ -72,7 +56,7 @@
             "creatorProfileName": "user1",
             "header": "This is header",
             "hidden": false,
-            "id": 331,
+            "id": 333,
             "medias": {
                 "mediaUrl": "mediaType"
             },
@@ -101,6 +85,22 @@
                 "@find"
             ]
         },
+        "tags": [
+            "tag1",
+            "tag2",
+            "@find"
+        ]
+    },
+    {
+        "body": "This is body",
+        "created": 1,
+        "creator": "0x120e725050340cab",
+        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+        "creatorName": "user1",
+        "creatorProfileName": "user1",
+        "header": "This is header",
+        "hidden": false,
+        "id": 340,
         "tags": [
             "tag1",
             "tag2",
