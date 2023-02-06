@@ -16,7 +16,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 	id := otu.setupMarketAndDandyDapper()
 	otu.registerDandyInNFTRegistry().
 		registerDUCInRegistry().
-		setFlowDandyMarketOption().
+		setFlowDandyMarketOption("dapper").
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find").
@@ -487,7 +487,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			}).

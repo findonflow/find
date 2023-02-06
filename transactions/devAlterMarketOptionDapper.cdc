@@ -4,17 +4,17 @@ transaction(action: String ){
     prepare(account: AuthAccount){
         let path = FindMarket.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
-		let option = "DapperLeaseSoft"
+		let marketOption = "DapperDandySoft"
 
         switch action {
             case "enable" :
-                tenantRef.enableMarketOption(option)
+                tenantRef.enableMarketOption(marketOption)
 
             case "deprecate" :
-                tenantRef.deprecateMarketOption(option)
+                tenantRef.deprecateMarketOption(marketOption)
 
             case "stop" :
-                tenantRef.stopMarketOption(option)
+                tenantRef.stopMarketOption(marketOption)
         }
     }
 }

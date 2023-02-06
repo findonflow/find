@@ -13,11 +13,11 @@ func TestMarketSale(t *testing.T) {
 	otu := NewOverflowTest(t).
 		setupFIND().
 		setupDandy("user1").
-		createUser(100.0, "user2").
+		createUser(1000.0, "user2").
 		registerUser("user2").
 		createUser(100.0, "user3").
 		registerUser("user3").
-		setFlowDandyMarketOption().
+		setFlowDandyMarketOption("find").
 		setProfile("user1").
 		setProfile("user2")
 	price := 10.0
@@ -540,6 +540,16 @@ func TestMarketSale(t *testing.T) {
 
 		ids := otu.mintThreeExampleDandies()
 		otu.sendDandy("user3", "user1", ids[0])
+		identifier, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+		assert.NoError(otu.T, err)
+
+		otu.O.Tx("devtenantsetMarketOptionAll",
+			WithSigner("find"),
+			WithArg("nftName", "Dandy"),
+			WithArg("nftType", identifier),
+			WithArg("cut", 0.0),
+		).
+			AssertSuccess(otu.T)
 
 		listingTx("listNFTForSale",
 			WithSigner("user3"),
@@ -582,7 +592,7 @@ func TestMarketSale(t *testing.T) {
 			createDapperUser("find-admin")
 
 		otu.registerDUCInRegistry().
-			setDUCExampleNFT().
+			setExampleNFT().
 			sendExampleNFT("user1", "find")
 
 		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
@@ -625,8 +635,8 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address": otu.O.Address("dapper"),
-					"amount":  0.25,
+					"address": otu.O.Address("find"),
+					"amount":  0.35,
 				})
 
 		otu.sendExampleNFT("user1", "user2")
@@ -658,8 +668,8 @@ func TestMarketSale(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address": otu.O.Address("dapper"),
-					"amount":  2.5,
+					"address": otu.O.Address("find"),
+					"amount":  3.5,
 				})
 
 		otu.sendExampleNFT("user1", "user2")
@@ -695,23 +705,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.linkDUCVaultReceiver("find")
 		otu.sendExampleNFT("user1", "user2")
-	})
-
-	t.Run("Should be able to list an NFT for sale and buy it. where id != uuid", func(t *testing.T) {
-		saleItem := otu.listExampleNFTForSale("user1", 0, price)
-
-		otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-		itemsForSale := otu.getItemsForSale("user1")
-		assert.Equal(t, 1, len(itemsForSale))
-		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-		otu.buyNFTForMarketSale("user2", "user1", saleItem[0], price).
-			sendExampleNFT("user1", "user2")
-		otu.cancelAllNFTForSale("user1")
-
-		otu.cancelAllNFTForSale("user1")
-
 	})
 
 	t.Run("Should be able to list multiple dandies for sale and buy them in one go", func(t *testing.T) {

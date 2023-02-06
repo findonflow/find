@@ -17,7 +17,7 @@ func TestFindWearablesSaleFUT(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	setupDapperMarketForWearables(otu, "FUT", 0.025, 0.01)
+	setupDapperMarketForWearables(otu, "FUT", 0.025, 0.0)
 
 	id1 := otu.mintWearables("user1")
 	addNFTCatalog(otu, "user1", id1)
@@ -48,7 +48,7 @@ func TestFindWearablesSaleFUT(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address":   otu.O.Address("dapper"),
+					"address":   otu.O.Address("find"),
 					"amount":    0.25,
 					"vaultType": token,
 				})
@@ -69,7 +69,7 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	setupDapperMarketForWearables(otu, "DUC", 0.025, 0.01)
+	setupDapperMarketForWearables(otu, "DUC", 0.025, 0.0)
 
 	id1 := otu.mintWearables("user1")
 	addNFTCatalog(otu, "user1", id1)
@@ -100,9 +100,10 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address":   otu.O.Address("dapper"),
-					"amount":    0.25,
-					"vaultType": token,
+					"address":     otu.O.Address("find"),
+					"amount":      0.25,
+					"vaultType":   token,
+					"royaltyName": "find",
 				}).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
@@ -133,9 +134,10 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address":   otu.O.Address("dapper"),
-					"amount":    2.5,
-					"vaultType": token,
+					"address":     otu.O.Address("find"),
+					"amount":      2.5,
+					"royaltyName": "find",
+					"vaultType":   token,
 				}).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
@@ -160,7 +162,7 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	setupDapperMarketForWearables(otu, "DUC", 0.25, 0.1)
+	setupDapperMarketForWearables(otu, "DUC", 0.25, 0.0)
 
 	id1 := otu.mintWearables("user1")
 	addNFTCatalog(otu, "user1", id1)
@@ -184,14 +186,15 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address":   otu.O.Address("dapper"),
-					"amount":    2.5,
-					"vaultType": token,
+					"address":     otu.O.Address("find"),
+					"amount":      2.5,
+					"royaltyName": "find",
+					"vaultType":   token,
 				}).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
 					"address":     otu.O.Address("dapper"),
-					"amount":      1.0,
+					"amount":      0.44,
 					"royaltyName": "dapper",
 					"vaultType":   token,
 				})
@@ -202,7 +205,7 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 	t.Run("Should be able to reconstruct the market with different fee structure", func(t *testing.T) {
 
 		resetTenant(otu, "dapper")
-		setupDapperMarketForWearables(otu, "DUC", 0.025, 0.01)
+		setupDapperMarketForWearables(otu, "DUC", 0.025, 0.00)
 
 		listWearablesForSaleFUT(otu, "user1", id1, price, token)
 
@@ -217,9 +220,10 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 			AssertSuccess(otu.T).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
-					"address":   otu.O.Address("dapper"),
-					"amount":    0.25,
-					"vaultType": token,
+					"address":     otu.O.Address("find"),
+					"amount":      0.25,
+					"royaltyName": "find",
+					"vaultType":   token,
 				}).
 			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
 				map[string]interface{}{
@@ -244,7 +248,7 @@ func resetTenant(otu *OverflowTestUtils, tenant string) *OverflowTestUtils {
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "TenantRemoved", map[string]interface{}{
-			"tenant":  "find_dapper",
+			"tenant":  "dapper",
 			"address": otu.O.Address(tenant),
 		})
 
@@ -259,16 +263,16 @@ func resetTenant(otu *OverflowTestUtils, tenant string) *OverflowTestUtils {
 
 func setupDapperMarketForWearables(otu *OverflowTestUtils, coin string, findCut, tenantCut float64) *OverflowTestUtils {
 	name := "dapper"
-	merchAddress := "0x01cf0e2f2f715450"
-	switch otu.O.Network {
-	case "testnet":
-		merchAddress = "0x4748780c8bf65e19"
-		name = "find-dapper"
+	// merchAddress := "0x01cf0e2f2f715450"
+	// switch otu.O.Network {
+	// case "testnet":
+	// 	merchAddress = "0x4748780c8bf65e19"
+	// 	name = "find-dapper"
 
-	case "mainnet":
-		merchAddress = "0x55459409d30274ee"
-		name = "find-dapper"
-	}
+	// case "mainnet":
+	// 	merchAddress = "0x55459409d30274ee"
+	// 	name = "find-dapper"
+	// }
 
 	o := otu.O
 	t := otu.T
@@ -286,45 +290,30 @@ func setupDapperMarketForWearables(otu *OverflowTestUtils, coin string, findCut,
 	).
 		AssertSuccess(t)
 
-	o.Tx("setup_find_market_1",
+	o.Tx("setup_find_market_1_dapper",
 		WithSigner(name),
+		WithArg("dapperAddress", "dapper"),
 	).
 		AssertSuccess(t)
 
-	o.Tx("setup_find_dapper_market",
-		WithSigner("find-admin"),
-		WithArg("adminAddress", name),
-		WithArg("tenantAddress", name),
-		WithArg("name", "find_dapper"),
-	).
-		AssertSuccess(t)
-
-	o.Tx("adminAddFindCutDapper",
+	o.Tx("setup_find_market_2",
 		WithSigner("find-admin"),
 		WithArg("tenant", name),
-		WithArg("merchAddress", merchAddress),
+		WithArg("tenantAddress", name),
 		WithArg("findCut", findCut),
 	).
 		AssertSuccess(t)
+	otu.setupInfrastructureCut(name)
 
-		// if coin == "DUC" {
-	o.Tx("adminSetSellDapper",
+	id, err := o.QualifiedIdentifier("Wearables", "NFT")
+	assert.NoError(t, err)
+	o.Tx("tenantsetMarketOptionDapper",
 		WithSigner(name),
-		WithArg("market", "Sale"),
-		WithArg("merchAddress", merchAddress),
-		WithArg("tenantCut", tenantCut),
+		WithArg("nftName", "Wearables"),
+		WithArg("nftType", id),
+		WithArg("cut", tenantCut),
 	).
 		AssertSuccess(t)
-	// }
-	// if coin == "FUT" {
-	// 	o.Tx("adminSetSellDapperFUT",
-	// 		WithSigner(name),
-	// 		WithArg("market", "Sale"),
-	// 		WithArg("merchAddress", merchAddress),
-	// 		WithArg("tenantCut", tenantCut),
-	// 	).
-	// 		AssertSuccess(t)
-	// }
 
 	return otu
 }

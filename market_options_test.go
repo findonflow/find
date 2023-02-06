@@ -13,7 +13,7 @@ func TestMarketOptions(t *testing.T) {
 		setupDandy("user1").
 		createUser(100.0, "user2").
 		registerUser("user2").
-		setFlowDandyMarketOption()
+		setFlowDandyMarketOption("find")
 
 	price := 10.0
 	ids := otu.mintThreeExampleDandies()
@@ -53,7 +53,7 @@ func TestMarketOptions(t *testing.T) {
 		listingTx("listNFTForSale").
 			AssertFailure(t, "Nothing matches")
 
-		otu.setFlowDandyMarketOption()
+		otu.setFlowDandyMarketOption("find")
 		otu.delistAllNFT("user1")
 
 	})

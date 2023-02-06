@@ -722,7 +722,7 @@ pub contract FindMarket {
 					returningCut = FindMarketCutStruct.Cuts(
 						[
 							FindMarketCutStruct.GeneralCut(
-								name : findCut.name,
+								name : findCut.cut!.description,
 								cap: findCut.cut!.receiver,
 								cut: findCut.cut!.cut,
 								description: findCut.cut!.description
@@ -773,7 +773,7 @@ pub contract FindMarket {
 					returningCut = FindMarketCutStruct.Cuts(
 						[
 							FindMarketCutStruct.GeneralCut(
-								name : item.name,
+								name : item.cut!.description,
 								cap: item.cut!.receiver,
 								cut: item.cut!.cut,
 								description: item.cut!.description
@@ -796,18 +796,30 @@ pub contract FindMarket {
 
 		access(account) fun addSaleItem(_ item: TenantSaleItem, type:String) {
 			if type=="find" {
+				var status : String? = nil
+				if self.findSaleItems[item.name] != nil {
+					status = "update"
+				}
 				self.findSaleItems[item.name]=item
 				FindRulesCache.resetTenantFindRulesCache(self.name)
-				self.emitRulesEvent(item: item, type: "find", status: nil)
+				self.emitRulesEvent(item: item, type: "find", status: status)
 			} else if type=="tenant" {
+				var status : String? = nil
+				if self.findSaleItems[item.name] != nil {
+					status = "update"
+				}
 				self.tenantSaleItems[item.name]=item
 				FindRulesCache.resetTenantTenantRulesCache(self.name)
 				FindRulesCache.resetTenantCutCache(self.name)
-				self.emitRulesEvent(item: item, type: "tenant", status: nil)
+				self.emitRulesEvent(item: item, type: "tenant", status: status)
 			} else if type=="cut" {
+				var status : String? = nil
+				if self.findSaleItems[item.name] != nil {
+					status = "update"
+				}
 				self.findCuts[item.name]=item
 				FindRulesCache.resetTenantCutCache(self.name)
-				self.emitRulesEvent(item: item, type: "cut", status: nil)
+				self.emitRulesEvent(item: item, type: "cut", status: status)
 			} else{
 				panic("Not valid type to add sale item for")
 			}
@@ -1347,7 +1359,7 @@ pub contract FindMarket {
 				if var cutAmount= cut.getAmountPayable(soldFor) {
 					let findName = resolveName(cut.getAddress())
 					emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:cut.getAddress(), findName: findName , royaltyName: cut.getName(), amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()))
+					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()).concat(" Royalty Name : ").concat(cut.getName()))
 					vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 			}

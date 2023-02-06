@@ -4,7 +4,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
-transaction(dapperAddress: Address?) {
+transaction(dapperAddress: Address) {
 	prepare(account: AuthAccount) {
 
 		let ftCaps : [Capability<&{FungibleToken.Receiver}>] = []
@@ -35,13 +35,11 @@ transaction(dapperAddress: Address?) {
 		}
 		ftCaps.append(usdcCap)
 
-		if dapperAddress != nil {
-			let dapper=getAccount(dapperAddress!)
-			let ducReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-			ftCaps.append(ducReceiver)
-			let futReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-			ftCaps.append(futReceiver)
-		}
+		let dapper=getAccount(dapperAddress)
+		let ducReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		ftCaps.append(ducReceiver)
+		let futReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		ftCaps.append(futReceiver)
 
 		// setup switch board
 		var checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)

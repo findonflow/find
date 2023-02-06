@@ -22,7 +22,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		registerDapperUser("user2").
 		createDapperUser("user3").
 		registerDapperUser("user3").
-		setFlowLeaseMarketOption("Sale").
+		setFlowLeaseMarketOption().
 		setProfile("user1").
 		setProfile("user2")
 
@@ -158,18 +158,6 @@ func TestLeaseMarketSale(t *testing.T) {
 			AssertFailure(t, "Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
 
 		otu.cancelAllLeaseForSale("user1")
-	})
-
-	t.Run("Should be able to list it in DUC but not DUT.", func(t *testing.T) {
-
-		otu.O.Tx("listLeaseForSale",
-			WithSigner("user1"),
-			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "FUT"),
-			WithArg("directSellPrice", price),
-			WithArg("validUntil", otu.currentTime()+100.0),
-		).
-			AssertFailure(t, "Nothing matches")
 	})
 
 	t.Run("Should be able cancel all listing", func(t *testing.T) {
@@ -339,7 +327,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
@@ -370,7 +358,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      2.5,
 				"leaseName":   "name1",
 				"royaltyName": "find",

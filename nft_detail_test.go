@@ -27,7 +27,7 @@ func TestNFTDetailScript(t *testing.T) {
 	otu.setUUID(600)
 	ids := otu.mintThreeExampleDandies()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption()
+		setFlowDandyMarketOption("find")
 
 	t.Run("Should be able to get nft details of item with script", func(t *testing.T) {
 
@@ -352,6 +352,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should return all blocked NFTs by type", func(t *testing.T) {
+		otu.alterMarketOption("enable")
 		otu.setUUID(2400)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").
@@ -373,6 +374,7 @@ func TestNFTDetailScript(t *testing.T) {
 	})
 
 	t.Run("Should not fetch NFTInfo if blocked by find", func(t *testing.T) {
+		otu.alterMarketOption("enable")
 		otu.setUUID(2800)
 		ids := otu.mintThreeExampleDandies()
 		otu.setProfile("user1").

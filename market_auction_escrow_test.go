@@ -21,7 +21,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	preIncrement := 5.0
 	id := otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption().
+		setFlowDandyMarketOption("find").
 		setProfile("user1").
 		setProfile("user2")
 
@@ -796,7 +796,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			setDUCExampleNFT().
 			sendExampleNFT("user1", "find")
 
 		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)

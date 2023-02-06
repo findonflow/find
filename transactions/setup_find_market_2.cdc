@@ -7,34 +7,33 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
 //signed by admin to link tenantClient to a new tenant
-transaction(tenantAddress: Address) {
+transaction(tenant: String, tenantAddress: Address, findCut: UFix64) {
 	//versus account
 	prepare(account: AuthAccount) {
 		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
 		// pass in the default cut rules here
-		let cut = [
+		let rules = [
 			FindMarket.TenantRule( name:"standard ft", types:[Type<@FUSD.Vault>(), Type<@FlowToken.Vault>(), Type<@FiatToken.Vault>(), Type<@DapperUtilityCoin.Vault>() , Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)
 		]
 
 		let royalty = MetadataViews.Royalty(
-			receiver: account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath),
-			cut: 0.025,
+			receiver: adminClient.getSwitchboardReceiverPublic(),
+			cut: findCut,
 			description: "find"
 		)
 
 		let saleItem = FindMarket.TenantSaleItem(
-			name: "FindRoyalty",
+			name: "findRoyalty",
 			cut: royalty,
-			rules : cut,
+			rules : rules,
 			status: "active",
 		)
 
 		//We create a tenant that has both auctions and direct offers
-		let tenantCap= adminClient.createFindMarket(name: "find", address: tenantAddress, findCutSaleItem: saleItem)
+		let tenantCap= adminClient.createFindMarket(name: tenant, address: tenantAddress, findCutSaleItem: saleItem)
 
 		let tenantAccount=getAccount(tenantAddress)
 		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!

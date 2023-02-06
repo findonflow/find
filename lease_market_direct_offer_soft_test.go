@@ -11,7 +11,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	otu.setupMarketAndDandyDapper()
 	otu.registerDUCInRegistry().
-		setFlowLeaseMarketOption("DirectOfferSoft").
+		setFlowLeaseMarketOption().
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find").
@@ -379,7 +379,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
@@ -528,8 +528,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.createDapperUser("user1").
 			createDapperUser("user2")
-
-		otu.setDUCLease()
 
 		otu.directOfferLeaseMarketSoftDUC("user2", "name1", price)
 

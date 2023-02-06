@@ -14,6 +14,7 @@ import FindPack from "./FindPack.cdc"
 import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
 import FindViews from "./FindViews.cdc"
+import FungibleTokenSwitchboard from "./standard/FungibleTokenSwitchboard.cdc"
 
 pub contract Admin {
 
@@ -518,6 +519,10 @@ pub contract Admin {
 
 			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
         	FINDCatalogAdmin.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
+		}
+
+		pub fun getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
+			return Admin.account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
 		}
 
 		init() {

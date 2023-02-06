@@ -7,7 +7,6 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
 transaction(tenant: Address, cut: UFix64){
     prepare(account: AuthAccount){
@@ -23,7 +22,7 @@ transaction(tenant: Address, cut: UFix64){
 		]
 
 		let royalty = MetadataViews.Royalty(
-			receiver: account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath),
+			receiver: adminRef.getSwitchboardReceiverPublic(),
 			cut: cut,
 			description: "find"
 		)

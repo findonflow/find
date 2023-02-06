@@ -464,7 +464,7 @@ pub contract FindLeaseMarket {
 				if var cutAmount= cut.getAmountPayable(soldFor) {
 					let findName = FIND.reverseLookup(cut.getAddress())
 					emit RoyaltyPaid(tenant: tenant, leaseName: leaseName, saleID: saleItem.uuid, address:cut.getAddress(), findName: findName , royaltyName: cut.getName(), amount: cutAmount,  vaultType: ftType.identifier, leaseInfo:leaseInfo)
-					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()))
+					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()).concat(" Royalty Name : ").concat(cut.getName()))
 					vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
 			}
