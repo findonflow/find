@@ -575,7 +575,7 @@ func TestMarketSale(t *testing.T) {
 					"address":         otu.O.Address("user1"),
 					"amount":          0.5,
 					"findName":        "user1",
-					"residualAddress": otu.O.Address("find-admin"),
+					"residualAddress": otu.O.Address("residual"),
 					"royaltyName":     "creator",
 				},
 			)
@@ -698,7 +698,7 @@ func TestMarketSale(t *testing.T) {
 					"address":         otu.O.Address("find"),
 					"amount":          0.1,
 					"findName":        "find",
-					"residualAddress": otu.O.Address("dapper"),
+					"residualAddress": otu.O.Address("residual"),
 					"royaltyName":     "creator",
 				},
 			)

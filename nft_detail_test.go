@@ -169,7 +169,7 @@ func TestNFTDetailScript(t *testing.T) {
 				"nftId":         803,
 				"nftIdentifier": "A.179b6b1cb6755e31.Dandy.NFT",
 				"saleType":      "active_listed",
-				"seller":        "0x120e725050340cab",
+				"seller":        "0xf669cb8d41ce0c74",
 				"sellerName":    "user1",
 			}),
 		)
@@ -344,7 +344,7 @@ func TestNFTDetailScript(t *testing.T) {
 				"nftId":                 2003,
 				"nftIdentifier":         "A.179b6b1cb6755e31.Dandy.NFT",
 				"saleType":              "active_listed",
-				"seller":                "0x120e725050340cab",
+				"seller":                "0xf669cb8d41ce0c74",
 				"sellerName":            "user1",
 			}),
 		)

@@ -201,8 +201,15 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	//link in the server in the versus client
 	otu.O.Tx("devSetResidualAddress",
 		findAdminSigner,
-		WithArg("address", "find-admin"),
+		WithArg("address", "residual"),
 	).AssertSuccess(otu.T)
+
+	otu.O.Tx(
+		"initSwitchboard",
+		WithSigner("residual"),
+		WithArg("dapperAddress", "dapper"),
+	).
+		AssertSuccess(otu.T)
 
 	otu.O.Tx("adminInitDapper",
 		findSigner,
@@ -287,9 +294,16 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 
 	//link in the server in the versus client
 	otu.O.Tx("devSetResidualAddress",
-		findSigner,
-		WithArg("address", "find"),
+		findAdminSigner,
+		WithArg("address", "residual"),
 	).AssertSuccess(otu.T)
+
+	otu.O.Tx(
+		"initSwitchboard",
+		WithSigner("residual"),
+		WithArg("dapperAddress", "dapper"),
+	).
+		AssertSuccess(otu.T)
 
 	otu.O.Tx("adminInitDapper",
 		dapperSigner,

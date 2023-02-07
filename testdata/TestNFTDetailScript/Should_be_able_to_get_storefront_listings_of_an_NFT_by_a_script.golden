@@ -11,7 +11,7 @@
       "nftId": 1203,
       "nftIdentifier": "A.179b6b1cb6755e31.Dandy.NFT",
       "saleType": "active_listed",
-      "seller": "0x120e725050340cab",
+      "seller": "0xf669cb8d41ce0c74",
       "sellerName": "user1",
     },
   },
@@ -82,7 +82,7 @@
     "amount": 10.0,
     "cuts": []interface {}{
       map[string]interface {}{
-        "address": "0x120e725050340cab",
+        "address": "0xf669cb8d41ce0c74",
         "amount": 10.0,
         "findName": "user1",
       },

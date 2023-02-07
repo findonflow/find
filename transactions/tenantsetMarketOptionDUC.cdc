@@ -14,15 +14,19 @@ transaction(nftName: String, nftType: String, cut: UFix64){
 		let defaultRules : [FindMarket.TenantRule] = [
 			FindMarket.TenantRule(
 				name: "Dapper",
-				types:[Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()],
+				types:[
+					// Type<@FlowUtilityToken.Vault>(),
+					Type<@DapperUtilityCoin.Vault>()
+				],
 				ruleType: "ft",
 				allow:true
 			),
 			FindMarket.TenantRule(
 				name: "Soft",
-				types:[Type<@FindMarketSale.SaleItem>(),
-				Type<@FindMarketAuctionSoft.SaleItem>(),
-				Type<@FindMarketDirectOfferSoft.SaleItem>()
+				types:[
+					Type<@FindMarketSale.SaleItem>(),
+					Type<@FindMarketAuctionSoft.SaleItem>(),
+					Type<@FindMarketDirectOfferSoft.SaleItem>()
 				],
 				ruleType: "listing",
 				allow:true

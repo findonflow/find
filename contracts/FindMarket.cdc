@@ -7,6 +7,8 @@ import FindRulesCache from "../contracts/FindRulesCache.cdc"
 import FindMarketCut from "../contracts/FindMarketCut.cdc"
 import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
+import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 pub contract FindMarket {
 	access(account) let  pathMap : {String: String}
@@ -664,6 +666,71 @@ pub contract FindMarket {
 			self.findCuts= {}
 		}
 
+		// This is an one-off temporary function to switch all receiver of rules / cuts to Switchboard cut
+		// This requires all tenant and find to have the switchboard set up, but this is very powerful and can enable all sorts of FT listings
+
+		access(account) fun setupSwitchboardCut() {
+			for key in self.findSaleItems.keys {
+				let val = self.findSaleItems[key]!
+				if val.cut != nil {
+					let newReceiver = getAccount(val.cut!.receiver.address).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+					let newCut = MetadataViews.Royalty(
+						receiver: newReceiver,
+						cut: val.cut!.cut,
+						description: val.cut!.description
+					)
+					let newVal = FindMarket.TenantSaleItem(
+						name : val.name,
+						cut : newCut,
+						rules : val.rules,
+						status : val.status
+					)
+					self.findSaleItems[key] = newVal
+				}
+			}
+
+			for key in self.tenantSaleItems.keys {
+				let val = self.tenantSaleItems[key]!
+				if val.cut != nil {
+					let newReceiver = getAccount(val.cut!.receiver.address).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+					let newCut = MetadataViews.Royalty(
+						receiver: newReceiver,
+						cut: val.cut!.cut,
+						description: val.cut!.description
+					)
+					let newVal = FindMarket.TenantSaleItem(
+						name : val.name,
+						cut : newCut,
+						rules : val.rules,
+						status : val.status
+					)
+					self.tenantSaleItems[key] = newVal
+				}
+			}
+
+			for key in self.findCuts.keys {
+				let val = self.findCuts[key]!
+				if val.cut != nil {
+					let newReceiver = getAccount(val.cut!.receiver.address).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+					let newCut = MetadataViews.Royalty(
+						receiver: newReceiver,
+						cut: val.cut!.cut,
+						description: val.cut!.description
+					)
+					let newVal = FindMarket.TenantSaleItem(
+						name : val.name,
+						cut : newCut,
+						rules : val.rules,
+						status : val.status
+					)
+					self.findCuts[key] = newVal
+				}
+			}
+			FindRulesCache.resetTenantCutCache(self.name)
+			FindRulesCache.resetTenantFindRulesCache(self.name)
+			FindRulesCache.resetTenantTenantRulesCache(self.name)
+		}
+
 		access(account) fun checkFindCuts(_ cutName: String) : Bool {
 			return self.findCuts.containsKey(cutName)
 		}
@@ -1245,7 +1312,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:{String : FindMarketCutStruct.Cuts}, resolver: ((Address) : String?), resolvedAddress: {Address: String}, dapperMerchAddress: Address) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:{String : FindMarketCutStruct.Cuts}, resolver: ((Address) : String?), resolvedAddress: {Address: String}) {
 		let resolved : {Address : String} = resolvedAddress
 
 		fun resolveName(_ addr: Address ) : String? {
@@ -1269,7 +1336,6 @@ pub contract FindMarket {
 
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
-		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 		let soldFor=vault.balance
 		let ftType=vault.getType()
 
@@ -1277,31 +1343,12 @@ pub contract FindMarket {
 		var payInFUT = false
 		var payInDUC = false
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-
-		//TODO: make this switchboard or our profile?
-		var residualAddress = FindMarket.residualAddress
-		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
-			residualAddress = dapperMerchAddress
-			payInFUT = true
-		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
-			residualAddress = dapperMerchAddress
-			payInDUC = true
-		}
-
-		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		let oldProfileCap= getAccount(seller).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let oldProfile = self.getPaymentWallet(oldProfileCap, ftInfo, panicOnFailCheck: true)
 
 		/* Check the total royalty to prevent changing of royalties */
 		let royalties = royalty.getRoyalties()
 
-		//we know the ftReceiver path
-		// valid options
-		// profile with type registered
-		// switchboard with type registered
-		// receiver with that path for the address in the capability
-
-		// what if this is a an switchboard?
-		// what if the path is for a wrong type?
-		// or what if it is forwarder?
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
 
@@ -1320,50 +1367,17 @@ pub contract FindMarket {
 				}
 
 				var receiver = royaltyItem.receiver.address
-
-				// This is set on testnet only to fix testnet doodles creator royalty
-				if FindMarket.account.address == 0x35717efbbce11c74 {
-					if receiver == 0xe03daebed8ca0615 {
-						receiver = 0x4748780c8bf65e19
-					}
-				}
-
 				let name = resolveName(royaltyItem.receiver.address)
-
-				var walletCheck = true
-				var royaltyReceiver : Capability<&{FungibleToken.Receiver}> = royaltyItem.receiver
-				if !royaltyItem.receiver.check() {
-					// if the capability is not valid, royalty cannot be paid
-					walletCheck = false
-				} else if royaltyItem.receiver.borrow()!.isInstance(Type<@Profile.User>()){
-					// if the capability is valid -> it is a User resource -> check if the wallet is set up.
-					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
-					walletCheck = ref.hasWallet(ftType.identifier)
-				//this does not work with forwarders
-				} else if !royaltyItem.receiver.borrow()!.isInstance(ftType){
-					// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
-					walletCheck = false
-				}
-
-				//what if this is true, but the types does not match?
-
-				// what if we want pay in DUC but the royalty vault is /flowTokenReceiver?
-				// if wallet check fails, try to borrow it the standard way
-				if !walletCheck{
-					royaltyReceiver = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
-					walletCheck = royaltyReceiver.check()
-				}
+				let wallet = self.getPaymentWallet(royaltyItem.receiver, ftInfo, panicOnFailCheck: false)
 
 				/* If the royalty receiver check failed */
-				if !walletCheck {
-					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: residualVault.address)
-					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				if wallet.owner!.address == FindMarket.residualAddress {
+					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: wallet.owner!.address)
+					wallet.deposit(from: <- vault.withdraw(amount: cutAmount))
 					continue
 				}
-
-				/* If the royalty receiver check succeed */
 				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-				royaltyReceiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				wallet.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 			if totalRoyalties != saleItem.getTotalRoyalties() {
 				panic("The total Royalties to be paid is changed after listing.")
@@ -1383,6 +1397,60 @@ pub contract FindMarket {
 		}
 
 		oldProfile.deposit(from: <- vault)
+	}
+
+	access(account) fun getPaymentWallet(_ cap: Capability<&{FungibleToken.Receiver}>, _ ftInfo: FTRegistry.FTInfo, panicOnFailCheck: Bool) : &{FungibleToken.Receiver} {
+		var walletCheck = true
+		var tempCap = cap
+
+		// If capability is valid, we do not trust it but will do the below checks
+		if tempCap.check() {
+			let ref = cap.borrow()!
+			let underlyingType = ref.getType()
+			switch underlyingType {
+				// If the underlying matches with the token type, we return the ref
+				case ftInfo.type :
+					return ref
+				// If the underlying is a profile, we check if the wallet type is registered in profile wallet and then return
+				// If it is not registered, it falls through and be handled by residual
+				case Type<@Profile.User>():
+					if let ProfileRef = getAccount(cap.address).getCapability<&{Profile.Public}>(Profile.publicPath).borrow() {
+						if ProfileRef.hasWallet(ftInfo.type.identifier) {
+							return ref
+						}
+					}
+				// If the underlying is a switchboard, we check if the wallet type is registered in switchboard wallet and then return
+				// If it is not registered, it falls through and be handled by residual
+				case Type<@FungibleTokenSwitchboard.Switchboard>() :
+					if let sbRef = getAccount(cap.address).getCapability<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.ReceiverPublicPath).borrow() {
+						if sbRef.getVaultTypes().contains(ftInfo.type) {
+							return ref
+						}
+					}
+				// If the underlying is a tokenforwarder, we cannot verify if it is pointing to the right vault type.
+				// The best we can do is to try borrow from the standard path and TRY deposit
+				case Type<@TokenForwarding.Forwarder>() :
+					tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+					if tempCap.check() {
+						return tempCap.borrow()!
+					}
+			}
+		}
+
+		// if capability is not valid, or if the above cases are fell through, we will try to get one with "standard" path
+		tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		if tempCap.check() {
+			return tempCap.borrow()!
+		}
+
+		if !panicOnFailCheck {
+			// If it all falls throught, these edge cases will be handled by a residual account that has switchboard set up
+			let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+			return residualVault.borrow() ?? panic("Cannot borrow residual vault in address : ".concat(FindMarket.residualAddress.toString()).concat(" type : ").concat(ftInfo.typeIdentifier))
+		}
+
+		let msg = "User ".concat(cap.address.toString()).concat(" does not have any usable links set up for vault type ").concat(ftInfo.typeIdentifier)
+		panic(msg)
 	}
 
 	pub struct NFTInfo {

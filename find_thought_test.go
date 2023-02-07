@@ -19,6 +19,8 @@ func TestFindThought(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
+	otu.setUUID(2000)
+
 	header := "This is header"
 	body := "This is body"
 	tags := []string{"tag1", "tag2", "@find"}

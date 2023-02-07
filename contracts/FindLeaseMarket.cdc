@@ -439,24 +439,14 @@ pub contract FindLeaseMarket {
 
 	}
 
-	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:{String : FindMarketCutStruct.Cuts}, dapperMerchAddress: Address) {
+	access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, leaseInfo: LeaseInfo, cuts:{String : FindMarketCutStruct.Cuts}) {
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
-		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 		let soldFor=vault.balance
 		let ftType=vault.getType()
-
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-
-		var payInDUC = false
-		var residualAddress = FindMarket.residualAddress
-		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
-			residualAddress = dapperMerchAddress
-		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
-			residualAddress = dapperMerchAddress
-			payInDUC = true
-		}
-		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		let oldProfileCap= getAccount(seller).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let oldProfile = FindMarket.getPaymentWallet(oldProfileCap, ftInfo, panicOnFailCheck: true)
 
 		for key in cuts.keys {
 			let allCuts = cuts[key]!

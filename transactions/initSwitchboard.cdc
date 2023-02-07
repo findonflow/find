@@ -10,28 +10,31 @@ transaction(dapperAddress: Address) {
 		let ftCaps : [Capability<&{FungibleToken.Receiver}>] = []
 
 		// setup Token for switchboard
-		let flowReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+		var flowReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		if !flowReceiver.check() {
 			account.link<&FlowToken.Vault{FungibleToken.Receiver}>( /public/flowTokenReceiver, target: /storage/flowTokenVault)
 			account.link<&FlowToken.Vault{FungibleToken.Balance}>( /public/flowTokenBalance, target: /storage/flowTokenVault)
+			flowReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		}
 		ftCaps.append(flowReceiver)
 
-		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+		var fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		if !fusdReceiver.check() {
 			let fusd <- FUSD.createEmptyVault()
 			account.save(<- fusd, to: /storage/fusdVault)
 			account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+			fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		}
 		ftCaps.append(fusdReceiver)
 
-		let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+		var usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
 		if !usdcCap.check() {
 				account.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-        account.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
+				account.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
+				account.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
 				account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+				usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
 		}
 		ftCaps.append(usdcCap)
 
@@ -45,8 +48,8 @@ transaction(dapperAddress: Address) {
 		var checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
 		if checkSB == nil {
 			account.save(<- FungibleTokenSwitchboard.createSwitchboard(), to: FungibleTokenSwitchboard.StoragePath)
-			account.link<&FungibleTokenSwitchboard.Switchboard{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath, target: FungibleTokenSwitchboard.StoragePath)
-			account.link<&FungibleTokenSwitchboard.Switchboard{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath, target: FungibleTokenSwitchboard.StoragePath)
+			account.link<&FungibleTokenSwitchboard.Switchboard{FungibleTokenSwitchboard.SwitchboardPublic, FungibleToken.Receiver}>(FungibleTokenSwitchboard.PublicPath, target: FungibleTokenSwitchboard.StoragePath)
+			account.link<&FungibleTokenSwitchboard.Switchboard{FungibleTokenSwitchboard.SwitchboardPublic, FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath, target: FungibleTokenSwitchboard.StoragePath)
 			checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
 		}
 

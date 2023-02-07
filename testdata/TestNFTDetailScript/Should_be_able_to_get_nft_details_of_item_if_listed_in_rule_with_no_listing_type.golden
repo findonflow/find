@@ -12,7 +12,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -34,7 +34,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -70,7 +70,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -92,7 +92,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -128,7 +128,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -150,7 +150,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -186,7 +186,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -208,7 +208,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -244,7 +244,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -266,7 +266,7 @@
                             "royaltyName": "find"
                         },
                         {
-                            "address": "0x120e725050340cab",
+                            "address": "0xf669cb8d41ce0c74",
                             "cut": 0.05,
                             "findName": "user1",
                             "royaltyName": "creator"
@@ -303,7 +303,7 @@
             "nftId": 603,
             "nftIdentifier": "A.179b6b1cb6755e31.Dandy.NFT",
             "saleType": "active_listed",
-            "seller": "0x120e725050340cab",
+            "seller": "0xf669cb8d41ce0c74",
             "sellerName": "user1"
         }
     },

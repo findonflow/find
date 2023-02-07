@@ -29,7 +29,7 @@ pub struct FINDReport{
 	// This is deprecating, moving to accounts
 	pub let relatedAccounts: { String: [Address]}
 
- pub let lostAndFoundTypes: {String : String}
+ 	pub let lostAndFoundTypes: {String : String}
 	// This is deprecating, moving to accounts
 	// EmeraldID Account Linkage
 	pub let emeraldIDAccounts : {String : Address}

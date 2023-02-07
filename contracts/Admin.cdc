@@ -427,6 +427,14 @@ pub contract Admin {
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
+		pub fun setupSwitchboardCut(tenant: Address) {
+			pre {
+				self.capability != nil: "Cannot create FIND, capability is not set"
+			}
+			let tenant = self.getTenantRef(tenant)
+			tenant.setupSwitchboardCut()
+		}
+
 		/// ===================================================================================
 		// Royalty Residual
 		/// ===================================================================================
