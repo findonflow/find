@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/findonflow/find/findGo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +18,12 @@ func TestFindWearablesSaleFUT(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	setupDapperMarketForWearables(otu, "FUT", 0.025, 0.0)
+	ot := findGo.OverflowUtils{
+		O: otu.O,
+		T: otu.T,
+	}
+
+	ot.UpgradeFindDapperTenantSwitchboard()
 
 	id1 := otu.mintWearables("user1")
 	addNFTCatalog(otu, "user1", id1)
@@ -40,7 +46,7 @@ func TestFindWearablesSaleFUT(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -69,7 +75,11 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	setupDapperMarketForWearables(otu, "DUC", 0.025, 0.0)
+	ot := findGo.OverflowUtils{
+		O: otu.O,
+		T: otu.T,
+	}
+	ot.UpgradeFindDapperTenantSwitchboard()
 
 	id1 := otu.mintWearables("user1")
 	addNFTCatalog(otu, "user1", id1)
@@ -92,7 +102,7 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -126,7 +136,7 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -162,8 +172,6 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	setupDapperMarketForWearables(otu, "DUC", 0.25, 0.0)
-
 	id1 := otu.mintWearables("user1")
 	addNFTCatalog(otu, "user1", id1)
 
@@ -178,7 +186,7 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -205,14 +213,18 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 	t.Run("Should be able to reconstruct the market with different fee structure", func(t *testing.T) {
 
 		resetTenant(otu, "dapper")
-		setupDapperMarketForWearables(otu, "DUC", 0.025, 0.00)
+		ot := findGo.OverflowUtils{
+			O: otu.O,
+			T: otu.T,
+		}
+		ot.UpgradeFindDapperTenantSwitchboard()
 
 		listWearablesForSaleFUT(otu, "user1", id1, price, token)
 
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "dapper"),
+			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -261,63 +273,6 @@ func resetTenant(otu *OverflowTestUtils, tenant string) *OverflowTestUtils {
 	return otu
 }
 
-func setupDapperMarketForWearables(otu *OverflowTestUtils, coin string, findCut, tenantCut float64) *OverflowTestUtils {
-	name := "dapper"
-	// merchAddress := "0x01cf0e2f2f715450"
-	// switch otu.O.Network {
-	// case "testnet":
-	// 	merchAddress = "0x4748780c8bf65e19"
-	// 	name = "find-dapper"
-
-	// case "mainnet":
-	// 	merchAddress = "0x55459409d30274ee"
-	// 	name = "find-dapper"
-	// }
-
-	o := otu.O
-	t := otu.T
-
-	o.Tx("adminSendFlow",
-		WithSigner("find"),
-		WithArg("receiver", name),
-		WithArg("amount", 0.1),
-	).
-		AssertSuccess(t)
-
-	o.Tx("createProfile",
-		WithSigner(name),
-		WithArg("name", name),
-	).
-		AssertSuccess(t)
-
-	o.Tx("setup_find_market_1_dapper",
-		WithSigner(name),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(t)
-
-	o.Tx("setup_find_market_2",
-		WithSigner("find-admin"),
-		WithArg("tenant", name),
-		WithArg("tenantAddress", name),
-		WithArg("findCut", findCut),
-	).
-		AssertSuccess(t)
-	otu.setupInfrastructureCut(name)
-
-	id, err := o.QualifiedIdentifier("Wearables", "NFT")
-	assert.NoError(t, err)
-	o.Tx("tenantsetMarketOptionDapper",
-		WithSigner(name),
-		WithArg("nftName", "Wearables"),
-		WithArg("nftType", id),
-		WithArg("cut", tenantCut),
-	).
-		AssertSuccess(t)
-
-	return otu
-}
-
 func addNFTCatalog(otu *OverflowTestUtils, user string, id uint64) *OverflowTestUtils {
 
 	contractAddress := "0xf8d6e0586b0a20c7"
@@ -353,7 +308,7 @@ func listWearablesForSaleFUT(otu *OverflowTestUtils, name string, id uint64, pri
 
 	res := otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
-		WithArg("marketplace", "dapper"),
+		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", token),

@@ -12,32 +12,31 @@ type OverflowUtils struct {
 	O *OverflowState
 }
 
-func (ot *OverflowUtils) upgradeFindDapperTenantSwitchboard() *OverflowUtils {
+func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 
 	o := ot.O
 	findCut := 0.025
 	tenantCut := 0.00
+
+	name := "find"
+	merchAddress := "0x01cf0e2f2f715450"
+	switch o.Network {
+	case "testnet":
+		merchAddress = "0x4748780c8bf65e19"
+
+	case "mainnet":
+		merchAddress = "0x55459409d30274ee"
+	}
+
 	infrastructureCut := []FindMarketCutStruct_ThresholdCut{
 		{
 			Name:           "dapper",
-			Address:        o.Address("dapper"),
+			Address:        merchAddress,
 			Cut:            0.01,
 			Description:    "Dapper takes 0.01% or 0.44 dollars, whichever is higher",
 			PublicPath:     "dapperUtilityCoinReceiver",
 			MinimumPayment: 0.44,
 		},
-	}
-
-	name := "dapper"
-	merchAddress := "0x01cf0e2f2f715450"
-	switch o.Network {
-	case "testnet":
-		merchAddress = "0x4748780c8bf65e19"
-		name = "find-dapper"
-
-	case "mainnet":
-		merchAddress = "0x55459409d30274ee"
-		name = "find-dapper"
 	}
 
 	// setup switchboard for tenant
