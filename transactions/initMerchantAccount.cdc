@@ -40,7 +40,7 @@ transaction(dapperMerchantAccountAddress: Address) {
 		}
 
 		//Dapper utility token
-	  let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		if !dapperDUCReceiver.check(){
 			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
 			acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
@@ -48,7 +48,7 @@ transaction(dapperMerchantAccountAddress: Address) {
 		}
 
 		//FlowUtility token
-	  let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 		if !dapperFUTReceiver.check(){
 			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
 			acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
@@ -65,8 +65,8 @@ transaction(dapperMerchantAccountAddress: Address) {
 		acct.save(<- switchboard, to: FungibleTokenSwitchboard.StoragePath)
 		acct.link<&FungibleTokenSwitchboard.Switchboard{FungibleToken.Receiver}>( FungibleTokenSwitchboard.ReceiverPublicPath, target: FungibleTokenSwitchboard.StoragePath)
 		acct.link<&FungibleTokenSwitchboard.Switchboard{FungibleTokenSwitchboard.SwitchboardPublic, FungibleToken.Receiver}>(
-		    FungibleTokenSwitchboard.PublicPath,
-		    target: FungibleTokenSwitchboard.StoragePath
+			FungibleTokenSwitchboard.PublicPath,
+			target: FungibleTokenSwitchboard.StoragePath
 		)
 	}
 }
