@@ -6,7 +6,7 @@ transaction() {
 	prepare(account: AuthAccount) {
 		// Get all the saleItems Id
 
-		let tenant = FindMarket.getTenant(FindMarket.getTenantAddress("findLease")!)
+		let tenant = FindMarket.getTenant(FindMarket.getFindTenantAddress())
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketSale.SaleItem>())
 		let cap = FindLeaseMarket.getSaleItemCollectionCapability(tenantRef: tenant, marketOption: marketOption, address: account.address)
 		let ref = cap.borrow() ?? panic("Cannot borrow reference to the capability.")

@@ -865,6 +865,7 @@ func TestFindPack(t *testing.T) {
 	otu.registerFtInRegistry()
 
 	find := otu.O.Address("find-admin")
+	otu.createUser(100.0, "find-admin")
 
 	t.Run("Should be able to register pack data with 2 NFT Types", func(t *testing.T) {
 

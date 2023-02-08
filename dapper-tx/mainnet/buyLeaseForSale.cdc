@@ -24,7 +24,7 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
             panic("address does not resolve to seller")
         }
 
-        let leaseMarketplace = FindMarket.getTenantAddress("findLease") ?? panic("Cannot find findLease tenant")
+        let leaseMarketplace = FindMarket.getFindTenantAddress()
         let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for findLease")
 
         self.to= account.address

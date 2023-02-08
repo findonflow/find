@@ -85,7 +85,7 @@ func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
 func (otu *OverflowTestUtils) setupMarketAndDandyDapper() uint64 {
 	t := otu.T
 
-	otu.setupDapper().
+	otu.setupFIND().
 		createDapperUser("user1").
 		registerDapperUser("user1")
 
@@ -177,10 +177,9 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 		WithArg("findCut", 0.025),
 	).AssertSuccess(otu.T)
 
-	otu.setupInfrastructureCut("find")
+	otu.setupInfrastructureCut()
 
 	otu.createUser(100.0, "find")
-	otu.createUser(100.0, "find-admin")
 
 	//link in the server in the versus client
 	otu.O.Tx("devSetResidualAddress",
@@ -213,28 +212,25 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	return otu.tickClock(1.0)
 }
 
-func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
+func (otu *OverflowTestUtils) setupOneFootball() *OverflowTestUtils {
 	//first step create the adminClient as the fin user
 
-	findSigner := WithSigner("find-admin")
-	saSigner := WithSigner("find")
-
-	otu.O.Tx("setup_fin_1_create_client", findSigner).
+	otu.O.Tx("setup_fin_1_create_client", findAdminSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//link in the server in the versus client
 	otu.O.Tx("setup_fin_2_register_client",
-		saSigner,
+		findSigner,
 		WithArg("ownerAddress", "find-admin"),
 	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	//set up fin network as the fin user
-	otu.O.Tx("setup_fin_3_create_network", findSigner).
+	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	otu.O.Tx(
 		"initSwitchboard",
-		saSigner,
+		WithSigner("find"),
 		WithArg("dapperAddress", "dapper"),
 	).
 		AssertSuccess(otu.T)
@@ -247,14 +243,14 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 
 	//link in the server in the versus client
 	otu.O.Tx("setup_find_dapper_market",
-		findSigner,
+		findAdminSigner,
 		WithArg("adminAddress", "find"),
 		WithArg("tenantAddress", "find"),
 		WithArg("tenant", "onefootball"),
 		WithArg("findCut", 0.025),
 	).AssertSuccess(otu.T)
 
-	otu.setupInfrastructureCut("dapper")
+	otu.setupInfrastructureCut()
 
 	otu.createDapperUser("find")
 
@@ -270,6 +266,16 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 		WithArg("dapperAddress", "dapper"),
 	).
 		AssertSuccess(otu.T)
+
+	// setup find forge
+	otu.O.Tx("setup_find_forge_1", WithSigner("find-forge")).
+		AssertSuccess(otu.T).AssertNoEvents(otu.T)
+
+	//link in the server in the versus client
+	otu.O.Tx("setup_find_forge_2",
+		findSigner,
+		WithArg("ownerAddress", "find-forge"),
+	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
 	return otu.tickClock(1.0)
 }
@@ -371,6 +377,8 @@ func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
 	expireTime := otu.currentTime() + leaseDurationFloat
 
 	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
+
+	otu.createUser(1000.0, "find-admin")
 
 	otu.O.Tx("register",
 		WithSigner("find-admin"),
@@ -1863,7 +1871,7 @@ func (otu *OverflowTestUtils) setFlowLeaseMarketOption() *OverflowTestUtils {
 	id, err := otu.O.QualifiedIdentifier("FIND", "Lease")
 	assert.NoError(otu.T, err)
 	otu.O.Tx("tenantsetLeaseOptionDapper",
-		WithSigner("find-lease"),
+		WithSigner("find"),
 		WithArg("nftName", "Lease"),
 		WithArg("nftType", id),
 		WithArg("cut", 0.0),
@@ -1887,7 +1895,7 @@ func (otu *OverflowTestUtils) alterMarketOption(ruleName string) *OverflowTestUt
 func (otu *OverflowTestUtils) alterMarketOptionDapper(ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterMarketOptionDapper",
-		WithSigner("dapper"),
+		WithSigner("find"),
 		WithArg("action", ruleName),
 	).
 		AssertSuccess(otu.T)
@@ -1898,7 +1906,7 @@ func (otu *OverflowTestUtils) alterMarketOptionDapper(ruleName string) *Overflow
 func (otu *OverflowTestUtils) alterLeaseMarketOption(ruleName string) *OverflowTestUtils {
 
 	otu.O.Tx("devAlterLeaseMarketOption",
-		WithSigner("find-lease"),
+		WithSigner("find"),
 		WithArg("action", ruleName),
 	).
 		AssertSuccess(otu.T)
@@ -1952,7 +1960,7 @@ func (otu *OverflowTestUtils) setFindCut(cut float64) *OverflowTestUtils {
 
 // 	otu.O.Tx("adminSetFindCut",
 // 		WithSigner("find-admin"),
-// 		WithArg("tenant", "find-lease"),
+// 		WithArg("tenant", "find"),
 // 		WithArg("saleItemName", "findFutRoyalty"),
 // 		WithArg("cut", cut),
 // 	).
@@ -2103,7 +2111,7 @@ func (otu *OverflowTestUtils) profileBan(user string) *OverflowTestUtils {
 func (otu *OverflowTestUtils) leaseProfileBan(user string) *OverflowTestUtils {
 
 	otu.O.Tx("adminSetProfileBan",
-		WithSigner("find-lease"),
+		WithSigner("find"),
 		WithArg("user", user),
 	).
 		AssertSuccess(otu.T)
@@ -2125,7 +2133,7 @@ func (otu *OverflowTestUtils) removeProfileBan(user string) *OverflowTestUtils {
 func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUtils {
 
 	otu.O.Tx("adminRemoveProfileBan",
-		WithSigner("find-lease"),
+		WithSigner("find"),
 		WithArg("user", user),
 	).
 		AssertSuccess(otu.T)
@@ -2227,7 +2235,7 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 	id, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
 	assert.NoError(otu.T, err)
 	otu.O.Tx("tenantsetMarketOptionDapper",
-		WithSigner("dapper"),
+		WithSigner("find"),
 		WithArg("nftName", "ExampleNFT"),
 		WithArg("nftType", id),
 		WithArg("cut", 0.0),
@@ -2353,14 +2361,14 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 			"leaseName":   name,
 			"address":     otu.O.Address("find"),
 			"royaltyName": "find",
-			"tenant":      "findLease",
+			"tenant":      "find",
 		}).
 		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
 			"amount":      dapperAmount,
 			"leaseName":   name,
 			"address":     otu.O.Address("dapper"),
 			"royaltyName": "dapper",
-			"tenant":      "findLease",
+			"tenant":      "find",
 		})
 
 	return otu
@@ -3177,12 +3185,12 @@ func (otu *OverflowTestUtils) mintRoyaltylessNFT(user string) (uint64, error) {
 
 }
 
-func (otu *OverflowTestUtils) setupInfrastructureCut(tenant string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) setupInfrastructureCut() *OverflowTestUtils {
 	id, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
 	assert.NoError(otu.T, err)
 	otu.O.Tx(
 		"tenantsetExtraCut",
-		WithSigner(tenant),
+		WithSigner("find"),
 		WithArg("ftTypes", []string{id}),
 		WithArg("category", "infrastructure"),
 		WithArg("cuts", []findGo.FindMarketCutStruct_ThresholdCut{

@@ -11,7 +11,7 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 	otu := NewOverflowTest(t)
 
-	otu.setupDapper().
+	otu.setupOneFootball().
 		setupDandy("user1").
 		createUser(100.0, "user2").
 		registerUser("user2").

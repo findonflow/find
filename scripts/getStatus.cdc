@@ -139,9 +139,11 @@ pub fun main(user: String) : Report? {
 			let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
 			let find= FindMarket.getFindTenantAddress()
-			let findLease= FindMarket.getTenantAddress("findLease")!
+			let findLease= FindMarket.getFindTenantAddress()
 			var items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
 
+			// This code is deprecating, switching to find tenant
+			// But it doesn't hurt to be here at the moment, as long as the user does have items in find / does not have item in find_dapper
 			if items.length == 0 {
 				if let findDapper= FindMarket.getTenantAddress("find_dapper") {
 					items = FindMarket.getSaleItemReport(tenant:findDapper, address: address, getNFTInfo:true)
@@ -150,6 +152,8 @@ pub fun main(user: String) : Report? {
 
 			var marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
+			// This code is deprecating, switching to find tenant
+			// But it doesn't hurt to be here at the moment, as long as the user does have items in find / does not have item in find_dapper
 			if marketBids.length == 0 {
 				if let findDapper = FindMarket.getTenantAddress("find_dapper") {
 					marketBids = FindMarket.getBidsReport(tenant:findDapper, address: address, getNFTInfo:true)

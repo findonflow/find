@@ -386,22 +386,22 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find",
-				"tenant":      "onefootball",
+				"tenant":      "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
-				"amount":      0.65,
+				"amount":      0.5,
 				"findName":    "user1",
 				"id":          id,
 				"royaltyName": "creator",
-				"tenant":      "onefootball",
+				"tenant":      "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("find"),
-				"amount":      0.65,
+				"amount":      0.25,
 				"id":          id,
 				"royaltyName": "find forge",
-				"tenant":      "onefootball",
+				"tenant":      "find",
 			})
 
 		otu.sendDandy("user1", "user2", id)
@@ -431,7 +431,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	// 			"amount":      0.35,
 	// 			"id":          id,
 	// 			"royaltyName": "find",
-	// 			"tenant":      "onefootball",
+	// 			"tenant":      "find",
 	// 		}).
 	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 	// 			"address":     otu.O.Address("user1"),
@@ -439,14 +439,14 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	// 			"findName":    "user1",
 	// 			"id":          id,
 	// 			"royaltyName": "creator",
-	// 			"tenant":      "onefootball",
+	// 			"tenant":      "find",
 	// 		}).
 	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 	// 			"address":     otu.O.Address("find"),
 	// 			"amount":      0.65,
 	// 			"id":          id,
 	// 			"royaltyName": "find forge",
-	// 			"tenant":      "onefootball",
+	// 			"tenant":      "find",
 	// 		})
 
 	// 	otu.sendDandy("user1", "user2", id)

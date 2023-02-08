@@ -5,10 +5,10 @@ transaction(leaseName: String) {
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 
 	prepare(account: AuthAccount) {
-		let marketplace = FindMarket.getTenantAddress("findLease")!
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) 
+		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: storagePath)
 	}
 
 	pre{

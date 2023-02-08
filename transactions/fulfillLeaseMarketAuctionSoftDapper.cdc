@@ -13,7 +13,7 @@ transaction(leaseName: String, amount:UFix64) {
 	let balanceBeforeTransfer: UFix64
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
-		let marketplace = FindMarket.getTenantAddress("findLease")!
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
@@ -23,7 +23,7 @@ transaction(leaseName: String, amount:UFix64) {
 		let item = FindLeaseMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, name: leaseName)
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-	
+
 		self.mainDapperCoinVault = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("Cannot borrow Dapper Coin vault from account storage. Type : ".concat(ft.type.identifier))
 		self.balanceBeforeTransfer = self.mainDapperCoinVault.balance
 
@@ -37,7 +37,7 @@ transaction(leaseName: String, amount:UFix64) {
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
+		let vault <- self.walletReference.withdraw(amount: amount)
 		self.bidsReference.fulfillAuction(name: leaseName, vault: <- vault)
 	}
 

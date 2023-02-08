@@ -331,14 +331,14 @@ func TestLeaseMarketSale(t *testing.T) {
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("dapper"),
 				"amount":      0.44,
 				"leaseName":   "name1",
 				"royaltyName": "dapper",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			})
 
 		otu.cancelAllLeaseForSale("user1").
@@ -362,14 +362,14 @@ func TestLeaseMarketSale(t *testing.T) {
 				"amount":      2.5,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("dapper"),
 				"amount":      1.0,
 				"leaseName":   "name1",
 				"royaltyName": "dapper",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			})
 
 		otu.cancelAllLeaseForSale("user1").
@@ -395,7 +395,7 @@ func TestLeaseMarketSale(t *testing.T) {
 	// 			"amount":      1.0,
 	// 			"leaseName":   "name1",
 	// 			"royaltyName": "find",
-	// 			"tenant":      "findLease",
+	// 			"tenant":      "find",
 	// 		})
 
 	// 	otu.cancelAllLeaseForSale("user1").

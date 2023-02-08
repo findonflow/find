@@ -7,7 +7,7 @@ import Profile from 0x097bafa4e0b48eef
 import FindMarket from 0x097bafa4e0b48eef
 import FindMarketDirectOfferSoft from 0x097bafa4e0b48eef
 import DapperUtilityCoin from 0xead892083b3e2c6c
-import FlowUtilityToken from 0xead892083b3e2c6c 
+import FlowUtilityToken from 0xead892083b3e2c6c
 import FindLeaseMarketDirectOfferSoft from 0x097bafa4e0b48eef
 import FindLeaseMarket from 0x097bafa4e0b48eef
 
@@ -67,18 +67,18 @@ transaction(name: String) {
         let dosSaleType= Type<@FindMarketDirectOfferSoft.SaleItemCollection>()
         let dosSalePublicPath=FindMarket.getPublicPath(dosSaleType, name: tenant.name)
         let dosSaleStoragePath= FindMarket.getStoragePath(dosSaleType, name:tenant.name)
-        let dosSaleCap= account.getCapability<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(dosSalePublicPath) 
+        let dosSaleCap= account.getCapability<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(dosSalePublicPath)
         if !dosSaleCap.check() {
             account.save<@FindMarketDirectOfferSoft.SaleItemCollection>(<- FindMarketDirectOfferSoft.createEmptySaleItemCollection(tenantCapability), to: dosSaleStoragePath)
             account.link<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(dosSalePublicPath, target: dosSaleStoragePath)
         }
 
-        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getTenantAddress("findLease")!)!
+        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
 
         let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
         let leaseDOSPublicPath=FindMarket.getPublicPath(leaseDOSSaleItemType, name: "findLease")
         let leaseDOSStoragePath= FindMarket.getStoragePath(leaseDOSSaleItemType, name:"findLease")
-        let leaseDOSSaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath) 
+        let leaseDOSSaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath)
         if !leaseDOSSaleItemCap.check() {
             //The link here has to be a capability not a tenant, because it can change.
             account.save<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseDOSStoragePath)

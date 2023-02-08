@@ -14,7 +14,7 @@ transaction(leaseName: String) {
 
 	prepare(account: AuthAccount) {
 
-		let marketplace = FindMarket.getTenantAddress("findLease")!
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
 		self.market = account.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
@@ -27,5 +27,5 @@ transaction(leaseName: String) {
 	execute {
 		self.market.acceptOffer(self.pointer)
 	}
-	
+
 }

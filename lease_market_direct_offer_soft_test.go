@@ -383,7 +383,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			})
 
 		otu.moveNameTo("user2", "user1", "name1")
@@ -411,7 +411,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 	// 			"amount":      0.25,
 	// 			"leaseName":   "name1",
 	// 			"royaltyName": "find",
-	// 			"tenant":      "findLease",
+	// 			"tenant":      "find",
 	// 		})
 
 	// 	otu.moveNameTo("user2", "user1", "name1")

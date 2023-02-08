@@ -28,7 +28,7 @@ transaction(tenantAddress: Address) {
 		)
 
 		//We create a tenant that has both auctions and direct offers
-		let tenantCap= adminClient.createFindMarket(name: "findLease", address: tenantAddress, findCutSaleItem: saleItem)
+		let tenantCap= adminClient.createFindMarket(name: "find", address: tenantAddress, findCutSaleItem: saleItem)
 
 		let tenantAccount=getAccount(tenantAddress)
 		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!

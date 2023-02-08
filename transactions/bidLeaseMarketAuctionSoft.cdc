@@ -8,7 +8,7 @@ import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.
 
 transaction(leaseName: String, amount: UFix64) {
 
-	let saleItemsCap: Capability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}> 
+	let saleItemsCap: Capability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}>
 	let walletReference : &FungibleToken.Vault
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let balanceBeforeBid: UFix64
@@ -20,15 +20,15 @@ transaction(leaseName: String, amount: UFix64) {
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}
 		let address = resolveAddress!
 
-		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+		let leaseMarketplace = FindMarket.getFindTenantAddress()
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let leaseASBidType= Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>()
-		let leaseASBidPublicPath=FindMarket.getPublicPath(leaseASBidType, name: "findLease")
-		let leaseASBidStoragePath= FindMarket.getStoragePath(leaseASBidType, name: "findLease")
-		let leaseASBidCap= account.getCapability<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath) 
+		let leaseASBidPublicPath=leaseTenant.getPublicPath(leaseASBidType)
+		let leaseASBidStoragePath= leaseTenant.getStoragePath(leaseASBidType)
+		let leaseASBidCap= account.getCapability<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath)
 		if !leaseASBidCap.check() {
 			account.save<@FindLeaseMarketAuctionSoft.MarketBidCollection>(<- FindLeaseMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseASBidStoragePath)
 			account.link<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath, target: leaseASBidStoragePath)
@@ -40,7 +40,7 @@ transaction(leaseName: String, amount: UFix64) {
 		let item = FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-		
+
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))
 		self.ftVaultType = ft.type
 
