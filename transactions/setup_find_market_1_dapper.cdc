@@ -3,6 +3,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
 //Transaction that is signed by find to create a find market tenant for find
@@ -41,6 +42,20 @@ transaction(dapperAddress: Address) {
 		ftCaps.append(usdcCap)
 
 		let dapper=getAccount(dapperAddress)
+		let selfDucReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		if !selfDucReceiver.check() {
+			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
+			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
+			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinVault)
+		}
+
+		let selfFutReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if !selfFutReceiver.check() {
+			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver))
+			account.save(<-futForwarder, to: /storage/flowUtilityTokenVault)
+			account.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver,target: /storage/flowUtilityTokenVault)
+		}
+
 		let ducReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		ftCaps.append(ducReceiver)
 		let futReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
