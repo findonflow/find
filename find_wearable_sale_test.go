@@ -381,27 +381,27 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 
 }
 
-func resetTenant(otu *OverflowTestUtils, tenant string) *OverflowTestUtils {
+// func resetTenant(otu *OverflowTestUtils, tenant string) *OverflowTestUtils {
 
-	otu.O.Tx(
-		"remove_find_market_1",
-		WithSigner("find-admin"),
-		WithArg("tenant", tenant),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "TenantRemoved", map[string]interface{}{
-			"tenant":  "dapper",
-			"address": otu.O.Address(tenant),
-		})
+// 	otu.O.Tx(
+// 		"remove_find_market_1",
+// 		WithSigner("find-admin"),
+// 		WithArg("tenant", tenant),
+// 	).
+// 		AssertSuccess(otu.T).
+// 		AssertEvent(otu.T, "TenantRemoved", map[string]interface{}{
+// 			"tenant":  "dapper",
+// 			"address": otu.O.Address(tenant),
+// 		})
 
-	otu.O.Tx(
-		"remove_find_market_2",
-		WithSigner(tenant),
-	).
-		AssertSuccess(otu.T)
+// 	otu.O.Tx(
+// 		"remove_find_market_2",
+// 		WithSigner(tenant),
+// 	).
+// 		AssertSuccess(otu.T)
 
-	return otu
-}
+// 	return otu
+// }
 
 func addNFTCatalog(otu *OverflowTestUtils, user string, id uint64) *OverflowTestUtils {
 

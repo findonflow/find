@@ -2399,36 +2399,6 @@ func (otu *OverflowTestUtils) registerDUCInRegistry() *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, price float64) []uint64 {
-	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
-	assert.NoError(otu.T, err)
-
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
-	assert.NoError(otu.T, err)
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
-	assert.NoError(otu.T, err)
-
-	res := otu.O.Tx("listNFTForAuctionSoftDapper",
-		WithSigner(name),
-		WithArg("marketplace", "find"),
-		WithArg("nftAliasOrIdentifier", nftIden),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", ftIden),
-		WithArg("price", price),
-		WithArg("auctionReservePrice", price+5.0),
-		WithArg("auctionDuration", 300.0),
-		WithArg("auctionExtensionOnLateBid", 60.0),
-		WithArg("minimumBidIncrement", 1.0),
-		WithArg("auctionValidUntil", otu.currentTime()+10.0),
-	).
-		AssertSuccess(otu.T).
-		GetIdsFromEvent(eventIden, "id")
-
-	return res
-
-}
-
 func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, price float64) *OverflowTestUtils {
 
 	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
@@ -2449,57 +2419,6 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, pric
 
 	return otu
 
-}
-
-func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint64, price float64) []uint64 {
-
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
-	assert.NoError(otu.T, err)
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
-	assert.NoError(otu.T, err)
-
-	res := otu.O.Tx("listNFTForAuctionSoft",
-		WithSigner(name),
-		WithArg("marketplace", "find"),
-		WithArg("nftAliasOrIdentifier", nftIden),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "DUC"),
-		WithArg("price", price),
-		WithArg("auctionReservePrice", price+5.0),
-		WithArg("auctionDuration", 300.0),
-		WithArg("auctionExtensionOnLateBid", 60.0),
-		WithArg("minimumBidIncrement", 1.0),
-		WithArg("auctionValidUntil", otu.currentTime()+10.0),
-	).
-		AssertSuccess(otu.T).
-		GetIdsFromEvent(eventIden, "id")
-
-	return res
-
-}
-
-func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string, id uint64, price float64) *OverflowTestUtils {
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
-	assert.NoError(otu.T, err)
-
-	otu.O.Tx("bidMarketAuctionSoftDapper",
-		WithSigner(name),
-		WithArg("marketplace", "find"),
-		WithArg("user", seller),
-		WithArg("id", id),
-		WithArg("amount", price),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"amount": price,
-			"id":     id,
-			"buyer":  otu.O.Address(name),
-			"status": "active_ongoing",
-		})
-
-	return otu
 }
 
 func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name string, price float64) *OverflowTestUtils {
@@ -2540,29 +2459,6 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name
 			"buyer":     otu.O.Address(user),
 			"amount":    price,
 			"status":    "sold",
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64, price float64) *OverflowTestUtils {
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
-	assert.NoError(otu.T, err)
-
-	otu.O.Tx("fulfillMarketAuctionSoftDapper",
-		WithSigner(name),
-		WithPayloadSigner("dapper"),
-		WithArg("marketplace", "find"),
-		WithArg("id", id),
-		WithArg("amount", price),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"id":     id,
-			"buyer":  otu.O.Address(name),
-			"amount": price,
-			"status": "sold",
 		})
 
 	return otu
