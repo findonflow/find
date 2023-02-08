@@ -3,7 +3,6 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
 transaction(dapperAddress: Address) {
