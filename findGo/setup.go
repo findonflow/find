@@ -47,14 +47,6 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 	)
 	ot.assertTrxn(res)
 
-	// setup switchboard for find
-	res = o.Tx(
-		"initSwitchboard",
-		WithSigner("find"),
-		WithArg("dapperAddress", merchAddress),
-	)
-	ot.assertTrxn(res)
-
 	res = o.Tx(
 		"adminsetupSwitchboardCut",
 		WithSigner("find-admin"),

@@ -156,13 +156,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	otu.O.Tx(
-		"initSwitchboard",
-		WithSigner("find"),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
 	otu.O.Tx("setup_find_market_1_dapper",
 		findSigner,
 		WithArg("dapperAddress", "dapper"),
@@ -227,13 +220,6 @@ func (otu *OverflowTestUtils) setupOneFootball() *OverflowTestUtils {
 	//set up fin network as the fin user
 	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	otu.O.Tx(
-		"initSwitchboard",
-		WithSigner("find"),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
 
 	otu.O.Tx("setup_find_market_1_dapper",
 		findSigner,
