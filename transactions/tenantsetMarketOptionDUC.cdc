@@ -1,9 +1,9 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
+import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
+import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
@@ -24,9 +24,9 @@ transaction(nftName: String, nftType: String, cut: UFix64){
 			FindMarket.TenantRule(
 				name: "Soft",
 				types:[
-					Type<@FindMarketSale.SaleItem>(),
-					Type<@FindMarketAuctionSoft.SaleItem>(),
-					Type<@FindMarketDirectOfferSoft.SaleItem>()
+					Type<@FindLeaseMarketSale.SaleItem>(),
+					Type<@FindLeaseMarketAuctionSoft.SaleItem>(),
+					Type<@FindLeaseMarketDirectOfferSoft.SaleItem>()
 				],
 				ruleType: "listing",
 				allow:true

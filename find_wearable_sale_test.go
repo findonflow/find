@@ -164,6 +164,8 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 
 func TestFindWearablesSaleResetMarket(t *testing.T) {
 
+	// This test aims to mimic how we switch from market items now to new find market structure
+
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createDapperUser("user1").
@@ -172,61 +174,38 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 		createWearableUser("user2").
 		registerDUCInRegistry()
 
-	id1 := otu.mintWearables("user1")
-	addNFTCatalog(otu, "user1", id1)
-
+	otu.setFlowDandyMarketOption("dapper")
 	price := 10.0
 
 	token, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
 	assert.NoError(t, err)
 
+	dandyIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
+	assert.NoError(otu.T, err)
+
+	otu.registerDapperUser("user1")
+	otu.buyForgeDapper("user1")
+	dandy := otu.mintThreeExampleDandies()[0]
+	otu.registerDandyInNFTRegistry()
+
 	t.Run("Should be able to trade in a differently set up market", func(t *testing.T) {
-		listWearablesForSaleFUT(otu, "user1", id1, price, token)
-
-		otu.O.Tx("buyNFTForSaleDapper",
-			WithSigner("user2"),
-			WithPayloadSigner("dapper"),
+		otu.O.Tx("listNFTForSaleDapper",
+			WithSigner("user1"),
 			WithArg("marketplace", "find"),
-			WithArg("address", "user1"),
-			WithArg("id", id1),
-			WithArg("amount", price),
+			WithArg("nftAliasOrIdentifier", dandyIden),
+			WithArg("id", dandy),
+			WithArg("ftAliasOrIdentifier", token),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
 		).
-			AssertSuccess(otu.T).
-			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
-				map[string]interface{}{
-					"address":     otu.O.Address("find"),
-					"amount":      2.5,
-					"royaltyName": "find",
-					"vaultType":   token,
-				}).
-			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
-				map[string]interface{}{
-					"address":     otu.O.Address("dapper"),
-					"amount":      0.44,
-					"royaltyName": "dapper",
-					"vaultType":   token,
-				})
-
-		sendWearables(otu, "user1", "user2", id1)
-	})
-
-	t.Run("Should be able to reconstruct the market with different fee structure", func(t *testing.T) {
-
-		resetTenant(otu, "dapper")
-		ot := findGo.OverflowUtils{
-			O: otu.O,
-			T: otu.T,
-		}
-		ot.UpgradeFindDapperTenantSwitchboard()
-
-		listWearablesForSaleFUT(otu, "user1", id1, price, token)
+			AssertSuccess(otu.T)
 
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
 			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
-			WithArg("id", id1),
+			WithArg("id", dandy),
 			WithArg("amount", price),
 		).
 			AssertSuccess(otu.T).
@@ -245,7 +224,158 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 					"vaultType":   token,
 				})
 
-		sendWearables(otu, "user1", "user2", id1)
+	})
+
+	wearable := otu.mintWearables("user1")
+	addNFTCatalog(otu, "user1", wearable)
+
+	ot := findGo.OverflowUtils{
+		O: otu.O,
+		T: otu.T,
+	}
+	ot.UpgradeFindDapperTenantSwitchboard()
+
+	dandy = otu.mintThreeExampleDandies()[0]
+	t.Run("Should still be able to trade original NFTs after the upgrade", func(t *testing.T) {
+		otu.O.Tx("listNFTForSaleDapper",
+			WithSigner("user1"),
+			WithArg("marketplace", "find"),
+			WithArg("nftAliasOrIdentifier", dandyIden),
+			WithArg("id", dandy),
+			WithArg("ftAliasOrIdentifier", token),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(otu.T)
+
+		otu.O.Tx("buyNFTForSaleDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("address", "user1"),
+			WithArg("id", dandy),
+			WithArg("amount", price),
+		).
+			AssertSuccess(otu.T).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("find"),
+					"amount":      0.25,
+					"royaltyName": "find",
+					"vaultType":   token,
+				}).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("dapper"),
+					"amount":      0.44,
+					"royaltyName": "dapper",
+					"vaultType":   token,
+				})
+
+	})
+
+	t.Run("Should be able to sell wearables in DUC with different fee structure", func(t *testing.T) {
+
+		listWearablesForSaleFUT(otu, "user1", wearable, price, token)
+
+		otu.O.Tx("buyNFTForSaleDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("address", "user1"),
+			WithArg("id", wearable),
+			WithArg("amount", price),
+		).
+			AssertSuccess(otu.T).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("find"),
+					"amount":      0.25,
+					"royaltyName": "find",
+					"vaultType":   token,
+				}).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("dapper"),
+					"amount":      0.44,
+					"royaltyName": "dapper",
+					"vaultType":   token,
+				})
+
+		sendWearables(otu, "user1", "user2", wearable)
+
+	})
+
+	t.Run("Should be able to sell wearables in FUT with different fee structure", func(t *testing.T) {
+		token, err := otu.O.QualifiedIdentifier("FlowUtilityToken", "Vault")
+		assert.NoError(t, err)
+		listWearablesForSaleFUT(otu, "user1", wearable, price, token)
+
+		otu.O.Tx("buyNFTForSaleDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("dapper"),
+			WithArg("marketplace", "find"),
+			WithArg("address", "user1"),
+			WithArg("id", wearable),
+			WithArg("amount", price),
+		).
+			AssertSuccess(otu.T).
+			AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("find"),
+					"amount":      0.25,
+					"royaltyName": "find",
+					"vaultType":   token,
+				})
+
+		sendWearables(otu, "user1", "user2", wearable)
+
+	})
+
+	t.Run("Should be able to list and buy lease in the market with different fee structure", func(t *testing.T) {
+
+		otu.registerDapperUserWithName("user1", "name1")
+
+		ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+		assert.NoError(otu.T, err)
+
+		otu.O.Tx("listLeaseForSaleDapper",
+			WithSigner("user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("ftAliasOrIdentifier", ftIden),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).
+			AssertSuccess(otu.T)
+
+	})
+
+	t.Run("Should be able to list and buy lease in the market with different fee structure", func(t *testing.T) {
+
+		otu.listLeaseForSaleDUC("user1", "name1", price)
+
+		otu.O.Tx("buyLeaseForSaleDapper",
+			WithSigner("user2"),
+			WithPayloadSigner("dapper"),
+			WithArg("sellerAccount", "user1"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", price),
+		).
+			AssertSuccess(otu.T).
+			AssertEvent(otu.T, "FindLeaseMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("find"),
+					"amount":      0.25,
+					"royaltyName": "find",
+					"vaultType":   token,
+				}).
+			AssertEvent(otu.T, "FindLeaseMarket.RoyaltyPaid",
+				map[string]interface{}{
+					"address":     otu.O.Address("dapper"),
+					"amount":      0.44,
+					"royaltyName": "dapper",
+					"vaultType":   token,
+				})
 
 	})
 

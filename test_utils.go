@@ -179,24 +179,8 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 
 	otu.setupInfrastructureCut("find")
 
-	// Setup Lease Market
-	otu.O.Tx("setup_find_market_1_dapper",
-		WithSigner("find-lease"),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
-	//link in the server in the client
-	otu.O.Tx("setup_find_lease_market_2",
-		findAdminSigner,
-		WithArg("tenantAddress", "find-lease"),
-	).AssertSuccess(otu.T)
-
-	otu.setupInfrastructureCut("find-lease")
-
 	otu.createUser(100.0, "find")
 	otu.createUser(100.0, "find-admin")
-	otu.createUser(100.0, "find-lease")
 
 	//link in the server in the versus client
 	otu.O.Tx("devSetResidualAddress",
@@ -232,7 +216,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 	//first step create the adminClient as the fin user
 
-	dapperSigner := WithSigner("dapper")
 	findSigner := WithSigner("find-admin")
 	saSigner := WithSigner("find")
 
@@ -257,7 +240,7 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 		AssertSuccess(otu.T)
 
 	otu.O.Tx("setup_find_market_1_dapper",
-		dapperSigner,
+		findSigner,
 		WithArg("dapperAddress", "dapper"),
 	).
 		AssertSuccess(otu.T)
@@ -265,7 +248,7 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 	//link in the server in the versus client
 	otu.O.Tx("setup_find_dapper_market",
 		findSigner,
-		WithArg("adminAddress", "dapper"),
+		WithArg("adminAddress", "find"),
 		WithArg("tenantAddress", "find"),
 		WithArg("tenant", "onefootball"),
 		WithArg("findCut", 0.025),
@@ -273,24 +256,7 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 
 	otu.setupInfrastructureCut("dapper")
 
-	// Setup Lease Market
-	otu.O.Tx("setup_find_market_1_dapper",
-		WithSigner("find-lease"),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
-	//link in the server in the client
-	//TODO: need to use _dapper method and send to our merchantAccount at dapper
-	otu.O.Tx("setup_find_lease_market_2",
-		WithSigner("find-admin"),
-		WithArg("tenantAddress", "find-lease"),
-	).AssertSuccess(otu.T)
-
-	otu.setupInfrastructureCut("find-lease")
-
 	otu.createDapperUser("find")
-	otu.createDapperUser("find-lease")
 
 	//link in the server in the versus client
 	otu.O.Tx("devSetResidualAddress",
@@ -304,11 +270,6 @@ func (otu *OverflowTestUtils) setupDapper() *OverflowTestUtils {
 		WithArg("dapperAddress", "dapper"),
 	).
 		AssertSuccess(otu.T)
-
-	otu.O.Tx("adminInitDapper",
-		dapperSigner,
-		WithArg("dapperAddress", "find"),
-	).AssertSuccess(otu.T)
 
 	return otu.tickClock(1.0)
 }
@@ -1887,7 +1848,7 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(tenant string) *OverflowT
 	}
 
 	otu.O.Tx(tx,
-		WithSigner(tenant),
+		WithSigner("find"),
 		WithArg("nftName", "Dandy"),
 		WithArg("nftType", id),
 		WithArg("cut", 0.0),
