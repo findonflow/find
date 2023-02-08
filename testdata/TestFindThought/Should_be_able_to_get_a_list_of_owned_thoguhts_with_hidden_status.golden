@@ -7,46 +7,8 @@
         "creatorName": "user1",
         "creatorProfileName": "user1",
         "header": "This is header",
-        "hidden": false,
-        "id": 333,
-        "medias": {
-            "mediaUrl": "mediaType"
-        },
-        "reacted": {
-            "fire": [
-                {
-                    "address": "0xf669cb8d41ce0c74",
-                    "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-                    "findName": "user2",
-                    "name": "user2",
-                    "reaction": "fire"
-                }
-            ]
-        },
-        "reactedUsers": {
-            "fire": [
-                "user2"
-            ]
-        },
-        "reactions": {
-            "fire": 1
-        },
-        "tags": [
-            "tag1",
-            "tag2",
-            "@find"
-        ]
-    },
-    {
-        "body": "This is body",
-        "created": 1,
-        "creator": "0x120e725050340cab",
-        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-        "creatorName": "user1",
-        "creatorProfileName": "user1",
-        "header": "This is header",
         "hidden": true,
-        "id": 342,
+        "id": 343,
         "quotedThought": {
             "body": "This is body",
             "created": 1,
@@ -56,7 +18,7 @@
             "creatorProfileName": "user1",
             "header": "This is header",
             "hidden": false,
-            "id": 333,
+            "id": 334,
             "medias": {
                 "mediaUrl": "mediaType"
             },
@@ -100,7 +62,45 @@
         "creatorProfileName": "user1",
         "header": "This is header",
         "hidden": false,
-        "id": 340,
+        "id": 341,
+        "tags": [
+            "tag1",
+            "tag2",
+            "@find"
+        ]
+    },
+    {
+        "body": "This is body",
+        "created": 1,
+        "creator": "0x120e725050340cab",
+        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+        "creatorName": "user1",
+        "creatorProfileName": "user1",
+        "header": "This is header",
+        "hidden": false,
+        "id": 334,
+        "medias": {
+            "mediaUrl": "mediaType"
+        },
+        "reacted": {
+            "fire": [
+                {
+                    "address": "0xf669cb8d41ce0c74",
+                    "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
+                    "findName": "user2",
+                    "name": "user2",
+                    "reaction": "fire"
+                }
+            ]
+        },
+        "reactedUsers": {
+            "fire": [
+                "user2"
+            ]
+        },
+        "reactions": {
+            "fire": 1
+        },
         "tags": [
             "tag1",
             "tag2",
