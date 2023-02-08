@@ -41,7 +41,7 @@ networkCap - link to the network (In find we support multiple tenant, so lease c
 market information - sale / auction / offer prices and details
 addons - .find leases can support add ons to the name itself.
 
-#### Interaction
+#### Contract Functions
 
 ```cadence
 	// resolve takes a string address or a find name and returns an address if valid
@@ -70,6 +70,23 @@ addons - .find leases can support add ons to the name itself.
 	// for users with profile, it supports as much FT as they've set up wallets in profile
 	// for users without profile, we support flow and FUSD at the moment but it can be extended pretty easily
 	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token)
+```
 
+#### Interaction Scripts
 
+Some example scripts to show how easy it is to implement FIND
+- get the owner from an address or find name
+```cadence
+import FIND
 
+pub fun main(input: String) : Address? {
+	return FIND.resolve(input)
+}
+```
+
+- get the name of an account
+```cadence
+pub fun main(input: Address) : String? {
+	return FIND.reverseLookup(input)
+}
+```
