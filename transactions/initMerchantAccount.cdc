@@ -13,6 +13,9 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
  It has to be a blocto account since dapper will not allow us to run this account on a merchan account
 
  The only input parameter to this is your merchant account at dapper
+
+ // 1. run this transaction in a lilico/blocto account your "credit account"
+ // 2. use the path = /public/fungibleTokenSwitchboardPublic on this account as royalty receiver, it will be able to handle all the common FT
 **/
 
 transaction(dapperMerchantAccountAddress: Address) {
