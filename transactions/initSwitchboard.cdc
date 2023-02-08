@@ -33,7 +33,8 @@ transaction(dapperAddress: Address) {
 
         //Dapper utility token
         let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        if !dapperDUCReceiver.check(){
+        let DUCReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        if !DUCReceiver.check(){
             let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
             acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
             acct.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver, target: /storage/dapperUtilityCoinReceiver)
@@ -41,7 +42,8 @@ transaction(dapperAddress: Address) {
 
         //FlowUtility token
         let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-        if !dapperFUTReceiver.check(){
+        let FUTReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+        if !FUTReceiver.check(){
             let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
             acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
             acct.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver, target: /storage/flowUtilityTokenReceiver)

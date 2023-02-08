@@ -187,11 +187,6 @@ func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
 	).
 		AssertSuccess(otu.T)
 
-	otu.O.Tx("adminInitDapper",
-		findSigner,
-		WithArg("dapperAddress", "dapper"),
-	).AssertSuccess(otu.T)
-
 	// setup find forge
 	otu.O.Tx("setup_find_forge_1", WithSigner("find-forge")).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)

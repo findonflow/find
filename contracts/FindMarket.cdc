@@ -1422,7 +1422,7 @@ pub contract FindMarket {
 				// If the underlying is a switchboard, we check if the wallet type is registered in switchboard wallet and then return
 				// If it is not registered, it falls through and be handled by residual
 				case Type<@FungibleTokenSwitchboard.Switchboard>() :
-					if let sbRef = getAccount(cap.address).getCapability<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.ReceiverPublicPath).borrow() {
+					if let sbRef = getAccount(cap.address).getCapability<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath).borrow() {
 						if sbRef.getVaultTypes().contains(ftInfo.type) {
 							return ref
 						}
