@@ -375,4 +375,18 @@ pub contract FindViews {
 		}
 		return false
 	}
+
+	pub fun getDapperAddress(): Address {
+		switch FindViews.account.address.toString() {
+			case "0x097bafa4e0b48eef":
+			//mainnet
+				return 0xead892083b3e2c6c
+			case "0x1ff7e32d71183db0":
+				//testnet
+				return 0x82ec283f88a62e65
+			default:
+				//emulator
+				return 0x01cf0e2f2f715450
+		}
+	}
 }

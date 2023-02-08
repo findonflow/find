@@ -5,6 +5,9 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 	
@@ -18,6 +21,9 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 
 		let tenant = tenantCapability.borrow()!
+
+		//TODO:how do we fix this on testnet/mainnet
+		let dapper=getAccount(FindViews.getDapperAddress())
 
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
@@ -35,6 +41,16 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 		let nft = collection.collectionData
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
+
+		let futReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if ft.type == Type<@FlowUtilityToken.Vault>() && !futReceiver.check() {
+			// Create a new Forwarder resource for FUT and store it in the new account's storage
+			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver))
+			account.save(<-futForwarder, to: /storage/flowUtilityTokenVault)
+			// Publish a Receiver capability for the new account, which is linked to the FUT Forwarder
+			account.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver,target: /storage/flowUtilityTokenVault)
+		}
+
 
 		let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
 
