@@ -302,6 +302,7 @@ pub contract FindMarketSale {
 	// getSaleItemCapability takes the marketplace (tenant) address and the user address, and return the saleItemCapability for fetching information and call buy function
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>?
 }
+```
 
 ## Interaction Templates
 
@@ -371,7 +372,6 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-//
 transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
