@@ -2,6 +2,7 @@
 
 .find is a solution that aims to make it easier to .find people and their things on the flow blockchain. It is live on mainnet since Dec 13th 2021 at https://find.xyz
 
+If you have questions implementing .find services, please reach out to any of us in discord.gg/findonflow
 
 # Product.find
 
@@ -16,13 +17,14 @@ Find out more by surfing find.xyz
 # Infrastructures.find
  - Name services
  - Asset Management
+ - Onchain Identity
+	- Profile
+	- Related Accounts
  - Marketplace
  - NFT Forger
  - NFT Pack
  - Community Tools Wrapper
  - Social Networking Tools (Thoughts)
- - User Profile
- - Related Accounts
 
 
 # Name services Contracts
@@ -91,14 +93,16 @@ pub fun main(input: Address) : String? {
 }
 ```
 
-# Asset Management
-
-With [Profile](./contracts/Profile.cdc) contract, [FindUserStatus](./contracts/FindUserStatus.cdc) contract and a list of scripts, viewing and managing FT and NFT assets made possible on .find and it is convenient with a call of the script. Even more we provide User information on community products like NFT Storefront listings, flowty rental / borrows and Flovatar marketplace listings.
-
-## Identity
+# Identity
 Identity and Personalized descriptions are important assets and features to .find and users. They show how a User want themselves to look like on chain and identify who they are besides the lengthy address.
 
 The information is stored under Profile resource in [Profile](./contracts/Profile.cdc) contract.
+
+
+
+# Identity
+
+With [Profile](./contracts/Profile.cdc) contract, [FindUserStatus](./contracts/FindUserStatus.cdc) contract and a list of scripts, viewing and managing FT and NFT assets made possible on .find and it is convenient with a call of the script. Even more we provide User information on community products like NFT Storefront listings, flowty rental / borrows and Flovatar marketplace listings.
 
 ## FungibleToken
 FungibleTokens are exposed under Find Profile contracts.
@@ -106,6 +110,109 @@ As soon as a user adds his/her wallet to Profile, it can be viewable in Profile 
 
 We have a primary social tools which users can follow / unfollow / setPrivate or ban other users.
 
+```cadence
+
+	// Identity and descriptions can be fetched from below functions
+	pub contract Profile {
+		pub resource interface Public {
+			// asReport is exposed in Public interface which Profile resource implement.
+			// It can be called by getting Profile Public capability
+
+			// asReport returns all User Profile information including
+			// address, profile name, find name, description, tags etc.
+			// and wallet information
+			pub fun asReport() : UserReport
+
+			// Primary social graphing functions are also exposed under the interface
+			pub fun isBanned(_ val: Address): Bool
+			pub fun isPrivateModeEnabled() : Bool
+			pub fun getFollowers(): [FriendStatus]
+			pub fun getFollowing(): [FriendStatus]
+			pub fun getLinks() : [Link]
+		}
+
+		// User resource is the Profile that we are referring to.
+		// Notice that User resource implments "FungibleToken.Receiver"
+		// Which means that it can be passed elsewhere as a FungibleToken Switchboard
+		pub resource User: Public, Owner, FungibleToken.Receiver {
+			// In deposit function,
+			// The profile is smart enough to identify the vault type and deposit to corresponding FT vault.
+			// Even if the wallet is not set to link with profile, we still tries to borrow vaults from standard path and deposit it.
+			pub fun deposit(from: @FungibleToken.Vault)
+
+			// Wallets related functions
+			pub fun hasWallet(_ name: String) : Bool
+			pub fun getWallets() : [Wallet]
+			pub fun addWallet(_ val: Wallet)
+			pub fun removeWallet(_ val: String)
+			pub fun setWallets(_ val: [Wallet])
+
+			// Followers related functions
+			pub fun removeFollower(_ val: Address)
+			pub fun follows(_ address: Address) : Bool
+			pub fun follow(_ address: Address, tags:[String])
+			pub fun unfollow(_ address: Address)
+		}
+	}
+```
+
+## Interaction Template (Profile)
+
+[createProfile](transactions/createProfile.cdc)
+
+```cadence
+transaction(
+	// This is NOT the find name
+	// This is the profile name that will be displayed on profile only
+	name: String
+)
+```
+
+[register](transactions/register.cdc)
+```cadence
+transaction(
+	// This is the find name to be purchased
+	name: String,
+	// Amount needed :
+	// 3 characters : 500 FUSD,
+	// 4 characters : 100 FUSD,
+	// 5 characters or above : 5 FUSD
+	amount: UFix64
+	)
+
+```
+
+[editProfile](dapper-tx/mainnet/editProfile.cdc)
+
+```cadence
+transaction(
+	name:String,
+	description: String,
+	// This should be the image URL to display user's profile image
+	avatar: String,
+	tags:[String],
+	allowStoringFollowers: Bool,
+
+	// For linkTitles, linkTypes and linkUrls :
+	// We will create a struct with these 3 maps,
+	// So make sure the keys of these 3 maps are the same,
+	// and put the title, types and urls in
+
+	// titles : ways to name the link
+	linkTitles : {String: String},
+	// types : Can be link, discord, twitter, linkedIn so on
+	linkTypes: {String:String},
+	// urls: urls
+	linkUrls : {String:String},
+
+	// removeLinks : array of link titles wanted to remove
+	removeLinks : [String]
+	)
+
+```
+
+
+# Asset Management
 ## NonFungibleToken
 We fetch users NonFungibleTokens(NFT) by looking up registered collections on NFTCatalog. NFTCatalog is a collection book of NFTs created by the flow team and tells where a collection should be in the user storage. By iterating through the catalog, we can tell if user has that collection and fetch information from it.
 
@@ -133,6 +240,24 @@ It is a little more complicated to handle NFT information because it can come in
 			pub fun getFollowing(): [FriendStatus]
 			pub fun getLinks() : [Link]
 		}
+
+		pub struct UserReport {
+			pub let findName: String
+			pub let createdAt: String
+			pub let address: Address
+			pub let name: String
+			pub let gender: String
+			pub let description: String
+			pub let tags: [String]
+			pub let avatar: String
+			pub let links: {String:Link}
+			// wallet status are exposed in this field
+			pub let wallets: [WalletProfile]
+			pub let following: [FriendStatus]
+			pub let followers: [FriendStatus]
+			pub let allowStoringFollowers: Bool
+		}
+
 	}
 ```
 
