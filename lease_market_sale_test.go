@@ -376,34 +376,6 @@ func TestLeaseMarketSale(t *testing.T) {
 			moveNameTo("user2", "user1", "name1")
 	})
 
-	// The find fee is now hard coeded for DUC and therefore this test does not make sense at the moment
-	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
-	// 	otu.setFindLeaseCutDapper(0.1)
-	// 	otu.listLeaseForSaleDUC("user1", "name1", price)
-
-	// 	otu.O.Tx("buyLeaseForSaleDapper",
-	// 		WithSigner("user2"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("sellerAccount", "user1"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", price),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("dapper"),
-	// 			"amount":      1.0,
-	// 			"leaseName":   "name1",
-	// 			"royaltyName": "find",
-	// 			"tenant":      "find",
-	// 		})
-
-	// 	otu.cancelAllLeaseForSale("user1").
-	// 		moveNameTo("user2", "user1", "name1").
-	// 		setFindLeaseCutDapper(0.025)
-
-	// })
-
 	/* Honour Banning */
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 

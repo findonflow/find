@@ -390,34 +390,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	})
 
-	// Find take 2.5% which is hard coded in the code now, this test does not make sense at the moment
-	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
-	// 	price = 10.0
-
-	// 	otu.directOfferLeaseMarketSoft("user2", "name1", price).
-	// 		saleLeaseListed("user1", "active_ongoing", price).
-	// 		acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
-	// 		setFindLeaseCutDapper(0.1)
-
-	// 	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
-	// 		WithSigner("user2"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", price),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"amount":      0.25,
-	// 			"leaseName":   "name1",
-	// 			"royaltyName": "find",
-	// 			"tenant":      "find",
-	// 		})
-
-	// 	otu.moveNameTo("user2", "user1", "name1")
-
-	// })
-
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
