@@ -93,20 +93,11 @@ pub fun main(input: Address) : String? {
 }
 ```
 
-# Identity
+# Identity (Profile)
 Identity and Personalized descriptions are important assets and features to .find and users. They show how a User want themselves to look like on chain and identify who they are besides the lengthy address.
 
 The information is stored under Profile resource in [Profile](./contracts/Profile.cdc) contract.
 
-
-
-# Identity
-
-With [Profile](./contracts/Profile.cdc) contract, [FindUserStatus](./contracts/FindUserStatus.cdc) contract and a list of scripts, viewing and managing FT and NFT assets made possible on .find and it is convenient with a call of the script. Even more we provide User information on community products like NFT Storefront listings, flowty rental / borrows and Flovatar marketplace listings.
-
-## FungibleToken
-FungibleTokens are exposed under Find Profile contracts.
-As soon as a user adds his/her wallet to Profile, it can be viewable in Profile report. By default we always add FUSD / USDC / Flow token for non-Dapper Users if they initiate their account on .find page.
 
 We have a primary social tools which users can follow / unfollow / setPrivate or ban other users.
 
@@ -211,8 +202,17 @@ transaction(
 
 ```
 
+# Identity (Related Account)
+ - to be added
+
 
 # Asset Management
+
+## FungibleToken
+FungibleTokens are exposed under Find Profile contracts.
+As soon as a user adds his/her wallet to Profile, it can be viewable in Profile report. By default we always add FUSD / USDC / Flow token for non-Dapper Users if they initiate their account on .find page.
+
+
 ## NonFungibleToken
 We fetch users NonFungibleTokens(NFT) by looking up registered collections on NFTCatalog. NFTCatalog is a collection book of NFTs created by the flow team and tells where a collection should be in the user storage. By iterating through the catalog, we can tell if user has that collection and fetch information from it.
 
