@@ -20,7 +20,7 @@ Find out more by surfing find.xyz
  - NFT Forger
  - NFT Pack
  - Community Tools Wrapper
- - Social Networking Tools
+ - Social Networking Tools (Thoughts)
  - User Profile
  - Related Accounts
 
@@ -600,4 +600,195 @@ transaction(
 	id: UInt64,
 	amount:UFix64
 	)
+```
+
+# Thoguhts
+
+[Thoughts](contracts/FindThoughts.cdc) is a fully on-chain social networking / posting platform.
+
+You can post thought (what we call Think like Tweet as to Twitter), share medias, reThink (quote and post on top), edit, delete, hide and react to thoughts.
+
+Thoughts are still in alpha stage, we are still forging the ability to share and point to NFTs / any onchain assets, adding reply function, publish with tag and get fetched / categorized by the tags, etc.
+
+This will be very important part of social mapping
+
+## Contract Function
+```cadence
+// ** Thoughts are NOT NFTs as they are not meant to be.
+// They should not be freely moved or regarded as NFT assets
+pub contract FindThoughts {
+
+	// These are the fields in the thoguht and exposed through ThoughtPublic interface to enable the above mentinoned functions
+
+	// One thing to mention is that Thought supports NFT views.
+	// We implemented FindViews.ViewReadPointer in thoughts, therefore it can be used to point to NFTs (and fetch NFT information)
+	pub resource interface ThoughtPublic {
+		pub let id: UInt64
+		pub let creator: Address
+		pub var header: String
+		pub var body: String
+		pub let created: UFix64
+		pub var lastUpdated: UFix64?
+		pub let medias: [MetadataViews.Media]
+		pub let nft: [FindViews.ViewReadPointer]
+		pub var tags: [String]
+		pub var reacted: {Address : String}
+		pub var reactions: {String : Int}
+
+		access(contract) fun internal_react(user: Address, reaction: String?)
+		pub fun getQuotedThought() : ThoughtPointer?
+		pub fun getHide() : Bool
+	}
+
+	// CollectionPublic interface exposes below functions to the public
+	pub resource interface CollectionPublic {
+		pub fun contains(_ id: UInt64) : Bool
+		pub fun getIDs() : [UInt64]
+		pub fun borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic}
+	}
+
+	// Collection
+	pub resource Collection : CollectionPublic, MetadataViews.ResolverCollection {
+		// Publish a thought with optional media, NFTPointer or quotes
+		pub fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
+		pub fun delete(_ id: UInt64)
+		pub fun hide(id: UInt64, hide: Bool)
+
+		// react to OTHER user's thought
+		pub fun react(user: Address, id: UInt64, reaction: String?)
+	}
+
+}
+
+```
+
+### Interaction Template
+
+[publishFindThought](transactions/publishFindThought.cdc)
+
+```cadence
+transaction(
+	// Header of the thought
+	header: String ,
+	// Body of the thought
+	body: String ,
+	// Tags of the thought
+	tags: [String],
+	// Media details if any
+	mediaHash: String?,
+	mediaType: String?,
+	// NFT Details if any
+	quoteNFTOwner: Address?,
+	quoteNFTType: String?,
+	quoteNFTId: UInt64?,
+	// Quoted Thoughts if any
+	quoteCreator: Address?,
+	quoteId: UInt64?
+	)
+
+```
+
+[editFindThought](transactions/editFindThought.cdc)
+
+```cadence
+transaction(
+	// Thought ID
+	id: UInt64,
+	// new header
+	header: String ,
+	// new body
+	body: String,
+	// new tags
+	tags: [String]
+	)
+
+```
+
+[deleteFindThoughts](transactions/deleteFindThoughts.cdc)
+
+```cadence
+transaction(
+	// Thought IDs
+	ids: [UInt64]
+	)
+```
+
+[deleteFindThoughts](transactions/deleteFindThoughts.cdc)
+
+```cadence
+transaction(
+	// Thought IDs
+	ids: [UInt64],
+	// corresponding hide status
+	// true = hide
+	// false = show
+	hide: [Bool]
+	)
+```
+
+[reactToFindThoughts](transactions/reactToFindThoughts.cdc)
+
+```cadence
+transaction(
+	// find name / string addrss of thought creator
+	users: [String],
+	// corresponding ids of thought
+	ids: [UInt64] ,
+	// corresponding reactions
+	reactions: [String],
+	// find name / string addrss of thought creator to undo reaction
+	undoReactionUsers: [String],
+	// corresponding ids of thought to undo reaction
+	undoReactionIds: [UInt64]
+	)
+
+```
+
+Scripts to fetch different user's thoughts
+
+[getFindThoughts](scripts/getFindThoughts.cdc)
+
+```cadence
+pub fun main(
+	// owner of the thought
+	addresses: [Address],
+	// corresponding thought IDs
+	ids: [UInt64]
+	) : [Thought]
+```
+
+Scripts to fetch one user's all thoughts
+
+[getOwnedFindThoughts](scripts/getOwnedFindThoughts.cdc)
+
+```cadence
+pub fun main(
+	// owner of the thought
+	address: Address
+	) : [Thought]
+
+```
+
+
+returning object
+```cadence
+pub struct Thought {
+	pub let id: UInt64
+	pub let creator: Address
+	pub let creatorName: String?
+	pub var creatorProfileName: String?
+	pub var creatorAvatar: String?
+	pub var header: String?
+	pub var body: String?
+	pub let created: UFix64?
+	pub var lastUpdated: UFix64?
+	pub let medias: {String : String}
+	pub let nft: [FindMarket.NFTInfo]
+	pub var tags: [String]
+	pub var reacted: {String : [User]}
+	pub var reactions: {String : Int}
+	pub var reactedUsers: {String : [String]}
+	pub var quotedThought: Thought?
+	pub let hidden: Bool?
+	}
 ```
