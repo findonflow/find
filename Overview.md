@@ -21,7 +21,7 @@ Find out more by surfing find.xyz
 	- Profile
 	- Related Accounts
  - Marketplace
- - NFT Forger
+ - NFT Batch Minter
  - NFT Pack
  - Community Tools Wrapper
  - Social Networking Tools (Thoughts)
@@ -37,7 +37,7 @@ A Lease is a permission to own and use the domain name within a period of time (
 ## Lease Attribute
 Leases are created and handled as resource on flow. So that they are properly handled and stored.
 
-Attributes :
+### Attributes :
 name - name of the lease
 networkCap - link to the network (In find we support multiple tenant, so lease can be connected to different network at creation, creating name services for different tenant)
 market information - sale / auction / offer prices and details
@@ -481,6 +481,10 @@ pub struct NFTDetailReport {
 
 The .find marketplace doesn't use StoreFront because we started on this before NFTStorefront is there. .find marketplace supports more than just direct sales but also Offers, Auctions and non-Escrowed Auctions (no funds locked for auctions)
 
+One feature to mention is that FindMarket supports multi-tenant model. That is each address can host a FindTenant and manage their own market rules (allowing specific listings , NFTs and FTs) and Cuts.
+
+Users can interact with each tenant easily by just changing the "tenant" parameter in the transactions
+
 ## Market Options
 
 .find now supports below market options.
@@ -898,7 +902,7 @@ transaction(
 	)
 ```
 
-# Thoguhts
+# Thoughts
 
 [Thoughts](contracts/FindThoughts.cdc) is a fully on-chain social networking / posting platform.
 
@@ -914,7 +918,7 @@ This will be very important part of social mapping
 // They should not be freely moved or regarded as NFT assets
 pub contract FindThoughts {
 
-	// These are the fields in the thoguht and exposed through ThoughtPublic interface to enable the above mentinoned functions
+	// These are the fields in the Thought and exposed through ThoughtPublic interface to enable the above mentinoned functions
 
 	// One thing to mention is that Thought supports NFT views.
 	// We implemented FindViews.ViewReadPointer in thoughts, therefore it can be used to point to NFTs (and fetch NFT information)
