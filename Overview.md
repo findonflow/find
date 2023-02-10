@@ -78,15 +78,19 @@ addons - .find leases can support add ons to the name itself.
 
 Some example scripts to show how easy it is to implement FIND
 - get the owner from an address or find name
+
+[resolve](scripts/resolve.cdc)
 ```cadence
 import FIND
 
-pub fun main(input: String) : Address? {
-	return FIND.resolve(input)
+pub fun main(name: String) : Address? {
+	return FIND.resolve(name)
 }
 ```
 
 - get the name of an account
+
+[reverseLookup](scripts/reverseLookup.cdc)
 ```cadence
 pub fun main(input: Address) : String? {
 	return FIND.reverseLookup(input)
@@ -100,6 +104,8 @@ The information is stored under Profile resource in [Profile](./contracts/Profil
 
 
 We have a primary social tools which users can follow / unfollow / setPrivate or ban other users.
+
+## Contract Functions
 
 ```cadence
 
@@ -203,8 +209,138 @@ transaction(
 ```
 
 # Identity (Related Account)
- - to be added
 
+Related Accounts enable user to build their own social networks and wallets on flow and on other chains.
+
+User can add their flow wallets / wallets on other chains by network and name. They can also add others wallet as "contact". Currently, if both accounts added each other as related wallet, we would take that as a "verified" trust.
+
+
+## Contract Functions
+
+```cadence
+
+	pub contract FindRelatedAccounts {
+		pub resource interface Public{
+			// get all registered related flow accounts
+			pub fun getFlowAccounts() : {String: [Address]}
+			// get all registered related accounts in specific network
+			pub fun getRelatedAccounts(_ network: String) : {String : [String]}
+			// get all registered related accounts : {Network : Addresses}
+			pub fun getAllRelatedAccounts() : {String : {String : [String]}}
+			// get all registered related accounts : {Network : AccountInfo struct}
+			pub fun getAllRelatedAccountInfo() : {String : AccountInformation}
+			// verify ensure this wallet address exist under the network
+			pub fun verify(network: String, address: String) : Bool
+			// linked ensure this wallet is linked in both wallet with the same name (but not socially linked only)
+			// only supports flow for now
+			pub fun linked(name: String, network: String, address: Address) : Bool
+			pub fun getAccount(name: String, network: String, address: String) : AccountInformation?
+		}
+
+	}
+```
+
+## Interaction Template (Related Accounts)
+
+[setRelatedAccount](transactions/setRelatedAccount.cdc)
+
+```cadence
+transaction(
+	// how user would like to name this wallet for their convenience
+	name: String,
+	// flow address in string or find name (we resolve this and get the address from it)
+	target: String
+	)
+
+```
+
+[addRelatedAccount](transactions/addRelatedAccount.cdc)
+
+```cadence
+transaction(
+	// how user would like to name this wallet for their convenience
+	name: String,
+	// network of the wallet (right now we are using "Flow" and "Ethereum")
+	network: String,
+	// string address to be added as wallet
+	address: String
+	)
+
+```
+
+[updateRelatedFlowAccount](transactions/updateRelatedFlowAccount.cdc)
+
+```cadence
+transaction(
+	// wallet to be updated
+	name: String,
+	oldAddress: Address,
+	address: Address
+	)
+```
+
+[updateRelatedAccount](transactions/updateRelatedAccount.cdc)
+
+```cadence
+transaction(
+	name: String,
+	network: String,
+	oldAddress:String,
+	address: String
+	)
+
+```
+
+[removeRelatedAccount](transactions/removeRelatedAccount.cdc)
+
+```cadence
+transaction(
+	name: String,
+	// Flow network also works here
+	network: String,
+	address: String
+	)
+
+```
+
+### Scripts
+
+[getAllRelatedAccounts](scripts/getAllRelatedAccounts.cdc)
+```cadence
+pub fun main(
+	user: Address
+	// @return : {Network : {Wallet : [wallet address]}}
+	) : {String : {String : [String]}}
+
+```
+
+Related accounts are also exposed in getStatus script under accounts with Emerald City Emerald ID.
+
+Report -> FINDReport -> accounts
+
+[getAllRelatedAccounts](scripts/getAllRelatedAccounts.cdc)
+```cadence
+pub fun main(
+	user: String
+	) : Report?
+
+pub struct Report {
+	pub let FINDReport: FINDReport?
+}
+
+pub struct FINDReport{
+	pub let accounts : [AccountInformation]?
+}
+
+pub struct AccountInformation {
+	pub let name: String
+	pub let address: String
+	pub let network: String
+	pub let trusted: Bool
+	pub let node: String
+}
+
+```
 
 # Asset Management
 
@@ -261,6 +397,7 @@ It is a little more complicated to handle NFT information because it can come in
 	}
 ```
 
+### Scripts
 NFTs can be fetched from these scripts
 
 - NFT script to fetch user collection with only IDs
@@ -271,7 +408,22 @@ NFTs can be fetched from these scripts
 // collections : target collection or empty if no specific collection wanted
 
 // @return a map of collection to ids
-pub fun main(user: String, collections: [String]) : {String : ItemReport}
+pub fun main(
+	user: String,
+	collections: [String]
+	) : {String : ItemReport}
+
+pub struct ItemReport {
+	// Mapping of collection to no. of ids
+	pub let length : Int
+	pub let extraIDs : [UInt64]
+	// Shard means which source we fetch information from. In this case it will always be NFTCatalog
+	pub let shard : String
+	// This is needed when we would like to fetch further IDs
+	pub let extraIDsIdentifier : String
+	// collectionName for display
+	pub let collectionName: String
+}
 ```
 
 - NFT script to fetch user collection with only IDs
@@ -303,7 +455,26 @@ pub fun main(user: String, collections: [String]) : {String : ItemReport}
 	Find Market Doable actions
 	Community Listings (Flovatar market, Flowty rental and borrow market, StoreFront market)
 */
-pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?
+pub fun main(
+	user: String,
+	project:String,
+	id: UInt64,
+	views: [String]
+	) : NFTDetailReport?
+
+pub struct NFTDetailReport {
+	pub let findMarket: {String : FindMarket.SaleItemInformation}
+	pub let storefront: FindUserStatus.StorefrontListing?
+	pub let storefrontV2: FindUserStatus.StorefrontListing?
+	pub let flowty: FindUserStatus.FlowtyListing?
+	pub let flowtyRental: FindUserStatus.FlowtyRental?
+	pub let flovatar: FindUserStatus.FlovatarListing?
+	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
+	pub let nftDetail: NFTDetail?
+	pub let allowedListingActions: {String : ListingTypeReport}
+	pub let dapperAllowedListingActions: {String : ListingTypeReport}
+	pub let linkedForMarket : Bool?
+}
 ```
 
 # Marketplace
@@ -869,6 +1040,7 @@ transaction(
 
 ```
 
+### Scripts
 Scripts to fetch different user's thoughts
 
 [getFindThoughts](scripts/getFindThoughts.cdc)
