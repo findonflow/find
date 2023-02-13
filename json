@@ -1,0 +1,2 @@
+#!/bin/bash
+jq ".networks.mainnet.scripts.$@.code" lib/find.json -r
