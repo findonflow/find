@@ -540,7 +540,10 @@
 				"FindFurnace",
 				"FindUtils",
 				"FindUserStatus",
-				"FindThoughts"
+				"FindMarketCut",
+				"FindMarketCutStruct",
+				"FindMarketCutInterface",
+				"FindMarketInfrastructureCut"
 			],
 			"mainnet-find-forge": [
 				"NFGv3",
@@ -590,7 +593,11 @@
 				"FindThoughts",
 				"FindUtils",
 				"FindUserStatus",
-				"FindLostAndFoundWrapper"
+				"FindLostAndFoundWrapper",
+				"FindMarketCut",
+				"FindMarketCutStruct",
+				"FindMarketCutInterface",
+				"FindMarketInfrastructureCut"
 			],
 			"testnet-find-forge": [
 				"NFGv3",

@@ -74,10 +74,11 @@ transaction(name: String) {
         }
 
         let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
+        let leaseTenant = leaseTenantCapability.borrow()!
 
         let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
-        let leaseDOSPublicPath=FindMarket.getPublicPath(leaseDOSSaleItemType, name: "findLease")
-        let leaseDOSStoragePath= FindMarket.getStoragePath(leaseDOSSaleItemType, name:"findLease")
+        let leaseDOSPublicPath=leaseTenant.getPublicPath(leaseDOSSaleItemType)
+        let leaseDOSStoragePath= leaseTenant.getStoragePath(leaseDOSSaleItemType)
         let leaseDOSSaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath)
         if !leaseDOSSaleItemCap.check() {
             //The link here has to be a capability not a tenant, because it can change.

@@ -103,7 +103,9 @@ func (ot *OverflowUtils) assertErr(err error) *OverflowUtils {
 	if testing {
 		assert.NoError(ot.T, err)
 	} else {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return ot
 }

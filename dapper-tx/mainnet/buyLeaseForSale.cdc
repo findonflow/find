@@ -24,8 +24,21 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
             panic("address does not resolve to seller")
         }
 
-        let leaseMarketplace = FindMarket.getFindTenantAddress()
+        let leaseMarketplace = FindMarket.getTenantAddress("find") ?? panic("Cannot find findLease tenant")
         let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for findLease")
+
+        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
+        let leaseTenant = leaseTenantCapability.borrow()!
+
+        let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
+        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "find")
+        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"find")
+        let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
+        if !leaseSaleItemCap.check() {
+            //The link here has to be a capability not a tenant, because it can change.
+            account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+            account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
+        }
 
         self.to= account.address
 

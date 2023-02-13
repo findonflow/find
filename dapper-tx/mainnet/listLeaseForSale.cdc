@@ -13,14 +13,14 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
     prepare(account: AuthAccount) {
 
         // Get the salesItemRef from tenant
-        let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+        let leaseMarketplace = FindMarket.getFindTenantAddress()
         let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
         let leaseTenant = leaseTenantCapability.borrow()!
 
         let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
-        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "findLease")
-        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"findLease")
-        let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath) 
+        let leasePublicPath=leaseTenant.getPublicPath(leaseSaleItemType)
+        let leaseStoragePath= leaseTenant.getStoragePath(leaseSaleItemType)
+        let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
         if !leaseSaleItemCap.check() {
             //The link here has to be a capability not a tenant, because it can change.
             account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
