@@ -1430,10 +1430,14 @@ pub contract FindMarket {
 				// If the underlying is a tokenforwarder, we cannot verify if it is pointing to the right vault type.
 				// The best we can do is to try borrow from the standard path and TRY deposit
 				case Type<@TokenForwarding.Forwarder>() :
+					return ref
+					//in the future use the new feature in the forwader to get the underlying type
+					/*
 					tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
 					if tempCap.check() {
 						return tempCap.borrow()!
 					}
+					*/
 			}
 		}
 
