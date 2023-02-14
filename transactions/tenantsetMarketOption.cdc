@@ -15,8 +15,16 @@ transaction(nftName: String, nftType: String, cut: UFix64){
 		let defaultRules : [FindMarket.TenantRule] = [
 			FindMarket.TenantRule(
 				name: "Flow",
-				types:[Type<@FlowToken.Vault>()],
+				types:[
+					Type<@FlowToken.Vault>()
+					],
 				ruleType: "ft",
+				allow:true
+			),
+			FindMarket.TenantRule(
+				name: nftName,
+				types:[CompositeType(nftType)!],
+				ruleType: "nft",
 				allow:true
 			),
 				FindMarket.TenantRule(

@@ -14,39 +14,24 @@ func main() {
 
 	// ot.UpgradeFindDapperTenantSwitchboard()
 	// 100256682
-	dandy, _ := o.QualifiedIdentifier("Dandy", "NFT")
-	o.Tx(
-		"listNFTForSale",
-		WithSigner("user1"),
-		WithArg("marketplace", "find"),
-		WithArg("nftAliasOrIdentifier", dandy),
-		WithArg("id", 100256682),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("directSellPrice", 0.1),
-		WithArg("validUntil", "nil"),
-	)
 
-	o.Tx(
-		"buyNFTForSale",
-		WithSigner("find"),
-		WithArg("marketplace", "find"),
-		WithArg("user", o.Address("user1")),
-		WithArg("id", 100256682),
-		WithArg("amount", 0.1),
-	)
+	list := map[string]string{
+		"Dandy":    "A.35717efbbce11c74.Dandy.NFT",
+		"Beam":     "A.6085ae87e78e1433.Beam.NFT",
+		"FLovatar": "A.9392a4a7c3f49a0b.Flovatar.NFT",
+		"Bl0x":     "A.e8124d8428980aa6.Bl0x.NFT",
+		"Versus":   "A.99ca04281098b33d.Art.NFT",
+	}
 
-	// o.Script(
-	// 	"getNFTCatalogIDs",
-	// 	WithArg("user", "user1"),
-	// 	WithArg("collections", []string{}),
-	// ).
-	// 	Print()
+	for key, val := range list {
 
-	// o.Script(
-	// 	"getNFTDetailsNFTCatalog",
-	// 	WithArg("user", "user1"),
-	// 	WithArg("project", "dandy"),
-	// 	WithArg("id", 100256682),
-	// 	WithArg("views", "[]"),
-	// )
+		o.Tx(
+			"tenantsetMarketOption",
+			WithSigner("find"),
+			WithArg("nftName", key),
+			WithArg("nftType", val),
+			WithArg("cut", 0.0),
+		)
+	}
+
 }

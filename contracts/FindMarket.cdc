@@ -1430,14 +1430,18 @@ pub contract FindMarket {
 				// If the underlying is a tokenforwarder, we cannot verify if it is pointing to the right vault type.
 				// The best we can do is to try borrow from the standard path and TRY deposit
 				case Type<@TokenForwarding.Forwarder>() :
-					return ref
+					// This might break FindMarket with NFT with "Any" kind of forwarder.
+					// We might have to restrict this to only DUC FUT at the moment and fix it after.
+					if ftInfo.tag.contains("dapper"){
+						return ref
+					}
 					//in the future use the new feature in the forwader to get the underlying type
 					/*
-					tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
-					if tempCap.check() {
-						return tempCap.borrow()!
-					}
-					*/
+					// tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+					// if tempCap.check() {
+					// 	return tempCap.borrow()!
+					// }
+					// */
 			}
 		}
 
