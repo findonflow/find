@@ -370,7 +370,7 @@ pub contract Profile {
 		}
 
 		pub fun emitUpdatedEvent() {
-			emit Updated(account:self.owner!.address, userName:self.name, findName:self.findName, thumbnail:self.createdAt)
+			emit Updated(account:self.owner!.address, userName:self.name, findName:self.findName, thumbnail:self.avatar)
 		}
 
 		pub fun emitCreatedEvent() {

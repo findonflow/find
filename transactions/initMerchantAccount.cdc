@@ -45,9 +45,10 @@ transaction(dapperMerchantAccountAddress: Address) {
 		//We have to first check if the SIGNER has forwarder created.
 		//If not then we create a forwarder with the capability to DAPPER's receiver
 		//Dapper utility token
-		let DUCReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		if !DUCReceiver.check(){
+
+		let ducReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		if !ducReceiver.check(){
+			let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
 			acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
 			acct.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver, target: /storage/dapperUtilityCoinReceiver)
@@ -56,17 +57,18 @@ transaction(dapperMerchantAccountAddress: Address) {
 		//We have to first check if the SIGNER has forwarder created.
 		//If not then we create a forwarder with the capability to DAPPER's receiver
 		//FlowUtility token
-		let FUTReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		if !FUTReceiver.check(){
+
+		let futReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if !futReceiver.check(){
+			let dapperFUTReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
 			acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
 			acct.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver, target: /storage/flowUtilityTokenReceiver)
 		}
 
 		let switchboard <- FungibleTokenSwitchboard.createSwitchboard()
-		switchboard.addNewVaultWrapper(capability: dapperDUCReceiver, type: Type<@DapperUtilityCoin.Vault>())
-		switchboard.addNewVaultWrapper(capability: dapperFUTReceiver, type: Type<@FlowUtilityToken.Vault>())
+		switchboard.addNewVaultWrapper(capability: ducReceiver, type: Type<@DapperUtilityCoin.Vault>())
+		switchboard.addNewVaultWrapper(capability: futReceiver, type: Type<@FlowUtilityToken.Vault>())
 		switchboard.addNewVault(capability: usdcCap)
 		switchboard.addNewVault(capability: fusdReceiver)
 		switchboard.addNewVault(capability: acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver))
