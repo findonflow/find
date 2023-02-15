@@ -597,4 +597,18 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	t.Run("Should not be able to use old leases anymore", func(t *testing.T) {
+
+		otu.registerUserWithName("user1", "testingname")
+
+		otu.expireLease().
+			expireLease().
+			tickClock(2.0)
+
+		otu.registerUserWithName("user2", "testingname")
+
+		otu.moveNameTo("user1", "user2", "testingname")
+
+	})
+
 }
