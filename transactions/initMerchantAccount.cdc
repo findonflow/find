@@ -43,22 +43,29 @@ transaction(dapperMerchantAccountAddress: Address) {
 		}
 
 		//Dapper utility token
+		let ducReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		if !dapperDUCReceiver.check(){
+		if !ducReceiver.check(){
 			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
 			acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
 			acct.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver, target: /storage/dapperUtilityCoinReceiver)
 		}
 
 		//FlowUtility token
-		let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		if !dapperFUTReceiver.check(){
+		let futReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		let dapperFUTReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if !futReceiver.check(){
 			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
 			acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
 			acct.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver, target: /storage/flowUtilityTokenReceiver)
 		}
 
 		let switchboard <- FungibleTokenSwitchboard.createSwitchboard()
+
+		//We add the direct forwarder to the merchant account to the switchboard so that the chain will be
+		//switchboard --> merchant account forwarder --> dapper
+		//the alternative would be 
+		//switchboard --> our forwarder --> merchant account forwarder --> dapper
 		switchboard.addNewVaultWrapper(capability: dapperDUCReceiver, type: Type<@DapperUtilityCoin.Vault>())
 		switchboard.addNewVaultWrapper(capability: dapperFUTReceiver, type: Type<@FlowUtilityToken.Vault>())
 		switchboard.addNewVault(capability: usdcCap)

@@ -179,7 +179,7 @@ transaction(
 
 ```
 
-[editProfile](dapper-tx/mainnet/editProfile.cdc)
+[editProfile](transactions/editProfile.cdc)
 
 ```cadence
 transaction(
@@ -207,6 +207,25 @@ transaction(
 	)
 
 ```
+
+[follow](transactions/follow.cdc)
+```cadence
+transaction(
+	// map of {User in string (find name or address) : [tag]}
+	follows:{String : [String]}
+	)
+
+```
+
+[unfollow](transactions/unfollow.cdc)
+```cadence
+transaction(
+// array of [User in string (find name or address)]
+	unfollows:[String]
+	)
+
+```
+
 
 # Identity (Related Account)
 
