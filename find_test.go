@@ -597,4 +597,35 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	otu.registerUser("user2")
+	t.Run("Should be able to follow someone", func(t *testing.T) {
+		otu.O.Tx(
+			"follow",
+			WithSigner("user1"),
+			WithArg("follows", map[string][]string{
+				"user2": {"user2", "man"},
+			}),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "Follow", map[string]interface{}{
+				"follower":  otu.O.Address("user1"),
+				"following": otu.O.Address("user2"),
+				"tags":      []interface{}{"user2", "man"},
+			})
+	})
+
+	t.Run("Should be able to unfollow someone", func(t *testing.T) {
+		otu.O.Tx(
+			"unfollow",
+			WithSigner("user1"),
+			WithArg("unfollows", []string{
+				"user2",
+			}),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, "Unfollow", map[string]interface{}{
+				"follower":    otu.O.Address("user1"),
+				"unfollowing": otu.O.Address("user2"),
+			})
+	})
 }
