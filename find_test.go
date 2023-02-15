@@ -611,4 +611,43 @@ func TestFIND(t *testing.T) {
 
 	})
 
+	// t.Run("Should not be able to get old leases anymore", func(t *testing.T) {
+
+	// 	otu.listNameForSale("user1", "testingname")
+
+	// 	otu.O.Tx("fulfillName",
+	// 		WithSigner("user2"),
+	// 		WithArg("name", "testingname"),
+	// 	).
+	// 		AssertSuccess(t)
+
+	// })
+
+	t.Run("Should not be able to get old leases anymore", func(t *testing.T) {
+
+		otu.registerUserWithName("user1", "testingname2")
+
+		otu.expireLease().
+			expireLease().
+			tickClock(2.0)
+
+		otu.registerUserWithName("user2", "testingname2")
+		otu.listNameForSale("user1", "testingname2")
+
+		otu.O.Script(`
+			import FIND from "../contracts/FIND.cdc"
+
+			pub fun main(user: Address) : [FIND.LeaseInformation] {
+			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+			return finLeases.getLeaseInformation()
+			}
+		`,
+			WithArg("user", "user1"),
+		).
+			Print().
+			GetAsJson()
+		assert.True(t, false)
+
+	})
+
 }
