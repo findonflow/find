@@ -1,13 +1,13 @@
 import FindMarket from "../contracts/FindMarket.cdc"
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 
 transaction(tenant: Address, ftName: String, nftName: String, listingName: String){
-    
-     let adminRef : &Admin.AdminProxy
+
+     let adminRef : &FindMarketAdmin.AdminProxy
 
     prepare(account: AuthAccount){
-        self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
-        
+        self.adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+
     }
     execute{
         let name = listingName.concat(ftName).concat(nftName)

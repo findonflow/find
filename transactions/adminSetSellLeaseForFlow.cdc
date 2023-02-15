@@ -3,7 +3,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
@@ -12,7 +12,7 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 
 transaction(tenant: Address, market: String, merchAddress: Address){
     prepare(account: AuthAccount){
-        let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let tenantRef = adminRef.getTenantRef(tenant)
 

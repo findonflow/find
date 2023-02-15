@@ -1,5 +1,5 @@
 import FindMarket from "../contracts/FindMarket.cdc"
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
@@ -8,7 +8,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(tenant: Address, merchAddress: Address) {
     prepare(account: AuthAccount){
-        let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let rules = [
             FindMarket.TenantRule(name:"DUC", types:[Type<@DapperUtilityCoin.Vault>()], ruleType: "ft", allow: true),
