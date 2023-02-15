@@ -1,0 +1,59 @@
+#!/bin/bash
+# declare an array variable
+declare -a txn=(\
+"createProfileDapper" \
+"buyLeaseForSaleDapper" \
+"buyAddonDapper" \
+"editProfileDapper" \
+"listLeaseForSaleDapper" \
+"moveNameToDapper" \
+"registerDapper" \
+"removeRelatedAccountDapper" \
+"renewNameDapper" \
+"setPrivateModeDapper" \
+"setRelatedAccountDapper" \
+"buyNFTForSaleDapper" \
+"listNFTForSaleDapper" \
+"delistNFTSale" \
+"setProfile" \
+"initWearables" \
+"sendWearables" \
+"deleteFindThoughts" \
+"hideFindThoughts" \
+"reactToFindThoughts" \
+"editFindThought" \
+"publishFindThought" \
+"publishFindThought" \
+"redeemNameVoucher" \
+"initCollections" \
+"redeemLostAndFoundNFTs" \
+"redeemAllLostAndFoundNFTs" \
+)
+
+declare -a script=(\
+"getMetadataForBuyNFTForSaleDapper" \
+"getMetadataForBuyAddonDapper" \
+"getMetadataForBuyLeaseForSaleDapper" \
+"getMetadataForRegisterDapper" \
+"getMetadataForRenewNameDapper" \
+)
+
+declare -a network=$@
+
+# get length of an array
+length=${#txn[@]}
+
+for (( i=0; i<length; i++ ));
+do
+	printf "making ${network} transactions ${txn[$i]%Dapper*} \n"
+	jq ".networks.${network}.transactions.${txn[$i]}.code" lib/find.json -r > dapper-tx/${network}/${txn[$i]%Dapper*}.cdc
+done
+
+# get length of an array
+length=${#script[@]}
+
+for (( j=0; j<length; j++ ));
+do
+	printf "making ${network} script ${script[$j]%Dapper*} \n"
+	jq ".networks.${network}.scripts.${script[$j]}.code" lib/find.json -r > dapper-tx/${network}/${script[$j]%Dapper*}.cdc
+done

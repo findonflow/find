@@ -22,7 +22,7 @@ transaction() {
 		self.nftInfos = {}
 		self.ids = FindLostAndFoundWrapper.getTicketIDs(user: account.address, specificType: Type<@NonFungibleToken.NFT>())
 
-		for type in self.ids.keys{ 
+		for type in self.ids.keys{
 			if self.nftInfos[type] == nil {
 				let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: type) ?? panic("NFT type is not supported at the moment. Type : ".concat(type))
 				self.nftInfos[type] = FINDNFTCatalog.getCatalogEntry(collectionIdentifier: collections.keys[0])!.collectionData
@@ -33,7 +33,7 @@ transaction() {
 	}
 
 	execute{
-		for type in self.ids.keys{ 
+		for type in self.ids.keys{
 			let path = self.nftInfos[type]!.publicPath
 			for id in self.ids[type]! {
 				FindLostAndFoundWrapper.redeemNFT(type: CompositeType(type)!, ticketID: id, receiverAddress: self.receiverAddress, collectionPublicPath: path)
