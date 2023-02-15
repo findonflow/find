@@ -1093,3 +1093,28 @@ pub struct Thought {
 	pub let hidden: Bool?
 	}
 ```
+
+
+# Name Voucher
+
+Name voucher is an NFT that enables owner to register / renew / extend a .find name lease.
+They are restricted by the minimum number of characters
+E.g. voucher with 3-characters can renew any lease / register any FREE lease ,
+voucher with 4-characters can only do so to 4-characters or above leases
+
+
+### Interaction Template
+
+[redeemNameVoucher](transactions/redeemNameVoucher.cdc)
+
+```cadence
+transaction(
+	// id of the voucher if the voucher is in collection
+	// OR
+	// ticket id of the LostAndFound Inbox
+	id: UInt64,
+	// .find name wanted to register or renew (that is owned by the signer)
+	name: String
+	)
+
+```
