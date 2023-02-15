@@ -3,16 +3,14 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FindPack from "../contracts/FindPack.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FindVerifier from "../contracts/FindVerifier.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 import Admin from "../contracts/Admin.cdc"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
-transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, itemTypes: [String], startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, storageRequirement: UInt64) {
+transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, walletType: String, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, itemTypes: [String], startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, storageRequirement: UInt64) {
 
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
@@ -36,7 +34,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 				panic("Type : ".concat(type.identifier).concat(" is not supported in NFTCatalog at the moment"))
 			}
 			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
-			let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)	
+			let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)
 
 			self.providerCaps[type] = providerCap
 		}
@@ -49,7 +47,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 			panic("wallet has to exist")
 		}
 
-		let minterPlatform = FindForge.getMinterPlatform(name: lease, forgeType: Type<@ExampleNFT.Forge>()) ?? panic("Please set up minter platform for Find Pack Forge")
+		let minterPlatform = FindForge.getMinterPlatform(name: lease, forgeType: Type<@FindPack.Forge>()) ?? panic("Please set up minter platform for Find Pack Forge")
 
 		let season=typeId-1
 		// leaseName + season + #PackTypeId
@@ -73,7 +71,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 		var saleInfo : [FindPack.SaleInfo] = []
 		for key in startTime.keys {
 			let price = price[key] ?? panic("Price for key ".concat(key).concat(" is missing"))
-			var verifier : [{FindVerifier.Verifier}] = [] 
+			var verifier : [{FindVerifier.Verifier}] = []
 			if floatEventId[key] != nil {
 				verifier.append(FindVerifier.HasOneFLOAT([floatEventId[key]!]))
 			}
@@ -90,21 +88,21 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 
 		let metadata = FindPack.Metadata(
 			name: name,
-			description: name, 
-			thumbnailUrl: nil, 
-			thumbnailHash: thumbnailHash, 
-			wallet: self.wallet, 
-			openTime:openTime, 
-			walletType: Type<@FlowToken.Vault>(),
+			description: name,
+			thumbnailUrl: nil,
+			thumbnailHash: thumbnailHash,
+			wallet: self.wallet,
+			openTime:openTime,
+			walletType: CompositeType(walletType)!,
 			itemTypes: self.itemTypes,
-			providerCaps: self.providerCaps, 
+			providerCaps: self.providerCaps,
 			requiresReservation:requiresReservation,
-			storageRequirement:storageRequirement, 
-			saleInfos: saleInfo, 
+			storageRequirement:storageRequirement,
+			saleInfos: saleInfo,
 			primarySaleRoyalties: packRoyalty,
-			royalties: royalties, 
+			royalties: royalties,
 			collectionDisplay: collectionDisplay,
-			packFields: {"Items" : "1"}, 
+			packFields: {"Items" : "1"},
 			extraData: {}
 		)
 
