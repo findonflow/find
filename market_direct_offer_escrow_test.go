@@ -538,7 +538,9 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	t.Run("Should be able to direct offer and fulfill multiple NFT in one go", func(t *testing.T) {
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "find")
+			sendExampleNFT("user1", "find").
+			setFlowExampleMarketOption("find")
+
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 
 		ids := otu.mintThreeExampleDandies()

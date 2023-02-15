@@ -1847,6 +1847,26 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(tenant string) *OverflowT
 	return otu
 }
 
+func (otu *OverflowTestUtils) setFlowExampleMarketOption(tenant string) *OverflowTestUtils {
+	id, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	assert.NoError(otu.T, err)
+
+	tx := "tenantsetMarketOption"
+	if tenant == "dapper" {
+		tx = "tenantsetMarketOptionDapper"
+	}
+
+	otu.O.Tx(tx,
+		WithSigner("find"),
+		WithArg("nftName", "ExampleNFT"),
+		WithArg("nftType", id),
+		WithArg("cut", 0.0),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) setFlowLeaseMarketOption() *OverflowTestUtils {
 
 	id, err := otu.O.QualifiedIdentifier("FIND", "Lease")

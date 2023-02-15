@@ -796,7 +796,8 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "find")
+			sendExampleNFT("user1", "find").
+			setFlowExampleMarketOption("find")
 
 		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
 

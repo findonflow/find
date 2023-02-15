@@ -593,7 +593,8 @@ func TestMarketSale(t *testing.T) {
 
 		otu.registerDUCInRegistry().
 			setExampleNFT().
-			sendExampleNFT("user1", "find")
+			sendExampleNFT("user1", "find").
+			setFlowExampleMarketOption("find")
 
 		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
 
