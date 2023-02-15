@@ -5,8 +5,7 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
-//TODO: test, and rename to Dapper, repeat for other tx
-pub fun main(sellerAccount:Address, leaseName: String, amount: UFix64) : PurchaseData {
+pub fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
 
 	let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
 	let leaseMarketplace = FindMarket.getFindTenantAddress()

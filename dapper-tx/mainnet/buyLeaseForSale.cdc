@@ -25,7 +25,7 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
         }
 
         let leaseMarketplace = FindMarket.getTenantAddress("find") ?? panic("Cannot find find tenant")
-        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for find tenant")
+        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for find")
 
         let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
         let leaseTenant = leaseTenantCapability.borrow()!
