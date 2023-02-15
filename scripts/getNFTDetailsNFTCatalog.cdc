@@ -17,12 +17,10 @@ pub struct NFTDetailReport {
 	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
-	// We still have it here and put it same as "allowedListingActions" otherwise FE might crash
-	pub let dapperAllowedListingActions: {String : ListingTypeReport}
 	pub let linkedForMarket : Bool?
 
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, dapperAllowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
+	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
 		self.findMarket=findMarket
 		self.storefront=storefront
 		self.storefrontV2=storefrontV2
@@ -32,7 +30,6 @@ pub struct NFTDetailReport {
 		self.flovatarComponent=flovatarComponent
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
-		self.dapperAllowedListingActions=dapperAllowedListingActions
 		self.linkedForMarket = linkedForMarket
 	}
 }
@@ -316,7 +313,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let flovatar = FindUserStatus.getFlovatarListing(user: address, id : id, type: nftType)
 		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
 
-		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions : report,  linkedForMarket : linkedForMarket)
+		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report,  linkedForMarket : linkedForMarket)
 	}
 	return nil
 
