@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
@@ -6,14 +6,12 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
 //signed by admin to link tenantClient to a new tenant
 transaction(tenant: String, adminAddress: Address, tenantAddress: Address, findCut: UFix64) {
 	//versus account
 	prepare(account: AuthAccount) {
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+		let adminClient=account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
 		// pass in the default cut rules here
 		let cut = [

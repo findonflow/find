@@ -1,14 +1,14 @@
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String], listingName: String, listingTypes: [String]) {
 
-    let adminRef : &Admin.AdminProxy
+    let adminRef : &FindMarketAdmin.AdminProxy
 
     prepare(account: AuthAccount){
-        self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
-        
+        self.adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+
     }
     execute{
 
@@ -39,16 +39,16 @@ transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String
         if nft.length > 0 {
             rules.append(FindMarket.TenantRule(name:nftName, types:nft, ruleType: "nft", allow: true))
         }
-        
+
 
         let tenantSaleItem = FindMarket.TenantSaleItem(
-            name: listingName.concat(ftName).concat(nftName), 
-            cut: nil, 
-            rules: rules, 
+            name: listingName.concat(ftName).concat(nftName),
+            cut: nil,
+            rules: rules,
             status:"active"
         )
 
         self.adminRef.setMarketOption(tenant: tenant, saleItem: tenantSaleItem)
-        
+
     }
 }

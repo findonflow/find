@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
@@ -8,7 +8,8 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 transaction(tenantAddress: Address) {
 	//versus account
 	prepare(account: AuthAccount) {
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+		let adminClient=account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
+
 		// pass in the default cut rules here
 		let cut = [
 			FindMarket.TenantRule( name:"standard ft", types:[Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)

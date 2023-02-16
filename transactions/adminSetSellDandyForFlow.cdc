@@ -1,5 +1,5 @@
 import FindMarket from "../contracts/FindMarket.cdc"
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
@@ -13,7 +13,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction(tenant: Address, market: String){
     prepare(account: AuthAccount){
-        let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let tenantRef = adminRef.getTenantRef(tenant)
 

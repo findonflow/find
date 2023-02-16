@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
@@ -12,7 +12,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction(tenant: String, tenantAddress: Address, findCut: UFix64) {
 	//versus account
 	prepare(account: AuthAccount) {
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+		let adminClient=account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
 		// pass in the default cut rules here
 		let rules = [

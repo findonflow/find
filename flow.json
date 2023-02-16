@@ -510,6 +510,7 @@
 				"Profile",
 				"Debug",
 				"Admin",
+				"FindMarketAdmin",
 				"CharityNFT",
 				"FindViews",
 				"Dandy",
@@ -563,6 +564,7 @@
 				"Profile",
 				"Debug",
 				"Admin",
+				"FindMarketAdmin",
 				"CharityNFT",
 				"FindViews",
 				"Dandy",
@@ -609,6 +611,7 @@
 		"emulator": {
 			"emulator-account": [
 				"NonFungibleToken",
+				"FungibleTokenSwitchboard",
 				"FUSD",
 				"FiatToken",
 				"MetadataViews",
@@ -639,7 +642,6 @@
 				"Templates",
 				"Wearables",
 				"WearablesDev",
-				"FungibleTokenSwitchboard",
 				"TopShot"
 			],
 			"emulator-dapper": [
@@ -653,6 +655,7 @@
 				"Profile",
 				"Debug",
 				"Admin",
+				"FindMarketAdmin",
 				"CharityNFT",
 				"FindViews",
 				"Dandy",

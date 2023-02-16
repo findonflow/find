@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
@@ -6,11 +6,10 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(tenant: Address, cut: UFix64){
     prepare(account: AuthAccount){
-        let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let defaultRules : [FindMarket.TenantRule] = [
 			FindMarket.TenantRule(

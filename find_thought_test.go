@@ -19,7 +19,7 @@ func TestFindThought(t *testing.T) {
 		setProfile("user1").
 		setProfile("user2")
 
-	otu.setUUID(2000)
+	otu.setUUID(10000)
 
 	header := "This is header"
 	body := "This is body"
