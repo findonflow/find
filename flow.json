@@ -111,7 +111,7 @@
 				"mainnet": "0x921ea449dffec68a"
 			}
 		},
-    "FungibleToken": {
+		"FungibleToken": {
 			"source": "./contracts/standard/FungibleToken.cdc",
 			"aliases": {
 				"testnet": "9a0766d93b6608b7",
@@ -119,7 +119,6 @@
 				"mainnet": "0xf233dcee88fe0abe"
 			}
 		},
-
 		"FungibleTokenSwitchboard": {
 			"source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
 			"aliases": {
@@ -339,6 +338,7 @@
 		"Sender": "./contracts/Sender.cdc",
 		"CharityNFT": "./contracts/CharityNFT.cdc",
 		"Admin": "./contracts/Admin.cdc",
+		"FindMarketAdmin": "./contracts/FindMarketAdmin.cdc",
 		"Clock": "./contracts/Clock.cdc",
 		"Profile": "./contracts/Profile.cdc",
 		"Debug": "./contracts/Debug.cdc",
@@ -486,6 +486,7 @@
 				"Profile",
 				"Debug",
 				"Admin",
+				"FindMarketAdmin",
 				"CharityNFT",
 				"FindViews",
 				"Dandy",
@@ -532,6 +533,7 @@
 				"Profile",
 				"Debug",
 				"Admin",
+				"FindMarketAdmin",
 				"CharityNFT",
 				"FindViews",
 				"Dandy",
@@ -578,7 +580,7 @@
 		"emulator": {
 			"emulator-account": [
 				"NonFungibleToken",
-        "FungibleTokenSwitchboard",
+				"FungibleTokenSwitchboard",
 				"FUSD",
 				"FiatToken",
 				"MetadataViews",
@@ -622,6 +624,7 @@
 				"Profile",
 				"Debug",
 				"Admin",
+				"FindMarketAdmin",
 				"CharityNFT",
 				"FindViews",
 				"Dandy",
