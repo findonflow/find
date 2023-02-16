@@ -692,7 +692,8 @@
 				"FindMarketCut",
 				"FindMarketCutStruct",
 				"FindMarketCutInterface",
-				"FindMarketInfrastructureCut"
+				"FindMarketInfrastructureCut",
+				"Dev"
 			],
 			"emulator-find-admin": [],
 			"emulator-find-forge": [
