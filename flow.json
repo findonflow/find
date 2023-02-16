@@ -83,6 +83,7 @@
 			}
 		},
 		"Debug": "./contracts/Debug.cdc",
+		"Dev": "./contracts/Dev.cdc",
 		"EmeraldIdentity": {
 			"source": "./contracts/standard/EmeraldIdentity.cdc",
 			"aliases": {
@@ -154,6 +155,7 @@
 		"FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
 		"FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
 		"FindMarket": "./contracts/FindMarket.cdc",
+		"FindMarketAdmin": "./contracts/FindMarketAdmin.cdc",
 		"FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
 		"FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
 		"FindMarketCut": "./contracts/FindMarketCut.cdc",
@@ -173,7 +175,6 @@
 		"FindVerifier": "./contracts/FindVerifier.cdc",
 		"FindViews": "./contracts/FindViews.cdc",
 		"Flomies": "./contracts/Flomies.cdc",
-		"Dev": "./contracts/Dev.cdc",
 		"Flovatar": {
 			"source": "./contracts/community/Flovatar.cdc",
 			"aliases": {
