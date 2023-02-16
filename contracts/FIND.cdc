@@ -583,6 +583,7 @@ pub contract FIND {
 	pub resource interface LeaseCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getLeases(): [String]
+		pub fun getInvalidatedLeases(): [String]
 		//fetch all names that are for sale
 		pub fun getLeaseInformation() : [LeaseInformation]
 		pub fun getLease(_ name: String) :LeaseInformation?
@@ -1297,7 +1298,27 @@ pub contract FIND {
 
 		// getIDs returns an array of the IDs that are in the collection
 		pub fun getLeases(): [String] {
-			return self.leases.keys
+			var list : [String] = []
+			for key in  self.leases.keys {
+				let lease = self.borrow(key)
+				if !lease.validate() {
+					continue
+				}
+				list.append(key)
+			}
+			return list
+		}
+
+		pub fun getInvalidatedLeases(): [String] {
+			var list : [String] = []
+			for key in  self.leases.keys {
+				let lease = self.borrow(key)
+				if lease.validate() {
+					continue
+				}
+				list.append(key)
+			}
+			return list
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
@@ -1338,6 +1359,14 @@ pub contract FIND {
 			}
 
 			network.registerDapper(merchAccount: merchAccount, name:name, vault: <- vault, profile: profileCap, leases: leases)
+		}
+
+		pub fun cleanUpInvalidatedLease(_ name: String) {
+			let lease = self.borrow(name)
+			if lease.validate() {
+				panic("This is a valid lease. You cannot clean this up. Lease : ".concat(name))
+			}
+			destroy <- self.leases.remove(key: name)!
 		}
 
 		destroy() {
