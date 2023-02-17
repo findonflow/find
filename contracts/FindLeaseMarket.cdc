@@ -645,15 +645,21 @@ pub contract FindLeaseMarket {
 	pub resource interface SaleItemCollectionPublic {
 		pub fun getNameSales(): [String]
 		pub fun containsNameSale(_ name: String): Bool
-		access(account) fun borrowSaleItem(_ name: String) : &{SaleItem}
+		// It doesn't hurt to expose it here
+		pub fun borrowSaleItem(_ name: String) : &{SaleItem}
 		pub fun getListingType() : Type
+		// pub fun getTenant() : String
+		// pub fun getTenantAddress() : Address
 	}
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getNameBids() : [String]
 		pub fun containsNameBid(_ name: String): Bool
 		pub fun getBidType() : Type
-		access(account) fun borrowBidItem(_ name: String) : &{Bid}
+		// It doesn't hurt to expose it here
+		pub fun borrowBidItem(_ name: String) : &{Bid}
+		// pub fun getTenant() : String
+		// pub fun getTenantAddress() : Address
 	}
 
 	pub struct GhostListing{
