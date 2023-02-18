@@ -1,12 +1,12 @@
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-// import NFTCatalog from "../contracts/NFTCatalog.cdc"
+import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 // import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
-import Flovatar from ""
 
 pub fun main(user: String): AnyStruct {
 	let addr = FIND.resolve(user)
@@ -28,6 +28,8 @@ pub fun main(user: String): AnyStruct {
 	var leaseBids: {String : [NameBid]} = {}
 	var resources: {StoragePath : Type} = {}
 
+	var flovatarOnSale: {UInt64 : NFTSale} = {}
+
     let iterateFunc: ((StoragePath, Type): Bool) = fun (path: StoragePath, type: Type): Bool {
 		// NFT
         if type.isSubtype(of: Type<@NonFungibleToken.Collection>()) {
@@ -35,7 +37,7 @@ pub fun main(user: String): AnyStruct {
 			let number = collection.ownedNFTs.length
 			nfts[path] = NFT(
 				path: path,
-				type: type.identifier,
+				type: type,
 				number: number,
 				ids: collection.ownedNFTs.keys
 				)
@@ -46,7 +48,7 @@ pub fun main(user: String): AnyStruct {
 			let vault = authAccount.borrow<&FungibleToken.Vault>(from: path)!
 			fts[path] = FT(
 				path: path,
-				type: type.identifier,
+				type: type,
 				balance: vault.balance,
 				)
 			return true
@@ -232,17 +234,43 @@ pub struct NFT {
 	pub let type: String
 	pub let number: Int
 	pub let ids: [UInt64]
+	pub var catalogData: CatalogData?
 
 	init(
 		path: StoragePath,
-		type: String,
+		type: Type,
 		number: Int,
 		ids: [UInt64]
 	) {
 		self.path=path
-		self.type=type
+		self.type=type.identifier
 		self.number=number
 		self.ids=ids
+		self.catalogData=nil
+		if let cd = FINDNFTCatalog.getMetadataFromType(type) {
+			self.catalogData = CatalogData(
+				contractName : cd.contractName,
+				contractAddress : cd.contractAddress,
+				collectionDisplay: cd.collectionDisplay,
+			)
+		}
+
+	}
+}
+
+pub struct CatalogData {
+	pub let contractName : String
+	pub let contractAddress : Address
+	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
+
+	init(
+		contractName : String,
+		contractAddress : Address,
+		collectionDisplay: MetadataViews.NFTCollectionDisplay,
+	) {
+		self.contractName=contractName
+		self.contractAddress=contractAddress
+		self.collectionDisplay=collectionDisplay
 	}
 }
 
@@ -254,14 +282,14 @@ pub struct FT {
 
 	init(
 		path: StoragePath,
-		type: String,
+		type: Type,
 		balance: UFix64,
 	) {
 		self.path=path
-		self.type=type
+		self.type=type.identifier
 		self.balance=balance
 		self.detail=nil
-		if let i = FTRegistry.getFTInfo(type) {
+		if let i = FTRegistry.getFTInfo(type.identifier) {
 			self.detail = FTInfo(i)
 		}
 	}
@@ -419,6 +447,11 @@ pub struct FTInfo {
 		self.icon=i.icon
 		self.tag=i.tag
 	}
+}
+
+pub struct NFTSale {
+	// pub let id : UInt64
+	// pub let type : UInt64
 }
 
 // pub struct Report {
