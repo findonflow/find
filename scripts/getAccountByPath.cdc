@@ -37,7 +37,7 @@ pub let banned : {StoragePath : Bool} = {
 	/storage/RaribleNFTCollection: true,
 	/storage/LibraryPassCollection: true
 }
-pub fun main(user: String): AnyStruct {
+pub fun main(user: String, targetPaths: [String]): AnyStruct {
 	let addr = FIND.resolve(user)
 	// if address cannot be resolved, we return the name status only
 	var nameStatus : NameReport? = nil
@@ -69,10 +69,16 @@ pub fun main(user: String): AnyStruct {
 
 	var listings: {String : [UInt64]} = {}
 
-    let iterateFunc: ((StoragePath, Type): Bool) = fun (path: StoragePath, type: Type): Bool {
+    let iterateFunc: ((AuthAccount, StoragePath): Bool) = fun (acct: AuthAccount, path: StoragePath): Bool {
 		if banned.containsKey(path) {
 			return true
 		}
+
+		if !targetPaths.contains(path.toString()) {
+			return true
+		}
+
+		var type = acct.type(at: path)!
 
 		// NFT
         if type.isSubtype(of: Type<@NonFungibleToken.Collection>()) {
@@ -198,7 +204,15 @@ pub fun main(user: String): AnyStruct {
         return true
     }
 
-    authAccount.forEachStored(iterateFunc)
+	let storagePaths : [StoragePath] = []
+	for targetPath in targetPaths {
+		storagePaths.append(StoragePath(identifier: targetPath.slice(from: "/storage/".length, upTo: targetPath.length))!)
+	}
+
+	var i = 0
+    while i < targetPaths.length && iterateFunc(authAccount, storagePaths[i])  {
+		i = i + 1
+	}
 
     return Report(
 		Account: authAccount,
@@ -530,6 +544,15 @@ pub struct FTInfo {
 
 pub struct NFTSale {
 
+	pub let category : String
+	pub let number : Int
 
+	init(
+		category: String,
+		number: Int
+	) {
+		self.category = category
+		self.number = number
+	}
 
 }

@@ -1,0 +1,3238 @@
+141
+⭐ Script getAccountByPath run result: {
+	"AccountBalance": 109.01106338,
+	"CurrentTime": 1676898090,
+	"FT": {
+		"/storage/USDCVault": {
+			"balance": 0,
+			"detail": {
+				"alias": "USDC",
+				"icon": "https://static.flowscan.org/mainnet/icons/A.b19436aae4d94622.FiatToken.png",
+				"tag": [
+					"stablecoin"
+				],
+				"type": "A.b19436aae4d94622.FiatToken.Vault"
+			},
+			"path": "/storage/USDCVault",
+			"type": "A.b19436aae4d94622.FiatToken.Vault"
+		},
+		"/storage/starlyTokenVault": {
+			"balance": 40.62651204,
+			"path": "/storage/starlyTokenVault",
+			"type": "A.142fa6570b62fd97.StarlyToken.Vault"
+		}
+	},
+	"Listing": {
+		"StoreFront": [
+			138556774,
+			138530032,
+			138530618,
+			697155743
+		]
+	},
+	"NFT": {
+		"/storage/BeamCollection001": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://frightclub.niftory.com/fc_black_logo_round.svg"
+						},
+						"mediaType": "image/svg+xml"
+					},
+					"description": "Frightclub collection",
+					"externalURL": {
+						"url": "frightclub.io"
+					},
+					"name": "Frightclub",
+					"squareImage": {
+						"file": {
+							"url": "https://frightclub.niftory.com/fc_black_logo_round.svg"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x86b4a0010a71cfc3",
+				"contractName": "Beam"
+			},
+			"ids": [
+				3389
+			],
+			"number": 1,
+			"path": "/storage/BeamCollection001",
+			"type": "A.86b4a0010a71cfc3.Beam.Collection"
+		},
+		"/storage/BitkuCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://bitku.art/banner1200x630.png"
+						},
+						"mediaType": "https://bitku.art/banner1200x630.png"
+					},
+					"description": "Generative Haiku NFT on Flow",
+					"externalURL": {
+						"url": "https://bitku.art/#0x1a89b561fef5ab6a/65"
+					},
+					"name": "Bitku",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/bKTHTd5ztx"
+						},
+						"github": {
+							"url": "https://github.com/docmarionum1/bitku"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://bitku.art/logo512.png"
+						},
+						"mediaType": "https://bitku.art/logo512.png"
+					}
+				},
+				"contractAddress": "0xf61e40c19db2a9e2",
+				"contractName": "HaikuNFT"
+			},
+			"ids": [
+				188,
+				187,
+				186
+			],
+			"number": 3,
+			"path": "/storage/BitkuCollection",
+			"type": "A.f61e40c19db2a9e2.HaikuNFT.Collection"
+		},
+		"/storage/CNN_NFTCollection": {
+			"number": 0,
+			"path": "/storage/CNN_NFTCollection",
+			"type": "A.329feb3ab062d289.CNN_NFT.Collection"
+		},
+		"/storage/CraveCollection001": {
+			"number": 0,
+			"path": "/storage/CraveCollection001",
+			"type": "A.6d008a788fc27265.Crave.Collection"
+		},
+		"/storage/CricketMomentsCollection": {
+			"number": 0,
+			"path": "/storage/CricketMomentsCollection",
+			"type": "A.ed398881d9bf40fb.CricketMoments.Collection"
+		},
+		"/storage/FLOATCollectionStoragePath": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://i.imgur.com/lEJuM70.png"
+						},
+						"mediaType": "https://i.imgur.com/lEJuM70.png"
+					},
+					"description": "FLOAT is a proof of attendance platform on the Flow blockchain.",
+					"externalURL": {
+						"url": "https://floats.city/0x99bd48c8036e2876/float/246122554"
+					},
+					"name": "FLOAT",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/emeraldcity"
+						},
+						"twitter": {
+							"url": "https://twitter.com/emerald_dao"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://i.imgur.com/uzt90wM.png"
+						},
+						"mediaType": "https://i.imgur.com/uzt90wM.png"
+					}
+				},
+				"contractAddress": "0x2d4c3caffbeab845",
+				"contractName": "FLOAT"
+			},
+			"ids": [
+				187937980,
+				737421068,
+				737428599,
+				277927096,
+				330754749,
+				724847873,
+				609844091,
+				737427578,
+				187915723,
+				609270011,
+				210258470,
+				266166874,
+				190802744,
+				432081782,
+				737405693,
+				191860078,
+				263084620,
+				185471283,
+				803903206,
+				683206330,
+				189206325,
+				218629271,
+				186653289,
+				190447045,
+				737410420,
+				737432704,
+				737426454,
+				187968171,
+				570998995,
+				247866873,
+				609268603,
+				454378280,
+				795203905,
+				737412327,
+				737420109,
+				585203688,
+				587494486,
+				258382799,
+				186287300,
+				266169714,
+				270027182,
+				287542918,
+				737425250,
+				289952155,
+				737423600,
+				737408895
+			],
+			"number": 46,
+			"path": "/storage/FLOATCollectionStoragePath",
+			"type": "A.2d4c3caffbeab845.FLOAT.Collection"
+		},
+		"/storage/GeeftCollection": {
+			"ids": [
+				496842657
+			],
+			"number": 1,
+			"path": "/storage/GeeftCollection",
+			"type": "A.80ec5732ee129467.Geeft.Collection"
+		},
+		"/storage/caaPassCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://raw.githubusercontent.com/williampucs/THiNG.FUND-Minter/main/assets/bannerImage.png"
+						},
+						"mediaType": "https://raw.githubusercontent.com/williampucs/THiNG.FUND-Minter/main/assets/bannerImage.png"
+					},
+					"description": "By holding THiNG.FUND’s membership badge NFTs in your blockchain wallet, you will become a member of THiNG.FUND club, grow with the creators and share the joy and beauty of Web3. At the same time, as a member, you will also get more privileges, including but not limited to obtaining airdrop gifts for creators’ works before obtaining THiNG.FUND limited collections or being invited to participate in offline/online events as a VIP.",
+					"externalURL": {
+						"url": "https://thing.fund/"
+					},
+					"name": "THiNG.FUND Membership Badge",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/thingfund"
+						},
+						"twitter": {
+							"url": "https://twitter.com/thing_fund"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://raw.githubusercontent.com/williampucs/THiNG.FUND-Minter/main/assets/squareImage.png"
+						},
+						"mediaType": "https://raw.githubusercontent.com/williampucs/THiNG.FUND-Minter/main/assets/squareImage.png"
+					}
+				},
+				"contractAddress": "0x98c9c2e548b84d31",
+				"contractName": "CaaPass"
+			},
+			"ids": [
+				33954
+			],
+			"number": 1,
+			"path": "/storage/caaPassCollection",
+			"type": "A.98c9c2e548b84d31.CaaPass.Collection"
+		},
+		"/storage/motogpPackCollection": {
+			"number": 0,
+			"path": "/storage/motogpPackCollection",
+			"type": "A.a49cc0ee46c54bfb.MotoGPPack.Collection"
+		},
+		"/storage/neoFounderCollection": {
+			"number": 0,
+			"path": "/storage/neoFounderCollection",
+			"type": "A.b25138dbf45e5801.NeoFounder.Collection"
+		},
+		"/storage/neoVoucherCollection": {
+			"number": 0,
+			"path": "/storage/neoVoucherCollection",
+			"type": "A.b25138dbf45e5801.NeoVoucher.Collection"
+		},
+		"/storage/stakedStarlyCardCollection": {
+			"ids": [
+				11721,
+				11715,
+				11734,
+				11724,
+				11707,
+				11736,
+				11711,
+				11729,
+				11709,
+				11723,
+				11705,
+				11718,
+				11717,
+				11703,
+				11712,
+				11710,
+				11735,
+				11695,
+				11730,
+				11728,
+				11701,
+				11696,
+				11731,
+				11732,
+				11720,
+				11697,
+				11704,
+				11722,
+				11725,
+				11726,
+				11702,
+				11714,
+				11694,
+				11699,
+				11713,
+				11706,
+				11738,
+				11737,
+				11727,
+				11716,
+				11719,
+				11708,
+				11700,
+				11698,
+				11733
+			],
+			"number": 45,
+			"path": "/storage/stakedStarlyCardCollection",
+			"type": "A.29fcd0b5e444242a.StakedStarlyCard.Collection"
+		}
+	},
+	"NameStatus": {
+		"cost": 5,
+		"lockedUntil": 1710107414,
+		"owner": "0x886f3aeaf848c535",
+		"registeredTime": 1639259414,
+		"status": "TAKEN",
+		"validUntil": 1702331414
+	},
+	"Resource": {
+		"/storage/A_097bafa4e0b48eef_FindLeaseMarketDirectOfferSoft_SaleItemCollection_findLease": "A.097bafa4e0b48eef.FindLeaseMarketDirectOfferSoft.SaleItemCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketDirectOfferEscrow_MarketBidCollection_find": "A.097bafa4e0b48eef.FindMarketDirectOfferEscrow.MarketBidCollection",
+		"/storage/FlowtyStorefront": "A.5c57f79c6694797f.Flowty.FlowtyStorefront",
+		"/storage/MatrixMarketOpenOffer": "A.2162bbe13ade251e.MatrixMarketOpenOffer.OpenOffer",
+		"/storage/SolarpupsMarketStoreProd01": "A.a8d493db1bb4df56.SolarpupsMarket.MarketStore",
+		"/storage/findSender": "A.097bafa4e0b48eef.Sender.Token",
+		"/storage/flowTokenHolder": "A.8d0e87b65159ae63.LockedTokens.TokenHolder"
+	},
+	"StorageAvailable": 10897893006,
+	"StorageCapacity": 10901106338,
+	"StorageUsed": 3213332
+}
+⭐ Script getAccountByPath run result: {
+	"AccountBalance": 109.01106338,
+	"CurrentTime": 1676898094,
+	"FT": {
+		"/storage/fusdVault": {
+			"balance": 1.09999994,
+			"detail": {
+				"alias": "FUSD",
+				"icon": "https://static.flowscan.org/mainnet/icons/A.3c5959b568896393.FUSD.png",
+				"tag": [
+					"stablecoin"
+				],
+				"type": "A.3c5959b568896393.FUSD.Vault"
+			},
+			"path": "/storage/fusdVault",
+			"type": "A.3c5959b568896393.FUSD.Vault"
+		},
+		"/storage/geniVault": {
+			"balance": 0,
+			"path": "/storage/geniVault",
+			"type": "A.abda6627c70c7f52.Geni.Vault"
+		},
+		"/storage/teleportedTetherTokenVault": {
+			"balance": 0,
+			"path": "/storage/teleportedTetherTokenVault",
+			"type": "A.cfdd90d4a00f7b5b.TeleportedTetherToken.Vault"
+		}
+	},
+	"NFT": {
+		"/storage/DayNFTCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://day-nft.io/header.png"
+						},
+						"mediaType": "https://day-nft.io/header.png"
+					},
+					"description": "One NFT per day, storing memories on Flow. Half of daily auction proceeds gets distributed back to holders.",
+					"externalURL": {
+						"url": "https://day-nft.io"
+					},
+					"name": "DayNFT",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/day_nft_io"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://day-nft.io/thumbnail.png"
+						},
+						"mediaType": "https://day-nft.io/thumbnail.png"
+					}
+				},
+				"contractAddress": "0x1600b04bf033fb99",
+				"contractName": "DayNFT"
+			},
+			"ids": [
+				170,
+				171,
+				29,
+				28
+			],
+			"number": 4,
+			"path": "/storage/DayNFTCollection",
+			"type": "A.1600b04bf033fb99.DayNFT.Collection"
+		},
+		"/storage/EverbloomCollection": {
+			"ids": [
+				3366
+			],
+			"number": 1,
+			"path": "/storage/EverbloomCollection",
+			"type": "A.e703f7fee6400754.Everbloom.Collection"
+		},
+		"/storage/KlktnNFTCollection": {
+			"ids": [
+				356,
+				5338
+			],
+			"number": 2,
+			"path": "/storage/KlktnNFTCollection",
+			"type": "A.abd6e80be7e9682c.KlktnNFT.Collection"
+		},
+		"/storage/MatrixMarketFlowverseSocksCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://media.nft.matrixmarket.xyz/media/cvR_VOmK5g6oGMhXRj1pR_IMAGE.png"
+						},
+						"mediaType": "image"
+					},
+					"description": "Socks by Flowverse are versatile NFTs that enable you to claim 1 limited edition pair of physical Flowverse Socks, shipped globally. The total number of Socks by Flowverse is 111.",
+					"externalURL": {
+						"url": "https://www.socknft.com/"
+					},
+					"name": "Flowverse Socks",
+					"socials": {
+						"discord": {
+							"url": "https://discord.com/invite/flowverse"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flowverse_"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://media.nft.matrixmarket.xyz/media/dbbrUIkarYLXKKjiY5AYk_IMAGE.png"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0xce4c02539d1fabe8",
+				"contractName": "FlowverseSocks"
+			},
+			"ids": [
+				61
+			],
+			"number": 1,
+			"path": "/storage/MatrixMarketFlowverseSocksCollection",
+			"type": "A.ce4c02539d1fabe8.FlowverseSocks.Collection"
+		},
+		"/storage/MomentCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://nbatopshot.com/static/img/top-shot-logo-horizontal-white.svg"
+						},
+						"mediaType": "image/svg+xml"
+					},
+					"description": "NBA Top Shot is your chance to own, sell, and trade official digital collectibles of the NBA and WNBA's greatest plays and players",
+					"externalURL": {
+						"url": "https://nbatopshot.com"
+					},
+					"name": "NBA-Top-Shot",
+					"socials": {
+						"discord": {
+							"url": "https://discord.com/invite/nbatopshot"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/nbatopshot"
+						},
+						"twitter": {
+							"url": "https://twitter.com/nbatopshot"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://nbatopshot.com/static/img/og/og.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x0b2a3299cc857e29",
+				"contractName": "TopShot"
+			},
+			"number": 0,
+			"path": "/storage/MomentCollection",
+			"type": "A.0b2a3299cc857e29.TopShot.Collection"
+		},
+		"/storage/PartyMansionDrinkCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://gateway.pinata.cloud/ipfs/QmVyXgw67QVAU98765yfQAB1meZhnSnYVoL6mz6UpzSw7W/"
+						},
+						"mediaType": "image/jpg"
+					},
+					"description": "What is a Party without drinks!? The Party Beers are an fun art collection of whacky drinks that can only be found at the bar in Party Mansion. These collectibles were first airdropped to Party Gooberz and will be a staple in the Mansion, Drink up!",
+					"externalURL": {
+						"url": "https://partymansion.io/"
+					},
+					"name": "Party Mansion Drinks",
+					"socials": {
+						"discord": {
+							"url": "http://discord.gg/zJRNqKuDQH"
+						},
+						"twitter": {
+							"url": "https://mobile.twitter.com/the_goobz_nft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://gateway.pinata.cloud/ipfs/QmSEJEwqdpotJ7RX42RKDy5sVgQzhNy3XiDmFsc81wgzNC/"
+						},
+						"mediaType": "image/jpg"
+					}
+				},
+				"contractAddress": "0x34f2bf4a80bb0f69",
+				"contractName": "PartyMansionDrinksContract"
+			},
+			"ids": [
+				836,
+				4034,
+				4307,
+				4455,
+				1112
+			],
+			"number": 5,
+			"path": "/storage/PartyMansionDrinkCollection",
+			"type": "A.34f2bf4a80bb0f69.PartyMansionDrinksContract.Collection"
+		},
+		"/storage/SoulMadeComponentCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://i.imgur.com/yBw3ktk.png"
+						},
+						"mediaType": "https://i.imgur.com/yBw3ktk.png"
+					},
+					"description": "SoulMade Component Collection",
+					"externalURL": {
+						"url": "https://soulmade.art"
+					},
+					"name": "SoulMadeComponent",
+					"socials": {
+						"discord": {
+							"url": "https://discord.com/invite/xtqqXCKW9B"
+						},
+						"twitter": {
+							"url": "https://twitter.com/soulmade_nft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://i.imgur.com/XgqDY3s.jpg"
+						},
+						"mediaType": "https://i.imgur.com/XgqDY3s.jpg"
+					}
+				},
+				"contractAddress": "0x9a57dfe5c8ce609c",
+				"contractName": "SoulMadeComponent"
+			},
+			"number": 0,
+			"path": "/storage/SoulMadeComponentCollection",
+			"type": "A.9a57dfe5c8ce609c.SoulMadeComponent.Collection"
+		},
+		"/storage/ZeedzINOCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://play.zeedz.io/background-zeedz.jpg"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "Zeedz is the first play-for-purpose game where players reduce global carbon emissions by collecting plant-inspired creatures: Zeedles. They live as NFTs on an eco-friendly blockchain (Flow) and grow with the real-world weather.",
+					"externalURL": {
+						"url": "https://play.zeedz.io/"
+					},
+					"name": "Zeedz",
+					"socials": {
+						"discord": {
+							"url": "http://discord.com/invite/zeedz"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/zeedz_official/"
+						},
+						"linkedin": {
+							"url": "https://www.linkedin.com/company/zeedz"
+						},
+						"medium": {
+							"url": "https://blog.zeedz.io/"
+						},
+						"twitter": {
+							"url": "https://twitter.com/zeedz_official"
+						},
+						"youtube": {
+							"url": "https://www.youtube.com/c/zeedz_official"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://play.zeedz.io/logo-zeedz.svg"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x62b3063fbe672fc8",
+				"contractName": "ZeedzINO"
+			},
+			"ids": [
+				34426
+			],
+			"number": 1,
+			"path": "/storage/ZeedzINOCollection",
+			"type": "A.62b3063fbe672fc8.ZeedzINO.Collection"
+		},
+		"/storage/bloctoPassCollection": {
+			"ids": [
+				5148
+			],
+			"number": 1,
+			"path": "/storage/bloctoPassCollection",
+			"type": "A.0f9df91c9121c460.BloctoPass.Collection"
+		},
+		"/storage/bloctoXtinglesCollectibleCollection": {
+			"ids": [
+				1281
+			],
+			"number": 1,
+			"path": "/storage/bloctoXtinglesCollectibleCollection",
+			"type": "A.f5b0eb433389ac3f.Collectible.Collection"
+		},
+		"/storage/flomiesNFT": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"cid": "QmPeZUjsfrFvkB1bvKBpAsxfoQ6jSoezqwWz9grkmNYdz1"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community.",
+					"externalURL": {
+						"url": "https://flomiesnft.com"
+					},
+					"name": "flomies",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/tVavHtPD"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/flomies_nft/"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flomiesnft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"cid": "QmYtowktCz6GbP6MqMd6SXqJEYazCpGTcFm4HrWX89nUvo"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x123cb666996b8432",
+				"contractName": "Flomies"
+			},
+			"ids": [
+				607991149
+			],
+			"number": 1,
+			"path": "/storage/flomiesNFT",
+			"type": "A.123cb666996b8432.Flomies.Collection"
+		},
+		"/storage/starlyTokenVestingCollection": {
+			"number": 0,
+			"path": "/storage/starlyTokenVestingCollection",
+			"type": "A.ee2f049f0ba04f0e.StarlyTokenVesting.Collection"
+		}
+	},
+	"NameStatus": {
+		"cost": 5,
+		"lockedUntil": 1710107414,
+		"owner": "0x886f3aeaf848c535",
+		"registeredTime": 1639259414,
+		"status": "TAKEN",
+		"validUntil": 1702331414
+	},
+	"Resource": {
+		"/storage/A_097bafa4e0b48eef_FindMarketAuctionEscrow_MarketBidCollection_find": "A.097bafa4e0b48eef.FindMarketAuctionEscrow.MarketBidCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketAuctionEscrow_SaleItemCollection_find": "A.097bafa4e0b48eef.FindMarketAuctionEscrow.SaleItemCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketAuctionSoft_MarketBidCollection_find": "A.097bafa4e0b48eef.FindMarketAuctionSoft.MarketBidCollection",
+		"/storage/FLOATEventsStoragePath": "A.2d4c3caffbeab845.FLOAT.FLOATEvents",
+		"/storage/FindThoughts": "A.097bafa4e0b48eef.FindThoughts.Collection",
+		"/storage/FlowtyRentalsStorefront": "A.5c57f79c6694797f.FlowtyRentals.FlowtyRentalsStorefront",
+		"/storage/GrantedAccountAccessInfo": "A.2d4c3caffbeab845.GrantedAccountAccess.Info",
+		"/storage/VersusUserProfile": "A.d796ff17107bbff6.Profile.User"
+	},
+	"StorageAvailable": 10897893006,
+	"StorageCapacity": 10901106338,
+	"StorageUsed": 3213332
+}
+⭐ Script getAccountByPath run result: {
+	"AccountBalance": 109.01106338,
+	"CurrentTime": 1676898094,
+	"FT": {
+		"/storage/bloctoTokenVault": {
+			"balance": 0,
+			"path": "/storage/bloctoTokenVault",
+			"type": "A.0f9df91c9121c460.BloctoToken.Vault"
+		},
+		"/storage/flowUsdtFspLpVault": {
+			"balance": 0,
+			"path": "/storage/flowUsdtFspLpVault",
+			"type": "A.c6c77b9f5c7a378f.FlowSwapPair.Vault"
+		}
+	},
+	"Leases": {
+		"benno": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1714507819,
+			"name": "benno",
+			"status": "TAKEN",
+			"validUntil": 1706731819
+		},
+		"bjarte": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1710245603,
+			"name": "bjarte",
+			"status": "TAKEN",
+			"validUntil": 1702469603
+		},
+		"bjartek": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1710107414,
+			"name": "bjartek",
+			"status": "TAKEN",
+			"validUntil": 1702331414
+		},
+		"dandy": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1710245626,
+			"name": "dandy",
+			"status": "TAKEN",
+			"validUntil": 1702469626
+		},
+		"overflow": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1710261157,
+			"name": "overflow",
+			"status": "TAKEN",
+			"validUntil": 1702485157
+		},
+		"remidemi": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1714318272,
+			"name": "remidemi",
+			"status": "TAKEN",
+			"validUntil": 1706542272
+		},
+		"wenpacks": {
+			"address": "0x886f3aeaf848c535",
+			"cost": 5,
+			"lockedUntil": 1714318323,
+			"name": "wenpacks",
+			"status": "TAKEN",
+			"validUntil": 1706542323
+		}
+	},
+	"NFT": {
+		"/storage/BarterYardClubWerewolfCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://images.barteryard.club/banner.svg"
+						},
+						"mediaType": "https://images.barteryard.club/banner.svg"
+					},
+					"description": "Barter Yard Club is an NFT toolbox organisation built on Flow Protocol and co-owned by the werewolves",
+					"externalURL": {
+						"url": "https://www.barteryard.club"
+					},
+					"name": "BarterYard Club Werewolves",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/barteryard"
+						},
+						"twitter": {
+							"url": "https://twitter.com/barteryard"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://images.barteryard.club/logo.svg"
+						},
+						"mediaType": "https://images.barteryard.club/logo.svg"
+					}
+				},
+				"contractAddress": "0x28abb9f291cadaf2",
+				"contractName": "BarterYardClubWerewolf"
+			},
+			"ids": [
+				28,
+				24,
+				1084,
+				770,
+				822,
+				1210,
+				25,
+				26,
+				27,
+				763
+			],
+			"number": 10,
+			"path": "/storage/BarterYardClubWerewolfCollection",
+			"type": "A.28abb9f291cadaf2.BarterYardClubWerewolf.Collection"
+		},
+		"/storage/BarterYardPackNFTCollection": {
+			"ids": [
+				9
+			],
+			"number": 1,
+			"path": "/storage/BarterYardPackNFTCollection",
+			"type": "A.a95b021cf8a30d80.BarterYardPackNFT.Collection"
+		},
+		"/storage/BlindBoxRedeemVoucherCollection": {
+			"ids": [
+				32156,
+				38477,
+				8552,
+				44860
+			],
+			"number": 4,
+			"path": "/storage/BlindBoxRedeemVoucherCollection",
+			"type": "A.910514afa41bfeac.BlindBoxRedeemVoucher.Collection"
+		},
+		"/storage/ChainmonstersRewardCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://chainmonsters.com/images/bg.jpg"
+						},
+						"mediaType": "image/jpeg"
+					},
+					"description": "Chainmonsters is a massive multiplayer online RPG where you catch, battle, trade, explore, and combine different types of monsters and abilities to create strong chain reactions! No game subscription required. Explore the vast lands of Ancora together with your friends on Steam, iOS and Android!",
+					"externalURL": {
+						"url": "https://chainmonsters.com"
+					},
+					"name": "Chainmonsters Rewards",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/chainmonsters"
+						},
+						"twitter": {
+							"url": "https://twitter.com/chainmonsters"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://chainmonsters.com/images/chipleaf.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x93615d25d14fa337",
+				"contractName": "ChainmonstersRewards"
+			},
+			"ids": [
+				318759
+			],
+			"number": 1,
+			"path": "/storage/ChainmonstersRewardCollection",
+			"type": "A.93615d25d14fa337.ChainmonstersRewards.Collection"
+		},
+		"/storage/FindPackCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"cid": "QmPeZUjsfrFvkB1bvKBpAsxfoQ6jSoezqwWz9grkmNYdz1"
+						},
+						"mediaType": "image"
+					},
+					"description": "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community.",
+					"externalURL": {
+						"url": "https://flomiesnft.com"
+					},
+					"name": "Flomies",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/mH329vhV7e"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/flomies_nft/"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flomiesnft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"cid": "QmYtowktCz6GbP6MqMd6SXqJEYazCpGTcFm4HrWX89nUvo"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0x097bafa4e0b48eef",
+				"contractName": "FindPack"
+			},
+			"ids": [
+				677813517,
+				805272616,
+				805272623,
+				805272621
+			],
+			"number": 4,
+			"path": "/storage/FindPackCollection",
+			"type": "A.097bafa4e0b48eef.FindPack.Collection"
+		},
+		"/storage/GoatCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png\u0026w=32\u0026q=75"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "GoatedGoats",
+					"externalURL": {
+						"url": "https://goatedgoats.com"
+					},
+					"name": "GoatedGoats",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/goatedgoats"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png\u0026w=32\u0026q=75"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x2068315349bdfce5",
+				"contractName": "GoatedGoats"
+			},
+			"ids": [
+				674,
+				865,
+				840,
+				646,
+				3643,
+				820
+			],
+			"number": 6,
+			"path": "/storage/GoatCollection",
+			"type": "A.2068315349bdfce5.GoatedGoats.Collection"
+		},
+		"/storage/GooberzPartyFolksCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"cid": "QmdU1j5nqeQBmVWZZDhz23z6mMPwMp5i2Ka2sBpMhYggPT"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "The Party Gooberz is a fun and comical art collection of 3550 collectibles living on the Flow Blockchain. As one of the first PFP collectibles on Flow, we enjoy bringing the party and hanging with friends. So grab a drink, pump up the music, and get ready to party because The Party Goobz are ready to go within Party Mansion!",
+					"externalURL": {
+						"url": "https://partymansion.io/"
+					},
+					"name": "Party Mansion Gooberz",
+					"socials": {
+						"discord": {
+							"url": "http://discord.gg/zJRNqKuDQH"
+						},
+						"twitter": {
+							"url": "https://mobile.twitter.com/the_goobz_nft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"cid": "QmeiwpEXCidsPae3ZPpSJTKVit1R2LHiF4cw5pvmMPRC4x"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x34f2bf4a80bb0f69",
+				"contractName": "GooberXContract"
+			},
+			"ids": [
+				461,
+				1158,
+				463,
+				464,
+				458,
+				3469,
+				1557
+			],
+			"number": 7,
+			"path": "/storage/GooberzPartyFolksCollection",
+			"type": "A.34f2bf4a80bb0f69.GooberXContract.Collection"
+		},
+		"/storage/MynftCollection": {
+			"ids": [
+				27226,
+				16931,
+				27271,
+				13958
+			],
+			"number": 4,
+			"path": "/storage/MynftCollection",
+			"type": "A.f6fcbef550d97aa5.Mynft.Collection"
+		},
+		"/storage/NyatheesOVOCollection": {
+			"number": 0,
+			"path": "/storage/NyatheesOVOCollection",
+			"type": "A.75e0b6de94eb05d0.NyatheesOVO.Collection"
+		},
+		"/storage/RCRDSHPNFTCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://rcrdshp-happyfox-assets.s3.amazonaws.com/banner.png"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "Here comes the drop!",
+					"externalURL": {
+						"url": "https://app.rcrdshp.com"
+					},
+					"name": "The RCRDSHP Collection",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/rcrdshp"
+						},
+						"facebook": {
+							"url": "https://www.facebook.com/rcrdshp"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/rcrdshp"
+						},
+						"twitter": {
+							"url": "https://twitter.com/rcrdshp"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://rcrdshp-happyfox-assets.s3.amazonaws.com/Purple.svg"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x6c3ff40b90b928ab",
+				"contractName": "RCRDSHPNFT"
+			},
+			"ids": [
+				244425,
+				240233
+			],
+			"number": 2,
+			"path": "/storage/RCRDSHPNFTCollection",
+			"type": "A.6c3ff40b90b928ab.RCRDSHPNFT.Collection"
+		},
+		"/storage/RareRooms_NFTCollection": {
+			"number": 0,
+			"path": "/storage/RareRooms_NFTCollection",
+			"type": "A.329feb3ab062d289.RareRooms_NFT.Collection"
+		},
+		"/storage/SolarpupsNFTsProd01": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://cdn.solarpups.com/web/assets/img/solar-pups/logo.png"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "The world's most adorable and sensitive pups.",
+					"externalURL": {
+						"url": "https://www.solarpups.com/marketplace"
+					},
+					"name": "The Krikey Solarpups Collection",
+					"socials": {
+						"discord": {
+							"url": "https://discord.com/invite/krikey"
+						},
+						"facebook": {
+							"url": "https://www.facebook.com/krikeyappAR/"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/krikeyapp/?hl=en"
+						},
+						"twitter": {
+							"url": "https://twitter.com/SolarPupsNFTs"
+						},
+						"youtube": {
+							"url": "https://www.youtube.com/channel/UCdTV4cmkQwWgaZ89ITMO-bg"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://cdn.solarpups.com/web/assets/img/solar-pups/logo.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0xa8d493db1bb4df56",
+				"contractName": "SolarpupsNFT"
+			},
+			"ids": [
+				18988,
+				154,
+				18989,
+				28,
+				18764,
+				18991,
+				35,
+				36,
+				18,
+				44,
+				18986,
+				18984,
+				18987,
+				18985,
+				41,
+				155,
+				18992,
+				17,
+				18981,
+				18982,
+				42,
+				18990,
+				27,
+				18983,
+				43
+			],
+			"number": 25,
+			"path": "/storage/SolarpupsNFTsProd01",
+			"type": "A.a8d493db1bb4df56.SolarpupsNFT.Collection"
+		},
+		"/storage/neoMemberCollection": {
+			"ids": [
+				273
+			],
+			"number": 1,
+			"path": "/storage/neoMemberCollection",
+			"type": "A.b25138dbf45e5801.NeoMember.Collection"
+		},
+		"/storage/neoStickerCollection": {
+			"number": 0,
+			"path": "/storage/neoStickerCollection",
+			"type": "A.b25138dbf45e5801.NeoSticker.Collection"
+		},
+		"/storage/starlyCardCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://storage.googleapis.com/starly-prod.appspot.com/assets/starly-banner.jpg"
+						},
+						"mediaType": "https://storage.googleapis.com/starly-prod.appspot.com/assets/starly-banner.jpg"
+					},
+					"description": "Starly is a launchpad and marketplace for gamified NFT collections on Flow.",
+					"externalURL": {
+						"url": "https://starly.io/afterfuture/x8yDgmJlpa9JzXZA6jXd/12/418"
+					},
+					"name": "Starly",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/starly"
+						},
+						"medium": {
+							"url": "https://medium.com/@StarlyNFT"
+						},
+						"twitter": {
+							"url": "https://twitter.com/StarlyNFT"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://storage.googleapis.com/starly-prod.appspot.com/assets/starly-square-logo.jpg"
+						},
+						"mediaType": "https://storage.googleapis.com/starly-prod.appspot.com/assets/starly-square-logo.jpg"
+					}
+				},
+				"contractAddress": "0x5b82f21c0edf76e3",
+				"contractName": "StarlyCard"
+			},
+			"ids": [
+				16081,
+				57599,
+				47409
+			],
+			"number": 3,
+			"path": "/storage/starlyCardCollection",
+			"type": "A.5b82f21c0edf76e3.StarlyCard.Collection"
+		},
+		"/storage/wearables": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://gateway.pinata.cloud/ipfs/QmWEsThoSdJHNVcwexYuSucR4MEGhkJEH6NCzdTV71y6GN/"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "Doodles 2 lets anyone create a uniquely personalized and endlessly customizable character in a one-of-a-kind style. Wearables and other collectibles can easily be bought, traded, or sold. Doodles 2 will also incorporate collaborative releases with top brands in fashion, music, sports, gaming, and more.\n\nDoodles 2 Private Beta, which will offer first access to the Doodles character creator tools, will launch later in 2022. Doodles 2 Private Beta will only be available to Beta Pass holders.",
+					"externalURL": {
+						"url": "https://doodles.app"
+					},
+					"name": "Wearables",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/doodles"
+						},
+						"twitter": {
+							"url": "https://twitter.com/doodles"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://gateway.pinata.cloud/ipfs/QmVpAiutpnzp3zR4q2cUedMxsZd8h5HDeyxs9x3HibsnJb/"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0xe81193c424cfd3fb",
+				"contractName": "Wearables"
+			},
+			"number": 0,
+			"path": "/storage/wearables",
+			"type": "A.e81193c424cfd3fb.Wearables.Collection"
+		}
+	},
+	"NameStatus": {
+		"cost": 5,
+		"lockedUntil": 1710107414,
+		"owner": "0x886f3aeaf848c535",
+		"registeredTime": 1639259414,
+		"status": "TAKEN",
+		"validUntil": 1702331414
+	},
+	"Profile": {
+		"address": "0x886f3aeaf848c535",
+		"allowStoringFollowers": true,
+		"avatar": "https://flovatar.com/api/image/95",
+		"createdAt": "find",
+		"description": "creator of .find, co-owner of versus. #SODA father. Co-author of metadata flow flip. OnFlow Community Rep. Service-Account signer.",
+		"findName": "bjartek",
+		"followers": [
+			{
+				"follower": "0xdec5369b36230285",
+				"following": "0x886f3aeaf848c535"
+			},
+			{
+				"follower": "0xf4c99941cd3ae3d5",
+				"following": "0x886f3aeaf848c535"
+			}
+		],
+		"links": {
+			"Homepage": {
+				"title": "Homepage",
+				"type": "globe",
+				"url": "https://bjartek.org"
+			},
+			"Twitter": {
+				"title": "Twitter",
+				"type": "twitter",
+				"url": "https://twitter.com/0xBjartek"
+			}
+		},
+		"name": "bjartek",
+		"tags": [
+			"find",
+			"versus",
+			"overflow",
+			"flovatar-maxi",
+			"neo-team-8"
+		],
+		"wallets": [
+			{
+				"accept": "A.3c5959b568896393.FUSD.Vault",
+				"balance": 1.09999994,
+				"name": "FUSD",
+				"tags": [
+					"fusd",
+					"stablecoin"
+				]
+			},
+			{
+				"accept": "A.1654653399040a61.FlowToken.Vault",
+				"balance": 109.01106338,
+				"name": "Flow",
+				"tags": [
+					"flow"
+				]
+			},
+			{
+				"accept": "A.b19436aae4d94622.FiatToken.Vault",
+				"balance": 0,
+				"name": "USDC",
+				"tags": [
+					"usdc",
+					"stablecoin"
+				]
+			}
+		]
+	},
+	"Resource": {
+		"/storage/chainmonstersRewardsMarketCollection": "A.64f83c60989ce555.ChainmonstersMarketplace.Collection",
+		"/storage/nftCatalogProposalManager": "A.49a7cda3a1eecc29.NFTCatalog.NFTCatalogProposalManager",
+		"/storage/stakingCollection": "A.8d0e87b65159ae63.FlowStakingCollection.StakingCollection"
+	},
+	"StorageAvailable": 10897893006,
+	"StorageCapacity": 10901106338,
+	"StorageUsed": 3213332
+}
+⭐ Script getAccountByPath run result: {
+	"AccountBalance": 109.01106338,
+	"CurrentTime": 1676898094,
+	"FT": {
+		"/storage/flowTokenVault": {
+			"balance": 109.01106338,
+			"detail": {
+				"alias": "Flow",
+				"icon": "https://static.flowscan.org/mainnet/icons/A.1654653399040a61.FlowToken.png",
+				"tag": [
+					"utility coin"
+				],
+				"type": "A.1654653399040a61.FlowToken.Vault"
+			},
+			"path": "/storage/flowTokenVault",
+			"type": "A.1654653399040a61.FlowToken.Vault"
+		}
+	},
+	"NFT": {
+		"/storage/Bl0xPackCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_banners/1535883931777892352/1661105339/1500x500"
+						},
+						"mediaType": "image"
+					},
+					"description": "Minting a Bl0x triggers the catalyst moment of a big bang scenario. Generating a treasure that is designed to relate specifically to its holder.",
+					"externalURL": {
+						"url": "https://find.xyz/mp/bl0xPack"
+					},
+					"name": "bl0x Pack",
+					"socials": {
+						"discord": {
+							"url": "https://t.co/iY7AhEumR9"
+						},
+						"twitter": {
+							"url": "https://twitter.com/Bl0xNFT"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://bl0x.xyz/assets/home/Bl0xlogo.webp"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0x7620acf6d7f2468a",
+				"contractName": "Bl0xPack"
+			},
+			"ids": [
+				208638869
+			],
+			"number": 1,
+			"path": "/storage/Bl0xPackCollection",
+			"type": "A.7620acf6d7f2468a.Bl0xPack.Collection"
+		},
+		"/storage/CryptoPiggoCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://ipfs.tenzingai.com/ipfs/QmUk3s7BoVSS56V2U4rxd1syVp8USUEygu7NmARppH183U"
+						},
+						"mediaType": "image/png"
+					},
+					"externalURL": {
+						"url": "https://www.rareworx.com/"
+					},
+					"name": "The Crypto Piggo NFT Collection",
+					"squareImage": {
+						"file": {
+							"url": "https://ipfs.tenzingai.com/ipfs/QmUk3s7BoVSS56V2U4rxd1syVp8USUEygu7NmARppH183U"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0xd3df824bf81910a4",
+				"contractName": "CryptoPiggo"
+			},
+			"ids": [
+				3733,
+				1864,
+				6397,
+				821,
+				2426,
+				1970,
+				314,
+				5778,
+				2596,
+				2885,
+				3044,
+				1702,
+				2592,
+				9996,
+				4347,
+				1520,
+				1914,
+				204,
+				1519,
+				7313,
+				1657,
+				3473,
+				518,
+				681,
+				1910
+			],
+			"number": 25,
+			"path": "/storage/CryptoPiggoCollection",
+			"type": "A.d3df824bf81910a4.CryptoPiggo.Collection"
+		},
+		"/storage/DOFCollectionStoragePath": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://day-nft.io/header.png"
+						},
+						"mediaType": "https://day-nft.io/header.png"
+					},
+					"description": "The collection can contain multiple series, each representing a set of DayNFTs.",
+					"externalURL": {
+						"url": "https://day-nft.io"
+					},
+					"name": "Days On Flow",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/day_nft_io"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://day-nft.io/QmcrhA1C3hTXnhRLpynZWBAyPaf4p8zsAE8NK3H3oM2qsv.jpg"
+						},
+						"mediaType": "https://day-nft.io/QmcrhA1C3hTXnhRLpynZWBAyPaf4p8zsAE8NK3H3oM2qsv.jpg"
+					}
+				},
+				"contractAddress": "0x799da0ef17f38104",
+				"contractName": "DaysOnFlow"
+			},
+			"ids": [
+				83,
+				82
+			],
+			"number": 2,
+			"path": "/storage/DOFCollectionStoragePath",
+			"type": "A.799da0ef17f38104.DaysOnFlow.Collection"
+		},
+		"/storage/FlobotCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://images.flovatar.com/logo-horizontal.svg"
+						},
+						"mediaType": "image/svg+xml"
+					},
+					"description": "Flovatar is pioneering a new way to unleash community creativity in Web3 by allowing users to be co-creators of their prized NFTs, instead of just being passive collectors.",
+					"externalURL": {
+						"url": "https://flovatar.com"
+					},
+					"name": "Flovatar Flobot",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/flovatar"
+						},
+						"instagram": {
+							"url": "https://instagram.com/flovatar_nft"
+						},
+						"tiktok": {
+							"url": "https://www.tiktok.com/@flovatar"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flovatar"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://images.flovatar.com/logo.svg"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x921ea449dffec68a",
+				"contractName": "Flobot"
+			},
+			"ids": [
+				3
+			],
+			"number": 1,
+			"path": "/storage/FlobotCollection",
+			"type": "A.921ea449dffec68a.Flobot.Collection"
+		},
+		"/storage/FlovatarCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://images.flovatar.com/logo-horizontal.svg"
+						},
+						"mediaType": "https://images.flovatar.com/logo-horizontal.svg"
+					},
+					"description": "Flovatar is pioneering a new way to unleash community creativity in Web3 by allowing users to be co-creators of their prized NFTs, instead of just being passive collectors.",
+					"externalURL": {
+						"url": "https://flovatar.com/flovatars/4963"
+					},
+					"name": "Flovatar",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/flovatar"
+						},
+						"instagram": {
+							"url": "https://instagram.com/flovatar_nft"
+						},
+						"tiktok": {
+							"url": "https://www.tiktok.com/@flovatar"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flovatar"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://images.flovatar.com/logo.svg"
+						},
+						"mediaType": "https://images.flovatar.com/logo.svg"
+					}
+				},
+				"contractAddress": "0x921ea449dffec68a",
+				"contractName": "Flovatar"
+			},
+			"ids": [
+				2271,
+				2864,
+				4164,
+				2273,
+				2096,
+				5513,
+				5953,
+				1501,
+				5946,
+				5008,
+				2256,
+				166,
+				5965,
+				2267,
+				1763,
+				3573,
+				5940,
+				1943,
+				6031,
+				1824,
+				1778,
+				5663,
+				5667,
+				3421,
+				4352,
+				2863,
+				1939,
+				3405,
+				5686,
+				4960,
+				3569,
+				3572,
+				5664,
+				4136,
+				2259,
+				2263,
+				3653,
+				3424,
+				3214,
+				2077,
+				3430,
+				5665,
+				2859,
+				1446,
+				1237,
+				5045,
+				5654,
+				95,
+				1260,
+				2264,
+				3760,
+				3219,
+				4214,
+				3657,
+				3410,
+				5905,
+				1945,
+				5947,
+				4048
+			],
+			"number": 59,
+			"path": "/storage/FlovatarCollection",
+			"type": "A.921ea449dffec68a.Flovatar.Collection"
+		},
+		"/storage/GoatTraitCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png\u0026w=32\u0026q=75"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "This is the collection of Traits that can be equipped onto Goated Goats",
+					"externalURL": {
+						"url": "https://GoatedGoats.com"
+					},
+					"name": "Goated Goats Traits",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/goatedgoats"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png\u0026w=32\u0026q=75"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x2068315349bdfce5",
+				"contractName": "GoatedGoatsTrait"
+			},
+			"ids": [
+				17920,
+				17792,
+				17795,
+				17831,
+				17784,
+				17793,
+				2131,
+				17910,
+				17921,
+				17923,
+				17909,
+				17906,
+				17924,
+				17897,
+				1871,
+				17931,
+				17895,
+				1147,
+				17783,
+				17827,
+				17782,
+				17925,
+				1234,
+				1637,
+				17832,
+				17926,
+				17898,
+				17919,
+				1293,
+				17828,
+				17929,
+				17794,
+				17907,
+				17918,
+				1638,
+				17905,
+				17933,
+				1233,
+				17829,
+				1872,
+				17927,
+				17779,
+				17908,
+				17930,
+				17917,
+				33859,
+				2132,
+				17796,
+				17928,
+				17781,
+				17780,
+				1148,
+				31721,
+				17922,
+				17791,
+				17896
+			],
+			"number": 56,
+			"path": "/storage/GoatTraitCollection",
+			"type": "A.2068315349bdfce5.GoatedGoatsTrait.Collection"
+		},
+		"/storage/GoatTraitsPackVoucherCollection": {
+			"number": 0,
+			"path": "/storage/GoatTraitsPackVoucherCollection",
+			"type": "A.dfc74d9d561374c0.TraitPacksVouchers.Collection"
+		},
+		"/storage/GoatedGoatsVoucherCollection": {
+			"number": 0,
+			"path": "/storage/GoatedGoatsVoucherCollection",
+			"type": "A.dfc74d9d561374c0.GoatedGoatsVouchers.Collection"
+		},
+		"/storage/MatrixWorldFlowFestNFTCollection": {
+			"number": 0,
+			"path": "/storage/MatrixWorldFlowFestNFTCollection",
+			"type": "A.2d2750f240198f91.MatrixWorldFlowFestNFT.Collection"
+		},
+		"/storage/MatrixWorldVoucherCollection": {
+			"number": 0,
+			"path": "/storage/MatrixWorldVoucherCollection",
+			"type": "A.0d77ec47bbad8ef6.MatrixWorldVoucher.Collection"
+		},
+		"/storage/MomentablesCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://s3.amazonaws.com/xyz.find.momentable/banner.svg"
+						},
+						"mediaType": "image/svg+xml"
+					},
+					"description": "Awakened from their eternal slumber and infused with technology, Pharaoh Cats are formidable war machines commanded by Crypto Pharaohs.",
+					"externalURL": {
+						"url": "https://storefront.momentable.ai/the-crypto-pharaohs-world"
+					},
+					"name": "Pharaoh Cats",
+					"socials": {
+						"instagram": {
+							"url": "https://www.instagram.com/nextdecentrum"
+						},
+						"linkedin": {
+							"url": "https://www.linkedin.com/company/nextdecentrum"
+						},
+						"twitter": {
+							"url": "https://twitter.com/nextdecentrum"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://s3.amazonaws.com/xyz.find.momentable/logo.svg"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x9d21537544d9123d",
+				"contractName": "Momentables"
+			},
+			"ids": [
+				108,
+				555
+			],
+			"number": 2,
+			"path": "/storage/MomentablesCollection",
+			"type": "A.9d21537544d9123d.Momentables.Collection"
+		},
+		"/storage/SoulMadePackCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://i.imgur.com/yBw3ktk.png"
+						},
+						"mediaType": "https://i.imgur.com/yBw3ktk.png"
+					},
+					"description": "SoulMade Main Collection",
+					"externalURL": {
+						"url": "https://soulmade.art"
+					},
+					"name": "SoulMadeMain",
+					"socials": {
+						"discord": {
+							"url": "https://discord.com/invite/xtqqXCKW9B"
+						},
+						"twitter": {
+							"url": "https://twitter.com/soulmade_nft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://i.imgur.com/XgqDY3s.jpg"
+						},
+						"mediaType": "https://i.imgur.com/XgqDY3s.jpg"
+					}
+				},
+				"contractAddress": "0x9a57dfe5c8ce609c",
+				"contractName": "SoulMadePack"
+			},
+			"number": 0,
+			"path": "/storage/SoulMadePackCollection",
+			"type": "A.9a57dfe5c8ce609c.SoulMadePack.Collection"
+		},
+		"/storage/jambbLaunchVouchersCollection": {
+			"number": 0,
+			"path": "/storage/jambbLaunchVouchersCollection",
+			"type": "A.444f5ea22c6ea12c.Vouchers.Collection"
+		},
+		"/storage/motogpCardCollection": {
+			"number": 0,
+			"path": "/storage/motogpCardCollection",
+			"type": "A.a49cc0ee46c54bfb.MotoGPCard.Collection"
+		},
+		"/storage/neoAvatarCollection": {
+			"ids": [
+				1,
+				293
+			],
+			"number": 2,
+			"path": "/storage/neoAvatarCollection",
+			"type": "A.b25138dbf45e5801.NeoAvatar.Collection"
+		},
+		"/storage/somePlaceCollectibleCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_banners/1329160722786336768/1647107895/1500x500"
+						},
+						"mediaType": "image"
+					},
+					"description": "Time to drink up.",
+					"externalURL": {
+						"url": "https://some.place/"
+					},
+					"name": "The Potion",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/some_place"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_images/1502703455747534850/O7LzbfKw_400x400.jpg"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0x0667a16294a089ef",
+				"contractName": "SomePlaceCollectible"
+			},
+			"ids": [
+				164769803
+			],
+			"number": 1,
+			"path": "/storage/somePlaceCollectibleCollection",
+			"type": "A.667a16294a089ef8.SomePlaceCollectible.Collection"
+		}
+	},
+	"NameStatus": {
+		"cost": 5,
+		"lockedUntil": 1710107414,
+		"owner": "0x886f3aeaf848c535",
+		"registeredTime": 1639259414,
+		"status": "TAKEN",
+		"validUntil": 1702331414
+	},
+	"Resource": {
+		"/storage/A_097bafa4e0b48eef_FindLeaseMarketDirectOfferSoft_MarketBidCollection_findLease": "A.097bafa4e0b48eef.FindLeaseMarketDirectOfferSoft.MarketBidCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketDirectOfferEscrow_SaleItemCollection_find": "A.097bafa4e0b48eef.FindMarketDirectOfferEscrow.SaleItemCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketDirectOfferSoft_SaleItemCollection_find": "A.097bafa4e0b48eef.FindMarketDirectOfferSoft.SaleItemCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketSale_SaleItemCollection_find": "A.097bafa4e0b48eef.FindMarketSale.SaleItemCollection",
+		"/storage/FindCuratedCollections": "{String:[String]}",
+		"/storage/userCertificate_increment": "A.f80cb737bfe7c792.LendingComptroller.UserCertificate"
+	},
+	"StorageAvailable": 10897893006,
+	"StorageCapacity": 10901106338,
+	"StorageUsed": 3213332
+}
+⭐ Script getAccountByPath run result: {
+	"AccountBalance": 109.01106338,
+	"CurrentTime": 1676898094,
+	"FT": {
+		"/storage/revvVault": {
+			"balance": 0,
+			"path": "/storage/revvVault",
+			"type": "A.d01e482eb680ec9f.REVV.Vault"
+		}
+	},
+	"NFT": {
+		"/storage/BlockleteGames_NFTCollection": {
+			"number": 0,
+			"path": "/storage/BlockleteGames_NFTCollection",
+			"type": "A.329feb3ab062d289.BlockleteGames_NFT.Collection"
+		},
+		"/storage/FabricantCollection001": {
+			"number": 0,
+			"path": "/storage/FabricantCollection001",
+			"type": "A.a0cbe021821c0965.TheFabricantMysteryBox_FF1.Collection"
+		},
+		"/storage/GaiaCollection001": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://d3ihoi13u6g9y2.cloudfront.net/metadata/ballerz-banner.png"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "A basketball-inspired generative NFT living on the Flow blockchain",
+					"externalURL": {
+						"url": "https://ongaia.com/"
+					},
+					"name": "Ballerz",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/ongaia"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://d3ihoi13u6g9y2.cloudfront.net/metadata/ballerz-square.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x8b148183c28ff88f",
+				"contractName": "Gaia"
+			},
+			"ids": [
+				8782
+			],
+			"number": 1,
+			"path": "/storage/GaiaCollection001",
+			"type": "A.8b148183c28ff88f.Gaia.Collection"
+		},
+		"/storage/GoatTraitPackCollection": {
+			"number": 0,
+			"path": "/storage/GoatTraitPackCollection",
+			"type": "A.2068315349bdfce5.GoatedGoatsTraitPack.Collection"
+		},
+		"/storage/MatrixMarketCollection": {
+			"number": 0,
+			"path": "/storage/MatrixMarketCollection",
+			"type": "A.2162bbe13ade251e.MatrixMarket.Collection"
+		},
+		"/storage/MintixCollection": {
+			"number": 0,
+			"path": "/storage/MintixCollection",
+			"type": "A.3aeb2f91034784ab.Mintix.Collection"
+		},
+		"/storage/NiftoryCollectibleCollection": {
+			"number": 0,
+			"path": "/storage/NiftoryCollectibleCollection",
+			"type": "A.23dddd854fcc8c6f.KOTD.Collection"
+		},
+		"/storage/RaceDay_NFTCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://media.gigantik.io/raceday/banner.png"
+						},
+						"mediaType": "image/png"
+					},
+					"externalURL": {
+						"url": "https://www.racedaynft.com"
+					},
+					"name": "RaceDayNFT",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/jkmrMY5TGB"
+						},
+						"facebook": {
+							"url": "https://www.facebook.com/RaceDayNFT"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/racedaynft/"
+						},
+						"twitter": {
+							"url": "https://twitter.com/RaceDayNFT"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://media.gigantik.io/raceday/square.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x329feb3ab062d289",
+				"contractName": "RaceDay_NFT"
+			},
+			"ids": [
+				55299
+			],
+			"number": 1,
+			"path": "/storage/RaceDay_NFTCollection",
+			"type": "A.329feb3ab062d289.RaceDay_NFT.Collection"
+		},
+		"/storage/SchmoesPreLaunchTokenCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://gateway.pinata.cloud/ipfs/QmXQ1iBke5wjcjYG22ACVXsCvtMJKEkwFiMf96UChP8uJq"
+						},
+						"mediaType": "https://gateway.pinata.cloud/ipfs/QmXQ1iBke5wjcjYG22ACVXsCvtMJKEkwFiMf96UChP8uJq"
+					},
+					"externalURL": {
+						"url": "https://schmoes.io"
+					},
+					"name": "Schmoes Pre Launch Token",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/SchmoesNFT"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://gateway.pinata.cloud/ipfs/QmXQ1iBke5wjcjYG22ACVXsCvtMJKEkwFiMf96UChP8uJq"
+						},
+						"mediaType": "https://gateway.pinata.cloud/ipfs/QmXQ1iBke5wjcjYG22ACVXsCvtMJKEkwFiMf96UChP8uJq"
+					}
+				},
+				"contractAddress": "0x6c4fe48768523577",
+				"contractName": "SchmoesPreLaunchToken"
+			},
+			"ids": [
+				9
+			],
+			"number": 1,
+			"path": "/storage/SchmoesPreLaunchTokenCollection",
+			"type": "A.6c4fe48768523577.SchmoesPreLaunchToken.Collection"
+		},
+		"/storage/SoulMadeMainCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://i.imgur.com/yBw3ktk.png"
+						},
+						"mediaType": "image"
+					},
+					"description": "SoulMade Main Collection",
+					"externalURL": {
+						"url": "https://soulmade.art"
+					},
+					"name": "SoulMadeMain",
+					"socials": {
+						"discord": {
+							"url": "https://discord.com/invite/xtqqXCKW9B"
+						},
+						"twitter": {
+							"url": "https://twitter.com/soulmade_nft"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://i.imgur.com/XgqDY3s.jpg"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0x9a57dfe5c8ce609c",
+				"contractName": "SoulMadeMain"
+			},
+			"ids": [
+				3736
+			],
+			"number": 1,
+			"path": "/storage/SoulMadeMainCollection",
+			"type": "A.9a57dfe5c8ce609c.SoulMadeMain.Collection"
+		},
+		"/storage/TuneGOCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://tunegonft.com/assets/images/collections-page/tunekitties.png"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "Deep in the clubs and streets of the metaverse TuneKitties prowl with the purrfect mix of sound and style. Limited edition NFTs by TuneGO.",
+					"externalURL": {
+						"url": "https://www.tunegonft.com/collection-details/98434c03-17e3-4e9a-9f6b-3b786a4fad6e"
+					},
+					"name": "TuneKitties",
+					"squareImage": {
+						"file": {
+							"url": "https://tunegonft.com/assets/images/collections-page/tunekitties.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x0d9bc5af3fc0c2e3",
+				"contractName": "TuneGO"
+			},
+			"ids": [
+				328
+			],
+			"number": 1,
+			"path": "/storage/TuneGOCollection",
+			"type": "A.0d9bc5af3fc0c2e3.TuneGO.Collection"
+		},
+		"/storage/bl0xNFTs": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_banners/1535883931777892352/1661105339/1500x500"
+						},
+						"mediaType": "image"
+					},
+					"description": "Minting a Bl0x triggers the catalyst moment of a big bang scenario. Generating a treasure that is designed to relate specifically to its holder.",
+					"externalURL": {
+						"url": "https://find.xyz/0x886f3aeaf848c535/collection/bl0x/208475629"
+					},
+					"name": "bl0x",
+					"socials": {
+						"discord": {
+							"url": "https://t.co/iY7AhEumR9"
+						},
+						"twitter": {
+							"url": "https://twitter.com/Bl0xNFT"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://bl0x.xyz/assets/home/Bl0xlogo.webp"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0x7620acf6d7f2468a",
+				"contractName": "Bl0x"
+			},
+			"ids": [
+				208477774,
+				208477139,
+				208475722,
+				208477055,
+				208476257,
+				208475913,
+				208476070,
+				208477501,
+				208477049,
+				208476374,
+				208477901,
+				208478415,
+				208478444,
+				208475760,
+				208475629,
+				208477415,
+				208475924,
+				208478011
+			],
+			"number": 18,
+			"path": "/storage/bl0xNFTs",
+			"type": "A.7620acf6d7f2468a.Bl0x.Collection"
+		},
+		"/storage/findCharityCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500"
+						},
+						"mediaType": "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500"
+					},
+					"description": "This collection is to show participation in the Neo Collectibles x Flowverse Charity Auction in 2021.",
+					"externalURL": {
+						"url": "http://find.xyz/neoCharity"
+					},
+					"name": "Neo Charity 2021",
+					"socials": {
+						"Discord": {
+							"url": "https://discord.gg/95P274mayM"
+						},
+						"Twitter": {
+							"url": "https://twitter.com/findonflow"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"
+						},
+						"mediaType": "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"
+					}
+				},
+				"contractAddress": "0x097bafa4e0b48eef",
+				"contractName": "CharityNFT"
+			},
+			"ids": [
+				29
+			],
+			"number": 1,
+			"path": "/storage/findCharityCollection",
+			"type": "A.097bafa4e0b48eef.CharityNFT.Collection"
+		},
+		"/storage/findDandy": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500"
+						},
+						"mediaType": "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500"
+					},
+					"description": ".find and dandy nfts",
+					"externalURL": {
+						"url": "https://find.xyz/find/collection/Dandy/412333935"
+					},
+					"name": "find",
+					"socials": {
+						"Discord": {
+							"url": "https://discord.gg/findonflow"
+						},
+						"Twitter": {
+							"url": "https://twitter.com/findonflow"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"
+						},
+						"mediaType": "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"
+					}
+				},
+				"contractAddress": "0x097bafa4e0b48eef",
+				"contractName": "Dandy"
+			},
+			"number": 0,
+			"path": "/storage/findDandy",
+			"type": "A.097bafa4e0b48eef.Dandy.Collection"
+		},
+		"/storage/jambbMomentsCollection": {
+			"ids": [
+				60024,
+				48376,
+				12503,
+				9822,
+				46792,
+				57144,
+				24489,
+				40919,
+				13962,
+				38759,
+				56183,
+				15902,
+				7771,
+				3297,
+				20650
+			],
+			"number": 15,
+			"path": "/storage/jambbMomentsCollection",
+			"type": "A.d4ad4740ee426334.Moments.Collection"
+		},
+		"/storage/nfgNFTCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"cid": "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes fabolous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
+					"externalURL": {
+						"url": "https://nonfungerbils.com"
+					},
+					"name": "NonFunGerbils",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/NonFunGerbils"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"cid": "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x123cb666996b8432",
+				"contractName": "NonFunGerbils"
+			},
+			"ids": [
+				426866948
+			],
+			"number": 1,
+			"path": "/storage/nfgNFTCollection",
+			"type": "A.123cb666996b8432.NFGv3.Collection"
+		}
+	},
+	"NameStatus": {
+		"cost": 5,
+		"lockedUntil": 1710107414,
+		"owner": "0x886f3aeaf848c535",
+		"registeredTime": 1639259414,
+		"status": "TAKEN",
+		"validUntil": 1702331414
+	},
+	"Resource": {
+		"/storage/A_097bafa4e0b48eef_FindLeaseMarketAuctionSoft_SaleItemCollection_findLease": "A.097bafa4e0b48eef.FindLeaseMarketAuctionSoft.SaleItemCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketAuctionSoft_SaleItemCollection_find": "A.097bafa4e0b48eef.FindMarketAuctionSoft.SaleItemCollection",
+		"/storage/A_097bafa4e0b48eef_FindMarketDirectOfferSoft_MarketBidCollection_find": "A.097bafa4e0b48eef.FindMarketDirectOfferSoft.MarketBidCollection",
+		"/storage/AshesCollection": "A.e2a89587100c6096.Ashes.Collection",
+		"/storage/FlovatarPackCollection": "A.921ea449dffec68a.FlovatarPack.Collection",
+		"/storage/SolarpupsMarketAdminProd01": "A.a8d493db1bb4df56.SolarpupsMarket.MarketAdmin",
+		"/storage/starlyCardMarketCollection": "A.5b82f21c0edf76e3.StarlyCardMarket.Collection",
+		"/storage/versusArtMarketplace": "A.d796ff17107bbff6.Marketplace.SaleCollection"
+	},
+	"StorageAvailable": 10897893006,
+	"StorageCapacity": 10901106338,
+	"StorageUsed": 3213332
+}
+⭐ Script getAccountByPath run result: {
+	"AccountBalance": 109.01106338,
+	"CurrentTime": 1676898094,
+	"NFT": {
+		"/storage/EternalShardCollection": {
+			"number": 0,
+			"path": "/storage/EternalShardCollection",
+			"type": "A.82b54037a8f180cf.Shard.Collection"
+		},
+		"/storage/FlovatarComponentCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://images.flovatar.com/logo-horizontal.svg"
+						},
+						"mediaType": "image/svg+xml"
+					},
+					"description": "Flovatar is pioneering a new way to unleash community creativity in Web3 by allowing users to be co-creators of their prized NFTs, instead of just being passive collectors.",
+					"externalURL": {
+						"url": "https://flovatar.com"
+					},
+					"name": "Flovatar Component",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/flovatar"
+						},
+						"instagram": {
+							"url": "https://instagram.com/flovatar_nft"
+						},
+						"tiktok": {
+							"url": "https://www.tiktok.com/@flovatar"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flovatar"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://images.flovatar.com/logo.svg"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x921ea449dffec68a",
+				"contractName": "FlovatarComponent"
+			},
+			"ids": [
+				89281,
+				3233,
+				84015,
+				100951,
+				89275,
+				105550,
+				104541,
+				73819,
+				92155,
+				83376,
+				88987,
+				9776,
+				103799,
+				75207,
+				111099,
+				98524,
+				57198,
+				86065,
+				41270,
+				95485,
+				92963,
+				85911,
+				89266,
+				82275,
+				72835,
+				10232,
+				72645,
+				80222,
+				86870,
+				7156,
+				111292,
+				116170,
+				71315,
+				83937,
+				88997,
+				96401,
+				5499,
+				112749,
+				99272,
+				111938,
+				91638,
+				8290,
+				84236,
+				113122,
+				1459,
+				107642,
+				108717,
+				106452,
+				87553,
+				83838,
+				76620,
+				101638,
+				111923,
+				115774,
+				82503,
+				95097,
+				103808,
+				84335,
+				82773,
+				108473,
+				113525,
+				116540,
+				86969,
+				84165,
+				70616,
+				88053,
+				100857,
+				88952,
+				8017,
+				85049,
+				97976,
+				110023,
+				6978,
+				91024,
+				86568,
+				83353,
+				89517,
+				108711,
+				81295,
+				79072,
+				77456,
+				83490,
+				7955,
+				92138,
+				46242,
+				7878,
+				54387,
+				86374,
+				108962,
+				87820,
+				86263,
+				8683,
+				3465,
+				92402,
+				102668,
+				56875,
+				6918,
+				54887,
+				41334,
+				108187,
+				71687,
+				49340,
+				84734,
+				103575,
+				40595,
+				83576,
+				97381,
+				109248,
+				88793,
+				92875,
+				94512,
+				112836,
+				82082,
+				101786,
+				53488,
+				82449,
+				91893,
+				99150,
+				108606,
+				105092,
+				109928,
+				86122,
+				107066,
+				75239,
+				83407,
+				85675,
+				89393,
+				87606,
+				111801,
+				116719,
+				82882,
+				77826,
+				77608,
+				91426,
+				96304,
+				95461,
+				49581,
+				97276,
+				78991,
+				114022,
+				107535,
+				107963,
+				82099,
+				116611,
+				97945,
+				79855,
+				47374,
+				108315,
+				81426,
+				7074,
+				87062,
+				83246,
+				83449,
+				73362,
+				83252,
+				57616,
+				55744,
+				84170,
+				85175,
+				75438,
+				47447,
+				48574,
+				10047,
+				55016,
+				85413,
+				76515,
+				79111,
+				100114,
+				74192,
+				84024,
+				96039,
+				8924,
+				45438,
+				83673,
+				109303,
+				82122,
+				11638,
+				87780,
+				84079,
+				8063,
+				113521,
+				82049,
+				88685,
+				101069,
+				3918,
+				54408,
+				46889,
+				9246,
+				52921,
+				87160,
+				75935,
+				85919,
+				75865,
+				81902,
+				47143,
+				81422,
+				88187,
+				83300,
+				115727,
+				83608,
+				55468,
+				3367,
+				72203,
+				46303,
+				72446,
+				88706,
+				87388,
+				78287,
+				72367,
+				82381,
+				49747,
+				82022,
+				88891,
+				87284,
+				83475,
+				108640,
+				109695,
+				91563,
+				110136,
+				81536,
+				85173,
+				112095,
+				82087,
+				98880,
+				60312,
+				85516,
+				115183,
+				6542,
+				89449,
+				37880,
+				113743,
+				50708,
+				70607,
+				81844,
+				86508,
+				116547,
+				100289,
+				109384,
+				95863,
+				108825,
+				85215,
+				83701,
+				81998,
+				7899,
+				10343,
+				72763,
+				75441,
+				44282,
+				103479,
+				75544,
+				68663,
+				106386,
+				84334,
+				12235,
+				99283,
+				69037,
+				89539,
+				27396,
+				20395,
+				107157,
+				32968,
+				82096,
+				65694,
+				66813,
+				91004,
+				79551,
+				28065,
+				108393,
+				23711,
+				91112,
+				66686,
+				64444,
+				89009,
+				20976,
+				25836,
+				65027,
+				23231,
+				24589,
+				55875,
+				116232,
+				86687,
+				89470,
+				20547,
+				68369,
+				60263,
+				66007,
+				24343,
+				24437,
+				70197,
+				111667,
+				114902,
+				30017,
+				1266,
+				77655,
+				17872,
+				102124,
+				84763,
+				84452,
+				53436,
+				66919,
+				87711,
+				66229,
+				65777,
+				49959,
+				92013,
+				23281,
+				112943,
+				28661,
+				111461,
+				97930,
+				5857,
+				66250,
+				67217,
+				68606,
+				66681,
+				64539,
+				82522,
+				52931,
+				68128,
+				68034,
+				102655,
+				7568,
+				52407,
+				113281,
+				86784,
+				85205,
+				71617,
+				87661,
+				68648,
+				108209,
+				109264,
+				85097,
+				30340,
+				108506,
+				111933,
+				69879,
+				92988,
+				111351,
+				88171,
+				69528,
+				27978,
+				90971,
+				73119,
+				67415,
+				83359,
+				24402,
+				75930,
+				7096,
+				100760,
+				116825,
+				31043,
+				107871,
+				47453,
+				82423,
+				76139,
+				29595,
+				108340,
+				31991,
+				85914,
+				67722,
+				57241,
+				24521,
+				55282,
+				27165,
+				88589,
+				85851,
+				66105,
+				86484,
+				112185,
+				91081,
+				102989,
+				25981,
+				70264,
+				89502,
+				105967,
+				30119,
+				70057,
+				82070,
+				69565,
+				21929,
+				76851,
+				81363,
+				5185,
+				72556,
+				41135,
+				85154,
+				111921,
+				57889,
+				49715,
+				116352,
+				90493,
+				84261,
+				18806,
+				113471,
+				64535,
+				87125,
+				87115,
+				23954,
+				20281,
+				88429,
+				52940,
+				42424,
+				49487,
+				51198,
+				31940,
+				82311,
+				30436,
+				84739,
+				103442,
+				68581,
+				31379,
+				83531,
+				25755,
+				54331,
+				17292,
+				64906,
+				94232,
+				75363,
+				9597,
+				109475,
+				96883,
+				85184,
+				70062,
+				73017,
+				9751,
+				85343,
+				24084,
+				89219,
+				31618,
+				87999,
+				29986,
+				79658,
+				67354,
+				89296,
+				21757,
+				92292,
+				86943,
+				85745,
+				17422,
+				95443,
+				89480,
+				109028,
+				29610,
+				69422,
+				89552,
+				9959,
+				35482,
+				70820,
+				76019,
+				35782,
+				8323,
+				67233,
+				64416,
+				72457,
+				88658,
+				82340,
+				4005,
+				31270,
+				33129,
+				65748,
+				66122
+			],
+			"number": 461,
+			"path": "/storage/FlovatarComponentCollection",
+			"type": "A.921ea449dffec68a.FlovatarComponent.Collection"
+		},
+		"/storage/FlowversePassCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://flowverse-mystery-pass.s3.filebase.com/mainnet/bannerImage.jpg"
+						},
+						"mediaType": "image/jpg"
+					},
+					"description": "The Flowverse Mystery Pass is a utility-focused membership pass that aims to level up Flowverse from a web2 information provider to a web3 brand",
+					"externalURL": {
+						"url": "https://nft.flowverse.co/flowverse-mystery-pass"
+					},
+					"name": "Flowverse Mystery Pass",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/flowverse"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/flowverseofficial"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flowverse_"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://flowverse-mystery-pass.s3.filebase.com/mainnet/squareImage.jpg"
+						},
+						"mediaType": "image/jpg"
+					}
+				},
+				"contractAddress": "0x9212a87501a8a6a2",
+				"contractName": "FlowversePass"
+			},
+			"ids": [
+				548
+			],
+			"number": 1,
+			"path": "/storage/FlowversePassCollection",
+			"type": "A.9212a87501a8a6a2.FlowversePass.Collection"
+		},
+		"/storage/FlowverseTreasuresCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://flowverse-treasures.s3.filebase.com/mainnet/afterfuture/afterfuture_fv_city_wide.png"
+						},
+						"mediaType": "image"
+					},
+					"description": "The treasures that await you in this collection are based on a foreign planet with imaginary sunrises and neon shades. The designs are by afterfuture, an artist team of two who have gained recognition in the Flow community for their NFT drops on both the Starly and Versus platforms. They also designed the artwork for the Flowverse Mystery Pass.",
+					"externalURL": {
+						"url": "https://nft.flowverse.co/treasures"
+					},
+					"name": "01. Ethereal Sunrise: The Neon Oasis of a Lost Planet",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/flowverse"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/flowverseofficial"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flowverse_"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://flowverse-treasures.s3.filebase.com/mainnet/afterfuture/afterfuture_fv_city_thumbnail.png"
+						},
+						"mediaType": "image"
+					}
+				},
+				"contractAddress": "0x9212a87501a8a6a2",
+				"contractName": "FlowverseTreasures"
+			},
+			"ids": [
+				191,
+				190
+			],
+			"number": 2,
+			"path": "/storage/FlowverseTreasuresCollection",
+			"type": "A.9212a87501a8a6a2.FlowverseTreasures.Collection"
+		},
+		"/storage/GeniaceNFTCollection": {
+			"ids": [
+				2083,
+				2281
+			],
+			"number": 2,
+			"path": "/storage/GeniaceNFTCollection",
+			"type": "A.abda6627c70c7f52.GeniaceNFT.Collection"
+		},
+		"/storage/MintStoreItemCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://dkuxa1i6sgo8h.cloudfront.net/mint/mint-nft-white-thumb.jpg"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "The official Mint Store NFT, the ultimate collectible sure to freshen up fan engagement and marketing experiences.",
+					"name": "MINT",
+					"squareImage": {
+						"file": {
+							"url": "https://dkuxa1i6sgo8h.cloudfront.net/mint/mint-nft-white-thumb.jpg"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x20187093790b9aef",
+				"contractName": "MintStoreItem"
+			},
+			"number": 0,
+			"path": "/storage/MintStoreItemCollection",
+			"type": "A.20187093790b9aef.MintStoreItem.Collection"
+		},
+		"/storage/PartyFavorzCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"cid": "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc"
+						},
+						"mediaType": "image/png"
+					},
+					"description": "Party Favorz are born to celebrate the first ever official NFTDay by Dapper on Sept 20, 2022",
+					"externalURL": {
+						"url": "https://find.xyz"
+					},
+					"name": "PartyFavorz",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/findonflow"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"cid": "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x123cb666996b8432",
+				"contractName": "PartyFavorz"
+			},
+			"ids": [
+				796553732,
+				805264187,
+				796553724,
+				796553656,
+				796553717,
+				796553595,
+				796553601,
+				587346716,
+				796553609,
+				805263731,
+				805264178,
+				805264189,
+				796553715,
+				677808438,
+				587353227,
+				796553640,
+				796553722,
+				805264812,
+				805294369,
+				805264196,
+				677807931,
+				587348807,
+				796553684,
+				677808624
+			],
+			"number": 24,
+			"path": "/storage/PartyFavorzCollection",
+			"type": "A.123cb666996b8432.PartyFavorz.Collection"
+		},
+		"/storage/fnsDomainCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://www.flowns.org/_next/image?url=%2Fassets%2Fflowns_logo_light.svg\u0026w=128\u0026q=75"
+						},
+						"mediaType": "image/svg+xml"
+					},
+					"description": "This collection is managed by Flowns and present the ownership of domain.",
+					"externalURL": {
+						"url": "https://flowns.org/domain/caos.fn"
+					},
+					"name": "The Flowns domain Collection",
+					"socials": {
+						"discord": {
+							"url": "https://discord.gg/fXz4gBaYXd"
+						},
+						"medium": {
+							"url": "https://medium.com/@Flowns"
+						},
+						"twitter": {
+							"url": "https://twitter.com/flownsorg"
+						},
+						"website": {
+							"url": "https://flowns.org"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://www.flowns.org/_next/image?url=%2Fassets%2Fflowns_v_logo_light.svg\u0026w=256\u0026q=75"
+						},
+						"mediaType": "image/svg+xml"
+					}
+				},
+				"contractAddress": "0x233eb012d34b0070",
+				"contractName": "Domains"
+			},
+			"ids": [
+				16163,
+				16164
+			],
+			"number": 2,
+			"path": "/storage/fnsDomainCollection",
+			"type": "A.233eb012d34b0070.Domains.Collection"
+		},
+		"/storage/sportsIconCollectibleCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://sportsicon.com/images/sportsicon-banner-flow.jpg"
+						},
+						"mediaType": "image/jpeg"
+					},
+					"description": "The world's first sports-focused NFT marketplace.",
+					"externalURL": {
+						"url": "https://sportsicon.com"
+					},
+					"name": "SportsIcon Collection",
+					"socials": {
+						"discord": {
+							"url": "http://discord.gg/mfAx4nzqEe"
+						},
+						"instagram": {
+							"url": "https://www.instagram.com/_SportsIcon_/"
+						},
+						"telegram": {
+							"url": "https://t.me/sportsiconchat"
+						},
+						"twitter": {
+							"url": "https://twitter.com/sportsicon"
+						},
+						"youtube": {
+							"url": "https://www.youtube.com/channel/UCpwABtrFnRHMMM1k7zIf93w"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://sportsicon.com/images/sportsicon-logo-flow.png"
+						},
+						"mediaType": "image/png"
+					}
+				},
+				"contractAddress": "0x8de96244f54db422",
+				"contractName": "SportsIconCollectible"
+			},
+			"ids": [
+				133173867,
+				170579767,
+				181422722,
+				411274337,
+				692707424,
+				411281709,
+				783894258,
+				61433832,
+				412324088,
+				411214428,
+				617138192,
+				411291246,
+				505259614
+			],
+			"number": 13,
+			"path": "/storage/sportsIconCollectibleCollection",
+			"type": "A.8de96244f54db422.SportsIconCollectible.Collection"
+		},
+		"/storage/starlyTokenStakingCollection": {
+			"ids": [
+				308,
+				3365,
+				8169
+			],
+			"number": 3,
+			"path": "/storage/starlyTokenStakingCollection",
+			"type": "A.76a9b420a331b9f0.StarlyTokenStaking.Collection"
+		},
+		"/storage/versusArtCollection": {
+			"catalogData": {
+				"collectionDisplay": {
+					"bannerImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_images/1295757455679528963/ibkAIRww_400x400.jpg"
+						},
+						"mediaType": "https://pbs.twimg.com/profile_images/1295757455679528963/ibkAIRww_400x400.jpg"
+					},
+					"description": "Curated auction house for fine art",
+					"externalURL": {
+						"url": "https://www.versus.auction/piece/0x886f3aeaf848c535/671"
+					},
+					"name": "Versus",
+					"socials": {
+						"twitter": {
+							"url": "https://twitter.com/FlowVersus"
+						}
+					},
+					"squareImage": {
+						"file": {
+							"url": "https://pbs.twimg.com/profile_images/1295757455679528963/ibkAIRww_400x400.jpg"
+						},
+						"mediaType": "https://pbs.twimg.com/profile_images/1295757455679528963/ibkAIRww_400x400.jpg"
+					}
+				},
+				"contractAddress": "0xd796ff17107bbff6",
+				"contractName": "Art"
+			},
+			"ids": [
+				850,
+				289,
+				287,
+				538,
+				230,
+				292,
+				836,
+				735,
+				288,
+				839,
+				920,
+				693,
+				691,
+				834,
+				676,
+				134,
+				284,
+				712,
+				606,
+				291,
+				1059,
+				1070,
+				1048,
+				598,
+				744,
+				898,
+				381,
+				865,
+				671
+			],
+			"number": 29,
+			"path": "/storage/versusArtCollection",
+			"type": "A.d796ff17107bbff6.Art.Collection"
+		}
+	},
+	"NameStatus": {
+		"cost": 5,
+		"lockedUntil": 1710107414,
+		"owner": "0x886f3aeaf848c535",
+		"registeredTime": 1639259414,
+		"status": "TAKEN",
+		"validUntil": 1702331414
+	},
+	"Resource": {
+		"/storage/A_097bafa4e0b48eef_FindLeaseMarketAuctionSoft_MarketBidCollection_findLease": "A.097bafa4e0b48eef.FindLeaseMarketAuctionSoft.MarketBidCollection",
+		"/storage/ZayTraderCollectionV2": "A.4c577a03bc1a82e0.ZayTraderV2.TradeCollection",
+		"/storage/increment_stakingUserCertificate": "A.1b77ba4b414de352.Staking.UserCertificate",
+		"/storage/increment_swap_lptoken_collection": "A.b063c16cac85dbd1.SwapFactory.LpTokenCollection"
+	},
+	"StorageAvailable": 10897893006,
+	"StorageCapacity": 10901106338,
+	"StorageUsed": 3213332
+}
