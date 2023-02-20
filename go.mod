@@ -8,6 +8,7 @@ require (
 	github.com/onflow/cadence v0.30.0
 	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20221216181912-916369eaf1cf
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
+	github.com/samber/lo v1.37.0
 	github.com/sanity-io/litter v1.5.5
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/crypto v0.1.0
@@ -135,7 +136,6 @@ require (
 	github.com/psiemens/sconfig v0.1.0 // indirect
 	github.com/rivo/uniseg v0.2.1-0.20211004051800-57c86be7915a // indirect
 	github.com/rs/zerolog v1.28.0 // indirect
-	github.com/samber/lo v1.37.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sethvargo/go-retry v0.2.3 // indirect
 	github.com/shurcooL/go-goon v0.0.0-20210110234559-7585751d9a17 // indirect
