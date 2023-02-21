@@ -79,7 +79,7 @@ pub contract NameVoucher: NonFungibleToken {
 				return MetadataViews.Royalties(NameVoucher.royalties)
 
 			case Type<MetadataViews.NFTCollectionDisplay>():
-				let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/nameVoucher")
+				let externalURL = MetadataViews.ExternalURL("https://find.xyz/")
 				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"), mediaType: "image")
 				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1674733461/1500x500"), mediaType: "image")
 				return MetadataViews.NFTCollectionDisplay(
