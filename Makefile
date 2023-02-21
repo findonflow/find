@@ -95,3 +95,6 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.scripts.getMetadataForRegisterDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForRegister.cdc
 	jq ".networks.mainnet.scripts.getMetadataForRenewNameDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForRenewName.cdc
 
+compare-client:
+	FLOW_NETWORK=testnet FOLDER_PATH=$(arg) go run ./tasks/checkDapperTx/main.go
+	FLOW_NETWORK=mainnet FOLDER_PATH=$(arg) go run ./tasks/checkDapperTx/main.go
