@@ -52,6 +52,7 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/listNFTForSaleDapper.cdc
 	jq ".networks.testnet.transactions.delistNFTSale.code" lib/find.json -r > dapper-tx/testnet/delistNFTSale.cdc
 	jq ".networks.testnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/testnet/setProfile.cdc
+	jq ".networks.testnet.transactions.setMainName.code" lib/find.json -r > dapper-tx/testnet/setMainName.cdc
 	jq ".networks.testnet.transactions.initWearables.code" lib/find.json -r > dapper-tx/testnet/initWearables.cdc
 	jq ".networks.testnet.transactions.sendWearables.code" lib/find.json -r > dapper-tx/testnet/sendWearables.cdc
 	jq ".networks.testnet.transactions.deleteFindThoughts.code" lib/find.json -r > dapper-tx/testnet/deleteFindThoughts.cdc
@@ -82,6 +83,7 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.listNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/listNFTForSaleDapper.cdc
 	jq ".networks.mainnet.transactions.delistNFTSale.code" lib/find.json -r > dapper-tx/mainnet/delistNFTSale.cdc
 	jq ".networks.mainnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/mainnet/setProfile.cdc
+	jq ".networks.mainnet.transactions.setMainName.code" lib/find.json -r > dapper-tx/mainnet/setMainName.cdc
 	jq ".networks.mainnet.transactions.initWearables.code" lib/find.json -r > dapper-tx/mainnet/initWearables.cdc
 	jq ".networks.mainnet.transactions.sendWearables.code" lib/find.json -r > dapper-tx/mainnet/sendWearables.cdc
 	jq ".networks.mainnet.transactions.deleteFindThoughts.code" lib/find.json -r > dapper-tx/mainnet/deleteFindThoughts.cdc
