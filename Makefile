@@ -59,6 +59,10 @@ client: gen-client client-dapper-mainnet
 	jq ".networks.testnet.transactions.reactToFindThoughts.code" lib/find.json -r > dapper-tx/testnet/reactToFindThoughts.cdc
 	jq ".networks.testnet.transactions.editFindThought.code" lib/find.json -r > dapper-tx/testnet/editFindThought.cdc
 	jq ".networks.testnet.transactions.publishFindThought.code" lib/find.json -r > dapper-tx/testnet/publishFindThought.cdc
+	jq ".networks.testnet.transactions.redeemLostAndFoundNFTs.code" lib/find.json -r > dapper-tx/testnet/redeemLostAndFoundNFTs.cdc
+	jq ".networks.testnet.transactions.redeemAllLostAndFoundNFTs.code" lib/find.json -r > dapper-tx/testnet/redeemAllLostAndFoundNFTs.cdc
+	jq ".networks.testnet.transactions.sendNFTs.code" lib/find.json -r > dapper-tx/testnet/sendNFTs.cdc
+	jq ".networks.testnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/testnet/setProfile.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyAddon.cdc
 	jq ".networks.testnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/testnet/getMetadataForBuyLeaseForSale.cdc
@@ -89,6 +93,10 @@ client-dapper-mainnet:
 	jq ".networks.mainnet.transactions.reactToFindThoughts.code" lib/find.json -r > dapper-tx/mainnet/reactToFindThoughts.cdc
 	jq ".networks.mainnet.transactions.editFindThought.code" lib/find.json -r > dapper-tx/mainnet/editFindThought.cdc
 	jq ".networks.mainnet.transactions.publishFindThought.code" lib/find.json -r > dapper-tx/mainnet/publishFindThought.cdc
+	jq ".networks.mainnet.transactions.redeemLostAndFoundNFTs.code" lib/find.json -r > dapper-tx/mainnet/redeemLostAndFoundNFTs.cdc
+	jq ".networks.mainnet.transactions.redeemAllLostAndFoundNFTs.code" lib/find.json -r > dapper-tx/mainnet/redeemAllLostAndFoundNFTs.cdc
+	jq ".networks.mainnet.transactions.sendNFTs.code" lib/find.json -r > dapper-tx/mainnet/sendNFTs.cdc
+	jq ".networks.mainnet.transactions.setProfile.code" lib/find.json -r > dapper-tx/mainnet/setProfile.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyNFTForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyNFTForSaleDapper.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyAddonDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyAddon.cdc
 	jq ".networks.mainnet.scripts.getMetadataForBuyLeaseForSaleDapper.code" lib/find.json -r > dapper-tx/mainnet/getMetadataForBuyLeaseForSale.cdc
