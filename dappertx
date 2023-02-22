@@ -24,7 +24,7 @@ declare -a txn=(\
 "editFindThought" \
 "publishFindThought" \
 "publishFindThought" \
-"redeemNameVoucher" \
+# "redeemNameVoucher" \
 "initCollections" \
 "redeemLostAndFoundNFTs" \
 "redeemAllLostAndFoundNFTs" \
