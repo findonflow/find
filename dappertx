@@ -5,7 +5,9 @@ declare -a txn=(\
 "buyLeaseForSaleDapper" \
 "buyAddonDapper" \
 "editProfileDapper" \
+"setProfile" \
 "listLeaseForSaleDapper" \
+"delistLeaseSale" \
 "moveNameToDapper" \
 "registerDapper" \
 "removeRelatedAccountDapper" \
@@ -15,14 +17,12 @@ declare -a txn=(\
 "buyNFTForSaleDapper" \
 "listNFTForSaleDapper" \
 "delistNFTSale" \
-"setProfile" \
 "initWearables" \
 "sendWearables" \
 "deleteFindThoughts" \
 "hideFindThoughts" \
 "reactToFindThoughts" \
 "editFindThought" \
-"publishFindThought" \
 "publishFindThought" \
 # "redeemNameVoucher" \
 "initCollections" \
