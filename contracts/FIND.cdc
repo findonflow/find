@@ -442,6 +442,27 @@ pub contract FIND {
 		pub fun getLeaseStatus() : LeaseStatus {
 			return FIND.status(self.name).status
 		}
+
+		pub fun validate() : Bool {
+			// if network is not there anymore, it is not valid
+			if !self.networkCap.check() {
+				return false
+			}
+			let network = self.networkCap.borrow()!
+			let lease = network.getLease(self.name)
+			// if the network lease is nil, it is definitely not validated
+			if lease == nil {
+				return false
+			}
+			// regardless of the status (FREE / LOCKED / TAKEN)
+			// (because other functions checks that)
+			// if this lease is not the current / latest owner, this lease is not valid anymore
+			let registeredOwner = lease!.profile.address
+			if registeredOwner == self.owner?.address {
+				return true
+			}
+			return false
+		}
 	}
 
 	/* An Auction for a lease */
@@ -562,6 +583,7 @@ pub contract FIND {
 	pub resource interface LeaseCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getLeases(): [String]
+		pub fun getInvalidatedLeases(): [String]
 		//fetch all names that are for sale
 		pub fun getLeaseInformation() : [LeaseInformation]
 		pub fun getLease(_ name: String) :LeaseInformation?
@@ -627,6 +649,10 @@ pub contract FIND {
 
 			let lease = self.borrow(name)
 
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			if lease.addons.containsKey(addon) {
 				panic("You already have this addon : ".concat(addon))
 			}
@@ -662,6 +688,10 @@ pub contract FIND {
 			let addonPrice = network.addonPrices[addon]!
 
 			let lease = self.borrow(name)
+
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
 
 			if lease.addons.containsKey(addon) {
 				panic("You already have this addon : ".concat(addon))
@@ -703,6 +733,10 @@ pub contract FIND {
 
 			let lease = self.borrow(name)
 
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			if lease.addons.containsKey(addon) {
 				panic("You already have this addon : ".concat(addon))
 			}
@@ -715,11 +749,17 @@ pub contract FIND {
 
 		pub fun getAddon(name: String) : [String] {
 			let lease = self.borrow(name)
+			if !lease.validate() {
+				return []
+			}
 			return lease.getAddon()
 		}
 
 		pub fun checkAddon(name:String, addon: String) : Bool {
 			let lease = self.borrow(name)
+			if !lease.validate() {
+				return false
+			}
 			return lease.checkAddon(addon: addon)
 		}
 
@@ -732,6 +772,11 @@ pub contract FIND {
 				return nil
 			}
 			let token=self.borrow(name)
+
+			if !token.validate() {
+				return nil
+			}
+
 
 			var latestBid: UFix64? = nil
 			var auctionEnds: UFix64?= nil
@@ -778,6 +823,11 @@ pub contract FIND {
 		pub fun startAuction(_ name: String) {
 			let timestamp=Clock.time()
 			let lease = self.borrow(name)
+
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			let duration=lease.auctionDuration
 			let extensionOnLateBid=lease.auctionExtensionOnLateBid
 			if lease.offerCallback == nil {
@@ -848,6 +898,11 @@ pub contract FIND {
 			}
 
 			let lease = self.borrow(name)
+
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			let timestamp=Clock.time()
 
 			if balance < lease.auctionMinBidIncrement {
@@ -897,6 +952,10 @@ pub contract FIND {
 
 			let timestamp=Clock.time()
 			let lease = self.borrow(name)
+
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
 
 			if self.auctions.containsKey(name) {
 				let auction = self.borrowAuction(name)
@@ -1051,6 +1110,11 @@ pub contract FIND {
 			}
 
 			let lease = self.borrow(name)
+
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			if lease.getLeaseStatus() == LeaseStatus.FREE {
 				panic("cannot fulfill sale name is now free")
 			}
@@ -1142,6 +1206,10 @@ pub contract FIND {
 
 			let tokenRef = self.borrow(name)
 
+			if !tokenRef.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			//if we have a callback there is no auction and it is a blind bid
 			if let cb= tokenRef.offerCallback {
 				let bidder= cb.address
@@ -1171,6 +1239,11 @@ pub contract FIND {
 			}
 
 			let tokenRef = self.borrow(name)
+
+			if !tokenRef.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			tokenRef.setSalePrice(directSellPrice)
 			emit Sale(name: name, uuid: tokenRef.uuid, seller: self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: tokenRef.salePrice!, status: "active_listed", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
 		}
@@ -1201,6 +1274,12 @@ pub contract FIND {
 
 		//note that when moving a name
 		pub fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+
+			let lease = self.borrow(name)
+			if !lease.validate() {
+				panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+			}
+
 			let token <- self.leases.remove(key:  name) ?? panic("missing NFT")
 			emit Moved(name: name, previousOwner:self.owner!.address, newOwner: profile.address, validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil())
 			token.move(profile: profile)
@@ -1219,7 +1298,27 @@ pub contract FIND {
 
 		// getIDs returns an array of the IDs that are in the collection
 		pub fun getLeases(): [String] {
-			return self.leases.keys
+			var list : [String] = []
+			for key in  self.leases.keys {
+				let lease = self.borrow(key)
+				if !lease.validate() {
+					continue
+				}
+				list.append(key)
+			}
+			return list
+		}
+
+		pub fun getInvalidatedLeases(): [String] {
+			var list : [String] = []
+			for key in  self.leases.keys {
+				let lease = self.borrow(key)
+				if lease.validate() {
+					continue
+				}
+				list.append(key)
+			}
+			return list
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
@@ -1260,6 +1359,14 @@ pub contract FIND {
 			}
 
 			network.registerDapper(merchAccount: merchAccount, name:name, vault: <- vault, profile: profileCap, leases: leases)
+		}
+
+		pub fun cleanUpInvalidatedLease(_ name: String) {
+			let lease = self.borrow(name)
+			if lease.validate() {
+				panic("This is a valid lease. You cannot clean this up. Lease : ".concat(name))
+			}
+			destroy <- self.leases.remove(key: name)!
 		}
 
 		destroy() {
