@@ -7,6 +7,9 @@ import FindUtils from "../contracts/FindUtils.cdc"
 import FlovatarMarketplace from "../contracts/community/FlovatarMarketplace.cdc"
 import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
 import NFTStorefrontV2 from "../contracts/standard/NFTStorefrontV2.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
+import FTRegistry from "../contracts/FTRegistry.cdc"
+import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
 pub fun main(user: String, path: String, id: UInt64, views: [String]): Report {
 	let addr = FIND.resolve(user)
@@ -35,7 +38,7 @@ pub fun main(user: String, path: String, id: UInt64, views: [String]): Report {
 
 
 	let nftRef = col.borrowNFT(id: id)
-	let nft = NFT(nftRef, views)
+	let nft = NFT(addr!, nftRef, views)
 	let collectionDisplay = getCollectionDisplay(nftRef)
 
 
@@ -159,8 +162,17 @@ pub struct NFT {
 	pub let license : String?
 	pub let views : [String]
 	pub let data: {String : AnyStruct}
+	pub let findMarket: {String : FindMarket.SaleItemInformation}
+	pub let storefront: FindUserStatus.StorefrontListing?
+	pub let storefrontV2: FindUserStatus.StorefrontListing?
+	pub let flowty: FindUserStatus.FlowtyListing?
+	pub let flowtyRental: FindUserStatus.FlowtyRental?
+	pub let flovatar: FindUserStatus.FlovatarListing?
+	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
+	pub var allowedListing: {String : ListingTypeReport}?
 
 	init(
+		_ user: Address,
 		_ nft: &NonFungibleToken.NFT,
 		_ views: [String]
 	) {
@@ -178,6 +190,75 @@ pub struct NFT {
 		self.license = getLicense(nft)?.spdxIdentifier
 		self.views = getViews(nft)
 		self.data = getExtraViews(nft, views: views)
+		self.allowedListing = nil
+
+
+		let findAddress=FindMarket.getFindTenantAddress()
+		if !self.soulBounded {
+			let tenantCap = FindMarket.getTenantCapability(findAddress)!
+			let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
+
+			let marketTypes = FindMarket.getSaleItemTypes()
+			var listing : {String : ListingTypeReport} = {}
+			for marketType in marketTypes {
+				if let allowedListing = tenantRef.getAllowedListings(nftType: nft.getType(), marketType: marketType) {
+					listing[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, nft: nft, tenantRef: tenantRef)
+				}
+			}
+		}
+
+		self.findMarket=FindMarket.getNFTListing(tenant:findAddress, address: user, id: nft.uuid, getNFTInfo:false)
+		self.storefront = FindUserStatus.getStorefrontListing(user: user, id : nft.id, type: nft.getType())
+		self.storefrontV2 = FindUserStatus.getStorefrontV2Listing(user: user, id : nft.id, type: nft.getType())
+		self.flowty = FindUserStatus.getFlowtyListing(user: user, id : nft.id, type: nft.getType())
+		self.flowtyRental = FindUserStatus.getFlowtyRentals(user: user, id : nft.id, type: nft.getType())
+		self.flovatar = FindUserStatus.getFlovatarListing(user: user, id : nft.id, type: nft.getType())
+		self.flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: user, id : nft.id, type: nft.getType())
+
+	}
+}
+
+pub struct ListingTypeReport {
+	pub let ftAlias: [String]
+	pub let ftIdentifiers: [String]
+	pub let listingType: String
+	pub let status: String
+	pub let ListingDetails: [ListingRoyalties]
+
+	init(listingType: String, ftAlias: [String], ftIdentifiers: [String],  status: String , ListingDetails: [ListingRoyalties]) {
+		self.listingType=listingType
+		self.status=status
+		self.ListingDetails=ListingDetails
+		self.ftAlias=ftAlias
+		self.ftIdentifiers=ftIdentifiers
+	}
+}
+
+pub struct ListingRoyalties {
+
+	pub let ftAlias: String?
+	pub let ftIdentifier: String
+	pub let royalties: [Royalties]
+
+	init(ftAlias: String?, ftIdentifier: String, royalties: [Royalties]) {
+		self.ftAlias=ftAlias
+		self.ftIdentifier=ftIdentifier
+		self.royalties=royalties
+	}
+}
+
+pub struct Royalties {
+
+	pub let royaltyName: String
+	pub let address: Address
+	pub let findName: String?
+	pub let cut: UFix64
+
+	init(royaltyName: String , address: Address, findName: String?, cut: UFix64) {
+		self.royaltyName=royaltyName
+		self.address=address
+		self.findName=findName
+		self.cut=cut
 	}
 }
 
@@ -281,6 +362,15 @@ pub fun getLicense(_ nft: &NonFungibleToken.NFT) : MetadataViews.License? {
 	return nil
 }
 
+pub fun getRoyalties(_ nft: &NonFungibleToken.NFT) : MetadataViews.Royalties? {
+	if let data = nft.resolveView(Type<MetadataViews.Royalties>()) {
+		if let d = data as? MetadataViews.Royalties {
+			return d
+		}
+	}
+	return nil
+}
+
 pub fun getMedias(_ nft: &NonFungibleToken.NFT) : {String: String} {
 	var media : {String : String } = {}
 	if let data = nft.resolveView(Type<MetadataViews.Medias>()) {
@@ -332,4 +422,61 @@ pub fun getExtraViews(_ nft: &NonFungibleToken.NFT, views: [String]) : {String: 
 	return map
 }
 
+/* Helper Function */
+pub fun resolveRoyalties(_ nft: &NonFungibleToken.NFT) : [Royalties] {
+	let array : [Royalties] = []
+	let royalties = getRoyalties(nft)?.getRoyalties() ?? []
+	for royalty in royalties {
+		let address = royalty.receiver.address
+		array.append(Royalties(royaltyName: royalty.description, address: address, findName: FIND.reverseLookup(address), cut: royalty.cut))
+	}
 
+	return array
+}
+
+pub fun resolveFindRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
+
+	let cuts = tenantRef.getTenantCut(name:"", listingType: listing, nftType:nft, ftType:ft)
+
+	let royalties :[Royalties] = []
+	if cuts.findCut != nil {
+		royalties.append(Royalties(royaltyName: cuts.findCut!.description, address: cuts.findCut!.receiver.address, findName: FIND.reverseLookup(cuts.findCut!.receiver.address), cut: cuts.findCut!.cut))
+	}
+
+	if cuts.tenantCut != nil {
+		royalties.append(Royalties(royaltyName: cuts.tenantCut!.description, address: cuts.tenantCut!.receiver.address, findName: FIND.reverseLookup(cuts.tenantCut!.receiver.address), cut: cuts.tenantCut!.cut))
+	}
+
+	return royalties
+}
+
+pub var nftRoyalties : [Royalties]? = nil
+
+pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, nft: &NonFungibleToken.NFT, tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}) : ListingTypeReport {
+	let listingType = allowedListing.listingType.identifier
+	var ftAlias : [String] = []
+	var ftIdentifier : [String] = []
+	var listingDetails : [ListingRoyalties] = []
+	for ft in allowedListing.ftTypes {
+		ftIdentifier.append(ft.identifier)
+		var alias : String? = nil
+		if let ftInfo = FTRegistry.getFTInfo(ft.identifier) {
+			alias = ftInfo.alias
+			ftAlias.append(ftInfo.alias)
+		}
+
+		// getRoyalties
+		var nftR = nftRoyalties
+		if nftR == nil {
+			nftRoyalties = resolveRoyalties(nft)
+			nftR = nftRoyalties
+		}
+
+		let findR = resolveFindRoyalties(tenantRef: tenantRef, listing: allowedListing.listingType , nft: nft.getType(), ft: ft)
+		findR.appendAll(nftR!)
+
+		listingDetails.append(ListingRoyalties(ftAlias: alias, ftIdentifier: ft.identifier, royalties: findR))
+	}
+
+	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status , ListingDetails: listingDetails)
+}

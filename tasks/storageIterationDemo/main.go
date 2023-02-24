@@ -47,9 +47,9 @@ func main() {
 	// }
 
 	res := o.Script("getPathNFTDetail",
-		WithArg("user", "bjartek"),
-		WithArg("path", "/storage/FlovatarCollection"),
-		WithArg("id", 4048),
+		WithArg("user", "cryptobird"),
+		WithArg("path", "/storage/wearables"),
+		WithArg("id", 893112366),
 		WithArg("views", []string{}),
 	)
 
