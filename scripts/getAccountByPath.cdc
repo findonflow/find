@@ -45,6 +45,19 @@ pub fun main(user: String, targetPaths: [String]): AnyStruct {
 		nameStatus = getNameStatus(user)
 	}
 
+	if addr == nil {
+		return Report(
+			Account: nil,
+			NFT: {},
+			FT: {},
+			Profile: nil,
+			Leases: {},
+			Resource: {},
+			Listing: {},
+			NameStatus: nameStatus,
+		)
+	}
+
     let authAccount: AuthAccount = getAuthAccount(addr!)
 	// if balance is 0.0, it is not a valid address. return not active
 	if authAccount.balance == 0.0 {
@@ -60,12 +73,12 @@ pub fun main(user: String, targetPaths: [String]): AnyStruct {
 			)
 	}
 
-    let nfts: {StoragePath: NFT} = {}
+    let nfts: {StoragePath: NFTCollection} = {}
 	let fts: {StoragePath: FT} = {}
 	var userProfile: Profile.UserReport? = nil
 	var leases: {String : LeaseInformation} = {}
 	var leaseBids: {String : [NameBid]} = {}
-	var resources: {StoragePath : Type} = {}
+	var resources: {StoragePath : ResourceType} = {}
 
 	var listings: {String : [UInt64]} = {}
 
@@ -84,7 +97,8 @@ pub fun main(user: String, targetPaths: [String]): AnyStruct {
         if type.isSubtype(of: Type<@NonFungibleToken.Collection>()) {
 			let collection = authAccount.borrow<&NonFungibleToken.Collection>(from: path)!
 			let number = collection.ownedNFTs.length
-			nfts[path] = NFT(
+			nfts[path] = NFTCollection(
+				user: addr!,
 				path: path,
 				type: type,
 				number: number,
@@ -194,11 +208,11 @@ pub fun main(user: String, targetPaths: [String]): AnyStruct {
 		}
 
         if type.isSubtype(of: Type<@AnyResource>()) {
-			resources[path] = authAccount.borrow<&AnyResource>(from: path)!.getType()
+			resources[path] = ResourceType(type: authAccount.borrow<&AnyResource>(from: path)!.getType(), genericType: "Any")
 		}
 
         if type.isSubtype(of: Type<AnyStruct>()) {
-			resources[path] = authAccount.borrow<&AnyStruct>(from: path)!.getType()
+			resources[path] = ResourceType(type: authAccount.borrow<&AnyStruct>(from: path)!.getType(), genericType: "Any")
 		}
 
         return true
@@ -250,38 +264,41 @@ pub struct Report {
 	pub var StorageCapacity: UInt64
 	pub var StorageAvailable: UInt64
 	pub var AccountBalance: UFix64
-	pub let NFT : {StoragePath : NFT}
+	pub let NFT : {StoragePath : NFTCollection}
 	pub let FT : {StoragePath : FT}
 	pub let Profile: Profile.UserReport?
 	pub let Leases: {String : LeaseInformation}
-	pub let Resource: {StoragePath : AnyStruct}
+	pub let Resource: {StoragePath : ResourceType}
 	pub let Listing: {String : [UInt64]}
 	pub let NameStatus: NameReport?
 
 	pub let CurrentTime: UFix64
 
 	init(
-		Account: AuthAccount,
-		NFT : {StoragePath : NFT},
+		Account: AuthAccount?,
+		NFT : {StoragePath : NFTCollection},
 		FT : {StoragePath : FT},
 		Profile: Profile.UserReport?,
 		Leases: {String : LeaseInformation},
-		Resource: {StoragePath : AnyStruct},
+		Resource: {StoragePath : ResourceType},
 		Listing: {String : [UInt64]},
 		NameStatus: NameReport?
 	) {
 
-		self.AccountBalance = Account.balance
+		self.AccountBalance = 0.0
+		if Account != nil {
+			self.AccountBalance = Account!.balance
+		}
 		self.StorageUsed = 0
 		self.StorageCapacity = 0
 		self.StorageAvailable = 0
 
 		if self.AccountBalance != 0.0 {
-			self.StorageUsed=Account.storageUsed
-			self.StorageCapacity=Account.storageCapacity
+			self.StorageUsed=Account!.storageUsed
+			self.StorageCapacity=Account!.storageCapacity
 			self.StorageAvailable=0
-			if Account.storageCapacity > Account.storageUsed {
-				self.StorageAvailable = Account.storageCapacity - Account.storageUsed
+			if Account!.storageCapacity > Account!.storageUsed {
+				self.StorageAvailable = Account!.storageCapacity - Account!.storageUsed
 			}
 		}
 
@@ -321,14 +338,17 @@ pub struct NameReport {
 	}
 }
 
-pub struct NFT {
+pub struct NFTCollection {
 	pub let path: StoragePath
 	pub let type: String
+	pub let genericType: String
 	pub let number: Int
 	pub let ids: [UInt64]
 	pub var catalogData: CatalogData?
+	pub let script: RunScript
 
 	init(
+		user: Address,
 		path: StoragePath,
 		type: Type,
 		number: Int,
@@ -336,6 +356,10 @@ pub struct NFT {
 	) {
 		self.path=path
 		self.type=type.identifier
+		if !type.isSubtype(of:Type<@NonFungibleToken.Collection>()) {
+			panic("type : ".concat(type.identifier).concat(" is not in type of NFT Collection"))
+		}
+		self.genericType = "NFT"
 		self.number=number
 		self.ids=ids
 		self.catalogData=nil
@@ -347,7 +371,14 @@ pub struct NFT {
 				collectionDisplay: cd.collectionDisplay,
 			)
 		}
-
+		self.script=RunScript(
+			"getPathNFTIDs",
+			{
+				"user" : user,
+				"path" : path.toString(),
+				"max" : 25
+			}
+		)
 	}
 }
 
@@ -370,6 +401,7 @@ pub struct CatalogData {
 pub struct FT {
 	pub let path: StoragePath
 	pub let type: String
+	pub let genericType: String
 	pub let balance: UFix64
 	pub var detail: FTInfo?
 
@@ -380,6 +412,10 @@ pub struct FT {
 	) {
 		self.path=path
 		self.type=type.identifier
+		if !type.isSubtype(of:Type<@FungibleToken.Vault>()) {
+			panic("type : ".concat(type.identifier).concat(" is not in type of FT"))
+		}
+		self.genericType = "NFT"
 		self.balance=balance
 		self.detail=nil
 		if let i = FTRegistry.getFTInfo(type.identifier) {
@@ -555,4 +591,29 @@ pub struct NFTSale {
 		self.number = number
 	}
 
+}
+
+pub struct ResourceType {
+
+	pub let type: String
+	pub let genericType: String
+
+	init(type: Type, genericType: String) {
+		self.type = type.identifier
+		self.genericType = genericType
+	}
+
+}
+
+pub struct RunScript {
+	pub let scriptName: String
+	pub let parameter: {String : AnyStruct}
+
+	init(
+		_ script: String,
+		_ param: {String : AnyStruct}
+	) {
+		self.scriptName=script
+		self.parameter=param
+	}
 }

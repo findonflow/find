@@ -2,8 +2,6 @@ package main
 
 import (
 	. "github.com/bjartek/overflow"
-	"github.com/samber/lo"
-	"github.com/sanity-io/litter"
 )
 
 func main() {
@@ -12,39 +10,53 @@ func main() {
 		WithNetwork("mainnet"),
 	)
 
-	var paths []string
-	err := o.Script(
-		`
-		import FIND from "../contracts/FIND.cdc"
-		pub fun main(address: String): AnyStruct {
-			let account = getAuthAccount(FIND.resolve(address)!)
-			return account.storagePaths
-		  }
-		`,
-		WithArg("address", "bjartek"),
-	).
-		MarshalAs(&paths)
+	// var paths []string
+	// err := o.Script(
+	// 	`
+	// 	import FIND from "../contracts/FIND.cdc"
+	// 	pub fun main(address: String): AnyStruct {
+	// 		let account = getAuthAccount(FIND.resolve(address)!)
+	// 		return account.storagePaths
+	// 	  }
+	// 	`,
+	// 	WithArg("address", "bam"),
+	// ).
+	// 	MarshalAs(&paths)
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	litter.Dump(len(paths))
+	// litter.Dump(len(paths))
+	// litter.Dump(paths)
 
-	chunks := lo.Chunk(paths, 25)
+	// chunks := lo.Chunk(paths, 25)
 
-	for _, chunk := range chunks {
-		res := o.Script("getAccountByPath",
-			WithArg("user", "bjartek"),
-			WithArg("targetPaths", chunk),
-		)
+	// for _, chunk := range chunks {
+	// 	res := o.Script("getAccountByPath",
+	// 		WithArg("user", "bam"),
+	// 		WithArg("targetPaths", chunk),
+	// 	)
 
-		if res.Err == nil {
-			res.Print()
-		} else {
-			panic(res.Err.Error())
-		}
+	// 	if res.Err == nil {
+	// 		res.Print()
+	// 	} else {
+	// 		panic(res.Err.Error())
+	// 	}
 
+	// }
+
+	res := o.Script("getPathNFTDetail",
+		WithArg("user", "bjartek"),
+		WithArg("path", "/storage/FlovatarCollection"),
+		WithArg("id", 4048),
+		WithArg("views", []string{}),
+	)
+
+	if res.Err == nil {
+		res.Print()
+	} else {
+		panic(res.Err.Error())
 	}
 
 }
