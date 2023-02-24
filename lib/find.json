@@ -208,6 +208,17 @@
                   }
                }
             },
+            "getInvalidatedLeases": {
+               "code": "import FIND from 0x179b6b1cb6755e31\n\npub fun main(user: Address) : [String] {\n    let finLeases= getAuthAccount(user).borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)!\n    return finLeases.getInvalidatedLeases()\n}",
+               "spec": {
+                  "order": [
+                     "user"
+                  ],
+                  "parameters": {
+                     "user": "Address"
+                  }
+               }
+            },
             "getItem": {
                "code": "import MetadataViews from 0xf8d6e0586b0a20c7\nimport FIND from 0x179b6b1cb6755e31\nimport FINDNFTCatalog from 0x179b6b1cb6755e31\n\npub struct MetadataCollectionItem {\n    pub let id:UInt64\n    pub let uuid:UInt64\n    pub let name: String\n    pub let description: String?\n    pub let image: String\n    pub let url: String\n    pub let contentType:String\n    pub let rarity:String\n    pub let minter:String?\n    pub let type:Type\n\n\n    init(id:UInt64, uuid:UInt64, name:String, description:String?, image:String, url:String, contentType: String, rarity: String, minter:String?, type:Type) {\n        self.id=id\n        self.uuid=uuid\n        self.name=name\n        self.description=description\n        self.minter=minter\n        self.url=url\n        self.type=type\n        self.image=image\n        self.contentType=contentType\n        self.rarity=rarity\n    }\n}\n\n\npub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{\n\n    let publicPath = getPublicPath(aliasOrIdentifier)\n\n    let resolveAddress = FIND.resolve(user) \n    if resolveAddress == nil {return nil}\n    let address = resolveAddress!\n    let account=getAccount(address)\n    if account.balance == 0.0 {\n        return nil\n    }\n    let resolverCollectionCap= account.getCapability\u003c\u0026{MetadataViews.ResolverCollection}\u003e(publicPath)\n    if !resolverCollectionCap.check() {\n        return nil\n    }\n\n    let collection = resolverCollectionCap.borrow()!\n    let nft = collection.borrowViewResolver(id: id)!\n\n    if let displayView = nft.resolveView(Type\u003cMetadataViews.Display\u003e()) {\n        let display = displayView as! MetadataViews.Display\n\n        var externalUrl=\"\"\n        if let externalUrlView = nft.resolveView(Type\u003cMetadataViews.ExternalURL\u003e()) {\n            let edvu= externalUrlView as! MetadataViews.ExternalURL\n            externalUrl=edvu.url\n        }\n        let item = MetadataCollectionItem(\n            id: id,\n            uuid: nft.uuid,\n            name: display.name,\n            description:display.description,\n            image: display.thumbnail.uri(),\n            url: externalUrl,\n            contentType: \"image\",\n            rarity: \"\",\n            minter: \"\",\n            type: nft.getType()\n        )\n        return item\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : PublicPath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.publicPath\n}",
                "spec": {
@@ -1447,6 +1458,17 @@
             },
             "cancelNameBid": {
                "code": "import FIND from 0x179b6b1cb6755e31\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: AuthAccount) {\n        self.bids = account.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "names"
+                  ],
+                  "parameters": {
+                     "names": "[String]"
+                  }
+               }
+            },
+            "cleanUpInvalidatedLease": {
+               "code": "import FIND from 0x179b6b1cb6755e31\n\n\ntransaction(names: [String]) {\n\n    let col : \u0026FIND.LeaseCollection\n\n    prepare(acct: AuthAccount) {\n        self.col= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n    }\n\n    execute {\n        for name in names {\n            self.col.cleanUpInvalidatedLease(name)\n        }\n    }\n}",
                "spec": {
                   "order": [
                      "names"
@@ -3460,6 +3482,17 @@
                   }
                }
             },
+            "getInvalidatedLeases": {
+               "code": "import FIND from 0x097bafa4e0b48eef\n\npub fun main(user: Address) : [String] {\n    let finLeases= getAuthAccount(user).borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)!\n    return finLeases.getInvalidatedLeases()\n}",
+               "spec": {
+                  "order": [
+                     "user"
+                  ],
+                  "parameters": {
+                     "user": "Address"
+                  }
+               }
+            },
             "getItem": {
                "code": "import MetadataViews from 0x1d7e57aa55817448\nimport FIND from 0x097bafa4e0b48eef\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\n\npub struct MetadataCollectionItem {\n    pub let id:UInt64\n    pub let uuid:UInt64\n    pub let name: String\n    pub let description: String?\n    pub let image: String\n    pub let url: String\n    pub let contentType:String\n    pub let rarity:String\n    pub let minter:String?\n    pub let type:Type\n\n\n    init(id:UInt64, uuid:UInt64, name:String, description:String?, image:String, url:String, contentType: String, rarity: String, minter:String?, type:Type) {\n        self.id=id\n        self.uuid=uuid\n        self.name=name\n        self.description=description\n        self.minter=minter\n        self.url=url\n        self.type=type\n        self.image=image\n        self.contentType=contentType\n        self.rarity=rarity\n    }\n}\n\n\npub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{\n\n    let publicPath = getPublicPath(aliasOrIdentifier)\n\n    let resolveAddress = FIND.resolve(user) \n    if resolveAddress == nil {return nil}\n    let address = resolveAddress!\n    let account=getAccount(address)\n    if account.balance == 0.0 {\n        return nil\n    }\n    let resolverCollectionCap= account.getCapability\u003c\u0026{MetadataViews.ResolverCollection}\u003e(publicPath)\n    if !resolverCollectionCap.check() {\n        return nil\n    }\n\n    let collection = resolverCollectionCap.borrow()!\n    let nft = collection.borrowViewResolver(id: id)!\n\n    if let displayView = nft.resolveView(Type\u003cMetadataViews.Display\u003e()) {\n        let display = displayView as! MetadataViews.Display\n\n        var externalUrl=\"\"\n        if let externalUrlView = nft.resolveView(Type\u003cMetadataViews.ExternalURL\u003e()) {\n            let edvu= externalUrlView as! MetadataViews.ExternalURL\n            externalUrl=edvu.url\n        }\n        let item = MetadataCollectionItem(\n            id: id,\n            uuid: nft.uuid,\n            name: display.name,\n            description:display.description,\n            image: display.thumbnail.uri(),\n            url: externalUrl,\n            contentType: \"image\",\n            rarity: \"\",\n            minter: \"\",\n            type: nft.getType()\n        )\n        return item\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : PublicPath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.publicPath\n}",
                "spec": {
@@ -4845,6 +4878,17 @@
             },
             "cancelNameBid": {
                "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: AuthAccount) {\n        self.bids = account.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "names"
+                  ],
+                  "parameters": {
+                     "names": "[String]"
+                  }
+               }
+            },
+            "cleanUpInvalidatedLease": {
+               "code": "import FIND from 0x097bafa4e0b48eef\n\n\ntransaction(names: [String]) {\n\n    let col : \u0026FIND.LeaseCollection\n\n    prepare(acct: AuthAccount) {\n        self.col= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n    }\n\n    execute {\n        for name in names {\n            self.col.cleanUpInvalidatedLease(name)\n        }\n    }\n}",
                "spec": {
                   "order": [
                      "names"
@@ -6845,6 +6889,17 @@
                   }
                }
             },
+            "getInvalidatedLeases": {
+               "code": "import FIND from 0x35717efbbce11c74\n\npub fun main(user: Address) : [String] {\n    let finLeases= getAuthAccount(user).borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)!\n    return finLeases.getInvalidatedLeases()\n}",
+               "spec": {
+                  "order": [
+                     "user"
+                  ],
+                  "parameters": {
+                     "user": "Address"
+                  }
+               }
+            },
             "getItem": {
                "code": "import MetadataViews from 0x631e88ae7f1d7c20\nimport FIND from 0x35717efbbce11c74\nimport FINDNFTCatalog from 0x35717efbbce11c74\n\npub struct MetadataCollectionItem {\n    pub let id:UInt64\n    pub let uuid:UInt64\n    pub let name: String\n    pub let description: String?\n    pub let image: String\n    pub let url: String\n    pub let contentType:String\n    pub let rarity:String\n    pub let minter:String?\n    pub let type:Type\n\n\n    init(id:UInt64, uuid:UInt64, name:String, description:String?, image:String, url:String, contentType: String, rarity: String, minter:String?, type:Type) {\n        self.id=id\n        self.uuid=uuid\n        self.name=name\n        self.description=description\n        self.minter=minter\n        self.url=url\n        self.type=type\n        self.image=image\n        self.contentType=contentType\n        self.rarity=rarity\n    }\n}\n\n\npub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{\n\n    let publicPath = getPublicPath(aliasOrIdentifier)\n\n    let resolveAddress = FIND.resolve(user) \n    if resolveAddress == nil {return nil}\n    let address = resolveAddress!\n    let account=getAccount(address)\n    if account.balance == 0.0 {\n        return nil\n    }\n    let resolverCollectionCap= account.getCapability\u003c\u0026{MetadataViews.ResolverCollection}\u003e(publicPath)\n    if !resolverCollectionCap.check() {\n        return nil\n    }\n\n    let collection = resolverCollectionCap.borrow()!\n    let nft = collection.borrowViewResolver(id: id)!\n\n    if let displayView = nft.resolveView(Type\u003cMetadataViews.Display\u003e()) {\n        let display = displayView as! MetadataViews.Display\n\n        var externalUrl=\"\"\n        if let externalUrlView = nft.resolveView(Type\u003cMetadataViews.ExternalURL\u003e()) {\n            let edvu= externalUrlView as! MetadataViews.ExternalURL\n            externalUrl=edvu.url\n        }\n        let item = MetadataCollectionItem(\n            id: id,\n            uuid: nft.uuid,\n            name: display.name,\n            description:display.description,\n            image: display.thumbnail.uri(),\n            url: externalUrl,\n            contentType: \"image\",\n            rarity: \"\",\n            minter: \"\",\n            type: nft.getType()\n        )\n        return item\n    }\n    return nil\n}\n\npub fun getPublicPath(_ nftIdentifier: String) : PublicPath {\n    let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftIdentifier)) \n    let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! \n    return collection.collectionData.publicPath\n}",
                "spec": {
@@ -8195,6 +8250,17 @@
             },
             "cancelNameBid": {
                "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: AuthAccount) {\n        self.bids = account.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}",
+               "spec": {
+                  "order": [
+                     "names"
+                  ],
+                  "parameters": {
+                     "names": "[String]"
+                  }
+               }
+            },
+            "cleanUpInvalidatedLease": {
+               "code": "import FIND from 0x35717efbbce11c74\n\n\ntransaction(names: [String]) {\n\n    let col : \u0026FIND.LeaseCollection\n\n    prepare(acct: AuthAccount) {\n        self.col= acct.borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n    }\n\n    execute {\n        for name in names {\n            self.col.cleanUpInvalidatedLease(name)\n        }\n    }\n}",
                "spec": {
                   "order": [
                      "names"
