@@ -5,9 +5,10 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
-transaction(marketplace:Address) {
+transaction() {
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 
 		if let saleItems= account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())) {

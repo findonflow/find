@@ -7,13 +7,14 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-transaction(marketplace:Address, ids: [UInt64]) {
+transaction(ids: [UInt64]) {
 
 	let market : &FindMarketDirectOfferSoft.SaleItemCollection
 	let pointer : [FindViews.AuthNFTPointer]
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
 		self.market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
@@ -32,9 +33,9 @@ transaction(marketplace:Address, ids: [UInt64]) {
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				// nft = getCollectionData(nftIdentifier) 
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				// nft = getCollectionData(nftIdentifier)
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftIdentifier] = nft
 			}
@@ -54,5 +55,5 @@ transaction(marketplace:Address, ids: [UInt64]) {
 			counter = counter + 1
 		}
 	}
-	
+
 }

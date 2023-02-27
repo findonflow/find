@@ -3,7 +3,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(marketplace:Address, ids: [UInt64], amounts:[UFix64]) {
+transaction(ids: [UInt64], amounts:[UFix64]) {
 
 	let walletReference : [&FungibleToken.Vault]
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
@@ -11,6 +11,7 @@ transaction(marketplace:Address, ids: [UInt64], amounts:[UFix64]) {
 	let balanceBeforeTransfer: {Type : UFix64}
 
 	prepare(dapper: AuthAccount, account: AuthAccount) {
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
@@ -60,7 +61,7 @@ transaction(marketplace:Address, ids: [UInt64], amounts:[UFix64]) {
 			if self.requiredAmount[counter] != amounts[counter] {
 				panic("Amount needed to fulfill is ".concat(amounts[counter].toString()))
 			}
-			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
+			let vault <- self.walletReference[counter].withdraw(amount: amounts[counter])
 			self.bidsReference.fulfillDirectOffer(id: ids[counter], vault: <- vault)
 			counter = counter + 1
 		}

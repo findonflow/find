@@ -3,7 +3,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(marketplace:Address, id: UInt64, amount: UFix64) {
+transaction(id: UInt64, amount: UFix64) {
 
 	let walletReference : &FungibleToken.Vault
 	let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection
@@ -12,6 +12,7 @@ transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 	prepare(account: AuthAccount) {
 
 		// Get the accepted vault type from BidInfo
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
@@ -28,7 +29,7 @@ transaction(marketplace:Address, id: UInt64, amount: UFix64) {
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
+		let vault <- self.walletReference.withdraw(amount: amount)
 		self.bidsReference.increaseBid(id: id, vault: <- vault)
 	}
 

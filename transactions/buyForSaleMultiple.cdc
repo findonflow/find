@@ -9,7 +9,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
+transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	var walletReference : [&FungibleToken.Vault]
@@ -23,6 +23,7 @@ transaction(marketplace:Address, users: [Address], ids: [AnyStruct], amounts: [U
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {
 			panic("The array length of users and ids should be the same")
 		}
