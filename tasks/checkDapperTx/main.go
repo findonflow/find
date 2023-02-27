@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/onflow/flow-go/utils/io"
 )
 
 func main() {
@@ -82,7 +80,7 @@ func ReadFiles(path string) (map[string][]byte, error) {
 		if strings.HasPrefix(e.Name(), "getMetadata") {
 			continue
 		}
-		cadenceFile, err := io.ReadFile(fmt.Sprintf("%s/%s", path, e.Name()))
+		cadenceFile, err := os.ReadFile(fmt.Sprintf("%s/%s", path, e.Name()))
 		if err != nil {
 			fmt.Printf("error reading %s/%s file \n", path, e.Name())
 			fmt.Println(err)
