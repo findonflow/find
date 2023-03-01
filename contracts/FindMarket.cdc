@@ -4,7 +4,11 @@ import Profile from "./Profile.cdc"
 import Clock from "./Clock.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindRulesCache from "../contracts/FindRulesCache.cdc"
+import FindMarketCut from "../contracts/FindMarketCut.cdc"
+import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
+import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 pub contract FindMarket {
 	access(account) let  pathMap : {String: String}
@@ -210,7 +214,7 @@ pub contract FindMarket {
 		for type in self.getSaleItemCollectionTypes() {
 			let marketOption = self.getMarketOptionFromType(type)
 			let returnedReport = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: true, getNFTInfo: getNFTInfo, getRoyaltyChanged: true )
-			if returnedReport.items.length > 0 || returnedReport.ghosts.length > 0 {
+			if returnedReport.items.length > 0 {
 				report[marketOption] = returnedReport.items[0]
 			}
 		}
@@ -640,7 +644,7 @@ pub contract FindMarket {
 		pub fun getStoragePath(_ type: Type) : StoragePath
 		pub fun getPublicPath(_ type: Type) : PublicPath
 		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindRulesCache.ActionResult
-		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts
+		pub fun getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts}
 		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing?
 		pub fun getBlockedNFT(marketType: Type) : [Type]
 		pub let name:String
@@ -662,12 +666,69 @@ pub contract FindMarket {
 			self.findCuts= {}
 		}
 
-		access(account) fun checkFindSaleItem(_ saleItemName: String) : Bool {
-			return self.findSaleItems.containsKey(saleItemName)
-		}
+		// This is an one-off temporary function to switch all receiver of rules / cuts to Switchboard cut
+		// This requires all tenant and find to have the switchboard set up, but this is very powerful and can enable all sorts of FT listings
 
-		access(account) fun checkTenantSaleItem(_ saleItemName: String) : Bool {
-			return self.tenantSaleItems.containsKey(saleItemName)
+		access(account) fun setupSwitchboardCut() {
+			for key in self.findSaleItems.keys {
+				let val = self.findSaleItems[key]!
+				if val.cut != nil {
+					let newReceiver = getAccount(val.cut!.receiver.address).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+					let newCut = MetadataViews.Royalty(
+						receiver: newReceiver,
+						cut: val.cut!.cut,
+						description: val.cut!.description
+					)
+					let newVal = FindMarket.TenantSaleItem(
+						name : val.name,
+						cut : newCut,
+						rules : val.rules,
+						status : val.status
+					)
+					self.findSaleItems[key] = newVal
+				}
+			}
+
+			for key in self.tenantSaleItems.keys {
+				let val = self.tenantSaleItems[key]!
+				if val.cut != nil {
+					let newReceiver = getAccount(val.cut!.receiver.address).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+					let newCut = MetadataViews.Royalty(
+						receiver: newReceiver,
+						cut: val.cut!.cut,
+						description: val.cut!.description
+					)
+					let newVal = FindMarket.TenantSaleItem(
+						name : val.name,
+						cut : newCut,
+						rules : val.rules,
+						status : val.status
+					)
+					self.tenantSaleItems[key] = newVal
+				}
+			}
+
+			for key in self.findCuts.keys {
+				let val = self.findCuts[key]!
+				if val.cut != nil {
+					let newReceiver = getAccount(val.cut!.receiver.address).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+					let newCut = MetadataViews.Royalty(
+						receiver: newReceiver,
+						cut: val.cut!.cut,
+						description: val.cut!.description
+					)
+					let newVal = FindMarket.TenantSaleItem(
+						name : val.name,
+						cut : newCut,
+						rules : val.rules,
+						status : val.status
+					)
+					self.findCuts[key] = newVal
+				}
+			}
+			FindRulesCache.resetTenantCutCache(self.name)
+			FindRulesCache.resetTenantFindRulesCache(self.name)
+			FindRulesCache.resetTenantTenantRulesCache(self.name)
 		}
 
 		access(account) fun checkFindCuts(_ cutName: String) : Bool {
@@ -680,106 +741,152 @@ pub contract FindMarket {
 			}
 			self.tenantSaleItems[name]!.alterStatus(status)
 			FindRulesCache.resetTenantTenantRulesCache(self.name)
+			FindRulesCache.resetTenantCutCache(self.name)
 			self.emitRulesEvent(item: self.tenantSaleItems[name]!, type: "tenant", status: status)
 		}
 
-		access(account) fun setTenantRule(optionName: String, tenantRule: TenantRule) {
-			pre{
-				self.tenantSaleItems[optionName] != nil : "This tenant does not exist. Tenant ".concat(optionName)
-			}
-			/*
-			let rules = self.tenantSaleItems[optionName]!.rules
-			for rule in rules {
-				assert(rule.name == tenantRule.name, message: "Rule with same name already exist. Name: ".concat(rule.name))
-			}
-			*/
-			self.tenantSaleItems[optionName]!.addRules(tenantRule)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
+		access(account) fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+			FindMarketCut.setTenantCuts(tenant: self.name, types: types, category: category, cuts: cuts)
 		}
 
-		access(account) fun removeTenantRule(optionName: String, tenantRuleName: String) {
-			pre{
-				self.tenantSaleItems[optionName] != nil : "This Market Option does not exist. Option :".concat(optionName)
+		pub fun getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts} {
+
+			let cuts = FindMarketCut.getCuts(tenant: self.name, listingType: listingType, nftType: nftType, ftType: ftType)
+
+			cuts["find"] = self.getFindCut(name: name, listingType: listingType, nftType: nftType, ftType: ftType)
+
+			cuts["tenant"] = self.getTenantCut(name: name, listingType: listingType, nftType: nftType, ftType: ftType)
+
+			return cuts
+		}
+
+		pub fun getFindCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
+			let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
+			let findRuleId = ruleId.concat("-find")
+			if let cache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: findRuleId) {
+				var returningCut : FindMarketCutStruct.Cuts? = nil
+				if let findCut = cache.findCut {
+					returningCut = FindMarketCutStruct.Cuts(
+						[
+							FindMarketCutStruct.GeneralCut(
+								name : findCut.description,
+								cap: findCut.receiver,
+								cut: findCut.cut,
+								description: findCut.description
+							)
+						]
+					)
+				}
+				return returningCut
 			}
-			let rules : [TenantRule] = self.tenantSaleItems[optionName]!.rules
-			var counter = 0
-			while counter < rules.length {
-				if rules[counter]!.name == tenantRuleName {
+
+			var cacheFindCut : MetadataViews.Royalty? = nil
+			var returningCut : FindMarketCutStruct.Cuts? = nil
+			for findCut in self.findCuts.values {
+				let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
+				if valid && findCut.cut != nil {
+					cacheFindCut = findCut.cut
+					returningCut = FindMarketCutStruct.Cuts(
+						[
+							FindMarketCutStruct.GeneralCut(
+								name : findCut.cut!.description,
+								cap: findCut.cut!.receiver,
+								cut: findCut.cut!.cut,
+								description: findCut.cut!.description
+							)
+						]
+					)
 					break
 				}
-				counter = counter + 1
-				assert(counter < rules.length, message: "This tenant rule does not exist. Rule :".concat(optionName))
 			}
-			self.tenantSaleItems[optionName]!.removeRules(counter)
-			FindRulesCache.resetTenantTenantRulesCache(self.name)
-			self.emitRulesEvent(item: self.tenantSaleItems[optionName]!, type: "tenant", status: nil)
+
+			// store that to cache
+			let cacheCut = FindRulesCache.TenantCuts(
+				findCut: cacheFindCut,
+				tenantCut: nil,
+			)
+			FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: findRuleId, cut: cacheCut)
+
+			return returningCut
 		}
 
-		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindRulesCache.TenantCuts {
+		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
+			let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
+			let tenantRuleId = ruleId.concat("-tenant")
+			if let cache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: tenantRuleId) {
+				var returningCut : FindMarketCutStruct.Cuts? = nil
+				if let tenantCut = cache.tenantCut {
+					returningCut = FindMarketCutStruct.Cuts(
+						[
+							FindMarketCutStruct.GeneralCut(
+								name : tenantCut.description,
+								cap: tenantCut.receiver,
+								cut: tenantCut.cut,
+								description: tenantCut.description
+							)
+						]
+					)
+				}
+				return returningCut
+			}
 
-			let ruleId = listingType.identifier.concat(nftType.identifier).concat(ftType.identifier)
+			var cacheTenantCut : MetadataViews.Royalty? = nil
+			var returningCut : FindMarketCutStruct.Cuts? = nil
+			for item in self.tenantSaleItems.values {
+				let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
 
-			let tenantCutCache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: ruleId)
-
-			if tenantCutCache == nil {
-				// If the tenantSaleItem name is known and if it exist
-				if let item = self.tenantSaleItems[name] {
-
-					for findCut in self.findCuts.values {
-						let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
-						if valid{
-							let result = FindRulesCache.TenantCuts(findCut:findCut.cut, tenantCut: item.cut)
-							FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
-							return result
-						}
-					}
-					let result = FindRulesCache.TenantCuts(findCut:nil, tenantCut: item.cut)
-					FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
-					return result
-				} else {
-					// Otherwise we loop thru the tenant sale item as well to get the cut (and record it in findRulesCache)
-
-					var tenantCut : MetadataViews.Royalty? = nil
-					for item in self.tenantSaleItems.values {
-						let valid = item.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
-
-						if valid {
-							tenantCut = item.cut
-						}
-					}
-
-					for findCut in self.findCuts.values {
-						let valid = findCut.isValid(nftType: nftType, ftType: ftType, listingType: listingType)
-						if valid{
-							let result = FindRulesCache.TenantCuts(findCut:findCut.cut, tenantCut: tenantCut)
-							FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
-							return result
-						}
-					}
-					let result = FindRulesCache.TenantCuts(findCut:nil, tenantCut: tenantCut)
-					FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: ruleId, cut: result)
-					return result
-
+				if valid && item.cut != nil{
+					cacheTenantCut = item.cut
+					returningCut = FindMarketCutStruct.Cuts(
+						[
+							FindMarketCutStruct.GeneralCut(
+								name : item.cut!.description,
+								cap: item.cut!.receiver,
+								cut: item.cut!.cut,
+								description: item.cut!.description
+							)
+						]
+					)
+					break
 				}
 			}
-			return tenantCutCache!
 
+			// store that to cache
+			let cacheCut = FindRulesCache.TenantCuts(
+				findCut: nil,
+				tenantCut: cacheTenantCut,
+			)
+			FindRulesCache.setTenantCutCache(tenant: self.name, ruleId: tenantRuleId, cut: cacheCut)
+
+			return returningCut
 		}
 
 		access(account) fun addSaleItem(_ item: TenantSaleItem, type:String) {
 			if type=="find" {
+				var status : String? = nil
+				if self.findSaleItems[item.name] != nil {
+					status = "update"
+				}
 				self.findSaleItems[item.name]=item
 				FindRulesCache.resetTenantFindRulesCache(self.name)
-				self.emitRulesEvent(item: item, type: "find", status: nil)
+				self.emitRulesEvent(item: item, type: "find", status: status)
 			} else if type=="tenant" {
+				var status : String? = nil
+				if self.findSaleItems[item.name] != nil {
+					status = "update"
+				}
 				self.tenantSaleItems[item.name]=item
 				FindRulesCache.resetTenantTenantRulesCache(self.name)
-				self.emitRulesEvent(item: item, type: "tenant", status: nil)
+				FindRulesCache.resetTenantCutCache(self.name)
+				self.emitRulesEvent(item: item, type: "tenant", status: status)
 			} else if type=="cut" {
+				var status : String? = nil
+				if self.findSaleItems[item.name] != nil {
+					status = "update"
+				}
 				self.findCuts[item.name]=item
 				FindRulesCache.resetTenantCutCache(self.name)
-				self.emitRulesEvent(item: item, type: "cut", status: nil)
+				self.emitRulesEvent(item: item, type: "cut", status: status)
 			} else{
 				panic("Not valid type to add sale item for")
 			}
@@ -794,6 +901,7 @@ pub contract FindMarket {
 			} else if type=="tenant" {
 				let item = self.tenantSaleItems.remove(key: name)?? panic("This Tenant Sale Item does not exist. SaleItem : ".concat(name))
 				FindRulesCache.resetTenantTenantRulesCache(self.name)
+				FindRulesCache.resetTenantCutCache(self.name)
 				self.emitRulesEvent(item: item, type: "tenant", status: "remove")
 				return item
 			} else if type=="cut" {
@@ -960,8 +1068,12 @@ pub contract FindMarket {
 			}
 
 			// Tenant Rules have to be allow rules
+			var returningFTTypes : [Type] = []
 			for item in self.tenantSaleItems.values {
 				var allowedFTTypes : [Type] = []
+				if item.status != "active" {
+					continue
+				}
 				for rule in item.rules {
 					if rule.ruleType == "ft"{
 						allowedFTTypes = rule.types
@@ -974,13 +1086,18 @@ pub contract FindMarket {
 					}
 				}
 				if containsListingType && containsNFTType {
-					return AllowedListing(listingType: marketType, ftTypes: allowedFTTypes, status: item.status)
+					returningFTTypes.appendAll(allowedFTTypes)
 				}
 
 				containsNFTType = false
 				containsListingType = true
 			}
-			return nil
+
+			if returningFTTypes.length == 0 {
+				return nil
+			}
+			returningFTTypes = FindUtils.deDupTypeArray(returningFTTypes)
+			return AllowedListing(listingType: marketType, ftTypes: returningFTTypes, status: "active")
 		}
 
 		pub fun getBlockedNFT(marketType: Type) : [Type] {
@@ -1077,14 +1194,9 @@ pub contract FindMarket {
 			self.capability = nil
 		}
 
-		pub fun setMarketOption(name: String, cut: MetadataViews.Royalty?, rules: [TenantRule]) {
+		pub fun setMarketOption(saleItem: TenantSaleItem) {
 			let tenant = self.getTenantRef()
-			tenant.addSaleItem(TenantSaleItem(
-				name: name,
-				cut: cut,
-				rules: rules,
-				status:"active"
-			), type: "tenant")
+			tenant.addSaleItem(saleItem, type: "tenant")
 		}
 
 		pub fun removeMarketOption(name: String) {
@@ -1107,16 +1219,6 @@ pub contract FindMarket {
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
-		pub fun setTenantRule(optionName: String, tenantRule: TenantRule) {
-			let tenantRef = self.getTenantRef()
-			tenantRef.setTenantRule(optionName: optionName, tenantRule: tenantRule)
-		}
-
-		pub fun removeTenantRule(optionName: String, tenantRuleName: String) {
-			let tenantRef = self.getTenantRef()
-			tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
-		}
-
 		pub fun getTenantRef() : &Tenant {
 			if self.capability == nil {
 				panic("TenantClient is not present")
@@ -1126,6 +1228,11 @@ pub contract FindMarket {
 			}
 
 			return self.capability!.borrow()!
+		}
+
+		pub fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+			let tenant = self.getTenantRef()
+			tenant.setExtraCut(types: types, category: category, cuts: cuts)
 		}
 	}
 
@@ -1152,7 +1259,7 @@ pub contract FindMarket {
 
 	}
 
-	access(account) fun createFindMarket(name: String, address:Address, defaultCutRules: [TenantRule], findRoyalty: MetadataViews.Royalty?) : Capability<&Tenant> {
+	access(account) fun createFindMarket(name: String, address:Address, findCutSaleItem: TenantSaleItem?) : Capability<&Tenant> {
 		let account=FindMarket.account
 
 		let tenant <- create Tenant(name)
@@ -1162,13 +1269,8 @@ pub contract FindMarket {
 		self.tenantAddressName[address]=name
 		self.tenantNameAddress[name]=address
 
-		if findRoyalty != nil {
-			tenant.addSaleItem(TenantSaleItem(
-				name:"findRoyalty",
-				cut:findRoyalty,
-				rules: defaultCutRules,
-				status:"active"
-			), type: "cut")
+		if findCutSaleItem != nil {
+			tenant.addSaleItem(findCutSaleItem!, type: "cut")
 		}
 
 		//end do on outside
@@ -1210,7 +1312,7 @@ pub contract FindMarket {
 	}
 
 
-	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:FindRulesCache.TenantCuts, resolver: ((Address) : String?), resolvedAddress: {Address: String}, dapperMerchAddress: Address) {
+	access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault: @FungibleToken.Vault, royalty: MetadataViews.Royalties, nftInfo:NFTInfo, cuts:{String : FindMarketCutStruct.Cuts}, resolver: ((Address) : String?), resolvedAddress: {Address: String}) {
 		let resolved : {Address : String} = resolvedAddress
 
 		fun resolveName(_ addr: Address ) : String? {
@@ -1234,7 +1336,6 @@ pub contract FindMarket {
 
 		let buyer=saleItem.getBuyer()
 		let seller=saleItem.getSeller()
-		let oldProfile= getAccount(seller).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()!
 		let soldFor=vault.balance
 		let ftType=vault.getType()
 
@@ -1242,18 +1343,12 @@ pub contract FindMarket {
 		var payInFUT = false
 		var payInDUC = false
 		let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-		var residualAddress = FindMarket.residualAddress
-		if FindUtils.contains(ftType.identifier, element: "FlowUtilityToken.Vault") {
-			residualAddress = dapperMerchAddress
-			payInFUT = true
-		} else if FindUtils.contains(ftType.identifier, element: "DapperUtilityCoin.Vault") {
-			residualAddress = dapperMerchAddress
-			payInDUC = true
-		}
-		let residualVault = getAccount(residualAddress).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		let oldProfileCap= getAccount(seller).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let oldProfile = self.getPaymentWallet(oldProfileCap, ftInfo, panicOnFailCheck: true)
 
 		/* Check the total royalty to prevent changing of royalties */
 		let royalties = royalty.getRoyalties()
+
 		if royalties.length != 0 {
 			var totalRoyalties : UFix64 = 0.0
 
@@ -1272,87 +1367,98 @@ pub contract FindMarket {
 				}
 
 				var receiver = royaltyItem.receiver.address
-
-				// This is set on testnet only to fix testnet doodles creator royalty
-				if FindMarket.account.address == 0x35717efbbce11c74 {
-					if receiver == 0xe03daebed8ca0615 {
-						receiver = 0x4748780c8bf65e19
-					}
-				}
-
 				let name = resolveName(royaltyItem.receiver.address)
-
-				var walletCheck = true
-				var royaltyReceiver : Capability<&{FungibleToken.Receiver}> = royaltyItem.receiver
-				if !royaltyItem.receiver.check() {
-					// if the capability is not valid, royalty cannot be paid
-					walletCheck = false
-				} else if royaltyItem.receiver.borrow()!.isInstance(Type<@Profile.User>()){
-					// if the capability is valid -> it is a User resource -> check if the wallet is set up.
-					let ref = getAccount(receiver).getCapability<&{Profile.Public}>(Profile.publicPath).borrow()! // If this is nil, there shouldn't be a wallet receiver
-					walletCheck = ref.hasWallet(ftType.identifier)
-				} else if !royaltyItem.receiver.borrow()!.isInstance(ftType){
-					// if the capability is valid -> it is a FT Vault, check if it matches the paying vault type.
-					walletCheck = false
-				}
-
-				// if wallet check fails, try to borrow it the standard way
-				if !walletCheck{
-					royaltyReceiver = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
-					walletCheck = royaltyReceiver.check()
-				}
+				let wallet = self.getPaymentWallet(royaltyItem.receiver, ftInfo, panicOnFailCheck: false)
 
 				/* If the royalty receiver check failed */
-				if !walletCheck {
-					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: residualVault.address)
-					residualVault.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				if wallet.owner!.address == FindMarket.residualAddress {
+					emit RoyaltyCouldNotBePaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo, residualAddress: wallet.owner!.address)
+					wallet.deposit(from: <- vault.withdraw(amount: cutAmount))
 					continue
 				}
-
-				/* If the royalty receiver check succeed */
 				emit RoyaltyPaid(tenant:tenant, id: id, saleID: saleItem.uuid, address:receiver, findName: name, royaltyName: description, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-				royaltyReceiver.borrow()!.deposit(from: <- vault.withdraw(amount: cutAmount))
+				wallet.deposit(from: <- vault.withdraw(amount: cutAmount))
 			}
 			if totalRoyalties != saleItem.getTotalRoyalties() {
 				panic("The total Royalties to be paid is changed after listing.")
 			}
 		}
 
-		if let findCut =cuts.findCut {
-			var cutAmount= soldFor * findCut.cut
-			let name = resolveName(findCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:findCut.receiver.address, findName: name , royaltyName: "find", amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = findCut.receiver.borrow() ?? panic("Find Royalty receiving account is not set up properly. Find Royalty account address : ".concat(findCut.receiver.address.toString()))
-			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
-		}
-
-		if let tenantCut =cuts.tenantCut {
-			// Dapper charges extra 1 % or 0.44 whichever is higher
-			var cutAmount= soldFor * tenantCut.cut
-			var royaltyName= "marketplace"
-			var tenantReceiver = tenantCut.receiver
-
-			// Tenant rules for dapper are set as DUC & FUT, with receiver being in FUT
-			// if royalties are paid in DUC, we would change the royalty receiver to DUC below
-			if payInDUC {
-				if cutAmount < 0.44 {
-					cutAmount = 0.44
+		for key in cuts.keys {
+			let allCuts = cuts[key]!
+			for cut in allCuts.cuts {
+				if var cutAmount= cut.getAmountPayable(soldFor) {
+					let findName = resolveName(cut.getAddress())
+					emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:cut.getAddress(), findName: findName , royaltyName: cut.getName(), amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
+					let vaultRef = cut.getReceiverCap().borrow() ?? panic("Royalty receiving account is not set up properly. Royalty account address : ".concat(cut.getAddress().toString()).concat(" Royalty Name : ").concat(cut.getName()))
+					vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 				}
-
-				if vault.balance < cutAmount {
-					panic("The listed price is too low and could not afford for dapper transaction charges.")
-				}
-				royaltyName = "dapper"
-				tenantReceiver = getAccount(tenantReceiver.address).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 			}
-
-			let name = resolveName(tenantCut.receiver.address)
-			emit RoyaltyPaid(tenant: tenant, id: id, saleID: saleItem.uuid, address:tenantCut.receiver.address, findName: name, royaltyName: royaltyName, amount: cutAmount,  vaultType: ftType.identifier, nft:nftInfo)
-			let vaultRef = tenantReceiver.borrow() ?? panic("Tenant Royalty receiving account is not set up properly. Tenant Royalty account address : ".concat(tenantCut.receiver.address.toString()))
-			vaultRef.deposit(from: <- vault.withdraw(amount: cutAmount))
 		}
 
 		oldProfile.deposit(from: <- vault)
+	}
+
+	access(account) fun getPaymentWallet(_ cap: Capability<&{FungibleToken.Receiver}>, _ ftInfo: FTRegistry.FTInfo, panicOnFailCheck: Bool) : &{FungibleToken.Receiver} {
+		var walletCheck = true
+		var tempCap = cap
+
+		// If capability is valid, we do not trust it but will do the below checks
+		if tempCap.check() {
+			let ref = cap.borrow()!
+			let underlyingType = ref.getType()
+			switch underlyingType {
+				// If the underlying matches with the token type, we return the ref
+				case ftInfo.type :
+					return ref
+				// If the underlying is a profile, we check if the wallet type is registered in profile wallet and then return
+				// If it is not registered, it falls through and be handled by residual
+				case Type<@Profile.User>():
+					if let ProfileRef = getAccount(cap.address).getCapability<&{Profile.Public}>(Profile.publicPath).borrow() {
+						if ProfileRef.hasWallet(ftInfo.type.identifier) {
+							return ref
+						}
+					}
+				// If the underlying is a switchboard, we check if the wallet type is registered in switchboard wallet and then return
+				// If it is not registered, it falls through and be handled by residual
+				case Type<@FungibleTokenSwitchboard.Switchboard>() :
+					if let sbRef = getAccount(cap.address).getCapability<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath).borrow() {
+						if sbRef.getVaultTypes().contains(ftInfo.type) {
+							return ref
+						}
+					}
+				// If the underlying is a tokenforwarder, we cannot verify if it is pointing to the right vault type.
+				// The best we can do is to try borrow from the standard path and TRY deposit
+				case Type<@TokenForwarding.Forwarder>() :
+					// This might break FindMarket with NFT with "Any" kind of forwarder.
+					// We might have to restrict this to only DUC FUT at the moment and fix it after.
+					if ftInfo.tag.contains("dapper"){
+						return ref
+					}
+					//in the future use the new feature in the forwader to get the underlying type
+					/*
+					// tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+					// if tempCap.check() {
+					// 	return tempCap.borrow()!
+					// }
+					// */
+			}
+		}
+
+		// if capability is not valid, or if the above cases are fell through, we will try to get one with "standard" path
+		tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+		if tempCap.check() {
+			return tempCap.borrow()!
+		}
+
+		if !panicOnFailCheck {
+			// If it all falls throught, these edge cases will be handled by a residual account that has switchboard set up
+			let residualVault = getAccount(FindMarket.residualAddress).getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
+			return residualVault.borrow() ?? panic("Cannot borrow residual vault in address : ".concat(FindMarket.residualAddress.toString()).concat(" type : ").concat(ftInfo.typeIdentifier))
+		}
+
+		let msg = "User ".concat(cap.address.toString()).concat(" does not have any usable links set up for vault type ").concat(ftInfo.typeIdentifier)
+		panic(msg)
 	}
 
 	pub struct NFTInfo {

@@ -13,7 +13,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	price := 10.0
 	preIncrement := 5.0
 	otu.setupMarketAndDandyDapper()
-	otu.setFlowLeaseMarketOption("AuctionSoft").
+	otu.setFlowLeaseMarketOption().
 		registerDUCInRegistry().
 		setProfile("user1").
 		setProfile("user2").
@@ -288,7 +288,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("AuctionSoft", "deprecate")
+		otu.alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -303,13 +303,13 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterLeaseMarketOption("AuctionSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 	})
 
 	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price)
 
-		otu.alterLeaseMarketOption("AuctionSoft", "deprecate")
+		otu.alterLeaseMarketOption("deprecate")
 
 		bitTx := otu.O.TxFN(
 			WithSigner("user2"),
@@ -333,7 +333,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("AuctionSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user2"),
@@ -348,7 +348,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("AuctionSoft", "deprecate")
+		otu.alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("cancelLeaseMarketAuctionSoft",
 			WithSigner("user2"),
@@ -356,14 +356,14 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("AuctionSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			moveNameTo("user2", "user1", "name1")
 
 	})
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction and delist after stopped", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("AuctionSoft", "stop")
+		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -378,9 +378,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("AuctionSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			listLeaseForSoftAuction("user1", "name1", price).
-			alterLeaseMarketOption("AuctionSoft", "stop")
+			alterLeaseMarketOption("stop")
 
 		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -389,9 +389,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("AuctionSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-			alterLeaseMarketOption("AuctionSoft", "stop")
+			alterLeaseMarketOption("stop")
 
 		otu.O.Tx("increaseBidLeaseMarketAuctionSoft",
 			WithSigner("user2"),
@@ -400,7 +400,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("AuctionSoft", "stop")
+		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("cancelLeaseMarketAuctionSoft",
 			WithSigner("user1"),
@@ -419,7 +419,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 		/* Reset */
-		otu.alterLeaseMarketOption("AuctionSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -486,42 +486,13 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			})
 
 		otu.moveNameTo("user2", "user1", "name1")
 	})
-
-	// Find take 2.5% which is hard coded in the code now, this test does not make sense at the moment
-	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
-	// 	price = 5.0
-
-	// 	otu.listLeaseForSoftAuction("user1", "name1", price).
-	// 		saleLeaseListed("user1", "active_listed", price).
-	// 		auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-	// 		setFindLeaseCutDapper(0.1)
-
-	// 	otu.tickClock(500.0)
-
-	// 	otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
-	// 		WithSigner("user2"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", 10.0),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("dapper"),
-	// 			"amount":      1.0,
-	// 			"royaltyName": "find",
-	// 		})
-
-	// 	otu.moveNameTo("user2", "user1", "name1")
-
-	// })
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 
@@ -647,8 +618,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.createDapperUser("user1").
 			createDapperUser("user2")
-
-		otu.setDUCLease()
 
 		otu.listLeaseForSoftAuctionDUC("user1", "name1", price)
 

@@ -328,6 +328,11 @@ pub contract Admin {
         	FINDCatalogAdmin.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
 		}
 
+		pub fun getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
+			// we hard code it here instead, to avoid importing just for path
+			return Admin.account.getCapability<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
+		}
+
 		/// ===================================================================================
 		// Name Voucher
 		/// ===================================================================================

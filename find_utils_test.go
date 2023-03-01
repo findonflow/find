@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/sanity-io/litter"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFindUtils(t *testing.T) {
@@ -412,6 +414,88 @@ pub fun main(name: String) : String {
 			WithArg("sep", cadence.Character("_")),
 		).
 			AssertWant(t, autogold.Want("splitString : HelloWorldAndAll", litter.Sdump([]interface{}{"HelloWorldAndAll"})))
+	})
+
+	// joinMapToString
+	devJoinMapToString := `import FindUtils from "../contracts/FindUtils.cdc"
+
+pub fun main(map: {String : String}) : String {
+	return FindUtils.joinMapToString(map)
+}
+`
+	t.Run("joinMapToString should join the map and return as expected", func(t *testing.T) {
+		o.Script(devJoinMapToString,
+			WithArg("map", map[string]string{
+				"1+1": "2",
+				"2+2": "4",
+				"3*3": "9",
+			}),
+		).
+			AssertWant(t, autogold.Want("joinMapToString : 1+1=2 2+2=4 3*3=9", "2+2=4 3*3=9 1+1=2"))
+	})
+
+	// joinString
+	devJoinString := `import FindUtils from "../contracts/FindUtils.cdc"
+
+pub fun main(s: [String], sep: String) : String {
+	return FindUtils.joinString(s, sep:sep)
+}
+`
+	t.Run("devJoinString should join the string with sep and return as expected", func(t *testing.T) {
+		o.Script(devJoinString,
+			WithArg("s", []string{
+				"1+1=2",
+				"2+2=4",
+				"3*3=9",
+			}),
+			WithArg("sep", " "),
+		).
+			AssertWant(t, autogold.Want("devJoinString : 1+1=2 2+2=4 3*3=9", "1+1=2 2+2=4 3*3=9"))
+	})
+
+	// deDupTypeArray
+	devDeDupTypeArray := `import FindUtils from "../contracts/FindUtils.cdc"
+
+pub fun main(s: [String]) : [Type] {
+	var typ : [Type] = []
+	for t in s {
+		typ.append(CompositeType(t)!)
+	}
+	return FindUtils.deDupTypeArray(typ)
+}
+`
+	t.Run("deDupTypeArray should dedup duplicated as expected", func(t *testing.T) {
+		flow, err := o.QualifiedIdentifier("FlowToken", "Vault")
+		assert.NoError(t, err)
+		ft, err := o.QualifiedIdentifier("FungibleToken", "Vault")
+		assert.NoError(t, err)
+		nft, err := o.QualifiedIdentifier("NonFungibleToken", "NFT")
+		assert.NoError(t, err)
+		collection, err := o.QualifiedIdentifier("NonFungibleToken", "Collection")
+		assert.NoError(t, err)
+		o.Script(devDeDupTypeArray,
+			WithArg("s", []string{
+				flow,
+				ft,
+				nft,
+				nft,
+				collection,
+				flow,
+				flow,
+				flow,
+				ft,
+				ft,
+				ft,
+				nft,
+				nft,
+			}),
+		).
+			AssertWant(t, autogold.Want("deDupTypeArray : flow, ft, nft, collection", fmt.Sprintf(`[]interface {}{
+  "%s",
+  "%s",
+  "%s",
+  "%s",
+}`, flow, ft, nft, collection)))
 	})
 
 }

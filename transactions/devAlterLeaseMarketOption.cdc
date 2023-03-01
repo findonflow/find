@@ -1,20 +1,20 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(market: String , action: String ){
+transaction(action: String ){
     prepare(account: AuthAccount){
         let path = FindMarket.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
-
+		let option = "DapperLeaseSoft"
 
         switch action {
             case "enable" :
-                tenantRef.enableMarketOption("FlowLease".concat(market))
+                tenantRef.enableMarketOption(option)
 
             case "deprecate" :
-                tenantRef.deprecateMarketOption("FlowLease".concat(market))
+                tenantRef.deprecateMarketOption(option)
 
             case "stop" :
-                tenantRef.stopMarketOption("FlowLease".concat(market))
+                tenantRef.stopMarketOption(option)
         }
     }
 }

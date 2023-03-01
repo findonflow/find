@@ -11,7 +11,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	otu.setupMarketAndDandyDapper()
 	otu.registerDUCInRegistry().
-		setFlowLeaseMarketOption("DirectOfferSoft").
+		setFlowLeaseMarketOption().
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find").
@@ -153,7 +153,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should not be able to add direct offer when deprecated", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "deprecate")
+		otu.alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -164,14 +164,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 	})
 
 	t.Run("Should not be able to increase bid but able to fulfill offer when deprecated", func(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
-			alterLeaseMarketOption("DirectOfferSoft", "deprecate")
+			alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("increaseBidLeaseMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -184,7 +184,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_finished", price).
 			fulfillLeaseMarketDirectOfferSoft("user2", "name1", price)
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			moveNameTo("user2", "user1", "name1")
 
 	})
@@ -193,15 +193,15 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
-			alterLeaseMarketOption("DirectOfferSoft", "deprecate").
+			alterLeaseMarketOption("deprecate").
 			rejectDirectOfferLeaseSoft("user1", "name1", 10.0)
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 	})
 
 	t.Run("Should not be able to add direct offer after stopped", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "stop")
+		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -212,14 +212,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 	})
 
 	t.Run("Should not be able to increase bid nor accept offer after stopped", func(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
-			alterLeaseMarketOption("DirectOfferSoft", "stop")
+			alterLeaseMarketOption("stop")
 
 		otu.O.Tx("increaseBidLeaseMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -234,7 +234,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
 	})
 
@@ -244,7 +244,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			saleLeaseListed("user1", "active_ongoing", price).
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
 			saleLeaseListed("user1", "active_finished", price).
-			alterLeaseMarketOption("DirectOfferSoft", "stop")
+			alterLeaseMarketOption("stop")
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -255,7 +255,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 			/* Reset */
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable")
+		otu.alterLeaseMarketOption("enable")
 
 		otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
@@ -273,7 +273,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
-			alterLeaseMarketOption("DirectOfferSoft", "stop")
+			alterLeaseMarketOption("stop")
 
 		otu.O.Tx("cancelLeaseMarketDirectOfferSoft",
 			WithSigner("user1"),
@@ -281,14 +281,14 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
 	})
 
 	t.Run("Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "stop").
-			alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("stop").
+			alterLeaseMarketOption("enable").
 			directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
 			acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
@@ -300,8 +300,8 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	t.Run("Should be able to reject offer after enabled", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "stop").
-			alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("stop").
+			alterLeaseMarketOption("enable").
 			directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
 			rejectDirectOfferLeaseSoft("user1", "name1", 10.0)
@@ -311,7 +311,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price).
-			alterLeaseMarketOption("DirectOfferSoft", "deprecate")
+			alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
@@ -322,7 +322,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "stop")
+		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user3"),
@@ -333,7 +333,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
 	})
 
@@ -342,7 +342,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		otu.directOfferLeaseMarketSoft("user2", "name1", price).
 			saleLeaseListed("user1", "active_ongoing", price)
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "stop")
+		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("retractOfferLeaseMarketDirectOfferSoft",
 			WithSigner("user2"),
@@ -350,10 +350,10 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "deprecate").
+		otu.alterLeaseMarketOption("deprecate").
 			retractOfferDirectOfferLeaseSoft("user2", "user1", "name1")
 
-		otu.alterLeaseMarketOption("DirectOfferSoft", "enable").
+		otu.alterLeaseMarketOption("enable").
 			cancelAllDirectOfferLeaseMarketSoft("user1")
 	})
 
@@ -379,44 +379,16 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			})
 
 		otu.moveNameTo("user2", "user1", "name1")
 
 	})
-
-	// Find take 2.5% which is hard coded in the code now, this test does not make sense at the moment
-	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
-	// 	price = 10.0
-
-	// 	otu.directOfferLeaseMarketSoft("user2", "name1", price).
-	// 		saleLeaseListed("user1", "active_ongoing", price).
-	// 		acceptLeaseDirectOfferMarketSoft("user2", "user1", "name1", price).
-	// 		setFindLeaseCutDapper(0.1)
-
-	// 	otu.O.Tx("fulfillLeaseMarketDirectOfferSoftDapper",
-	// 		WithSigner("user2"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", price),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"amount":      0.25,
-	// 			"leaseName":   "name1",
-	// 			"royaltyName": "find",
-	// 			"tenant":      "findLease",
-	// 		})
-
-	// 	otu.moveNameTo("user2", "user1", "name1")
-
-	// })
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 
@@ -528,8 +500,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.createDapperUser("user1").
 			createDapperUser("user2")
-
-		otu.setDUCLease()
 
 		otu.directOfferLeaseMarketSoftDUC("user2", "name1", price)
 

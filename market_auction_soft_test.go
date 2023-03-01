@@ -16,7 +16,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 	id := otu.setupMarketAndDandyDapper()
 	otu.registerDandyInNFTRegistry().
 		registerDUCInRegistry().
-		setFlowDandyMarketOption("AuctionSoft").
+		setFlowDandyMarketOption("dapper").
 		setProfile("user1").
 		setProfile("user2").
 		createDapperUser("find").
@@ -289,20 +289,20 @@ func TestMarketAuctionSoft(t *testing.T) {
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
 
-		otu.alterMarketOptionDapper("AuctionSoft", "deprecate")
+		otu.alterMarketOptionDapper("deprecate")
 
 		listingTx(
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOptionDapper("AuctionSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 	})
 
 	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
 		otu.listNFTForSoftAuction("user1", id, price)
 
-		otu.alterMarketOptionDapper("AuctionSoft", "deprecate")
+		otu.alterMarketOptionDapper("deprecate")
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -329,7 +329,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOptionDapper("AuctionSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 
 		listingTx(
 			WithSigner("user2"),
@@ -339,7 +339,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.auctionBidMarketSoft("user1", "user2", id, price+5.0)
 
-		otu.alterMarketOptionDapper("AuctionSoft", "deprecate")
+		otu.alterMarketOptionDapper("deprecate")
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner("user2"),
@@ -347,14 +347,14 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterMarketOptionDapper("AuctionSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			sendDandy("user1", "user2", id)
 
 	})
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction after stopped", func(t *testing.T) {
 
-		otu.alterMarketOptionDapper("AuctionSoft", "stop")
+		otu.alterMarketOptionDapper("stop")
 
 		listingTx(
 			WithSigner("user1"),
@@ -362,9 +362,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOptionDapper("AuctionSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			listNFTForSoftAuction("user1", id, price).
-			alterMarketOptionDapper("AuctionSoft", "stop")
+			alterMarketOptionDapper("stop")
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -374,9 +374,9 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOptionDapper("AuctionSoft", "enable").
+		otu.alterMarketOptionDapper("enable").
 			auctionBidMarketSoft("user2", "user1", id, price+5.0).
-			alterMarketOptionDapper("AuctionSoft", "stop")
+			alterMarketOptionDapper("stop")
 
 		otu.O.Tx("increaseBidMarketAuctionSoft",
 			WithSigner("user2"),
@@ -385,7 +385,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOptionDapper("AuctionSoft", "stop")
+		otu.alterMarketOptionDapper("stop")
 
 		otu.tickClock(500.0)
 
@@ -398,7 +398,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 		/* Reset */
-		otu.alterMarketOptionDapper("AuctionSoft", "enable")
+		otu.alterMarketOptionDapper("enable")
 
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -467,61 +467,23 @@ func TestMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("find-admin"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"royaltyName": "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user1"),
-				"amount":      0.65,
+				"amount":      0.5,
 				"royaltyName": "creator",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("find"),
-				"amount":      0.65,
+				"amount":      0.25,
 				"royaltyName": "find forge",
 			})
 
 		otu.sendDandy("user1", "user2", id)
 	})
-
-	// Find take 2.5% which is hard coded in the code now, this test does not make sense at the moment
-	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
-	// 	price = 5.0
-
-	// 	otu.listNFTForSoftAuction("user1", id, price).
-	// 		saleItemListed("user1", "active_listed", price).
-	// 		auctionBidMarketSoft("user2", "user1", id, price+5.0).
-	// 		setFindCutDapper(0.035)
-
-	// 	otu.tickClock(500.0)
-
-	// 	otu.O.Tx("fulfillMarketAuctionSoftDapper",
-	// 		WithSigner("user2"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("id", id),
-	// 		WithArg("amount", 10.0),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("find-admin"),
-	// 			"amount":      0.35,
-	// 			"royaltyName": "find",
-	// 		}).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("user1"),
-	// 			"amount":      0.65,
-	// 			"royaltyName": "creator",
-	// 		}).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("find"),
-	// 			"amount":      0.65,
-	// 			"royaltyName": "find forge",
-	// 		})
-
-	// 	otu.sendDandy("user1", "user2", id)
-	// })
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 

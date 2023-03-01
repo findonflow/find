@@ -326,8 +326,8 @@ pub contract FindMarketAuctionSoft {
 				previousBuyerName = FIND.reverseLookup(pb)
 			}
 
-			let buyerName=FIND.reverseLookup(buyer!)
-			let profile = Profile.find(buyer!)
+			let buyerName=FIND.reverseLookup(buyer)
+			let profile = Profile.find(buyer)
 			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: newOfferBalance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 
 		}
@@ -515,7 +515,7 @@ pub contract FindMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType)
+			let cuts= tenant.getCuts(name: actionResult.name, listingType: Type<@FindMarketAuctionSoft.SaleItem>(), nftType: nftType, ftType: ftType)
 
 			let nftInfo=saleItem.toNFTInfo(true)
 			let royalty=saleItem.getRoyalty()
@@ -530,7 +530,7 @@ pub contract FindMarketAuctionSoft {
 			let status="sold"
 			let buyerName=FIND.reverseLookup(buyer)
 			let sellerName=FIND.reverseLookup(seller)
-			let profile = Profile.find(buyer!)
+			let profile = Profile.find(buyer)
 			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 
 			saleItem.acceptNonEscrowedBid()
@@ -543,7 +543,7 @@ pub contract FindMarketAuctionSoft {
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
 
-			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: FIND.reverseLookupFN(), resolvedAddress: resolved, dapperMerchAddress: FIND.getMerchantAddress())
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: FIND.reverseLookupFN(), resolvedAddress: resolved)
 
 			destroy <- self.items.remove(key: id)
 

@@ -7,7 +7,7 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 
-/** 
+/**
  This is a transaction to set up an merchant account
 
  It has to be a blocto account since dapper will not allow us to run this account on a merchan account
@@ -42,7 +42,10 @@ transaction(dapperMerchantAccountAddress: Address) {
 			acct.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
 		}
 
+		//We have to first check if the SIGNER has forwarder created.
+		//If not then we create a forwarder with the capability to DAPPER's receiver
 		//Dapper utility token
+
 		let ducReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 		if !ducReceiver.check(){
@@ -51,7 +54,10 @@ transaction(dapperMerchantAccountAddress: Address) {
 			acct.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver, target: /storage/dapperUtilityCoinReceiver)
 		}
 
+		//We have to first check if the SIGNER has forwarder created.
+		//If not then we create a forwarder with the capability to DAPPER's receiver
 		//FlowUtility token
+
 		let futReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 		let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 		if !futReceiver.check(){

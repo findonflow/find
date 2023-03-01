@@ -3,8 +3,8 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 
 transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
@@ -25,14 +25,14 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		assert(walletReference.balance > amount , message: "Bidder has to have enough balance in wallet")
 
-		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+		let leaseMarketplace = FindMarket.getFindTenantAddress()
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
 		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let leaseDOSBidType= Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>()
-		let leaseDOSBidPublicPath=FindMarket.getPublicPath(leaseDOSBidType, name: "findLease")
-		let leaseDOSBidStoragePath= FindMarket.getStoragePath(leaseDOSBidType, name: "findLease")
+		let leaseDOSBidPublicPath=leaseTenant.getPublicPath(leaseDOSBidType)
+		let leaseDOSBidStoragePath= leaseTenant.getStoragePath(leaseDOSBidType)
 		let leaseDOSBidCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.MarketBidCollection{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidPublicPath)
 		if !leaseDOSBidCap.check() {
 			account.save<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOSBidStoragePath)

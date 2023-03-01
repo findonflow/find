@@ -445,7 +445,7 @@ func TestFIND(t *testing.T) {
 			WithArg("user", "lease"),
 		).
 			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, TAKEN", map[string]interface{}{
-				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x120e725050340cab",
+				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0xf669cb8d41ce0c74",
 				"registeredTime": 9.4608005e+07,
 				"status":         "TAKEN",
 				"validUntil":     1.26144005e+08,
@@ -460,7 +460,7 @@ func TestFIND(t *testing.T) {
 		).
 			Print().
 			AssertWithPointerWant(t, "/NameReport", autogold.Want("getStatus, LOCKED", map[string]interface{}{
-				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0x120e725050340cab",
+				"cost": 5, "lockedUntil": 1.33920005e+08, "owner": "0xf669cb8d41ce0c74",
 				"registeredTime": 9.4608005e+07,
 				"status":         "LOCKED",
 				"validUntil":     1.26144005e+08,
@@ -580,18 +580,18 @@ func TestFIND(t *testing.T) {
 			AssertWithPointerWant(t, "/FINDReport/accounts",
 				autogold.Want("with accounts", `[]interface {}{
   map[string]interface {}{
-    "address": "0xf669cb8d41ce0c74",
-    "name": "link",
-    "network": "Flow",
-    "node": "FindRelatedAccounts",
-    "trusted": true,
-  },
-  map[string]interface {}{
-    "address": "0x192440c99cb17282",
+    "address": "0xfd43f9148d4b725d",
     "name": "notLink",
     "network": "Flow",
     "node": "FindRelatedAccounts",
     "trusted": false,
+  },
+  map[string]interface {}{
+    "address": "0x192440c99cb17282",
+    "name": "link",
+    "network": "Flow",
+    "node": "FindRelatedAccounts",
+    "trusted": true,
   },
 }`))
 

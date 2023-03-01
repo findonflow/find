@@ -5,24 +5,23 @@ import DapperUtilityCoin from 0x82ec283f88a62e65
 import FindLeaseMarketSale from 0x35717efbbce11c74
 import FindLeaseMarket from 0x35717efbbce11c74
 
-//TODO: test, and rename to Dapper, repeat for other tx
-pub fun main(sellerAccount:Address, leaseName: String, amount: UFix64) : PurchaseData {
+pub fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
 
     let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
-    let leaseMarketplace = FindMarket.getTenantAddress("findLease") ?? panic("Cannot find findLease tenant")
+    let leaseMarketplace = FindMarket.getFindTenantAddress()
     let leaseTenant = FindMarket.getTenant(leaseMarketplace)
     let storagePath = leaseTenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>())
     let saleItemRef = getAuthAccount(address).borrow<&FindLeaseMarketSale.SaleItemCollection>(from: storagePath) ?? panic("Cannot borrow reference to sale item")
-    let saleItem = saleItemRef.borrow(leaseName) 
-    
+    let saleItem = saleItemRef.borrow(leaseName)
+
     let description = "Name :".concat(leaseName).concat(" for Dapper Credit ").concat(amount.toString())
     let imageURL = "https://i.imgur.com/8W8NoO1.png"
 
     return PurchaseData(
-            id: saleItem.getId(), 
-            name: leaseName, 
-            amount: amount, 
-            description: description, 
+            id: saleItem.getId(),
+            name: leaseName,
+            amount: amount,
+            description: description,
             imageURL: imageURL
             )
 }

@@ -18,7 +18,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	id := otu.setupMarketAndDandy()
 	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("DirectOfferEscrow").
+		setFlowDandyMarketOption("find").
 		setProfile("user1").
 		setProfile("user2")
 
@@ -228,7 +228,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 	/* Tests on Rules */
 	t.Run("Should not be able to direct offer after deprecated", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferEscrow", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		bidTx("bidMarketDirectOfferEscrowed",
 			WithSigner("user2"),
@@ -237,7 +237,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOption("DirectOfferEscrow", "enable")
+		otu.alterMarketOption("enable")
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
@@ -246,7 +246,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
 
-		otu.alterMarketOption("DirectOfferEscrow", "deprecate")
+		otu.alterMarketOption("deprecate")
 
 		otu.O.Tx("increaseBidMarketDirectOfferEscrowed",
 			WithSigner("user2"),
@@ -258,7 +258,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.saleItemListed("user1", "active_ongoing", 10.0).
 			acceptDirectOfferMarketEscrowed("user1", id, "user2", 10.0)
 
-		otu.alterMarketOption("DirectOfferEscrow", "enable")
+		otu.alterMarketOption("enable")
 
 		otu.sendDandy("user1", "user2", id).
 			sendFT("user1", "user2", "Flow", 10.0)
@@ -269,20 +269,20 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferEscrow", "deprecate").
+			alterMarketOption("deprecate").
 			rejectDirectOfferEscrowed("user1", id, 10.0)
-		otu.alterMarketOption("DirectOfferEscrow", "enable")
+		otu.alterMarketOption("enable")
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
 	t.Run("Should not be able to direct offer after stopped", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferEscrow", "stop")
+		otu.alterMarketOption("stop")
 
 		bidTx("bidMarketDirectOfferEscrowed").
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("DirectOfferEscrow", "enable")
+		otu.alterMarketOption("enable")
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
@@ -291,7 +291,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price)
 
-		otu.alterMarketOption("DirectOfferEscrow", "stop")
+		otu.alterMarketOption("stop")
 
 		otu.O.Tx("increaseBidMarketDirectOfferEscrowed",
 			WithSigner("user2"),
@@ -308,14 +308,14 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("DirectOfferEscrow", "enable").
+		otu.alterMarketOption("enable").
 			cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
 	t.Run("Should be able to able to direct offer, add bit and accept offer after enabled", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferEscrow", "deprecate").
-			alterMarketOption("DirectOfferEscrow", "enable").
+		otu.alterMarketOption("deprecate").
+			alterMarketOption("enable").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			increaseDirectOfferMarketEscrowed("user2", id, 5.0, 15.0).
@@ -329,8 +329,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	t.Run("Should be able to able to direct offerand reject after enabled", func(t *testing.T) {
 
-		otu.alterMarketOption("DirectOfferEscrow", "deprecate").
-			alterMarketOption("DirectOfferEscrow", "enable").
+		otu.alterMarketOption("deprecate").
+			alterMarketOption("enable").
 			directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
 			rejectDirectOfferEscrowed("user1", id, 10.0)
@@ -341,7 +341,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferEscrow", "deprecate")
+			alterMarketOption("deprecate")
 
 		bidTx("bidMarketDirectOfferEscrowed",
 			WithSigner("user3"),
@@ -350,7 +350,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterMarketOption("DirectOfferEscrow", "stop")
+		otu.alterMarketOption("stop")
 
 		bidTx("bidMarketDirectOfferEscrowed",
 			WithSigner("user3"),
@@ -359,7 +359,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterMarketOption("DirectOfferEscrow", "enable").
+		otu.alterMarketOption("enable").
 			cancelAllDirectOfferMarketEscrowed("user1")
 
 	})
@@ -368,12 +368,12 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price).
 			saleItemListed("user1", "active_ongoing", price).
-			alterMarketOption("DirectOfferEscrow", "stop")
+			alterMarketOption("stop")
 
-		otu.alterMarketOption("DirectOfferEscrow", "deprecate").
+		otu.alterMarketOption("deprecate").
 			retractOfferDirectOfferEscrowed("user2", "user1", id)
 
-		otu.alterMarketOption("DirectOfferEscrow", "enable")
+		otu.alterMarketOption("enable")
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
 
@@ -524,23 +524,10 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to offer an NFT and fulfill it with id != uuid", func(t *testing.T) {
-
-		otu.registerDUCInRegistry().
-			setDUCExampleNFT().
-			sendExampleNFT("user1", "find")
-
-		saleItem := otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
-
-		otu.saleItemListed("user1", "active_ongoing", price)
-		otu.acceptDirectOfferMarketEscrowed("user1", saleItem[0], "user2", price)
-		otu.cancelAllDirectOfferMarketEscrowed("user1")
-
-		otu.sendExampleNFT("user1", "user2")
-
-	})
-
 	t.Run("Should be able to direct offer and fulfill multiple NFT in one go", func(t *testing.T) {
+		otu.registerDUCInRegistry().
+			sendExampleNFT("user1", "find").
+			setFlowExampleMarketOption("find")
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 

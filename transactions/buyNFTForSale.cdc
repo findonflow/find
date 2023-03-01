@@ -36,7 +36,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 		}
 		let address = resolveAddress!
 		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
+		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItem>())
 
 		let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 

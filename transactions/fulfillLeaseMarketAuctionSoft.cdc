@@ -11,7 +11,7 @@ transaction(leaseName: String, amount:UFix64) {
 	let requiredAmount: UFix64
 
 	prepare(account: AuthAccount) {
-		let marketplace = FindMarket.getTenantAddress("findLease")!
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
@@ -21,7 +21,7 @@ transaction(leaseName: String, amount:UFix64) {
 		let item = FindLeaseMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, name: leaseName)
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-	
+
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.requiredAmount = self.bidsReference.getBalance(leaseName)
 	}
@@ -32,7 +32,7 @@ transaction(leaseName: String, amount:UFix64) {
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
+		let vault <- self.walletReference.withdraw(amount: amount)
 		self.bidsReference.fulfillAuction(name: leaseName, vault: <- vault)
 	}
 }

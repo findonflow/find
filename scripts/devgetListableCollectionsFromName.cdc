@@ -69,7 +69,7 @@ pub fun main():AnyStruct {
 
 	var tenantAddr = FindMarket.getFindTenantAddress()
 	if tenant == "Dapper" {
-		tenantAddr = FindMarket.getTenantAddress("find_dapper")!
+		tenantAddr = FindMarket.getTenantAddress("find")!
 	}
 	let tenantRef = FindMarket.getTenant(tenantAddr)
 

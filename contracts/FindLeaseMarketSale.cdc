@@ -174,7 +174,7 @@ pub contract FindLeaseMarketSale {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTenantCut(name: actionResult.name, listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= self.getTenant().getCuts(name: actionResult.name, listingType: Type<@FindLeaseMarketSale.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			let ftType=saleItem.vaultType
 			let owner=saleItem.getSeller()
@@ -188,7 +188,7 @@ pub contract FindLeaseMarketSale {
 
 			saleItem.pointer.move(to: to)
 
-			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts, dapperMerchAddress: FIND.getMerchantAddress())
+			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
 
 			emit Sale(tenant:self.getTenant().name, leaseName: name, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, leaseInfo:leaseInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
 

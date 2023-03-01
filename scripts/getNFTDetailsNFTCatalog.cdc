@@ -291,12 +291,6 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let findAddress=FindMarket.getFindTenantAddress()
 		var findMarket=FindMarket.getNFTListing(tenant:findAddress, address: address, id: nftDetail!.uuid, getNFTInfo:false)
 
-		let dapperAddress=FindMarket.getTenantAddress("find_dapper") 
-
-		if dapperAddress !=nil && findMarket.length == 0 {
-			 findMarket=FindMarket.getNFTListing(tenant:dapperAddress!, address: address, id: nftDetail!.uuid, getNFTInfo:false)
-		}
-
 		var report : {String : ListingTypeReport} = {}
 		var dapperReport : {String : ListingTypeReport} = {}
 
@@ -305,24 +299,12 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 			let tenantCap = FindMarket.getTenantCapability(findAddress)!
 			let tenantRef = tenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(tenantCap.address.toString()))
 
-			var dapperTenantRef : &FindMarket.Tenant{FindMarket.TenantPublic}? =nil
-			if dapperAddress != nil {
-				let dapperTenantCap = FindMarket.getTenantCapability(dapperAddress!)!
-				dapperTenantRef = dapperTenantCap.borrow() ?? panic("This tenant is not set up. Tenant : ".concat(dapperTenantCap.address.toString()))
-			}
-
-
 			let marketTypes = FindMarket.getSaleItemTypes()
 
 			for marketType in marketTypes {
 				if let allowedListing = tenantRef.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-					report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef)
-				}
-
-				if dapperTenantRef != nil {
-				if let allowedListing = dapperTenantRef!.getAllowedListings(nftType: pointer.getItemType(), marketType: marketType) {
-					dapperReport[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: dapperTenantRef!)
-				}
+					report[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef, dapper: false)
+					dapperReport[FindMarket.getMarketOptionFromType(marketType)] = createListingTypeReport(allowedListing, pointer: pointer, tenantRef: tenantRef, dapper: true)
 				}
 			}
 		}
@@ -335,8 +317,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let flovatar = FindUserStatus.getFlovatarListing(user: address, id : id, type: nftType)
 		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
 
-
-		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions : dapperReport,  linkedForMarket : linkedForMarket)
+		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions: dapperReport, linkedForMarket : linkedForMarket)
 	}
 	return nil
 
@@ -544,34 +525,43 @@ pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	return array
 }
 
-pub fun resolveFindRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
+pub fun resolveMarketplaceRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
 
-	let cuts = tenantRef.getTenantCut(name:"", listingType: listing, nftType:nft, ftType:ft)
+	let cuts = tenantRef.getCuts(name:"", listingType: listing, nftType:nft, ftType:ft)
 
 	let royalties :[Royalties] = []
-	if cuts.findCut != nil {
-		royalties.append(Royalties(royaltyName: cuts.findCut!.description, address: cuts.findCut!.receiver.address, findName: reverseLookup(cuts.findCut!.receiver.address), cut: cuts.findCut!.cut))
-	}
 
-	if cuts.tenantCut != nil {
-		royalties.append(Royalties(royaltyName: cuts.tenantCut!.description, address: cuts.tenantCut!.receiver.address, findName: reverseLookup(cuts.tenantCut!.receiver.address), cut: cuts.tenantCut!.cut))
+	for allCuts in cuts.values {
+		for cut in allCuts.cuts {
+			royalties.append(Royalties(royaltyName: cut.getName(), address: cut.getAddress(), findName: reverseLookup(cut.getAddress()), cut: cut.getCut()))
+		}
 	}
 
 	return royalties
 }
 
-pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, pointer: FindViews.ViewReadPointer, tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}) : ListingTypeReport {
+pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, pointer: FindViews.ViewReadPointer, tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, dapper: Bool) : ListingTypeReport? {
 	let listingType = allowedListing.listingType.identifier
 	var ftAlias : [String] = []
 	var ftIdentifier : [String] = []
 	var listingDetails : [ListingRoyalties] = []
 	for ft in allowedListing.ftTypes {
-		ftIdentifier.append(ft.identifier)
 		var alias : String? = nil
-		if let ftInfo = FTRegistry.getFTInfo(ft.identifier) {
-			alias = ftInfo.alias
-			ftAlias.append(ftInfo.alias)
+		let ftInfo = FTRegistry.getFTInfo(ft.identifier) ?? panic(ft.identifier.concat(" is not added to FTRegistry yet."))
+		switch dapper {
+			case true :
+				if !ftInfo.tag.contains("dapper") {
+					continue
+				}
+
+			case false :
+				if ftInfo.tag.contains("dapper") {
+					continue
+				}
 		}
+		alias = ftInfo.alias
+		ftAlias.append(ftInfo.alias)
+		ftIdentifier.append(ft.identifier)
 
 		// getRoyalties
 		var nftR = nftRoyalties
@@ -580,10 +570,14 @@ pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, poi
 			nftR = nftRoyalties
 		}
 
-		let findR = resolveFindRoyalties(tenantRef: tenantRef, listing: allowedListing.listingType , nft: pointer.getItemType(), ft: ft)
+		let findR = resolveMarketplaceRoyalties(tenantRef: tenantRef, listing: allowedListing.listingType , nft: pointer.getItemType(), ft: ft)
 		findR.appendAll(nftR!)
 
 		listingDetails.append(ListingRoyalties(ftAlias: alias, ftIdentifier: ft.identifier, royalties: findR))
+	}
+
+	if ftIdentifier.length == 0 {
+		return nil
 	}
 
 	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status , ListingDetails: listingDetails)

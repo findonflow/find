@@ -423,8 +423,8 @@ pub contract FindMarketAuctionEscrow {
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			let buyerName=FIND.reverseLookup(buyer!)
-			let profile = Profile.find(buyer!)
+			let buyerName=FIND.reverseLookup(buyer)
+			let profile = Profile.find(buyer)
 			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 		}
@@ -539,7 +539,7 @@ pub contract FindMarketAuctionEscrow {
 					panic(actionResult.message)
 				}
 
-				let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType)
+				let cuts= tenant.getCuts(name: actionResult.name, listingType: Type<@FindMarketAuctionEscrow.SaleItem>(), nftType: nftType, ftType: ftType)
 
 				if !saleItem.hasAuctionMetReservePrice() {
 					self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
@@ -557,7 +557,7 @@ pub contract FindMarketAuctionEscrow {
 
 				let buyerName=FIND.reverseLookup(buyer)
 				let sellerName = FIND.reverseLookup(seller)
-				let profile = Profile.find(buyer!)
+				let profile = Profile.find(buyer)
 				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: sellerName, amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 				let vault <- saleItem.acceptEscrowedBid()
@@ -569,7 +569,7 @@ pub contract FindMarketAuctionEscrow {
 				// Have to make sure the tenant always have the valid find name
 				resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
-				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved, dapperMerchAddress: FIND.getMerchantAddress())
+				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
 
 				destroy <- self.items.remove(key: id)
 				return

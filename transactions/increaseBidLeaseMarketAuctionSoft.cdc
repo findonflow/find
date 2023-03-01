@@ -9,7 +9,7 @@ transaction(leaseName: String, amount: UFix64) {
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection
 
 	prepare(account: AuthAccount) {
-		let marketplace = FindMarket.getTenantAddress("findLease")!
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")

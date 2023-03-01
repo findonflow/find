@@ -367,12 +367,12 @@ pub contract FindLeaseMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getTenantCut(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= self.getTenant().getCuts(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 			let leaseInfo=saleItem.toLeaseInfo()
 			saleItem.acceptNonEscrowedBid()
-			FindLeaseMarket.pay(tenant: self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo: leaseInfo, cuts:cuts, dapperMerchAddress: FIND.getMerchantAddress())
+			FindLeaseMarket.pay(tenant: self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo: leaseInfo, cuts:cuts)
 
 			destroy <- self.items.remove(key: name)
 		}

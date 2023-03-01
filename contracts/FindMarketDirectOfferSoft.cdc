@@ -459,7 +459,7 @@ pub contract FindMarketDirectOfferSoft {
 				panic(actionResult.message)
 			}
 
-			let cuts= tenant.getTenantCut(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: nftType, ftType: ftType)
+			let cuts= tenant.getCuts(name: actionResult.name, listingType: Type<@FindMarketDirectOfferSoft.SaleItem>(), nftType: nftType, ftType: ftType)
 
 
 			let status="sold"
@@ -484,7 +484,7 @@ pub contract FindMarketDirectOfferSoft {
 			// Have to make sure the tenant always have the valid find name
 			resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
 
-			FindMarket.pay(tenant: tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo: nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved, dapperMerchAddress: FIND.getMerchantAddress())
+			FindMarket.pay(tenant: tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo: nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
 
 			destroy <- self.items.remove(key: id)
 		}

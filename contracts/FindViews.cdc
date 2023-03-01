@@ -381,7 +381,7 @@ pub contract FindViews {
 			case "0x097bafa4e0b48eef":
 			//mainnet
 				return 0xead892083b3e2c6c
-			case "0x1ff7e32d71183db0":
+			case  "0x35717efbbce11c74":
 				//testnet
 				return 0x82ec283f88a62e65
 			default:

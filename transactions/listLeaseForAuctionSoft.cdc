@@ -5,24 +5,24 @@ import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
-	
+
 	let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
 	let pointer : FindLeaseMarket.AuthLeasePointer
 	let vaultType : Type
-	
+
 	prepare(account: AuthAccount) {
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		
-		let leaseMarketplace = FindMarket.getTenantAddress("findLease")!
+
+		let leaseMarketplace = FindMarket.getFindTenantAddress()
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
 		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
-		let leaseASPublicPath=FindMarket.getPublicPath(leaseASSaleItemType, name: "findLease")
-		let leaseASStoragePath= FindMarket.getStoragePath(leaseASSaleItemType, name:"findLease")
-		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath) 
+		let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
+		let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
+		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath)
 		if !leaseASSaleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
@@ -37,9 +37,9 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auction
 	}
 
 	pre{
-		// Ben : panic on some unreasonable inputs in trxn 
+		// Ben : panic on some unreasonable inputs in trxn
 		minimumBidIncrement > 0.0 :"Minimum bid increment should be larger than 0."
-		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment." 
+		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment."
 		auctionDuration > 0.0 : "Auction Duration should be greater than 0."
 		auctionExtensionOnLateBid > 0.0 : "Auction Duration should be greater than 0."
 		self.saleItems != nil : "Cannot borrow reference to saleItem"

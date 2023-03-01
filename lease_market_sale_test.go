@@ -22,7 +22,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		registerDapperUser("user2").
 		createDapperUser("user3").
 		registerDapperUser("user3").
-		setFlowLeaseMarketOption("Sale").
+		setFlowLeaseMarketOption().
 		setProfile("user1").
 		setProfile("user2")
 
@@ -160,18 +160,6 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.cancelAllLeaseForSale("user1")
 	})
 
-	t.Run("Should be able to list it in DUC but not DUT.", func(t *testing.T) {
-
-		otu.O.Tx("listLeaseForSale",
-			WithSigner("user1"),
-			WithArg("leaseName", "name1"),
-			WithArg("ftAliasOrIdentifier", "FUT"),
-			WithArg("directSellPrice", price),
-			WithArg("validUntil", otu.currentTime()+100.0),
-		).
-			AssertFailure(t, "Nothing matches")
-	})
-
 	t.Run("Should be able cancel all listing", func(t *testing.T) {
 
 		otu.listLeaseForSaleDUC("user1", "name1", price)
@@ -199,7 +187,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.alterLeaseMarketOption("Sale", "deprecate")
+		otu.alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
@@ -219,11 +207,11 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("Sale", "enable")
+		otu.alterLeaseMarketOption("enable")
 
 		otu.listLeaseForSaleDUC("user1", "name2", price)
 
-		otu.alterLeaseMarketOption("Sale", "deprecate")
+		otu.alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("delistLeaseSale",
 			WithSigner("user1"),
@@ -231,7 +219,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("Sale", "enable")
+		otu.alterLeaseMarketOption("enable")
 
 		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
@@ -247,7 +235,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.alterLeaseMarketOption("Sale", "stop")
+		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
@@ -273,7 +261,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("Sale", "enable")
+		otu.alterLeaseMarketOption("enable")
 		otu.cancelAllLeaseForSale("user1")
 
 	})
@@ -339,18 +327,18 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      0.25,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("dapper"),
 				"amount":      0.44,
 				"leaseName":   "name1",
 				"royaltyName": "dapper",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			})
 
 		otu.cancelAllLeaseForSale("user1").
@@ -370,51 +358,23 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-				"address":     otu.O.Address("dapper"),
+				"address":     otu.O.Address("find"),
 				"amount":      2.5,
 				"leaseName":   "name1",
 				"royaltyName": "find",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			}).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("dapper"),
 				"amount":      1.0,
 				"leaseName":   "name1",
 				"royaltyName": "dapper",
-				"tenant":      "findLease",
+				"tenant":      "find",
 			})
 
 		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
 	})
-
-	// The find fee is now hard coeded for DUC and therefore this test does not make sense at the moment
-	// t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
-	// 	otu.setFindLeaseCutDapper(0.1)
-	// 	otu.listLeaseForSaleDUC("user1", "name1", price)
-
-	// 	otu.O.Tx("buyLeaseForSaleDapper",
-	// 		WithSigner("user2"),
-	// 		WithPayloadSigner("dapper"),
-	// 		WithArg("sellerAccount", "user1"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", price),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("dapper"),
-	// 			"amount":      1.0,
-	// 			"leaseName":   "name1",
-	// 			"royaltyName": "find",
-	// 			"tenant":      "findLease",
-	// 		})
-
-	// 	otu.cancelAllLeaseForSale("user1").
-	// 		moveNameTo("user2", "user1", "name1").
-	// 		setFindLeaseCutDapper(0.025)
-
-	// })
 
 	/* Honour Banning */
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {

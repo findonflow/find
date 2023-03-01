@@ -8,11 +8,8 @@ import MetadataViews from 0x631e88ae7f1d7c20
 import FlowUtilityToken from 0x82ec283f88a62e65
 import TokenForwarding from 0x51ea0e37c27a1f1a
 import FungibleToken from 0x9a0766d93b6608b7
-<<<<<<<< HEAD:dapper-tx/testnet/listNFTForSale.cdc
-========
 
 transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
->>>>>>>> main:dapper-tx/testnet/listNFTForSaleDapper.cdc
 
     let saleItems : &FindMarketSale.SaleItemCollection?
     let pointer : FindViews.AuthNFTPointer

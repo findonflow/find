@@ -29,7 +29,7 @@ pub struct FINDReport{
 	// This is deprecating, moving to accounts
 	pub let relatedAccounts: { String: [Address]}
 
- pub let lostAndFoundTypes: {String : String}
+ 	pub let lostAndFoundTypes: {String : String}
 	// This is deprecating, moving to accounts
 	// EmeraldID Account Linkage
 	pub let emeraldIDAccounts : {String : Address}
@@ -139,26 +139,13 @@ pub fun main(user: String) : Report? {
 			let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
 
 			let find= FindMarket.getFindTenantAddress()
-			let findLease= FindMarket.getTenantAddress("findLease")!
 			var items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
-
-			if items.length == 0 {
-				if let findDapper= FindMarket.getTenantAddress("find_dapper") {
-					items = FindMarket.getSaleItemReport(tenant:findDapper, address: address, getNFTInfo:true)
-				}
-			}
 
 			var marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
-			if marketBids.length == 0 {
-				if let findDapper = FindMarket.getTenantAddress("find_dapper") {
-					marketBids = FindMarket.getBidsReport(tenant:findDapper, address: address, getNFTInfo:true)
-				}
-			}
+			let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:find, address: address, getLeaseInfo:true)
 
-			let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:findLease, address: address, getLeaseInfo:true)
-
-			let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:findLease, address: address, getLeaseInfo:true)
+			let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:find, address: address, getLeaseInfo:true)
 
 			var profileReport = profile?.asReport()
 			if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {

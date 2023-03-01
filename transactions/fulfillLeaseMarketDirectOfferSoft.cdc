@@ -11,7 +11,7 @@ transaction(leaseName: String, amount:UFix64) {
 	let requiredAmount:UFix64
 
 	prepare(account: AuthAccount) {
-		let marketplace = FindMarket.getTenantAddress("findLease")!
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
@@ -31,7 +31,7 @@ transaction(leaseName: String, amount:UFix64) {
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
+		let vault <- self.walletReference.withdraw(amount: amount)
 		self.bidsReference.fulfillDirectOffer(name: leaseName, vault: <- vault)
 	}
 }
