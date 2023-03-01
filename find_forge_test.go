@@ -8,7 +8,7 @@ import (
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
-	"github.com/onflow/flow-cli/pkg/flowkit/services"
+	"github.com/onflow/flow-cli/pkg/flowkit"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -414,16 +414,9 @@ func TestFindForge(t *testing.T) {
 	t.Run("Should be able to deploy Forge recipe contract and fulfill the order", func(t *testing.T) {
 		file, err := os.ReadFile("./contracts/FindFooDIM.cdc")
 		assert.NoError(t, err)
-		contract := services.Contract{
-			Name: "FindFooDIM",
-			Script: &services.Script{
-				Code:     file,
-				Args:     []cadence.Value{},
-				Filename: "./contracts/FindFooDIM.cdc",
-			},
-			Network: "emulator",
-		}
-		_, err = otu.O.Services.Accounts.AddContract(otu.O.Account("find-forge"), &contract, false)
+
+		script := flowkit.NewScript(file, []cadence.Value{}, "./contracts/FindFooDIM.cdc")
+		_, _, err = otu.O.Services.Accounts.AddContract(otu.O.Account("find-forge"), script, "emulator", false)
 		assert.NoError(t, err)
 	})
 
