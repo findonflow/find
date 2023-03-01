@@ -1,13 +1,15 @@
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 import FIND from "../contracts/FIND.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(marketplace:Address, owner: String, id: UInt64) {
+transaction(owner: String, id: UInt64) {
 
 	let saleItem : Capability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}>?
 
 	prepare(account: AuthAccount) {
+		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(owner)
-		if resolveAddress == nil { 
+		if resolveAddress == nil {
 			panic("The address input is not a valid name nor address. Input : ".concat(owner))
 		}
 		let address = resolveAddress!

@@ -7,7 +7,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix64]) {
+transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	var walletReference : [&FungibleToken.Vault]
@@ -17,6 +17,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 	let prices : [UFix64]
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {
 			panic("The array length of users and ids should be the same")
 		}
@@ -40,7 +41,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
 		if !saleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
@@ -59,7 +60,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			if saleItems[address] == nil {
 				let saleItem = getAccount(address).getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath).borrow() ?? panic("cannot find sale item cap")
 				self.saleItems.append(saleItem)
-				saleItems[address] = saleItem 
+				saleItems[address] = saleItem
 			} else {
 				self.saleItems.append(saleItems[address]!)
 			}
@@ -79,8 +80,8 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftIdentifier] = nft
 			}
@@ -89,7 +90,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 				ft = fts[ftIdentifier]
 			} else {
 				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
-				fts[ftIdentifier] = ft 
+				fts[ftIdentifier] = ft
 			}
 
 			self.walletReference.append(
@@ -133,7 +134,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 				panic("Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
 			}
 
-			self.saleItems[counter].buy(id:ids[counter], vault: <- self.walletReference[counter].withdraw(amount: amounts[counter]) 
+			self.saleItems[counter].buy(id:ids[counter], vault: <- self.walletReference[counter].withdraw(amount: amounts[counter])
 			, nftCap: self.targetCapability[counter])
 			counter = counter + 1
 		}

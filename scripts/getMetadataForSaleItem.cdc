@@ -1,4 +1,5 @@
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 
 pub struct PurchaseData {
 	pub let id: UInt64
@@ -15,7 +16,8 @@ pub struct PurchaseData {
 		self.imageURL = imageURL
 	}
 }
-pub fun main(merchantAddress: Address, marketplace:Address, address: Address, id: UInt64, amount: UFix64) : PurchaseData{
+pub fun main(merchantAddress: Address,  address: Address, id: UInt64, amount: UFix64) : PurchaseData{
+	let marketplace = FindMarket.getFindTenantAddress()
 	let saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 	let saleItemCollection = saleItemsCap.borrow()!
 	let item = saleItemCollection.borrowSaleItem(id)
@@ -24,10 +26,10 @@ pub fun main(merchantAddress: Address, marketplace:Address, address: Address, id
 
 	var thumbnail = replacePrefix(display.thumbnail.uri(), prefix: "ipfs://", replace:"https://find.mypinata.clloud/ipfs/")
 	return PurchaseData(
-		id: id, 
-		name: display.name, 
+		id: id,
+		name: display.name,
 		amount: amount,
-		description: display.description, 
+		description: display.description,
 		imageURL: thumbnail
 	)
 }

@@ -2,8 +2,9 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
 
-pub fun main(address: Address, marketplace:Address, id: UInt64, amount: UFix64) : PurchaseData {
+pub fun main(address: Address, id: UInt64, amount: UFix64) : PurchaseData {
 
+	let marketplace = FindMarket.getFindTenantAddress()
 	let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
 	let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 	let display = item.getDisplay()
