@@ -735,7 +735,6 @@ func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *Overflow
 
 	otu.O.Tx("delistNFTSale",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("ids", []uint64{id}),
 	).
 		AssertSuccess(otu.T).
@@ -768,7 +767,6 @@ func (otu *OverflowTestUtils) cancelAllNFTForSale(name string) *OverflowTestUtil
 
 	otu.O.Tx("delistAllNFTSale",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -779,7 +777,6 @@ func (otu *OverflowTestUtils) cancelAllLeaseForSale(name string) *OverflowTestUt
 
 	otu.O.Tx("delistAllLeaseSale",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -794,7 +791,6 @@ func (otu *OverflowTestUtils) listNFTForSale(name string, id uint64, price float
 
 	otu.O.Tx("listNFTForSale",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
@@ -823,7 +819,6 @@ func (otu *OverflowTestUtils) listExampleNFTForSale(name string, id uint64, pric
 
 	res := otu.O.Tx("listNFTForSale",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
@@ -844,7 +839,6 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 
 	otu.O.Tx("listNFTForAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
@@ -879,7 +873,6 @@ func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id u
 
 	res := otu.O.Tx("listNFTForAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
@@ -902,7 +895,6 @@ func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *Overf
 
 	otu.O.Tx("cancelAllMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -917,7 +909,6 @@ func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, pric
 
 	otu.O.Tx("listNFTForAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "FUT"),
@@ -971,7 +962,6 @@ func (otu *OverflowTestUtils) delistAllNFT(name string) *OverflowTestUtils {
 
 	otu.O.Tx("cancelAllMarketListings",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -983,7 +973,6 @@ func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowT
 
 	otu.O.Tx("cancelAllMarketAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1035,7 +1024,6 @@ func (otu *OverflowTestUtils) buyNFTForMarketSale(name string, seller string, id
 
 	otu.O.Tx("buyNFTForSale",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1057,7 +1045,6 @@ func (otu *OverflowTestUtils) increaseAuctioBidMarketEscrow(name string, id uint
 
 	otu.O.Tx("increaseBidMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1077,7 +1064,6 @@ func (otu *OverflowTestUtils) increaseAuctionBidMarketSoft(name string, id uint6
 
 	otu.O.Tx("increaseBidMarketAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1137,7 +1123,6 @@ func (otu *OverflowTestUtils) auctionBidMarketEscrow(name string, seller string,
 
 	otu.O.Tx("bidMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1157,7 +1142,6 @@ func (otu *OverflowTestUtils) auctionBidMarketSoft(name string, seller string, i
 
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -1196,7 +1180,6 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketEscrowed(name string, id 
 
 	otu.O.Tx("increaseBidMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1215,7 +1198,6 @@ func (otu *OverflowTestUtils) increaseDirectOfferMarketSoft(name string, id uint
 
 	otu.O.Tx("increaseBidMarketDirectOfferSoft",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1256,7 +1238,6 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 
 	otu.O.Tx("bidMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
@@ -1285,7 +1266,6 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, s
 
 	res := otu.O.Tx("bidMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
@@ -1307,7 +1287,6 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) 
 
 	otu.O.Tx("cancelAllMarketDirectOfferEscrowed",
 		WithSigner(signer),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1322,7 +1301,6 @@ func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, 
 
 	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
@@ -1364,7 +1342,6 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *Ove
 
 	otu.O.Tx("cancelAllMarketDirectOfferSoft",
 		WithSigner(signer),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1375,7 +1352,6 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferLeaseMarketSoft(signer string)
 
 	otu.O.Tx("cancelAllLeaseMarketDirectOfferSoft",
 		WithSigner(signer),
-		WithArg("marketplace", "find"),
 	).
 		AssertSuccess(otu.T)
 
@@ -1386,7 +1362,6 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketEscrowed(name string, id ui
 
 	otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1405,7 +1380,6 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoft(name string, id uint64
 
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1442,7 +1416,6 @@ func (otu *OverflowTestUtils) rejectDirectOfferEscrowed(name string, id uint64, 
 
 	otu.O.Tx("cancelMarketDirectOfferEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("ids", []uint64{id}),
 	).
 		AssertSuccess(otu.T).
@@ -1460,7 +1433,6 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferEscrowed(buyer, seller stri
 
 	otu.O.Tx("retractOfferMarketDirectOfferEscrowed",
 		WithSigner(buyer),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1477,7 +1449,6 @@ func (otu *OverflowTestUtils) rejectDirectOfferSoft(name string, id uint64, pric
 
 	otu.O.Tx("cancelMarketDirectOfferSoft",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("ids", []uint64{id}),
 	).
 		AssertSuccess(otu.T).
@@ -1512,7 +1483,6 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, 
 
 	otu.O.Tx("retractOfferMarketDirectOfferSoft",
 		WithSigner(buyer),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1545,7 +1515,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrowFromBidder(name string, 
 
 	otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -1563,7 +1532,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionEscrow(name string, id uint64,
 
 	otu.O.Tx("fulfillMarketAuctionEscrowed",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("owner", name),
 		WithArg("id", id),
 	).
@@ -1584,7 +1552,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoft(name string, id uint64, p
 	otu.O.Tx("fulfillMarketAuctionSoftDapper",
 		WithSigner(name),
 		WithPayloadSigner("dapper"),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -1623,7 +1590,6 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint6
 	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 		WithSigner(name),
 		WithPayloadSigner("dapper"),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -2244,7 +2210,6 @@ func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price fl
 
 	res := otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", ftIden),
@@ -2279,7 +2244,6 @@ func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, pric
 
 	result, err := otu.O.Script("getMetadataForSaleItem",
 		WithArg("merchantAddress", "find"),
-		WithArg("marketplace", "find"),
 		WithArg("address", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -2299,7 +2263,6 @@ func (otu *OverflowTestUtils) buyNFTForMarketSaleDUC(name string, seller string,
 	otu.O.Tx("buyNFTForSaleDapper",
 		WithSigner(name),
 		WithPayloadSigner("dapper"),
-		WithArg("marketplace", "find"),
 		WithArg("address", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -2396,7 +2359,6 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 
 	res := otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", ftIden),
@@ -2446,7 +2408,6 @@ func (otu *OverflowTestUtils) listExampleNFTForSoftAuction(name string, id uint6
 
 	res := otu.O.Tx("listNFTForAuctionSoft",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "DUC"),
@@ -2471,7 +2432,6 @@ func (otu *OverflowTestUtils) auctionBidMarketSoftDUC(name string, seller string
 
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -2538,7 +2498,6 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64
 	otu.O.Tx("fulfillMarketAuctionSoftDapper",
 		WithSigner(name),
 		WithPayloadSigner("dapper"),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).
@@ -2563,7 +2522,6 @@ func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller strin
 
 	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
@@ -2604,7 +2562,6 @@ func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, selle
 
 	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
@@ -2625,7 +2582,6 @@ func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uin
 
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).
@@ -2669,7 +2625,6 @@ func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoftDUC(name string, id ui
 	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 		WithSigner(name),
 		WithPayloadSigner("dapper"),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 		WithArg("amount", price),
 	).

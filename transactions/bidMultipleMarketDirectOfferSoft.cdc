@@ -9,7 +9,7 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers:[String], amounts: [UFix64], validUntil: UFix64?) {
+transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers:[String], amounts: [UFix64], validUntil: UFix64?) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	let walletReference : [&FungibleToken.Vault]
@@ -30,11 +30,12 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			panic("The length of arrays passed in has to be the same")
 		}
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let addresses : {String : Address} = {}
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
 		let vaultRefs : {StoragePath : &FungibleToken.Vault} = {}
-		
+
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
@@ -68,8 +69,8 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftIdentifier] = nft
 			}
@@ -78,9 +79,9 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 				ft = fts[ftIdentifier]
 			} else {
 				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
-				fts[ftIdentifier] = ft 
+				fts[ftIdentifier] = ft
 			}
-		
+
 			if vaultRefs[ft!.vaultPath] != nil {
 				self.walletReference.append(vaultRefs[ft!.vaultPath]!)
 				self.ftVaultType.append(vaultRefs[ft!.vaultPath]!.getType())
@@ -135,9 +136,9 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		while counter < ids.length {
 			if self.walletReference[counter].balance < self.totalPrice[ftAliasOrIdentifiers[counter]]! {
 				panic("Your wallet does not have enough funds to pay for this item. Vault Type : ".concat(self.ftVaultType[counter].getType().identifier).concat(" . Required : ".concat(self.totalPrice[ftAliasOrIdentifiers[counter]]!.toString())))
-			}	
+			}
 			self.bidsReference!.bid(item:self.pointer[counter], amount: amounts[counter], vaultType: self.ftVaultType[counter], nftCap: self.targetCapability[counter], validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
-			counter = counter + 1 
+			counter = counter + 1
 		}
 	}
 }
