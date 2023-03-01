@@ -7,7 +7,6 @@ import FIND from "./FIND.cdc"
 import Debug from "./Debug.cdc"
 import Clock from "./Clock.cdc"
 import FTRegistry from "./FTRegistry.cdc"
-import FindMarket from "./FindMarket.cdc"
 import FindForge from "./FindForge.cdc"
 import FindForgeOrder from "./FindForgeOrder.cdc"
 import FindPack from "./FindPack.cdc"
@@ -48,17 +47,6 @@ pub contract Admin {
 			}
 			self.capability = cap
 		}
-
-		/*
-		pub fun addTenantItem(_ item: FindMarket.TenantSaleItem) {
-			pre {
-				self.capability != nil: "Cannot create FIND, capability is not set"
-			}
-
-			self.capability!.borrow()!.addTenantItem(item)
-
-		}
-		*/
 
 		pub fun addPublicForgeType(name: String, forgeType : Type) {
 			pre {
