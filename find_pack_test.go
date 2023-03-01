@@ -6,6 +6,7 @@ import (
 
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,6 +25,9 @@ func TestFindPack(t *testing.T) {
 		registerExampleNFTInNFTRegistry()
 
 	singleType := []string{exampleNFTType(otu)}
+
+	flow, err := otu.O.QualifiedIdentifier("FlowToken", "Vault")
+	assert.NoError(otu.T, err)
 	t.Run("Should be able to mint Example NFTs", func(t *testing.T) {
 		otu.mintExampleNFTs()
 	})
@@ -271,6 +275,7 @@ func TestFindPack(t *testing.T) {
 			WithArg("typeId", packTypeId),
 			WithArg("thumbnailHash", "thumbnailHash"),
 			WithArg("wallet", "find-admin"),
+			WithArg("walletType", flow),
 			WithArg("openTime", 1.0),
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),

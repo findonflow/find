@@ -46,7 +46,6 @@ func TestFindWearablesSaleFUT(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -102,7 +101,6 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -136,7 +134,6 @@ func TestFindWearablesSaleDUC(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id1),
 			WithArg("amount", price),
@@ -203,7 +200,6 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", dandy),
 			WithArg("amount", price),
@@ -381,28 +377,6 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 
 }
 
-// func resetTenant(otu *OverflowTestUtils, tenant string) *OverflowTestUtils {
-
-// 	otu.O.Tx(
-// 		"remove_find_market_1",
-// 		WithSigner("find-admin"),
-// 		WithArg("tenant", tenant),
-// 	).
-// 		AssertSuccess(otu.T).
-// 		AssertEvent(otu.T, "TenantRemoved", map[string]interface{}{
-// 			"tenant":  "dapper",
-// 			"address": otu.O.Address(tenant),
-// 		})
-
-// 	otu.O.Tx(
-// 		"remove_find_market_2",
-// 		WithSigner(tenant),
-// 	).
-// 		AssertSuccess(otu.T)
-
-// 	return otu
-// }
-
 func addNFTCatalog(otu *OverflowTestUtils, user string, id uint64) *OverflowTestUtils {
 
 	contractAddress := "0xf8d6e0586b0a20c7"
@@ -438,7 +412,6 @@ func listWearablesForSaleFUT(otu *OverflowTestUtils, name string, id uint64, pri
 
 	res := otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", nftIden),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", token),

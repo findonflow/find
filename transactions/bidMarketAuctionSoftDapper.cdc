@@ -9,9 +9,9 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 
-transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
+transaction(user: String, id: UInt64, amount: UFix64) {
 
-	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}> 
+	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}>
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let bidsReference: &FindMarketAuctionSoft.MarketBidCollection?
 	let pointer: FindViews.ViewReadPointer
@@ -19,6 +19,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
@@ -30,7 +31,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
 		let asBidPublicPath=FindMarket.getPublicPath(asBidType, name: tenant.name)
 		let asBidStoragePath= FindMarket.getStoragePath(asBidType, name:tenant.name)
-		let asBidCap= account.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath) 
+		let asBidCap= account.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath)
 		if !asBidCap.check() {
 			account.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
 			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
@@ -42,12 +43,12 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 		let item = FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
 
 		let nftIdentifier = item.getItemType().identifier
-		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		let nft = collection.collectionData
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-	
+
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		/* Check for nftCapability */
 		if !self.targetCapability.check() {
@@ -68,7 +69,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 			}
 
 		}
-		
+
 		self.ftVaultType = ft.type
 
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())

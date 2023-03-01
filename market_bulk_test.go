@@ -74,7 +74,6 @@ func TestBulkMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyMultipleNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", "user1"),
 			WithArg("ids", []uint64{id}),
 			WithArg("amounts", `[10.0]`),
@@ -83,7 +82,6 @@ func TestBulkMarketSale(t *testing.T) {
 
 		result := otu.O.Tx("buyMultipleNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", "user1"),
 			WithArg("ids", []uint64{id2}),
 			WithArg("amounts", `[10.0]`),
@@ -100,7 +98,6 @@ func TestBulkMarketSale(t *testing.T) {
 
 		result := otu.O.Tx("buyMultipleNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1", "user1"),
 			WithArg("ids", []uint64{id3, id4, id5, id6, id7, id8, id9, id10, id11, id12}),
 			WithArg("amounts", `[10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]`),

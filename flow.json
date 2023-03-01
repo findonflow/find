@@ -374,7 +374,8 @@
 		"FindMarketCutInterface": "./contracts/FindMarketCutInterface.cdc",
 		"FindMarketCutStruct": "./contracts/FindMarketCutStruct.cdc",
 		"FindMarketInfrastructureCut": "./contracts/FindMarketInfrastructureCut.cdc",
-		"Dev": "./contracts/Dev.cdc"
+		"Dev": "./contracts/Dev.cdc",
+		"NameVoucher": "./contracts/NameVoucher.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -546,7 +547,8 @@
 				"FindMarketCut",
 				"FindMarketCutStruct",
 				"FindMarketCutInterface",
-				"FindMarketInfrastructureCut"
+				"FindMarketInfrastructureCut",
+				"NameVoucher"
 			],
 			"mainnet-find-forge": [
 				"NFGv3",
@@ -597,7 +599,8 @@
 				"FindMarketCut",
 				"FindMarketCutStruct",
 				"FindMarketCutInterface",
-				"FindMarketInfrastructureCut"
+				"FindMarketInfrastructureCut",
+				"NameVoucher"
 			],
 			"testnet-find-forge": [
 				"NFGv3",
@@ -693,7 +696,8 @@
 				"FindMarketCutStruct",
 				"FindMarketCutInterface",
 				"FindMarketInfrastructureCut",
-				"Dev"
+				"Dev",
+				"NameVoucher"
 			],
 			"emulator-find-admin": [],
 			"emulator-find-forge": [

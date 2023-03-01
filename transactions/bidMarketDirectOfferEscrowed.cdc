@@ -9,7 +9,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
+transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -18,16 +18,17 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
 
-		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier)) 
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier))
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		let nft = collection.collectionData
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		
+
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
@@ -38,7 +39,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
 		let doeBidPublicPath=FindMarket.getPublicPath(doeBidType, name: tenant.name)
 		let doeBidStoragePath= FindMarket.getStoragePath(doeBidType, name:tenant.name)
-		let doeBidCap= account.getCapability<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath) 
+		let doeBidCap= account.getCapability<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath)
 		if !doeBidCap.check() {
 			account.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: doeBidStoragePath)
 			account.link<&FindMarketDirectOfferEscrow.MarketBidCollection{FindMarketDirectOfferEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(doeBidPublicPath, target: doeBidStoragePath)
@@ -74,7 +75,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 	}
 
 	execute {
-		let vault <- self.walletReference.withdraw(amount: amount) 
+		let vault <- self.walletReference.withdraw(amount: amount)
 		self.bidsReference!.bid(item:self.pointer, vault: <- vault, nftCap: self.targetCapability, validUntil: validUntil, saleItemExtraField: {}, bidExtraField: {})
 	}
 

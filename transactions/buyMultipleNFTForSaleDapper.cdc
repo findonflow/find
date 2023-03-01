@@ -7,7 +7,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix64]) {
+transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	var walletReference : [&FungibleToken.Vault]
@@ -18,6 +18,7 @@ transaction(marketplace:Address, users: [Address], ids: [UInt64], amounts: [UFix
 	let prices : [UFix64]
 	prepare(dapper: AuthAccount, account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {
 			panic("The array length of users and ids should be the same")
 		}

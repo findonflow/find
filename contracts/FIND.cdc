@@ -1495,25 +1495,13 @@ pub contract FIND {
 		//this method is only called from a lease, and only the owner has that capability
 		access(contract) fun renew(name: String, vault: @FUSD.Vault) {
 			if let lease= self.profiles[name] {
-
-				var newTime=0.0
-				if lease.status() == LeaseStatus.TAKEN {
-					//the name is taken but not expired so we extend the total period of the lease
-					lease.setValidUntil(lease.validUntil + self.leasePeriod)
-				} else {
-					lease.setValidUntil(Clock.time() + self.leasePeriod)
-				}
-				lease.setLockedUntil(lease.validUntil+ self.lockPeriod)
-
 				let cost= self.calculateCost(name)
 				if vault.balance != cost {
 					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
 				}
 				let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
 				walletRef.deposit(from: <- vault)
-
-				emit Register(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
-				self.profiles[name] =  lease
+				self.internal_renew(name: name)
 				return
 			}
 			panic("Could not find profile with name=".concat(name))
@@ -1523,6 +1511,22 @@ pub contract FIND {
 
 			FIND.checkMerchantAddress(merchAccount)
 
+			if let lease= self.profiles[name] {
+				let cost= self.calculateCost(name)
+				if vault.balance != cost {
+					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Dapper Credit"))
+				}
+				let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+
+				let walletRef = wallet.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
+				walletRef.deposit(from: <- vault)
+				self.internal_renew(name: name)
+				return
+			}
+			panic("Could not find profile with name=".concat(name))
+		}
+
+		access(account) fun internal_renew(name: String) {
 			if let lease= self.profiles[name] {
 
 				var newTime=0.0
@@ -1534,14 +1538,6 @@ pub contract FIND {
 				}
 				lease.setLockedUntil(lease.validUntil+ self.lockPeriod)
 
-				let cost= self.calculateCost(name)
-				if vault.balance != cost {
-					panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Dapper Credit"))
-				}
-				let wallet = getAccount(merchAccount).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-
-				let walletRef = wallet.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
-				walletRef.deposit(from: <- vault)
 
 				emit Register(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 				self.profiles[name] =  lease

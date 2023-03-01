@@ -1,12 +1,13 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 
-transaction(marketplace:Address, ids: [UInt64]) {
+transaction(ids: [UInt64]) {
 
 	let saleItems : &FindMarketAuctionEscrow.SaleItemCollection?
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		self.saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionEscrow.SaleItemCollection>()))
 

@@ -10,7 +10,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], amounts: [UFix64], validUntil: UFix64?) {
+transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], amounts: [UFix64], validUntil: UFix64?) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
@@ -28,7 +28,8 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		} else if nftAliasOrIdentifiers.length != amounts.length {
 			panic("The length of arrays passed in has to be the same")
 		}
-		
+
+		let marketplace = FindMarket.getFindTenantAddress()
 		let addresses : {String : Address} = {}
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
@@ -40,7 +41,7 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 		let tenant = tenantCapability.borrow()!
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: bidStoragePath)
-		
+
 		self.pointer = []
 		self.targetCapability = []
 		self.walletReference = []
@@ -70,8 +71,8 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftIdentifier] = nft
 			}
@@ -80,9 +81,9 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 				ft = fts[ftIdentifier]
 			} else {
 				ft = FTRegistry.getFTInfo(ftIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftIdentifier))
-				fts[ftIdentifier] = ft 
+				fts[ftIdentifier] = ft
 			}
-		
+
 			self.ftVaultType.append(fts[ftIdentifier]!.type)
 
 

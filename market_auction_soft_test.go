@@ -30,7 +30,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 	listingTx := otu.O.TxFileNameFN(
 		"listNFTForAuctionSoftDapper",
 		WithSigner("user1"),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "FUT"),
@@ -93,7 +92,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
@@ -158,7 +156,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -175,7 +172,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -194,7 +190,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner(name),
-			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
@@ -218,7 +213,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner(name),
-			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertFailure(t, "Cannot cancel finished auction, fulfill it instead")
@@ -242,7 +236,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
 		).
@@ -264,7 +257,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner(name),
-			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
@@ -286,7 +278,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 0.1),
 		).
@@ -315,7 +306,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -324,7 +314,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+10.0),
 		).
@@ -335,7 +324,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 30.0),
 		).
@@ -355,7 +343,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
@@ -381,7 +368,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -394,7 +380,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+10.0),
 		).
@@ -407,7 +392,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
 		).
@@ -419,7 +403,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
 		).
@@ -434,7 +417,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 1.0),
@@ -452,7 +434,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user3"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 5.0),
@@ -481,7 +462,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 10.0),
 		).
@@ -525,7 +505,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[1]),
 			WithArg("amount", price),
@@ -535,7 +514,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
 		).
@@ -543,7 +521,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", ids[1:1]),
 		).
 			AssertSuccess(t)
@@ -553,7 +530,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
 		).
@@ -577,7 +553,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[1]),
 			WithArg("amount", price),
@@ -587,7 +562,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
 		).
@@ -599,7 +573,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price+5.0),
 		).
@@ -618,7 +591,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user3"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 20.0),
@@ -674,7 +646,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("listNFTForAuctionSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
 			WithArg("id", 1),
 			WithArg("ftAliasOrIdentifier", "FUT"),
@@ -702,7 +673,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", saleItemID[0]),
 			WithArg("amount", 15.0),
 		).
@@ -710,7 +680,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketAuctionSoft",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", saleItemID[0:1]),
 		).
 			AssertSuccess(t).
@@ -732,7 +701,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -743,7 +711,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("relistMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)
@@ -754,7 +721,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0, true)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -765,7 +731,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 
 		otu.O.Tx("cancelMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)

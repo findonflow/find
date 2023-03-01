@@ -53,7 +53,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -85,7 +84,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -116,7 +114,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", bidPrice+1.0),
 		).
@@ -140,7 +137,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("bidMarketDirectOfferEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
@@ -157,7 +153,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("owner", "user1"),
 			WithArg("id", id),
 		).
@@ -183,7 +178,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("bidMarketDirectOfferEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
@@ -214,7 +208,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertFailure(t, "this is a ghost listing")
@@ -237,7 +230,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("bidMarketDirectOfferEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
@@ -319,7 +311,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		saleId, err := otu.O.Tx("listNFTForAuctionEscrowed",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
 			WithArg("id", 1),
 			WithArg("ftAliasOrIdentifier", "Flow"),
@@ -353,7 +344,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		// Bids will also show as ghost
 		otu.O.Tx("bidMarketAuctionEscrowed",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", saleId),
 			WithArg("amount", price+5.0),
@@ -396,7 +386,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("bidMarketAuctionSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", bidPrice),
@@ -426,7 +415,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("increaseBidMarketAuctionSoft",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", bidPrice+1.0),
 		).
@@ -457,7 +445,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 15.0),
 		).
@@ -478,7 +465,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.O.Tx("acceptDirectOfferSoftDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 		).
 			AssertFailure(t, "this is a ghost listing")
@@ -501,7 +487,6 @@ func TestMarketGhostlistingTest(t *testing.T) {
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).

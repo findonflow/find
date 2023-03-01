@@ -6,7 +6,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
-transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
+transaction(user: String, id: UInt64, amount: UFix64) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -15,6 +15,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 

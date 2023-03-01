@@ -1,17 +1,17 @@
-import FindMarket from 0x35717efbbce11c74
-import Profile from 0x35717efbbce11c74
-import FindMarketSale from 0x35717efbbce11c74
-import NFTCatalog from 0x324c34e1c517e4db
-import FINDNFTCatalog from 0x35717efbbce11c74
-import FTRegistry from 0x35717efbbce11c74
-import NonFungibleToken from 0x631e88ae7f1d7c20
-import MetadataViews from 0x631e88ae7f1d7c20
-import FungibleToken from 0x9a0766d93b6608b7
-import DapperStorageRent from 0x43ee8c22fcf94ea3
-import TopShot from 0x877931736ee77cff
+import FindMarket from 0x097bafa4e0b48eef
+import Profile from 0x097bafa4e0b48eef
+import FindMarketSale from 0x097bafa4e0b48eef
+import NFTCatalog from 0x49a7cda3a1eecc29
+import FINDNFTCatalog from 0x097bafa4e0b48eef
+import FTRegistry from 0x097bafa4e0b48eef
+import NonFungibleToken from 0x1d7e57aa55817448
+import MetadataViews from 0x1d7e57aa55817448
+import FungibleToken from 0xf233dcee88fe0abe
+import DapperStorageRent from 0xa08e88e23f332538
+import TopShot from 0x0b2a3299cc857e29
 
 //first argument is the address to the merchant that gets the funds
-transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
+transaction(address: Address, id: UInt64, amount: UFix64) {
 
     let targetCapability : Capability<&{NonFungibleToken.Receiver}>
     let walletReference : &FungibleToken.Vault
@@ -20,6 +20,7 @@ transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
     let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
     let balanceBeforeTransfer: UFix64
     prepare(dapper: AuthAccount, account: AuthAccount) {
+        let marketplace = FindMarket.getFindTenantAddress()
         self.receiver=account.address
         let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!

@@ -641,7 +641,7 @@ import FlowToken
 // marketplace : tenant address
 // id : listing ID (not uuid) of the NFT
 // directSellPrice : price
-transaction(marketplace:Address, id: UInt64, directSellPrice:UFix64) {
+transaction(id: UInt64, directSellPrice:UFix64) {
 
 	let saleItems : &FindMarketSale.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
@@ -649,6 +649,7 @@ transaction(marketplace:Address, id: UInt64, directSellPrice:UFix64) {
 	prepare(account: AuthAccount) {
 
 		// Get tenant from marketplace address
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 
@@ -691,7 +692,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
+transaction(user: String, id: UInt64, amount: UFix64) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -700,6 +701,7 @@ transaction(marketplace:Address, user: String, id: UInt64, amount: UFix64) {
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		// resolve user address here (it supports string address and find names)
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {
@@ -749,7 +751,6 @@ More Interaction templates can be found in the repo.
 
 ```cadence
 transaction(
-	marketplace:Address,
 	nftAliasOrIdentifier: String,
 	// This is the ID of the NFT (NOT UUID)
 	id: UInt64,
@@ -763,7 +764,6 @@ transaction(
 [buy](transactions/buyNFTForSale.cdc)
 ```cadence
 transaction(
-	marketplace:Address,
 	user: String,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
@@ -776,7 +776,6 @@ transaction(
 [delist](transactions/delistNFTSale.cdc)
 ```cadence
 transaction(
-	marketplace:Address,
 	// This is the UUID of the NFT
 	ids: [UInt64]
 	)
@@ -791,7 +790,6 @@ transaction(
 
 ```cadence
 transaction(
-	marketplace:Address,
 	nftAliasOrIdentifier:String,
 	// This is the ID of the NFT (NOT UUID)
 	id: UInt64,
@@ -818,7 +816,6 @@ transaction(
 
 ```cadence
 transaction(
-	marketplace:Address,
 	user: String,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
@@ -832,7 +829,6 @@ transaction(
 
 ```cadence
 transaction(
-	marketplace:Address,
 	owner: String,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
@@ -846,7 +842,6 @@ Soft Auction works differently here because we do not escrow fund. Therefore bid
 
 ```cadence
 transaction(
-	marketplace:Address,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
 	id: UInt64,
@@ -861,7 +856,6 @@ transaction(
 [cancelMarketAuctionSoft](transactions/cancelMarketAuctionSoft.cdc)
 ```cadence
 transaction(
-	marketplace:Address,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
 	ids: [UInt64]
@@ -879,7 +873,6 @@ transaction(
 
 ```cadence
 transaction(
-	marketplace:Address,
 	user: String,
 	nftAliasOrIdentifier: String,
 	// This is the ID of the NFT (NOT UUID)
@@ -899,7 +892,6 @@ Direct Offer Soft here, after seller accept offer here, buyer has to send the fu
 
 ```cadence
 transaction(
-	marketplace:Address,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
 	id: UInt64
@@ -913,7 +905,6 @@ Buyer has to fulfill the soft trade at last by sending the needed fund through (
 
 ```cadence
 transaction(
-	marketplace:Address,
 	// This is the UUID of the NFT
 	// Because we do not send in types here, id has to be unique for the listing
 	id: UInt64,
@@ -1111,4 +1102,29 @@ pub struct Thought {
 	pub var quotedThought: Thought?
 	pub let hidden: Bool?
 	}
+```
+
+
+# Name Voucher
+
+Name voucher is an NFT that enables owner to register / renew / extend a .find name lease.
+They are restricted by the minimum number of characters
+E.g. voucher with 3-characters can renew any lease / register any FREE lease ,
+voucher with 4-characters can only do so to 4-characters or above leases
+
+
+### Interaction Template
+
+[redeemNameVoucher](transactions/redeemNameVoucher.cdc)
+
+```cadence
+transaction(
+	// id of the voucher if the voucher is in collection
+	// OR
+	// ticket id of the LostAndFound Inbox
+	id: UInt64,
+	// .find name wanted to register or renew (that is owned by the signer)
+	name: String
+	)
+
 ```

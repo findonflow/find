@@ -6,7 +6,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
+transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 
 	let saleItems : &FindMarketSale.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
@@ -14,6 +14,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 

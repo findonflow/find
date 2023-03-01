@@ -6,13 +6,14 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(marketplace:Address, ids: [UInt64]) {
+transaction(ids: [UInt64]) {
 
 	let market : &FindMarketDirectOfferEscrow.SaleItemCollection?
 	let pointer : [FindViews.AuthNFTPointer]
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
@@ -30,12 +31,12 @@ transaction(marketplace:Address, ids: [UInt64]) {
 			if nfts[nftIdentifier] != nil {
 				nft = nfts[nftIdentifier]
 			} else {
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftIdentifier] = nft
 			}
-		
+
 			var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
 
 			/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
@@ -45,7 +46,7 @@ transaction(marketplace:Address, ids: [UInt64]) {
 						target: nft!.storagePath
 				)
 				if newCap == nil {
-					// If linking is not successful, we link it using finds custom link 
+					// If linking is not successful, we link it using finds custom link
 					let pathIdentifier = nft!.privatePath.toString()
 					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
 					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
