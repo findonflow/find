@@ -9,7 +9,7 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
+transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : &FungibleToken.Vault
@@ -19,13 +19,14 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 	let ftVaultType: Type
 
 	prepare(account: AuthAccount) {
-		
+
+		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
 		let address = resolveAddress!
 
-		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier)) 
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+		let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier))
+		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		let nft = collection.collectionData
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
@@ -42,7 +43,7 @@ transaction(marketplace:Address, user: String, nftAliasOrIdentifier: String, id:
 		let dosBidType= Type<@FindMarketDirectOfferSoft.MarketBidCollection>()
 		let dosBidPublicPath=FindMarket.getPublicPath(dosBidType, name: tenant.name)
 		let dosBidStoragePath= FindMarket.getStoragePath(dosBidType, name:tenant.name)
-		let dosBidCap= account.getCapability<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath) 
+		let dosBidCap= account.getCapability<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath)
 		if !dosBidCap.check() {
 			account.save<@FindMarketDirectOfferSoft.MarketBidCollection>(<- FindMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: dosBidStoragePath)
 			account.link<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath, target: dosBidStoragePath)

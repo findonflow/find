@@ -35,7 +35,6 @@ func TestMarketSale(t *testing.T) {
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", "Dandy"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
@@ -110,7 +109,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("delistNFTSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
@@ -139,7 +137,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -153,7 +150,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -178,7 +174,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", 5.0),
@@ -210,7 +205,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("delistAllNFTSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 		).AssertSuccess(t)
 		//TODO: assert on events
 
@@ -239,7 +233,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -254,7 +247,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("delistNFTSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", ids[1:1]),
 		).
 			AssertSuccess(t)
@@ -263,7 +255,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("delistAllNFTSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 		).
 			AssertSuccess(t)
 
@@ -289,7 +280,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -319,7 +309,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -351,7 +340,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -390,7 +378,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -436,7 +423,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -454,7 +440,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -485,7 +470,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user3"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -520,7 +504,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user3"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -556,7 +539,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user3"),
 			WithArg("id", ids[0]),
 			WithArg("amount", price),
@@ -620,7 +602,6 @@ func TestMarketSale(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner(name),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", seller),
 			WithArg("id", saleItemID[0]),
 			WithArg("amount", price),
@@ -653,7 +634,6 @@ func TestMarketSale(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner(name),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", seller),
 			WithArg("id", saleItemID[0]),
 			WithArg("amount", 100.0),
@@ -679,7 +659,6 @@ func TestMarketSale(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", saleItemID[0]),
 			WithArg("amount", price),
@@ -723,7 +702,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("listMultipleNFTForSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifiers", []string{dandyNFTType(otu), dandyNFTType(otu), dandyNFTType(otu)}),
 			WithArg("ids", ids),
 			WithArg("ftAliasOrIdentifiers", []string{"FUSD", "FUSD", "FUSD"}),
@@ -748,7 +726,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyMultipleNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", "user1", "user1", "user1"),
 			WithArg("ids", ids),
 			WithArg("amounts", `[10.0 , 10.0, 10.0]`),
@@ -807,7 +784,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("listMultipleNFTForSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifiers", dandy),
 			WithArg("ids", ids),
 			WithArg("ftAliasOrIdentifiers", fusd),
@@ -838,7 +814,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("listMultipleNFTForSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifiers", dandy),
 			WithArg("ids", ids),
 			WithArg("ftAliasOrIdentifiers", fusd),
@@ -849,7 +824,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyMultipleNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", buyers...),
 			WithArg("ids", ids),
 			WithArg("amounts", prices),
@@ -867,7 +841,6 @@ func TestMarketSale(t *testing.T) {
 
 		saleItemID := otu.O.Tx("listMultipleNFTForSaleDapper",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("ids", []uint64{0}),
 			WithArg("ftAliasOrIdentifiers", []string{ftIden}),
@@ -886,7 +859,6 @@ func TestMarketSale(t *testing.T) {
 		otu.O.Tx("buyMultipleNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", "user1"),
 			WithArg("ids", saleItemID[0:1]),
 			WithArg("amounts", `[10.0]`),
@@ -914,7 +886,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("listNFTForSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
 			WithArg("id", 1),
 			WithArg("ftAliasOrIdentifier", "Flow"),
@@ -948,7 +919,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("buyNFTForSale",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 			WithArg("id", saleItem[0]),
 			WithArg("amount", price),
@@ -957,7 +927,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("delistNFTSale",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", saleItem[0:1]),
 		).
 			AssertSuccess(t)
@@ -979,7 +948,6 @@ func TestMarketSale(t *testing.T) {
 		otu.checkRoyalty("user1", 0, "cheater", exampleNFTType(otu), 0.99)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -990,7 +958,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("relistMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)
@@ -1001,7 +968,6 @@ func TestMarketSale(t *testing.T) {
 		otu.changeRoyaltyExampleNFT("user1", 0, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("marketplace", "find"),
 			WithArg("user", "user1"),
 		).
 			GetAsJson()
@@ -1012,7 +978,6 @@ func TestMarketSale(t *testing.T) {
 
 		otu.O.Tx("cancelMarketListings",
 			WithSigner("user1"),
-			WithArg("marketplace", "find"),
 			WithArg("ids", ids),
 		).
 			AssertSuccess(t)

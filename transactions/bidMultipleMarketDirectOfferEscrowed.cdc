@@ -10,7 +10,7 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers:[String], amounts: [UFix64], validUntil: UFix64?) {
+transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers:[String], amounts: [UFix64], validUntil: UFix64?) {
 
 	let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
 	let walletReference : [&FungibleToken.Vault]
@@ -29,6 +29,7 @@ transaction(marketplace:Address, users: [String], nftAliasOrIdentifiers: [String
 			panic("The length of arrays passed in has to be the same")
 		}
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let addresses : {String : Address} = {}
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}
 		let fts : {String : FTRegistry.FTInfo} = {}
