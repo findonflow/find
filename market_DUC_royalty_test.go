@@ -61,7 +61,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -95,7 +94,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("address", "user1"),
 			WithArg("id", id),
 			WithArg("amount", price),
@@ -133,7 +131,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", 10.0),
 		).
@@ -167,7 +164,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("fulfillMarketAuctionSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price+5.0),
 		).
@@ -199,7 +195,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
@@ -235,7 +230,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
 			WithPayloadSigner("dapper"),
-			WithArg("marketplace", "find"),
 			WithArg("id", id),
 			WithArg("amount", price),
 		).
@@ -266,7 +260,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 		name := "user1"
 		otu.O.Tx("listNFTForSaleDapper",
 			WithSigner(name),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", DUCType),
@@ -277,7 +270,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("listNFTForAuctionSoftDapper",
 			WithSigner(name),
-			WithArg("marketplace", "find"),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
 			WithArg("ftAliasOrIdentifier", DUCType),
@@ -295,7 +287,6 @@ func TestMarketDUCRoyalty(t *testing.T) {
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithArg("user", name),
 			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 			WithArg("id", id),
@@ -313,7 +304,6 @@ func listNFTForSaleDUC(otu *OverflowTestUtils, name string, id uint64, price flo
 	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("listNFTForSaleDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", DUCType),
@@ -336,7 +326,6 @@ func listNFTForSoftAuction(otu *OverflowTestUtils, name string, id uint64, price
 	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("listNFTForAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", DUCType),
@@ -364,7 +353,6 @@ func auctionBidMarketSoft(otu *OverflowTestUtils, name string, seller string, id
 
 	otu.O.Tx("bidMarketAuctionSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("id", id),
 		WithArg("amount", price),
@@ -385,7 +373,6 @@ func directOfferMarketSoft(otu *OverflowTestUtils, name string, seller string, i
 	DUCType := otu.identifier("DapperUtilityCoin", "Vault")
 	otu.O.Tx("bidMarketDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("user", seller),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
@@ -408,7 +395,6 @@ func acceptDirectOfferMarketSoft(otu *OverflowTestUtils, name string, id uint64,
 
 	otu.O.Tx("acceptDirectOfferSoftDapper",
 		WithSigner(name),
-		WithArg("marketplace", "find"),
 		WithArg("id", id),
 	).
 		AssertSuccess(otu.T).

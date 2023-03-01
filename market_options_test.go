@@ -24,7 +24,6 @@ func TestMarketOptions(t *testing.T) {
 
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", ids[1]),
 		WithArg("ftAliasOrIdentifier", "Flow"),

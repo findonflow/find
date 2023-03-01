@@ -1,11 +1,12 @@
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(marketplace: Address, id: UInt64, amount: UFix64) {
+transaction(id: UInt64, amount: UFix64) {
 
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 
 	prepare(account: AuthAccount) {
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")

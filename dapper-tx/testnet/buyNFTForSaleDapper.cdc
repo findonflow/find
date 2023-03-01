@@ -11,7 +11,7 @@ import DapperStorageRent from 0x43ee8c22fcf94ea3
 import TopShot from 0x877931736ee77cff
 
 //first argument is the address to the merchant that gets the funds
-transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
+transaction(address: Address, id: UInt64, amount: UFix64) {
 
     let targetCapability : Capability<&{NonFungibleToken.Receiver}>
     let walletReference : &FungibleToken.Vault
@@ -20,6 +20,7 @@ transaction(address: Address, marketplace:Address, id: UInt64, amount: UFix64) {
     let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
     let balanceBeforeTransfer: UFix64
     prepare(dapper: AuthAccount, account: AuthAccount) {
+        let marketplace = FindMarket.getFindTenantAddress()
         self.receiver=account.address
         let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
