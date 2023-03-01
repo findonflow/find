@@ -27,10 +27,10 @@
 
 // For more info on GrantedAccountAccess, see GrantedAccountAccess.cdc
 
-import NonFungibleToken from  "./NonFungibleToken.cdc"
-import MetadataViews from  "./MetadataViews.cdc"
-import GrantedAccountAccess from  "./GrantedAccountAccess.cdc"
-import FungibleToken from  "./FungibleToken.cdc"
+import NonFungibleToken from "./NonFungibleToken.cdc"
+import MetadataViews from "./MetadataViews.cdc"
+import GrantedAccountAccess from "./GrantedAccountAccess.cdc"
+import FungibleToken from "./FungibleToken.cdc"
 import FlowToken from "./FlowToken.cdc"
 
 pub contract FLOAT: NonFungibleToken {
