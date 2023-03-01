@@ -35,7 +35,6 @@ func TestMarketAndLeaseSale(t *testing.T) {
 	listingTx := otu.O.TxFileNameFN(
 		"listForSaleMultiple",
 		WithSigner("user1"),
-		WithArg("marketplace", "find"),
 
 		WithArg("validUntil", otu.currentTime()+100.0),
 	)
@@ -97,7 +96,6 @@ func TestMarketAndLeaseSale(t *testing.T) {
 		res := otu.O.Tx(
 			"buyForSaleMultiple",
 			WithSigner("user2"),
-			WithArg("marketplace", "find"),
 			WithAddresses("users", "user1", "user1", "user1", "user1", "user1"),
 			WithArg("ids", []interface{}{ids[0], ids[1], ids[2], names[0], names[1]}),
 			WithArg("amounts", []float64{1.0, 2.0, 3.0, 4.0, 5.0}),

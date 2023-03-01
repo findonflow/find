@@ -7,12 +7,12 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
-	
+transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
+
 	let saleItems : &FindMarketSale.SaleItemCollection?
 	let pointers : [FindViews.AuthNFTPointer]
 	let vaultTypes : [Type]
-	
+
 	prepare(account: AuthAccount) {
 
 		if nftAliasOrIdentifiers.length != ids.length {
@@ -21,7 +21,7 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 			panic("The length of arrays passed in has to be the same")
 		}
 
-
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
 		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
@@ -32,7 +32,7 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
 		if !saleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
@@ -50,8 +50,8 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 			if nfts[nftAliasOrIdentifiers[counter]] != nil {
 				nft = nfts[nftAliasOrIdentifiers[counter]]
 			} else {
-				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifiers[counter])?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifiers[counter])) 
-				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+				let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifiers[counter])?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifiers[counter]))
+				let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 				nft = collection.collectionData
 				nfts[nftAliasOrIdentifiers[counter]] = nft
 			}
@@ -61,7 +61,7 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 				self.vaultTypes.append(ft.type)
 			} else {
 				let ft = FTRegistry.getFTInfo(ftAliasOrIdentifiers[counter]) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifiers[counter]))
-				fts[ftAliasOrIdentifiers[counter]] = ft 
+				fts[ftAliasOrIdentifiers[counter]] = ft
 				self.vaultTypes.append(ft.type)
 			}
 
@@ -76,7 +76,7 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [UInt64],
 						target: nft!.storagePath
 				)
 				if newCap == nil {
-					// If linking is not successful, we link it using finds custom link 
+					// If linking is not successful, we link it using finds custom link
 					let pathIdentifier = nft!.privatePath.toString()
 					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
 					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(

@@ -134,7 +134,6 @@ func main() {
 
 	o.Tx("listMultipleNFTForSale",
 		WithSigner("user1"),
-		WithArg("marketplace", "find"),
 		WithArg("nftAliasOrIdentifiers", nftIdentifiers),
 		WithArg("ids", saleIds),
 		WithArg("ftAliasOrIdentifiers", ftIdentifiers),
@@ -145,7 +144,6 @@ func main() {
 
 	o.Tx("buyMultipleNFTForSale",
 		WithSigner("user2"),
-		WithArg("marketplace", "find"),
 		WithAddresses("users", sellers...),
 		WithArg("ids", saleIds),
 		WithArg("amounts", prices),

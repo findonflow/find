@@ -1,13 +1,14 @@
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(marketplace:Address) {
+transaction() {
 
 	let saleItems : &FindMarketSale.SaleItemCollection?
 
 	prepare(account: AuthAccount) {
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant = FindMarket.getTenant(marketplace)
-		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>())) 
+		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 	}
 
 	pre{

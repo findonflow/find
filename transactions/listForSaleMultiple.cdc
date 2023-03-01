@@ -9,7 +9,7 @@ import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
+transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
 
 	let saleItems : &FindMarketSale.SaleItemCollection?
 	let pointers : [FindViews.AuthNFTPointer]
@@ -19,6 +19,7 @@ transaction(marketplace:Address, nftAliasOrIdentifiers: [String], ids: [AnyStruc
 
 	prepare(account: AuthAccount) {
 
+		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
 		self.vaultTypes= []
