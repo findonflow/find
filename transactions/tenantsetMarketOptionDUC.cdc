@@ -8,8 +8,13 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
-transaction(nftName: String, nftType: String, cut: UFix64){
+transaction(nftName: String, nftTypes: [String], cut: UFix64){
     prepare(account: AuthAccount){
+
+		let nfts : [Type] = []
+		for t in nftTypes {
+			nfts.append(CompositeType(t)!)
+		}
 
 		let defaultRules : [FindMarket.TenantRule] = [
 			FindMarket.TenantRule(
@@ -36,7 +41,7 @@ transaction(nftName: String, nftType: String, cut: UFix64){
 		defaultRules.append(
 			FindMarket.TenantRule(
 				name: nftName,
-				types:[CompositeType(nftType)!],
+				types:nfts,
 				ruleType: "nft",
 				allow:true
 			)

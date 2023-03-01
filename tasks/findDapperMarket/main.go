@@ -29,7 +29,7 @@ func main() {
 			"tenantsetMarketOption",
 			WithSigner("find"),
 			WithArg("nftName", key),
-			WithArg("nftType", val),
+			WithArg("nftTypes", []string{val}),
 			WithArg("cut", 0.0),
 		)
 	}

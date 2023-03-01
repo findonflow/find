@@ -1839,7 +1839,7 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(tenant string) *OverflowT
 	otu.O.Tx(tx,
 		WithSigner("find"),
 		WithArg("nftName", "Dandy"),
-		WithArg("nftType", id),
+		WithArg("nftTypes", []string{id}),
 		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
@@ -1859,7 +1859,7 @@ func (otu *OverflowTestUtils) setFlowExampleMarketOption(tenant string) *Overflo
 	otu.O.Tx(tx,
 		WithSigner("find"),
 		WithArg("nftName", "ExampleNFT"),
-		WithArg("nftType", id),
+		WithArg("nftTypes", []string{id}),
 		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
@@ -2222,7 +2222,7 @@ func (otu *OverflowTestUtils) setExampleNFT() *OverflowTestUtils {
 	otu.O.Tx("tenantsetMarketOptionDapper",
 		WithSigner("find"),
 		WithArg("nftName", "ExampleNFT"),
-		WithArg("nftType", id),
+		WithArg("nftTypes", []string{id}),
 		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)
@@ -2238,7 +2238,7 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 	otu.O.Tx("tenantsetMarketOptionDapper",
 		WithSigner("find"),
 		WithArg("nftName", "ExampleNFT"),
-		WithArg("nftType", id),
+		WithArg("nftTypes", []string{id}),
 		WithArg("cut", 0.0),
 	).
 		AssertSuccess(otu.T)

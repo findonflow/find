@@ -66,7 +66,7 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 	res = o.Tx("tenantsetMarketOptionDapper",
 		WithSigner(name),
 		WithArg("nftName", "Wearables"),
-		WithArg("nftType", wearable),
+		WithArg("nftTypes", []string{wearable}),
 		WithArg("cut", tenantCut),
 	)
 	ot.assertTrxn(res)
@@ -76,7 +76,7 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 	res = o.Tx("tenantsetMarketOptionDUC",
 		WithSigner(name),
 		WithArg("nftName", "Lease"),
-		WithArg("nftType", lease),
+		WithArg("nftTypes", []string{lease}),
 		WithArg("cut", tenantCut),
 	)
 	ot.assertTrxn(res)
