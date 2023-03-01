@@ -6,7 +6,7 @@ import FungibleTokenSwitchboard from "./standard/FungibleTokenSwitchboard.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import FindViews from "./FindViews.cdc"
-import FindAirdropper from "./FindAirdropper.cdc"
+// import FindAirdropper from "./FindAirdropper.cdc"
 
 pub contract NameVoucher: NonFungibleToken {
 
@@ -224,7 +224,7 @@ pub contract NameVoucher: NonFungibleToken {
 
 	// Internal mint NFT is used inside the contract as a helper function
 	// It DOES NOT emit events so the admin function calling this should emit that
-	access(contract) fun internal_mintNFT(
+	access(account) fun mintNFT(
 		recipient: &{NonFungibleToken.Receiver},
 		minCharLength: UInt64
 	) : UInt64 {
@@ -240,53 +240,8 @@ pub contract NameVoucher: NonFungibleToken {
 
 		let id = newNFT.id
 		recipient.deposit(token: <-newNFT)
-		return id
-	}
-
-	// mintNFT function mint NFT and send to the receiver reference
-	access(account) fun mintNFT(
-		recipient: &{NonFungibleToken.Receiver},
-		minCharLength: UInt64
-	) {
-		pre {
-			recipient.owner != nil : "Recipients NFT collection is not owned"
-		}
-
-		let id = self.internal_mintNFT(recipient: recipient, minCharLength: minCharLength)
 		emit Minted(id: id, address: recipient.owner!.address, minCharLength: minCharLength)
-
-	}
-
-	// mintAndAirdropNFT function mint NFT , deposit to the contract account, then airdrop it to the receiver by airdropper
-	access(account) fun mintAndAirdropNFT(
-		recipient: Address,
-		minCharLength: UInt64,
-		storagePayment: &FungibleToken.Vault,
-		repayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
-	){
-		pre {
-			getAccount(recipient).balance > 0.0 : "Account is not initiated. Address : ".concat(recipient.toString())
-		}
-
-		// To use airdropper, it has to be in the collection first.
-		let cap = NameVoucher.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver}>(NameVoucher.CollectionPrivatePath)
-		let ref = cap.borrow() ?? panic("FIND Name Voucher collection is not set. Please set it up as .find")
-
-		let id = NameVoucher.internal_mintNFT(recipient: ref, minCharLength: minCharLength)
-		emit Minted(id: id, address: recipient, minCharLength: minCharLength)
-
-		// Then we can use airdropper here
-		let authPointer = FindViews.AuthNFTPointer(cap: cap, id: id)
-		FindAirdropper.forcedAirdrop(
-			pointer: authPointer,
-			receiver: recipient,
-			path: NameVoucher.CollectionPublicPath,
-			context: {},
-			storagePayment: storagePayment,
-			flowTokenRepayment: repayment,
-			deepValidation: false
-		)
-
+		return id
 	}
 
 	access(account) fun setRoyaltycut(_ cutInfo: [MetadataViews.Royalty]) {

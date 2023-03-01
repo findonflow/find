@@ -4,6 +4,7 @@ import NameVoucher from "../contracts/NameVoucher.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
+import FindAirdropper from "../contracts/FindAirdropper.cdc"
 
 transaction(users: [Address], minCharLength: UInt64) {
 
@@ -17,11 +18,22 @@ transaction(users: [Address], minCharLength: UInt64) {
 
 		let paymentVaultRef = &paymentVault as &FungibleToken.Vault
 		for user in users {
-			client.mintAndAirdropNameVoucher(
-				receiver: user,
-				minCharLength: minCharLength,
-				storagePayment: paymentVaultRef,
-				repayment: repayment)
+			let id = client.mintNameVoucherToFind(
+				minCharLength: minCharLength
+			)
+
+			let authPointer = client.getAuthPointer(pathIdentifier: "nameVoucher", id: id)
+			FindAirdropper.forcedAirdrop(
+					pointer: authPointer,
+					receiver: user,
+					path: NameVoucher.CollectionPublicPath,
+					context: {
+						"tenant" : "find"
+					},
+					storagePayment: paymentVaultRef,
+					flowTokenRepayment: repayment,
+					deepValidation: false
+			)
 		}
 
 		vaultRef.deposit(from: <- paymentVault)
