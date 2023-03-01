@@ -8,15 +8,19 @@ import MetadataViews from 0x631e88ae7f1d7c20
 import FlowUtilityToken from 0x82ec283f88a62e65
 import TokenForwarding from 0x51ea0e37c27a1f1a
 import FungibleToken from 0x9a0766d93b6608b7
+<<<<<<<< HEAD:dapper-tx/testnet/listNFTForSale.cdc
+========
 
-transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
-    
+transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
+>>>>>>>> main:dapper-tx/testnet/listNFTForSaleDapper.cdc
+
     let saleItems : &FindMarketSale.SaleItemCollection?
     let pointer : FindViews.AuthNFTPointer
     let vaultType : Type
-    
+
     prepare(account: AuthAccount) {
 
+        let marketplace = FindMarket.getFindTenantAddress()
         let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 
@@ -28,7 +32,7 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
         let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-        let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath) 
+        let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
         if !saleItemCap.check() {
             //The link here has to be a capability not a tenant, because it can change.
             account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
@@ -36,8 +40,8 @@ transaction(marketplace:Address, nftAliasOrIdentifier: String, id: UInt64, ftAli
         }
 
         // Get supported NFT and FT Information from Registries from input alias
-        let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier)) 
-        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
+        let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier))
+        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
         let nft = collection.collectionData
 
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))

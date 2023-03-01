@@ -369,7 +369,8 @@
 		"FindUtils": "./contracts/FindUtils.cdc",
 		"FindUserStatus": "./contracts/FindUserStatus.cdc",
 		"FindThoughts": "./contracts/FindThoughts.cdc",
-		"WearablesDev": "./contracts/community/WearablesDev.cdc"
+		"WearablesDev": "./contracts/community/WearablesDev.cdc",
+		"NameVoucher": "./contracts/NameVoucher.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -517,7 +518,8 @@
 				"FindFurnace",
 				"FindUtils",
 				"FindUserStatus",
-				"FindThoughts"
+				"FindThoughts",
+				"NameVoucher"
 			],
 			"mainnet-find-forge": [
 				"NFGv3",
@@ -564,7 +566,8 @@
 				"FindThoughts",
 				"FindUtils",
 				"FindUserStatus",
-				"FindLostAndFoundWrapper"
+				"FindLostAndFoundWrapper",
+				"NameVoucher"
 			],
 			"testnet-find-forge": [
 				"NFGv3",
@@ -655,7 +658,8 @@
 				"FindFurnace",
 				"FindUtils",
 				"FindUserStatus",
-				"FindThoughts"
+				"FindThoughts",
+				"NameVoucher"
 			],
 			"emulator-find-admin": [],
 			"emulator-find-forge": [

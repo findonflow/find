@@ -2768,12 +2768,16 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 	).
 		AssertSuccess(t)
 
+	flow, err := o.QualifiedIdentifier("FlowToken", "Vault")
+	assert.NoError(otu.T, err)
+
 	o.Tx("adminRegisterFindPackMetadata",
 		WithSigner("find-admin"),
 		WithArg("lease", user),
 		WithArg("typeId", packTypeId),
 		WithArg("thumbnailHash", "thumbnailHash"),
 		WithArg("wallet", clientAddress),
+		WithArg("walletType", flow),
 		WithArg("openTime", openTime),
 		WithArg("royaltyCut", 0.075),
 		WithArg("royaltyAddress", clientAddress),

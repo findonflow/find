@@ -1,4 +1,5 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
+import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import Profile from "./Profile.cdc"
@@ -13,6 +14,7 @@ import FindPack from "./FindPack.cdc"
 import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
 import FindViews from "./FindViews.cdc"
+import NameVoucher from "./NameVoucher.cdc"
 
 pub contract Admin {
 
@@ -336,6 +338,26 @@ pub contract Admin {
 
 			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
         	FINDCatalogAdmin.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
+		}
+
+		/// ===================================================================================
+		// Name Voucher
+		/// ===================================================================================
+
+		pub fun mintNameVoucher(receiver : &{NonFungibleToken.Receiver}, minCharLength : UInt64) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+
+			NameVoucher.mintNFT(recipient: receiver, minCharLength: minCharLength)
+		}
+
+		pub fun mintAndAirdropNameVoucher(receiver : Address, minCharLength : UInt64, storagePayment: &FungibleToken.Vault, repayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>) {
+			pre {
+				self.capability != nil: "Cannot create Admin, capability is not set"
+			}
+
+			NameVoucher.mintAndAirdropNFT(recipient: receiver, minCharLength: minCharLength, storagePayment: storagePayment, repayment: repayment)
 		}
 
 		init() {
