@@ -337,20 +337,21 @@ pub contract Admin {
 		// Name Voucher
 		/// ===================================================================================
 
-		pub fun mintNameVoucher(receiver : &{NonFungibleToken.Receiver}, minCharLength : UInt64) {
+		pub fun mintNameVoucher(receiver : &{NonFungibleToken.Receiver}, minCharLength : UInt64) : UInt64  {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			NameVoucher.mintNFT(recipient: receiver, minCharLength: minCharLength)
+			return NameVoucher.mintNFT(recipient: receiver, minCharLength: minCharLength)
 		}
 
-		pub fun mintAndAirdropNameVoucher(receiver : Address, minCharLength : UInt64, storagePayment: &FungibleToken.Vault, repayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>) {
+		pub fun mintNameVoucherToFind(minCharLength : UInt64) : UInt64 {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			NameVoucher.mintAndAirdropNFT(recipient: receiver, minCharLength: minCharLength, storagePayment: storagePayment, repayment: repayment)
+			let receiver = Admin.account.borrow<&NameVoucher.Collection{NonFungibleToken.Receiver}>(from: NameVoucher.CollectionStoragePath)!
+			return NameVoucher.mintNFT(recipient: receiver, minCharLength: minCharLength)
 		}
 
 		init() {

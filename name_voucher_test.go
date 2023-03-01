@@ -43,7 +43,7 @@ func TestNameVoucher(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "Minted", map[string]interface{}{
-				"address":       otu.O.Address("user1"),
+				"address":       otu.O.Address("find"),
 				"minCharLength": minCharLength,
 			}).
 			AssertEvent(t, "Deposit", map[string]interface{}{
@@ -85,7 +85,7 @@ func TestNameVoucher(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "Minted", map[string]interface{}{
-				"address":       otu.O.Address("user2"),
+				"address":       otu.O.Address("find"),
 				"minCharLength": minCharLength,
 			}).
 			AssertEvent(t, "AirdroppedToLostAndFound", map[string]interface{}{
