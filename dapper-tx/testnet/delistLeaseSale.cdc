@@ -6,7 +6,7 @@ transaction(leases: [String]) {
 
     prepare(account: AuthAccount) {
 
-        let tenant=FindMarket.getTenant(FindMarket.getTenantAddress("findLease")!)
+        let tenant=FindMarket.getTenant(FindMarket.getFindTenantAddress())
         self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>()))
 
     }
