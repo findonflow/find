@@ -37,6 +37,12 @@ major:
 	json-bump lib/package.json --major
 
 client: gen-client
-
 	./dappertx testnet
 	./dappertx mainnet
+
+compare-client:
+	FLOW_NETWORK=testnet FOLDER_PATH=$(arg) go run ./tasks/checkDapperTx/main.go
+	FLOW_NETWORK=mainnet FOLDER_PATH=$(arg) go run ./tasks/checkDapperTx/main.go
+
+
+
