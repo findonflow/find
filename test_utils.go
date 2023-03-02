@@ -753,9 +753,8 @@ func (otu *OverflowTestUtils) cancelLeaseForSale(user, name string) *OverflowTes
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "Sale", map[string]interface{}{
-			"status":    "cancel",
-			"leaseName": name,
-			"seller":    otu.O.Address(user),
+			"status": "cancel",
+			"seller": otu.O.Address(user),
 		})
 	return otu
 
@@ -948,7 +947,6 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuction(user string, name string, 
 			"status":              "active_listed",
 			"amount":              price,
 			"auctionReservePrice": price + 5.0,
-			"leaseName":           name,
 			"seller":              otu.O.Address(user),
 		})
 
@@ -1086,10 +1084,9 @@ func (otu *OverflowTestUtils) increaseAuctionBidLeaseMarketSoft(buyer string, na
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
-			"amount":    totalPrice,
-			"leaseName": name,
-			"buyer":     otu.O.Address(buyer),
-			"status":    "active_ongoing",
+			"amount": totalPrice,
+			"buyer":  otu.O.Address(buyer),
+			"status": "active_ongoing",
 		})
 
 	return otu
@@ -1164,10 +1161,9 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoft(buyer string, name strin
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
-			"amount":    price,
-			"leaseName": name,
-			"buyer":     otu.O.Address(buyer),
-			"status":    "active_ongoing",
+			"amount": price,
+			"buyer":  otu.O.Address(buyer),
+			"status": "active_ongoing",
 		})
 
 	return otu
@@ -1220,10 +1216,9 @@ func (otu *OverflowTestUtils) increaseDirectOfferLeaseMarketSoft(user, name stri
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"amount":    totalPrice,
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
-			"status":    "active_offered",
+			"amount": totalPrice,
+			"buyer":  otu.O.Address(user),
+			"status": "active_offered",
 		})
 
 	return otu
@@ -1328,9 +1323,8 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoft(user string, name strin
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"amount":    price,
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
+			"amount": price,
+			"buyer":  otu.O.Address(user),
 		})
 
 	return otu
@@ -1400,11 +1394,10 @@ func (otu *OverflowTestUtils) acceptLeaseDirectOfferMarketSoft(buyer, seller str
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"leaseName": name,
-			"seller":    otu.O.Address(seller),
-			"buyer":     otu.O.Address(buyer),
-			"amount":    price,
-			"status":    "active_accepted",
+			"seller": otu.O.Address(seller),
+			"buyer":  otu.O.Address(buyer),
+			"amount": price,
+			"status": "active_accepted",
 		})
 
 	return otu
@@ -1468,10 +1461,9 @@ func (otu *OverflowTestUtils) rejectDirectOfferLeaseSoft(user, name string, pric
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"status":    "cancel_rejected",
-			"leaseName": name,
-			"seller":    otu.O.Address(user),
-			"amount":    price,
+			"status": "cancel_rejected",
+			"seller": otu.O.Address(user),
+			"amount": price,
 		})
 
 	return otu
@@ -1501,9 +1493,8 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseSoft(buyer, seller, na
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"status":    "cancel",
-			"leaseName": name,
-			"seller":    otu.O.Address(seller),
+			"status": "cancel",
+			"seller": otu.O.Address(seller),
 		})
 
 	return otu
@@ -1574,10 +1565,9 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name st
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
-			"amount":    price,
-			"status":    "sold",
+			"buyer":  otu.O.Address(user),
+			"amount": price,
+			"status": "sold",
 		})
 
 	return otu
@@ -1612,10 +1602,9 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name strin
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
-			"amount":    price,
-			"status":    "sold",
+			"buyer":  otu.O.Address(user),
+			"amount": price,
+			"status": "sold",
 		})
 
 	return otu
@@ -2314,22 +2303,19 @@ func (otu *OverflowTestUtils) buyLeaseForMarketSaleDUC(buyer, seller, name strin
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"amount":    price,
-			"leaseName": name,
-			"seller":    otu.O.Address(seller),
-			"buyer":     otu.O.Address(buyer),
-			"status":    "sold",
+			"amount": price,
+			"seller": otu.O.Address(seller),
+			"buyer":  otu.O.Address(buyer),
+			"status": "sold",
 		}).
 		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
 			"amount":      amount,
-			"leaseName":   name,
 			"address":     otu.O.Address("find"),
 			"royaltyName": "find",
 			"tenant":      "find",
 		}).
 		AssertEvent(otu.T, "RoyaltyPaid", map[string]interface{}{
 			"amount":      dapperAmount,
-			"leaseName":   name,
 			"address":     otu.O.Address("dapper"),
 			"royaltyName": "dapper",
 			"tenant":      "find",
@@ -2475,10 +2461,9 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoftDUC(user string, name str
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"amount":    price,
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
-			"status":    "active_ongoing",
+			"amount": price,
+			"buyer":  otu.O.Address(user),
+			"status": "active_ongoing",
 		})
 
 	return otu
@@ -2497,10 +2482,9 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoftDUC(user string, name
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
-			"amount":    price,
-			"status":    "sold",
+			"buyer":  otu.O.Address(user),
+			"amount": price,
+			"status": "sold",
 		})
 
 	return otu
@@ -2623,11 +2607,10 @@ func (otu *OverflowTestUtils) acceptDirectOfferLeaseMarketSoftDUC(buyer, seller 
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"leaseName": name,
-			"seller":    otu.O.Address(seller),
-			"buyer":     otu.O.Address(buyer),
-			"amount":    price,
-			"status":    "active_accepted",
+			"seller": otu.O.Address(seller),
+			"buyer":  otu.O.Address(buyer),
+			"amount": price,
+			"status": "active_accepted",
 		})
 
 	return otu
@@ -2668,10 +2651,9 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name st
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, eventIden, map[string]interface{}{
-			"leaseName": name,
-			"buyer":     otu.O.Address(user),
-			"amount":    price,
-			"status":    "sold",
+			"buyer":  otu.O.Address(user),
+			"amount": price,
+			"status": "sold",
 		})
 
 	return otu
