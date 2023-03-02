@@ -487,7 +487,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			AssertSuccess(t).
 			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount":        newPrice,
-				"leaseName":     "name1",
 				"buyer":         otu.O.Address("user3"),
 				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_offered",

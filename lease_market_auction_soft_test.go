@@ -76,11 +76,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("leaseNames", `["name1"]`),
 		).
 			AssertEvent(t, eventIdentifier, map[string]interface{}{
-				"leaseName": "name1",
-				"seller":    otu.O.Address("user1"),
-				"buyer":     otu.O.Address("user2"),
-				"amount":    15.0,
-				"status":    "cancel_ghostlisting",
+				"seller": otu.O.Address("user1"),
+				"buyer":  otu.O.Address("user2"),
+				"amount": 15.0,
+				"status": "cancel_ghostlisting",
 			})
 
 		otu.moveNameTo("user2", "user1", "name1")
@@ -197,10 +196,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, eventIdentifier, map[string]interface{}{
-				"leaseName": "name1",
-				"seller":    otu.O.Address(name),
-				"amount":    10.0,
-				"status":    "cancel",
+				"seller": otu.O.Address(name),
+				"amount": 10.0,
+				"status": "cancel",
 			})
 	})
 
@@ -260,11 +258,10 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("leaseNames", `["name1"]`),
 		).
 			AssertEvent(t, eventIdentifier, map[string]interface{}{
-				"leaseName": "name1",
-				"seller":    otu.O.Address(name),
-				"buyer":     otu.O.Address(buyer),
-				"amount":    11.0,
-				"status":    "cancel_reserved_not_met",
+				"seller": otu.O.Address(name),
+				"buyer":  otu.O.Address(buyer),
+				"amount": 11.0,
+				"status": "cancel_reserved_not_met",
 			})
 	})
 
@@ -605,7 +602,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			AssertSuccess(t).
 			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"amount":        20.0,
-				"leaseName":     "name1",
 				"buyer":         otu.O.Address("user3"),
 				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_ongoing",

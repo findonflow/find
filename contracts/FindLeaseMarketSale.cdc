@@ -11,7 +11,7 @@ A Find Market for direct sales
 */
 pub contract FindLeaseMarketSale {
 
-	pub event Sale(tenant: String, leaseName: String, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
+	pub event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
 	//A sale item for a direct sale
 	pub resource SaleItem : FindLeaseMarket.SaleItem{
@@ -190,7 +190,7 @@ pub contract FindLeaseMarketSale {
 
 			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
 
-			emit Sale(tenant:self.getTenant().name, leaseName: name, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, leaseInfo:leaseInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
+			emit Sale(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: soldFor, status:"sold", vaultType: ftType.identifier, leaseInfo:leaseInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar() ,endsAt:saleItem.validUntil)
 
 			destroy <- self.items.remove(key: name)
 		}
@@ -216,7 +216,7 @@ pub contract FindLeaseMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant: self.getTenant().name, leaseName: pointer.name, saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, leaseInfo:saleItem.toLeaseInfo(), buyer: nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			emit Sale(tenant: self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, leaseInfo:saleItem.toLeaseInfo(), buyer: nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			let old <- self.items[pointer.name] <- saleItem
 			destroy old
 
@@ -236,16 +236,16 @@ pub contract FindLeaseMarketSale {
 					panic(actionResult.message)
 				}
 				let owner=self.owner!.address
-				emit Sale(tenant:self.getTenant().name, leaseName: name, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,leaseInfo: saleItem.toLeaseInfo(), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+				emit Sale(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,leaseInfo: saleItem.toLeaseInfo(), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 				destroy saleItem
 				return
 			}
 
 			let owner=self.owner!.address
 			if !saleItem.checkPointer() {
-				emit Sale(tenant:self.getTenant().name, leaseName: name, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,leaseInfo: nil, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+				emit Sale(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,leaseInfo: nil, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			} else {
-				emit Sale(tenant:self.getTenant().name, leaseName: name, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,leaseInfo: saleItem.toLeaseInfo(), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+				emit Sale(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "cancel", vaultType: saleItem.vaultType.identifier,leaseInfo: saleItem.toLeaseInfo(), buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			}
 			destroy saleItem
 		}
