@@ -3,6 +3,9 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 pub struct FINDReport {
 	pub let profile:Profile.UserReport?
@@ -11,15 +14,19 @@ pub struct FINDReport {
 	pub let leases: [LeaseInformation]
 	pub let privateMode: Bool
 	pub let activatedAccount: Bool
+	pub let isDapper: Bool?
+	pub let address: Address?
 
 
-	init(profile: Profile.UserReport?, relatedAccounts: { String: [Address]}, bids: [FIND.BidInfo], leases : [LeaseInformation], privateMode: Bool, activatedAccount: Bool ) {
+	init(profile: Profile.UserReport?, relatedAccounts: { String: [Address]}, bids: [FIND.BidInfo], leases : [LeaseInformation], privateMode: Bool, activatedAccount: Bool , isDapper: Bool?, address: Address?) {
 		self.profile=profile
 		self.bids=bids
 		self.leases=leases
 		self.relatedAccounts=relatedAccounts
 		self.privateMode=privateMode
 		self.activatedAccount=activatedAccount
+		self.isDapper=isDapper
+		self.address=address
 	}
 }
 
@@ -81,13 +88,26 @@ pub fun main(user: String) : NameReport? {
 				outputLeases.append(leaseInfo)
 			}
 
+			var isDapper=false
+			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
+			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
+			} else {
+				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
+					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
+				} else {
+					isDapper = false
+				}
+			}
+
 			findReport = FINDReport(
 				profile: profileReport,
 				relatedAccounts: FindRelatedAccounts.findRelatedFlowAccounts(address:address),
 				bids: bidCap.borrow()?.getBids() ?? [],
 				leases: outputLeases,
 				privateMode: profile?.isPrivateModeEnabled() ?? false,
-				activatedAccount: true
+				activatedAccount: true,
+				isDapper:isDapper,
+				address: address
 			)
 			if FIND.validateFindName(user) && findReport != nil {
 				for lease in findReport!.leases {
@@ -104,7 +124,9 @@ pub fun main(user: String) : NameReport? {
 				bids: [],
 				leases: [],
 				privateMode: false,
-				activatedAccount: false
+				activatedAccount: false,
+				isDapper: nil,
+				address: nil
 			)
 		}
 
@@ -143,6 +165,10 @@ pub fun main(user: String) : NameReport? {
 		pub var auctionReservePrice: UFix64?
 		pub var extensionOnLateBid: UFix64?
 		pub var addons: [String]
+		pub var saleFtAlias: String?
+		pub var saleFtIdentifier: String?
+		pub var auctionFtAlias: String?
+		pub var auctionFtIdentifier: String?
 
 		init(_ l: FIND.LeaseInformation){
 
@@ -162,10 +188,24 @@ pub fun main(user: String) : NameReport? {
 			self.cost=l.cost
 			self.addons=l.addons
 
+			self.saleFtAlias=nil
+			self.saleFtIdentifier=nil
+			self.auctionFtAlias=nil
+			self.auctionFtIdentifier=nil
+			if self.salePrice != nil {
+				self.saleFtAlias="FUSD"
+				self.saleFtIdentifier=Type<@FUSD.Vault>().identifier
+			}
+			if self.auctionStartPrice != nil {
+				self.auctionFtAlias="FUSD"
+				self.auctionFtIdentifier=Type<@FUSD.Vault>().identifier
+			}
 		}
 
 		pub fun addSale(_ s: FindLeaseMarket.SaleItemInformation) {
 			self.salePrice = s.amount
+			self.saleFtAlias = s.ftAlias
+			self.saleFtIdentifier = s.ftTypeIdentifier
 		}
 
 		pub fun addAuction(_ s: FindLeaseMarket.SaleItemInformation) {
@@ -175,6 +215,8 @@ pub fun main(user: String) : NameReport? {
 			self.auctionStartPrice = s.auction?.startPrice
 			self.auctionReservePrice = s.auction?.reservePrice
 			self.extensionOnLateBid = s.auction?.extentionOnLateBid
+			self.auctionFtAlias = s.ftAlias
+			self.auctionFtIdentifier = s.ftTypeIdentifier
 		}
 
 	}
