@@ -16,11 +16,6 @@ import FindThoughts from "../contracts/FindThoughts.cdc"
 
 transaction(name: String) {
 	prepare(account: AuthAccount) {
-		//if we do not have a profile it might be stored under a different address so we will just remove it
-		let profileCapFirst = account.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if profileCapFirst.check() {
-			return
-		}
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
 		//Add exising FUSD or create a new one and add it
@@ -83,16 +78,42 @@ transaction(name: String) {
 			)
 		}
 
+
+		let tenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
+
+		let tenant = tenantCapability.borrow()!
+
+		let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
+		let doeSalePublicPath=FindMarket.getPublicPath(doeSaleType, name: tenant.name)
+		let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
+		let doeSaleCap= account.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath)
+		if !doeSaleCap.check() {
+			account.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
+			account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
+		}
+
+		let leasedoeSaleType= Type<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>()
+		let leasedoeSalePublicPath=FindMarket.getPublicPath(leasedoeSaleType, name: tenant.name)
+		let leasedoeSaleStoragePath= FindMarket.getStoragePath(leasedoeSaleType, name:tenant.name)
+		let leasedoeSaleCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasedoeSalePublicPath)
+		if !leasedoeSaleCap.check() {
+			account.save<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: leasedoeSaleStoragePath)
+			account.link<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasedoeSalePublicPath, target: leasedoeSaleStoragePath)
+		}
+
 		var created=false
 		var updated=false
+		//if we do not have a profile it might be stored under a different address so we will just remove it
 		let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
-		if !profileCap.check() {
-			let profile <-Profile.createUser(name:name, createdAt: "find")
-			account.save(<-profile, to: Profile.storagePath)
-			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
-			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
-			created=true
+		if profileCap.check() {
+			return
 		}
+
+		let profileResource <-Profile.createUser(name:name, createdAt: "find")
+		account.save(<-profileResource, to: Profile.storagePath)
+		account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
+		account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
+		created=true
 
 		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
 
@@ -127,28 +148,6 @@ transaction(name: String) {
 			profile.emitUpdatedEvent()
 		}
 
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let tenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
-
-		let tenant = tenantCapability.borrow()!
-
-		let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
-		let doeSalePublicPath=FindMarket.getPublicPath(doeSaleType, name: tenant.name)
-		let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
-		let doeSaleCap= account.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath)
-		if !doeSaleCap.check() {
-			account.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
-			account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
-		}
-
-		let leasedoeSaleType= Type<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>()
-		let leasedoeSalePublicPath=FindMarket.getPublicPath(leasedoeSaleType, name: tenant.name)
-		let leasedoeSaleStoragePath= FindMarket.getStoragePath(leasedoeSaleType, name:tenant.name)
-		let leasedoeSaleCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasedoeSalePublicPath)
-		if !leasedoeSaleCap.check() {
-			account.save<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: leasedoeSaleStoragePath)
-			account.link<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: leasedoeSaleStoragePath)
-		}
 		//SYNC with register
 
 	}

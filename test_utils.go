@@ -1296,6 +1296,23 @@ func (otu *OverflowTestUtils) increaseDirectOfferLeaseMarketSoft(user, name stri
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseDirectOfferLeaseMarketEscrow(user, name string, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.Tx("increaseBidLeaseMarketDirectOfferEscrow",
+		WithSigner(user),
+		WithArg("leaseName", name),
+		WithArg("amount", price),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"amount": totalPrice,
+			"buyer":  otu.O.Address(user),
+			"status": "active_offered",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 
 	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
@@ -1402,6 +1419,24 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoft(user string, name strin
 	return otu
 }
 
+func (otu *OverflowTestUtils) directOfferLeaseMarketEscrow(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("bidLeaseMarketDirectOfferEscrow",
+		WithSigner(user),
+		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("amount", price),
+		WithArg("validUntil", otu.currentTime()+100.0),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"amount": price,
+			"buyer":  otu.O.Address(user),
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *OverflowTestUtils {
 
 	otu.O.Tx("cancelAllMarketDirectOfferSoft",
@@ -1415,6 +1450,16 @@ func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *Ove
 func (otu *OverflowTestUtils) cancelAllDirectOfferLeaseMarketSoft(signer string) *OverflowTestUtils {
 
 	otu.O.Tx("cancelAllLeaseMarketDirectOfferSoft",
+		WithSigner(signer),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) cancelAllDirectOfferLeaseMarketEscrow(signer string) *OverflowTestUtils {
+
+	otu.O.Tx("cancelAllLeaseMarketDirectOfferEscrow",
 		WithSigner(signer),
 	).
 		AssertSuccess(otu.T)
@@ -1470,6 +1515,23 @@ func (otu *OverflowTestUtils) acceptLeaseDirectOfferMarketSoft(buyer, seller str
 			"buyer":  otu.O.Address(buyer),
 			"amount": price,
 			"status": "active_accepted",
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) fulfillLeaseDirectOfferMarketEscrow(buyer, seller string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("fulfillLeaseMarketDirectOfferEscrow",
+		WithSigner(seller),
+		WithArg("leaseName", name),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"seller": otu.O.Address(seller),
+			"buyer":  otu.O.Address(buyer),
+			"amount": price,
+			"status": "sold",
 		})
 
 	return otu
@@ -1541,6 +1603,22 @@ func (otu *OverflowTestUtils) rejectDirectOfferLeaseSoft(user, name string, pric
 	return otu
 }
 
+func (otu *OverflowTestUtils) rejectDirectOfferLeaseEscrow(user, name string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("cancelLeaseMarketDirectOfferEscrow",
+		WithSigner(user),
+		WithArg("leaseNames", []string{name}),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
+			"status": "cancel_rejected",
+			"seller": otu.O.Address(user),
+			"amount": price,
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) retractOfferDirectOfferSoft(buyer, seller string, id uint64) *OverflowTestUtils {
 
 	otu.O.Tx("retractOfferMarketDirectOfferSoft",
@@ -1565,6 +1643,21 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseSoft(buyer, seller, na
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferSoft.DirectOffer", map[string]interface{}{
+			"status": "cancel",
+			"seller": otu.O.Address(seller),
+		})
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseEscrow(buyer, seller, name string) *OverflowTestUtils {
+
+	otu.O.Tx("retractOfferLeaseMarketDirectOfferSoft",
+		WithSigner(buyer),
+		WithArg("leaseName", name),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
 			"status": "cancel",
 			"seller": otu.O.Address(seller),
 		})

@@ -603,28 +603,4 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.delistAllLeaseForEscrowAuction("user1")
 	})
 
-	// t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
-
-	// 	otu.createDapperUser("user1").
-	// 		createDapperUser("user2")
-
-	// 	otu.listLeaseForEscrowAuctionDUC("user1", "name1", price)
-
-	// 	otu.saleLeaseListed("user1", "active_listed", price).
-	// 		auctionBidLeaseMarketEscrowDUC("user2", "name1", price+5.0)
-
-	// 	otu.O.Tx("increaseBidLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", 5.0),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// 	otu.tickClock(400.0).
-	// 		saleLeaseListed("user1", "finished_completed", price+10.0).
-	// 		fulfillLeaseMarketAuctionEscrowDUC("user2", "name1", price+10.0)
-
-	// 	otu.moveNameTo("user2", "user1", "name1")
-	// })
-
 }

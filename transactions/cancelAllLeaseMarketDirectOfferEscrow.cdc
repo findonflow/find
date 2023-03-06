@@ -1,11 +1,12 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 
-transaction(leaseNames: [String]) {
+transaction() {
 
 	let saleItems : &FindLeaseMarketDirectOfferEscrow.SaleItemCollection?
 
 	prepare(account: AuthAccount) {
+
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		self.saleItems= account.borrow<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>()))
@@ -13,12 +14,14 @@ transaction(leaseNames: [String]) {
 	}
 
 	pre{
-		self.saleItems != nil : "Cannot borrow reference to saleItem"
+		self.saleItems != nil : "Cannot borrow reference to saleItem."
 	}
 
-	execute {
-		for leaseName in leaseNames {
-			self.saleItems!.cancel(leaseName)
+	execute{
+		let nameLeases = self.saleItems!.getNameSales()
+		for nameLease in nameLeases {
+			self.saleItems!.cancel(nameLease)
 		}
 	}
+
 }

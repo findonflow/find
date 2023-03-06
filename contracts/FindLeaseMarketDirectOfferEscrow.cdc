@@ -31,7 +31,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			return self.pointer.name
 		}
 
-		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
+		access(contract) fun acceptEscrowedBid() : @FungibleToken.Vault {
 			if !self.offerCallback.check() {
 				panic("Bidder unlinked bid collection capability. Bidder Address : ".concat(self.offerCallback.address.toString()))
 			}
@@ -320,12 +320,12 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			//Set the auth pointer in the saleItem so that it now can be fulfilled
 			saleItem.setPointer(pointer)
 
-			self.emitEvent(saleItem: saleItem, status: "active_accepted", previousBuyer:nil)
-
-			let vault <- saleItem.acceptEscrowedBid()
+			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
 
 			let cuts= tenant.getCuts(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 			let leaseInfo = saleItem.toLeaseInfo()
+			let vault <- saleItem.acceptEscrowedBid()
+
 			FindLeaseMarket.pay(tenant: tenant.name, leaseName:pointer.name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
 			destroy <- self.items.remove(key: pointer.name)
 		}
@@ -367,7 +367,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 		access(contract) var bidAt: UFix64
 		access(contract) let bidExtraField: {String : AnyStruct}
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, leaseName: String,  vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, leaseName: String,  vault: @FungibleToken.Vault, bidExtraField: {String : AnyStruct}) {
 			self.vaultType=vault.getType()
 			self.vault <- vault
 			self.leaseName=leaseName
@@ -451,7 +451,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			return Type<@Bid>()
 		}
 
-		pub fun bid(name: String, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
+		pub fun bid(name: String, vault: @FungibleToken.Vault, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
 
 			// ensure it is not a 0 dollar listing
 			if vault.balance <= 0.0 {
@@ -474,7 +474,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			let tenant = self.getTenant()
 			let from=getAccount(owner).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
 
-			let bid <- create Bid(from: from, leaseName:name, vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)
+			let bid <- create Bid(from: from, leaseName:name, vault: <- vault, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for name=".concat(name))
 			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[name] <- bid
@@ -512,7 +512,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 
 		pub fun borrowBid(_ name: String): &Bid {
 			pre{
-				self.bids.containsKey(name) : "This name bid does not exist.".concat(name)
+				self.bids.containsKey(name) : "This name bid does not exist.".concat(name).concat(self.bids.keys[0])
 			}
 			return (&self.bids[name] as &Bid?)!
 		}
