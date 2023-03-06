@@ -8,7 +8,9 @@ import FIND from "../contracts/FIND.cdc"
 import FindPack from "../contracts/FindPack.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
+import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
+import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindThoughts from "../contracts/FindThoughts.cdc"
 
@@ -17,7 +19,7 @@ transaction(name: String) {
 		//if we do not have a profile it might be stored under a different address so we will just remove it
 		let profileCapFirst = account.getCapability<&{Profile.Public}>(Profile.publicPath)
 		if profileCapFirst.check() {
-			return 
+			return
 		}
 		//the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
 		//SYNC with register
@@ -96,7 +98,7 @@ transaction(name: String) {
 
 		if !profile.hasWallet("Flow") {
 			let flowWallet=Profile.Wallet( name:"Flow", receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance), accept: Type<@FlowToken.Vault>(), tags: ["flow"])
-	
+
 			profile.addWallet(flowWallet)
 			updated=true
 		}
@@ -114,7 +116,7 @@ transaction(name: String) {
 		if profile.getFindName() == "" {
 			if let findName = FIND.reverseLookup(account.address) {
 				profile.setFindName(findName)
-				// If name is set, it will emit Updated Event, there is no need to emit another update event below. 
+				// If name is set, it will emit Updated Event, there is no need to emit another update event below.
 				updated=false
 			}
 		}
@@ -133,10 +135,19 @@ transaction(name: String) {
 		let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
 		let doeSalePublicPath=FindMarket.getPublicPath(doeSaleType, name: tenant.name)
 		let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
-		let doeSaleCap= account.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath) 
+		let doeSaleCap= account.getCapability<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath)
 		if !doeSaleCap.check() {
 			account.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
 			account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
+		}
+
+		let leasedoeSaleType= Type<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>()
+		let leasedoeSalePublicPath=FindMarket.getPublicPath(leasedoeSaleType, name: tenant.name)
+		let leasedoeSaleStoragePath= FindMarket.getStoragePath(leasedoeSaleType, name:tenant.name)
+		let leasedoeSaleCap= account.getCapability<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasedoeSalePublicPath)
+		if !leasedoeSaleCap.check() {
+			account.save<@FindLeaseMarketDirectOfferEscrow.SaleItemCollection>(<- FindLeaseMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: leasedoeSaleStoragePath)
+			account.link<&FindLeaseMarketDirectOfferEscrow.SaleItemCollection{FindLeaseMarketDirectOfferEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: leasedoeSaleStoragePath)
 		}
 		//SYNC with register
 

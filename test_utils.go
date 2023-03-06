@@ -941,6 +941,7 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuction(user string, name string, 
 		WithArg("auctionExtensionOnLateBid", 60.0),
 		WithArg("minimumBidIncrement", 1.0),
 		WithArg("auctionValidUntil", otu.currentTime()+100.0),
+		WithArg("auctionStartTime", nil),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
@@ -984,6 +985,42 @@ func (otu *OverflowTestUtils) delistAllLeaseForSoftAuction(name string) *Overflo
 		AssertSuccess(otu.T)
 
 	return otu
+}
+
+func (otu *OverflowTestUtils) delistAllLeaseForEscrowAuction(name string) *OverflowTestUtils {
+
+	otu.O.Tx("cancelAllLeaseMarketAuctionEscrow",
+		WithSigner(name),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) listLeaseForEscrowAuction(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("listLeaseForAuctionEscrow",
+		WithSigner(user),
+		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", "Flow"),
+		WithArg("price", price),
+		WithArg("auctionReservePrice", price+5.0),
+		WithArg("auctionDuration", 300.0),
+		WithArg("auctionExtensionOnLateBid", 60.0),
+		WithArg("minimumBidIncrement", 1.0),
+		WithArg("auctionValidUntil", otu.currentTime()+100.0),
+		WithArg("auctionStartTime", nil),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			"status":              "active_listed",
+			"amount":              price,
+			"auctionReservePrice": price + 5.0,
+			"seller":              otu.O.Address(user),
+		})
+
+	return otu
+
 }
 
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
@@ -1092,6 +1129,23 @@ func (otu *OverflowTestUtils) increaseAuctionBidLeaseMarketSoft(buyer string, na
 	return otu
 }
 
+func (otu *OverflowTestUtils) increaseAuctionBidLeaseMarketEscrow(buyer string, name string, price float64, totalPrice float64) *OverflowTestUtils {
+
+	otu.O.Tx("increaseBidLeaseMarketAuctionEscrow",
+		WithSigner(buyer),
+		WithArg("leaseName", name),
+		WithArg("amount", price),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			"amount": totalPrice,
+			"buyer":  otu.O.Address(buyer),
+			"status": "active_ongoing",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) saleItemListed(name string, saleType string, price float64) *OverflowTestUtils {
 
 	t := otu.T
@@ -1161,6 +1215,24 @@ func (otu *OverflowTestUtils) auctionBidLeaseMarketSoft(buyer string, name strin
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketAuctionSoft.EnglishAuction", map[string]interface{}{
+			"amount": price,
+			"buyer":  otu.O.Address(buyer),
+			"status": "active_ongoing",
+		})
+
+	return otu
+
+}
+
+func (otu *OverflowTestUtils) auctionBidLeaseMarketEscrow(buyer string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("bidLeaseMarketAuctionEscrow",
+		WithSigner(buyer),
+		WithArg("leaseName", name),
+		WithArg("amount", price),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
 			"amount": price,
 			"buyer":  otu.O.Address(buyer),
 			"status": "active_ongoing",
@@ -1573,6 +1645,23 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionSoft(user string, name st
 	return otu
 }
 
+func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionEscrow(user string, name string, price float64) *OverflowTestUtils {
+
+	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+		WithSigner(user),
+		WithArg("leaseName", name),
+		WithArg("amount", price),
+	).
+		AssertSuccess(otu.T).
+		AssertEvent(otu.T, "FindLeaseMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			"buyer":  otu.O.Address(user),
+			"amount": price,
+			"status": "sold",
+		})
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) fulfillMarketDirectOfferSoft(name string, id uint64, price float64) *OverflowTestUtils {
 
 	otu.O.Tx("fulfillMarketDirectOfferSoftDapper",
@@ -1822,11 +1911,26 @@ func (otu *OverflowTestUtils) setFlowExampleMarketOption(tenant string) *Overflo
 	return otu
 }
 
-func (otu *OverflowTestUtils) setFlowLeaseMarketOption() *OverflowTestUtils {
+func (otu *OverflowTestUtils) setFlowLeaseMarketOptionDapper() *OverflowTestUtils {
 
 	id, err := otu.O.QualifiedIdentifier("FIND", "Lease")
 	assert.NoError(otu.T, err)
 	otu.O.Tx("tenantsetLeaseOptionDapper",
+		WithSigner("find"),
+		WithArg("nftName", "Lease"),
+		WithArg("nftType", id),
+		WithArg("cut", 0.0),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
+func (otu *OverflowTestUtils) setFlowLeaseMarketOption() *OverflowTestUtils {
+
+	id, err := otu.O.QualifiedIdentifier("FIND", "Lease")
+	assert.NoError(otu.T, err)
+	otu.O.Tx("tenantsetLeaseOptionFlow",
 		WithSigner("find"),
 		WithArg("nftName", "Lease"),
 		WithArg("nftType", id),

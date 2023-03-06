@@ -1,14 +1,14 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
+import FindViews from "./FindViews.cdc"
 import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindLeaseMarket from "./FindLeaseMarket.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
-pub contract FindLeaseMarketAuctionSoft {
+pub contract FindLeaseMarketAuctionEscrow {
 
 	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, leaseInfo:FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
@@ -24,7 +24,7 @@ pub contract FindLeaseMarketAuctionSoft {
 		access(contract) var auctionValidUntil: UFix64?
 		access(contract) var auctionEndsAt: UFix64?
 		access(contract) var offerCallback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>?
-		access(contract) var saleItemExtraField: {String : AnyStruct}
+		access(contract) let saleItemExtraField: {String : AnyStruct}
 
 		init(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 			self.vaultType=vaultType
@@ -41,19 +41,26 @@ pub contract FindLeaseMarketAuctionSoft {
 			self.saleItemExtraField=saleItemExtraField
 		}
 
-		//Here we do not get a vault back, it is sent in to the method itself
-		pub fun acceptNonEscrowedBid() {
+		pub fun getId() : UInt64{
+			return self.pointer.getUUID()
+		}
+
+		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
 			pre{
 				self.offerCallback != nil : "There is no bid offer to the item."
 				self.offerCallback!.check() : "Bidder unlinked bid collection capability."
 			}
-			self.offerCallback!.borrow()!.accept(self.getLeaseName())
+			let vault <- self.offerCallback!.borrow()!.accept(self.getLeaseName())
 			self.pointer.move(to: self.offerCallback!.address)
+			return <- vault
 		}
 
 		pub fun getBalance() : UFix64 {
 			if let cb= self.offerCallback {
-				return cb.borrow()?.getBalance(self.getLeaseName()) ?? panic("Bidder unlinked bid collection capability. bidder address : ".concat(cb.address.toString()))
+				if !cb.check() {
+					panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
+				}
+				return cb.borrow()!.getBalance(self.getLeaseName())
 			}
 			return self.auctionStartPrice
 		}
@@ -72,10 +79,6 @@ pub contract FindLeaseMarketAuctionSoft {
 				return cb.address
 			}
 			return nil
-		}
-
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
 		}
 
 		pub fun getBuyerName() : String? {
@@ -146,6 +149,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			self.offerCallback=callback
 		}
 
+
 		pub fun getSaleType(): String {
 			if self.auctionStartedAt != nil {
 				if self.hasAuctionEnded() {
@@ -163,7 +167,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			return Type<@SaleItem>()
 		}
 
-		pub fun getListingTypeIdentifier() : String {
+		pub fun getListingTypeIdentifier(): String {
 			return Type<@SaleItem>().identifier
 		}
 
@@ -207,23 +211,23 @@ pub contract FindLeaseMarketAuctionSoft {
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
-
 	}
+
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		pub fun getNameSales(): [String]
 		pub fun containsNameSale(_ name: String): Bool
-		access(contract) fun registerIncreasedBid(_ name: String, oldBalance: UFix64)
+		access(contract) fun registerIncreasedBid(_ name: String, oldBalance:UFix64)
 
 		//place a bid on a token
 		access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, vaultType:Type)
 
-		//only buyer can fulfill auctions since he needs to send funds for this type
-		access(contract) fun fulfillAuction(name: String, vault: @FungibleToken.Vault)
+		//anybody should be able to fulfill an auction as long as it is done
+		pub fun fulfillAuction(_ name: String)
 	}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic  {
+	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{String: SaleItem}
 
@@ -234,9 +238,10 @@ pub contract FindLeaseMarketAuctionSoft {
 			self.tenantCapability=tenantCapability
 		}
 
+
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check()  {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
@@ -272,10 +277,10 @@ pub contract FindLeaseMarketAuctionSoft {
 			return Type<@SaleItem>()
 		}
 
-		access(self) fun addBid(name:String, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance: UFix64) {
+		access(self) fun addBid(name:String, newOffer: Capability<&MarketBidCollection{MarketBidCollectionPublic}>, oldBalance:UFix64) {
 			let saleItem=self.borrow(name)
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"add bit in soft-auction"), seller: self.owner!.address ,buyer: newOffer.address)
+			let actionResult=self.getTenant().allowedAction(listingType: Type<@FindLeaseMarketAuctionEscrow.SaleItem>(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"add bid in auction"), seller: self.owner!.address, buyer: newOffer.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
@@ -284,13 +289,11 @@ pub contract FindLeaseMarketAuctionSoft {
 			let timestamp=Clock.time()
 			let newOfferBalance=newOffer.borrow()?.getBalance(name) ?? panic("The new offer bid capability is invalid.")
 
-			let previousOffer = saleItem.offerCallback!
-
+			let previousOffer = saleItem.offerCallback
 
 			var minBid=oldBalance + saleItem.auctionMinBidIncrement
-			if newOffer.address != previousOffer.address {
-				let previousBalance = previousOffer.borrow()?.getBalance(name) ?? panic("Previous bidder unlinked the bid ccollection capability. bidder address : ".concat(previousOffer.address.toString()))
-				minBid = previousBalance + saleItem.auctionMinBidIncrement
+			if previousOffer != nil && newOffer.address != previousOffer!.address {
+				minBid = previousOffer!.borrow()!.getBalance(name) + saleItem.auctionMinBidIncrement
 			}
 
 			if newOfferBalance < minBid {
@@ -298,9 +301,12 @@ pub contract FindLeaseMarketAuctionSoft {
 			}
 
 			var previousBuyer:Address?=nil
-			if newOffer.address != previousOffer.address {
-				previousOffer.borrow()!.cancelBidFromSaleItem(name)
-				previousBuyer=previousOffer.address
+			if previousOffer != nil && newOffer.address != previousOffer!.address {
+				if !previousOffer!.check() {
+					panic("Previous bidder unlinked the bid collection capability. bidder address : ".concat(previousOffer!.address.toString()))
+				}
+				previousOffer!.borrow()!.cancelBidFromSaleItem(name)
+				previousBuyer=previousOffer!.address
 			}
 
 			saleItem.setCallback(newOffer)
@@ -310,8 +316,8 @@ pub contract FindLeaseMarketAuctionSoft {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer)
 
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer)
 		}
 
 		access(contract) fun registerIncreasedBid(_ name: String, oldBalance:UFix64) {
@@ -321,7 +327,7 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			let saleItem=self.borrow(name)
 
-			if !saleItem.hasAuctionStarted()  {
+			if !saleItem.hasAuctionStarted() {
 				panic("Auction is not started")
 			}
 
@@ -329,8 +335,7 @@ pub contract FindLeaseMarketAuctionSoft {
 				panic("Auction has ended")
 			}
 
-			self.addBid(name: name, newOffer: saleItem.offerCallback!, oldBalance: oldBalance)
-
+			self.addBid(name: name, newOffer: saleItem.offerCallback!, oldBalance:oldBalance)
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
@@ -350,26 +355,32 @@ pub contract FindLeaseMarketAuctionSoft {
 					}
 				}
 
-				self.addBid(name: name, newOffer: callback, oldBalance: 0.0)
+				self.addBid(name: name, newOffer: callback, oldBalance: saleItem.auctionStartPrice)
 				return
 			}
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"bid item in soft-auction"), seller: self.owner!.address, buyer: callback.address)
+			// If the auction is not started but the start time is set, it falls in here
+			if let startTime = saleItem.auctionStartedAt {
+				panic("Auction is not yet started, please place your bid after ".concat(startTime.toString()))
+			}
+
+			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"bid in auction"), seller: self.owner!.address, buyer: callback.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
 
-			let balance=callback.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(callback.address.toString()))
+			let balance=callback.borrow()?.getBalance(name) ?? panic("Bidder unlinked bid collection capability. bidder address : ".concat(callback.address.toString()))
 
 			if saleItem.auctionStartPrice >  balance {
 				panic("You need to bid more then the starting price of ".concat(saleItem.auctionStartPrice.toString()))
 			}
 
 			if let valid = saleItem.getValidUntil() {
-				assert( valid >= Clock.time(), message: "This auction listing is already expired")
+				if valid < Clock.time() {
+					panic("This auction listing is already expired")
+				}
 			}
-
 			saleItem.setCallback(callback)
 			let duration=saleItem.auctionDuration
 			let endsAt=timestamp + duration
@@ -377,6 +388,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			saleItem.setAuctionEnds(endsAt)
 
 			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil)
+
 		}
 
 		pub fun cancel(_ name: String) {
@@ -386,37 +398,66 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			let saleItem=self.borrow(name)
 
-			var status="cancel_listing"
+			var status = "cancel_listing"
 			if saleItem.checkPointer() {
 				if saleItem.hasAuctionStarted() && saleItem.hasAuctionEnded() {
 					if saleItem.hasAuctionMetReservePrice() {
 						panic("Cannot cancel finished auction, fulfill it instead")
 					}
 					status="cancel_reserved_not_met"
-
 				}
 			} else {
-				status="cancel_ghostlisting"
+				status = "cancel_ghostlisting"
 			}
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"delist item from soft-auction"), seller: nil, buyer: nil)
 
-			if !actionResult.allowed {
-				panic(actionResult.message)
+			self.internalCancelAuction(saleItem: saleItem, status: status)
+
+		}
+
+		pub fun relist(_ name: String) {
+			let saleItem = self.borrow(name)
+			let pointer= saleItem.pointer
+			let vaultType= saleItem.vaultType
+			let auctionStartPrice= saleItem.auctionStartPrice
+			let auctionReservePrice= saleItem.auctionReservePrice
+			let auctionDuration = saleItem.auctionDuration
+			let auctionExtensionOnLateBid = saleItem.auctionExtensionOnLateBid
+			let minimumBidIncrement = saleItem.auctionMinBidIncrement
+			var auctionValidUntil= saleItem.auctionValidUntil
+			let currentTime = Clock.time()
+			if auctionValidUntil != nil && auctionValidUntil! <= currentTime {
+				auctionValidUntil = nil
 			}
+			var auctionStartedAt = saleItem.auctionStartedAt
+			if auctionStartedAt != nil && auctionStartedAt! <= currentTime {
+				auctionStartedAt = nil
+			}
+			let saleItemExtraField= saleItem.saleItemExtraField
+
+			self.cancel(name)
+			self.listForAuction(pointer: pointer, vaultType: vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionStartTime: auctionStartedAt,  auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
+
+		}
+
+		access(self) fun internalCancelAuction(saleItem: &SaleItem, status:String) {
 
 			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil)
+			let name = saleItem.getLeaseName()
 
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(name)
 			}
-
 			destroy <- self.items.remove(key: name)
 		}
 
 
-		access(contract) fun fulfillAuction(name: String, vault: @FungibleToken.Vault) {
+		/// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
+		pub fun fulfillAuction(_ name: String) {
 			pre {
 				self.items.containsKey(name) : "Invalid lease name=".concat(name)
+			}
+			if self.borrow(name).auctionStartPrice == nil {
+				panic("Cannot fulfill sale that is not an auction=".concat(name))
 			}
 
 			let saleItem = self.borrow(name)
@@ -429,32 +470,29 @@ pub contract FindLeaseMarketAuctionSoft {
 				panic("Auction has not ended yet")
 			}
 
-			if vault.getType() != saleItem.vaultType {
-				panic("The FT vault sent in to fulfill does not match the required type. Required Type : ".concat(saleItem.vaultType.identifier).concat(" . Sent-in vault type : ".concat(vault.getType().identifier)))
-			}
+			let tenant = self.getTenant()
 
-			if vault.balance < saleItem.auctionReservePrice {
-				panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
-			}
-
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"buy item for soft-auction"), seller: self.owner!.address,buyer: saleItem.offerCallback!.address)
+			let actionResult=tenant.allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"fulfill auction"), seller: self.owner!.address,buyer: saleItem.offerCallback!.address)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
 
-			let cuts= self.getTenant().getCuts(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
+			let cuts= tenant.getCuts(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 
-
-			let leaseInfo=saleItem.toLeaseInfo()
+			if !saleItem.hasAuctionMetReservePrice() {
+				self.internalCancelAuction(saleItem: saleItem, status: "cancel_reserved_not_met")
+				return
+			}
 
 			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
-			saleItem.acceptNonEscrowedBid()
 
-			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
+			let vault <- saleItem.acceptEscrowedBid()
+
+			let leaseInfo=saleItem.toLeaseInfo()
+			FindLeaseMarket.pay(tenant:tenant.name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
 
 			destroy <- self.items.remove(key: name)
-
 		}
 
 		pub fun listForAuction(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionStartTime: UFix64?, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
@@ -469,29 +507,46 @@ pub contract FindLeaseMarketAuctionSoft {
 				panic("Auction reserve price should be greater than Auction start price")
 			}
 
+			let currentTime = Clock.time()
 			// ensure validUntil is valid
-			if auctionValidUntil != nil && auctionValidUntil! < Clock.time() {
+			if auctionValidUntil != nil && auctionValidUntil! < currentTime {
 				panic("Valid until is before current time")
+			}
+
+			// if we do this, the auctionStartTime variable from arg is gone
+			var auctionStartTime = auctionStartTime
+			// ensure startTime is valid, if auctionStartTime is < currentTime, make it currentTIme (might not be easy to pass in exact time)
+			if auctionStartTime != nil && auctionStartTime! < currentTime {
+				auctionStartTime = currentTime
 			}
 
 			let saleItem <- create SaleItem(pointer: pointer, vaultType:vaultType, auctionStartPrice: auctionStartPrice, auctionReservePrice:auctionReservePrice, auctionValidUntil: auctionValidUntil, saleItemExtraField: saleItemExtraField)
 
-			let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name:"list item for soft-auction"), seller: self.owner!.address, buyer: nil)
+			// if startTime is set, start the auction at the specified time with intended auction duration
+			if auctionStartTime != nil {
+				saleItem.setAuctionStarted(auctionStartTime!)
+				let endTime = auctionStartTime! + auctionDuration
+				saleItem.setAuctionEnds(endTime)
+			}
+
+			let tenant=self.getTenant()
+			let nftType= saleItem.getItemType()
+			let ftType= saleItem.getFtType()
+
+			let actionResult=tenant.allowedAction(listingType: self.getListingType(), nftType: nftType, ftType: ftType, action: FindMarket.MarketAction(listing:true, name: "list item for auction"), seller: self.owner!.address, buyer: nil)
 
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
+			let name=pointer.name
 
-			assert(self.items[pointer.name] == nil , message: "Auction listing for this item is already created.")
+			if self.items[name] != nil {
+				panic("Auction listing for this item is already created.")
+			}
 
 			saleItem.setAuctionDuration(auctionDuration)
 			saleItem.setExtentionOnLateBid(auctionExtensionOnLateBid)
 			saleItem.setMinBidIncrement(minimumBidIncrement)
-
-			if auctionStartTime != nil {
-				saleItem.setAuctionStarted(auctionStartTime!)
-			}
-
 			self.items[pointer.name] <-! saleItem
 			let saleItemRef = self.borrow(pointer.name)
 			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil)
@@ -528,22 +583,19 @@ pub contract FindLeaseMarketAuctionSoft {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let leaseName: String
 
+		//this should reflect on what the above uuid is for
+		access(contract) let vault: @FungibleToken.Vault
 		access(contract) let vaultType: Type
 		access(contract) var bidAt: UFix64
-		access(contract) var balance: UFix64
 		access(contract) let bidExtraField: {String : AnyStruct}
 
-		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, leaseName: String, vaultType:Type,  balance:UFix64, bidExtraField: {String : AnyStruct}){
-			self.vaultType= vaultType
-			self.balance=balance
+		init(from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>, leaseName: String, vault: @FungibleToken.Vault, bidExtraField: {String : AnyStruct}) {
+			self.vaultType= vault.getType()
+			self.vault <- vault
 			self.leaseName=leaseName
 			self.from=from
 			self.bidAt=Clock.time()
 			self.bidExtraField=bidExtraField
-		}
-
-		access(contract) fun setBalance(_ balance:UFix64) {
-			self.balance=balance
 		}
 
 		access(contract) fun setBidAt(_ time: UFix64) {
@@ -551,7 +603,7 @@ pub contract FindLeaseMarketAuctionSoft {
 		}
 
 		pub fun getBalance() : UFix64 {
-			return self.balance
+			return self.vault.balance
 		}
 
 		pub fun getSellerAddress() : Address {
@@ -561,12 +613,16 @@ pub contract FindLeaseMarketAuctionSoft {
 		pub fun getBidExtraField() : {String : AnyStruct} {
 			return self.bidExtraField
 		}
+
+		destroy() {
+			destroy self.vault
+		}
 	}
 
 	pub resource interface MarketBidCollectionPublic {
 		pub fun getBalance(_ name: String) : UFix64
 		pub fun containsNameBid(_ name: String): Bool
-		access(contract) fun accept(_ name: String)
+		access(contract) fun accept(_ name: String) : @FungibleToken.Vault
 		access(contract) fun cancelBidFromSaleItem(_ name: String)
 	}
 
@@ -585,20 +641,23 @@ pub contract FindLeaseMarketAuctionSoft {
 		}
 
 		access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
-			pre{
-				self.tenantCapability.check() : "Tenant client is not linked anymore"
+			if !self.tenantCapability.check()  {
+				panic("Tenant client is not linked anymore")
 			}
 			return self.tenantCapability.borrow()!
 		}
 
 		//called from lease when auction is ended
-		access(contract) fun accept(_ name: String) {
+		access(contract) fun accept(_ name: String) : @FungibleToken.Vault {
 			pre {
 				self.bids[name] != nil : "You need to have a bid here already"
 			}
 
-			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
+			let bid <- self.bids.remove(key: name)!
+			let vaultRef = &bid.vault as &FungibleToken.Vault
+			let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
 			destroy bid
+			return <- vault
 		}
 
 		pub fun getNameBids() : [String] {
@@ -613,54 +672,65 @@ pub contract FindLeaseMarketAuctionSoft {
 			return Type<@Bid>()
 		}
 
-		pub fun bid(name: String, amount:UFix64, vaultType:Type, bidExtraField: {String : AnyStruct}) {
-			pre {
-				self.owner!.address != FIND.status(name).owner!  : "You cannot bid on your own resource"
-				self.bids[name] == nil : "You already have an bid for this item, use increaseBid on that bid"
+		pub fun bid(name: String, vault: @FungibleToken.Vault, bidExtraField: {String : AnyStruct}) {
+
+			let owner = FIND.status(name).owner!
+			if self.owner!.address == owner {
+				panic("You cannot bid on your own resource")
 			}
 
-			let from=getAccount(FIND.status(name).owner!).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
+			if self.bids[name] != nil {
+				panic("You already have an bid for this item, use increaseBid on that bid")
+			}
 
-			let bid <- create Bid(from: from, leaseName:name, vaultType: vaultType, balance:amount, bidExtraField: bidExtraField)
-			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for lease name=".concat(name))
+			let tenant=self.getTenant()
+			let from=getAccount(owner).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+			let vaultType=vault.getType()
 
-			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
+			let bid <- create Bid(from: from, leaseName:name, vault: <- vault, bidExtraField: bidExtraField)
+			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for name=".concat(name))
+
+			let callbackCapability =self.owner!.getCapability<&MarketBidCollection{MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
 			let oldToken <- self.bids[name] <- bid
 			saleItemCollection.registerBid(name: name, callback: callbackCapability, vaultType: vaultType)
 			destroy oldToken
 		}
 
-		pub fun fulfillAuction(name:String, vault: @FungibleToken.Vault) {
-			pre {
-				self.bids[name] != nil : "You need to have a bid here already"
+		pub fun fulfillAuction(_ name:String) {
+
+			if self.bids[name] == nil {
+				panic("You need to have a bid here already")
 			}
 			let bid =self.borrowBid(name)
 			let saleItem=bid.from.borrow()!
-			saleItem.fulfillAuction(name:name, vault: <- vault)
+			saleItem.fulfillAuction(name)
 		}
 
-		//increase a bid, will not work if the auction has already started
-		pub fun increaseBid(name: String, increaseBy: UFix64) {
-			pre {
-				self.bids[name] != nil : "You need to have a bid here already"
+		pub fun increaseBid(name: String, vault: @FungibleToken.Vault) {
+			if self.bids[name] == nil {
+				panic("You need to have a bid here already")
 			}
 			let bid =self.borrowBid(name)
 
-			let oldBalance=bid.balance
+			let oldBalance=bid.vault.balance
 
 			bid.setBidAt(Clock.time())
-			bid.setBalance(bid.balance + increaseBy)
-
-			if !bid.from.check(){
-				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
+			bid.vault.deposit(from: <- vault)
+			if !bid.from.check() {
+				panic("Seller unlinked SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
 			}
-			bid.from.borrow()!.registerIncreasedBid(name, oldBalance: oldBalance)
+			bid.from.borrow()!.registerIncreasedBid(name, oldBalance:oldBalance)
 		}
 
 		//called from saleItem when things are cancelled
 		//if the bid is canceled from seller then we move the vault tokens back into your vault
 		access(contract) fun cancelBidFromSaleItem(_ name: String) {
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
+			let vaultRef = &bid.vault as &FungibleToken.Vault
+			if !self.receiver.check() {
+				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
+			}
+			self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
 			destroy bid
 		}
 
@@ -679,11 +749,8 @@ pub contract FindLeaseMarketAuctionSoft {
 		}
 
 		pub fun getBalance(_ name: String) : UFix64 {
-			pre {
-				self.bids[name] != nil : "You need to have a bid here already"
-			}
 			let bid= self.borrowBid(name)
-			return bid.balance
+			return bid.vault.balance
 		}
 
 		destroy() {
@@ -701,8 +768,8 @@ pub contract FindLeaseMarketAuctionSoft {
 	}
 
 	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		if FindMarket.getTenantCapability(marketplace) == nil {
+			panic("Invalid tenant")
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&SaleItemCollection{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
@@ -711,8 +778,8 @@ pub contract FindLeaseMarketAuctionSoft {
 	}
 
 	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>? {
-		pre{
-			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+		if FindMarket.getTenantCapability(marketplace) == nil {
+			panic("Invalid tenant")
 		}
 		if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 			return getAccount(user).getCapability<&MarketBidCollection{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
@@ -726,5 +793,4 @@ pub contract FindLeaseMarketAuctionSoft {
 		FindLeaseMarket.addMarketBidType(Type<@Bid>())
 		FindLeaseMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
 	}
-
 }

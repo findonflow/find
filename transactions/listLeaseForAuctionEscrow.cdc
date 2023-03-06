@@ -1,12 +1,12 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
+import FindLeaseMarketAuctionEscrow from "../contracts/FindLeaseMarketAuctionEscrow.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?, auctionStartTime: UFix64?) {
 
-	let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
+	let saleItems : &FindLeaseMarketAuctionEscrow.SaleItemCollection?
 	let pointer : FindLeaseMarket.AuthLeasePointer
 	let vaultType : Type
 
@@ -19,17 +19,17 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
-		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
+		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionEscrow.SaleItemCollection>()
 		let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
 		let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
-		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath)
+		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionEscrow.SaleItemCollection{FindLeaseMarketAuctionEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath)
 		if !leaseASSaleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
-			account.link<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
+			account.save<@FindLeaseMarketAuctionEscrow.SaleItemCollection>(<- FindLeaseMarketAuctionEscrow.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
+			account.link<&FindLeaseMarketAuctionEscrow.SaleItemCollection{FindLeaseMarketAuctionEscrow.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
 		}
 
-		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
+		self.saleItems= account.borrow<&FindLeaseMarketAuctionEscrow.SaleItemCollection>(from: leaseASStoragePath)
 		let ref= account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
 		self.vaultType= ft.type
@@ -45,7 +45,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
 	}
 
 	execute{
-		self.saleItems!.listForAuction(pointer: self.pointer, vaultType: self.vaultType, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionStartTime:auctionStartTime, auctionValidUntil: auctionValidUntil, saleItemExtraField: {})
+		self.saleItems!.listForAuction(pointer: self.pointer, vaultType: self.vaultType, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionStartTime: auctionStartTime, auctionValidUntil: auctionValidUntil, saleItemExtraField: {})
 
 	}
 }

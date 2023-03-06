@@ -4,7 +4,7 @@ transaction(action: String ){
     prepare(account: AuthAccount){
         let path = FindMarket.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
-		let option = "StandardLeaseEscrow"
+		let option = "DapperLeaseSoft"
 
         switch action {
             case "enable" :
