@@ -1,14 +1,14 @@
 import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
+import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 
 transaction(leaseName: String) {
-	let bidsReference: &FindLeaseMarketDirectOfferEscrow.MarketBidCollection?
+	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 
 	prepare(account: AuthAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
-		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferEscrow.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)
+		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())
+		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: storagePath)
 	}
 
 	pre{
