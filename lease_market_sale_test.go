@@ -22,7 +22,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		registerDapperUser("user2").
 		createDapperUser("user3").
 		registerDapperUser("user3").
-		setFlowLeaseMarketOption().
+		setFlowLeaseMarketOptionDapper().
 		setProfile("user1").
 		setProfile("user2")
 
@@ -187,7 +187,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.alterLeaseMarketOption("deprecate")
+		otu.alterLeaseMarketOptionDapper("deprecate")
 
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
@@ -207,11 +207,11 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("enable")
+		otu.alterLeaseMarketOptionDapper("enable")
 
 		otu.listLeaseForSaleDUC("user1", "name2", price)
 
-		otu.alterLeaseMarketOption("deprecate")
+		otu.alterLeaseMarketOptionDapper("deprecate")
 
 		otu.O.Tx("delistLeaseSale",
 			WithSigner("user1"),
@@ -219,7 +219,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("enable")
+		otu.alterLeaseMarketOptionDapper("enable")
 
 		otu.cancelAllLeaseForSale("user1").
 			moveNameTo("user2", "user1", "name1")
@@ -235,7 +235,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 		assert.Equal(t, price, itemsForSale[0].Amount)
 
-		otu.alterLeaseMarketOption("stop")
+		otu.alterLeaseMarketOptionDapper("stop")
 
 		otu.O.Tx("listLeaseForSale",
 			WithSigner("user1"),
@@ -261,7 +261,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("enable")
+		otu.alterLeaseMarketOptionDapper("enable")
 		otu.cancelAllLeaseForSale("user1")
 
 	})

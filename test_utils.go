@@ -1652,7 +1652,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseSoft(buyer, seller, na
 
 func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseEscrow(buyer, seller, name string) *OverflowTestUtils {
 
-	otu.O.Tx("retractOfferLeaseMarketDirectOfferSoft",
+	otu.O.Tx("retractOfferLeaseMarketDirectOfferEscrow",
 		WithSigner(buyer),
 		WithArg("leaseName", name),
 	).
