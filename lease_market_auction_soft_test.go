@@ -13,7 +13,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	price := 10.0
 	preIncrement := 5.0
 	otu.setupMarketAndDandyDapper()
-	otu.setFlowLeaseMarketOption().
+	otu.setFlowLeaseMarketOptionDapper().
 		registerDUCInRegistry().
 		setProfile("user1").
 		setProfile("user2").
@@ -43,6 +43,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction listing for this item is already created.")
@@ -97,6 +98,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction start price should be greater than 0")
@@ -115,6 +117,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
@@ -133,6 +136,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
@@ -198,7 +202,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			AssertEvent(t, eventIdentifier, map[string]interface{}{
 				"seller": otu.O.Address(name),
 				"amount": 10.0,
-				"status": "cancel",
+				"status": "cancel_listing",
 			})
 	})
 
@@ -285,7 +289,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("deprecate")
+		otu.alterLeaseMarketOptionDapper("deprecate")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -296,17 +300,18 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
 
-		otu.alterLeaseMarketOption("enable")
+		otu.alterLeaseMarketOptionDapper("enable")
 	})
 
 	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
 		otu.listLeaseForSoftAuction("user1", "name1", price)
 
-		otu.alterLeaseMarketOption("deprecate")
+		otu.alterLeaseMarketOptionDapper("deprecate")
 
 		bitTx := otu.O.TxFN(
 			WithSigner("user2"),
@@ -330,7 +335,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("enable")
+		otu.alterLeaseMarketOptionDapper("enable")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user2"),
@@ -341,11 +346,12 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("deprecate")
+		otu.alterLeaseMarketOptionDapper("deprecate")
 
 		otu.O.Tx("cancelLeaseMarketAuctionSoft",
 			WithSigner("user2"),
@@ -353,14 +359,14 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.alterLeaseMarketOption("enable").
+		otu.alterLeaseMarketOptionDapper("enable").
 			moveNameTo("user2", "user1", "name1")
 
 	})
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction and delist after stopped", func(t *testing.T) {
 
-		otu.alterLeaseMarketOption("stop")
+		otu.alterLeaseMarketOptionDapper("stop")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -371,13 +377,14 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("enable").
+		otu.alterLeaseMarketOptionDapper("enable").
 			listLeaseForSoftAuction("user1", "name1", price).
-			alterLeaseMarketOption("stop")
+			alterLeaseMarketOptionDapper("stop")
 
 		otu.O.Tx("bidLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -386,9 +393,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("enable").
+		otu.alterLeaseMarketOptionDapper("enable").
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
-			alterLeaseMarketOption("stop")
+			alterLeaseMarketOptionDapper("stop")
 
 		otu.O.Tx("increaseBidLeaseMarketAuctionSoft",
 			WithSigner("user2"),
@@ -397,7 +404,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-		otu.alterLeaseMarketOption("stop")
+		otu.alterLeaseMarketOptionDapper("stop")
 
 		otu.O.Tx("cancelLeaseMarketAuctionSoft",
 			WithSigner("user1"),
@@ -416,7 +423,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 		/* Reset */
-		otu.alterLeaseMarketOption("enable")
+		otu.alterLeaseMarketOptionDapper("enable")
 
 		otu.O.Tx("fulfillLeaseMarketAuctionSoftDapper",
 			WithSigner("user2"),
@@ -508,6 +515,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionDuration", 300.0),
 			WithArg("auctionExtensionOnLateBid", 60.0),
 			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionStartTime", `nil`),
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Seller banned by Tenant")

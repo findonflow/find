@@ -2067,6 +2067,17 @@ func (otu *OverflowTestUtils) alterLeaseMarketOption(ruleName string) *OverflowT
 	return otu
 }
 
+func (otu *OverflowTestUtils) alterLeaseMarketOptionDapper(ruleName string) *OverflowTestUtils {
+
+	otu.O.Tx("devAlterLeaseMarketOptionDapper",
+		WithSigner("find"),
+		WithArg("action", ruleName),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+}
+
 func (otu *OverflowTestUtils) removeMarketOption(marketType string) *OverflowTestUtils {
 
 	otu.O.Tx("removeMarketOption",
@@ -2589,6 +2600,7 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuctionDUC(user, name string, pric
 		WithArg("auctionDuration", 300.0),
 		WithArg("auctionExtensionOnLateBid", 60.0),
 		WithArg("minimumBidIncrement", 1.0),
+		WithArg("auctionStartTime", `nil`),
 		WithArg("auctionValidUntil", otu.currentTime()+10.0),
 	).
 		AssertSuccess(otu.T)
