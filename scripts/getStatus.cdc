@@ -341,6 +341,7 @@ pub struct SaleItemInformation {
 	pub var auction: FindLeaseMarket.AuctionItem?
 	pub var listingStatus:String
 	pub var saleItemExtraField: {String : AnyStruct}
+	pub var market: String
 
 	init(
 		leaseIdentifier: String,
@@ -359,7 +360,8 @@ pub struct SaleItemInformation {
 		lease: LeaseInfo?,
 		auction: FindLeaseMarket.AuctionItem?,
 		listingStatus:String,
-		saleItemExtraField: {String : AnyStruct}
+		saleItemExtraField: {String : AnyStruct},
+		market: String
 	) {
 		self.leaseIdentifier=leaseIdentifier
 		self.leaseName=leaseName
@@ -378,6 +380,7 @@ pub struct SaleItemInformation {
 		self.auction=auction
 		self.listingStatus=listingStatus
 		self.saleItemExtraField=saleItemExtraField
+		self.market=market
 	}
 }
 
@@ -458,7 +461,8 @@ pub fun SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemInfo
 		lease: LeaseInfoFromFindLeaseMarket(s.lease),
 		auction: s.auction,
 		listingStatus:s.listingStatus,
-		saleItemExtraField: s.saleItemExtraField
+		saleItemExtraField: s.saleItemExtraField,
+		market: "FindLeaseMarket"
 	)
 }
 
@@ -496,7 +500,8 @@ pub fun transformLeaseSale(_ leases: [FIND.LeaseInformation]) : {String : SaleIt
 					lease: LeaseInfoFromFIND(l),
 					auction: nil,
 					listingStatus:"active_listed",
-					saleItemExtraField: {}
+					saleItemExtraField: {},
+					market: "FIND"
 				)
 				saleCollection.append(sale)
 		}
@@ -534,7 +539,8 @@ pub fun transformLeaseSale(_ leases: [FIND.LeaseInformation]) : {String : SaleIt
 				lease: LeaseInfoFromFIND(l),
 				auction: a,
 				listingStatus:"active_listed",
-				saleItemExtraField: {}
+				saleItemExtraField: {},
+				market: "FIND"
 			)
 			auctionCollection.append(auction)
 		} else if l.latestBid != nil {
@@ -560,7 +566,8 @@ pub fun transformLeaseSale(_ leases: [FIND.LeaseInformation]) : {String : SaleIt
 				lease: LeaseInfoFromFIND(l),
 				auction: nil,
 				listingStatus:"active_listed",
-				saleItemExtraField: {}
+				saleItemExtraField: {},
+				market: "FIND"
 			)
 			OfferCollection.append(bid)
 		}
@@ -614,29 +621,34 @@ pub struct BidInfo{
 	pub let bidTypeIdentifier: String
 	pub let timestamp: UFix64
 	pub let item: SaleItemInformation
+	pub let market: String
 
 	init(
 		name: String,
 		bidAmount: UFix64,
 		bidTypeIdentifier: String,
 		timestamp: UFix64,
-		item: SaleItemInformation
+		item: SaleItemInformation,
+		market: String
 	) {
 		self.name=name
 		self.bidAmount=bidAmount
 		self.bidTypeIdentifier=bidTypeIdentifier
 		self.timestamp=timestamp
 		self.item=item
+		self.market=market
 	}
 }
 
 pub fun BidInfoFromFindLeaseMarket(_ b: FindLeaseMarket.BidInfo) : BidInfo {
+	let i = SaleItemInformationFromFindLeaseMarket(b.item)
 	return BidInfo(
 		name: b.name,
 		bidAmount: b.bidAmount,
 		bidTypeIdentifier: b.bidTypeIdentifier,
 		timestamp: b.timestamp,
-		item: SaleItemInformationFromFindLeaseMarket(b.item)
+		item: i,
+		market: "FindLeaseMarket"
 	)
 }
 
@@ -702,7 +714,8 @@ pub fun transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectio
 				lease: LeaseInfoFromFIND(l.lease),
 				auction: nil,
 				listingStatus:"active_ongoing",
-				saleItemExtraField: {}
+				saleItemExtraField: {},
+				market: "FIND"
 			)
 
 			let a = BidInfo(
@@ -710,7 +723,8 @@ pub fun transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectio
 				bidAmount: l.amount,
 				bidTypeIdentifier: Type<@FIND.Lease>().identifier,
 				timestamp: Clock.time(),
-				item: saleInfo
+				item: saleInfo,
+				market: "FIND"
 			)
 
 			auctionCollection.append(a)
@@ -743,7 +757,8 @@ pub fun transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectio
 				lease: LeaseInfoFromFIND(l.lease),
 				auction: nil,
 				listingStatus:"active_offered",
-				saleItemExtraField: {}
+				saleItemExtraField: {},
+				market: "FIND"
 			)
 
 			let a = BidInfo(
@@ -751,7 +766,8 @@ pub fun transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectio
 				bidAmount: l.amount,
 				bidTypeIdentifier: Type<@FIND.Lease>().identifier,
 				timestamp: Clock.time(),
-				item: saleInfo
+				item: saleInfo,
+				market: "FIND"
 			)
 
 			OfferCollection.append(a)
