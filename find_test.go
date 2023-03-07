@@ -634,16 +634,6 @@ func TestFIND(t *testing.T) {
 
 	// setup for testing old leases
 	otu.registerUserWithName(oldOwner, testingName)
-	// otu.listNameForSale(oldOwner, testingName)
-	// otu.O.Tx("listNameForAuction",
-	// 	WithSigner(oldOwner),
-	// 	WithArg("name", testingName),
-	// 	WithArg("auctionStartPrice", 5.0),
-	// 	WithArg("auctionReservePrice", 20.0),
-	// 	WithArg("auctionDuration", auctionDurationFloat),
-	// 	WithArg("auctionExtensionOnLateBid", 300.0),
-	// ).
-	// 	AssertSuccess(t)
 
 	otu.expireLease().
 		expireLease().
@@ -720,82 +710,6 @@ func TestFIND(t *testing.T) {
 }`))
 
 	})
-
-	// t.Run("Should not be able to list old leases for sale", func(t *testing.T) {
-
-	// 	// should be able to list name for sale
-	// 	otu.O.Tx("listNameForSale",
-	// 		WithSigner(currentOwner),
-	// 		WithArg("name", testingName),
-	// 		WithArg("directSellPrice", 10.0),
-	// 	).AssertSuccess(t)
-
-	// 	// should not be able to list name for sale
-	// 	otu.O.Tx("listNameForSale",
-	// 		WithSigner(oldOwner),
-	// 		WithArg("name", testingName),
-	// 		WithArg("directSellPrice", 10.0),
-	// 	).
-	// 		AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-
-	// })
-
-	// t.Run("Should not be able to list old leases for auction", func(t *testing.T) {
-
-	// 	// should be able to list name for auction
-	// 	otu.O.Tx("listNameForAuction",
-	// 		WithSigner(currentOwner),
-	// 		WithArg("name", testingName),
-	// 		WithArg("auctionStartPrice", 5.0),
-	// 		WithArg("auctionReservePrice", 20.0),
-	// 		WithArg("auctionDuration", auctionDurationFloat),
-	// 		WithArg("auctionExtensionOnLateBid", 300.0),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// 	// should not be able to list name for auction
-	// 	otu.O.Tx("listNameForAuction",
-	// 		WithSigner(oldOwner),
-	// 		WithArg("name", testingName),
-	// 		WithArg("auctionStartPrice", 5.0),
-	// 		WithArg("auctionReservePrice", 20.0),
-	// 		WithArg("auctionDuration", auctionDurationFloat),
-	// 		WithArg("auctionExtensionOnLateBid", 300.0),
-	// 	).
-	// 		AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-
-	// })
-
-	// t.Run("Should be able to delist old leases for sale", func(t *testing.T) {
-
-	// 	// should be able to delist name for sale
-	// 	otu.O.Tx("delistNameSale",
-	// 		WithSigner(currentOwner),
-	// 		WithArg("names", []string{testingName}),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// 	// should be able to delist name for sale
-	// 	otu.O.Tx("delistNameSale",
-	// 		WithSigner(oldOwner),
-	// 		WithArg("names", []string{testingName}),
-	// 	).
-	// 		AssertSuccess(t)
-
-	// })
-
-	// t.Run("Should be able to delist old leases for auction", func(t *testing.T) {
-
-	// 	otu.O.Tx("cancelNameAuction",
-	// 		WithSigner(currentOwner),
-	// 		WithArg("names", []string{testingName}),
-	// 	).AssertSuccess(t)
-
-	// 	otu.O.Tx("cancelNameAuction",
-	// 		WithSigner(oldOwner),
-	// 		WithArg("names", []string{testingName}),
-	// 	).AssertSuccess(t)
-	// })
 
 	t.Run("Should be able to cleanup invalid leases", func(t *testing.T) {
 		otu.O.Tx("cleanUpInvalidatedLease",
