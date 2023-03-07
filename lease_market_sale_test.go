@@ -455,4 +455,20 @@ func TestLeaseMarketSale(t *testing.T) {
 
 	})
 
+	otu.setFlowLeaseMarketOption()
+	t.Run("Should be able to migrate sales from old market", func(t *testing.T) {
+
+		otu.listNameForSale("user1", "name1")
+
+		otu.O.Tx(
+			"migrateNameListings",
+			WithSigner("user1"),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FindLeaseMarketSale.Sale")
+
+		otu.cancelAllLeaseForSale("user1")
+
+	})
+
 }

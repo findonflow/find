@@ -603,4 +603,20 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.delistAllLeaseForEscrowAuction("user1")
 	})
 
+	otu.setFlowLeaseMarketOption()
+	t.Run("Should be able to migrate auctions from old market", func(t *testing.T) {
+
+		otu.listForAuction("user1")
+
+		otu.O.Tx(
+			"migrateNameListings",
+			WithSigner("user1"),
+		).
+			AssertSuccess(t).
+			AssertEmitEventName(t, "FindLeaseMarketAuctionEscrow.EnglishAuction")
+
+		otu.delistAllLeaseForEscrowAuction("user1")
+
+	})
+
 }
