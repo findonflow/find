@@ -32,6 +32,9 @@ pub contract FindMarketDirectOfferSoft {
 			self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
 		}
 
+		access(contract) fun getPointer() : {FindViews.Pointer} {
+			return self.pointer
+		}
 
 		pub fun getId() : UInt64{
 			return self.pointer.getUUID()

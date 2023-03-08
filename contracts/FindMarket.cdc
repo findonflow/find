@@ -9,6 +9,8 @@ import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import FindViews from "../contracts/FindViews.cdc"
+// import FIND from "../contracts/FIND.cdc"
 
 pub contract FindMarket {
 	access(account) let  pathMap : {String: String}
@@ -1683,41 +1685,77 @@ pub contract FindMarket {
 	}
 
 	pub resource interface SaleItem {
+		access(contract) let totalRoyalties: UFix64
+
+		access(contract) fun getPointer() : {FindViews.Pointer}
 
 		//this is the type of sale this is, auction, direct offer etc
 		pub fun getSaleType(): String
-		pub fun getListingTypeIdentifier(): String
+		pub fun getListingTypeIdentifier(): String {
+			return self.getType().identifier
+		}
 
-		pub fun getSeller(): Address
+		pub fun getSeller(): Address {
+			return self.getPointer().owner()
+		}
+
 		pub fun getBuyer(): Address?
 
 		pub fun getSellerName() : String?
 		pub fun getBuyerName() : String?
 
-		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo
-		pub fun checkPointer() : Bool
-		pub fun checkSoulBound() : Bool
-		pub fun getListingType() : Type
+		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
+			return FindMarket.NFTInfo(self.getPointer().getViewResolver(), id: self.getPointer().id, detail:detail)
+		}
+
+		pub fun checkPointer() : Bool {
+			return self.getPointer().valid()
+		}
+
+		pub fun checkSoulBound() : Bool {
+			return self.getPointer().checkSoulBound()
+		}
+
+		pub fun getListingType() : Type {
+			return self.getType()
+		}
 
 		// pub fun getFtAlias(): String
 		//the Type of the item for sale
-		pub fun getItemType(): Type
+		pub fun getItemType() : Type {
+			return self.getPointer().getItemType()
+		}
 		//The id of the nft for sale
-		pub fun getItemID() : UInt64
+		pub fun getItemID() : UInt64 {
+			return self.getPointer().id
+		}
 		//The id of this sale item, ie the UUID of the item listed for sale
-		pub fun getId() : UInt64
+		pub fun getId() : UInt64{
+			return self.getPointer().getUUID()
+		}
 
 		pub fun getBalance(): UFix64
-		pub fun getAuction(): AuctionItem?
+		pub fun getAuction(): AuctionItem? {
+			return nil
+		}
 		pub fun getFtType() : Type //The type of FT used for this sale item
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 
-		pub fun getTotalRoyalties() : UFix64
-		pub fun validateRoyalties() : Bool
-		pub fun getDisplay() : MetadataViews.Display
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
+		pub fun getTotalRoyalties() : UFix64 {
+			return self.totalRoyalties
+		}
+		pub fun validateRoyalties() : Bool {
+			return self.totalRoyalties == self.getPointer().getTotalRoyaltiesCut()
+		}
+		pub fun getDisplay() : MetadataViews.Display {
+			return self.getPointer().getDisplay()
+		}
+
+		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
+			return self.getPointer().getNFTCollectionData()
+		}
 	}
 
 	pub struct SaleItemInformation {

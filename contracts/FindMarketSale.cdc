@@ -41,6 +41,10 @@ pub contract FindMarketSale {
 			self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
 		}
 
+		access(contract) fun getPointer() : {FindViews.Pointer} {
+			return self.pointer
+		}
+
 		pub fun getSaleType() : String {
 			return "active_listed"
 		}
