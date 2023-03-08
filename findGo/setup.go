@@ -124,3 +124,17 @@ func (ot *OverflowUtils) assertTrxn(res *OverflowResult) *OverflowUtils {
 	}
 	return ot
 }
+
+func (ot *OverflowUtils) AddItem(contract string) *OverflowUtils {
+	o := ot.O
+	wearable, err := o.QualifiedIdentifier(contract, "NFT")
+	ot.assertErr(err)
+	res := o.Tx("tenantsetMarketOptionDapper",
+		WithSigner("find"),
+		WithArg("nftName", contract),
+		WithArg("nftTypes", []string{wearable}),
+		WithArg("cut", 0.0),
+	)
+	ot.assertTrxn(res)
+	return ot
+}
