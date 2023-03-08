@@ -3,7 +3,6 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "./FindViews.cdc"
 import Clock from "./Clock.cdc"
-import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import Profile from "./Profile.cdc"
 
@@ -48,10 +47,6 @@ pub contract FindMarketAuctionEscrow {
 			return self.pointer
 		}
 
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
-		}
-
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
 			if !self.offerCallback!.check()  {
 				panic("bidder unlinked the bid collection capability. bidder address : ".concat(self.offerCallback!.address.toString()))
@@ -59,10 +54,6 @@ pub contract FindMarketAuctionEscrow {
 			let path = self.pointer.getNFTCollectionData().publicPath
 			let vault <- self.offerCallback!.borrow()!.accept(<- self.pointer.withdraw(), path: path)
 			return <- vault
-		}
-
-		pub fun getRoyalty() : MetadataViews.Royalties {
-			return self.pointer.getRoyalty()
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -75,31 +66,11 @@ pub contract FindMarketAuctionEscrow {
 			return self.auctionStartPrice
 		}
 
-		pub fun getSeller() : Address {
-			return self.pointer.owner()
-		}
-
-		pub fun getSellerName() : String? {
-			let address = self.pointer.owner()
-			return FIND.reverseLookup(address)
-		}
-
 		pub fun getBuyer() : Address? {
 			if let cb= self.offerCallback {
 				return cb.address
 			}
 			return nil
-		}
-
-		pub fun getBuyerName() : String? {
-			if let cb= self.offerCallback {
-				return FIND.reverseLookup(cb.address)
-			}
-			return nil
-		}
-
-		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
 		}
 
 		pub fun setAuctionStarted(_ startedAt: UFix64) {
@@ -173,23 +144,6 @@ pub contract FindMarketAuctionEscrow {
 			return "active_listed"
 		}
 
-		pub fun getListingType() : Type {
-			return Type<@SaleItem>()
-		}
-
-		pub fun getListingTypeIdentifier(): String {
-			return Type<@SaleItem>().identifier
-		}
-
-
-		pub fun getItemID() : UInt64 {
-			return self.pointer.id
-		}
-
-		pub fun getItemType() : Type {
-			return self.pointer.getItemType()
-		}
-
 		pub fun getAuction(): FindMarket.AuctionItem? {
 			return FindMarket.AuctionItem(startPrice: self.auctionStartPrice,
 			currentPrice: self.getBalance(),
@@ -215,32 +169,8 @@ pub contract FindMarketAuctionEscrow {
 			return self.auctionValidUntil
 		}
 
-		pub fun checkPointer() : Bool {
-			return self.pointer.valid()
-		}
-
-		pub fun checkSoulBound() : Bool {
-			return self.pointer.checkSoulBound()
-		}
-
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
-		}
-
-		pub fun getTotalRoyalties() : UFix64 {
-			return self.totalRoyalties
-		}
-
-		pub fun validateRoyalties() : Bool {
-			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
-		}
-
-		pub fun getDisplay() : MetadataViews.Display {
-			return self.pointer.getDisplay()
-		}
-
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			return self.pointer.getNFTCollectionData()
 		}
 	}
 
@@ -318,6 +248,7 @@ pub contract FindMarketAuctionEscrow {
 				previousBuyer=previousOffer!.address
 			}
 
+			var previousBuyerName = saleItem.getBuyerName()
 			saleItem.setCallback(newOffer)
 
 			let suggestedEndTime=timestamp+saleItem.auctionExtensionOnLateBid
@@ -332,18 +263,11 @@ pub contract FindMarketAuctionEscrow {
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			var previousBuyerName : String?=nil
-			if let pb= previousBuyer {
-				previousBuyerName = FIND.reverseLookup(pb)
-			}
-
 			let buyer=newOffer.address
 
-			let buyerName=FIND.reverseLookup(buyer!)
+			let buyerName=saleItem.getBuyerName()
 			let profile = Profile.find(buyer!)
-			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: newOfferBalance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: previousBuyer, previousBuyerName:previousBuyerName)
-
-
+			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: saleItem.getSellerName(), amount: newOfferBalance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: previousBuyer, previousBuyerName:previousBuyerName)
 		}
 
 		access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
@@ -427,9 +351,9 @@ pub contract FindMarketAuctionEscrow {
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			let buyerName=FIND.reverseLookup(buyer)
+			let buyerName=saleItem.getBuyerName()
 			let profile = Profile.find(buyer)
-			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
+			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: saleItem.getSellerName(), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 		}
 
@@ -502,11 +426,11 @@ pub contract FindMarketAuctionEscrow {
 
 			let buyer=saleItem.getBuyer()
 			if buyer != nil {
-				let buyerName=FIND.reverseLookup(buyer!)
+				let buyerName=saleItem.getBuyerName()
 				let profile = Profile.find(buyer!)
-				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
+				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: saleItem.getSellerName(), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(),startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 			} else {
-				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil,startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
+				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: saleItem.getSellerName(), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil,startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
 			}
 
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
@@ -559,21 +483,14 @@ pub contract FindMarketAuctionEscrow {
 
 				let buyer=saleItem.getBuyer()!
 
-				let buyerName=FIND.reverseLookup(buyer)
-				let sellerName = FIND.reverseLookup(seller)
+				let buyerName=saleItem.getBuyerName()
+				let sellerName = saleItem.getSellerName()
 				let profile = Profile.find(buyer)
 				emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:seller, sellerName: sellerName, amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), startsAt: saleItem.auctionStartedAt, endsAt: saleItem.auctionEndsAt, previousBuyer: nil, previousBuyerName:nil)
 
 				let vault <- saleItem.acceptEscrowedBid()
 
-				let resolved : {Address : String} = {}
-				resolved[buyer] = buyerName ?? ""
-				resolved[seller] = sellerName ?? ""
-				resolved[FindMarketAuctionEscrow.account.address] =  "find"
-				// Have to make sure the tenant always have the valid find name
-				resolved[FindMarket.tenantNameAddress[tenant.name]!] =  tenant.name
-
-				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
+				FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:royalty, nftInfo:nftInfo, cuts:cuts)
 
 				destroy <- self.items.remove(key: id)
 				return
@@ -661,7 +578,7 @@ pub contract FindMarketAuctionEscrow {
 
 			let nftInfo=saleItemRef.toNFTInfo(true)
 
-			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItemRef.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, startsAt: saleItemRef.auctionStartedAt, endsAt: saleItemRef.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
+			emit EnglishAuction(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:seller, sellerName: saleItemRef.getSellerName(), amount: balance, auctionReservePrice: saleItemRef.auctionReservePrice,  status: status, vaultType:ftType.identifier, nft: nftInfo,  buyer: nil, buyerName: nil, buyerAvatar:nil, startsAt: saleItemRef.auctionStartedAt, endsAt: saleItemRef.auctionEndsAt, previousBuyer:nil, previousBuyerName:nil)
 
 		}
 

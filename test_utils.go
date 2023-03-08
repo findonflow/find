@@ -1805,7 +1805,7 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 	var findReport Report
 	err := otu.O.Script("getStatus",
 		WithArg("user", name),
-	).MarshalAs(&findReport)
+	).Print().MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
