@@ -500,7 +500,6 @@ pub contract FindLeaseMarketDirectOfferSoft {
 
 		pub fun bid(name: String, amount:UFix64, vaultType:Type, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
 			pre {
-				self.owner!.address != FIND.status(name).owner!  : "You cannot bid on your own resource"
 				self.bids[name] == nil : "You already have an bid for this item, use increaseBid on that bid"
 			}
 
@@ -514,7 +513,12 @@ pub contract FindLeaseMarketDirectOfferSoft {
 				panic("Valid until is before current time")
 			}
 
-			let from=getAccount(FIND.status(name).owner!).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
+			let owner = FIND.status(name).owner!
+			if self.owner!.address == owner {
+				panic("You cannot bid on your own resource")
+			}
+
+			let from=getAccount(owner).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
 			let bid <- create Bid(from: from, leaseName: name, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for name=".concat(name))
