@@ -1691,6 +1691,14 @@ pub contract FindMarket {
 
 		//this is the type of sale this is, auction, direct offer etc
 		pub fun getSaleType(): String
+		pub fun getBuyer(): Address?
+
+		pub fun getSellerName() : String?
+		pub fun getBuyerName() : String?
+		pub fun getBalance(): UFix64
+		pub fun getFtType() : Type //The type of FT used for this sale item
+		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
+
 		pub fun getListingTypeIdentifier(): String {
 			return self.getType().identifier
 		}
@@ -1698,11 +1706,6 @@ pub contract FindMarket {
 		pub fun getSeller(): Address {
 			return self.getPointer().owner()
 		}
-
-		pub fun getBuyer(): Address?
-
-		pub fun getSellerName() : String?
-		pub fun getBuyerName() : String?
 
 		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
 			return FindMarket.NFTInfo(self.getPointer().getViewResolver(), id: self.getPointer().id, detail:detail)
@@ -1734,14 +1737,15 @@ pub contract FindMarket {
 			return self.getPointer().getUUID()
 		}
 
-		pub fun getBalance(): UFix64
 		pub fun getAuction(): AuctionItem? {
 			return nil
 		}
-		pub fun getFtType() : Type //The type of FT used for this sale item
-		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
+
+		pub fun getRoyalty() : MetadataViews.Royalties {
+			return self.getPointer().getRoyalty()
+		}
 
 		pub fun getTotalRoyalties() : UFix64 {
 			return self.totalRoyalties

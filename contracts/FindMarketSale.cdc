@@ -49,14 +49,6 @@ pub contract FindMarketSale {
 			return "active_listed"
 		}
 
-		pub fun getListingType() : Type {
-			return Type<@SaleItem>()
-		}
-
-		pub fun getListingTypeIdentifier(): String {
-			return Type<@SaleItem>().identifier
-		}
-
 		pub fun setBuyer(_ address:Address) {
 			self.buyer=address
 		}
@@ -70,22 +62,6 @@ pub contract FindMarketSale {
 				return FIND.reverseLookup(address)
 			}
 			return nil
-		}
-
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
-		}
-
-		pub fun getItemID() : UInt64 {
-			return self.pointer.id
-		}
-
-		pub fun getItemType() : Type {
-			return self.pointer.getItemType()
-		}
-
-		pub fun getRoyalty() : MetadataViews.Royalties {
-			return self.pointer.getRoyalty()
 		}
 
 		pub fun getSeller() : Address {
@@ -116,36 +92,8 @@ pub contract FindMarketSale {
 			return self.validUntil
 		}
 
-		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
-		}
-
-		pub fun checkPointer() : Bool {
-			return self.pointer.valid()
-		}
-
-		pub fun checkSoulBound() : Bool {
-			return self.pointer.checkSoulBound()
-		}
-
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
-		}
-
-		pub fun getTotalRoyalties() : UFix64 {
-			return self.totalRoyalties
-		}
-
-		pub fun validateRoyalties() : Bool {
-			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
-		}
-
-		pub fun getDisplay() : MetadataViews.Display {
-			return self.pointer.getDisplay()
-		}
-
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			return self.pointer.getNFTCollectionData()
 		}
 	}
 

@@ -34,10 +34,6 @@ pub contract FindMarketDirectOfferEscrow {
 			return self.pointer
 		}
 
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
-		}
-
 		pub fun acceptEscrowedBid() : @FungibleToken.Vault {
 			if !self.offerCallback.check() {
 				panic("Bidder unlinked bid collection capability. Bidder Address : ".concat(self.offerCallback.address.toString()))
@@ -46,10 +42,6 @@ pub contract FindMarketDirectOfferEscrow {
 			let publicPath = pointer.getNFTCollectionData().publicPath
 			let vault <- self.offerCallback.borrow()!.accept(<- pointer.withdraw(), path:publicPath)
 			return <- vault
-		}
-
-		pub fun getRoyalty() : MetadataViews.Royalties {
-			return self.pointer.getRoyalty()
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -80,36 +72,12 @@ pub contract FindMarketDirectOfferEscrow {
 			return nil
 		}
 
-		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
-		}
-
 		pub fun getSaleType() : String {
 			return "active_ongoing"
 		}
 
-		pub fun getListingType() : Type {
-			return Type<@SaleItem>()
-		}
-
-		pub fun getListingTypeIdentifier() : String {
-			return Type<@SaleItem>().identifier
-		}
-
 		pub fun setPointer(_ pointer: FindViews.AuthNFTPointer) {
 			self.pointer=pointer
-		}
-
-		pub fun getItemID() : UInt64 {
-			return self.pointer.id
-		}
-
-		pub fun getItemType() : Type {
-			return self.pointer.getItemType()
-		}
-
-		pub fun getAuction(): FindMarket.AuctionItem? {
-			return nil
 		}
 
 		pub fun getFtType() : Type  {
@@ -131,36 +99,12 @@ pub contract FindMarketDirectOfferEscrow {
 			self.offerCallback=callback
 		}
 
-		pub fun checkPointer() : Bool {
-			return self.pointer.valid()
-		}
-
-		pub fun checkSoulBound() : Bool {
-			return self.pointer.checkSoulBound()
-		}
-
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
 
 		access(contract) fun setSaleItemExtraField(_ field: {String : AnyStruct}) {
 			self.saleItemExtraField = field
-		}
-
-		pub fun getTotalRoyalties() : UFix64 {
-			return self.totalRoyalties
-		}
-
-		pub fun validateRoyalties() : Bool {
-			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
-		}
-
-		pub fun getDisplay() : MetadataViews.Display {
-			return self.pointer.getDisplay()
-		}
-
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			return self.pointer.getNFTCollectionData()
 		}
 	}
 

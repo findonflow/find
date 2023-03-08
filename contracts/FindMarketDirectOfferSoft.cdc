@@ -36,10 +36,6 @@ pub contract FindMarketDirectOfferSoft {
 			return self.pointer
 		}
 
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
-		}
-
 		pub fun acceptDirectOffer() {
 			self.directOfferAccepted=true
 		}
@@ -53,10 +49,6 @@ pub contract FindMarketDirectOfferSoft {
 			self.offerCallback.borrow()!.acceptNonEscrowed(<- pointer.withdraw())
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalties {
-			return self.pointer.getRoyalty()
-		}
-
 		pub fun getFtType() : Type {
 			if !self.offerCallback.check() {
 				panic("Bidder unlinked the bid collection capability. Bidder Address : ".concat(self.offerCallback.address.toString()))
@@ -64,31 +56,11 @@ pub contract FindMarketDirectOfferSoft {
 			return self.offerCallback.borrow()!.getVaultType(self.getId())
 		}
 
-		pub fun getItemID() : UInt64 {
-			return self.pointer.id
-		}
-
-		pub fun getItemType() : Type {
-			return self.pointer.getItemType()
-		}
-
-		pub fun getAuction(): FindMarket.AuctionItem? {
-			return nil
-		}
-
 		pub fun getSaleType() : String {
 			if self.directOfferAccepted {
 				return "active_finished"
 			}
 			return "active_ongoing"
-		}
-
-		pub fun getListingType() : Type {
-			return Type<@SaleItem>()
-		}
-
-		pub fun getListingTypeIdentifier() : String {
-			return Type<@SaleItem>().identifier
 		}
 
 		pub fun getBalance() : UFix64 {
@@ -118,10 +90,6 @@ pub contract FindMarketDirectOfferSoft {
 			return nil
 		}
 
-		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo{
-			return FindMarket.NFTInfo(self.pointer.getViewResolver(), id: self.pointer.id, detail:detail)
-		}
-
 		pub fun setValidUntil(_ time: UFix64?) {
 			self.validUntil=time
 		}
@@ -138,36 +106,12 @@ pub contract FindMarketDirectOfferSoft {
 			self.offerCallback=callback
 		}
 
-		pub fun checkPointer() : Bool {
-			return self.pointer.valid()
-		}
-
-		pub fun checkSoulBound() : Bool {
-			return self.pointer.checkSoulBound()
-		}
-
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
 
 		access(contract) fun setSaleItemExtraField(_ field: {String : AnyStruct}) {
 			self.saleItemExtraField = field
-		}
-
-		pub fun getTotalRoyalties() : UFix64 {
-			return self.totalRoyalties
-		}
-
-		pub fun validateRoyalties() : Bool {
-			return self.totalRoyalties == self.pointer.getTotalRoyaltiesCut()
-		}
-
-		pub fun getDisplay() : MetadataViews.Display {
-			return self.pointer.getDisplay()
-		}
-
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			return self.pointer.getNFTCollectionData()
 		}
 	}
 
