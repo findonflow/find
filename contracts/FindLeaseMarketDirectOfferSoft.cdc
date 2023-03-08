@@ -29,10 +29,6 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			self.pointer=pointer
 		}
 
-		pub fun getName() : String {
-			return self.pointer.name
-		}
-
 		pub fun acceptDirectOffer() {
 			self.directOfferAccepted=true
 		}

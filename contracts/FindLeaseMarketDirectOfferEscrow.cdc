@@ -27,10 +27,6 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			self.saleItemExtraField=saleItemExtraField
 		}
 
-		pub fun getName() : String {
-			return self.pointer.name
-		}
-
 		access(contract) fun acceptEscrowedBid() : @FungibleToken.Vault {
 			if !self.offerCallback.check() {
 				panic("Bidder unlinked bid collection capability. Bidder Address : ".concat(self.offerCallback.address.toString()))
