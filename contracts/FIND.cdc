@@ -53,6 +53,7 @@ pub contract FIND {
 
 	///  Emitted when a name is registred in FIND
 	pub event Register(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64)
+	pub event Renew(name: String, owner: Address, validUntil: UFix64, lockedUntil: UFix64)
 
 	/// Emitted when a name is moved to a new owner
 	pub event Moved(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64)
@@ -1539,7 +1540,7 @@ pub contract FIND {
 				lease.setLockedUntil(lease.validUntil+ self.lockPeriod)
 
 
-				emit Register(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
+				emit Renew(name: name, owner:lease.profile.address, validUntil: lease.validUntil, lockedUntil: lease.lockedUntil)
 				self.profiles[name] =  lease
 				return
 			}
