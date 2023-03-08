@@ -50,8 +50,8 @@ pub contract FindLeaseMarketAuctionEscrow {
 				self.offerCallback != nil : "There is no bid offer to the item."
 				self.offerCallback!.check() : "Bidder unlinked bid collection capability."
 			}
-			let vault <- self.offerCallback!.borrow()!.accept(self.getLeaseName())
 			self.pointer.move(to: self.offerCallback!.address)
+			let vault <- self.offerCallback!.borrow()!.accept(self.getLeaseName())
 			return <- vault
 		}
 
@@ -652,6 +652,9 @@ pub contract FindLeaseMarketAuctionEscrow {
 			pre {
 				self.bids[name] != nil : "You need to have a bid here already"
 			}
+
+			// check that the bidder already has the name
+			assert(FIND.status(name).owner! == self.owner!.address, message: "The lease is not transferred. Auction cannot be fulfilled")
 
 			let bid <- self.bids.remove(key: name)!
 			let vaultRef = &bid.vault as &FungibleToken.Vault

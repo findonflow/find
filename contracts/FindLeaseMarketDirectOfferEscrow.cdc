@@ -427,6 +427,9 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 		}
 
 		access(contract) fun accept(_ name: String) : @FungibleToken.Vault {
+			// check that the bidder already has the name
+			assert(FIND.status(name).owner! == self.owner!.address, message: "The lease is not transferred. Offer cannot be fulfilled")
+
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
 
