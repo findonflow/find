@@ -677,7 +677,6 @@ func TestMarketSale(t *testing.T) {
 				map[string]interface{}{
 					"address":         otu.O.Address("find"),
 					"amount":          0.1,
-					"findName":        "find",
 					"residualAddress": otu.O.Address("residual"),
 					"royaltyName":     "creator",
 				},

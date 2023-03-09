@@ -528,111 +528,6 @@ pub fun main() :  UFix64 {
 	return res
 }
 
-func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
-
-	otu.O.Tx("listNameForSale",
-		WithSigner(name),
-		WithArg("name", name),
-		WithArg("directSellPrice", 10.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Sale", map[string]interface{}{
-			"amount": 10.0,
-			"status": "active_listed",
-			"name":   name,
-			"seller": otu.O.Address(name),
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTestUtils {
-
-	otu.O.Tx("listNameForSale",
-		WithSigner(seller),
-		WithArg("name", name),
-		WithArg("directSellPrice", 10.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Sale", map[string]interface{}{
-			"amount":     10.0,
-			"status":     "active_listed",
-			"seller":     otu.O.Address(seller),
-			"sellerName": seller,
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *OverflowTestUtils {
-	otu.O.Tx("bidName",
-		WithSigner(buyer),
-		WithArg("name", name),
-		WithArg("amount", amount),
-	).AssertSuccess(otu.T).AssertEvent(otu.T, "FIND.DirectOffer", map[string]interface{}{
-		"amount": amount,
-		"buyer":  otu.O.Address(buyer),
-		"name":   name,
-		"status": "active_offered",
-	})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
-
-	otu.O.Tx("listNameForAuction",
-		WithSigner(name),
-		WithArg("name", name),
-		WithArg("auctionStartPrice", 5.0),
-		WithArg("auctionReservePrice", 20.0),
-		WithArg("auctionDuration", auctionDurationFloat),
-		WithArg("auctionExtensionOnLateBid", 300.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"amount":              5.0,
-			"auctionReservePrice": 20.0,
-			"status":              "active_listed",
-			"name":                name,
-			"seller":              otu.O.Address(name),
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) bid(buyer, name string, amount float64) *OverflowTestUtils {
-
-	endTime := otu.currentTime() + auctionDurationFloat
-	otu.O.Tx("bidName",
-		WithSigner(buyer),
-		WithArg("name", name),
-		WithArg("amount", amount),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"amount":    amount,
-			"endsAt":    endTime,
-			"buyer":     otu.O.Address(buyer),
-			"buyerName": buyer,
-			"name":      name,
-			"status":    "active_ongoing",
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) auctionBid(buyer, name string, amount float64) *OverflowTestUtils {
-
-	endTime := otu.currentTime() + auctionDurationFloat
-	otu.O.Tx("bidName",
-		WithSigner(buyer),
-		WithArg("name", name),
-		WithArg("amount", amount),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"amount":    amount,
-			"endsAt":    endTime,
-			"buyer":     otu.O.Address(buyer),
-			"buyerName": buyer,
-			"name":      name,
-			"status":    "active_ongoing",
-		})
-	return otu
-}
-
 func (otu *OverflowTestUtils) expireAuction() *OverflowTestUtils {
 	return otu.tickClock(auctionDurationFloat)
 }
@@ -1805,7 +1700,7 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 	var findReport Report
 	err := otu.O.Script("getStatus",
 		WithArg("user", name),
-	).MarshalAs(&findReport)
+	).Print().MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
@@ -2441,6 +2336,24 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 	assert.NoError(otu.T, err)
 
 	otu.O.Tx("listLeaseForSaleDapper",
+		WithSigner(user),
+		WithArg("leaseName", name),
+		WithArg("ftAliasOrIdentifier", ftIden),
+		WithArg("directSellPrice", price),
+		WithArg("validUntil", otu.currentTime()+100.0),
+	).
+		AssertSuccess(otu.T)
+
+	return otu
+
+}
+
+func (otu *OverflowTestUtils) listLeaseForSale(user string, name string, price float64) *OverflowTestUtils {
+
+	ftIden, err := otu.O.QualifiedIdentifier("FlowToken", "Vault")
+	assert.NoError(otu.T, err)
+
+	otu.O.Tx("listLeaseForSale",
 		WithSigner(user),
 		WithArg("leaseName", name),
 		WithArg("ftAliasOrIdentifier", ftIden),

@@ -3,7 +3,6 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
-import FIND from "./FIND.cdc"
 import Profile from "./Profile.cdc"
 import FindMarket from "./FindMarket.cdc"
 
@@ -57,27 +56,8 @@ pub contract FindMarketSale {
 			return self.buyer
 		}
 
-		pub fun getBuyerName() : String? {
-			if let address = self.buyer {
-				return FIND.reverseLookup(address)
-			}
-			return nil
-		}
-
-		pub fun getSeller() : Address {
-			return self.pointer.owner()
-		}
-
-		pub fun getSellerName() : String? {
-			return FIND.reverseLookup(self.pointer.owner())
-		}
-
 		pub fun getBalance() : UFix64 {
 			return self.salePrice
-		}
-
-		pub fun getAuction(): FindMarket.AuctionItem? {
-			return nil
 		}
 
 		pub fun getFtType() : Type  {
@@ -139,9 +119,6 @@ pub contract FindMarketSale {
 
 			let saleItem=self.borrow(id)
 
-
-
-
 			if saleItem.salePrice != vault.balance {
 				panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
 			}
@@ -169,22 +146,12 @@ pub contract FindMarketSale {
 			let nftInfo= saleItem.toNFTInfo(true)
 			saleItem.setBuyer(nftCap.address)
 			let buyer=nftCap.address
-			let buyerName=FIND.reverseLookup(buyer)
-			let sellerName=FIND.reverseLookup(self.owner!.address)
+			let buyerName=saleItem.getBuyerName()
+			let sellerName=saleItem.getSellerName()
 
-			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: sellerName, amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
 
-
-			let resolved : {Address : String} = {}
-
-			resolved[buyer] = buyerName ?? ""
-			resolved[self.owner!.address] = sellerName ?? ""
-			resolved[FindMarketSale.account.address] = "find"
-			// Have to make sure the tenant always have the valid find name
-			resolved[FindMarket.tenantNameAddress[tenant.name]!] = tenant.name
-
-			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts, resolver: fun(address:Address): String? { return FIND.reverseLookup(address) }, resolvedAddress: resolved)
-
+			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts)
 
 			if !nftCap.check() {
 				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.CollectionPublic}>(saleItem.getNFTCollectionData().publicPath)
@@ -242,7 +209,7 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant: tenant.name, id: pointer.getUUID(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, nft:saleItem.toNFTInfo(true), buyer: nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			emit Sale(tenant: tenant.name, id: pointer.getUUID(), saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: saleItem.salePrice, status: "active_listed", vaultType: vaultType.identifier, nft:saleItem.toNFTInfo(true), buyer: nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			let old <- self.items[pointer.getUUID()] <- saleItem
 			destroy old
 
@@ -264,7 +231,7 @@ pub contract FindMarketSale {
 			}
 
 			let owner=self.owner!.address
-			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:FIND.reverseLookup(owner), amount: saleItem.salePrice, status: status, vaultType: saleItem.vaultType.identifier,nft: nftInfo, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName:saleItem.getSellerName(), amount: saleItem.salePrice, status: status, vaultType: saleItem.vaultType.identifier,nft: nftInfo, buyer:nil, buyerName:nil, buyerAvatar:nil, endsAt:saleItem.validUntil)
 			destroy saleItem
 		}
 

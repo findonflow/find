@@ -3,7 +3,7 @@ import MetadataViews from 0x631e88ae7f1d7c20
 import FindViews from 0x35717efbbce11c74
 import FIND from 0x35717efbbce11c74
 import FindAirdropper from 0x35717efbbce11c74
-import Wearables from 0x1e0493ee604e7598
+import Wearables from 0x1c5033ad60821c97
 
 transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
