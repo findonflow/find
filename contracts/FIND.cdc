@@ -1487,7 +1487,6 @@ pub contract FIND {
 		}
 	}
 
-
 	pub resource Bid {
 		access(contract) let from: Capability<&LeaseCollection{LeaseCollectionPublic}>
 		access(contract) let name: String
