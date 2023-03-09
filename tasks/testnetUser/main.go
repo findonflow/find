@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"strconv"
+
 	. "github.com/bjartek/overflow"
 )
 
@@ -48,12 +51,12 @@ func main() {
 
 	// New Overflow
 
-	// number := 10
-	// price := 1.0
-	// priceString := fmt.Sprintf("%.1f", price)
-	// nftIdentifier := `"Dandy"`
-	// ftIdentifier := `"Flow"`
-	// seller := "user1"
+	number := 10
+	price := 1.0
+	priceString := fmt.Sprintf("%.1f", price)
+	nftIdentifier := `"Dandy"`
+	ftIdentifier := `"Flow"`
+	seller := "user1"
 
 	o := Overflow(
 		WithNetwork("testnet"),
@@ -71,17 +74,17 @@ func main() {
 	// 	Arg("name", "user2"),
 	// )
 
-	o.Tx("devMintDandyTO",
-		WithSigner("find-forge"),
+	ids := o.Tx("devMintDandyTO",
+		WithSigner("user1"),
 		WithArg("name", "user1"),
-		WithArg("maxEdition", 1),
+		WithArg("maxEdition", 12),
 		WithArg("artist", "Neo"),
 		WithArg("nftName", "Neo Motorcycle"),
 		WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
 		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
 		WithArg("rarity", "rare"),
 		WithArg("rarityNum", 50.0),
-		WithArg("to", "0x51164279381f8a8e"),
+		WithArg("to", "user1"),
 	).
 		GetIdsFromEvent("Deposit", "id")
 
@@ -98,53 +101,53 @@ func main() {
 	// 	100293828,
 	// }
 
-	// saleIds := fmt.Sprint(`[ `, ids[0])
+	saleIds := fmt.Sprint(`[ `, ids[0])
 
-	// prices := `[ ` + priceString
-	// var nftIdentifiers string = `[ "Dandy" `
-	// var ftIdentifiers string = ` [ "Flow" `
+	prices := `[ ` + priceString
+	var nftIdentifiers string = `[ "Dandy" `
+	var ftIdentifiers string = ` [ "Flow" `
 
-	// sellers := make([]string, 1)
-	// sellers[0] = seller
-	// i := 1
-	// for i < number {
-	// 	id := fmt.Sprint(ids[i])
-	// 	saleIds = saleIds + ` , ` + id
-	// 	prices = prices + ` , ` + priceString
-	// 	nftIdentifiers = nftIdentifiers + ` , ` + nftIdentifier
-	// 	ftIdentifiers = ftIdentifiers + ` , ` + ftIdentifier
-	// 	sellers = append(sellers, seller)
+	sellers := make([]string, 1)
+	sellers[0] = seller
+	i := 1
+	for i < number {
+		id := fmt.Sprint(ids[i])
+		saleIds = saleIds + ` , ` + id
+		prices = prices + ` , ` + priceString
+		nftIdentifiers = nftIdentifiers + ` , ` + nftIdentifier
+		ftIdentifiers = ftIdentifiers + ` , ` + ftIdentifier
+		sellers = append(sellers, seller)
 
-	// 	i++
-	// }
-	// saleIds = saleIds + ` ]`
-	// nftIdentifiers = nftIdentifiers + ` ]`
-	// ftIdentifiers = ftIdentifiers + ` ]`
-	// prices = prices + ` ]`
+		i++
+	}
+	saleIds = saleIds + ` ]`
+	nftIdentifiers = nftIdentifiers + ` ]`
+	ftIdentifiers = ftIdentifiers + ` ]`
+	prices = prices + ` ]`
 
-	// returnTime, _ := o.Script(`import Clock from "../contracts/Clock.cdc"
-	// pub fun main() :  UFix64 {
-	// 	return Clock.time()
-	// }`).GetAsJson()
+	returnTime, _ := o.Script(`import Clock from "../contracts/Clock.cdc"
+	pub fun main() :  UFix64 {
+		return Clock.time()
+	}`).GetAsJson()
 
-	// time, _ := strconv.ParseFloat(returnTime, 64)
+	time, _ := strconv.ParseFloat(returnTime, 64)
 
-	// o.Tx("listMultipleNFTForSale",
-	// 	WithSigner("user1"),
-	// 	WithArg("nftAliasOrIdentifiers", nftIdentifiers),
-	// 	WithArg("ids", saleIds),
-	// 	WithArg("ftAliasOrIdentifiers", ftIdentifiers),
-	// 	WithArg("directSellPrices", prices),
-	// 	WithArg("validUntil", time+100000.0))
+	o.Tx("listMultipleNFTForSale",
+		WithSigner("user1"),
+		WithArg("nftAliasOrIdentifiers", nftIdentifiers),
+		WithArg("ids", saleIds),
+		WithArg("ftAliasOrIdentifiers", ftIdentifiers),
+		WithArg("directSellPrices", prices),
+		WithArg("validUntil", time+100000.0))
 
-	// fmt.Println(saleIds)
+	fmt.Println(saleIds)
 
-	// o.Tx("buyMultipleNFTForSale",
-	// 	WithSigner("user2"),
-	// 	WithAddresses("users", sellers...),
-	// 	WithArg("ids", saleIds),
-	// 	WithArg("amounts", prices),
-	// 	WithMaxGas(2300),
-	// )
+	o.Tx("buyMultipleNFTForSale",
+		WithSigner("user2"),
+		WithAddresses("users", sellers...),
+		WithArg("ids", saleIds),
+		WithArg("amounts", prices),
+		WithMaxGas(2300),
+	)
 
 }
