@@ -55,7 +55,6 @@ func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 
 const leaseDurationFloat = 31536000.0
 const lockDurationFloat = 7776000.0
-const auctionDurationFloat = 86400.0
 
 func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
 	otu.T.Helper()
@@ -528,16 +527,8 @@ pub fun main() :  UFix64 {
 	return res
 }
 
-func (otu *OverflowTestUtils) expireAuction() *OverflowTestUtils {
-	return otu.tickClock(auctionDurationFloat)
-}
-
 func (otu *OverflowTestUtils) expireLease() *OverflowTestUtils {
 	return otu.tickClock(leaseDurationFloat)
-}
-
-func (otu *OverflowTestUtils) expireLock() *OverflowTestUtils {
-	return otu.tickClock(lockDurationFloat)
 }
 
 func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
@@ -2219,22 +2210,6 @@ func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *Overflow
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Moved", map[string]interface{}{
 			"name": name,
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTestUtils {
-
-	otu.O.Tx("cancelNameAuction",
-		WithSigner(owner),
-		WithArg("names", []string{name}),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"name":       name,
-			"sellerName": owner,
-			"status":     "cancel_listing",
 		})
 
 	return otu
