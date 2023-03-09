@@ -312,14 +312,14 @@
 			"source": "./contracts/community/Wearables.cdc",
 			"aliases": {
 				"mainnet": "0xe81193c424cfd3fb",
-				"testnet": "0x1e0493ee604e7598"
+				"testnet": "0x1c5033ad60821c97"
 			}
 		},
 		"Templates": {
 			"source": "./contracts/community/Templates.cdc",
 			"aliases": {
 				"mainnet": "0xe81193c424cfd3fb",
-				"testnet": "0x1e0493ee604e7598"
+				"testnet": "0x1c5033ad60821c97"
 			}
 		},
 		"ProfileCache": "./contracts/ProfileCache.cdc",
