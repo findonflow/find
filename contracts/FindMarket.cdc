@@ -1619,6 +1619,10 @@ pub contract FindMarket {
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
 
+		access(contract) fun getProfile(_ addr: Address) : &Profile.User{Profile.Public}? {
+			return getAccount(addr).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow()
+		}
+
 		pub fun getListingTypeIdentifier(): String {
 			return self.getType().identifier
 		}
@@ -1631,9 +1635,20 @@ pub contract FindMarket {
 			return FIND.reverseLookup(self.getPointer().owner())
 		}
 
+		pub fun getSellerProfile() : &Profile.User{Profile.Public}? {
+			return self.getProfile(self.getSeller())
+		}
+
 		pub fun getBuyerName() : String? {
 			if let b = self.getBuyer() {
 				return FIND.reverseLookup(b)
+			}
+			return nil
+		}
+
+		pub fun getBuyerProfile() : &Profile.User{Profile.Public}? {
+			if let b = self.getBuyer() {
+				return self.getProfile(b)
 			}
 			return nil
 		}

@@ -1,9 +1,7 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
-import Profile from "./Profile.cdc"
 import FindMarket from "./FindMarket.cdc"
 
 /*
@@ -149,7 +147,7 @@ pub contract FindMarketSale {
 			let buyerName=saleItem.getBuyerName()
 			let sellerName=saleItem.getSellerName()
 
-			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: sellerName, amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: Profile.find(nftCap.address).getAvatar() ,endsAt:saleItem.validUntil)
+			emit Sale(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:self.owner!.address, sellerName: sellerName, amount: saleItem.getBalance(), status:"sold", vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: saleItem.getBuyerProfile()?.getAvatar() ,endsAt:saleItem.validUntil)
 
 			FindMarket.pay(tenant:tenant.name, id:id, saleItem: saleItem, vault: <- vault, royalty:saleItem.getRoyalty(), nftInfo:nftInfo, cuts:cuts)
 

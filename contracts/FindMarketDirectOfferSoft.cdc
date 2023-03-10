@@ -1,12 +1,9 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
 import FindMarket from "./FindMarket.cdc"
-import Profile from "./Profile.cdc"
 
 pub contract FindMarketDirectOfferSoft {
 
@@ -160,14 +157,14 @@ pub contract FindMarketDirectOfferSoft {
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
 			let buyerName=saleItem.getBuyerName()
-			let profile = Profile.find(buyer)
+			let profile = saleItem.getBuyerProfile()
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(false)
 			}
 
-			emit DirectOffer(tenant:tenant.name, id: saleItem.getId(), saleID: saleItem.uuid, seller:self.owner!.address, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
+			emit DirectOffer(tenant:tenant.name, id: saleItem.getId(), saleID: saleItem.uuid, seller:self.owner!.address, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
 			destroy <- self.items.remove(key: id)
 		}
@@ -195,11 +192,11 @@ pub contract FindMarketDirectOfferSoft {
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
 			let buyerName=saleItem.getBuyerName()
-			let profile = Profile.find(buyer)
+			let profile = saleItem.getBuyerProfile()
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
+			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
 		}
 
@@ -229,11 +226,11 @@ pub contract FindMarketDirectOfferSoft {
 				let balance=saleItemRef.getBalance()
 				let buyer=callback.address
 				let buyerName=saleItemRef.getBuyerName()
-				let profile = Profile.find(buyer)
+				let profile = saleItemRef.getBuyerProfile()
 
 				let nftInfo=saleItemRef.toNFTInfo(true)
 
-				emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:owner, sellerName: saleItemRef.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItemRef.validUntil, previousBuyer:nil, previousBuyerName:nil)
+				emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItemRef.uuid, seller:owner, sellerName: saleItemRef.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItemRef.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
 
 				return
@@ -274,11 +271,11 @@ pub contract FindMarketDirectOfferSoft {
 			let owner=self.owner!.address
 			let buyer=saleItem.getBuyer()!
 			let buyerName=saleItem.getBuyerName()
-			let profile = Profile.find(buyer)
+			let profile = saleItem.getBuyerProfile()
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
+			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 
 		}
 
@@ -301,14 +298,14 @@ pub contract FindMarketDirectOfferSoft {
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
 			let buyerName=saleItem.getBuyerName()
-			let profile = Profile.find(buyer)
+			let profile = saleItem.getBuyerProfile()
 
 			var nftInfo:FindMarket.NFTInfo?=nil
 			if saleItem.checkPointer() {
 				nftInfo=saleItem.toNFTInfo(false)
 			}
 
-			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
+			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
 			if !saleItem.offerCallback.check() {
 				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(saleItem.offerCallback.address.toString()))
@@ -350,11 +347,11 @@ pub contract FindMarketDirectOfferSoft {
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
 			let buyerName=saleItem.getBuyerName()
-			let profile = Profile.find(buyer)
+			let profile = saleItem.getBuyerProfile()
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
+			emit DirectOffer(tenant:tenant.name, id: id, saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 		}
 
 		/// this is called from a bid when a seller accepts
@@ -392,11 +389,11 @@ pub contract FindMarketDirectOfferSoft {
 			let buyer=saleItem.getBuyer()!
 			let buyerName=saleItem.getBuyerName()
 			let sellerName=saleItem.getSellerName()
-			let profile = Profile.find(buyer)
+			let profile = saleItem.getBuyerProfile()
 
 			let nftInfo=saleItem.toNFTInfo(true)
 
-			emit DirectOffer(tenant:tenant.name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: sellerName, amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
+			emit DirectOffer(tenant:tenant.name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: sellerName, amount: balance, status:status, vaultType: ftType.identifier, nft:nftInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:nil, previousBuyerName:nil)
 
 			let royalty=saleItem.getRoyalty()
 			saleItem.acceptNonEscrowedBid()

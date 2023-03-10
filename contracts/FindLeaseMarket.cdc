@@ -324,8 +324,12 @@ pub contract FindLeaseMarket {
 		pub let uuid: UInt64
 
 		pub fun valid() : Bool
-		pub fun getUUID() :UInt64
-		pub fun getLease() : FIND.LeaseInformation
+		pub fun getUUID() :UInt64{
+			return self.uuid
+		}
+		pub fun getLease() : FIND.LeaseInformation {
+			return self.borrow().getLease(self.name) ?? panic("The owner doesn't hold the lease anymore".concat(self.name))
+		}
 		pub fun owner() : Address
 		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic}
 	}
@@ -353,14 +357,6 @@ pub contract FindLeaseMarket {
 
 		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic} {
 			return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
-		}
-
-		pub fun getLease() : FIND.LeaseInformation {
-			return self.borrow().getLease(self.name) ?? panic("The owner doesn't hold the lease anymore".concat(self.name))
-		}
-
-		pub fun getUUID() :UInt64{
-			return self.uuid
 		}
 
 		pub fun owner() : Address {
@@ -402,14 +398,6 @@ pub contract FindLeaseMarket {
 
 		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic} {
 			return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
-		}
-
-		pub fun getLease() : FIND.LeaseInformation {
-			return self.borrow().getLease(self.name) ?? panic("The owner doesn't hold the lease anymore".concat(self.name))
-		}
-
-		pub fun getUUID() :UInt64{
-			return self.uuid
 		}
 
 		pub fun valid() : Bool {
@@ -503,29 +491,75 @@ pub contract FindLeaseMarket {
 	pub resource interface SaleItem {
 		//this is the type of sale this is, active, cancelled etc
 		pub fun getSaleType(): String
-		pub fun getSeller(): Address
+		access(contract) fun getPointer() : {LeasePointer}
 		pub fun getBuyer(): Address?
-
-		pub fun getSellerName() : String?
-		pub fun getBuyerName() : String?
-
-		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo
-		pub fun checkPointer() : Bool
-		pub fun getListingType() : Type
-		pub fun getListingTypeIdentifier(): String
-
-		//the Type of the item for sale
-		pub fun getItemType(): Type
-		//The id of the nft for sale
-		pub fun getLeaseName() : String
-
 		pub fun getBalance(): UFix64
-		pub fun getAuction(): AuctionItem?
 		pub fun getFtType() : Type //The type of FT used for this sale item
 		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
-
 		pub fun getSaleItemExtraField() : {String : AnyStruct}
-		pub fun getId() : UInt64
+
+		access(contract) fun getProfile(_ addr: Address) : &Profile.User{Profile.Public}? {
+			return getAccount(addr).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow()
+		}
+
+		pub fun getSeller(): Address {
+			return self.getPointer().owner()
+		}
+
+		pub fun getSellerName() : String? {
+			return FIND.reverseLookup(self.getPointer().owner())
+		}
+
+		pub fun getSellerProfile() : &Profile.User{Profile.Public}? {
+			return self.getProfile(self.getSeller())
+		}
+
+		pub fun getBuyerName() : String? {
+			if let b = self.getBuyer() {
+				return FIND.reverseLookup(b)
+			}
+			return nil
+		}
+
+		pub fun getBuyerProfile() : &Profile.User{Profile.Public}? {
+			if let b = self.getBuyer() {
+				return self.getProfile(b)
+			}
+			return nil
+		}
+
+		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo {
+			return FindLeaseMarket.LeaseInfo(self.getPointer())
+		}
+
+		pub fun checkPointer() : Bool {
+			return self.getPointer().valid()
+		}
+
+		pub fun getListingType() : Type {
+			return self.getType()
+		}
+
+		pub fun getListingTypeIdentifier(): String {
+			return self.getType().identifier
+		}
+
+		//the Type of the item for sale
+		pub fun getItemType() : Type {
+			return Type<@FIND.Lease>()
+		}
+		//The id of the nft for sale
+		pub fun getLeaseName() : String {
+			return self.getPointer().name
+		}
+
+		pub fun getAuction(): AuctionItem? {
+			return nil
+		}
+
+		pub fun getId() : UInt64 {
+			return self.getPointer().getUUID()
+		}
 	}
 
 	pub resource interface Bid {
@@ -736,6 +770,10 @@ pub contract FindLeaseMarket {
 			}
 			counter = counter + 1
 		}
+	}
+
+	pub fun getCurrentOwner(_ name: String) : Address? {
+		return FIND.status(name).owner
 	}
 
 	init() {

@@ -1,9 +1,5 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
-import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindLeaseMarket from "./FindLeaseMarket.cdc"
 
@@ -41,6 +37,10 @@ pub contract FindLeaseMarketAuctionSoft {
 			self.saleItemExtraField=saleItemExtraField
 		}
 
+		access(contract) fun getPointer() : {FindLeaseMarket.LeasePointer} {
+			return self.pointer
+		}
+
 		//Here we do not get a vault back, it is sent in to the method itself
 		pub fun acceptNonEscrowedBid() {
 			pre{
@@ -58,35 +58,11 @@ pub contract FindLeaseMarketAuctionSoft {
 			return self.auctionStartPrice
 		}
 
-		pub fun getSeller() : Address {
-			return self.pointer.owner()
-		}
-
-		pub fun getSellerName() : String? {
-			let address = self.pointer.owner()
-			return FIND.reverseLookup(address)
-		}
-
 		pub fun getBuyer() : Address? {
 			if let cb= self.offerCallback {
 				return cb.address
 			}
 			return nil
-		}
-
-		pub fun getId() : UInt64{
-			return self.pointer.getUUID()
-		}
-
-		pub fun getBuyerName() : String? {
-			if let cb= self.offerCallback {
-				return FIND.reverseLookup(cb.address)
-			}
-			return nil
-		}
-
-		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo {
-			return FindLeaseMarket.LeaseInfo(self.pointer)
 		}
 
 		pub fun setAuctionStarted(_ startedAt: UFix64) {
@@ -159,22 +135,6 @@ pub contract FindLeaseMarketAuctionSoft {
 			return "active_listed"
 		}
 
-		pub fun getListingType() : Type {
-			return Type<@SaleItem>()
-		}
-
-		pub fun getListingTypeIdentifier() : String {
-			return Type<@SaleItem>().identifier
-		}
-
-		pub fun getLeaseName() : String {
-			return self.pointer.name
-		}
-
-		pub fun getItemType() : Type {
-			return Type<@FIND.Lease>()
-		}
-
 		pub fun getAuction(): FindLeaseMarket.AuctionItem? {
 			return FindLeaseMarket.AuctionItem(startPrice: self.auctionStartPrice,
 			currentPrice: self.getBalance(),
@@ -198,10 +158,6 @@ pub contract FindLeaseMarketAuctionSoft {
 				return self.auctionEndsAt
 			}
 			return self.auctionValidUntil
-		}
-
-		pub fun checkPointer() : Bool {
-			return self.pointer.valid()
 		}
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
@@ -241,7 +197,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			return self.tenantCapability.borrow()!
 		}
 
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String,previousBuyer:Address?) {
+		access(self) fun emitEvent(saleItem: &SaleItem, status: String,previousBuyer:Address?,previousBuyerName:String?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
 			let balance=saleItem.getBalance()
@@ -254,18 +210,9 @@ pub contract FindLeaseMarketAuctionSoft {
 				leaseInfo=saleItem.toLeaseInfo()
 			}
 
-			var previousBuyerName : String?=nil
-			if let pb= previousBuyer {
-				previousBuyerName = FIND.reverseLookup(pb)
-			}
-
-			if buyer != nil {
-				let buyerName=FIND.reverseLookup(buyer!)
-				let profile = FIND.lookup(buyer!.toString())
-				emit EnglishAuction(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, leaseInfo: leaseInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-			} else {
-				emit EnglishAuction(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:seller, sellerName: FIND.reverseLookup(seller), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, leaseInfo: leaseInfo,  buyer: nil, buyerName: nil, buyerAvatar: nil, endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-			}
+			let buyerName=saleItem.getBuyerName()
+			let profile = saleItem.getBuyerProfile()
+			emit EnglishAuction(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:seller, sellerName: saleItem.getSellerName(), amount: balance, auctionReservePrice: saleItem.auctionReservePrice,  status: status, vaultType:saleItem.vaultType.identifier, leaseInfo: leaseInfo,  buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.auctionEndsAt, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 		}
 
 		pub fun getListingType() : Type {
@@ -298,9 +245,11 @@ pub contract FindLeaseMarketAuctionSoft {
 			}
 
 			var previousBuyer:Address?=nil
+			var previousBuyerName:String?=nil
 			if newOffer.address != previousOffer.address {
 				previousOffer.borrow()!.cancelBidFromSaleItem(name)
 				previousBuyer=previousOffer.address
+				previousBuyerName=saleItem.getBuyerName()
 			}
 
 			saleItem.setCallback(newOffer)
@@ -310,7 +259,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			if suggestedEndTime > saleItem.auctionEndsAt! {
 				saleItem.setAuctionEnds(suggestedEndTime)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer)
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:previousBuyer,previousBuyerName:previousBuyerName)
 
 		}
 
@@ -376,7 +325,7 @@ pub contract FindLeaseMarketAuctionSoft {
 			saleItem.setAuctionStarted(timestamp)
 			saleItem.setAuctionEnds(endsAt)
 
-			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "active_ongoing", previousBuyer:nil,previousBuyerName:nil)
 		}
 
 		pub fun cancel(_ name: String) {
@@ -404,7 +353,7 @@ pub contract FindLeaseMarketAuctionSoft {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: status, previousBuyer:nil,previousBuyerName:nil)
 
 			if saleItem.offerCallback != nil && saleItem.offerCallback!.check() {
 				saleItem.offerCallback!.borrow()!.cancelBidFromSaleItem(name)
@@ -448,7 +397,7 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			let leaseInfo=saleItem.toLeaseInfo()
 
-			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil,previousBuyerName:nil)
 			saleItem.acceptNonEscrowedBid()
 
 			FindLeaseMarket.pay(tenant:self.getTenant().name, leaseName:name, saleItem: saleItem, vault: <- vault, leaseInfo:leaseInfo, cuts:cuts)
@@ -494,7 +443,7 @@ pub contract FindLeaseMarketAuctionSoft {
 
 			self.items[pointer.name] <-! saleItem
 			let saleItemRef = self.borrow(pointer.name)
-			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItemRef, status: "active_listed", previousBuyer:nil,previousBuyerName:nil)
 		}
 
 		pub fun getNameSales(): [String] {
@@ -615,11 +564,11 @@ pub contract FindLeaseMarketAuctionSoft {
 
 		pub fun bid(name: String, amount:UFix64, vaultType:Type, bidExtraField: {String : AnyStruct}) {
 			pre {
-				self.owner!.address != FIND.status(name).owner!  : "You cannot bid on your own resource"
+				self.owner!.address != FindLeaseMarket.getCurrentOwner(name)  : "You cannot bid on your own resource"
 				self.bids[name] == nil : "You already have an bid for this item, use increaseBid on that bid"
 			}
 
-			let from=getAccount(FIND.status(name).owner!).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
+			let from=getAccount(FindLeaseMarket.getCurrentOwner(name)!).getCapability<&SaleItemCollection{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
 			let bid <- create Bid(from: from, leaseName:name, vaultType: vaultType, balance:amount, bidExtraField: bidExtraField)
 			let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for lease name=".concat(name))

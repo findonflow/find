@@ -1,10 +1,6 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
 import Clock from "./Clock.cdc"
 import Debug from "./Debug.cdc"
-import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindLeaseMarket from "./FindLeaseMarket.cdc"
 
@@ -25,6 +21,10 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			self.offerCallback=callback
 			self.validUntil=validUntil
 			self.saleItemExtraField=saleItemExtraField
+		}
+
+		access(contract) fun getPointer() : {FindLeaseMarket.LeasePointer} {
+			return self.pointer
 		}
 
 		access(contract) fun acceptEscrowedBid() : @FungibleToken.Vault {
@@ -51,61 +51,16 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			return self.offerCallback.borrow()!.getBalance(self.getLeaseName())
 		}
 
-		pub fun getSeller() : Address {
-			return self.pointer.owner()
-		}
-
-		pub fun getSellerName() : String? {
-			let address = self.pointer.owner()
-			return FIND.reverseLookup(address)
-		}
-
-
 		pub fun getBuyer() : Address? {
 			return self.offerCallback.address
-		}
-
-		pub fun getBuyerName() : String? {
-			if let name = FIND.reverseLookup(self.offerCallback.address) {
-				return name
-			}
-			return nil
-		}
-
-		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo{
-			return FindLeaseMarket.LeaseInfo(self.pointer)
 		}
 
 		pub fun getSaleType() : String {
 			return "active_ongoing"
 		}
 
-		pub fun getListingType() : Type {
-			return Type<@SaleItem>()
-		}
-
-		pub fun getListingTypeIdentifier() : String {
-			return Type<@SaleItem>().identifier
-		}
-
 		pub fun setPointer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
 			self.pointer=pointer
-		}
-
-		pub fun getLeaseName() : String {
-			return self.pointer.name
-		}
-
-		pub fun getItemType() : Type {
-			return Type<@FIND.Lease>()
-		}
-
-		pub fun getAuction(): FindLeaseMarket.AuctionItem? {
-			return nil
-		}
-
-		pub fun getId() : UInt64 {
-			return self.pointer.getUUID()
 		}
 
 		pub fun setValidUntil(_ time: UFix64?) {
@@ -118,10 +73,6 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 
 		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
 			self.offerCallback=callback
-		}
-
-		pub fun checkPointer() : Bool {
-			return self.pointer.valid()
 		}
 
 		pub fun getSaleItemExtraField() : {String : AnyStruct} {
@@ -169,25 +120,20 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			return Type<@SaleItem>()
 		}
 
-		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?) {
+		access(self) fun emitEvent(saleItem: &SaleItem, status: String, previousBuyer:Address?, previousBuyerName: String?) {
 			let owner=saleItem.getSeller()
 			let ftType=saleItem.getFtType()
 			let balance=saleItem.getBalance()
 			let buyer=saleItem.getBuyer()!
-			let buyerName=FIND.reverseLookup(buyer)
-			let profile = FIND.lookup(buyer.toString())
+			let buyerName=saleItem.getBuyerName()
+			let profile=saleItem.getBuyerProfile()
 
 			var leaseInfo:FindLeaseMarket.LeaseInfo?=nil
 			if saleItem.checkPointer() {
 				leaseInfo=saleItem.toLeaseInfo()
 			}
 
-			var previousBuyerName : String?=nil
-			if let pb= previousBuyer {
-				previousBuyerName = FIND.reverseLookup(pb)
-			}
-
-			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: FIND.reverseLookup(owner), amount: balance, status:status, vaultType: ftType.identifier, leaseInfo:leaseInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
+			emit DirectOffer(tenant:self.getTenant().name, id: saleItem.getId(), saleID: saleItem.uuid, seller:owner, sellerName: saleItem.getSellerName(), amount: balance, status:status, vaultType: ftType.identifier, leaseInfo:leaseInfo, buyer: buyer, buyerName: buyerName, buyerAvatar: profile?.getAvatar(), endsAt: saleItem.validUntil, previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
 		}
 
 		//this is called when a buyer cancel a direct offer
@@ -202,7 +148,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "cancel", previousBuyer: nil)
+			self.emitEvent(saleItem: saleItem, status: "cancel", previousBuyer: nil, previousBuyerName: nil)
 
 			destroy <- self.items.remove(key: name)
 		}
@@ -219,7 +165,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			if !actionResult.allowed {
 				panic(actionResult.message)
 			}
-			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:nil, previousBuyerName: nil)
 		}
 
 		//This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
@@ -238,7 +184,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 
 				self.items[name] <-! saleItem
 				let saleItemRef=self.borrow(name)
-				self.emitEvent(saleItem: saleItemRef, status: "active_offered", previousBuyer:nil)
+				self.emitEvent(saleItem: saleItemRef, status: "active_offered", previousBuyer:nil, previousBuyerName: nil)
 				return
 			}
 
@@ -263,12 +209,13 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			}
 			//somebody else has the highest item so we cancel it
 			let previousBuyer=saleItem.offerCallback.address
+			let previousBuyerName=saleItem.getBuyerName()
 			let previousCB = saleItem.offerCallback.borrow() ?? panic("Previous bidder unlinked the bid collection capability. bidder address : ".concat(previousBuyer.toString()))
 			previousCB.cancelBidFromSaleItem(name)
 			saleItem.setValidUntil(validUntil)
 			saleItem.setCallback(callback)
 
-			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:previousBuyer)
+			self.emitEvent(saleItem: saleItem, status: "active_offered", previousBuyer:previousBuyer, previousBuyerName: previousBuyerName)
 
 		}
 
@@ -286,7 +233,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 				panic(actionResult.message)
 			}
 
-			self.emitEvent(saleItem: saleItem, status: "cancel_rejected", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "cancel_rejected", previousBuyer:nil, previousBuyerName: nil)
 			if !saleItem.offerCallback.check() {
 				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(saleItem.offerCallback.address.toString()))
 			}
@@ -316,7 +263,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 			//Set the auth pointer in the saleItem so that it now can be fulfilled
 			saleItem.setPointer(pointer)
 
-			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil)
+			self.emitEvent(saleItem: saleItem, status: "sold", previousBuyer:nil, previousBuyerName: nil)
 
 			let cuts= tenant.getCuts(name: actionResult.name, listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType())
 			let leaseInfo = saleItem.toLeaseInfo()
@@ -424,7 +371,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 
 		access(contract) fun accept(_ name: String) : @FungibleToken.Vault {
 			// check that the bidder already has the name
-			assert(FIND.status(name).owner! == self.owner!.address, message: "The lease is not transferred. Offer cannot be fulfilled")
+			assert(FindLeaseMarket.getCurrentOwner(name) == self.owner!.address, message: "The lease is not transferred. Offer cannot be fulfilled")
 
 			let bid <- self.bids.remove(key: name) ?? panic("missing bid")
 			let vaultRef = &bid.vault as &FungibleToken.Vault
@@ -462,7 +409,7 @@ pub contract FindLeaseMarketDirectOfferEscrow {
 				panic("Valid until is before current time")
 			}
 
-			let owner = FIND.status(name).owner!
+			let owner = FindLeaseMarket.getCurrentOwner(name)!
 			if self.owner!.address == owner {
 				panic("You cannot bid on your own resource")
 			}
