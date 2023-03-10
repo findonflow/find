@@ -195,11 +195,15 @@ func TestNameVoucher(t *testing.T) {
 								"minCharLength": tf.NameVoucherLength,
 								"findName":      name,
 								"action":        tf.ExpectedAction,
-							}).
-							AssertEvent(t, "Register", map[string]interface{}{
-								"owner": otu.O.Address(user),
-								"name":  name,
 							})
+						e := "Register"
+						if tf.ExpectedAction == "renew" {
+							e = "Renew"
+						}
+						res.AssertEvent(t, e, map[string]interface{}{
+							"owner": otu.O.Address(user),
+							"name":  name,
+						})
 						return
 					}
 					res.AssertFailure(t, fmt.Sprintf("You are trying to register a %d character name, but the voucher can only support names with minimun character of %d", len(name), tf.NameVoucherLength))

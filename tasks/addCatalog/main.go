@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	network := "mainnet"
+	network := "testnet"
 	o := Overflow(
 		WithNetwork(network),
 	)
@@ -15,12 +15,12 @@ func main() {
 	case "testnet":
 		o.Tx("adminAddNFTCatalog",
 			WithSigner("find-admin"),
-			WithArg("collectionIdentifier", "Gaia"),
-			WithArg("contractName", "Gaia"),
-			WithArg("contractAddress", "0x40e47dca6a761db7"),
-			WithArg("addressWithNFT", "0x8fb4a6a11757b80d"),
-			WithArg("nftID", 15536),
-			WithArg("publicPathIdentifier", "GaiaCollection001"),
+			WithArg("collectionIdentifier", "NameVoucher"),
+			WithArg("contractName", "NameVoucher"),
+			WithArg("contractAddress", "0x35717efbbce11c74"),
+			WithArg("addressWithNFT", "0x35717efbbce11c74"),
+			WithArg("nftID", 138511757),
+			WithArg("publicPathIdentifier", "nameVoucher"),
 		).
 			Print()
 
