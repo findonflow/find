@@ -1540,7 +1540,7 @@ func (otu *OverflowTestUtils) retractOfferDirectOfferLeaseEscrow(buyer, seller, 
 
 	otu.O.Tx("retractOfferLeaseMarketDirectOfferEscrow",
 		WithSigner(buyer),
-		WithArg("leaseName", name),
+		WithArg("leaseNames", []string{name}),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
@@ -1629,7 +1629,6 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketAuctionEscrow(user string, name 
 	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 		WithSigner(user),
 		WithArg("leaseName", name),
-		WithArg("amount", price),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FindLeaseMarketAuctionEscrow.EnglishAuction", map[string]interface{}{

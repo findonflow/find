@@ -238,7 +238,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertFailure(t, "Auction has not ended yet")
 
@@ -328,8 +327,9 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 
 		otu.tickClock(500.0)
 
-		bitTx("fulfillLeaseMarketAuctionEscrow",
-			WithArg("amount", 30.0),
+		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
 		).
 			AssertSuccess(t)
 
@@ -409,7 +409,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
@@ -419,7 +418,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertSuccess(t)
 
@@ -475,7 +473,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", 10.0),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
@@ -519,7 +516,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
@@ -534,7 +530,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertSuccess(t)
 
@@ -561,7 +556,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertFailure(t, "Buyer banned by Tenant")
 
@@ -571,7 +565,6 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price+5.0),
 		).
 			AssertSuccess(t)
 

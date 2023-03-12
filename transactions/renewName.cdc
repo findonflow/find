@@ -4,8 +4,8 @@ import FIND from "../contracts/FIND.cdc"
 transaction(name: String, amount: UFix64) {
 
 	let price : UFix64
-	let vaultRef : &FUSD.Vault? 
-	let finLeases : &FIND.LeaseCollection? 
+	let vaultRef : &FUSD.Vault?
+	let finLeases : &FIND.LeaseCollection?
 
 	prepare(acct: AuthAccount) {
 		self.price=FIND.calculateCost(name)
