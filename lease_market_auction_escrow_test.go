@@ -27,7 +27,7 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 	otu.setUUID(500)
 
 	eventIdentifier := otu.identifier("FindLeaseMarketAuctionEscrow", "EnglishAuction")
-	// royaltyIdentifier := otu.identifier("FindLeaseMarket", "RoyaltyPaid")
+	royaltyIdentifier := otu.identifier("FindLeaseMarket", "RoyaltyPaid")
 
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 
@@ -454,146 +454,146 @@ func TestLeaseMarketAuctionEscrow(t *testing.T) {
 		otu.delistAllLeaseForEscrowAuction("user1")
 	})
 
-	// /* Testing on Royalties */
+	/* Testing on Royalties */
 
-	// // platform 0.15
-	// // artist 0.05
-	// // find 0.025
-	// // tenant nil
-	// t.Run("Royalties should be sent to correspondence upon fulfill action", func(t *testing.T) {
+	// platform 0.15
+	// artist 0.05
+	// find 0.025
+	// tenant nil
+	t.Run("Royalties should be sent to correspondence upon fulfill action", func(t *testing.T) {
 
-	// 	price = 5.0
+		price = 5.0
 
-	// 	otu.listLeaseForEscrowAuction("user1", "name1", price).
-	// 		saleLeaseListed("user1", "active_listed", price).
-	// 		auctionBidLeaseMarketEscrow("user2", "name1", price+5.0)
+		otu.listLeaseForEscrowAuction("user1", "name1", price).
+			saleLeaseListed("user1", "active_listed", price).
+			auctionBidLeaseMarketEscrow("user2", "name1", price+5.0)
 
-	// 	otu.tickClock(500.0)
+		otu.tickClock(500.0)
 
-	// 	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name1"),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, royaltyIdentifier, map[string]interface{}{
-	// 			"address":     otu.O.Address("find"),
-	// 			"amount":      0.25,
-	// 			"royaltyName": "find",
-	// 		})
+		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
+				"address":     otu.O.Address("find"),
+				"amount":      0.25,
+				"royaltyName": "find",
+			})
 
-	// 	otu.moveNameTo("user2", "user1", "name1")
-	// })
+		otu.moveNameTo("user2", "user1", "name1")
+	})
 
-	// t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
+	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 
-	// 	otu.listLeaseForEscrowAuction("user1", "name1", price).
-	// 		listLeaseForEscrowAuction("user1", "name2", price).
-	// 		auctionBidLeaseMarketEscrow("user2", "name1", price+5.0).
-	// 		tickClock(400.0).
-	// 		leaseProfileBan("user1")
+		otu.listLeaseForEscrowAuction("user1", "name1", price).
+			listLeaseForEscrowAuction("user1", "name2", price).
+			auctionBidLeaseMarketEscrow("user2", "name1", price+5.0).
+			tickClock(400.0).
+			leaseProfileBan("user1")
 
-	// 	otu.O.Tx("listLeaseForAuctionEscrow",
-	// 		WithSigner("user1"),
-	// 		WithArg("leaseName", "name3"),
-	// 		WithArg("ftAliasOrIdentifier", "Flow"),
-	// 		WithArg("price", price),
-	// 		WithArg("auctionReservePrice", price+5.0),
-	// 		WithArg("auctionDuration", 300.0),
-	// 		WithArg("auctionExtensionOnLateBid", 60.0),
-	// 		WithArg("minimumBidIncrement", 1.0),
-	// 		WithArg("auctionValidUntil", otu.currentTime()+10.0),
-	// 		WithArg("auctionStartTime", nil),
-	// 	).
-	// 		AssertFailure(t, "Seller banned by Tenant")
+		otu.O.Tx("listLeaseForAuctionEscrow",
+			WithSigner("user1"),
+			WithArg("leaseName", "name3"),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("price", price),
+			WithArg("auctionReservePrice", price+5.0),
+			WithArg("auctionDuration", 300.0),
+			WithArg("auctionExtensionOnLateBid", 60.0),
+			WithArg("minimumBidIncrement", 1.0),
+			WithArg("auctionValidUntil", otu.currentTime()+10.0),
+			WithArg("auctionStartTime", nil),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
-	// 	otu.O.Tx("bidLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name2"),
-	// 		WithArg("amount", price),
-	// 	).
-	// 		AssertFailure(t, "Seller banned by Tenant")
+		otu.O.Tx("bidLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name2"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
-	// 	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name1"),
-	// 	).
-	// 		AssertFailure(t, "Seller banned by Tenant")
+		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertFailure(t, "Seller banned by Tenant")
 
-	// 	otu.O.Tx("cancelLeaseMarketAuctionEscrow",
-	// 		WithSigner("user1"),
-	// 		WithArg("leaseNames", `["name2"]`),
-	// 	).
-	// 		AssertSuccess(t)
+		otu.O.Tx("cancelLeaseMarketAuctionEscrow",
+			WithSigner("user1"),
+			WithArg("leaseNames", `["name2"]`),
+		).
+			AssertSuccess(t)
 
-	// 	otu.removeLeaseProfileBan("user1")
+		otu.removeLeaseProfileBan("user1")
 
-	// 	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name1"),
-	// 	).
-	// 		AssertSuccess(t)
+		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertSuccess(t)
 
-	// 	otu.delistAllLeaseForEscrowAuction("user1").
-	// 		moveNameTo("user2", "user1", "name1")
+		otu.delistAllLeaseForEscrowAuction("user1").
+			moveNameTo("user2", "user1", "name1")
 
-	// })
+	})
 
-	// t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
+	t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
 
-	// 	otu.listLeaseForEscrowAuction("user1", "name1", price).
-	// 		listLeaseForEscrowAuction("user1", "name2", price).
-	// 		auctionBidLeaseMarketEscrow("user2", "name1", price+5.0).
-	// 		tickClock(400.0).
-	// 		leaseProfileBan("user2")
+		otu.listLeaseForEscrowAuction("user1", "name1", price).
+			listLeaseForEscrowAuction("user1", "name2", price).
+			auctionBidLeaseMarketEscrow("user2", "name1", price+5.0).
+			tickClock(400.0).
+			leaseProfileBan("user2")
 
-	// 	otu.O.Tx("bidLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name2"),
-	// 		WithArg("amount", price),
-	// 	).
-	// 		AssertFailure(t, "Buyer banned by Tenant")
+		otu.O.Tx("bidLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name2"),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "Buyer banned by Tenant")
 
-	// 	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name1"),
-	// 	).
-	// 		AssertFailure(t, "Buyer banned by Tenant")
+		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertFailure(t, "Buyer banned by Tenant")
 
-	// 	/* Reset */
-	// 	otu.removeLeaseProfileBan("user2")
+		/* Reset */
+		otu.removeLeaseProfileBan("user2")
 
-	// 	otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
-	// 		WithSigner("user2"),
-	// 		WithArg("leaseName", "name1"),
-	// 	).
-	// 		AssertSuccess(t)
+		otu.O.Tx("fulfillLeaseMarketAuctionEscrow",
+			WithSigner("user2"),
+			WithArg("leaseName", "name1"),
+		).
+			AssertSuccess(t)
 
-	// 	otu.delistAllLeaseForEscrowAuction("user1").
-	// 		moveNameTo("user2", "user1", "name1")
+		otu.delistAllLeaseForEscrowAuction("user1").
+			moveNameTo("user2", "user1", "name1")
 
-	// })
+	})
 
-	// t.Run("Should emit previous bidder if outbid", func(t *testing.T) {
+	t.Run("Should emit previous bidder if outbid", func(t *testing.T) {
 
-	// 	otu.listLeaseForEscrowAuction("user1", "name1", price).
-	// 		saleLeaseListed("user1", "active_listed", price).
-	// 		auctionBidLeaseMarketEscrow("user2", "name1", price+5.0).
-	// 		saleLeaseListed("user1", "active_ongoing", price+5.0)
+		otu.listLeaseForEscrowAuction("user1", "name1", price).
+			saleLeaseListed("user1", "active_listed", price).
+			auctionBidLeaseMarketEscrow("user2", "name1", price+5.0).
+			saleLeaseListed("user1", "active_ongoing", price+5.0)
 
-	// 	otu.O.Tx("bidLeaseMarketAuctionEscrow",
-	// 		WithSigner("user3"),
-	// 		WithArg("leaseName", "name1"),
-	// 		WithArg("amount", 20.0),
-	// 	).
-	// 		AssertSuccess(t).
-	// 		AssertEvent(t, eventIdentifier, map[string]interface{}{
-	// 			"amount":        20.0,
-	// 			"buyer":         otu.O.Address("user3"),
-	// 			"previousBuyer": otu.O.Address("user2"),
-	// 			"status":        "active_ongoing",
-	// 		})
+		otu.O.Tx("bidLeaseMarketAuctionEscrow",
+			WithSigner("user3"),
+			WithArg("leaseName", "name1"),
+			WithArg("amount", 20.0),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, eventIdentifier, map[string]interface{}{
+				"amount":        20.0,
+				"buyer":         otu.O.Address("user3"),
+				"previousBuyer": otu.O.Address("user2"),
+				"status":        "active_ongoing",
+			})
 
-	// 	otu.delistAllLeaseForEscrowAuction("user1")
-	// })
+		otu.delistAllLeaseForEscrowAuction("user1")
+	})
 
 }
