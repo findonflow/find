@@ -88,7 +88,7 @@ func TestLeaseMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.O.Tx("retractOfferLeaseMarketDirectOfferEscrow",
 			WithSigner("user2"),
-			WithArg("leaseName", "name1"),
+			WithArg("leaseNames", []string{"name1"}),
 		).
 			AssertSuccess(t)
 
@@ -334,7 +334,7 @@ func TestLeaseMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.O.Tx("retractOfferLeaseMarketDirectOfferEscrow",
 			WithSigner("user2"),
-			WithArg("leaseName", "name1"),
+			WithArg("leaseNames", []string{"name1"}),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 

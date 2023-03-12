@@ -1,7 +1,7 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarketDirectOfferEscrow from "../contracts/FindLeaseMarketDirectOfferEscrow.cdc"
 
-transaction(leaseName: String) {
+transaction(leaseNames: [String]) {
 	let bidsReference: &FindLeaseMarketDirectOfferEscrow.MarketBidCollection?
 
 	prepare(account: AuthAccount) {
@@ -16,7 +16,9 @@ transaction(leaseName: String) {
 	}
 
 	execute {
-		self.bidsReference!.cancelBid(leaseName)
+		for n in leaseNames {
+			self.bidsReference!.cancelBid(n)
+		}
 	}
 }
 

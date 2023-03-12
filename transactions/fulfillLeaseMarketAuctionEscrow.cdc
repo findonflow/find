@@ -1,7 +1,7 @@
 import FindLeaseMarketAuctionEscrow from "../contracts/FindLeaseMarketAuctionEscrow.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-transaction(leaseName: String, amount:UFix64) {
+transaction(leaseName: String) {
 
 	let bidsReference: &FindLeaseMarketAuctionEscrow.MarketBidCollection
 
