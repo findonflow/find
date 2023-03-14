@@ -59,7 +59,15 @@ pub contract NameVoucher: NonFungibleToken {
 
 		pub fun resolveView(_ view: Type): AnyStruct? {
 
-			let imageFile=NameVoucher.thumbnail
+			var imageFile=NameVoucher.thumbnail
+
+			switch self.minCharLength {
+				case 3 :
+					imageFile = MetadataViews.IPFSFile(cid: "QmYMtXfFcgpJgm3Mhy68r6cuHTCMMcucVUpYTVeSRTWLTh", path: nil)
+
+				case 4 :
+					imageFile = MetadataViews.IPFSFile(cid: "QmWpQRvGudYrkZw6rKKTrkghkYKs4wt3KQGzxcXJ8JmuSc", path: nil)
+			}
 
 			let name= self.minCharLength.toString().concat("-characters .find name voucher")
 			let description ="The owner of this voucher can claim OR extend any available / owned .find name of ".concat(self.minCharLength.toString()).concat(" characters or more. \nThis voucher is single-use only and will be destroyed after any registration or extension of .find name.\nIf the voucher was airdropped then you will find it in your inbox ready to be claimed or used. If it is already in your collection then it is already claimed and can be used in one of two ways:\n- To register a new name, login and search for the name using the top search bar. If it is available you will have the option to either Register or Use Voucher. Click Use Voucher and follow the prompts to register that name using your voucher. Once successful the voucher will be burnt and you will have the chosen name in your account\n- To extend an existing name. Log in to find and go to the Names tab in your dashboard. Click Manage on the name you wish to extend and if you have this voucher in that account you will an option of Use Voucher underneath Extend. Click that and follow the prompts. On success you will have extended your lease and the voucher will be burnt.")
@@ -89,8 +97,8 @@ pub contract NameVoucher: NonFungibleToken {
 					squareImage: squareImage,
 					bannerImage: bannerImage,
 					socials: {
-						"discord": MetadataViews.ExternalURL("https://t.co/iY7AhEumR9"),
-						"twitter" : MetadataViews.ExternalURL("https://twitter.com/Bl0xNFT")
+						"discord": MetadataViews.ExternalURL("https://discord.gg/findonflow"),
+						"twitter" : MetadataViews.ExternalURL("https://twitter.com/findonflow")
 					}
 				)
 
@@ -175,8 +183,8 @@ pub contract NameVoucher: NonFungibleToken {
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-			let bl0x = nft as! &NFT
-			return bl0x as &AnyResource{MetadataViews.Resolver}
+			let vr = nft as! &NFT
+			return vr as &AnyResource{MetadataViews.Resolver}
 		}
 
 		pub fun redeem(id: UInt64, name: String) {
@@ -260,7 +268,8 @@ pub contract NameVoucher: NonFungibleToken {
 				description: "network"
 			)
 		]
-		self.thumbnail = MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg")
+		// 5 - letter Thumbnail
+		self.thumbnail = MetadataViews.IPFSFile(cid: "QmWj3bwRfksGXvFQYoWtjdycD68cp4xRGMJonnDibsN6Rz", path: nil)
 
 		// Set the named paths
 		self.CollectionStoragePath = /storage/nameVoucher

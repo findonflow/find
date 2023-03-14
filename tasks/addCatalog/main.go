@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	network := "mainnet"
+	network := "testnet"
 	o := Overflow(
 		WithNetwork(network),
 	)
@@ -13,28 +13,41 @@ func main() {
 	switch network {
 
 	case "testnet":
+		o.Tx(`
+			import NameVoucher from "../contracts/NameVoucher.cdc"
+
+			transaction(){
+				execute{
+					NameVoucher.setThumbnail()
+				}
+			}
+			`,
+			WithSigner("find-admin"),
+		).
+			Print()
+
 		o.Tx("adminAddNFTCatalog",
 			WithSigner("find-admin"),
-			WithArg("collectionIdentifier", "Gaia"),
-			WithArg("contractName", "Gaia"),
-			WithArg("contractAddress", "0x40e47dca6a761db7"),
-			WithArg("addressWithNFT", "0x8fb4a6a11757b80d"),
-			WithArg("nftID", 15536),
-			WithArg("publicPathIdentifier", "GaiaCollection001"),
+			WithArg("collectionIdentifier", "Name Voucher"),
+			WithArg("contractName", "NameVoucher"),
+			WithArg("contractAddress", "0x35717efbbce11c74"),
+			WithArg("addressWithNFT", "0x35717efbbce11c74"),
+			WithArg("nftID", 138511503),
+			WithArg("publicPathIdentifier", "nameVoucher"),
 		).
 			Print()
 
 	case "mainnet":
-		o.Tx("adminAddNFTCatalog",
-			WithSigner("find-admin"),
-			WithArg("collectionIdentifier", "Gaia"),
-			WithArg("contractName", "Gaia"),
-			WithArg("contractAddress", "8b148183c28ff88f"),
-			WithArg("addressWithNFT", "0x886f3aeaf848c535"),
-			WithArg("nftID", 8782),
-			WithArg("publicPathIdentifier", "GaiaCollection001"),
-		).
-			Print()
+		// o.Tx("adminAddNFTCatalog",
+		// 	WithSigner("find-admin"),
+		// 	WithArg("collectionIdentifier", "Gaia"),
+		// 	WithArg("contractName", "Gaia"),
+		// 	WithArg("contractAddress", "8b148183c28ff88f"),
+		// 	WithArg("addressWithNFT", "0x886f3aeaf848c535"),
+		// 	WithArg("nftID", 8782),
+		// 	WithArg("publicPathIdentifier", "GaiaCollection001"),
+		// ).
+		// 	Print()
 	}
 
 }
