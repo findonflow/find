@@ -90,9 +90,10 @@ pub contract NameVoucher: NonFungibleToken {
 				let externalURL = MetadataViews.ExternalURL("https://find.xyz/")
 				let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"), mediaType: "image")
 				let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1674733461/1500x500"), mediaType: "image")
+				let desc = "Name Vouchers can be used to claim or extend any available .find name of 3-characters or more, depending on voucher rarity. Vouchers can be used only once and will be destroyed after use. Enjoy!"
 				return MetadataViews.NFTCollectionDisplay(
 					name: "NameVoucher",
-					description: "The owner of this voucher can claim OR extend any available / owned .find names.\nThis voucher is single-use only and will be destroyed after any registration or extension of .find name.\nIf the voucher was airdropped then you will find it in your inbox ready to be claimed or used. If it is already in your collection then it is already claimed and can be used in one of two ways:\n- To register a new name, login and search for the name using the top search bar. If it is available you will have the option to either Register or Use Voucher. Click Use Voucher and follow the prompts to register that name using your voucher. Once successful the voucher will be burnt and you will have the chosen name in your account\n- To extend an existing name. Log in to find and go to the Names tab in your dashboard. Click Manage on the name you wish to extend and if you have this voucher in that account you will an option of Use Voucher underneath Extend. Click that and follow the prompts. On success you will have extended your lease and the voucher will be burnt.",
+					description: desc,
 					externalURL: externalURL,
 					squareImage: squareImage,
 					bannerImage: bannerImage,
