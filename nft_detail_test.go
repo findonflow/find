@@ -188,7 +188,7 @@ func TestNFTDetailScript(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
+		actual, err := otu.O.Script("getNFTDetailsNFTCatalogCommunity",
 			WithArg("user", "user1"),
 			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", ids[1]),
