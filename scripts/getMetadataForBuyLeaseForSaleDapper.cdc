@@ -14,7 +14,7 @@ pub fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :Purchas
 	let saleItemRef = getAuthAccount(address).borrow<&FindLeaseMarketSale.SaleItemCollection>(from: storagePath) ?? panic("Cannot borrow reference to sale item")
 	let saleItem = saleItemRef.borrow(leaseName)
 
-	let description = "Name :".concat(leaseName).concat(" for Dapper Credit ").concat(amount.toString())
+	let description = "Name :".concat(leaseName).concat(" for DUC ").concat(amount.toString())
 	let imageURL = "https://i.imgur.com/8W8NoO1.png"
 
 	return PurchaseData(
