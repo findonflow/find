@@ -5,37 +5,27 @@ import FIND from "../contracts/FIND.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
 pub struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
-	pub let storefront: FindUserStatus.StorefrontListing?
-	pub let storefrontV2: FindUserStatus.StorefrontListing?
-	pub let flowty: FindUserStatus.FlowtyListing?
-	pub let flowtyRental: FindUserStatus.FlowtyRental?
-	pub let flovatar: FindUserStatus.FlovatarListing?
-	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
 	pub let dapperAllowedListingActions: {String : ListingTypeReport}
 	pub let linkedForMarket : Bool?
 
 
-	init(findMarket:{String : FindMarket.SaleItemInformation}, storefront: FindUserStatus.StorefrontListing?, storefrontV2: FindUserStatus.StorefrontListing?, flowty: FindUserStatus.FlowtyListing?, flowtyRental: FindUserStatus.FlowtyRental? , flovatar: FindUserStatus.FlovatarListing? , flovatarComponent: FindUserStatus.FlovatarComponentListing? , nftDetail: NFTDetail?, allowedListingActions: {String : ListingTypeReport}, dapperAllowedListingActions: {String : ListingTypeReport}, linkedForMarket : Bool?) {
+	init(findMarket:{String : FindMarket.SaleItemInformation},
+		 nftDetail: NFTDetail?,
+		 allowedListingActions: {String : ListingTypeReport},
+		 dapperAllowedListingActions: {String : ListingTypeReport},
+		 linkedForMarket : Bool?) {
 		self.findMarket=findMarket
-		self.storefront=storefront
-		self.storefrontV2=storefrontV2
-		self.flowty=flowty
-		self.flowtyRental=flowtyRental
-		self.flovatar=flovatar
-		self.flovatarComponent=flovatarComponent
 		self.nftDetail=nftDetail
 		self.allowedListingActions=allowedListingActions
 		self.dapperAllowedListingActions=dapperAllowedListingActions
 		self.linkedForMarket = linkedForMarket
 	}
 }
-
 
 pub struct ListingTypeReport {
 	pub let ftAlias: [String]
@@ -257,8 +247,6 @@ pub struct NFTCollectionDisplay {
 	}
 }
 
-pub var counter = 0
-
 pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user)
 	if resolveAddress == nil {
@@ -273,8 +261,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		let linkedForMarket = account.getCapability<&{MetadataViews.ResolverCollection}>(getPublicPath(project)).check()
 
 		let storagePath = getStoragePath(project)
-		let publicPath = PublicPath(identifier: "find_temp_path_".concat(counter.toString()))!
-		counter = counter + 1
+		let publicPath = PublicPath(identifier: "find_temp_path")!
 		account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
 		let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
 		if !cap.check() {
@@ -310,14 +297,13 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 		}
 
 		let nftType = pointer.itemType
-		let listingsV1 = FindUserStatus.getStorefrontListing(user: address, id : id, type: nftType)
-		let listingsV2 = FindUserStatus.getStorefrontV2Listing(user: address, id : id, type: nftType)
-		let flowty = FindUserStatus.getFlowtyListing(user: address, id : id, type: nftType)
-		let flowtyRental = FindUserStatus.getFlowtyRentals(user: address, id : id, type: nftType)
-		let flovatar = FindUserStatus.getFlovatarListing(user: address, id : id, type: nftType)
-		let flovatarComponent = FindUserStatus.getFlovatarComponentListing(user: address, id : id, type: nftType)
 
-		return NFTDetailReport(findMarket:findMarket, storefront:listingsV1, storefrontV2: listingsV2, flowty:flowty, flowtyRental:flowtyRental, flovatar:flovatar, flovatarComponent:flovatarComponent, nftDetail: nftDetail, allowedListingActions: report, dapperAllowedListingActions: dapperReport, linkedForMarket : linkedForMarket)
+		return NFTDetailReport(
+			findMarket:findMarket,
+			nftDetail: nftDetail,
+			allowedListingActions: report,
+			dapperAllowedListingActions: dapperReport,
+			linkedForMarket : linkedForMarket)
 	}
 	return nil
 
