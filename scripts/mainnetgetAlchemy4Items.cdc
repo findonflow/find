@@ -29,7 +29,6 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
         }
     }
 
-
     pub struct MetadataCollectionItem {
         pub let id:UInt64
         pub let name: String
