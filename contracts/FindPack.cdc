@@ -705,7 +705,7 @@ pub contract FindPack: NonFungibleToken {
 
 			for royalty in metadata.primarySaleRoyalties.getRoyalties() {
 				if royalty.receiver.check(){
-					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
+					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * royalty.cut))
 				} else {
 					//to-do :  emit events here ?
 				}
@@ -714,7 +714,7 @@ pub contract FindPack: NonFungibleToken {
 			let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 			if wallet.check() {
 				let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
-				r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
+				r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * r.cut))
 			}
 
 			metadata.wallet.borrow()!.deposit(from: <- vault)
@@ -776,7 +776,7 @@ pub contract FindPack: NonFungibleToken {
 			var royaltiesPaid=false
 			for royalty in metadata.primarySaleRoyalties.getRoyalties() {
 				if royalty.receiver.check(){
-					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * royalty.cut))
+					royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * royalty.cut))
 					royaltiesPaid=true
 				} else {
 					//to-do :  emit events here ?
@@ -788,7 +788,7 @@ pub contract FindPack: NonFungibleToken {
 				let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 				if wallet.check() {
 					let r = MetadataViews.Royalty(receiver: wallet, cut: 0.10, description: ".find")
-					r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * r.cut))
+					r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * r.cut))
 				}
 			}
 
