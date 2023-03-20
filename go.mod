@@ -8,6 +8,7 @@ require (
 	github.com/onflow/cadence v0.31.0
 	github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20230207204031-95bd20a67160
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
+	github.com/samber/lo v1.37.0
 	github.com/sanity-io/litter v1.5.5
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/crypto v0.1.0
