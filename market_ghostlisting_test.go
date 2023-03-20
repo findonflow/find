@@ -245,7 +245,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to return ghost listings with script getStatus", func(t *testing.T) {
+	t.Run("Should be able to return ghost listings with script getFindMarket", func(t *testing.T) {
 		otu.setUUID(1400)
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price).
@@ -257,10 +257,10 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.buyNFTForMarketSale("user2", "user1", ids[0], price)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
-		).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow",
-			autogold.Want("getStatus", map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{"id": 1402, "listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem"}}}),
+		).AssertWithPointerWant(t, "/itemsForSale/FindMarketAuctionEscrow",
+			autogold.Want("getFindMarket", map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{"id": 1402, "listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem"}}}),
 		)
 
 		otu.sendDandy("user1", "user2", ids[0]).
@@ -268,7 +268,7 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to return ghost bids with script getStatus", func(t *testing.T) {
+	t.Run("Should be able to return ghost bids with script getFindMarket", func(t *testing.T) {
 		otu.setUUID(1800)
 		ids := otu.mintThreeExampleDandies()
 		otu.listNFTForSale("user1", ids[0], price).
@@ -283,10 +283,10 @@ func TestMarketGhostlistingTest(t *testing.T) {
 
 		otu.buyNFTForMarketSale("user2", "user1", ids[0], price)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user2"),
-		).AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow",
-			autogold.Want("getStatusBid", map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{"id": 1802, "listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.Bid"}}}),
+		).AssertWithPointerWant(t, "/marketBids/FindMarketAuctionEscrow",
+			autogold.Want("getFindMarketBid", map[string]interface{}{"ghosts": []interface{}{map[string]interface{}{"id": 1802, "listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.Bid"}}}),
 		)
 
 		otu.sendDandy("user1", "user2", ids[0]).
@@ -334,10 +334,10 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			WithArg("soulBound", true),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
+			AssertWithPointerWant(t, "/itemsForSale/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
 				autogold.Want("soulBoundGhost", otu.identifier("FindMarketAuctionEscrow", "SaleItem")),
 			)
 
@@ -349,10 +349,10 @@ func TestMarketGhostlistingTest(t *testing.T) {
 			WithArg("amount", price+5.0),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user2"),
 		).Print().
-			AssertWithPointerWant(t, "/FINDReport/marketBids/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
+			AssertWithPointerWant(t, "/marketBids/FindMarketAuctionEscrow/ghosts/0/listingTypeIdentifier",
 				autogold.Want("Bid", otu.identifier("FindMarketAuctionEscrow", "Bid")),
 			)
 	})
