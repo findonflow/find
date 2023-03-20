@@ -199,7 +199,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/relatedAccounts",
+			AssertWithPointerWant(t, "/relatedAccounts",
 				autogold.Want("getStatus Dapper", map[string]interface{}{"Flow_dapper": []interface{}{otu.O.Address("user2")}}))
 
 		otu.O.Tx("removeRelatedAccountDapper",
@@ -220,7 +220,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerError(t, "/FINDReport/relatedAccounts",
+			AssertWithPointerError(t, "/relatedAccounts",
 				"Object has no key 'relatedAccounts'")
 
 	})
@@ -235,7 +235,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/privateMode",
+			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode true", true),
 			)
 
@@ -247,7 +247,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/privateMode",
+			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode false", false),
 			)
 
@@ -259,7 +259,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", nameAddress),
 		).AssertWithPointerWant(t,
-			"/FINDReport",
+			"/",
 			autogold.Want("getStatus", map[string]interface{}{
 				"activatedAccount": true, "isDapper": false, "privateMode": false,
 				"readyForWearables": false,
@@ -274,7 +274,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", nameAddress),
 		).AssertWithPointerError(t,
-			"/FINDReport/profile/findName",
+			"/profile/findName",
 			"Object has no key 'findName'",
 		)
 	})
@@ -298,7 +298,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
-			"/FINDReport/profile/links/FindTwitter",
+			"/profile/links/FindTwitter",
 			autogold.Want("getStatus Find twitter", map[string]interface{}{
 				"title": "find",
 				"type":  "Twitter",
@@ -323,7 +323,7 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerError(t,
-			"/FINDReport/profile/links/FindTwitter",
+			"/profile/links/FindTwitter",
 			"Object has no key 'FindTwitter'",
 		)
 
