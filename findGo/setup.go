@@ -63,7 +63,7 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 
 	wearable, err := o.QualifiedIdentifier("Wearables", "NFT")
 	ot.assertErr(err)
-	res = o.Tx("tenantsetMarketOptionDUC",
+	res = o.Tx("tenantsetMarketOptionDapper",
 		WithSigner(name),
 		WithArg("nftName", "Wearables"),
 		WithArg("nftTypes", []string{wearable}),
