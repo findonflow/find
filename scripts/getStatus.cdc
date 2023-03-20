@@ -11,13 +11,14 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import Wearables from "../contracts/community/Wearables.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 import Clock from "../contracts/Clock.cdc"
+import LostAndFound from "../contracts/standard/LostAndFound.cdc"
 
 pub struct FINDReport{
 	pub let isDapper: Bool
 	pub let profile:Profile.UserReport?
 	pub let privateMode: Bool
 	pub let activatedAccount: Bool
-	pub let lostAndFoundTypes: {String : String}
+	pub let hasLostAndFoundItem: Bool
 	pub let accounts : [AccountInformation]?
 	//not sure
 	pub let readyForWearables : Bool?
@@ -27,11 +28,12 @@ pub struct FINDReport{
 	privateMode: Bool,
 	activatedAccount: Bool,
 	isDapper: Bool,
+	hasLostAndFoundItem: Bool,
 	accounts: [AccountInformation]?,
 	readyForWearables: Bool?,
 	paths: [String]) {
 
-		self.lostAndFoundTypes={}
+		self.hasLostAndFoundItem=hasLostAndFoundItem
 		self.profile=profile
 		self.privateMode=privateMode
 		self.activatedAccount=activatedAccount
@@ -210,12 +212,21 @@ pub fun main(user: String) : FINDReport? {
 		let path = p.toString()
 		paths.append(path.slice(from: storage.length, upTo: path.length))
 	}
+
+	var hasLostAndFoundItem : Bool = false
+	for t in LostAndFound.getRedeemableTypes(address) {
+		if t.isSubtype(of: Type<@NonFungibleToken.NFT>()) {
+			hasLostAndFoundItem = true
+			break
+		}
+	}
+
 	return FINDReport(
 		profile: profileReport,
 		privateMode: profile?.isPrivateModeEnabled() ?? false,
-
 		activatedAccount: true,
 		isDapper:isDapper,
+		hasLostAndFoundItem: hasLostAndFoundItem,
 		accounts: accounts,
 		readyForWearables: readyForWearables,
 		paths:paths
