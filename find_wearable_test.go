@@ -71,7 +71,7 @@ func TestFindWearables(t *testing.T) {
 			"getStatus",
 			WithArg("user", user2),
 		).
-			AssertWithPointerWant(t, "/FINDReport/readyForWearables", autogold.Want("should be ready", true))
+			AssertWithPointerWant(t, "/readyForWearables", autogold.Want("should be ready", true))
 
 	})
 
@@ -82,7 +82,7 @@ func TestFindWearables(t *testing.T) {
 			"getStatus",
 			WithArg("user", user3),
 		).
-			AssertWithPointerWant(t, "/FINDReport/readyForWearables", autogold.Want("should be not ready", false))
+			AssertWithPointerWant(t, "/readyForWearables", autogold.Want("should be not ready", false))
 
 	})
 
