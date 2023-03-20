@@ -199,8 +199,14 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/relatedAccounts",
-				autogold.Want("getStatus Dapper", map[string]interface{}{"Flow_dapper": []interface{}{otu.O.Address("user2")}}))
+			AssertWithPointerWant(t, "/accounts/0",
+				autogold.Want("getStatus Dapper", map[string]interface{}{
+					"address": otu.O.Address("user2"),
+					"name":    "dapper",
+					"network": "Flow",
+					"node":    "FindRelatedAccounts",
+					"trusted": false,
+				}))
 
 		otu.O.Tx("removeRelatedAccountDapper",
 			WithSigner("user1"),
@@ -220,8 +226,8 @@ func TestFINDDapper(t *testing.T) {
 		otu.O.Script("getStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerError(t, "/relatedAccounts",
-				"Object has no key 'relatedAccounts'")
+			AssertWithPointerError(t, "/accounts",
+				"Object has no key 'accounts'")
 
 	})
 
@@ -258,11 +264,14 @@ func TestFINDDapper(t *testing.T) {
 		nameAddress := otu.O.Address("user3")
 		otu.O.Script("getStatus",
 			WithArg("user", nameAddress),
-		).AssertWithPointerWant(t,
-			"/",
+		).AssertWant(t,
 			autogold.Want("getStatus", map[string]interface{}{
-				"activatedAccount": true, "isDapper": false, "privateMode": false,
-				"readyForWearables": false,
+				"activatedAccount":    true,
+				"hasLostAndFoundItem": false,
+				"isDapper":            false,
+				"paths":               []interface{}{"flowTokenVault"},
+				"privateMode":         false,
+				"readyForWearables":   false,
 			}),
 		)
 	})
