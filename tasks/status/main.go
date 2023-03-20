@@ -1,11 +1,7 @@
 package main
 
 import (
-	"os"
-
 	. "github.com/bjartek/overflow"
-	"github.com/samber/lo"
-	"github.com/sanity-io/litter"
 )
 
 func main() {
@@ -14,35 +10,51 @@ func main() {
 		WithNetwork(network),
 	)
 
-	input := os.Args[1]
+	o.Script(`
 
-	user := o.Script("getInfo", WithArg("user", input))
+import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
+pub fun main() : AnyStruct {
+ let types =FindLeaseMarket.getSaleItemCollectionTypes()
 
-	var address string
-	user.MarshalPointerAs("/profile/address", &address)
+ 
+ let allTypes : [String]=[]
+ for type in types {
+ 	allTypes.append(FindMarket.getMarketOptionFromType(type))
+ }
+ return allTypes
+}
+`).Print()
+	/*
+	   input := os.Args[1]
 
-	var paths []string
-	user.MarshalPointerAs("/paths", &paths)
+	   	user := o.Script("getInfo", WithArg("user", input))
 
-	pathChunks := lo.Chunk(paths, 25)
+	   	var address string
+	   	user.MarshalPointerAs("/profile/address", &address)
 
-	allReports := map[string][]uint64{}
-	for _, c := range pathChunks {
-		nfts := o.Script("getNFTIds", WithArg("address", address), WithArg("targetPaths", c))
+	   	var paths []string
+	   	user.MarshalPointerAs("/paths", &paths)
 
-		var report map[string][]uint64
-		nfts.MarshalAs(&report)
+	   	pathChunks := lo.Chunk(paths, 25)
 
-		for col, ids := range report {
-			allReports[col] = ids
-		}
+	   	allReports := map[string][]uint64{}
+	   	for _, c := range pathChunks {
+	   		nfts := o.Script("getNFTIds", WithArg("address", address), WithArg("targetPaths", c))
 
-	}
+	   		var report map[string][]uint64
+	   		nfts.MarshalAs(&report)
 
-	litter.Dump(allReports)
-	collection := "GaiaCollection001"
-	itemRes := o.Script("getNFTItems", WithArg("address", address), WithArg("collection", collection), WithArg("ids", allReports[collection]))
+	   		for col, ids := range report {
+	   			allReports[col] = ids
+	   		}
 
-	itemRes.Print()
+	   	}
 
+	   	litter.Dump(allReports)
+	   	collection := "GaiaCollection001"
+	   	itemRes := o.Script("getNFTItems", WithArg("address", address), WithArg("collection", collection), WithArg("ids", allReports[collection]))
+
+	   	itemRes.Print()
+	*/
 }
