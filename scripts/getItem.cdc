@@ -47,7 +47,7 @@ pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataColle
 	}
 
 	let collection = resolverCollectionCap.borrow()!
-	let nft = collection.borrowViewResolver(id: id)!
+	let nft = collection.borrowViewResolver(id: id)
 
 	if let displayView = nft.resolveView(Type<MetadataViews.Display>()) {
 		let display = displayView as! MetadataViews.Display
