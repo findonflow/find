@@ -3,48 +3,59 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-pub fun main(address: Address, collection: String, ids: [UInt64]) :  { String : [MetadataCollectionItem]} {
 
-	let account = getAuthAccount(address)
+pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
-	let report : { String: [MetadataCollectionItem]}= { collection : []}
+	let report : { String: [MetadataCollectionItem]}= { }
+	let address = FIND.resolve(user)
+
+	if address==nil{
+		return report
+	}
+
+	let account = getAuthAccount(address!)
+
 	if account.balance == 0.0 {
 		return report
 	}
 
 
-	let storagePath = StoragePath(identifier:collection)!
-	let colRef = account.borrow<&NonFungibleToken.Collection>(from: storagePath)
-	if colRef ==nil{
-		return  report
+	for collection in collectionIDs.keys {
+		let ids = collectionIDs[collection]!
+
+		let storagePath = StoragePath(identifier:collection)!
+		let colRef = account.borrow<&NonFungibleToken.Collection>(from: storagePath)
+		if colRef ==nil{
+			return  report
+		}
+
+		let col = colRef!
+
+		let results : [MetadataCollectionItem] = []
+		var triedFetchingData=false
+		for i, id in ids {
+
+				let nft = col.borrowNFT(id: id)
+
+
+				let display=getDisplay(nft)
+				if display==nil{
+					continue;
+				}
+				let collectionDisplay=getCollectionDisplay(nft)
+				results.append(MetadataCollectionItem(
+					id: nft.id, 
+					uuid: nft.uuid, 
+					name: display!.name, 
+					collection: collectionDisplay?.name ?? collection, 
+					storagePath: collection, 
+					identifier:nft.getType().identifier,
+					media: display!.thumbnail.uri()
+				))
+		}
+
+		report[collection]=results
 	}
-
-	let col = colRef!
-
-	let results : [MetadataCollectionItem] = []
-	var triedFetchingData=false
-	for i, id in ids {
-
-			let nft = col.borrowNFT(id: id)
-
-
-			let display=getDisplay(nft)
-			if display==nil{
-				continue;
-			}
-			let collectionDisplay=getCollectionDisplay(nft)
-			results.append(MetadataCollectionItem(
-				id: nft.id, 
-				uuid: nft.uuid, 
-				name: display!.name, 
-				collection: collectionDisplay?.name ?? collection, 
-				storagePath: collection, 
-				identifier:nft.getType().identifier,
-				media: display!.thumbnail.uri()
-			))
-	}
-
-	report[collection]=results
 	return report
 }
 
@@ -54,8 +65,10 @@ pub struct MetadataCollectionItem {
 	pub let name: String
 	pub let collection: String 
 	pub let storagePath: String
-	pub let identifier:String
+	pub let nftDetailIdentifier:String
 	pub let media  : String
+	pub let mediaType  : String
+	pub let source  : String
 
 	init(id:UInt64, uuid:UInt64, name: String, collection: String, storagePath:String, identifier: String, media  : String) {
 		self.id=id
@@ -63,8 +76,10 @@ pub struct MetadataCollectionItem {
 		self.name=name
 		self.storagePath=storagePath
 		self.collection=collection
-		self.identifier=identifier
+		self.nftDetailIdentifier=identifier
 		self.media=media
+		self.mediaType="image"
+		self.source="views"
 	}
 }
 
