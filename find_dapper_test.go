@@ -32,7 +32,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("name", "user2"),
 			WithArg("amount", 5.0),
 		).AssertWant(t, autogold.Want("getMetadataForRegisterDapper", map[string]interface{}{
-			"amount": 5, "description": "Name :user2 for Dapper Credit 5.00000000",
+			"amount": 5, "description": "Name :user2 for DUC 5.00000000",
 			"id":       0,
 			"imageURL": "https://ik.imagekit.io/xyvsisxky/tr:ot-user2,ots-55,otc-58B792,ox-N166,oy-N24,ott-b/https://i.imgur.com/8W8NoO1.png",
 			"name":     "user2",
@@ -127,7 +127,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("name", "user1"),
 			WithArg("amount", 5.0),
 		).AssertWant(t, autogold.Want("getMetadataForRenewNameDapper", map[string]interface{}{
-			"amount": 5, "description": "Renew name :user1 for Dapper Credit 5.00000000",
+			"amount": 5, "description": "Renew name :user1 for DUC 5.00000000",
 			"id":       0,
 			"imageURL": "https://ik.imagekit.io/xyvsisxky/tr:ot-user1,ots-55,otc-58B792,ox-N166,oy-N24,ott-b/https://i.imgur.com/8W8NoO1.png",
 			"name":     "user1",
@@ -337,7 +337,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("addon", "forge"),
 			WithArg("amount", 10.0),
 		).AssertWant(t, autogold.Want("getMetadataForBuyAddonDapper", map[string]interface{}{
-			"amount": 10, "description": "Purchase addon forge for name :name1 for Dapper Credit 10.00000000",
+			"amount": 10, "description": "Purchase addon forge for name :name1 for DUC 10.00000000",
 			"id":       0,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",
