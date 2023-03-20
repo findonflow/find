@@ -32,10 +32,10 @@ func TestMarketOptionsContract(t *testing.T) {
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
-			"/FINDReport/itemsForSale",
+			"/itemsForSale",
 			autogold.Want("ghostListing", map[string]interface{}{"FindMarketAuctionEscrow": map[string]interface{}{"items": []interface{}{map[string]interface{}{
 				"amount": 10,
 				"auction": map[string]interface{}{
@@ -101,10 +101,10 @@ func TestMarketOptionsContract(t *testing.T) {
 
 		otu.acceptDirectOfferMarketEscrowed("user1", ids[0], "user2", price)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
-			"/FINDReport/itemsForSale",
+			"/itemsForSale",
 			autogold.Want("ghostBids", map[string]interface{}{"FindMarketAuctionEscrow": map[string]interface{}{
 				"ghosts": []interface{}{map[string]interface{}{
 					"id":                    602,
