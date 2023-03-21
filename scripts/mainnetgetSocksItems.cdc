@@ -46,46 +46,46 @@ pub fun getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTView] 
 			results.append(view)
 		}
 	}
-	
+
 	return results
 }
 
 pub struct CollectionReport {
-	pub let items : {String : [MetadataCollectionItem]} 
-	pub let collections : {String : Int} // mapping of collection to no. of ids 
-	pub let extraIDs : {String : [UInt64]} 
+	pub let items : {String : [MetadataCollectionItem]}
+	pub let collections : {String : Int} // mapping of collection to no. of ids
+	pub let extraIDs : {String : [UInt64]}
 
 	init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
-		self.items=items 
-		self.collections=collections 
+		self.items=items
+		self.collections=collections
 		self.extraIDs=extraIDs
 	}
 }
 
 pub struct MetadataCollectionItem {
 	pub let id:UInt64
+	pub let uuid:UInt64?
 	pub let name: String
 	pub let collection: String // <- This will be Alias unless they want something else
-	pub let subCollection: String? // <- This will be Alias unless they want something else
-	pub let nftDetailIdentifier: String
+	pub let project: String
 
 	pub let media  : String
-	pub let mediaType : String 
-	pub let source : String 
+	pub let mediaType : String
+	pub let source : String
 
-	init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
+	init(id:UInt64, uuid: UInt64?, name: String, collection: String, media  : String, mediaType : String, source : String, project: String) {
 		self.id=id
-		self.name=name 
-		self.collection=collection 
-		self.subCollection=subCollection 
-		self.media=media 
-		self.mediaType=mediaType 
+		self.name=name
+		self.uuid=uuid
+		self.collection=collection
+		self.media=media
+		self.mediaType=mediaType
 		self.source=source
-		self.nftDetailIdentifier=nftDetailIdentifier
+		self.project=project
 	}
 }
 
-// Helper function 
+// Helper function
 
 pub fun resolveAddress(user: String) : PublicAccount? {
 	let address = FIND.resolve(user)
@@ -96,14 +96,21 @@ pub fun resolveAddress(user: String) : PublicAccount? {
 }
 
 pub fun fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-	let source = "RaribleNFT"
-	let account = resolveAddress(user: user)
-	if account == nil { return {} }
-	if account!.balance == 0.0 {
+	let source = "getNFTDetailsSocks"
+	let acct = resolveAddress(user: user)
+	if acct == nil { return {} }
+	if acct!.balance == 0.0 {
 		return {}
 	}
+	let account = getAuthAccount(acct!.address)
 
 	let items : {String : [MetadataCollectionItem]} = {}
+
+	let tempPathStr = "RaribleNFTFIND"
+	let tempPublicPath = PublicPath(identifier: tempPathStr)!
+	account.link<&RaribleNFT.Collection>(tempPublicPath, target: RaribleNFT.collectionStoragePath)
+	let cap= account.getCapability<&RaribleNFT.Collection>(tempPublicPath)
+	let ref = cap.borrow()!
 
 	let fetchingIDs = collectionIDs
 	for project in fetchingIDs.keys {
@@ -114,17 +121,18 @@ pub fun fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {St
 			if !FlowverseSocksIds.contains(id) {
 				continue
 			}
-            
+			let nft = getAccount
+
 			let image = "https://img.rarible.com/prod/video/upload/t_video_big/prod-itemAnimations/FLOW-A.01ab36aaf654a13e.RaribleNFT:15029/b1cedf3"
 			let item = MetadataCollectionItem(
 				id: id,
+				uuid: ref.borrowNFT(id: id).uuid,
 				name: "Flowverse socks",
 				collection: "Flowverse socks",
-				subCollection: nil, 
 				media: image,
 				mediaType: "video",
-				source: source, 
-				nftDetailIdentifier: project 
+				source: source,
+				project: project
 			)
 			collectionItems.append(item)
 		}

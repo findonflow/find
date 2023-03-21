@@ -44,11 +44,11 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 				}
 				let collectionDisplay=getCollectionDisplay(nft)
 				results.append(MetadataCollectionItem(
-					id: nft.id, 
-					uuid: nft.uuid, 
-					name: display!.name, 
-					collection: collectionDisplay?.name ?? collection, 
-					storagePath: collection, 
+					id: nft.id,
+					uuid: nft.uuid,
+					name: display!.name,
+					collection: collectionDisplay?.name ?? collection,
+					storagePath: collection,
 					identifier:nft.getType().identifier,
 					media: display!.thumbnail.uri()
 				))
@@ -63,12 +63,13 @@ pub struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let uuid:UInt64
 	pub let name: String
-	pub let collection: String 
+	pub let collection: String
 	pub let storagePath: String
-	pub let nftDetailIdentifier:String
+	pub let nftIdentifier:String
 	pub let media  : String
 	pub let mediaType  : String
 	pub let source  : String
+	pub let project : String
 
 	init(id:UInt64, uuid:UInt64, name: String, collection: String, storagePath:String, identifier: String, media  : String) {
 		self.id=id
@@ -76,10 +77,11 @@ pub struct MetadataCollectionItem {
 		self.name=name
 		self.storagePath=storagePath
 		self.collection=collection
-		self.nftDetailIdentifier=identifier
+		self.nftIdentifier=identifier
 		self.media=media
 		self.mediaType="image"
-		self.source="views"
+		self.source="getNFTDetails"
+		self.project=storagePath
 	}
 }
 

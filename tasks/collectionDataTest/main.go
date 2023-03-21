@@ -12,6 +12,7 @@ func main() {
 
 	o := Overflow(
 		WithNetwork(network),
+		WithGlobalPrintOptions(),
 	)
 
 	prefix := network + "get"

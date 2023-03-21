@@ -32,24 +32,24 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 
     pub struct MetadataCollectionItem {
         pub let id:UInt64
+        pub let uuid:UInt64?
         pub let name: String
         pub let collection: String // <- This will be Alias unless they want something else
-        pub let subCollection: String? // <- This will be Alias unless they want something else
-        pub let nftDetailIdentifier: String
+        pub let project: String
 
         pub let media  : String
         pub let mediaType : String
         pub let source : String
 
-        init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
+        init(id:UInt64, uuid: UInt64?, name: String, collection: String, media  : String, mediaType : String, source : String, project: String) {
             self.id=id
             self.name=name
+			self.uuid=uuid
             self.collection=collection
-            self.subCollection=subCollection
             self.media=media
             self.mediaType=mediaType
             self.source=source
-            self.nftDetailIdentifier=nftDetailIdentifier
+            self.project=project
         }
     }
 
@@ -68,7 +68,7 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
     // Fetch Specific Collections in Shard 2
     ////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "Shard2"
+        let source = "getNFTDetailsShard2"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
         if account!.balance == 0.0 {
@@ -109,13 +109,13 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 
                 let item = MetadataCollectionItem(
                     id: nft!.id,
+					uuid: nft!.uuid,
                     name: nft!.title ?? "",
                     collection: project,
-                    subCollection: nil,
                     media: media,
                     mediaType: mediaType,
                     source: source,
-                    nftDetailIdentifier: project
+                    project: project
                 )
                 collectionItems.append(item)
             }
