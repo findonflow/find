@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/bjartek/overflow"
@@ -15,10 +16,11 @@ func main() {
 
 	input := os.Args[1]
 
-	// o.Script("getNameSearchbar", WithArg("name", input)).
-	// 	Print()
+	o.Script("getNameSearchbar", WithArg("name", input)).
+		Print()
 
-	user := o.Script("getFindStatus", WithArg("user", input))
+	user := o.Script("getFindStatus", WithArg("user", input)).
+		Print()
 
 	var address string
 	err := user.MarshalPointerAs("/profile/address", &address)
@@ -64,21 +66,25 @@ func main() {
 		Print()
 
 	// NFT Items (Alchemy)
-	// alCollection := "Moments"
-	// o.Script(fmt.Sprintf("%s%s", o.Network, "getAlchemy4Items"), WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{alCollection: allReports[alCollection]})).
-	// 	Print()
+	alCollection := "Moments"
+	o.Script(fmt.Sprintf("%s%s", o.Network, "getAlchemy4Items"), WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{alCollection: allReports[alCollection]})).
+		Print()
 
 	// NFT Details
-	// project := "FlovatarCollection"
-	// o.Script("getNFTDetails", WithArg("user", address), WithArg("project", project), WithArg("id", allReports[project][0]), WithArg("views", []string{})).
-	// 	Print()
+	project := "FlovatarCollection"
+	o.Script("getNFTDetails", WithArg("user", address), WithArg("project", project), WithArg("id", allReports[project][0]), WithArg("views", []string{})).
+		Print()
+
+	if true {
+		return
+	}
 
 	// Find Market
-	// o.Script("getFindMarket", WithArg("user", address)).
-	// 	Print()
+	o.Script("getFindMarket", WithArg("user", address)).
+		Print()
 
 	// Find Lease Market
-	// o.Script("getFindLeaseMarket", WithArg("user", address)).
-	// 	Print()
+	o.Script("getFindLeaseMarket", WithArg("user", address)).
+		Print()
 
 }
