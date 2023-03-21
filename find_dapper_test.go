@@ -196,11 +196,11 @@ func TestFINDDapper(t *testing.T) {
 				"action":     "add",
 			})
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/accounts/0",
-				autogold.Want("getStatus Dapper", map[string]interface{}{
+				autogold.Want("getFindStatus Dapper", map[string]interface{}{
 					"address": otu.O.Address("user2"),
 					"name":    "dapper",
 					"network": "Flow",
@@ -223,7 +223,7 @@ func TestFINDDapper(t *testing.T) {
 				"network":    "Flow",
 			})
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerError(t, "/accounts",
@@ -238,7 +238,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("mode", true),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/privateMode",
@@ -250,7 +250,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("mode", false),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/privateMode",
@@ -259,13 +259,13 @@ func TestFINDDapper(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus of new user", func(t *testing.T) {
 
 		nameAddress := otu.O.Address("user3")
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
 		).AssertWant(t,
-			autogold.Want("getStatus", map[string]interface{}{
+			autogold.Want("getFindStatus", map[string]interface{}{
 				"activatedAccount":    true,
 				"hasLostAndFoundItem": false,
 				"isDapper":            false,
@@ -280,7 +280,7 @@ func TestFINDDapper(t *testing.T) {
 
 		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
 		).AssertWithPointerError(t,
 			"/profile/findName",
@@ -304,11 +304,11 @@ func TestFINDDapper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
 			"/profile/links/FindTwitter",
-			autogold.Want("getStatus Find twitter", map[string]interface{}{
+			autogold.Want("getFindStatus Find twitter", map[string]interface{}{
 				"title": "find",
 				"type":  "Twitter",
 				"url":   "https://twitter.com/findonflow",
@@ -329,7 +329,7 @@ func TestFINDDapper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerError(t,
 			"/profile/links/FindTwitter",
