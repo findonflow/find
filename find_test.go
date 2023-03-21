@@ -173,11 +173,11 @@ func TestFIND(t *testing.T) {
 				"action":     "add",
 			})
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/accounts/0",
-				autogold.Want("getStatus Dapper", map[string]interface{}{
+				autogold.Want("getFindStatus Dapper", map[string]interface{}{
 					"address": otu.O.Address("user2"),
 					"name":    "dapper",
 					"network": "Flow",
@@ -199,7 +199,7 @@ func TestFIND(t *testing.T) {
 				"action":     "remove",
 			})
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerError(t, "/accounts",
@@ -214,7 +214,7 @@ func TestFIND(t *testing.T) {
 			WithArg("mode", true),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/privateMode",
@@ -226,7 +226,7 @@ func TestFIND(t *testing.T) {
 			WithArg("mode", false),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			AssertWithPointerWant(t, "/privateMode",
@@ -235,13 +235,13 @@ func TestFIND(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus of new user", func(t *testing.T) {
 
 		nameAddress := otu.O.Address("user3")
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
 		).AssertWant(t,
-			autogold.Want("getStatus", map[string]interface{}{
+			autogold.Want("getFindStatus", map[string]interface{}{
 				"activatedAccount":    true,
 				"hasLostAndFoundItem": false,
 				"isDapper":            false,
@@ -256,7 +256,7 @@ func TestFIND(t *testing.T) {
 
 		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
 		).AssertWithPointerError(t,
 			"/profile/findName",
@@ -280,11 +280,11 @@ func TestFIND(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
 			"/profile/links/FindTwitter",
-			autogold.Want("getStatus Find twitter", map[string]interface{}{
+			autogold.Want("getFindStatus Find twitter", map[string]interface{}{
 				"title": "find",
 				"type":  "Twitter",
 				"url":   "https://twitter.com/findonflow",
@@ -305,7 +305,7 @@ func TestFIND(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerError(t,
 			"/profile/links/FindTwitter",
@@ -439,7 +439,7 @@ func TestFIND(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to getStatus of an FREE lease", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus of an FREE lease", func(t *testing.T) {
 		res := otu.O.Script("getNameSearchbar",
 			WithArg("name", "lease"),
 		).
@@ -448,7 +448,7 @@ func TestFIND(t *testing.T) {
 		assert.NoError(t, res.Err)
 	})
 
-	t.Run("Should be able to getStatus of an TAKEN lease", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus of an TAKEN lease", func(t *testing.T) {
 		otu.registerUserWithName("user1", "lease")
 		res := otu.O.Script("getNameSearchbar",
 			WithArg("name", "lease"),
@@ -465,13 +465,13 @@ func TestFIND(t *testing.T) {
 		assert.NoError(t, res.Err)
 	})
 
-	t.Run("Should be able to getStatus of an LOCKED lease", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus of an LOCKED lease", func(t *testing.T) {
 		otu.expireLease()
 		res := otu.O.Script("getNameSearchbar",
 			WithArg("name", "lease"),
 		).
 			Print().
-			AssertWant(t, autogold.Want("getStatus, LOCKED", map[string]interface{}{
+			AssertWant(t, autogold.Want("getFindStatus, LOCKED", map[string]interface{}{
 				"avatar":         "This is avatar",
 				"cost":           5,
 				"lockedUntil":    1.33920005e+08,
@@ -565,7 +565,7 @@ func TestFIND(t *testing.T) {
 
 	})
 
-	t.Run("Should be able to getStatus for trusted accounts", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus for trusted accounts", func(t *testing.T) {
 
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
@@ -588,7 +588,7 @@ func TestFIND(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
 			Print().

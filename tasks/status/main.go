@@ -16,7 +16,7 @@ func main() {
 
 	input := os.Args[1]
 
-	user := o.Script("getStatus", WithArg("user", input))
+	user := o.Script("getFindStatus", WithArg("user", input))
 
 	var address string
 	err := user.MarshalPointerAs("/profile/address", &address)
