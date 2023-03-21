@@ -18,41 +18,41 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 }
 
     pub struct CollectionReport {
-        pub let items : {String : [MetadataCollectionItem]} 
-        pub let collections : {String : Int} // mapping of collection to no. of ids 
-        pub let extraIDs : {String : [UInt64]} 
+        pub let items : {String : [MetadataCollectionItem]}
+        pub let collections : {String : Int} // mapping of collection to no. of ids
+        pub let extraIDs : {String : [UInt64]}
 
         init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
-            self.items=items 
-            self.collections=collections 
+            self.items=items
+            self.collections=collections
             self.extraIDs=extraIDs
         }
     }
 
     pub struct MetadataCollectionItem {
         pub let id:UInt64
+        pub let uuid:UInt64?
         pub let name: String
         pub let collection: String // <- This will be Alias unless they want something else
-        pub let subCollection: String? // <- This will be Alias unless they want something else
-        pub let nftDetailIdentifier: String
+        pub let project: String
 
         pub let media  : String
-        pub let mediaType : String 
-        pub let source : String 
+        pub let mediaType : String
+        pub let source : String
 
-        init(id:UInt64, name: String, collection: String, subCollection: String?, media  : String, mediaType : String, source : String, nftDetailIdentifier: String) {
+        init(id:UInt64, uuid: UInt64?, name: String, collection: String, media  : String, mediaType : String, source : String, project: String) {
             self.id=id
-            self.name=name 
-            self.collection=collection 
-            self.subCollection=subCollection 
-            self.media=media 
-            self.mediaType=mediaType 
+            self.name=name
+			self.uuid=uuid
+            self.collection=collection
+            self.media=media
+            self.mediaType=mediaType
             self.source=source
-            self.nftDetailIdentifier=nftDetailIdentifier
+            self.project=project
         }
     }
 
-    // Helper function 
+    // Helper function
 
     pub fun resolveAddress(user: String) : PublicAccount? {
 	    let address = FIND.resolve(user)
@@ -62,20 +62,20 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
         return getAccount(address!)
     }
 
-		
+
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 4
     //////////////////////////////////////////////////////////////
     pub fun fetchAlchemyCollectionShard4(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
-        let source = "Shard4"
+        let source = "getNFTDetailsShard4"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
         if account!.balance == 0.0 {
 		    return {}
 	    }
-        
+
         let items : {String : [MetadataCollectionItem]} = {}
-        
+
         let fetchingIDs = collectionIDs
 
         for project in fetchingIDs.keys {
@@ -108,13 +108,13 @@ pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [Meta
 
                 let item = MetadataCollectionItem(
                     id: nft!.id,
+					uuid: nft!.uuid,
                     name: nft!.title ?? "",
                     collection: project,
-                    subCollection: nil, 
                     media: media,
                     mediaType: mediaType,
-                    source: source, 
-                    nftDetailIdentifier: project 
+                    source: source,
+                    project: project
                 )
                 collectionItems.append(item)
             }
