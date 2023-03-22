@@ -2753,6 +2753,69 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 
 }
 
+func (otu *OverflowTestUtils) generatePackStruct(user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) findGo.FindPack_PackRegisterInfo {
+
+	flow, err := otu.O.QualifiedIdentifier("FlowToken", "Vault")
+	assert.NoError(otu.T, err)
+
+	saleInfo := []findGo.FindPack_PackRegisterSaleInfo{
+		{
+			Name:      "publis sale",
+			StartTime: buyTime,
+			Price:     4.2,
+			Verifiers: []findGo.FindVerifier_HasOneFLOAT{},
+			VerifyAll: false,
+		},
+		{
+			Name:      "whitelist sale",
+			StartTime: whitelistTime,
+			Price:     4.2,
+			Verifiers: []findGo.FindVerifier_HasOneFLOAT{
+				{
+					FloatEventIds: []uint64{
+						floatId,
+					},
+					Description: "",
+				},
+			},
+			VerifyAll: true,
+		},
+	}
+
+	return findGo.FindPack_PackRegisterInfo{
+		Forge:           user,
+		Name:            user,
+		Description:     "description",
+		TypeId:          packTypeId,
+		ExternalURL:     "url",
+		SquareImageHash: "thumbnailHash",
+		BannerHash:      "bannerHash",
+		Socials: map[string]string{
+			"twitter": "@ABC",
+		},
+		PaymentAddress:      otu.O.Address(clientAddress),
+		PaymentType:         flow,
+		OpenTime:            openTime,
+		RequiresReservation: requiresReservation,
+		NFTTypes:            itemType,
+		StorageRequirement:  60000.0,
+		SaleInfo:            saleInfo,
+		PrimaryRoyalty: []findGo.FindPack_Royalty{
+			{
+				Recipient:   otu.O.Address("find"),
+				Cut:         0.15,
+				Description: "find",
+			},
+		},
+		SecondaryRoyalty: []findGo.FindPack_Royalty{},
+		PackFields: map[string]string{
+			"Items": "1",
+		},
+		Extra: map[string]interface{}{},
+	}
+
+}
+
 func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) *OverflowTestUtils {
 	o := otu.O
 	t := otu.T
@@ -2760,39 +2823,22 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
 	assert.NoError(otu.T, err)
 
+	info := otu.generatePackStruct(user, packTypeId, itemType, whitelistTime, buyTime, openTime, requiresReservation, floatId, clientAddress, marketAddress)
+
 	o.Tx("setupFindPackMinterPlatform",
 		WithSigner(user),
 		WithArg("lease", user),
 	).
 		AssertSuccess(t)
 
-	flow, err := o.QualifiedIdentifier("FlowToken", "Vault")
-	assert.NoError(otu.T, err)
-
-	o.Tx("adminRegisterFindPackMetadata",
+	o.Tx("adminRegisterFindPackMetadataStruct",
 		WithSigner("find-admin"),
-		WithArg("lease", user),
-		WithArg("typeId", packTypeId),
-		WithArg("thumbnailHash", "thumbnailHash"),
-		WithArg("wallet", clientAddress),
-		WithArg("walletType", flow),
-		WithArg("openTime", openTime),
-		WithArg("royaltyCut", 0.075),
-		WithArg("royaltyAddress", clientAddress),
-		WithArg("requiresReservation", requiresReservation),
-		WithArg("itemTypes", itemType),
-		WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": whitelistTime, "publicSale": buyTime})),
-		WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": buyTime})),
-		WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatId})),
-		WithArg("price", createStringUFix64(map[string]float64{"whiteList": 4.20, "publicSale": 4.20})),
-		WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
-		WithArg("storageRequirement", 50000),
+		WithArg("info", info),
 	).
 		AssertSuccess(t).
 		AssertEvent(t, eventIden, map[string]interface{}{
 			"packTypeId": packTypeId,
 		})
-
 	return otu
 }
 

@@ -6,19 +6,20 @@ import FindPack from "../contracts/FindPack.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FindVerifier from "../contracts/FindVerifier.cdc"
 import FindForge from "../contracts/FindForge.cdc"
-import Admin from "../contracts/Admin.cdc"
+import FIND from "../contracts/FIND.cdc"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
 transaction(forge: String, name: String, description:String, typeId: UInt64, externalURL: String, thumbnailHash: String, bannerHash: String, social: {String : String}, wallet: Address, walletType: String, openTime:UFix64, primaryRoyaltyRecipients : [Address], primaryRoyaltyCuts: [UFix64], primaryRoyaltyDescriptions: [String], secondaryRoyaltyRecipients: [Address], secondaryRoyaltyCuts: [UFix64],  secondaryRoyaltyDescriptions: [String], requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, packFields : {String:String}, nftTypes: [String], storageRequirement: UInt64) {
 
-	let admin: &Admin.AdminProxy
+	let lease: &FIND.Lease
 	let wallet: Capability<&{FungibleToken.Receiver}>
 	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
 	let types : [Type]
 
 	prepare(account: AuthAccount) {
-		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+		let leaseCol =account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Could not borrow leases collection")
+		self.lease = leaseCol.borrow(forge)
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
 		//for each tier you need a providerAddress and path
@@ -108,6 +109,6 @@ transaction(forge: String, name: String, description:String, typeId: UInt64, ext
 
 		let input : {UInt64 : FindPack.Metadata} = {typeId : metadata}
 
-		self.admin.addForgeContractData(lease: forge, forgeType: Type<@FindPack.Forge>() , data: input)
+		FindForge.addContractData(lease: self.lease, forgeType: Type<@FindPack.Forge>() , data: input)
 	}
 }
