@@ -480,11 +480,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"public sale": 4.20})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"public sale": floatID}),
+			WithArg("price", map[string]float64{"public sale": 4.20}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", true),
 		).
 			AssertSuccess(t).
@@ -530,11 +530,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"public sale": 4.20})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"public sale": floatID}),
+			WithArg("price", map[string]float64{"public sale": 4.20}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -569,11 +569,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"public sale": 4.20})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"public sale": floatID}),
+			WithArg("price", map[string]float64{"public sale": 4.20}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -609,11 +609,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 0.0, "pre-sale": 0.0, "public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"whiteList": 0.0, "pre-sale": 0.0, "public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID}),
+			WithArg("price", map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -673,11 +673,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 2.0, "pre-sale": 3.0, "public sale": 4.0})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0}),
+			WithArg("endTime", map[string]float64{"whiteList": 2.0, "pre-sale": 3.0, "public sale": 4.0}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID}),
+			WithArg("price", map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -769,11 +769,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 2.0})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatID, "pre-sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 1.1, "pre-sale": 2.2, "public sale": 3.3})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0}),
+			WithArg("endTime", map[string]float64{"whiteList": 2.0}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": floatID, "pre-sale": floatID}),
+			WithArg("price", map[string]float64{"whiteList": 1.1, "pre-sale": 2.2, "public sale": 3.3}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -1056,7 +1056,6 @@ func TestFindPack(t *testing.T) {
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
-		// otu.fulfillPack(packId, ids, salt)
 
 		otu.O.Tx("adminFulfillFindPack",
 			WithSigner("find-admin"),
