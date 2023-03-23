@@ -38,6 +38,65 @@ func TestFindPack(t *testing.T) {
 		packTypeId++
 	})
 
+	t.Run("Should be able to register pack as a User with struct", func(t *testing.T) {
+
+		otu.O.Tx("registerFindPackMetadata",
+			WithSigner("user1"),
+			WithArg("forge", buyer),
+			WithArg("name", buyer),
+			WithArg("description", "test"),
+			WithArg("typeId", packTypeId),
+			WithArg("externalURL", "url"),
+			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("bannerHash", "bannerHash"),
+			WithArg("social", map[string]string{"twitter": "twitterLink"}),
+			WithArg("wallet", "find-admin"),
+			WithArg("walletType", flow),
+			WithArg("openTime", 1.0),
+			WithAddresses("primaryRoyaltyRecipients", "find", "find-admin"),
+			WithArg("primaryRoyaltyCuts", []float64{0.1, 0.3}),
+			WithArg("primaryRoyaltyDescriptions", []string{"", ""}),
+			WithAddresses("secondaryRoyaltyRecipients", "find", "find-admin"),
+			WithArg("secondaryRoyaltyCuts", []float64{0.1, 0.3}),
+			WithArg("secondaryRoyaltyDescriptions", []string{"", ""}),
+			WithArg("requiresReservation", false),
+			WithArg("startTime", map[string]float64{}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{}),
+			WithArg("price", map[string]float64{}),
+			WithArg("purchaseLimit", map[string]uint64{}),
+			WithArg("packFields", map[string]string{
+				"Items": "1",
+			}),
+			WithArg("nftTypes", []string{exampleNFTType(otu)}),
+			WithArg("storageRequirement", 50000),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+		packTypeId++
+	})
+
+	t.Run("Should be able to register pack as a User with struct", func(t *testing.T) {
+
+		eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
+		assert.NoError(otu.T, err)
+
+		info := otu.generatePackStruct("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
+
+		otu.O.Tx("registerFindPackMetadataStruct",
+			WithSigner("user1"),
+			WithArg("info", info),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, eventIden, map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+
+		packTypeId++
+	})
+
 	t.Run("Should be able to mint pack", func(t *testing.T) {
 
 		id1 := otu.mintExampleNFTs()
@@ -198,9 +257,9 @@ func TestFindPack(t *testing.T) {
 
 		otu.O.Tx("adminFulfillPacks",
 			WithSigner("find-admin"),
-			WithArg("types", createUInt64ToString64Array(types)),
-			WithArg("rewards", createUInt64ToUInt64Array(pid)),
-			WithArg("salts", createUInt64ToString(map[uint64]string{packId: "wrong salt"})),
+			WithArg("types", types),
+			WithArg("rewards", pid),
+			WithArg("salts", map[uint64]string{packId: "wrong salt"}),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
@@ -259,6 +318,58 @@ func TestFindPack(t *testing.T) {
 		packTypeId++
 	})
 
+	t.Run("Should be able to register with adminRegisterFindPackMetadata transaction", func(t *testing.T) {
+		id1 := otu.mintExampleNFTs()
+		ids := []uint64{id1}
+
+		freeMintFloat := otu.createFloatEvent("find")
+		whiteListFloat := otu.createFloatEvent("find")
+
+		otu.claimFloat("find", buyer, freeMintFloat)
+		otu.claimFloat("find", buyer, whiteListFloat)
+
+		otu.O.Tx("adminRegisterFindPackMetadata",
+			WithSigner("find-admin"),
+			WithArg("forge", buyer),
+			WithArg("name", buyer),
+			WithArg("description", "test"),
+			WithArg("typeId", packTypeId),
+			WithArg("externalURL", "url"),
+			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("bannerHash", "bannerHash"),
+			WithArg("social", map[string]string{"twitter": "twitterLink"}),
+			WithArg("wallet", "find-admin"),
+			WithArg("walletType", flow),
+			WithArg("openTime", 1.0),
+			WithAddresses("primaryRoyaltyRecipients", "find", "find-admin"),
+			WithArg("primaryRoyaltyCuts", []float64{0.1, 0.3}),
+			WithArg("primaryRoyaltyDescriptions", []string{"", ""}),
+			WithAddresses("secondaryRoyaltyRecipients", "find", "find-admin"),
+			WithArg("secondaryRoyaltyCuts", []float64{0.1, 0.3}),
+			WithArg("secondaryRoyaltyDescriptions", []string{"", ""}),
+			WithArg("requiresReservation", false),
+			WithArg("startTime", map[string]float64{"whiteList": 10.0, "pre-sale": 20.0, "public sale": 30.0}),
+			WithArg("endTime", map[string]float64{"whiteList": 20.0, "pre-sale": 30.0}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": freeMintFloat, "pre-sale": whiteListFloat}),
+			WithArg("price", map[string]float64{"whiteList": 0.0, "pre-sale": 4.2, "public sale": 4.2}),
+			WithArg("purchaseLimit", map[string]uint64{"whiteList": 1, "pre-sale": 20}),
+			WithArg("packFields", map[string]string{
+				"Items": "1",
+			}),
+			WithArg("nftTypes", []string{exampleNFTType(otu)}),
+			WithArg("storageRequirement", 50000),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, otu.identifier("FindPack", "MetadataRegistered"), map[string]interface{}{
+				"packTypeId": packTypeId,
+			})
+
+		otu.mintPack("user1", packTypeId, ids, singleType, salt)
+
+		otu.buyPack(buyer, buyer, packTypeId, 1, 0.0)
+		// no need to pump packTypeId here
+	})
+
 	t.Run("Should be able to buy nft for different price", func(t *testing.T) {
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
@@ -271,21 +382,33 @@ func TestFindPack(t *testing.T) {
 
 		otu.O.Tx("adminRegisterFindPackMetadata",
 			WithSigner("find-admin"),
-			WithArg("lease", buyer),
+			WithArg("forge", buyer),
+			WithArg("name", buyer),
+			WithArg("description", "test"),
 			WithArg("typeId", packTypeId),
+			WithArg("externalURL", "url"),
 			WithArg("thumbnailHash", "thumbnailHash"),
+			WithArg("bannerHash", "bannerHash"),
+			WithArg("social", map[string]string{"twitter": "twitterLink"}),
 			WithArg("wallet", "find-admin"),
 			WithArg("walletType", flow),
 			WithArg("openTime", 1.0),
-			WithArg("royaltyCut", 0.15),
-			WithArg("royaltyAddress", "find"),
+			WithAddresses("primaryRoyaltyRecipients", "find", "find-admin"),
+			WithArg("primaryRoyaltyCuts", []float64{0.1, 0.3}),
+			WithArg("primaryRoyaltyDescriptions", []string{"", ""}),
+			WithAddresses("secondaryRoyaltyRecipients", "find", "find-admin"),
+			WithArg("secondaryRoyaltyCuts", []float64{0.1, 0.3}),
+			WithArg("secondaryRoyaltyDescriptions", []string{"", ""}),
 			WithArg("requiresReservation", false),
-			WithArg("itemTypes", []string{exampleNFTType(otu)}),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 10.0, "pre-sale": 20.0, "public sale": 30.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 20.0, "pre-sale": 30.0})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": freeMintFloat, "pre-sale": whiteListFloat})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 0.0, "pre-sale": 4.2, "public sale": 4.2})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{"whiteList": 1, "pre-sale": 20})),
+			WithArg("startTime", map[string]float64{"whiteList": 10.0, "pre-sale": 20.0, "public sale": 30.0}),
+			WithArg("endTime", map[string]float64{"whiteList": 20.0, "pre-sale": 30.0}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": freeMintFloat, "pre-sale": whiteListFloat}),
+			WithArg("price", map[string]float64{"whiteList": 0.0, "pre-sale": 4.2, "public sale": 4.2}),
+			WithArg("purchaseLimit", map[string]uint64{"whiteList": 1, "pre-sale": 20}),
+			WithArg("packFields", map[string]string{
+				"Items": "1",
+			}),
+			WithArg("nftTypes", []string{exampleNFTType(otu)}),
 			WithArg("storageRequirement", 50000),
 		).
 			AssertSuccess(t).
@@ -357,11 +480,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"public sale": 4.20})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"public sale": floatID}),
+			WithArg("price", map[string]float64{"public sale": 4.20}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", true),
 		).
 			AssertSuccess(t).
@@ -407,11 +530,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"public sale": 4.20})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"public sale": floatID}),
+			WithArg("price", map[string]float64{"public sale": 4.20}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -446,11 +569,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"public sale": 4.20})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"public sale": floatID}),
+			WithArg("price", map[string]float64{"public sale": 4.20}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -486,11 +609,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 0.0, "pre-sale": 0.0, "public sale": 0.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"whiteList": 0.0, "pre-sale": 0.0, "public sale": 0.0}),
+			WithArg("endTime", map[string]float64{}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID}),
+			WithArg("price", map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -550,11 +673,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 2.0, "pre-sale": 3.0, "public sale": 4.0})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0}),
+			WithArg("endTime", map[string]float64{"whiteList": 2.0, "pre-sale": 3.0, "public sale": 4.0}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": floatID, "pre-sale": floatID, "public sale": floatID}),
+			WithArg("price", map[string]float64{"whiteList": 3.3, "pre-sale": 2.2, "public sale": 1.1}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -570,7 +693,7 @@ func TestFindPack(t *testing.T) {
 					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
 					"description": "Example NFT FIND",
 					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
-					"name":        "user1 season #19",
+					"name":        "user1 season #21",
 					"socials": map[string]interface{}{
 						"Discord": map[string]interface{}{"url": "discord.gg/"},
 						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
@@ -580,9 +703,9 @@ func TestFindPack(t *testing.T) {
 						"mediaType": "image",
 					},
 				},
-				"description":         "user1 season #19",
-				"itemTypes":           []interface{}{exampleNFTType(otu)},
-				"name":                "user1 season #19",
+				"description":         "user1 season #21",
+				"itemTypes":           []interface{}{"A.179b6b1cb6755e31.ExampleNFT.NFT"},
+				"name":                "user1 season #21",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
@@ -595,7 +718,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 673",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -606,7 +729,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 3,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 673",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -617,7 +740,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 673",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -625,7 +748,7 @@ func TestFindPack(t *testing.T) {
 				},
 				"storageRequirement": 10000,
 				"thumbnailHash":      "thumbnailHash",
-				"walletType":         otu.identifier("FlowToken", "Vault"),
+				"walletType":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}))
 		packTypeId++
 	})
@@ -646,11 +769,11 @@ func TestFindPack(t *testing.T) {
 			WithArg("royaltyCut", 0.15),
 			WithArg("royaltyAddress", "find"),
 			WithArg("requiresReservation", false),
-			WithArg("startTime", createStringUFix64(map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0})),
-			WithArg("endTime", createStringUFix64(map[string]float64{"whiteList": 2.0})),
-			WithArg("floatEventId", createStringUInt64(map[string]uint64{"whiteList": floatID, "pre-sale": floatID})),
-			WithArg("price", createStringUFix64(map[string]float64{"whiteList": 1.1, "pre-sale": 2.2, "public sale": 3.3})),
-			WithArg("purchaseLimit", createStringUInt64(map[string]uint64{})),
+			WithArg("startTime", map[string]float64{"whiteList": 1.0, "pre-sale": 2.0, "public sale": 3.0}),
+			WithArg("endTime", map[string]float64{"whiteList": 2.0}),
+			WithArg("floatEventId", map[string]uint64{"whiteList": floatID, "pre-sale": floatID}),
+			WithArg("price", map[string]float64{"whiteList": 1.1, "pre-sale": 2.2, "public sale": 3.3}),
+			WithArg("purchaseLimit", map[string]uint64{}),
 			WithArg("checkAll", false),
 		).
 			AssertSuccess(t).
@@ -668,7 +791,7 @@ func TestFindPack(t *testing.T) {
 					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
 					"description": "Example NFT FIND",
 					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
-					"name":        "user1 season #20",
+					"name":        "user1 season #22",
 					"socials": map[string]interface{}{
 						"Discord": map[string]interface{}{"url": "discord.gg/"},
 						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
@@ -678,9 +801,9 @@ func TestFindPack(t *testing.T) {
 						"mediaType": "image",
 					},
 				},
-				"description":         "user1 season #20",
-				"itemTypes":           []interface{}{exampleNFTType(otu)},
-				"name":                "user1 season #20",
+				"description":         "user1 season #22",
+				"itemTypes":           []interface{}{"A.179b6b1cb6755e31.ExampleNFT.NFT"},
+				"name":                "user1 season #22",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
@@ -691,7 +814,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 677",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -708,7 +831,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 677",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -723,7 +846,7 @@ func TestFindPack(t *testing.T) {
 					"startTime":          2,
 					"userPurchaseRecord": 0,
 				},
-				"walletType": otu.identifier("FlowToken", "Vault"),
+				"walletType": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}))
 		// no need to bump packTypeId here
 	})
@@ -740,7 +863,7 @@ func TestFindPack(t *testing.T) {
 					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
 					"description": "Example NFT FIND",
 					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
-					"name":        "user1 season #20",
+					"name":        "user1 season #22",
 					"socials": map[string]interface{}{
 						"Discord": map[string]interface{}{"url": "discord.gg/"},
 						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
@@ -750,9 +873,9 @@ func TestFindPack(t *testing.T) {
 						"mediaType": "image",
 					},
 				},
-				"description":         "user1 season #20",
-				"itemTypes":           []interface{}{exampleNFTType(otu)},
-				"name":                "user1 season #20",
+				"description":         "user1 season #22",
+				"itemTypes":           []interface{}{"A.179b6b1cb6755e31.ExampleNFT.NFT"},
+				"name":                "user1 season #22",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
@@ -763,7 +886,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 677",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -780,7 +903,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 677",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -795,7 +918,7 @@ func TestFindPack(t *testing.T) {
 					"startTime":          3,
 					"userPurchaseRecord": 0,
 				},
-				"walletType": otu.identifier("FlowToken", "Vault"),
+				"walletType": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}))
 
 	})
@@ -810,7 +933,7 @@ func TestFindPack(t *testing.T) {
 					"bannerImage": map[string]interface{}{"file": map[string]interface{}{"url": "Example NFT banner image"}, "mediaType": "image"},
 					"description": "Example NFT FIND",
 					"externalURL": map[string]interface{}{"url": "Example NFT external url"},
-					"name":        "user1 season #20",
+					"name":        "user1 season #22",
 					"socials": map[string]interface{}{
 						"Discord": map[string]interface{}{"url": "discord.gg/"},
 						"Twitter": map[string]interface{}{"url": "https://twitter.com/home"},
@@ -820,9 +943,9 @@ func TestFindPack(t *testing.T) {
 						"mediaType": "image",
 					},
 				},
-				"description":         "user1 season #20",
-				"itemTypes":           []interface{}{exampleNFTType(otu)},
-				"name":                "user1 season #20",
+				"description":         "user1 season #22",
+				"itemTypes":           []interface{}{"A.179b6b1cb6755e31.ExampleNFT.NFT"},
+				"name":                "user1 season #22",
 				"openTime":            2,
 				"packFields":          map[string]interface{}{"Items": "1"},
 				"packsLeft":           0,
@@ -834,7 +957,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 677",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -851,7 +974,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							fmt.Sprintf("User with one of these FLOATs are verified : %d", floatID),
+							"User with one of these FLOATs are verified : 677",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -859,7 +982,7 @@ func TestFindPack(t *testing.T) {
 				},
 				"storageRequirement": 10000,
 				"thumbnailHash":      "thumbnailHash",
-				"walletType":         otu.identifier("FlowToken", "Vault"),
+				"walletType":         "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}))
 		packTypeId++
 	})
@@ -933,7 +1056,6 @@ func TestFindPack(t *testing.T) {
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
-		// otu.fulfillPack(packId, ids, salt)
 
 		otu.O.Tx("adminFulfillFindPack",
 			WithSigner("find-admin"),
