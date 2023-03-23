@@ -26,8 +26,8 @@ declare -a txn=(\
 "publishFindThought" \
 "redeemNameVoucher" \
 "initCollections" \
-"redeemLostAndFoundNFTsDapper" \
-"redeemAllLostAndFoundNFTsDapper" \
+"redeemLostAndFoundNFTs" \
+"redeemAllLostAndFoundNFTs" \
 "sendNFTs" \
 "setProfile" \
 )
