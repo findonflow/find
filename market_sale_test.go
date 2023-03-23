@@ -199,17 +199,17 @@ func TestMarketSale(t *testing.T) {
 		otu.listNFTForSale("user1", ids[1], price)
 		otu.listNFTForSale("user1", ids[2], price)
 
-		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
-		scriptResult.AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
-		scriptResult.AssertLengthWithPointer(t, "/FINDReport/itemsForSale/FindMarketSale/items", 3)
+		scriptResult := otu.O.Script("getFindMarket", WithArg("user", "user1"))
+		scriptResult.AssertWithPointerWant(t, "/itemsForSale/FindMarketSale/items/0/saleType", autogold.Want("firstSaleItem", "active_listed"))
+		scriptResult.AssertLengthWithPointer(t, "/itemsForSale/FindMarketSale/items", 3)
 
 		otu.O.Tx("delistAllNFTSale",
 			WithSigner("user1"),
 		).AssertSuccess(t)
 		//TODO: assert on events
 
-		scriptResultAfter := otu.O.Script("getStatus", WithArg("user", "user1"))
-		scriptResultAfter.AssertWithPointerError(t, "/FINDReport/itemsForSale", "Object has no key 'itemsForSale'")
+		scriptResultAfter := otu.O.Script("getFindMarket", WithArg("user", "user1"))
+		scriptResultAfter.AssertWithPointerError(t, "/itemsForSale", "Object has no key 'itemsForSale'")
 	})
 
 	t.Run("Should be able to list it, deprecate it and cannot list another again, but able to buy and delist.", func(t *testing.T) {
@@ -701,10 +701,10 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		scriptResult := otu.O.Script("getStatus", WithArg("user", "user1"))
+		scriptResult := otu.O.Script("getFindMarket", WithArg("user", "user1"))
 
 		var itemsForSale []SaleItemInformation
-		err := scriptResult.MarshalPointerAs("/FINDReport/itemsForSale/FindMarketSale/items", &itemsForSale)
+		err := scriptResult.MarshalPointerAs("/itemsForSale/FindMarketSale/items", &itemsForSale)
 
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(itemsForSale))

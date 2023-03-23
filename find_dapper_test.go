@@ -32,7 +32,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("name", "user2"),
 			WithArg("amount", 5.0),
 		).AssertWant(t, autogold.Want("getMetadataForRegisterDapper", map[string]interface{}{
-			"amount": 5, "description": "Name :user2 for Dapper Credit 5.00000000",
+			"amount": 5, "description": "Name :user2 for DUC 5.00000000",
 			"id":       0,
 			"imageURL": "https://ik.imagekit.io/xyvsisxky/tr:ot-user2,ots-55,otc-58B792,ox-N166,oy-N24,ott-b/https://i.imgur.com/8W8NoO1.png",
 			"name":     "user2",
@@ -127,7 +127,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("name", "user1"),
 			WithArg("amount", 5.0),
 		).AssertWant(t, autogold.Want("getMetadataForRenewNameDapper", map[string]interface{}{
-			"amount": 5, "description": "Renew name :user1 for Dapper Credit 5.00000000",
+			"amount": 5, "description": "Renew name :user1 for DUC 5.00000000",
 			"id":       0,
 			"imageURL": "https://ik.imagekit.io/xyvsisxky/tr:ot-user1,ots-55,otc-58B792,ox-N166,oy-N24,ott-b/https://i.imgur.com/8W8NoO1.png",
 			"name":     "user1",
@@ -196,11 +196,17 @@ func TestFINDDapper(t *testing.T) {
 				"action":     "add",
 			})
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/relatedAccounts",
-				autogold.Want("getStatus Dapper", map[string]interface{}{"Flow_dapper": []interface{}{otu.O.Address("user2")}}))
+			AssertWithPointerWant(t, "/accounts/0",
+				autogold.Want("getFindStatus Dapper", map[string]interface{}{
+					"address": otu.O.Address("user2"),
+					"name":    "dapper",
+					"network": "Flow",
+					"node":    "FindRelatedAccounts",
+					"trusted": false,
+				}))
 
 		otu.O.Tx("removeRelatedAccountDapper",
 			WithSigner("user1"),
@@ -217,11 +223,11 @@ func TestFINDDapper(t *testing.T) {
 				"network":    "Flow",
 			})
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerError(t, "/FINDReport/relatedAccounts",
-				"Object has no key 'relatedAccounts'")
+			AssertWithPointerError(t, "/accounts",
+				"Object has no key 'accounts'")
 
 	})
 
@@ -232,10 +238,10 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("mode", true),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/privateMode",
+			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode true", true),
 			)
 
@@ -244,25 +250,28 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("mode", false),
 		).AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).
-			AssertWithPointerWant(t, "/FINDReport/privateMode",
+			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode false", false),
 			)
 
 	})
 
-	t.Run("Should be able to getStatus of new user", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus of new user", func(t *testing.T) {
 
 		nameAddress := otu.O.Address("user3")
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
-		).AssertWithPointerWant(t,
-			"/FINDReport",
-			autogold.Want("getStatus", map[string]interface{}{
-				"activatedAccount": true, "isDapper": false, "privateMode": false,
-				"readyForWearables": false,
+		).AssertWant(t,
+			autogold.Want("getFindStatus", map[string]interface{}{
+				"activatedAccount":    true,
+				"hasLostAndFoundItem": false,
+				"isDapper":            false,
+				"paths":               []interface{}{"flowTokenVault"},
+				"privateMode":         false,
+				"readyForWearables":   false,
 			}),
 		)
 	})
@@ -271,10 +280,10 @@ func TestFINDDapper(t *testing.T) {
 
 		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
 		).AssertWithPointerError(t,
-			"/FINDReport/profile/findName",
+			"/profile/findName",
 			"Object has no key 'findName'",
 		)
 	})
@@ -295,11 +304,11 @@ func TestFINDDapper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerWant(t,
-			"/FINDReport/profile/links/FindTwitter",
-			autogold.Want("getStatus Find twitter", map[string]interface{}{
+			"/profile/links/FindTwitter",
+			autogold.Want("getFindStatus Find twitter", map[string]interface{}{
 				"title": "find",
 				"type":  "Twitter",
 				"url":   "https://twitter.com/findonflow",
@@ -320,10 +329,10 @@ func TestFINDDapper(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
 		).AssertWithPointerError(t,
-			"/FINDReport/profile/links/FindTwitter",
+			"/profile/links/FindTwitter",
 			"Object has no key 'FindTwitter'",
 		)
 
@@ -337,7 +346,7 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("addon", "forge"),
 			WithArg("amount", 10.0),
 		).AssertWant(t, autogold.Want("getMetadataForBuyAddonDapper", map[string]interface{}{
-			"amount": 10, "description": "Purchase addon forge for name :name1 for Dapper Credit 10.00000000",
+			"amount": 10, "description": "Purchase addon forge for name :name1 for DUC 10.00000000",
 			"id":       0,
 			"imageURL": "https://i.imgur.com/8W8NoO1.png",
 			"name":     "name1",

@@ -1620,15 +1620,15 @@ type Royalty struct {
 
 func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation {
 
-	var findReport Report
-	err := otu.O.Script("getStatus",
+	var findReport FINDReport
+	err := otu.O.Script("getFindMarket",
 		WithArg("user", name),
 	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
 	var list []SaleItemInformation
-	for _, saleItemCollectionReport := range findReport.FINDReport.ItemsForSale {
+	for _, saleItemCollectionReport := range findReport.ItemsForSale {
 		list = append(list, saleItemCollectionReport.Items...)
 	}
 	return list
@@ -1637,15 +1637,15 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 
 func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformation {
 
-	var findReport Report
-	err := otu.O.Script("getStatus",
+	var findReport FINDReport
+	err := otu.O.Script("getFindLeaseMarket",
 		WithArg("user", name),
 	).MarshalAs(&findReport)
 	if err != nil {
 		swallowErr(err)
 	}
 	var list []SaleItemInformation
-	for _, saleItemCollectionReport := range findReport.FINDReport.LeasesForSale {
+	for _, saleItemCollectionReport := range findReport.LeasesForSale {
 		list = append(list, saleItemCollectionReport.Items...)
 	}
 	return list

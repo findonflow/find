@@ -129,9 +129,9 @@ func TestNFTDetailScript(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", ids[0], price)
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
-		).AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/items/0",
+		).AssertWithPointerWant(t, "/itemsForSale/FindMarketAuctionEscrow/items/0",
 			autogold.Want("get all listings", map[string]interface{}{
 				"amount": 10, "auction": map[string]interface{}{
 					"currentPrice": 10, "extentionOnLateBid": 60, "minimumBidIncrement": 1,
@@ -188,7 +188,7 @@ func TestNFTDetailScript(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		actual, err := otu.O.Script("getNFTDetailsNFTCatalog",
+		actual, err := otu.O.Script("getNFTDetailsNFTCatalogCommunity",
 			WithArg("user", "user1"),
 			WithArg("project", dandyNFTType(otu)),
 			WithArg("id", ids[1]),
@@ -325,9 +325,9 @@ func TestNFTDetailScript(t *testing.T) {
 			directOfferMarketEscrowed("user2", "user1", ids[0], price).
 			alterMarketOption("stop")
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
-		).Print().AssertWithPointerWant(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/items/0",
+		).Print().AssertWithPointerWant(t, "/itemsForSale/FindMarketAuctionEscrow/items/0",
 			autogold.Want("Should not be fetching NFTInfo if stopped", map[string]interface{}{
 				"amount": 10, "auction": map[string]interface{}{
 					"currentPrice": 10, "extentionOnLateBid": 60, "minimumBidIncrement": 1,
@@ -382,9 +382,9 @@ func TestNFTDetailScript(t *testing.T) {
 			listNFTForEscrowedAuction("user1", ids[1], price).
 			blockDandy("devBlockItem")
 
-		otu.O.Script("getStatus",
+		otu.O.Script("getFindMarket",
 			WithArg("user", "user1"),
-		).AssertWithPointerError(t, "/FINDReport/itemsForSale/FindMarketAuctionEscrow/items/0/nft", "")
+		).AssertWithPointerError(t, "/itemsForSale/FindMarketAuctionEscrow/items/0/nft", "")
 
 	})
 

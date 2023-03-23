@@ -64,25 +64,25 @@ func TestFindWearables(t *testing.T) {
 		})
 	})
 
-	t.Run("Should be able to getStatus with user that has wearables set", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus with user that has wearables set", func(t *testing.T) {
 		otu.createUser(10.0, "user2")
 
 		otu.O.Script(
-			"getStatus",
+			"getFindStatus",
 			WithArg("user", user2),
 		).
-			AssertWithPointerWant(t, "/FINDReport/readyForWearables", autogold.Want("should be ready", true))
+			AssertWithPointerWant(t, "/readyForWearables", autogold.Want("should be ready", true))
 
 	})
 
-	t.Run("Should be able to getStatus with user that doesnt has wearables set", func(t *testing.T) {
+	t.Run("Should be able to getFindStatus with user that doesnt has wearables set", func(t *testing.T) {
 		otu.createUser(10.0, "user3")
 
 		otu.O.Script(
-			"getStatus",
+			"getFindStatus",
 			WithArg("user", user3),
 		).
-			AssertWithPointerWant(t, "/FINDReport/readyForWearables", autogold.Want("should be not ready", false))
+			AssertWithPointerWant(t, "/readyForWearables", autogold.Want("should be not ready", false))
 
 	})
 

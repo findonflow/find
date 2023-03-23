@@ -3,7 +3,6 @@ import FindViews from "../contracts/FindViews.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 import FIND from "../contracts/FIND.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 pub struct NFTDetailReport {
@@ -588,27 +587,11 @@ pub fun defaultViews() : [Type] {
 }
 
 pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
-	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
-		return collection.collectionData.storagePath
-	}
-
-	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
-		return collection.collectionData.storagePath
-	}
-	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+	return StoragePath(identifier: nftIdentifier)!
 }
 
 pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
-	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
-		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
-		return collection.collectionData.publicPath
-	}
-
-	if let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier :nftIdentifier) {
-		return collection.collectionData.publicPath
-	}
-	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
+	return PublicPath(identifier: nftIdentifier)!
 }
 
 pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
