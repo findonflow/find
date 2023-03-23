@@ -241,12 +241,13 @@ func TestNameVoucher(t *testing.T) {
 				},
 				{
 					pointer: "/description",
-					expected: autogold.Want("display_description", `This voucher entitles the holder to claim or extend any available or owned .find domain name with 4 characters or more. It is valid for one-time use only and will be voided after the successful registration or extension of a .find domain name.
+					expected: autogold.Want("display_description", `This voucher entitles the holder to claim or extend any available or owned .find name with 4 characters or more. It is valid for one-time use only and will be voided after the successful registration or extension of a .find name.
+
 If you received this voucher via airdrop, check your inbox to claim it. Once claimed, it will be added to your collection. To use the voucher, follow these steps:
 Log in to your account.
 Navigate to the Collection page and locate the voucher you wish to use.
-Click the “Use Voucher” button and follow the on-screen instructions to register a new domain name or extend an existing one.
-Upon successful completion, the voucher will be invalidated, and the chosen domain name will be registered or extended under your account.`),
+Click the “Use Voucher” button and follow the on-screen instructions to register a new .find name or extend an existing one.
+Upon successful completion, the voucher will be invalidated, and the chosen .find name will be registered or extended under your account.`),
 				},
 				{
 					pointer:  "/thumbnail/cid",
