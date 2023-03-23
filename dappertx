@@ -24,7 +24,7 @@ declare -a txn=(\
 "reactToFindThoughts" \
 "editFindThought" \
 "publishFindThought" \
-# "redeemNameVoucher" \
+"redeemNameVoucher" \
 "initCollections" \
 "redeemLostAndFoundNFTs" \
 "redeemAllLostAndFoundNFTs" \
