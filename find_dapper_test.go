@@ -41,7 +41,7 @@ func TestFINDDapper(t *testing.T) {
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
 
-		otu.O.Tx("registerDapper",
+		otu.O.Tx("devRegisterDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("dapper"),
 			WithArg("merchAccount", "find"),
@@ -51,7 +51,7 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("Should get error if you try to register a name that is already claimed", func(t *testing.T) {
-		otu.O.Tx("registerDapper",
+		otu.O.Tx("devRegisterDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("dapper"),
 			WithArg("merchAccount", "dapper"),

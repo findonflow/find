@@ -16,6 +16,7 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
     }
 
     pre{
+        merchAccount == 0x4748780c8bf65e19 : "Merchant account is not .find"
         self.price == amount : "expected renew cost : ".concat(self.price.toString()).concat(" is not the same as calculated renew cost : ").concat(amount.toString())
     }
 

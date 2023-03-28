@@ -383,8 +383,8 @@ func addNFTCatalog(otu *OverflowTestUtils, user string, id uint64) *OverflowTest
 		contractAddress = "0xe81193c424cfd3fb"
 	}
 
-	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find-admin"),
+	otu.O.Tx("devaddNFTCatalog",
+		WithSigner("account"),
 		WithArg("collectionIdentifier", "wearables"),
 		WithArg("contractName", "Wearables"),
 		WithArg("contractAddress", contractAddress),
