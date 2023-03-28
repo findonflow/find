@@ -2,13 +2,13 @@ import FindMarket from 0x097bafa4e0b48eef
 import Profile from 0x097bafa4e0b48eef
 import FindMarketSale from 0x097bafa4e0b48eef
 import NFTCatalog from 0x49a7cda3a1eecc29
-import FINDNFTCatalog from 0x097bafa4e0b48eef
-import FTRegistry from 0x097bafa4e0b48eef
 import NonFungibleToken from 0x1d7e57aa55817448
 import MetadataViews from 0x1d7e57aa55817448
 import FungibleToken from 0xf233dcee88fe0abe
 import DapperStorageRent from 0xa08e88e23f332538
 import TopShot from 0x0b2a3299cc857e29
+import DapperUtilityCoin from 0xead892083b3e2c6c
+import FlowUtilityToken from 0xead892083b3e2c6c
 
 //first argument is the address to the merchant that gets the funds
 transaction(address: Address, id: UInt64, amount: UFix64) {
@@ -40,11 +40,21 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
         //we do some security check to verify that this tenant can do this operation. This will ensure that the onefootball tenant can only sell using DUC and not some other token. But we can change this with transactions later and not have to modify code/transactions
         let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
-           let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: item.getItemType().identifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(item.getItemType().identifier))
-        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
+           let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: item.getItemType().identifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(item.getItemType().identifier))
+        let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
         let nft = collection.collectionData
 
-        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
+        var ftVaultPath : StoragePath? = nil
+        switch item.getFtType() {
+            case Type<@DapperUtilityCoin.Vault>() :
+                ftVaultPath = /storage/dapperUtilityCoinVault
+
+            case Type<@FlowUtilityToken.Vault>() :
+                ftVaultPath = /storage/flowUtilityTokenVault
+
+            default :
+            panic("This FT is not supported by the Find Market in Dapper Wallet. Type : ".concat(item.getFtType().identifier))
+        }
 
         self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 
@@ -65,7 +75,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
             }
         }
 
-        self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+        self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
         self.balanceBeforeTransfer = self.walletReference.balance
     }
 

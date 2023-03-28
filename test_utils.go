@@ -1714,8 +1714,8 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 		id = ids[0].(uint64)
 	}
 
-	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find-admin"),
+	otu.O.Tx("devaddNFTCatalog",
+		WithSigner("account"),
 		WithArg("collectionIdentifier", nftIden),
 		WithArg("contractName", nftIden),
 		WithArg("contractAddress", "find"),
@@ -1732,8 +1732,8 @@ func (otu *OverflowTestUtils) registerExampleNFTInNFTRegistry() *OverflowTestUti
 	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
 	assert.NoError(otu.T, err)
 
-	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find-admin"),
+	otu.O.Tx("devaddNFTCatalog",
+		WithSigner("account"),
 		WithArg("collectionIdentifier", nftIden),
 		WithArg("contractName", nftIden),
 		WithArg("contractAddress", "find"),
@@ -2866,8 +2866,8 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 
 	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
 
-	otu.O.Tx("adminAddNFTCatalog",
-		WithSigner("find-admin"),
+	otu.O.Tx("devaddNFTCatalog",
+		WithSigner("account"),
 		WithArg("collectionIdentifier", minter+" season#"+fmt.Sprint(packTypeId)),
 		WithArg("contractName", fmt.Sprintf(eventIden, "NFT")),
 		WithArg("contractAddress", "find"),
