@@ -410,7 +410,7 @@ func (otu *OverflowTestUtils) registerDapperUser(name string) *OverflowTestUtils
 
 	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
 
-	otu.O.Tx("registerDapper",
+	otu.O.Tx("devRegisterDapper",
 		WithSigner(name),
 		WithPayloadSigner("dapper"),
 		WithArg("merchAccount", "dapper"),
@@ -438,7 +438,7 @@ func (otu *OverflowTestUtils) registerDapperUserWithName(buyer, name string) *Ov
 
 	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
 
-	otu.O.Tx("registerDapper",
+	otu.O.Tx("devRegisterDapper",
 		WithSigner(buyer),
 		WithPayloadSigner("dapper"),
 		WithArg("merchAccount", "dapper"),
@@ -469,7 +469,7 @@ func (otu *OverflowTestUtils) renewUserWithName(user, name string) *OverflowTest
 }
 
 func (otu *OverflowTestUtils) renewDapperUserWithName(user, name string) *OverflowTestUtils {
-	otu.O.Tx("renewNameDapper",
+	otu.O.Tx("devRenewNameDapper",
 		WithSigner(user),
 		WithPayloadSigner("dapper"),
 		WithArg("merchAccount", "dapper"),
