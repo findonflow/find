@@ -27,30 +27,30 @@ transaction() {
 		if DandyRef == nil {
 			account.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
 			account.unlink(Dandy.CollectionPublicPath)
-			account.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPublicPath,
 				target: Dandy.CollectionStoragePath
 			)
 			account.unlink(Dandy.CollectionPrivatePath)
-			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPrivatePath,
 				target: Dandy.CollectionStoragePath
 			)
 		}
 
-		let DandyCap= account.getCapability<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath)
+		let DandyCap= account.getCapability<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(Dandy.CollectionPublicPath)
 		if !DandyCap.check() {
 			account.unlink(Dandy.CollectionPublicPath)
-			account.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPublicPath,
 				target: Dandy.CollectionStoragePath
 			)
 		}
 
-		let DandyProviderCap= account.getCapability<&Dandy.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPrivatePath)
+		let DandyProviderCap= account.getCapability<&Dandy.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(Dandy.CollectionPrivatePath)
 		if !DandyProviderCap.check() {
 			account.unlink(Dandy.CollectionPrivatePath)
-			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPrivatePath,
 				target: Dandy.CollectionStoragePath
 			)
