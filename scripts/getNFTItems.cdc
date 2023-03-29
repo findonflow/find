@@ -70,6 +70,7 @@ pub struct MetadataCollectionItem {
 	pub let mediaType  : String
 	pub let source  : String
 	pub let project : String
+	pub let community : String
 
 	init(id:UInt64, uuid:UInt64, name: String, collection: String, storagePath:String, identifier: String, media  : String) {
 		self.id=id
@@ -82,6 +83,7 @@ pub struct MetadataCollectionItem {
 		self.mediaType="image"
 		self.source="getNFTDetails"
 		self.project=storagePath
+		self.community="getNFTDetailsCommunity"
 	}
 }
 

@@ -242,13 +242,25 @@ func TestFIND(t *testing.T) {
 			WithArg("user", nameAddress),
 		).AssertWant(t,
 			autogold.Want("getFindStatus", map[string]interface{}{
-				"activatedAccount":    true,
-				"hasLostAndFoundItem": false,
-				"isDapper":            false,
-				"paths":               []interface{}{"flowTokenVault"},
-				"privateMode":         false,
-				"readyForWearables":   false,
+				"activatedAccount": true, "hasLostAndFoundItem": false,
+				"isDapper":          false,
+				"privateMode":       false,
+				"readyForWearables": false,
 			}),
+		)
+	})
+
+	t.Run("Should be able to getFindPaths of a user", func(t *testing.T) {
+
+		nameAddress := otu.O.Address("user1")
+		otu.O.Script("getFindPaths",
+			WithArg("user", nameAddress),
+		).AssertWant(t,
+			autogold.Want("getFindPaths", map[string]interface{}{"address": "0xf669cb8d41ce0c74", "paths": []interface{}{
+				"findDandy",
+				"A_179b6b1cb6755e31_FindMarketDirectOfferEscrow_SaleItemCollection_find",
+				"FindPackCollection",
+			}}),
 		)
 	})
 

@@ -22,7 +22,6 @@ pub struct FINDReport{
 	pub let accounts : [AccountInformation]?
 	//not sure
 	pub let readyForWearables : Bool?
-	pub let paths:[String]
 
 	init(profile: Profile.UserReport?,
 	privateMode: Bool,
@@ -30,8 +29,8 @@ pub struct FINDReport{
 	isDapper: Bool,
 	hasLostAndFoundItem: Bool,
 	accounts: [AccountInformation]?,
-	readyForWearables: Bool?,
-	paths: [String]) {
+	readyForWearables: Bool?
+	) {
 
 		self.hasLostAndFoundItem=hasLostAndFoundItem
 		self.profile=profile
@@ -40,7 +39,6 @@ pub struct FINDReport{
 		self.isDapper=isDapper
 		self.accounts=accounts
 		self.readyForWearables=readyForWearables
-		self.paths=paths
 	}
 }
 
@@ -174,45 +172,6 @@ pub fun main(user: String) : FINDReport? {
 		readyForWearables = false
 	}
 
-	let allPaths = account.storagePaths
-
-	 let banned : {StoragePath : Bool} = {
-    /storage/FantastecNFTCollection: true,
-    /storage/FantastecNFTMinter: true,
-    /storage/jambbLaunchCollectiblesCollection: true,
-    /storage/jambbLaunchCollectiblesMinter: true,
-    /storage/RacingTimeCollection: true,
-    /storage/RacingTimeMinter: true,
-    /storage/MusicBlockCollection: true,
-    /storage/MusicBlockMinter: true,
-    /storage/SupportUkraineCollectionV10: true,
-    /storage/SupportUkraineMinterV10: true,
-    /storage/DropzTokenCollection: true,
-    /storage/DropzTokenAdmin: true,
-    /storage/TokenLendingUserCertificate001: true,
-    /storage/TokenLendingPlaceMinterProxy001: true,
-    /storage/TokenLendingPlaceAdmin: true,
-    /storage/TokenLendingPlace001: true,
-    /storage/BnGNFTCollection: true,
-    /storage/FuseCollectiveCollection: true,
-    /storage/NFTLXKickCollection: true,
-    /storage/NFTLXKickMinter: true,
-    /storage/revvTeleportCustodyAdmin: true,
-		/storage/ZayTraderCollection: true,
-		/storage/RaribleNFTCollection: true,
-		/storage/LibraryPassCollection: true
-	}
-
-	let storage = "/storage/"
-	let paths : [String] = []
-	for p in allPaths {
-		if banned.containsKey(p) {
-			continue
-		}
-		let path = p.toString()
-		paths.append(path.slice(from: storage.length, upTo: path.length))
-	}
-
 	var hasLostAndFoundItem : Bool = false
 	for t in LostAndFound.getRedeemableTypes(address) {
 		if t.isSubtype(of: Type<@NonFungibleToken.NFT>()) {
@@ -229,7 +188,6 @@ pub fun main(user: String) : FINDReport? {
 		hasLostAndFoundItem: hasLostAndFoundItem,
 		accounts: accounts,
 		readyForWearables: readyForWearables,
-		paths:paths
 	)
 }
 
