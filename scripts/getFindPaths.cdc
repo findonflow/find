@@ -85,7 +85,8 @@ pub fun main(user: String) : Report? {
 		/storage/findBids : true,
 		/storage/findLeases : true,
 		/storage/findProfile : true,
-		/storage/findSender : true
+		/storage/findSender : true,
+		/storage/findRelatedAccounts : true
 	}
 
 	let storage = "/storage/"
