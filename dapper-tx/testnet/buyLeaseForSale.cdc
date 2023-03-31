@@ -1,5 +1,6 @@
 import FindMarket from 0x35717efbbce11c74
-import FTRegistry from 0x35717efbbce11c74
+import DapperUtilityCoin from 0x82ec283f88a62e65
+import FlowUtilityToken from 0x82ec283f88a62e65
 import FungibleToken from 0x9a0766d93b6608b7
 import FIND from 0x35717efbbce11c74
 import Profile from 0x35717efbbce11c74
@@ -44,8 +45,21 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 
         self.saleItemCollection = saleItemsCap.borrow()!
         let item = self.saleItemCollection.borrowSaleItem(leaseName)
-        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-        self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+
+        var ftVaultPath : StoragePath? = nil
+        switch item.getFtType() {
+            case Type<@DapperUtilityCoin.Vault>() :
+                ftVaultPath = /storage/dapperUtilityCoinVault
+
+            case Type<@FlowUtilityToken.Vault>() :
+                ftVaultPath = /storage/flowUtilityTokenVault
+
+            default :
+            panic("This FT is not supported by the Find Market in Dapper Wallet. Type : ".concat(item.getFtType().identifier))
+        }
+
+
+        self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
         self.balanceBeforeTransfer = self.walletReference.balance
     }
 
