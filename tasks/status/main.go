@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	. "github.com/bjartek/overflow"
@@ -57,23 +56,37 @@ func main() {
 			key := m["key"].(string)
 			allReports[key] = arr
 
-			// NFT Details
-			project := m["project"].(string)
-			source := m["source"].(string)
+			// // NFT Details
+			// project := m["project"].(string)
+			// source := m["source"].(string)
+			// community, ok := m["community"].(string)
 
-			if source != "getNFTDetails" {
-				source = fmt.Sprintf("mainnet%s", source)
-			}
+			// if source != "getNFTDetails" {
+			// 	source = fmt.Sprintf("mainnet%s", source)
+			// }
 
-			res := o.Script(source, WithArg("user", address), WithArg("project", project), WithArg("id", arr[0]), WithArg("views", []string{})).
-				Print()
+			// res := o.Script(source, WithArg("user", address), WithArg("project", project), WithArg("id", arr[0]), WithArg("views", []string{})).
+			// 	Print()
 
-			if res.Err != nil {
-				res.PrintArguments(nil)
-				fmt.Println(source)
-				fmt.Println(project)
-				panic(res.Err)
-			}
+			// if res.Err != nil {
+			// 	res.PrintArguments(nil)
+			// 	fmt.Println(source)
+			// 	fmt.Println(project)
+			// 	panic(res.Err)
+			// }
+
+			// if ok {
+			// 	res = o.Script(community, WithArg("user", address), WithArg("project", project), WithArg("id", arr[0]), WithArg("views", []string{})).
+			// 	Print()
+
+			// 	if res.Err != nil {
+			// 		res.PrintArguments(nil)
+			// 		fmt.Println(source)
+			// 		fmt.Println(project)
+			// 		panic(res.Err)
+			// 	}
+			// }
+
 		}
 
 
