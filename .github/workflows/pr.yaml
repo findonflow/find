@@ -1,5 +1,5 @@
 on:
- pull_request: 
+ pull_request:
     branches:
     - main
 
@@ -8,11 +8,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
       - name: Checkout code
         uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 1.18
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -23,20 +23,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: 1.18
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - uses: zencargo/github-action-go-mod-tidy@v1
         with:
-          go-version: 1.18 
+          go-version: 1.18
 
   test:
     runs-on: ubuntu-latest
@@ -47,17 +39,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: 1.18
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: run tests
         run: go test -timeout 30m -json ./... > test.json
       - name: Annotate tests
@@ -65,3 +49,36 @@ jobs:
         uses: guyarb/golang-test-annotations@v0.5.0
         with:
           test-results: test.json
+
+generate-client:
+    runs-on: ubuntu-latest
+    env:
+      TESTNET_ACCOUNT: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      MAINNET_FIND: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      MAINNET_FIND_ADMIN: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+    needs: test
+    steps:
+     - name: Checkout code
+       uses: actions/checkout@v3
+     - uses: actions/setup-go@v4
+       with:
+         go-version: 1.18
+     - run: make client
+     - name: verify client changed
+       uses: tj-actions/verify-changed-files@v14
+       id: verify-changed-files
+       with:
+         files: |
+           lib/find.json
+           dapper-tx
+     - name: fail if client changed
+       if: contains(steps.verify-changed-files.outputs.changed_files, 'lib/find.json')
+       run: |
+        echo "find client is not updated"
+        exit 1
+     - name: fail if dapper transactions changed
+       if: contains(steps.verify-changed-files.outputs.changed_files, 'dapper-tx')
+       run: |
+        echo "dapper-tx is not updated"
+        exit 1
+
