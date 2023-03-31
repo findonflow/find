@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/bjartek/overflow"
@@ -55,9 +56,31 @@ func main() {
 			}
 			key := m["key"].(string)
 			allReports[key] = arr
+
+			// NFT Details
+			project := m["project"].(string)
+			source := m["source"].(string)
+
+			if source != "getNFTDetails" {
+				source = fmt.Sprintf("mainnet%s", source)
+			}
+
+			res := o.Script(source, WithArg("user", address), WithArg("project", project), WithArg("id", arr[0]), WithArg("views", []string{})).
+				Print()
+
+			if res.Err != nil {
+				res.PrintArguments(nil)
+				fmt.Println(source)
+				fmt.Println(project)
+				panic(res.Err)
+			}
 		}
 
+
+
 	}
+
+
 
 	// // NFT Items (MetadataViews)
 	// collection := "versusArtCollection"
@@ -69,7 +92,7 @@ func main() {
 	// o.Script(fmt.Sprintf("%s%s", o.Network, "getAlchemy4Items"), WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{alCollection: allReports[alCollection]})).
 	// 	Print()
 
-	// // NFT Details
+	// NFT Details
 	// project := "FlovatarCollection"
 	// o.Script("getNFTDetails", WithArg("user", address), WithArg("project", project), WithArg("id", allReports[project][0]), WithArg("views", []string{})).
 	// 	Print()
