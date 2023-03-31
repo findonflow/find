@@ -1,56 +1,63 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 
 pub struct Report{
+	pub let alias:String
 	pub let ids:[UInt64]
 	pub let key:String
 	pub let address:Address
 	pub let resolver:String
+	pub let source:String
+	pub let community:String?
+	pub let project:String
 
-	init(ids:[UInt64], key:String, address:Address, resolver:String) {
+	init(alias: String,ids:[UInt64], key:String, address:Address, resolver:String, source: String, community: String?, project: String) {
+		self.alias=alias
 		self.ids=ids
 		self.key=key
 		self.address=address
 		self.resolver=resolver
-
+		self.source=source
+		self.community=community
+		self.project=project
 	}
 }
 
 pub fun main(address: Address, targetPaths: [String]): {String : Report}{
 
-
 	let resolvers = {
-	"CricketMomentsCollection" : "getAlchemy1Items",
-	"KlktnNFTCollection": "getAlchemy1Items",
-	"KlktnNFT2Collection": "getAlchemy1Items",
-	"MatrixWorldFlowFestNFTCollection": "getAlchemy1Items",
-	"MynftCollection": "getAlchemy1Items",
-	"EternalShardCollection": "getAlchemy1Items",
-	"jambbLaunchVouchersCollection" : "getAlchemy1Items",
-	"BarterYardPackNFTCollection" : "getAlchemy2Items",
-	"bloctoXtinglesCollectibleCollection" : "getAlchemy2Items",
-	"CryptoZooCollection": "getAlchemy2Items",
-	"DieselCollection004" : "getAlchemy2Items",
-	"FlowChinaBadgeCollection" : "getAlchemy2Items",
-	"GeniaceNFTCollection" : "getAlchemy2Items",
-	"MiamiCollection004" : "getAlchemy2Items",
-	"FabricantCollection004" : "getAlchemy2Items",
-	"ARTIFACTCollection" : "getAlchemy3Items",
-	"ARTIFACTPackCollection" : "getAlchemy3Items",
-	"BlindBoxRedeemVoucherCollection" : "getAlchemy3Items",
-	"GogoroCollectibleCollection":"getAlchemy3Items",
-	"MatrixWorldAssetNFTCollection" : "getAlchemy3Items",
-	"metaverseCollection" : "getAlchemy3Items",
-	"nftRealityCollection" : "getAlchemy3Items",
-	"NowggNFTsCollection" : "getAlchemy3Items",
-	"AADigitalNFTCollection" : "getAlchemy4Items",
-	"f4264ac8f3256818_Evolution_Collection" : "getAlchemy4Items",
-	"MaxarNFTCollection" : "getAlchemy4Items",
-	"jambbMomentsCollection" : "getAlchemy4Items",
-	"motogpCardCollection" : "getAlchemy4Items",
-	"TroonCollection" : "getAlchemy4Items",
-	"S2ItemCollection0028" : "getAlchemy4Items",
-	"BNVnMissNFTCollection006" : "getAlchemy4Items"
+	"CricketMomentsCollection" : 1,
+	"KlktnNFTCollection": 1,
+	"KlktnNFT2Collection": 1,
+	"MatrixWorldFlowFestNFTCollection": 1,
+	"MynftCollection": 1,
+	"EternalShardCollection": 1,
+	"jambbLaunchVouchersCollection" : 1,
+	"BarterYardPackNFTCollection" : 2,
+	"bloctoXtinglesCollectibleCollection" : 2,
+	"CryptoZooCollection": 2,
+	"DieselCollection004" : 2,
+	"FlowChinaBadgeCollection" : 2,
+	"GeniaceNFTCollection" : 2,
+	"MiamiCollection004" : 2,
+	"FabricantCollection004" : 2,
+	"ARTIFACTCollection" : 3,
+	"ARTIFACTPackCollection" : 3,
+	"BlindBoxRedeemVoucherCollection" : 3,
+	"GogoroCollectibleCollection":3,
+	"MatrixWorldAssetNFTCollection" : 3,
+	"metaverseCollection" : 3,
+	"nftRealityCollection" : 3,
+	"NowggNFTsCollection" : 3,
+	"AADigitalNFTCollection" : 4,
+	"f4264ac8f3256818_Evolution_Collection" : 4,
+	"MaxarNFTCollection" : 4,
+	"jambbMomentsCollection" : 4,
+	"motogpCardCollection" : 4,
+	"TroonCollection" : 4,
+	"S2ItemCollection0028" : 4,
+	"BNVnMissNFTCollection006" : 4
 }
 
 
@@ -101,15 +108,68 @@ pub fun main(address: Address, targetPaths: [String]): {String : Report}{
 				let resolver = resolvers[p]
 				let key = keys[p]
 
+				// try to use the key from alchemy as alias
+				var alias = key
+				// if the item is not in alchemy, then we know it should have NFTCollection, we tries to use the collection display name for alias
+				// if not, it has to be the path
+				if alias == nil {
+					if let nft = collection.borrowNFT(id: ids[0]).resolveView(Type<MetadataViews.NFTCollectionDisplay>()) {
+						if let v = nft as? MetadataViews.NFTCollectionDisplay {
+							alias = v.name
+						}
+					} else {
+						continue
+					}
+				}
+
+				// if the item is not in either, we just try our best to give a good collection information
+				if alias == nil {
+					var pIden = p
+					let col = "Collection"
+					if pIden.length > col.length {
+						let pslice = pIden.slice(from: (pIden.length - col.length) , upTo: pIden.length)
+						if pslice == col {
+							pIden = pIden.slice(from: 0 , upTo: (pIden.length - col.length))
+						}
+					}
+					alias = pIden
+				}
 
 				report[p]=Report(
+					alias: alias!,
 					ids:ids,
 					key:key ?? p,
 					address:address,
-					resolver:resolver ?? "getNFTItems")
+					resolver:getAlchemyItem(resolver) ?? "getNFTItems",
+					source: getAlchemyDetail(resolver) ?? "getNFTDetails",
+					community: resolver!=nil ? nil : "getNFTDetailsCommunity",
+					project: getProject(key) ?? p
+				)
 
 			}
 		}
 	}
 	return report
+}
+
+pub fun getAlchemyItem(_ shard: Int?) : String? {
+	if shard == nil {
+		return nil
+	}
+	return "getAlchemy".concat(shard!.toString()).concat("Items")
+}
+
+pub fun getAlchemyDetail(_ shard: Int?) : String? {
+		if shard == nil {
+		return nil
+	}
+	return "getNFTDetailsShard".concat(shard!.toString())
+}
+
+pub fun getProject(_ shard: String?) : String? {
+
+	if shard == "BarterYardPackNFT" {
+		return "BarterYardPack"
+	}
+	return shard
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	. "github.com/bjartek/overflow"
@@ -19,11 +18,11 @@ func main() {
 	o.Script("getNameSearchbar", WithArg("name", input)).
 		Print()
 
-	user := o.Script("getFindStatus", WithArg("user", input)).
+	user := o.Script("getFindPaths", WithArg("user", input)).
 		Print()
 
 	var address string
-	err := user.MarshalPointerAs("/profile/address", &address)
+	err := user.MarshalPointerAs("/address", &address)
 	if err != nil {
 		panic(err)
 	}
@@ -56,35 +55,71 @@ func main() {
 			}
 			key := m["key"].(string)
 			allReports[key] = arr
+
+			// // NFT Details
+			// project := m["project"].(string)
+			// source := m["source"].(string)
+			// community, ok := m["community"].(string)
+
+			// if source != "getNFTDetails" {
+			// 	source = fmt.Sprintf("mainnet%s", source)
+			// }
+
+			// res := o.Script(source, WithArg("user", address), WithArg("project", project), WithArg("id", arr[0]), WithArg("views", []string{})).
+			// 	Print()
+
+			// if res.Err != nil {
+			// 	res.PrintArguments(nil)
+			// 	fmt.Println(source)
+			// 	fmt.Println(project)
+			// 	panic(res.Err)
+			// }
+
+			// if ok {
+			// 	res = o.Script(community, WithArg("user", address), WithArg("project", project), WithArg("id", arr[0]), WithArg("views", []string{})).
+			// 	Print()
+
+			// 	if res.Err != nil {
+			// 		res.PrintArguments(nil)
+			// 		fmt.Println(source)
+			// 		fmt.Println(project)
+			// 		panic(res.Err)
+			// 	}
+			// }
+
 		}
 
+
+
 	}
 
-	// NFT Items (MetadataViews)
-	collection := "versusArtCollection"
-	o.Script("getNFTItems", WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{collection: allReports[collection]})).
-		Print()
 
-	// NFT Items (Alchemy)
-	alCollection := "Moments"
-	o.Script(fmt.Sprintf("%s%s", o.Network, "getAlchemy4Items"), WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{alCollection: allReports[alCollection]})).
-		Print()
+
+	// // NFT Items (MetadataViews)
+	// collection := "versusArtCollection"
+	// o.Script("getNFTItems", WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{collection: allReports[collection]})).
+	// 	Print()
+
+	// // NFT Items (Alchemy)
+	// alCollection := "Moments"
+	// o.Script(fmt.Sprintf("%s%s", o.Network, "getAlchemy4Items"), WithArg("user", address), WithArg("collectionIDs", map[string][]uint64{alCollection: allReports[alCollection]})).
+	// 	Print()
 
 	// NFT Details
-	project := "FlovatarCollection"
-	o.Script("getNFTDetails", WithArg("user", address), WithArg("project", project), WithArg("id", allReports[project][0]), WithArg("views", []string{})).
-		Print()
+	// project := "FlovatarCollection"
+	// o.Script("getNFTDetails", WithArg("user", address), WithArg("project", project), WithArg("id", allReports[project][0]), WithArg("views", []string{})).
+	// 	Print()
 
-	if true {
-		return
-	}
+	// if true {
+	// 	return
+	// }
 
-	// Find Market
-	o.Script("getFindMarket", WithArg("user", address)).
-		Print()
+	// // Find Market
+	// o.Script("getFindMarket", WithArg("user", address)).
+	// 	Print()
 
-	// Find Lease Market
-	o.Script("getFindLeaseMarket", WithArg("user", address)).
-		Print()
+	// // Find Lease Market
+	// o.Script("getFindLeaseMarket", WithArg("user", address)).
+	// 	Print()
 
 }
