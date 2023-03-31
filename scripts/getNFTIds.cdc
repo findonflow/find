@@ -1,13 +1,16 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 
 pub struct Report{
+	pub let alias:String
 	pub let ids:[UInt64]
 	pub let key:String
 	pub let address:Address
 	pub let resolver:String
 
-	init(ids:[UInt64], key:String, address:Address, resolver:String) {
+	init(alias: String,ids:[UInt64], key:String, address:Address, resolver:String) {
+		self.alias=alias
 		self.ids=ids
 		self.key=key
 		self.address=address
@@ -101,8 +104,20 @@ pub fun main(address: Address, targetPaths: [String]): {String : Report}{
 				let resolver = resolvers[p]
 				let key = keys[p]
 
+				// try to use the key from alchemy as alias
+				var alias = key
+				// if the item is not in alchemy, then we know it should have NFTCollection, we tries to use the collection display name for alias
+				// if not, it has to be the path
+				if alias == nil {
+					if let nft = collection.borrowNFT(id: ids[0]).resolveView(Type<MetadataViews.NFTCollectionDisplay>()) {
+						if let v = nft as? MetadataViews.NFTCollectionDisplay {
+							alias = v.name
+						}
+					}
+				}
 
 				report[p]=Report(
+					alias: alias ?? p,
 					ids:ids,
 					key:key ?? p,
 					address:address,

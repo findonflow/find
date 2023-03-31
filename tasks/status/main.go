@@ -19,11 +19,11 @@ func main() {
 	o.Script("getNameSearchbar", WithArg("name", input)).
 		Print()
 
-	user := o.Script("getFindStatus", WithArg("user", input)).
+	user := o.Script("getFindPaths", WithArg("user", input)).
 		Print()
 
 	var address string
-	err := user.MarshalPointerAs("/profile/address", &address)
+	err := user.MarshalPointerAs("/address", &address)
 	if err != nil {
 		panic(err)
 	}
