@@ -116,8 +116,21 @@ pub fun main(address: Address, targetPaths: [String]): {String : Report}{
 					}
 				}
 
+				// if the item is not in either, we just try our best to give a good collection information
+				if alias == nil {
+					var pIden = p
+					let col = "Collection"
+					if pIden.length > col.length {
+						let pslice = pIden.slice(from: (pIden.length - col.length) , upTo: pIden.length)
+						if pslice == col {
+							pIden = pIden.slice(from: 0 , upTo: (pIden.length - col.length))
+						}
+					}
+					alias = pIden
+				}
+
 				report[p]=Report(
-					alias: alias ?? p,
+					alias: alias!,
 					ids:ids,
 					key:key ?? p,
 					address:address,
