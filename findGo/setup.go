@@ -73,10 +73,19 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 
 	lease, err := o.QualifiedIdentifier("FIND", "Lease")
 	ot.assertErr(err)
-	res = o.Tx("tenantsetMarketOptionDUC",
+	res = o.Tx("tenantsetLeaseOptionDapper",
 		WithSigner(name),
 		WithArg("nftName", "Lease"),
-		WithArg("nftTypes", []string{lease}),
+		WithArg("nftType", lease),
+		WithArg("cut", tenantCut),
+	)
+	ot.assertTrxn(res)
+
+		// "flovatar":             `["A.921ea449dffec68a.Flovatar.NFT" , "A.921ea449dffec68a.FlovatarComponent.NFT", "A.921ea449dffec68a.Flobot.NFT"]`,
+	res = o.Tx("tenantsetMarketOptionDapper",
+		WithSigner(name),
+		WithArg("nftName", "flovatar"),
+		WithArg("nftTypes", []string{"A.921ea449dffec68a.Flovatar.NFT" , "A.921ea449dffec68a.FlovatarComponent.NFT", "A.921ea449dffec68a.Flobot.NFT"}),
 		WithArg("cut", tenantCut),
 	)
 	ot.assertTrxn(res)

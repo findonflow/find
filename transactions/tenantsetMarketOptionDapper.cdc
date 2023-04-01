@@ -24,9 +24,9 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
 			FindMarket.TenantRule(
 				name: "Soft",
 				types:[
-					Type<@FindMarketSale.SaleItem>(),
-					Type<@FindMarketAuctionSoft.SaleItem>(),
-					Type<@FindMarketDirectOfferSoft.SaleItem>()
+					Type<@FindMarketSale.SaleItem>()
+					// Type<@FindMarketAuctionSoft.SaleItem>(),
+					// Type<@FindMarketDirectOfferSoft.SaleItem>()
 				],
 				ruleType: "listing",
 				allow:true
