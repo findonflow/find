@@ -1400,7 +1400,6 @@ pub contract FindMarket {
 	}
 
 	access(account) fun getPaymentWallet(_ cap: Capability<&{FungibleToken.Receiver}>, _ ftInfo: FTRegistry.FTInfo, panicOnFailCheck: Bool) : &{FungibleToken.Receiver} {
-		var walletCheck = true
 		var tempCap = cap
 
 		// If capability is valid, we do not trust it but will do the below checks
@@ -1432,11 +1431,8 @@ pub contract FindMarket {
 				case Type<@TokenForwarding.Forwarder>() :
 					// This might break FindMarket with NFT with "Any" kind of forwarder.
 					// We might have to restrict this to only DUC FUT at the moment and fix it after.
-					if ftInfo.tag.contains("dapper"){
-						tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
-						if tempCap.check() {
-							return tempCap.borrow()!
-						}
+					if !ftInfo.tag.contains("dapper"){
+						return ref
 					}
 			}
 		}
