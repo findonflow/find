@@ -1433,15 +1433,11 @@ pub contract FindMarket {
 					// This might break FindMarket with NFT with "Any" kind of forwarder.
 					// We might have to restrict this to only DUC FUT at the moment and fix it after.
 					if ftInfo.tag.contains("dapper"){
-						return ref
+						tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
+						if tempCap.check() {
+							return tempCap.borrow()!
+						}
 					}
-					//in the future use the new feature in the forwader to get the underlying type
-					/*
-					// tempCap = getAccount(cap.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
-					// if tempCap.check() {
-					// 	return tempCap.borrow()!
-					// }
-					// */
 			}
 		}
 
