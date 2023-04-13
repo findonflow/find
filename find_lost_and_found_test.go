@@ -21,7 +21,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -34,10 +34,10 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
-				"name":         "DUCExampleNFT",
-				"description":  "For testing listing in DUC",
+				"name":         "FlowExampleNFT",
+				"description":  "For testing listing in Flow",
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			})
 
@@ -53,9 +53,9 @@ func TestFindLostAndFound(t *testing.T) {
 		).
 			AssertWant(t, autogold.Want("Should get all NFT Type", map[string]interface{}{
 				"nftCatalogTicketInfo": map[string]interface{}{exampleNFTType(otu): []interface{}{map[string]interface{}{
-					"description":    "For testing listing in DUC",
+					"description":    "For testing listing in Flow",
 					"memo":           "Hello!",
-					"name":           "DUCExampleNFT",
+					"name":           "FlowExampleNFT",
 					"redeemed":       false,
 					"redeemer":       otu.O.Address("user1"),
 					"thumbnail":      "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
@@ -119,7 +119,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -132,9 +132,9 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
-				"name":         "DUCExampleNFT",
+				"name":         "FlowExampleNFT",
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			})
 		resetState(otu, "user1", true)
@@ -153,7 +153,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["`+receiverAddress+`"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -166,9 +166,9 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
-				"name":         "DUCExampleNFT",
+				"name":         "FlowExampleNFT",
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			})
 		resetState(otu, "user1", true)
@@ -181,7 +181,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -194,9 +194,9 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
-				"name":         "DUCExampleNFT",
+				"name":         "FlowExampleNFT",
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			}).
 			GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
@@ -225,7 +225,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -238,9 +238,9 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
-				"name":         "DUCExampleNFT",
+				"name":         "FlowExampleNFT",
 				"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 			}).
 			GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
@@ -269,7 +269,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -282,7 +282,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
 			}).
 			GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
@@ -311,7 +311,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -324,7 +324,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
 			}).
 			GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
@@ -353,7 +353,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -366,7 +366,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
 			}).
 			GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
@@ -396,7 +396,7 @@ func TestFindLostAndFound(t *testing.T) {
 			WithSigner("find"),
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("allReceivers", `["user1"]`),
-			WithArg("ids", []uint64{0}),
+			WithArg("ids", []uint64{2}),
 			WithArg("memos", `["Hello!"]`),
 			WithArg("donationTypes", `[nil]`),
 			WithArg("donationAmounts", `[nil]`),
@@ -409,7 +409,7 @@ func TestFindLostAndFound(t *testing.T) {
 				"receiverName": "user1",
 				"sender":       otu.O.Address("find"),
 				"type":         exampleNFTType(otu),
-				"id":           0,
+				"id":           2,
 				"memo":         "Hello!",
 			})
 
@@ -527,71 +527,6 @@ func TestFindLostAndFound(t *testing.T) {
 
 	})
 
-	/*
-		t.Run("Should refill user storage if the receiver account is full by subsidizing", func(t *testing.T) {
-
-			otu.O.Tx("setupDandyCollection",
-				WithSigner("user2"),
-			).
-				AssertSuccess(t)
-
-			otu.O.Tx("devFillUpStorage",
-				WithSigner("user2"),
-			).
-				AssertSuccess(t)
-
-			otu.O.FillUpStorage("user2")
-
-			amount := 20
-
-			ids := mintDandies(otu, amount)
-
-			identifiers := []string{}
-			allReceivers := []string{}
-			memos := []string{}
-			nils := `[nil`
-
-			for len(identifiers) < len(ids) {
-				identifiers = append(identifiers, "A.f8d6e0586b0a20c7.Dandy.NFT")
-				allReceivers = append(allReceivers, "user2")
-				memos = append(memos, "Msg")
-				nils = nils + `, nil`
-			}
-			nils = nils + `]`
-
-			otu.O.Tx("sendNFTsSubsidize",
-				WithSigner("user1"),
-				WithArg("nftIdentifiers", identifiers),
-				WithArg("allReceivers", allReceivers),
-				WithArg("ids", ids),
-				WithArg("memos", memos),
-				WithArg("donationTypes", nils),
-				WithArg("donationAmounts", nils),
-				WithArg("findDonationType", nil),
-				WithArg("findDonationAmount", nil),
-			).
-				AssertSuccess(t).
-				AssertEvent(t, "FindLostAndFoundWrapper.NFTDeposited", map[string]interface{}{
-					"receiver":     otu.O.Address("user2"),
-					"receiverName": "user2",
-					"sender":       otu.O.Address("user1"),
-					"type":         "A.f8d6e0586b0a20c7.Dandy.NFT",
-					"memo":         "Msg",
-				}).
-				AssertEvent(t, "FindLostAndFoundWrapper.UserStorageSubsidized", map[string]interface{}{
-					"receiver":     otu.O.Address("user2"),
-					"receiverName": "user2",
-					"sender":       otu.O.Address("user1"),
-				})
-
-			otu.O.Tx("devRefillStorage",
-				WithSigner("user2"),
-			).
-				AssertSuccess(t)
-
-		})
-	*/
-
 	t.Run("Should be able to get required storage type by script so that they can redeem NFTs", func(t *testing.T) {
 
 		resetState(otu, "user2", false)
@@ -686,7 +621,7 @@ func resetState(otu *OverflowTestUtils, user string, resetExampleNFT bool) *Over
 		AssertSuccess(otu.T)
 
 	if resetExampleNFT {
-		otu.sendExampleNFT("find", user)
+		otu.sendExampleNFT("find", user, 2)
 	}
 
 	signWithUser("devDestroyExampleNFTCollection").

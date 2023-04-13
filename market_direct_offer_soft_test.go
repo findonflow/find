@@ -518,7 +518,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 
 		otu.setDUCExampleNFT().
-			sendExampleNFT("user1", "find")
+			sendExampleNFT("user1", "find",0)
 
 		saleItemID := otu.directOfferMarketSoftDUC("user2", "user1", 0, price)
 
@@ -527,7 +527,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoftDUC("user2", saleItemID[0], price)
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 	})
 
 	t.Run("Should be able to offer an NFT and fulfill it with id != uuid", func(t *testing.T) {
@@ -539,7 +539,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user1", "active_finished", price).
 			fulfillMarketDirectOfferSoft("user2", saleItemID[0], price)
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 	})
 
 	t.Run("Should be able to multiple offer and fulfill", func(t *testing.T) {
@@ -765,7 +765,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"amount": price,
 				"status": "sold",
 			})
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 	})
 
 	t.Run("Should not be able to make offer on soul bound items", func(t *testing.T) {

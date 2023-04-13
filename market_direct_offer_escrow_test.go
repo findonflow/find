@@ -526,7 +526,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	t.Run("Should be able to direct offer and fulfill multiple NFT in one go", func(t *testing.T) {
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "find").
+			sendExampleNFT("user1", "find",2).
 			setFlowExampleMarketOption("find")
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
@@ -711,11 +711,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
 
-		saleItem := otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
+		saleItem := otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 2, price)
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 
-		otu.changeRoyaltyExampleNFT("user1", 0, true)
+		otu.changeRoyaltyExampleNFT("user1", 2, true)
 
 		otu.O.Tx("fulfillMarketDirectOfferEscrowed",
 			WithSigner("user1"),
@@ -735,11 +735,11 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
 
-		otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 0, price)
+		otu.directOfferMarketEscrowedExampleNFT("user2", "user1", 2, price)
 
 		otu.saleItemListed("user1", "active_ongoing", price)
 
-		otu.changeRoyaltyExampleNFT("user1", 0, false)
+		otu.changeRoyaltyExampleNFT("user1", 2, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("user", "user1"),

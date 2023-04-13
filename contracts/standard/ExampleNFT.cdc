@@ -387,7 +387,11 @@ pub contract ExampleNFT: NonFungibleToken {
         let nft <- ExampleNFT.mintNFT(name: "DUCExampleNFT", description: "For testing listing in DUC", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false,traits : [], royalties: MetadataViews.Royalties(royalties))
         let nft2 <- ExampleNFT.mintNFT(name: "SoulBoundNFT", description: "This is soulBound", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: true,traits : [1,2,3], royalties: MetadataViews.Royalties(royalties))
 
+        let flowR = MetadataViews.Royalties([MetadataViews.Royalty(receiver:ExampleNFT.account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), cut: 0.01, description: "Flow royalty")])
+        let nft3 <- ExampleNFT.mintNFT(name: "FlowExampleNFT", description: "For testing listing in Flow", thumbnail: "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg", soulBound: false,traits : [1,2,3], royalties: flowR)
+
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft)
         ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft2)
+        ExampleNFT.account.borrow<&ExampleNFT.Collection>(from: self.CollectionStoragePath)!.deposit(token : <- nft3)
     }
 }

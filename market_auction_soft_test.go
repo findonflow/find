@@ -610,7 +610,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
 
 		otu.setDUCExampleNFT().
-			sendExampleNFT("user1", "find")
+			sendExampleNFT("user1", "find",0)
 
 		saleItemID := otu.listNFTForSoftAuctionDUC("user1", 0, price)
 
@@ -620,7 +620,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionSoftDUC("user2", saleItemID[0], 15.0)
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 	})
 
 	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
@@ -633,7 +633,7 @@ func TestMarketAuctionSoft(t *testing.T) {
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionSoft("user2", saleItemID[0], 15.0)
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 	})
 
 	t.Run("Should not be able to list soul bound items", func(t *testing.T) {
