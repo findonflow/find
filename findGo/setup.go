@@ -73,10 +73,10 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 
 	lease, err := o.QualifiedIdentifier("FIND", "Lease")
 	ot.assertErr(err)
-	res = o.Tx("tenantsetMarketOptionDUC",
+	res = o.Tx("tenantsetLeaseOptionDapper",
 		WithSigner(name),
 		WithArg("nftName", "Lease"),
-		WithArg("nftTypes", []string{lease}),
+		WithArg("nftType", lease),
 		WithArg("cut", tenantCut),
 	)
 	ot.assertTrxn(res)

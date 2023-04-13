@@ -4,10 +4,15 @@ import . "github.com/bjartek/overflow"
 
 func main() {
 	o := Overflow(
-		WithNetwork("testnet"),
+		WithNetwork("mainnet"),
+		WithGlobalPrintOptions(),
 	)
 
-	list := map[uint64][]string{}
+	list := map[uint64][]string{
+		3: {"0x7f97054dc583b63c"},
+		4: {"0x7f97054dc583b63c"},
+		5: {"0x7f97054dc583b63c"},
+	}
 
 	AirdropNameVoucher(list, o)
 
