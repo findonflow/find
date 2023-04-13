@@ -36,6 +36,9 @@ minor:
 major:
 	json-bump lib/package.json --major
 
+bump:
+	go run tasks/bumpVersion/main.go
+
 client: gen-client
 	./dappertx testnet
 	./dappertx mainnet

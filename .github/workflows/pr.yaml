@@ -50,13 +50,15 @@ jobs:
         with:
           test-results: test.json
 
-generate-client:
+  generate-client:
     runs-on: ubuntu-latest
     env:
       TESTNET_ACCOUNT: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
       MAINNET_FIND: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
       MAINNET_FIND_ADMIN: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
     needs: test
+    output:
+      client_changed: ${{ steps.bump.outputs.bumped }}
     steps:
      - name: Checkout code
        uses: actions/checkout@v3
@@ -71,14 +73,35 @@ generate-client:
          files: |
            lib/find.json
            dapper-tx
-     - name: fail if client changed
-       if: contains(steps.verify-changed-files.outputs.changed_files, 'lib/find.json')
-       run: |
-        echo "find client is not updated"
-        exit 1
-     - name: fail if dapper transactions changed
+      - name: fail if dapper transactions changed
        if: contains(steps.verify-changed-files.outputs.changed_files, 'dapper-tx')
        run: |
         echo "dapper-tx is not updated"
         exit 1
+     - name: bump client if find client changed
+       id: bump
+       if: contains(steps.verify-changed-files.outputs.changed_files, 'lib/find.json')
+       run: |
+        make bump
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add .
+        git commit -m "bump client"
+        git push
+        "bumped=true" >> $GITHUB_OUTPUT
+
+  publish :
+    runs-on: ubuntu-latest
+    needs: generate-client
+    if: needs.generate-client.outputs.client_changed == 'true'
+    env:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+    steps:
+     - name: Checkout code
+       uses: actions/checkout@v3
+     - uses: actions/setup-go@v4
+       with:
+         go-version: 1.18
+     - name: publish npm
+        run: make publish
 

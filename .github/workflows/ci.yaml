@@ -49,13 +49,15 @@ jobs:
         with:
           test-results: test.json
 
-generate-client:
+  generate-client:
     runs-on: ubuntu-latest
     env:
       TESTNET_ACCOUNT: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
       MAINNET_FIND: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
       MAINNET_FIND_ADMIN: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
     needs: test
+    output:
+      client_changed: ${{ steps.bump.outputs.bumped }}
     steps:
      - name: Checkout code
        uses: actions/checkout@v3
@@ -70,16 +72,27 @@ generate-client:
          files: |
            lib/find.json
            dapper-tx
-     - name: Bump client version
-       if: contains(steps.verify-changed-files.outputs.changed_files, 'lib/find.json')
-       uses: 'phips28/gh-action-bump-version@master'
-       env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-         PACKAGEJSON_DIR:  'lib'
-       with:
-         tag-prefix:  'v'
-         commit-message: 'CI: bumps version to {{version}} [skip ci]'
-     - uses: fregante/release-with-changelog@v3
-       if: contains(steps.verify-changed-files.outputs.changed_files, 'lib/client.json')
-       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: fail if dapper transactions changed
+        if: contains(steps.verify-changed-files.outputs.changed_files, 'dapper-tx')
+        run: |
+        echo "dapper-tx is not updated"
+        exit 1
+      - name: fail if find client changed
+        if: contains(steps.verify-changed-files.outputs.changed_files, 'lib/find.json')
+        run: |
+        echo "find client is not updated"
+        exit 1
+
+      - name: Check package version
+        id: cpv
+        uses: PostHog/check-package-version@v2
+
+      - name: Ensure package is not rc version
+      if : contains(steps.cpv.outputs.committed-version, 'rc')
+        run : |
+          echo "version is not updated, it cannot be in rc version"
+          exit 1
+
+      - name: Publish new version
+        if: steps.cpv.outputs.is-new-version == 'true'
+        run: npm publish
