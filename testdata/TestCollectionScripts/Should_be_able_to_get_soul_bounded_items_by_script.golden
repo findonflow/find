@@ -1,6 +1,18 @@
 []interface{}{
 	map[string]interface{}{
 		"collection":          "A.179b6b1cb6755e31.ExampleNFT.NFT",
+		"edition":             2,
+		"id":                  2,
+		"media":               "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
+		"mediaType":           "image/png",
+		"name":                "FlowExampleNFT",
+		"nftDetailIdentifier": "A.179b6b1cb6755e31.ExampleNFT.NFT",
+		"soulBounded":         false,
+		"source":              "NFTCatalog",
+		"subCollection":       "The Example Collection",
+	},
+	map[string]interface{}{
+		"collection":          "A.179b6b1cb6755e31.ExampleNFT.NFT",
 		"edition":             1,
 		"id":                  1,
 		"media":               "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",

@@ -760,17 +760,17 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
 
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "find").
+			sendExampleNFT("user1", "find", 2).
 			setFlowExampleMarketOption("find")
 
-		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
+		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
 
 		otu.saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
 			fulfillMarketAuctionEscrow("user1", saleItem[0], "user2", price+5.0).
-			sendExampleNFT("user1", "user2")
+			sendExampleNFT("user1", "user2", 2)
 
 	})
 
@@ -800,14 +800,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
 
-		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
+		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
 
 		otu.saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.changeRoyaltyExampleNFT("user1", 0, true)
+		otu.changeRoyaltyExampleNFT("user1", 2, true)
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
 			WithSigner("user2"),
@@ -829,14 +829,14 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
 
-		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 0, price)
+		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
 
 		otu.saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.changeRoyaltyExampleNFT("user1", 0, false)
+		otu.changeRoyaltyExampleNFT("user1", 2, false)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("user", "user1"),
@@ -856,7 +856,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	})
 
 	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
-		otu.changeRoyaltyExampleNFT("user1", 0, true)
+		otu.changeRoyaltyExampleNFT("user1", 2, true)
 
 		ids, err := otu.O.Script("getRoyaltyChangedIds",
 			WithArg("user", "user1"),

@@ -575,7 +575,7 @@ func TestMarketSale(t *testing.T) {
 
 		otu.registerDUCInRegistry().
 			setExampleNFT().
-			sendExampleNFT("user1", "find").
+			sendExampleNFT("user1", "find",0).
 			setFlowExampleMarketOption("find")
 
 		saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
@@ -589,7 +589,7 @@ func TestMarketSale(t *testing.T) {
 		otu.getNFTForMarketSale("user1", saleItemID[0], price)
 
 		otu.buyNFTForMarketSaleDUC("user2", "user1", saleItemID[0], price).
-			sendExampleNFT("user1", "user2")
+			sendExampleNFT("user1", "user2", 0)
 
 	})
 
@@ -621,7 +621,7 @@ func TestMarketSale(t *testing.T) {
 					"amount":  0.35,
 				})
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 
 	})
 
@@ -653,7 +653,7 @@ func TestMarketSale(t *testing.T) {
 					"amount":  3.5,
 				})
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 
 	})
 
@@ -684,7 +684,7 @@ func TestMarketSale(t *testing.T) {
 			)
 
 		otu.linkDUCVaultReceiver("find")
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 	})
 
 	t.Run("Should be able to list multiple dandies for sale and buy them in one go", func(t *testing.T) {
@@ -863,7 +863,7 @@ func TestMarketSale(t *testing.T) {
 				"status": "sold",
 			})
 
-		otu.sendExampleNFT("user1", "user2")
+		otu.sendExampleNFT("user1", "user2",0)
 
 	})
 

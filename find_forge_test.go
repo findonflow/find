@@ -49,7 +49,14 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionBannerImage", "Example NFT banner image"),
 		).AssertSuccess(t)
 
-		// autogold.Equal(t, result)
+		extraIDs ,err := otu.O.Script(
+			`
+				import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+
+				pub fun main() : UInt64 {return ExampleNFT.totalSupply - 1}
+			`,
+		).GetAsInterface()
+		assert.NoError(t, err)
 
 		otu.O.Script("getNFTCatalogIDs",
 			WithArg("user", "user1"),
@@ -57,7 +64,7 @@ func TestFindForge(t *testing.T) {
 		).AssertWant(t,
 			autogold.Want("collection", map[string]interface{}{exampleNFTIdentifier: map[string]interface{}{
 				"collectionName":     "The Example Collection",
-				"extraIDs":           []interface{}{2},
+				"extraIDs":           []interface{}{extraIDs},
 				"extraIDsIdentifier": exampleNFTIdentifier,
 				"length":             1,
 				"shard":              "NFTCatalog",

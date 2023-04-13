@@ -243,10 +243,10 @@ func TestFindVerifier(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsInPath",
 			WithArg("user", otu.O.Address("find")),
 			WithArg("path", "exampleNFTCollection"),
-			WithArg("threshold", 3),
+			WithArg("threshold", 100),
 		).
 			AssertWant(t, autogold.Want("Has no. of NFT less than threshold, false", map[string]interface{}{
-				"description": "Users with at least 3 nos. of NFT in path /public/exampleNFTCollection are verified",
+				"description": "Users with at least 100 nos. of NFT in path /public/exampleNFTCollection are verified",
 				"result":      false,
 			}))
 	})

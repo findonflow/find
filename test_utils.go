@@ -1788,7 +1788,7 @@ func (otu *OverflowTestUtils) setFlowDandyMarketOption(tenant string) *OverflowT
 
 	tx := "tenantsetMarketOption"
 	if tenant == "dapper" {
-		tx = "tenantsetMarketOptionDapper"
+		tx = "devtenantsetMarketOptionDapper"
 	}
 
 	otu.O.Tx(tx,
@@ -1808,7 +1808,7 @@ func (otu *OverflowTestUtils) setFlowExampleMarketOption(tenant string) *Overflo
 
 	tx := "tenantsetMarketOption"
 	if tenant == "dapper" {
-		tx = "tenantsetMarketOptionDapper"
+		tx = "devtenantsetMarketOptionDapper"
 	}
 
 	otu.O.Tx(tx,
@@ -2137,7 +2137,7 @@ func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTes
 	return otu
 }
 
-func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowTestUtils {
+func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string, id uint64) *OverflowTestUtils {
 
 	otu.O.Tx("setupExampleNFTCollection",
 		WithSigner(receiver),
@@ -2147,7 +2147,7 @@ func (otu *OverflowTestUtils) sendExampleNFT(receiver, sender string) *OverflowT
 	otu.O.Tx("sendExampleNFT",
 		WithSigner(sender),
 		WithArg("user", otu.O.Address(receiver)),
-		WithArg("id", 0),
+		WithArg("id", id),
 	).
 		AssertSuccess(otu.T)
 
@@ -2174,7 +2174,7 @@ func (otu *OverflowTestUtils) setExampleNFT() *OverflowTestUtils {
 
 	id, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
 	assert.NoError(otu.T, err)
-	otu.O.Tx("tenantsetMarketOptionDapper",
+	otu.O.Tx("devtenantsetMarketOptionDapper",
 		WithSigner("find"),
 		WithArg("nftName", "ExampleNFT"),
 		WithArg("nftTypes", []string{id}),
@@ -2190,7 +2190,7 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 
 	id, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
 	assert.NoError(otu.T, err)
-	otu.O.Tx("tenantsetMarketOptionDapper",
+	otu.O.Tx("devtenantsetMarketOptionDapper",
 		WithSigner("find"),
 		WithArg("nftName", "ExampleNFT"),
 		WithArg("nftTypes", []string{id}),
@@ -2690,7 +2690,7 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 		WithSigner("find"),
 		WithArg("nftIdentifiers", []string{nftIden}),
 		WithArg("allReceivers", `["user1"]`),
-		WithArg("ids", []uint64{0}),
+		WithArg("ids", []uint64{2}),
 		WithArg("memos", `["Hello!"]`),
 		WithArg("donationTypes", `[nil]`),
 		WithArg("donationAmounts", `[nil]`),
@@ -2703,10 +2703,10 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 			"receiverName": "user1",
 			"sender":       otu.O.Address("find"),
 			"type":         nftIden,
-			"id":           0,
+			"id":           2,
 			"memo":         "Hello!",
-			"name":         "DUCExampleNFT",
-			"description":  "For testing listing in DUC",
+			"name":         "FlowExampleNFT",
+			"description":  "For testing listing in Flow",
 			"thumbnail":    "https://images.ongaia.com/ipfs/QmZPxYTEx8E5cNy5SzXWDkJQg8j5C3bKV6v7csaowkovua/8a80d1575136ad37c85da5025a9fc3daaf960aeab44808cd3b00e430e0053463.jpg",
 		})
 
