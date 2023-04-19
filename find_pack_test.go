@@ -24,6 +24,8 @@ func TestFindPack(t *testing.T) {
 		buyForge("user1").
 		registerExampleNFTInNFTRegistry()
 
+	otu.setUUID(5000)
+
 	singleType := []string{exampleNFTType(otu)}
 
 	flow, err := otu.O.QualifiedIdentifier("FlowToken", "Vault")
@@ -718,7 +720,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 674",
+							"User with one of these FLOATs are verified : 5335",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -729,7 +731,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 3,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 674",
+							"User with one of these FLOATs are verified : 5335",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -740,7 +742,7 @@ func TestFindPack(t *testing.T) {
 						"price":     3.3,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 674",
+							"User with one of these FLOATs are verified : 5335",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -814,7 +816,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 678",
+							"User with one of these FLOATs are verified : 5339",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -831,7 +833,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 678",
+							"User with one of these FLOATs are verified : 5339",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -886,7 +888,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 678",
+							"User with one of these FLOATs are verified : 5339",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -903,7 +905,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 678",
+							"User with one of these FLOATs are verified : 5339",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -957,7 +959,7 @@ func TestFindPack(t *testing.T) {
 						"price":     2.2,
 						"startTime": 2,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 678",
+							"User with one of these FLOATs are verified : 5339",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,
@@ -974,7 +976,7 @@ func TestFindPack(t *testing.T) {
 						"price":     1.1,
 						"startTime": 1,
 						"verifiers": []interface{}{
-							"User with one of these FLOATs are verified : 678",
+							"User with one of these FLOATs are verified : 5339",
 							"Users with one of these find names are verified : user1",
 						},
 						"verifyAll": false,

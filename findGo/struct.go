@@ -52,3 +52,26 @@ type FindVerifier_HasOneFLOAT struct {
 	FloatEventIds []uint64 `json:"floatEventIds"`
 	Description   string   `json:"description"`
 }
+
+type GeneratedExperience_CollectionInfo struct {
+	Season uint64 `json:"season"`
+	Royalties []FindPack_Royalty `json:"royalties"`
+	SquareImage string `json:"squareImage"`
+	BannerImage string `json:"bannerImage"`
+	Description string `json:"description"`
+	Extra map[string]interface{} `json:"extra"`
+}
+
+type GeneratedExperience_Info struct {
+	Season uint64 `json:"season"`
+	Name string `json:"name"`
+	Description string `json:"description"`
+	ThumbnailHash string `json:"thumbnailHash"`
+	FullsizeHash string `json:"fullsizeHash"`
+	Edition uint64 `json:"edition"`
+	MaxEdition uint64 `json:"maxEdition"`
+	Artist string `json:"artist"`
+	Rarity string `json:"rarity"`
+	Extra map[string]interface{} `json:"extra"`
+
+}

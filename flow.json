@@ -352,6 +352,7 @@
 		"NFGv3": "./contracts/NFGv3.cdc",
 		"PartyFavorz": "./contracts/PartyFavorz.cdc",
 		"PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc",
+		"GeneratedExperience": "./contracts/GeneratedExperience.cdc",
 		"FindRewardToken": "./contracts/FindRewardToken.cdc",
 		"FindToken": "./contracts/FindToken.cdc",
 		"FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
@@ -554,7 +555,8 @@
 				"NFGv3",
 				"PartyFavorz",
 				"PartyFavorzExtraData",
-				"Flomies"
+				"Flomies",
+				"GeneratedExperience"
 			]
 		},
 		"testnet": {
@@ -606,7 +608,9 @@
 				"NFGv3",
 				"PartyFavorz",
 				"PartyFavorzExtraData",
-				"Flomies"
+				"Flomies",
+				"GeneratedExperience"
+
 			],
 			"testnet-emerald-identity": [
 				"EmeraldIdentityLilico",
@@ -705,7 +709,8 @@
 				"PartyFavorz",
 				"PartyFavorzExtraData",
 				"Bl0x",
-				"Bl0xPack"
+				"Bl0xPack",
+				"GeneratedExperience"
 			],
 			"emulator-find-lease": [],
 			"emulator-user1": [],
