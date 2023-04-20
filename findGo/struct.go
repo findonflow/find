@@ -1,5 +1,9 @@
 package findGo
 
+import (
+	. "github.com/bjartek/overflow"
+)
+
 type FindMarketCutStruct_ThresholdCut struct {
 	Name           string         `json:"name"`
 	Address        string         `json:"address" cadence:"address,cadenceAddress"`
@@ -57,8 +61,8 @@ type GeneratedExperience_CollectionInfo struct {
 	Season uint64 `json:"season"`
 	Royalties []interface{} `json:"royalties"`
 	RoyaltiesInput []FindPack_Royalty `json:"royaltiesInput"`
-	SquareImage string `json:"squareImage"`
-	BannerImage string `json:"bannerImage"`
+	SquareImage MetadataViews_Media_IPFS `json:"squareImage"`
+	BannerImage MetadataViews_Media_IPFS `json:"bannerImage"`
 	Description string `json:"description"`
 	Extra map[string]interface{} `json:"extra"`
 }
@@ -67,8 +71,8 @@ type GeneratedExperience_Info struct {
 	Season uint64 `json:"season"`
 	Name string `json:"name"`
 	Description string `json:"description"`
-	ThumbnailHash string `json:"thumbnailHash"`
-	FullsizeHash string `json:"fullsizeHash"`
+	Thumbnail MetadataViews_IPFSFile `json:"thumbnail"`
+	Fullsize MetadataViews_IPFSFile `json:"fullsize"`
 	Edition uint64 `json:"edition"`
 	MaxEdition uint64 `json:"maxEdition"`
 	Artist string `json:"artist"`

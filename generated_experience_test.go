@@ -39,8 +39,18 @@ func TestGeneratedExperience(t *testing.T) {
 						Description: "Royalty",
 					},
 				},
-				SquareImage: "https://example.com/square.png",
-				BannerImage: "https://example.com/banner.png",
+				SquareImage: MetadataViews_Media_IPFS{
+					File: MetadataViews_IPFSFile{
+						Cid: "square",
+					},
+					MediaType: "png",
+				},
+				BannerImage: MetadataViews_Media_IPFS{
+					File: MetadataViews_IPFSFile{
+						Cid: "banner",
+					},
+					MediaType: "png",
+				},
 				Description: "Description",
 			},
 		}
@@ -53,8 +63,8 @@ func TestGeneratedExperience(t *testing.T) {
 			AssertSuccess(t).
 			AssertEvent(t, "SeasonAdded", map[string]interface{}{
 				"season":      1,
-				"squareImage": "https://example.com/square.png",
-				"bannerImage": "https://example.com/banner.png",
+				"squareImage": "ipfs://square",
+				"bannerImage": "ipfs://banner",
 			})
 
 	})
@@ -63,26 +73,34 @@ func TestGeneratedExperience(t *testing.T) {
 
 		info := []findGo.GeneratedExperience_Info{
 			{
-				Season:        1,
-				Description:   "Description",
-				Name:          "Name",
-				ThumbnailHash: "https://example.com/thumbnail.png",
-				FullsizeHash:  "https://example.com/fullsize.png",
-				Edition:       1,
-				MaxEdition:    2,
-				Artist:        "Artist",
-				Rarity:        "Common",
+				Season:      1,
+				Description: "Description",
+				Name:        "Name",
+				Thumbnail: MetadataViews_IPFSFile{
+					Cid: "thumbnail",
+				},
+				Fullsize: MetadataViews_IPFSFile{
+					Cid: "fullsize",
+				},
+				Edition:    1,
+				MaxEdition: 2,
+				Artist:     "Artist",
+				Rarity:     "Common",
 			},
 			{
-				Season:        1,
-				Description:   "Description",
-				Name:          "Name",
-				ThumbnailHash: "https://example.com/thumbnail.png",
-				FullsizeHash:  "https://example.com/fullsize.png",
-				Edition:       2,
-				MaxEdition:    2,
-				Artist:        "Artist",
-				Rarity:        "Rare",
+				Season:      1,
+				Description: "Description",
+				Name:        "Name",
+				Thumbnail: MetadataViews_IPFSFile{
+					Cid: "thumbnail",
+				},
+				Fullsize: MetadataViews_IPFSFile{
+					Cid: "fullsize",
+				},
+				Edition:    2,
+				MaxEdition: 2,
+				Artist:     "Artist",
+				Rarity:     "Rare",
 			},
 		}
 
@@ -95,8 +113,8 @@ func TestGeneratedExperience(t *testing.T) {
 			AssertEvent(t, "Minted", map[string]interface{}{
 				"season":     1,
 				"name":       "Name",
-				"thumbnail":  "https://example.com/thumbnail.png",
-				"fullsize":   "https://example.com/fullsize.png",
+				"thumbnail":  "ipfs://thumbnail",
+				"fullsize":   "ipfs://fullsize",
 				"artist":     "Artist",
 				"rarity":     "Common",
 				"edition":    1,
@@ -105,8 +123,8 @@ func TestGeneratedExperience(t *testing.T) {
 			AssertEvent(t, "Minted", map[string]interface{}{
 				"season":     1,
 				"name":       "Name",
-				"thumbnail":  "https://example.com/thumbnail.png",
-				"fullsize":   "https://example.com/fullsize.png",
+				"thumbnail":  "ipfs://thumbnail",
+				"fullsize":   "ipfs://fullsize",
 				"artist":     "Artist",
 				"rarity":     "Rare",
 				"edition":    2,
@@ -150,14 +168,13 @@ func TestGeneratedExperience(t *testing.T) {
 	})
 
 	tcs := map[string]autogold.Value{
-		"A.f8d6e0586b0a20c7.MetadataViews.Display":     autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "https://example.com/thumbnail.png"}}),
+		"A.f8d6e0586b0a20c7.MetadataViews.Display":     autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Royalties":   autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0xf669cb8d41ce0c74, path: /public/findProfileReceiver)"}}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Editions":    autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "genereatedexperience", "number": 2}}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Traits":      autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/0xf3fcd2c1a78f5eee/collection/main/generatedExperience/331"}),
 		"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay": autogold.Want("NFTCollectionDisplay", map[string]interface{}{
-			"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "https://example.com/banner.png"}, "mediaType": "image/png"},
-			"description": "Description",
+			"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "banner"}, "mediaType": "png"}, "description": "Description",
 			"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperience"},
 			"name":        "GeneratedExperience",
 			"socials": map[string]interface{}{
@@ -165,23 +182,16 @@ func TestGeneratedExperience(t *testing.T) {
 				"twitter": map[string]interface{}{"url": "https://twitter.com/GeneratedExperience"},
 			},
 			"squareImage": map[string]interface{}{
-				"file":      map[string]interface{}{"cid": "https://example.com/square.png"},
-				"mediaType": "image/png",
+				"file":      map[string]interface{}{"cid": "square"},
+				"mediaType": "png",
 			},
 		}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Medias": autogold.Want("Medias", map[string]interface{}{"items": []interface{}{
-			map[string]interface{}{"file": map[string]interface{}{"cid": "https://example.com/thumbnail.png"}, "mediaType": "image/png"},
-			map[string]interface{}{
-				"file":      map[string]interface{}{"cid": "https://example.com/fullsize.png"},
-				"mediaType": "image/png",
-			},
-		}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Rarity": autogold.Want("Rarity", map[string]interface{}{"description": "Rare"}),
-		"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", map[string]interface{}{"data": map[string]interface{}{
-			"nftImage": "ipfs://https://example.com/thumbnail.png",
-			"nftName":  "Name",
-			"packType": "GeneratedExperience",
-		}}),
+		"A.f8d6e0586b0a20c7.MetadataViews.Medias": autogold.Want("Medias", map[string]interface{}{"items": []interface{}{map[string]interface{}{"file": map[string]interface{}{"cid": "thumbnail"}, "mediaType": "image"}, map[string]interface{}{
+			"file":      map[string]interface{}{"cid": "fullsize"},
+			"mediaType": "image",
+		}}}),
+		"A.f8d6e0586b0a20c7.MetadataViews.Rarity":    autogold.Want("Rarity", map[string]interface{}{"description": "Rare"}),
+		"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", map[string]interface{}{"data": map[string]interface{}{"nftImage": "ipfs://thumbnail", "nftName": "Name", "packType": "GeneratedExperience"}}),
 	}
 
 	script := `

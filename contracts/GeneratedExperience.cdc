@@ -27,8 +27,8 @@ pub contract GeneratedExperience: NonFungibleToken {
 		pub var royalties: [MetadataViews.Royalty]
 		// This is only used internally for fetching royalties in
 		pub let royaltiesInput: [FindPack.Royalty]
-		pub let squareImage: String
-		pub let bannerImage: String
+		pub let squareImage: MetadataViews.Media
+		pub let bannerImage: MetadataViews.Media
 		pub let description: String
 		access(contract) let extra: {String: AnyStruct}
 
@@ -36,8 +36,8 @@ pub contract GeneratedExperience: NonFungibleToken {
 			season: UInt64,
 			royalties: [MetadataViews.Royalty],
 			royaltiesInput: [FindPack.Royalty],
-			squareImage: String,
-			bannerImage: String,
+			squareImage: MetadataViews.Media,
+			bannerImage: MetadataViews.Media,
 			description: String
 		) {
 			self.season = season
@@ -59,22 +59,22 @@ pub contract GeneratedExperience: NonFungibleToken {
 		pub let season: UInt64
 		pub let name: String
 		pub let description: String
-		pub let thumbnailHash: String
-		pub let fullsizeHash: String
+		pub let thumbnail: {MetadataViews.File}
+		pub let fullsize: {MetadataViews.File}
 		pub let edition: UInt64
 		pub let maxEdition: UInt64
 		pub let artist: String
 		pub let rarity: String
 		access(self) let extra: {String: AnyStruct}
 
-		init(season: UInt64, name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, fullsizeHash: String, artist: String, rarity: String) {
+		init(season: UInt64, name: String, description: String, thumbnail: {MetadataViews.File}, edition:UInt64, maxEdition:UInt64, fullsize: {MetadataViews.File}, artist: String, rarity: String) {
 			self.season=season
 			self.name=name
 			self.description=description
-			self.thumbnailHash=thumbnailHash
+			self.thumbnail=thumbnail
+			self.fullsize=fullsize
 			self.edition=edition
 			self.maxEdition=maxEdition
-			self.fullsizeHash=fullsizeHash
 			self.artist=artist
 			self.rarity=rarity
 			self.extra={}
@@ -110,13 +110,12 @@ pub contract GeneratedExperience: NonFungibleToken {
 		pub fun resolveView(_ view: Type): AnyStruct? {
 
 			let collection = GeneratedExperience.collectionInfo[self.info.season]!
-			let imageFile = MetadataViews.IPFSFile( cid: self.info.thumbnailHash, path: nil)
 
 			switch view {
 
 			case Type<FindPack.PackRevealData>():
 				let data : {String : String} = {
-					"nftImage" : imageFile.uri() ,
+					"nftImage" : self.info.thumbnail.uri() ,
 					"nftName" : self.info.name,
 					"packType" : "GeneratedExperience"
 				}
@@ -126,9 +125,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				return MetadataViews.Display(
 					name: self.info.name,
 					description: self.info.description,
-					thumbnail: MetadataViews.IPFSFile(
-						cid: self.info.thumbnailHash, path: nil
-					)
+					thumbnail: self.info.thumbnail
 				)
 			case Type<MetadataViews.Editions>():
 				// We do not show season here unless there are more than 1 collectionInfo (that is indexed by season)
@@ -161,21 +158,9 @@ pub contract GeneratedExperience: NonFungibleToken {
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
 
-				var square = MetadataViews.Media(
-					file: MetadataViews.IPFSFile(
-						cid: collection.squareImage,
-						path: nil
-					),
-					mediaType: "image/png"
-				)
+				var square = collection.squareImage
 
-				var banner = MetadataViews.Media(
-					file: MetadataViews.IPFSFile(
-						cid: collection.bannerImage,
-						path: nil
-					),
-					mediaType: "image/png"
-				)
+				var banner = collection.bannerImage
 
 				return MetadataViews.NFTCollectionDisplay(
 					name: "GeneratedExperience",
@@ -203,12 +188,9 @@ pub contract GeneratedExperience: NonFungibleToken {
 				return MetadataViews.Traits(traits)
 
 			case Type<MetadataViews.Medias>() :
-				var thumbnailMediaType = "image/png"
-				var fullImageMediaType = "image/png"
-
 				return MetadataViews.Medias([
-						MetadataViews.Media(file: MetadataViews.IPFSFile(cid: self.info.thumbnailHash, path: nil), mediaType: thumbnailMediaType),
-						MetadataViews.Media(file: MetadataViews.IPFSFile(cid: self.info.fullsizeHash, path: nil), mediaType: fullImageMediaType)
+						MetadataViews.Media(file: self.info.thumbnail, mediaType: "image"),
+						MetadataViews.Media(file: self.info.fullsize, mediaType: "image")
 				])
 
 			case Type<MetadataViews.Rarity>() :
@@ -288,7 +270,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 			)
 
 			GeneratedExperience.totalSupply = GeneratedExperience.totalSupply + 1
-			emit Minted(id:newNFT.id, season: info.season, name: info.name, thumbnail: info.thumbnailHash, fullsize: info.fullsizeHash, artist: info.artist, rarity: info.rarity, edition: info.edition, maxEdition: info.maxEdition)
+			emit Minted(id:newNFT.id, season: info.season, name: info.name, thumbnail: info.thumbnail.uri(), fullsize: info.fullsize.uri(), artist: info.artist, rarity: info.rarity, edition: info.edition, maxEdition: info.maxEdition)
 			return <- newNFT
 		}
 
@@ -314,7 +296,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 			collectionInfo.setRoyalty(r: arr)
 
 			GeneratedExperience.collectionInfo[collectionInfo.season] = collectionInfo
-			emit SeasonAdded(season:collectionInfo.season, squareImage: collectionInfo.squareImage, bannerImage: collectionInfo.bannerImage)
+			emit SeasonAdded(season:collectionInfo.season, squareImage: collectionInfo.squareImage.file.uri(), bannerImage: collectionInfo.bannerImage.file.uri())
         }
 	}
 
