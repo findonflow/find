@@ -55,7 +55,8 @@ type FindVerifier_HasOneFLOAT struct {
 
 type GeneratedExperience_CollectionInfo struct {
 	Season uint64 `json:"season"`
-	Royalties []FindPack_Royalty `json:"royalties"`
+	Royalties []interface{} `json:"royalties"`
+	RoyaltiesInput []FindPack_Royalty `json:"royaltiesInput"`
 	SquareImage string `json:"squareImage"`
 	BannerImage string `json:"bannerImage"`
 	Description string `json:"description"`

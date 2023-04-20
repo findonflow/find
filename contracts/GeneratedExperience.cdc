@@ -11,7 +11,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
 	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id:UInt64, serial: UInt64, season: UInt64, name: String, thumbnail: String, fullsize: String, artist: String, rarity: String, edition: UInt64, maxEdition: UInt64)
+	pub event Minted(id:UInt64, season: UInt64, name: String, thumbnail: String, fullsize: String, artist: String, rarity: String, edition: UInt64, maxEdition: UInt64)
 	pub event SeasonAdded(season:UInt64, squareImage: String, bannerImage: String)
 
 	pub let CollectionStoragePath: StoragePath
@@ -24,25 +24,34 @@ pub contract GeneratedExperience: NonFungibleToken {
 
 	pub struct CollectionInfo {
 		pub let season: UInt64
-		pub let royalties: [FindPack.Royalty]
+		pub var royalties: [MetadataViews.Royalty]
+		// This is only used internally for fetching royalties in
+		pub let royaltiesInput: [FindPack.Royalty]
 		pub let squareImage: String
 		pub let bannerImage: String
 		pub let description: String
-		access(self) let extra: {String: AnyStruct}
+		access(contract) let extra: {String: AnyStruct}
 
 		init(
 			season: UInt64,
-			royalties: [FindPack.Royalty],
+			royalties: [MetadataViews.Royalty],
+			royaltiesInput: [FindPack.Royalty],
 			squareImage: String,
 			bannerImage: String,
 			description: String
 		) {
 			self.season = season
 			self.royalties = royalties
+			self.royaltiesInput = royaltiesInput
 			self.squareImage = squareImage
 			self.bannerImage = bannerImage
 			self.description = description
 			self.extra={}
+		}
+
+		// This is only used internally for fetching royalties in
+		access(contract) fun setRoyalty(r: [MetadataViews.Royalty])  {
+			self.royalties = r
 		}
 	}
 
@@ -123,43 +132,18 @@ pub contract GeneratedExperience: NonFungibleToken {
 				)
 			case Type<MetadataViews.Editions>():
 				// We do not show season here unless there are more than 1 collectionInfo (that is indexed by season)
-				var editionName = "edition"
-				if GeneratedExperience.collectionInfo.length > 1 {
-					editionName = "season ".concat(self.info.season.toString()).concat(" edition")
-				}
+				let editionName = "GeneratedExperience"
 				let editionInfo = MetadataViews.Edition(name: editionName, number: self.info.edition, max: self.info.maxEdition)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
 					editionList
 				)
 			case Type<MetadataViews.Royalties>():
-				// TODO: Do we create royalties here every time?
-				let arr : [MetadataViews.Royalty] = []
-				let royalties = collection.royalties
-				for r in royalties {
-					// Try to get Token Switchboard
-					var receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
-					// If it fails, try to get Find Profile
-					if !receiverCap.check(){
-						receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/findProfileReceiver)
-					}
-					// If it fails, try to get Flow Token Receiver
-					if !receiverCap.check(){
-						receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-					}
-					// If it still fails, it might be a Dapper wallet and tries to get DUC receiver
-					if !receiverCap.check(){
-						receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-					}
-
-					arr.append(MetadataViews.Royalty(recipient: receiverCap, cut: r.cut, description: r.description))
-				}
-
-				return MetadataViews.Royalties(arr)
+				return MetadataViews.Royalties(collection.royalties)
 
 			case Type<MetadataViews.ExternalURL>():
 				if self.owner != nil {
-					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/main/generatedExperienceCollection/").concat(self.id.toString()))
+					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/main/generatedExperience/").concat(self.id.toString()))
 				}
 				return MetadataViews.ExternalURL("https://find.xyz/")
 
@@ -304,16 +288,33 @@ pub contract GeneratedExperience: NonFungibleToken {
 			)
 
 			GeneratedExperience.totalSupply = GeneratedExperience.totalSupply + 1
-			emit Minted(id:newNFT.id, serial: GeneratedExperience.totalSupply, season: info.season, name: info.name, thumbnail: info.thumbnailHash, fullsize: info.fullsizeHash, artist: info.artist, rarity: info.rarity, edition: info.edition, maxEdition: info.maxEdition)
+			emit Minted(id:newNFT.id, season: info.season, name: info.name, thumbnail: info.thumbnailHash, fullsize: info.fullsizeHash, artist: info.artist, rarity: info.rarity, edition: info.edition, maxEdition: info.maxEdition)
 			return <- newNFT
 		}
 
-
 		pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
-			let info = data as? CollectionInfo ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<CollectionInfo>().identifier))
+			let collectionInfo = data as? CollectionInfo ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<CollectionInfo>().identifier))
 
-			GeneratedExperience.collectionInfo[info.season] = info
-			emit SeasonAdded(season:info.season, squareImage: info.squareImage, bannerImage: info.bannerImage)
+			// We cannot send in royalties directly, therefore we have to send in FindPack Royalties and generate it during minting
+			let arr : [MetadataViews.Royalty] = []
+			for r in collectionInfo.royaltiesInput {
+				// Try to get Token Switchboard
+				var receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
+				// If it fails, try to get Find Profile
+				if !receiverCap.check(){
+					receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/findProfileReceiver)
+				}
+				// Do we check and panic here?
+				// if !receiverCap.check(){
+				// 	panic("royalty is not valid")
+				// }
+
+				arr.append(MetadataViews.Royalty(recipient: receiverCap, cut: r.cut, description: r.description))
+			}
+			collectionInfo.setRoyalty(r: arr)
+
+			GeneratedExperience.collectionInfo[collectionInfo.season] = collectionInfo
+			emit SeasonAdded(season:collectionInfo.season, squareImage: collectionInfo.squareImage, bannerImage: collectionInfo.bannerImage)
         }
 	}
 
@@ -326,9 +327,9 @@ pub contract GeneratedExperience: NonFungibleToken {
 		self.totalSupply = 0
 
 		// Set the named paths
-		self.CollectionStoragePath = /storage/GeneratedExperienceCollection
-		self.CollectionPrivatePath = /private/GeneratedExperienceCollection
-		self.CollectionPublicPath = /public/GeneratedExperienceCollection
+		self.CollectionStoragePath = /storage/GeneratedExperience
+		self.CollectionPrivatePath = /private/GeneratedExperience
+		self.CollectionPublicPath = /public/GeneratedExperience
 		self.MinterStoragePath = /storage/GeneratedExperienceMinter
 
 		self.collectionInfo = {}
