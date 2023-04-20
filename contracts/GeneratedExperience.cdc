@@ -132,7 +132,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				)
 			case Type<MetadataViews.Editions>():
 				// We do not show season here unless there are more than 1 collectionInfo (that is indexed by season)
-				let editionName = "GeneratedExperience"
+				let editionName = "genereatedexperience"
 				let editionInfo = MetadataViews.Edition(name: editionName, number: self.info.edition, max: self.info.maxEdition)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
