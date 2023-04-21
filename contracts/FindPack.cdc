@@ -528,7 +528,9 @@ pub contract FindPack: NonFungibleToken {
 				case Type<FindPack.Metadata>():
 				return metadata
 				case Type<MetadataViews.ExternalURL>():
-				//return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/findPack/").concat(self.id.toString()))
+				if self.owner != nil {
+					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/main/FindPackCollection/").concat(self.id.toString()))
+				}
 				return MetadataViews.ExternalURL("https://find.xyz/")
 
 				case Type<MetadataViews.Royalties>():
