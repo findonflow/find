@@ -19,6 +19,8 @@ pub contract GeneratedExperience: NonFungibleToken {
 	pub let CollectionPublicPath: PublicPath
 	pub let MinterStoragePath: StoragePath
 
+	pub let CollectionName : String
+
 	// {Season : CollectionInfo}
 	pub let collectionInfo: {UInt64 : CollectionInfo}
 
@@ -30,6 +32,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 		pub let squareImage: MetadataViews.Media
 		pub let bannerImage: MetadataViews.Media
 		pub let description: String
+		pub let socials: {String : String}
 		access(contract) let extra: {String: AnyStruct}
 
 		init(
@@ -38,6 +41,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 			royaltiesInput: [FindPack.Royalty],
 			squareImage: MetadataViews.Media,
 			bannerImage: MetadataViews.Media,
+			socials: {String : String},
 			description: String
 		) {
 			self.season = season
@@ -46,6 +50,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 			self.squareImage = squareImage
 			self.bannerImage = bannerImage
 			self.description = description
+			self.socials = socials
 			self.extra={}
 		}
 
@@ -117,7 +122,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				let data : {String : String} = {
 					"nftImage" : self.info.thumbnail.uri() ,
 					"nftName" : self.info.name,
-					"packType" : "GeneratedExperience"
+					"packType" : GeneratedExperience.CollectionName
 				}
 				return FindPack.PackRevealData(data)
 
@@ -129,7 +134,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				)
 			case Type<MetadataViews.Editions>():
 				// We do not show season here unless there are more than 1 collectionInfo (that is indexed by season)
-				let editionName = "genereatedexperience"
+				let editionName = GeneratedExperience.CollectionName.toLower()
 				let editionInfo = MetadataViews.Edition(name: editionName, number: self.info.edition, max: self.info.maxEdition)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
@@ -140,7 +145,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 
 			case Type<MetadataViews.ExternalURL>():
 				if self.owner != nil {
-					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/main/generatedExperience/").concat(self.id.toString()))
+					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/main/").concat(GeneratedExperience.CollectionName).concat("/").concat(self.id.toString()))
 				}
 				return MetadataViews.ExternalURL("https://find.xyz/")
 
@@ -162,17 +167,18 @@ pub contract GeneratedExperience: NonFungibleToken {
 
 				var banner = collection.bannerImage
 
+				let social : {String : MetadataViews.ExternalURL} = {}
+				for s in collection.socials.keys {
+					social[s] = MetadataViews.ExternalURL(collection.socials[s]!)
+				}
+
 				return MetadataViews.NFTCollectionDisplay(
-					name: "GeneratedExperience",
+					name: GeneratedExperience.CollectionName,
 					description: collection.description,
-					externalURL: MetadataViews.ExternalURL("https://find.xyz/mp/GeneratedExperience"),
+					externalURL: MetadataViews.ExternalURL("https://find.xyz/mp/".concat(GeneratedExperience.CollectionName)),
 					squareImage: square,
 					bannerImage: banner,
-					socials: {
-						// TODO: Update later
-						"twitter": MetadataViews.ExternalURL("https://twitter.com/GeneratedExperience"),
-						"discord" : MetadataViews.ExternalURL("https://discord.gg/GeneratedExperience")
-					}
+					socials: social
 				)
 
 			case Type<MetadataViews.Traits>() :
@@ -286,10 +292,6 @@ pub contract GeneratedExperience: NonFungibleToken {
 				if !receiverCap.check(){
 					receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/findProfileReceiver)
 				}
-				// Do we check and panic here?
-				// if !receiverCap.check(){
-				// 	panic("royalty is not valid")
-				// }
 
 				arr.append(MetadataViews.Royalty(recipient: receiverCap, cut: r.cut, description: r.description))
 			}
@@ -305,14 +307,15 @@ pub contract GeneratedExperience: NonFungibleToken {
 	}
 
 	init() {
+		self.CollectionName = "GeneratedExperience"
 		// Initialize the total supply
 		self.totalSupply = 0
 
 		// Set the named paths
-		self.CollectionStoragePath = /storage/GeneratedExperience
-		self.CollectionPrivatePath = /private/GeneratedExperience
-		self.CollectionPublicPath = /public/GeneratedExperience
-		self.MinterStoragePath = /storage/GeneratedExperienceMinter
+		self.CollectionStoragePath = StoragePath(identifier: self.CollectionName)!
+		self.CollectionPrivatePath = PrivatePath(identifier: self.CollectionName)!
+		self.CollectionPublicPath = PublicPath(identifier: self.CollectionName)!
+		self.MinterStoragePath = StoragePath(identifier: self.CollectionName.concat("Minter"))!
 
 		self.collectionInfo = {}
 

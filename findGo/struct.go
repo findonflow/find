@@ -64,6 +64,7 @@ type GeneratedExperience_CollectionInfo struct {
 	SquareImage MetadataViews_Media_IPFS `json:"squareImage"`
 	BannerImage MetadataViews_Media_IPFS `json:"bannerImage"`
 	Description string `json:"description"`
+	Socials map[string]string `json:"socials"`
 	Extra map[string]interface{} `json:"extra"`
 }
 

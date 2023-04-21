@@ -52,6 +52,10 @@ func TestGeneratedExperience(t *testing.T) {
 					MediaType: "png",
 				},
 				Description: "Description",
+				Socials: map[string]string{
+					"twitter": "twitter",
+					"discord": "discord",
+				},
 			},
 		}
 
@@ -170,16 +174,16 @@ func TestGeneratedExperience(t *testing.T) {
 	tcs := map[string]autogold.Value{
 		"A.f8d6e0586b0a20c7.MetadataViews.Display":     autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Royalties":   autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0xf669cb8d41ce0c74, path: /public/findProfileReceiver)"}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Editions":    autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "genereatedexperience", "number": 2}}}),
+		"A.f8d6e0586b0a20c7.MetadataViews.Editions":    autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperience", "number": 2}}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Traits":      autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/0xf3fcd2c1a78f5eee/collection/main/generatedExperience/331"}),
+		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/0xf3fcd2c1a78f5eee/collection/main/GeneratedExperience/331"}),
 		"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay": autogold.Want("NFTCollectionDisplay", map[string]interface{}{
 			"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "banner"}, "mediaType": "png"}, "description": "Description",
 			"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperience"},
 			"name":        "GeneratedExperience",
 			"socials": map[string]interface{}{
-				"discord": map[string]interface{}{"url": "https://discord.gg/GeneratedExperience"},
-				"twitter": map[string]interface{}{"url": "https://twitter.com/GeneratedExperience"},
+				"discord": map[string]interface{}{"url": "discord"},
+				"twitter": map[string]interface{}{"url": "twitter"},
 			},
 			"squareImage": map[string]interface{}{
 				"file":      map[string]interface{}{"cid": "square"},
@@ -204,7 +208,7 @@ func TestGeneratedExperience(t *testing.T) {
 			.borrow<&{MetadataViews.ResolverCollection}>()
 			?? panic("Could not borrow capability from public collection")
 
-		let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[1])
+		let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[0])
 		return resolver.resolveView(CompositeType(view)!)
 	}
 `
