@@ -11,7 +11,7 @@ import (
 
 var forge = "user1"
 
-func TestGeneratedExperience(t *testing.T) {
+func TestGeneratedExperiences(t *testing.T) {
 
 	otu := NewOverflowTest(t).
 		setupFIND().
@@ -19,7 +19,7 @@ func TestGeneratedExperience(t *testing.T) {
 		registerUserWithName("user1", forge).
 		buyForgeForName("user1", forge)
 
-	generatedExpForge := otu.identifier("GeneratedExperience", "Forge")
+	generatedExpForge := otu.identifier("GeneratedExperiences", "Forge")
 
 	otu.O.Tx("adminAddForge",
 		WithSigner("find-admin"),
@@ -29,7 +29,7 @@ func TestGeneratedExperience(t *testing.T) {
 
 	t.Run("Should be able to add season", func(t *testing.T) {
 
-		season := []findGo.GeneratedExperience_CollectionInfo{
+		season := []findGo.GeneratedExperiences_CollectionInfo{
 			{
 				Season: 1,
 				RoyaltiesInput: []findGo.FindPack_Royalty{
@@ -59,7 +59,7 @@ func TestGeneratedExperience(t *testing.T) {
 			},
 		}
 
-		otu.O.Tx("devAdminAddSeasonGeneratedExperience",
+		otu.O.Tx("devAdminAddSeasonGeneratedExperiences",
 			WithSigner("find-admin"),
 			WithArg("name", "user1"),
 			WithArg("season", season),
@@ -75,7 +75,7 @@ func TestGeneratedExperience(t *testing.T) {
 
 	t.Run("Should be able to add mint token", func(t *testing.T) {
 
-		info := []findGo.GeneratedExperience_Info{
+		info := []findGo.GeneratedExperiences_Info{
 			{
 				Season:      1,
 				Description: "Description",
@@ -108,7 +108,7 @@ func TestGeneratedExperience(t *testing.T) {
 			},
 		}
 
-		otu.O.Tx("devAdminMintGeneratedExperience",
+		otu.O.Tx("devAdminMintGeneratedExperiences",
 			WithSigner("find-admin"),
 			WithArg("name", "user1"),
 			WithArg("info", info),
@@ -140,12 +140,12 @@ func TestGeneratedExperience(t *testing.T) {
 	t.Run("Ensure views are returned correctly", func(t *testing.T) {
 
 		viewscript := `
-		import GeneratedExperience from "../contracts/GeneratedExperience.cdc"
+		import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
 		import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 		pub fun main(user: Address): AnyStruct {
 			let acct = getAccount(user)
-			let collectionRef = acct.getCapability(GeneratedExperience.CollectionPublicPath)
+			let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
 				.borrow<&{MetadataViews.ResolverCollection}>()
 				?? panic("Could not borrow capability from public collection")
 
@@ -174,13 +174,13 @@ func TestGeneratedExperience(t *testing.T) {
 	tcs := map[string]autogold.Value{
 		"A.f8d6e0586b0a20c7.MetadataViews.Display":     autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Royalties":   autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0xf669cb8d41ce0c74, path: /public/findProfileReceiver)"}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Editions":    autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperience", "number": 2}}}),
+		"A.f8d6e0586b0a20c7.MetadataViews.Editions":    autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperiences", "number": 2}}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Traits":      autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/0xf3fcd2c1a78f5eee/collection/main/GeneratedExperience/331"}),
+		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/0xf3fcd2c1a78f5eee/collection/main/GeneratedExperiences/331"}),
 		"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay": autogold.Want("NFTCollectionDisplay", map[string]interface{}{
 			"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "banner"}, "mediaType": "png"}, "description": "Description",
-			"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperience"},
-			"name":        "GeneratedExperience",
+			"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperiences"},
+			"name":        "GeneratedExperiences",
 			"socials": map[string]interface{}{
 				"discord": map[string]interface{}{"url": "discord"},
 				"twitter": map[string]interface{}{"url": "twitter"},
@@ -195,16 +195,16 @@ func TestGeneratedExperience(t *testing.T) {
 			"mediaType": "image",
 		}}}),
 		"A.f8d6e0586b0a20c7.MetadataViews.Rarity":    autogold.Want("Rarity", map[string]interface{}{"description": "Rare"}),
-		"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", map[string]interface{}{"data": map[string]interface{}{"nftImage": "ipfs://thumbnail", "nftName": "Name", "packType": "GeneratedExperience"}}),
+		"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", map[string]interface{}{"data": map[string]interface{}{"nftImage": "ipfs://thumbnail", "nftName": "Name", "packType": "GeneratedExperiences"}}),
 	}
 
 	script := `
-	import GeneratedExperience from "../contracts/GeneratedExperience.cdc"
+	import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
 	import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 	pub fun main(user: Address, view: String): AnyStruct {
 		let acct = getAccount(user)
-		let collectionRef = acct.getCapability(GeneratedExperience.CollectionPublicPath)
+		let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
 			.borrow<&{MetadataViews.ResolverCollection}>()
 			?? panic("Could not borrow capability from public collection")
 

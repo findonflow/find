@@ -4,7 +4,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
 
-pub contract GeneratedExperience: NonFungibleToken {
+pub contract GeneratedExperiences: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 
@@ -114,7 +114,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 
 		pub fun resolveView(_ view: Type): AnyStruct? {
 
-			let collection = GeneratedExperience.collectionInfo[self.info.season]!
+			let collection = GeneratedExperiences.collectionInfo[self.info.season]!
 
 			switch view {
 
@@ -122,7 +122,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				let data : {String : String} = {
 					"nftImage" : self.info.thumbnail.uri() ,
 					"nftName" : self.info.name,
-					"packType" : GeneratedExperience.CollectionName
+					"packType" : GeneratedExperiences.CollectionName
 				}
 				return FindPack.PackRevealData(data)
 
@@ -134,7 +134,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				)
 			case Type<MetadataViews.Editions>():
 				// We do not show season here unless there are more than 1 collectionInfo (that is indexed by season)
-				let editionName = GeneratedExperience.CollectionName.toLower()
+				let editionName = GeneratedExperiences.CollectionName.toLower()
 				let editionInfo = MetadataViews.Edition(name: editionName, number: self.info.edition, max: self.info.maxEdition)
 				let editionList: [MetadataViews.Edition] = [editionInfo]
 				return MetadataViews.Editions(
@@ -145,20 +145,20 @@ pub contract GeneratedExperience: NonFungibleToken {
 
 			case Type<MetadataViews.ExternalURL>():
 				if self.owner != nil {
-					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/main/").concat(GeneratedExperience.CollectionName).concat("/").concat(self.id.toString()))
+					return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/main/").concat(GeneratedExperiences.CollectionName).concat("/").concat(self.id.toString()))
 				}
 				return MetadataViews.ExternalURL("https://find.xyz/")
 
 			case Type<MetadataViews.NFTCollectionData>():
 				return MetadataViews.NFTCollectionData(
-					storagePath: GeneratedExperience.CollectionStoragePath,
-					publicPath: GeneratedExperience.CollectionPublicPath,
-					providerPath: GeneratedExperience.CollectionPrivatePath,
-					publicCollection: Type<&GeneratedExperience.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					publicLinkedType: Type<&GeneratedExperience.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					providerLinkedType: Type<&GeneratedExperience.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+					storagePath: GeneratedExperiences.CollectionStoragePath,
+					publicPath: GeneratedExperiences.CollectionPublicPath,
+					providerPath: GeneratedExperiences.CollectionPrivatePath,
+					publicCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+					publicLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+					providerLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
 					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-						return <-GeneratedExperience.createEmptyCollection()
+						return <-GeneratedExperiences.createEmptyCollection()
 					})
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
@@ -173,9 +173,9 @@ pub contract GeneratedExperience: NonFungibleToken {
 				}
 
 				return MetadataViews.NFTCollectionDisplay(
-					name: GeneratedExperience.CollectionName,
+					name: GeneratedExperiences.CollectionName,
 					description: collection.description,
-					externalURL: MetadataViews.ExternalURL("https://find.xyz/mp/".concat(GeneratedExperience.CollectionName)),
+					externalURL: MetadataViews.ExternalURL("https://find.xyz/mp/".concat(GeneratedExperiences.CollectionName)),
 					squareImage: square,
 					bannerImage: banner,
 					socials: social
@@ -187,7 +187,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 					MetadataViews.Trait(name: "Artist", value: self.info.artist, displayType: "String", rarity: nil)
 				]
 
-				if GeneratedExperience.collectionInfo.length > 1 {
+				if GeneratedExperiences.collectionInfo.length > 1 {
 					traits.append(MetadataViews.Trait(name: "Season", value: self.info.season, displayType: "Numeric", rarity: nil))
 				}
 
@@ -227,7 +227,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
 		pub fun deposit(token: @NonFungibleToken.NFT) {
-			let token <- token as! @GeneratedExperience.NFT
+			let token <- token as! @GeneratedExperiences.NFT
 
 			let id: UInt64 = token.id
 
@@ -252,7 +252,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 
 		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-			let ge = nft as! &GeneratedExperience.NFT
+			let ge = nft as! &GeneratedExperiences.NFT
 			return ge as &AnyResource{MetadataViews.Resolver}
 		}
 
@@ -275,7 +275,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 				info: info,
 			)
 
-			GeneratedExperience.totalSupply = GeneratedExperience.totalSupply + 1
+			GeneratedExperiences.totalSupply = GeneratedExperiences.totalSupply + 1
 			emit Minted(id:newNFT.id, season: info.season, name: info.name, thumbnail: info.thumbnail.uri(), fullsize: info.fullsize.uri(), artist: info.artist, rarity: info.rarity, edition: info.edition, maxEdition: info.maxEdition)
 			return <- newNFT
 		}
@@ -297,7 +297,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 			}
 			collectionInfo.setRoyalty(r: arr)
 
-			GeneratedExperience.collectionInfo[collectionInfo.season] = collectionInfo
+			GeneratedExperiences.collectionInfo[collectionInfo.season] = collectionInfo
 			emit SeasonAdded(season:collectionInfo.season, squareImage: collectionInfo.squareImage.file.uri(), bannerImage: collectionInfo.bannerImage.file.uri())
         }
 	}
@@ -307,7 +307,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 	}
 
 	init() {
-		self.CollectionName = "GeneratedExperience"
+		self.CollectionName = "GeneratedExperiences"
 		// Initialize the total supply
 		self.totalSupply = 0
 
@@ -324,7 +324,7 @@ pub contract GeneratedExperience: NonFungibleToken {
 		self.account.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
-		self.account.link<&GeneratedExperience.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+		self.account.link<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)

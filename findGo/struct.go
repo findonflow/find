@@ -57,7 +57,7 @@ type FindVerifier_HasOneFLOAT struct {
 	Description   string   `json:"description"`
 }
 
-type GeneratedExperience_CollectionInfo struct {
+type GeneratedExperiences_CollectionInfo struct {
 	Season uint64 `json:"season"`
 	Royalties []interface{} `json:"royalties"`
 	RoyaltiesInput []FindPack_Royalty `json:"royaltiesInput"`
@@ -68,7 +68,7 @@ type GeneratedExperience_CollectionInfo struct {
 	Extra map[string]interface{} `json:"extra"`
 }
 
-type GeneratedExperience_Info struct {
+type GeneratedExperiences_Info struct {
 	Season uint64 `json:"season"`
 	Name string `json:"name"`
 	Description string `json:"description"`

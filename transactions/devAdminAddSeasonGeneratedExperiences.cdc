@@ -1,24 +1,24 @@
 import Admin from "../contracts/Admin.cdc"
 import FIND from "../contracts/FIND.cdc"
-import GeneratedExperience from "../contracts/GeneratedExperience.cdc"
+import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
-transaction(name: String, season: [GeneratedExperience.CollectionInfo]) {
+transaction(name: String, season: [GeneratedExperiences.CollectionInfo]) {
     prepare(account: AuthAccount){
 
 		// setup Collection
-		if account.borrow<&GeneratedExperience.Collection>(from: GeneratedExperience.CollectionStoragePath) == nil {
-			let collection <- GeneratedExperience.createEmptyCollection()
-			account.save(<-collection, to: GeneratedExperience.CollectionStoragePath)
-			account.link<&GeneratedExperience.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(GeneratedExperience.CollectionPublicPath, target: GeneratedExperience.CollectionStoragePath)
-			account.link<&GeneratedExperience.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(GeneratedExperience.CollectionPrivatePath, target: GeneratedExperience.CollectionStoragePath)
+		if account.borrow<&GeneratedExperiences.Collection>(from: GeneratedExperiences.CollectionStoragePath) == nil {
+			let collection <- GeneratedExperiences.createEmptyCollection()
+			account.save(<-collection, to: GeneratedExperiences.CollectionStoragePath)
+			account.link<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(GeneratedExperiences.CollectionPublicPath, target: GeneratedExperiences.CollectionStoragePath)
+			account.link<&GeneratedExperiences.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(GeneratedExperiences.CollectionPrivatePath, target: GeneratedExperiences.CollectionStoragePath)
 		}
 
         let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
-		let forgeType = GeneratedExperience.getForgeType()
+		let forgeType = GeneratedExperiences.getForgeType()
 		if !FindForge.checkMinterPlatform(name: name, forgeType: forgeType ) {
 			/* set up minterPlatform */
 			adminRef.adminSetMinterPlatform(name: name,
