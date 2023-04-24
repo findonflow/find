@@ -1,6 +1,7 @@
 package test_main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -8,7 +9,6 @@ import (
 	. "github.com/bjartek/overflow"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
-	"github.com/onflow/flow-cli/pkg/flowkit"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,7 +49,7 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionBannerImage", "Example NFT banner image"),
 		).AssertSuccess(t)
 
-		extraIDs ,err := otu.O.Script(
+		extraIDs, err := otu.O.Script(
 			`
 				import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 
@@ -422,8 +422,7 @@ func TestFindForge(t *testing.T) {
 		file, err := os.ReadFile("./contracts/FindFooDIM.cdc")
 		assert.NoError(t, err)
 
-		script := flowkit.NewScript(file, []cadence.Value{}, "./contracts/FindFooDIM.cdc")
-		_, _, err = otu.O.Services.Accounts.AddContract(otu.O.Account("find-forge"), script, "emulator", false)
+		err = otu.O.AddContract(context.Background(), "find-forge", file, []cadence.Value{}, "./contracts/FindFooDIM.cdc", false)
 		assert.NoError(t, err)
 	})
 

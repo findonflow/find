@@ -375,7 +375,7 @@ func TestFindWearablesSaleResetMarket(t *testing.T) {
 func addNFTCatalog(otu *OverflowTestUtils, user string, id uint64) *OverflowTestUtils {
 
 	contractAddress := "0xf8d6e0586b0a20c7"
-	switch otu.O.Network {
+	switch otu.O.GetNetwork() {
 	case "testnet":
 		contractAddress = "0x1e0493ee604e7598"
 
