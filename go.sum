@@ -56,8 +56,6 @@ github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 h1:fLjPD/aNc3UIOA6tDi6QXUemppXK3P9BI7mr2hd6gx8=
 github.com/VictoriaMetrics/fastcache v1.6.0 h1:C/3Oi3EiBCqufydp1neRZkqcwmEiuRT9c3fqvvgKm5o=
-github.com/a8m/envsubst v1.3.0 h1:GmXKmVssap0YtlU3E230W98RWtWCyIZzjtf1apWWyAg=
-github.com/a8m/envsubst v1.3.0/go.mod h1:MVUTQNGQ3tsjOOtKCNd+fl8RzhsXcDvvAEzkhGtlsbY=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
@@ -71,10 +69,6 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/bits-and-blooms/bitset v1.3.0 h1:h7mv5q31cthBTd7V4kLAZaIThj1e8vPGcSqpPue9KVI=
 github.com/bits-and-blooms/bitset v1.3.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=
-github.com/bjartek/overflow v1.3.1-0.20230424172302-90c187e911c6 h1:SuuQYSASC7TiGcnrJD36NOosRaaNsKvPgC/xvLKN8Yk=
-github.com/bjartek/overflow v1.3.1-0.20230424172302-90c187e911c6/go.mod h1:kvoHXfma0lPCKZLIqNzfm7mzXa/Xe0lQalyZ/PLaZW4=
-github.com/bjartek/overflow v1.3.1-0.20230424173421-654afa1e0a61 h1:Z/6oxh85oF/x+mNJy+zOK0OfCrJc+BXRE2cEaocryVU=
-github.com/bjartek/overflow v1.3.1-0.20230424173421-654afa1e0a61/go.mod h1:kvoHXfma0lPCKZLIqNzfm7mzXa/Xe0lQalyZ/PLaZW4=
 github.com/bjartek/overflow v1.3.1-0.20230424174205-0c162b5a5549 h1:ZEc0ojoLZiY2ghEPFLiDuwsqWBYPMCc44tSOs3RoPys=
 github.com/bjartek/overflow v1.3.1-0.20230424174205-0c162b5a5549/go.mod h1:kvoHXfma0lPCKZLIqNzfm7mzXa/Xe0lQalyZ/PLaZW4=
 github.com/btcsuite/btcd v0.22.1 h1:CnwP9LM/M9xuRrGSCGeMVs9iv09uMqwsVX7EeIpgV2c=
@@ -350,8 +344,6 @@ github.com/jbenet/go-temp-err-catcher v0.1.0 h1:zpb3ZH6wIE8Shj2sKS+khgRvf7T7RABo
 github.com/jbenet/go-temp-err-catcher v0.1.0/go.mod h1:0kJRvmDZXNMIiJirNPEYfhpPwbGVtZVWC34vc5WLsDk=
 github.com/jbenet/goprocess v0.1.4 h1:DRGOFReOMqqDNXwW70QkacFW0YN9QnwLV0Vqk+3oU0o=
 github.com/jbenet/goprocess v0.1.4/go.mod h1:5yspPrukOVuOLORacaBi858NqyClJPQxYZlqdZVfqY4=
-github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
-github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
@@ -466,8 +458,6 @@ github.com/onflow/cadence v0.38.1 h1:8YpnE1ixAGB8hF3t+slkHGhjfIBJ95dqUS+sEHrM2kY
 github.com/onflow/cadence v0.38.1/go.mod h1:SpfjNhPsJxGIHbOthE9JD/e8JFaFY73joYLPsov+PY4=
 github.com/onflow/flow-cli/flowkit v1.0.0-rc1.0.20230424161647-1a9e45f851ef h1:UlvXi1usX8ndl+ktf1zE1zNPmjXWtvvMUWqsJoUb76U=
 github.com/onflow/flow-cli/flowkit v1.0.0-rc1.0.20230424161647-1a9e45f851ef/go.mod h1:FmGytfptb3PzboPopGdsTUw4NZan28P60Sjuxw/IQEo=
-github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20230207204031-95bd20a67160 h1:N9bgJAGpM5VRvKFaSL15Uo1xFQoXrJ+l4wh7/eF/WLs=
-github.com/onflow/flow-cli/pkg/flowkit v0.0.0-20230207204031-95bd20a67160/go.mod h1:BDgjn6DgYmL70Dy346o6mq/D9hskwEYCZdnGhWjywwo=
 github.com/onflow/flow-core-contracts/lib/go/contracts v1.2.3 h1:wV+gcgOY0oJK4HLZQYQoK+mm09rW1XSxf83yqJwj0n4=
 github.com/onflow/flow-core-contracts/lib/go/contracts v1.2.3/go.mod h1:Osvy81E/+tscQM+d3kRFjktcIcZj2bmQ9ESqRQWDEx8=
 github.com/onflow/flow-core-contracts/lib/go/templates v1.2.3 h1:X25A1dNajNUtE+KoV76wQ6BR6qI7G65vuuRXxDDqX7E=
