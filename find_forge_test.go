@@ -226,6 +226,7 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionSquareImage", "Example NFT square image"),
 			WithArg("collectionBannerImage", "Example NFT banner image"),
 		).
+		Print().
 			AssertFailure(t, "This trait does not exist ID :4")
 	})
 

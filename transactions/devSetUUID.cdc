@@ -4,7 +4,7 @@ transaction(target: UInt64) {
 	prepare(account: AuthAccount){}
 	execute{
 		let col <- Dandy.createEmptyCollection()
-		var uuid = col.uuid 
+		var uuid = col.uuid
 		destroy col
 		if uuid > target {
 			panic("UUID is already greater than target. Now at ".concat(uuid.toString()) )

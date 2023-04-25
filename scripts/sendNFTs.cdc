@@ -49,8 +49,7 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 				report.append(logErr(i, err: "Cannot borrow collection from sender. Type : ".concat(type.identifier)))
 				continue
 			}
-			let ownedNFTs : &{UInt64 : NonFungibleToken.NFT} = &checkCol!.ownedNFTs as &{UInt64 : NonFungibleToken.NFT}
-			let owned = ownedNFTs.containsKey(ids[i])
+			let owned = checkCol!.getIDs().contains(ids[i])
 
 			let receiver = allReceivers[i]
 			let id = ids[i]
