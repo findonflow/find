@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.18
 
 require (
-	github.com/bjartek/overflow v1.3.1-0.20230424174205-0c162b5a5549
+	github.com/bjartek/overflow v1.3.1-0.20230426130917-965d532a89ab
 	github.com/hexops/autogold v1.3.1
 	github.com/onflow/cadence v0.38.1
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
@@ -104,10 +104,10 @@ require (
 	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/onflow/atree v0.5.0 // indirect
-	github.com/onflow/flow-cli/flowkit v1.0.0-rc1.0.20230424161647-1a9e45f851ef // indirect
+	github.com/onflow/flow-cli/flowkit v1.0.1-0.20230425190809-6a954b22d83b // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v1.2.3 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v1.2.3 // indirect
-	github.com/onflow/flow-emulator v0.47.0 // indirect
+	github.com/onflow/flow-emulator v0.48.0 // indirect
 	github.com/onflow/flow-ft/lib/go/contracts v0.7.0 // indirect
 	github.com/onflow/flow-go v0.30.1-0.20230419183628-e1fa8dba5ec5 // indirect
 	github.com/onflow/flow-go-sdk v0.40.0 // indirect
@@ -125,10 +125,9 @@ require (
 	github.com/psiemens/sconfig v0.1.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.2.1-0.20211004051800-57c86be7915a // indirect
-	github.com/rs/zerolog v1.29.0 // indirect
+	github.com/rs/zerolog v1.29.1 // indirect
 	github.com/sethvargo/go-retry v0.2.3 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
-	github.com/smartystreets/goconvey v1.7.2 // indirect
+	github.com/smartystreets/goconvey v1.8.0 // indirect
 	github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
@@ -182,3 +181,5 @@ require (
 	modernc.org/sqlite v1.21.1 // indirect
 	mvdan.cc/gofumpt v0.4.0 // indirect
 )
+
+replace github.com/onflow/flow-cli/flowkit => github.com/bjartek/flow-cli/flowkit v0.0.0-20230426102910-814b3555c673
