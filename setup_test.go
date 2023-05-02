@@ -1,7 +1,9 @@
 package test_main
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/bjartek/overflow"
@@ -9,29 +11,27 @@ import (
 )
 
 // we set the shared overflow test struct that will reset to known setup state after each test
-var otu *OverflowTest
+var ot *OverflowTest
 
 func TestMain(m *testing.M) {
 
 	var err error
-	otu, err = SetupTest([]OverflowOption{
-			WithCoverageReport(),
-			WithFlowForNewUsers(100.0),
-		}, SetupFIND)
+	ot, err = SetupTest([]OverflowOption{
+		WithCoverageReport(),
+		WithFlowForNewUsers(100.0),
+	}, SetupFIND)
 	if err != nil {
 		panic(err)
 	}
-
-		// otu := NewOverflowTest(t).
-		// setupFIND().
-		// createUser(100.0, "user1").
-		// registerUser("user1")
-
 	code := m.Run()
-	otu.Teardown()
+	ot.Teardown()
 	os.Exit(code)
 }
 
+/*
+* user1 and user2 are the same
+* user3 does not have a name
+ */
 func SetupFIND(o *OverflowState) error {
 
 	stx := o.TxFN(WithPanicInteractionOnError(true))
@@ -51,7 +51,6 @@ func SetupFIND(o *OverflowState) error {
 		findSigner,
 		WithArg("dapperAddress", "dapper"),
 	)
-
 
 	//link in the server in the versus client
 	res := stx("setup_find_market_2",
@@ -86,7 +85,7 @@ func SetupFIND(o *OverflowState) error {
 		}),
 	)
 
-	CreateUser(o, 100.0, "find")
+	createUser(stx, 100.0, "find")
 
 	//link in the server in the versus client
 	stx("devSetResidualAddress",
@@ -114,7 +113,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("clock", 1.0),
 	)
 
-	CreateUser(o, 100.0, "user1")
+	createUser(stx, 100.0, "user1")
 
 	stx("register",
 		WithSigner("user1"),
@@ -122,32 +121,51 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("amount", 5.0),
 	)
 
+	createUser(stx, 100.0, "user2")
+
+	stx("register",
+		WithSigner("user2"),
+		WithArg("name", "user2"),
+		WithArg("amount", 5.0),
+	)
+
+	createUser(stx, 100.0, "user3")
+
+	tokens := []string{
+		"Flow",
+		"FUSD",
+		"USDC",
+	}
+
+	for _, alias := range tokens {
+		registerFtInFTRegistry(stx, strings.ToLower(alias))
+	}
+
+	//	otu.registerDandyInNFTRegistry()
+
 	return nil
 }
 
+func registerFtInFTRegistry(stx OverflowTransactionFunction, alias string) {
+	stx(fmt.Sprintf("adminSetFTInfo_%s", alias),
+		WithSigner("find-admin"),
+	)
+}
 
-func CreateUser(o *OverflowState, fusd float64, name string) error {
-	stx := o.TxFN(WithPanicInteractionOnError(true))
+func createUser(stx OverflowTransactionFunction, fusd float64, name string) {
 
 	nameSigner := WithSigner(name)
 	nameArg := WithArg("name", name)
 
 	stx("createProfile", nameSigner, nameArg)
 
-	mintFn := o.TxFN(
-		WithSigner("account"),
-		WithArg("recipient", name),
-		WithArg("amount", fusd),
-		WithPanicInteractionOnError(true),
-	)
-
 	for _, mintName := range []string{
 		"devMintFusd",
 		"devMintUsdc",
 	} {
-		mintFn(mintName)
+		stx(mintName, WithSigner("account"),
+			WithArg("recipient", name),
+			WithArg("amount", fusd),
+		)
 	}
-
-	return nil
-
 }
