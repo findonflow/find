@@ -9,7 +9,7 @@ func main() {
 	adminSigner := WithSigner("find")
 
 	o := Overflow(
-		WithNetwork("testnet"),
+		WithNetwork("mainnet"),
 		WithGlobalPrintOptions(),
 	)
 
@@ -19,7 +19,7 @@ func main() {
 	)
 
 	flowNfts := map[string]string{
-		"FlovatarComponent": "A.9392a4a7c3f49a0b.FlovatarComponent.NFT",
+		"GeneratedExperiences": "A.123cb666996b8432.GeneratedExperiences.NFT",
 		/*
 			"bl0x":       `["A.7620acf6d7f2468a.Bl0x.NFT"]`,
 			"pharaohs":   `["A.9d21537544d9123d.Momentables.NFT"]`,

@@ -27,12 +27,12 @@ func main() {
 	case "mainnet":
 		o.Tx("adminAddNFTCatalog",
 			WithSigner("find-admin"),
-			WithArg("collectionIdentifier", "Gaia"),
-			WithArg("contractName", "Gaia"),
-			WithArg("contractAddress", "8b148183c28ff88f"),
-			WithArg("addressWithNFT", "0x886f3aeaf848c535"),
-			WithArg("nftID", 8782),
-			WithArg("publicPathIdentifier", "GaiaCollection001"),
+			WithArg("collectionIdentifier", "GeneratedExperiences"),
+			WithArg("contractName", "GeneratedExperiences"),
+			WithArg("contractAddress", "0x123cb666996b8432"),
+			WithArg("addressWithNFT", "0x09a86f2493ce2e9d"),
+			WithArg("nftID", 1011239371),
+			WithArg("publicPathIdentifier", "GeneratedExperiences"),
 		).
 			Print()
 	}
