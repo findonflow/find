@@ -987,12 +987,15 @@ pub contract FindPack: NonFungibleToken {
                     fields["nftImage"]=display.thumbnail.uri()
                 }
             }
+
+            if let cd = MetadataViews.getNFTCollectionData(nft) {
+                fields["path"]=cd.storagePath.toString()
+            }
             let token <- source.withdraw(withdrawID: id)
 
             emit PackReveal(
                 packTypeName: packTypeName,
                 packTypeId: packTypeId,
-
                 packId:packId,
                 address:receiver[type]!.address,
                 rewardId: id,
