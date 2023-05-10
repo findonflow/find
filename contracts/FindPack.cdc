@@ -981,6 +981,11 @@ pub contract FindPack: NonFungibleToken {
             if nft.getViews().contains(viewType) {
                 let view=nft.resolveView(viewType)! as! PackRevealData
                 fields=view.data
+            } else {
+                if let display=MetadataViews.getDisplay(nft) {
+                    fields["nftName"]=display.name
+                    fields["nftImage"]=display.thumbnail.uri()
+                }
             }
             let token <- source.withdraw(withdrawID: id)
 
