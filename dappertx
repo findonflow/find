@@ -15,7 +15,7 @@ declare -a txn=(\
 "setPrivateModeDapper" \
 "setRelatedAccountDapper" \
 "buyNFTForSaleDapper" \
-# "listNFTForSaleDapper" \
+"listNFTForSaleDapper" \
 "delistNFTSale" \
 "initWearables" \
 "sendWearables" \

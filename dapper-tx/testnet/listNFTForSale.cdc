@@ -23,8 +23,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
 
         let tenant = tenantCapability.borrow()!
 
-        //TODO:how do we fix this on testnet/mainnet
-        let dapper=getAccount(FindViews.getDapperAddress())
+        let dapper= getAccount(0x82ec283f88a62e65)
 
         let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
