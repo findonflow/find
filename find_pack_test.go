@@ -85,7 +85,7 @@ func TestFindPack(t *testing.T) {
 		eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
 		assert.NoError(otu.T, err)
 
-		info := otu.generatePackStruct("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
+		info := generatePackStruct(otu.O, "user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 
 		otu.O.Tx("registerFindPackMetadataStruct",
 			WithSigner("user1"),

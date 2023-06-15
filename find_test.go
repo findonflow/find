@@ -277,8 +277,8 @@ func TestFIND(t *testing.T) {
 	ot.Run(t, "Should not be able to buy forge for less then amount", func(t *testing.T) {
 
 		otu.O.Tx("buyAddon",
-			WithSigner("user1"),
-			WithArg("name", "user1"),
+			WithSigner("user2"),
+			WithArg("name", "user2"),
 			WithArg("addon", "forge"),
 			WithArg("amount", 10.0),
 		).
@@ -286,7 +286,7 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to buy addons that are on Network", func(t *testing.T) {
-		otu.buyForge("user1")
+		otu.buyForge("user2")
 
 	})
 

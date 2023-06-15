@@ -1684,6 +1684,18 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 	return otu
 }
 
+func (otu *OverflowTestUtils) getDandies() []uint64 {
+	otu.T.Helper()
+	var data []uint64
+	err := otu.O.Script("getDandiesIDsFor",
+		WithArg("user", "user1"),
+		WithArg("minter", "user1"),
+	).MarshalAs(&data)
+
+	require.NoError(otu.T, err)
+	return data
+
+}
 func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 
 	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
@@ -2753,14 +2765,13 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 
 }
 
-func (otu *OverflowTestUtils) generatePackStruct(user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) findGo.FindPack_PackRegisterInfo {
+func generatePackStruct(o *OverflowState, user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) findGo.FindPack_PackRegisterInfo {
 
-	flow, err := otu.O.QualifiedIdentifier("FlowToken", "Vault")
-	assert.NoError(otu.T, err)
+	flow, _ := o.QualifiedIdentifier("FlowToken", "Vault")
 
 	saleInfo := []findGo.FindPack_PackRegisterSaleInfo{
 		{
-			Name:      "publis sale",
+			Name:      "public sale",
 			StartTime: buyTime,
 			Price:     4.2,
 			Verifiers: []findGo.FindVerifier_HasOneFLOAT{},
@@ -2793,7 +2804,7 @@ func (otu *OverflowTestUtils) generatePackStruct(user string, packTypeId uint64,
 		Socials: map[string]string{
 			"twitter": "@ABC",
 		},
-		PaymentAddress:      otu.O.Address(clientAddress),
+		PaymentAddress:      o.Address(clientAddress),
 		PaymentType:         flow,
 		OpenTime:            openTime,
 		RequiresReservation: requiresReservation,
@@ -2802,7 +2813,7 @@ func (otu *OverflowTestUtils) generatePackStruct(user string, packTypeId uint64,
 		SaleInfo:            saleInfo,
 		PrimaryRoyalty: []findGo.FindPack_Royalty{
 			{
-				Recipient:   otu.O.Address("find"),
+				Recipient:   o.Address("find"),
 				Cut:         0.15,
 				Description: "find",
 			},
@@ -2823,7 +2834,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
 	assert.NoError(otu.T, err)
 
-	info := otu.generatePackStruct(user, packTypeId, itemType, whitelistTime, buyTime, openTime, requiresReservation, floatId, clientAddress, marketAddress)
+	info := generatePackStruct(otu.O, user, packTypeId, itemType, whitelistTime, buyTime, openTime, requiresReservation, floatId, clientAddress, marketAddress)
 
 	o.Tx("setupFindPackMinterPlatform",
 		WithSigner(user),

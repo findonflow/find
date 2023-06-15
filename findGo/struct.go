@@ -58,26 +58,32 @@ type FindVerifier_HasOneFLOAT struct {
 }
 
 type GeneratedExperiences_CollectionInfo struct {
-	Season uint64 `json:"season"`
-	Royalties []interface{} `json:"royalties"`
-	RoyaltiesInput []FindPack_Royalty `json:"royaltiesInput"`
-	SquareImage MetadataViews_Media_IPFS `json:"squareImage"`
-	BannerImage MetadataViews_Media_IPFS `json:"bannerImage"`
-	Description string `json:"description"`
-	Socials map[string]string `json:"socials"`
-	Extra map[string]interface{} `json:"extra"`
+	Season         uint64                   `json:"season"`
+	Royalties      []interface{}            `json:"royalties"`
+	RoyaltiesInput []FindPack_Royalty       `json:"royaltiesInput"`
+	SquareImage    MetadataViews_Media_IPFS `json:"squareImage"`
+	BannerImage    MetadataViews_Media_IPFS `json:"bannerImage"`
+	Description    string                   `json:"description"`
+	Socials        map[string]string        `json:"socials"`
+	Extra          map[string]interface{}   `json:"extra"`
 }
 
 type GeneratedExperiences_Info struct {
-	Season uint64 `json:"season"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Thumbnail MetadataViews_IPFSFile `json:"thumbnail"`
-	Fullsize MetadataViews_IPFSFile `json:"fullsize"`
-	Edition uint64 `json:"edition"`
-	MaxEdition uint64 `json:"maxEdition"`
-	Artist string `json:"artist"`
-	Rarity string `json:"rarity"`
-	Extra map[string]interface{} `json:"extra"`
+	Season      uint64                 `json:"season"`
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	Thumbnail   MetadataViews_IPFSFile `json:"thumbnail"`
+	Fullsize    MetadataViews_IPFSFile `json:"fullsize"`
+	Edition     uint64                 `json:"edition"`
+	MaxEdition  uint64                 `json:"maxEdition"`
+	Artist      string                 `json:"artist"`
+	Rarity      string                 `json:"rarity"`
+	Extra       map[string]interface{} `json:"extra"`
+}
 
+type FindPack_AirdropInfo struct {
+	PackTypeName string `cadence:"packTypeName"`
+	PackTypeId   uint64 `cadence:"packTypeId"`
+	Users        []string
+	Message      string
 }

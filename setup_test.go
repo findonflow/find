@@ -8,6 +8,7 @@ import (
 
 	. "github.com/bjartek/overflow"
 	"github.com/findonflow/find/findGo"
+	"github.com/findonflow/find/utils"
 )
 
 // we set the shared overflow test struct that will reset to known setup state after each test
@@ -121,6 +122,13 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("amount", 5.0),
 	)
 
+	stx("buyAddon",
+		WithSigner("user1"),
+		WithArg("name", "user1"),
+		WithArg("addon", "forge"),
+		WithArg("amount", 50.0),
+	)
+
 	createUser(stx, 100.0, "user2")
 
 	stx("register",
@@ -141,7 +149,88 @@ func SetupFIND(o *OverflowState) error {
 		registerFtInFTRegistry(stx, strings.ToLower(alias))
 	}
 
-	//	otu.registerDandyInNFTRegistry()
+	//we register example NFT in the catalog
+	exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")
+	stx("devaddNFTCatalog",
+		WithSigner("account"),
+		WithArg("collectionIdentifier", exampleNFTIdentifier),
+		WithArg("contractName", exampleNFTIdentifier),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "find"),
+		WithArg("nftID", 0),
+		WithArg("publicPathIdentifier", "exampleNFTCollection"),
+	)
+
+	//we mint dandy for testing
+	result := stx("mintDandy",
+		user1Signer,
+		WithArg("name", "user1"),
+		WithArg("maxEdition", 3),
+		WithArg("artist", "Neo"),
+		WithArg("nftName", "Neo Motorcycle"),
+		WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
+
+		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("collectionDescription", "Neo Collectibles FIND"),
+		WithArg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
+		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
+	)
+	dandyIds := result.GetIdsFromEvent("Dandy.Deposit", "id")
+
+	dandyIdentifier, _ := o.QualifiedIdentifier("Dandy", "NFT")
+	stx("devaddNFTCatalog",
+		WithSigner("account"),
+		WithArg("collectionIdentifier", dandyIdentifier),
+		WithArg("contractName", dandyIdentifier),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "user1"),
+		WithArg("nftID", dandyIds[0]),
+		WithArg("publicPathIdentifier", "findDandy"),
+	)
+
+	//set up packs
+	packTypeId := uint64(1)
+	salt := "find"
+	singleType := []string{dandyIdentifier}
+	minter := "user1"
+
+	info := generatePackStruct(o, minter, packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+
+	stx("setupFindPackMinterPlatform",
+		WithSigner("user1"),
+		WithArg("lease", "user1"),
+	)
+
+	stx("adminRegisterFindPackMetadataStruct",
+		WithSigner("find-admin"),
+		WithArg("info", info),
+	)
+
+	//mint a pack
+	packHash := utils.CreateSha3Hash([]uint64{dandyIds[0]}, singleType, salt)
+
+	packIdentTemplate, _ := o.QualifiedIdentifier("FindPack", "%s")
+
+	packId, _ := stx("adminMintFindPack",
+		WithSigner("find-admin"),
+		WithArg("packTypeName", minter),
+		WithArg("typeId", packTypeId),
+		WithArg("hashes", []string{packHash}),
+	).GetIdFromEvent(fmt.Sprintf(packIdentTemplate, "Deposit"), "id")
+
+	fmt.Println(packId)
+	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
+
+	stx("devaddNFTCatalog",
+		WithSigner("account"),
+		WithArg("collectionIdentifier", minter+" season#"+fmt.Sprint(packTypeId)),
+		WithArg("contractName", fmt.Sprintf(packIdentTemplate, "NFT")),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "find"),
+		WithArg("nftID", packId),
+		WithArg("publicPathIdentifier", publicPathIdentifier),
+	)
 
 	return nil
 }
