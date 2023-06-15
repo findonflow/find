@@ -159,6 +159,11 @@ func createUser(stx OverflowTransactionFunction, fusd float64, name string) {
 
 	stx("createProfile", nameSigner, nameArg)
 
+	stx("setProfile",
+		WithSigner(name),
+		WithArg("avatar", "https://find.xyz/assets/img/avatars/avatar14.png"),
+	)
+
 	for _, mintName := range []string{
 		"devMintFusd",
 		"devMintUsdc",
