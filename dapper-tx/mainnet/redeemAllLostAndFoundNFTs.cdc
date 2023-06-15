@@ -10,6 +10,7 @@ import NFGv3 from 0x123cb666996b8432
 import PartyFavorz from 0x123cb666996b8432
 import NameVoucher from 0x097bafa4e0b48eef
 import Wearables from 0xe81193c424cfd3fb
+import FindPack from 0x097bafa4e0b48eef
 
 //IMPORT
 
@@ -53,6 +54,40 @@ transaction() {
             account.link<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(
                 Dandy.CollectionPrivatePath,
                 target: Dandy.CollectionStoragePath
+            )
+        }
+
+        //findPack
+        let FindPackRef= account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
+        if FindPackRef == nil {
+            account.save<@NonFungibleToken.Collection>(<- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+            account.unlink(FindPack.CollectionPublicPath)
+            account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+                FindPack.CollectionPublicPath,
+                target: FindPack.CollectionStoragePath
+            )
+            account.unlink(FindPack.CollectionPrivatePath)
+            account.link<&FindPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+                FindPack.CollectionPrivatePath,
+                target: FindPack.CollectionStoragePath
+            )
+        }
+
+        let FindPackCap= account.getCapability<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(FindPack.CollectionPublicPath)
+        if !FindPackCap.check() {
+            account.unlink(FindPack.CollectionPublicPath)
+            account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+                FindPack.CollectionPublicPath,
+                target: FindPack.CollectionStoragePath
+            )
+        }
+
+        let FindPackProviderCap= account.getCapability<&FindPack.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(FindPack.CollectionPrivatePath)
+        if !FindPackProviderCap.check() {
+            account.unlink(FindPack.CollectionPrivatePath)
+            account.link<&FindPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+                FindPack.CollectionPrivatePath,
+                target: FindPack.CollectionStoragePath
             )
         }
 

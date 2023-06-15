@@ -40,7 +40,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
 		WithArg("id", id),
 		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("amount", 0.0),
+		WithArg("amount", 10.0),
 	)
 
 	t.Run("Should be able to add direct offer and then sell", func(t *testing.T) {
@@ -279,7 +279,9 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.alterMarketOption("stop")
 
-		bidTx("bidMarketDirectOfferEscrowed").
+		bidTx("bidMarketDirectOfferEscrowed",
+			WithArg("validUntil", otu.currentTime()+200.0),
+		).
 			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterMarketOption("enable")
@@ -526,7 +528,7 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	t.Run("Should be able to direct offer and fulfill multiple NFT in one go", func(t *testing.T) {
 		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "find",2).
+			sendExampleNFT("user1", "find", 2).
 			setFlowExampleMarketOption("find")
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
