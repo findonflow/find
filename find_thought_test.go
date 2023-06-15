@@ -262,7 +262,7 @@ func TestFindThought(t *testing.T) {
 
 		id := otu.mintThreeExampleDandies()[0]
 		identifier := dandyNFTType(otu)
-		owner := otu.O.Account("user1").Address().Bytes()
+		owner := otu.O.FlowAddress("user1").Bytes()
 
 		otu.registerDandyInNFTRegistry()
 
@@ -328,7 +328,7 @@ func TestFindThought(t *testing.T) {
 
 	t.Run("Should be able to post a thought with quote", func(t *testing.T) {
 
-		owner := otu.O.Account("user1").Address().Bytes()
+		owner := otu.O.FlowAddress("user1").Bytes()
 		Owner := cadence.BytesToAddress(owner)
 		inputOwner := cadence.NewOptional(Owner)
 
@@ -365,7 +365,7 @@ func TestFindThought(t *testing.T) {
 	})
 
 	if thoughtWithQuote == 0 {
-		owner := otu.O.Account("user1").Address().Bytes()
+		owner := otu.O.FlowAddress("user1").Bytes()
 		Owner := cadence.BytesToAddress(owner)
 		inputOwner := cadence.NewOptional(Owner)
 

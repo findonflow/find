@@ -311,11 +311,11 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		bitTx := otu.O.TxFN(
 			WithSigner("user2"),
 			WithArg("leaseName", "name1"),
-			WithArg("amount", price),
 		)
 
-		bitTx("bidLeaseMarketAuctionSoftDapper").
-			AssertSuccess(t)
+		bitTx("bidLeaseMarketAuctionSoftDapper",
+			WithArg("amount", price),
+		).AssertSuccess(t)
 
 		bitTx("increaseBidLeaseMarketAuctionSoft",
 			WithArg("amount", price+10.0),
@@ -327,7 +327,7 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 		bitTx("fulfillLeaseMarketAuctionSoftDapper",
 			WithPayloadSigner("dapper"),
 			WithArg("amount", 30.0),
-		).
+		).Print(WithArguments()).
 			AssertSuccess(t)
 
 		otu.alterLeaseMarketOption("enable")

@@ -20,7 +20,7 @@ func (ot *OverflowUtils) UpgradeFindDapperTenantSwitchboard() *OverflowUtils {
 
 	name := "find"
 	merchAddress := "0x01cf0e2f2f715450"
-	switch o.Network {
+	switch o.GetNetwork() {
 	case "testnet":
 		merchAddress = "0x4748780c8bf65e19"
 
