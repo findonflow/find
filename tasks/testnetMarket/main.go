@@ -9,7 +9,7 @@ func main() {
 	adminSigner := WithSigner("find")
 
 	o := Overflow(
-		WithNetwork("testnet"),
+		WithNetwork("mainnet"),
 		WithGlobalPrintOptions(),
 	)
 
@@ -19,7 +19,7 @@ func main() {
 	)
 
 	flowNfts := map[string]string{
-		"FLOAT": "A.0afe396ebc8eee65.FLOAT.NFT",
+		"GeneratedExperiences": "A.123cb666996b8432.GeneratedExperiences.NFT",
 		/*
 			"bl0x":       `["A.7620acf6d7f2468a.Bl0x.NFT"]`,
 			"pharaohs":   `["A.9d21537544d9123d.Momentables.NFT"]`,
@@ -34,11 +34,13 @@ func main() {
 	}
 
 	for name, contracts := range flowNfts {
-		upsertItem(
-			"tenantsetMarketOptionDapper",
-			WithArg("nftName", name), //primary key
-			WithArg("nftTypes", []string{contracts}),
-		)
+		/*
+			upsertItem(
+				"tenantsetMarketOptionDapper",
+				WithArg("nftName", name), //primary key
+				WithArg("nftTypes", []string{contracts}),
+			)
+		*/
 
 		upsertItem(
 			"tenantsetMarketOption",
