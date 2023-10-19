@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.20
       - name: Checkout code
         uses: actions/checkout@v3
       - name: golangci-lint
@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.20
       - uses: actions/cache@v2
         with:
           path: |
@@ -35,20 +35,20 @@ jobs:
             ${{ runner.os }}-go-
       - uses: zencargo/github-action-go-mod-tidy@v1
         with:
-          go-version: 1.18  
+          go-version: 1.20
 
   test:
     runs-on: ubuntu-latest
     env:
-      TESTNET_ACCOUNT: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
-      MAINNET_FIND: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
-      MAINNET_FIND_ADMIN: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      TESTNET_ACCOUNT: '98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc'
+      MAINNET_FIND: '98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc'
+      MAINNET_FIND_ADMIN: '98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.20
       - uses: actions/cache@v3
         with:
           path: |
@@ -64,4 +64,3 @@ jobs:
         uses: guyarb/golang-test-annotations@v0.5.0
         with:
           test-results: test.json
-
