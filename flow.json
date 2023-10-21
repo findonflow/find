@@ -10,14 +10,16 @@
       "source": "./contracts/standard/NonFungibleToken.cdc",
       "aliases": {
         "testnet": "0x631e88ae7f1d7c20",
-        "mainnet": "0x1d7e57aa55817448"
+        "mainnet": "0x1d7e57aa55817448",
+        "emulator": "0xf8d6e0586b0a20c7"
       }
     },
     "MetadataViews": {
       "source": "./contracts/standard/MetadataViews.cdc",
       "aliases": {
         "mainnet": "0x1d7e57aa55817448",
-        "testnet": "0x631e88ae7f1d7c20"
+        "testnet": "0x631e88ae7f1d7c20",
+        "emulator": "0xf8d6e0586b0a20c7"
       }
     },
     "FUSD": {
@@ -60,6 +62,7 @@
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
+    "Admin": "./contracts/Admin.cdc",
     "Sender": "./contracts/Sender.cdc",
     "Clock": "./contracts/Clock.cdc",
     "Profile": "./contracts/Profile.cdc",
@@ -135,164 +138,21 @@
     "emulator-user9": {
       "address": "f4a3472b32eac8d8",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-    },
-    "testnet-account": {
-      "address": "0x1ff7e32d71183db0",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-find": {
-      "address": "35717efbbce11c74",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-find-lease": {
-      "address": "49d14b03d7411f53",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-find-admin": {
-      "address": "d116c726ad1b1cab",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-find-lost-and-found-wrapper": {
-      "address": "82836e61c008d6d1",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-emerald-identity": {
-      "address": "c9d218cc626cd7f5",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-find-forge": {
-      "address": "3e5b4c627064625d",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-find-dapper": {
-      "address": "695502f4d2ccd475",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "testnet-user1": {
-      "address": "0xffbdace90dd96d40",
-      "key": "${TESTNET_ACCOUNT}"
-    },
-    "mainnet-find": {
-      "address": "0x097bafa4e0b48eef",
-      "key": "${MAINNET_FIND}"
-    },
-    "mainnet-find-forge": {
-      "address": "0x123cb666996b8432",
-      "key": "${MAINNET_FIND}"
-    },
-    "mainnet-find-admin": {
-      "address": "0x09a86f2493ce2e9d",
-      "key": "${MAINNET_FIND_ADMIN}"
-    },
-    "mainnet-find-lease": {
-      "address": "0x8f8767d488332ac7",
-      "key": "${MAINNET_FIND_ADMIN}"
-    },
-    "mainnet-find-dapper": {
-      "address": "0x46b99041da7235e9",
-      "key": "${MAINNET_FIND_ADMIN}"
     }
   },
   "deployments": {
-    "mainnet": {
-      "mainnet-find": [
-        "FIND",
-        "Clock",
-        "Profile",
-        "Debug",
-        "Admin",
-        "FindMarketAdmin",
-        "CharityNFT",
-        "FindViews",
-        "Dandy",
-        "FindMarket",
-        "FindMarketSale",
-        "FindMarketDirectOfferEscrow",
-        "FindMarketDirectOfferSoft",
-        "FindMarketAuctionEscrow",
-        "FindMarketAuctionSoft",
-        "FindLeaseMarket",
-        "FindLeaseMarketSale",
-        "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft",
-        "Sender",
-        "FindRelatedAccounts",
-        "FTRegistry",
-        "FindForge",
-        "FindForgeOrder",
-        "FindForgeStruct",
-        "ProfileCache",
-        "FindRulesCache",
-        "FINDNFTCatalog",
-        "FINDNFTCatalogAdmin",
-        "FindLostAndFoundWrapper",
-        "FindPack",
-        "FindVerifier",
-        "FindAirdropper",
-        "FindFurnace",
-        "FindUtils",
-        "FindUserStatus",
-        "FindThoughts",
-        "FindMarketCut",
-        "FindMarketCutStruct",
-        "FindMarketCutInterface",
-        "FindMarketInfrastructureCut",
-        "NameVoucher"
-      ],
-      "mainnet-find-forge": ["NFGv3", "PartyFavorz", "PartyFavorzExtraData", "Flomies", "GeneratedExperiences"]
-    },
-    "testnet": {
-      "testnet-find": [
-        "FIND",
-        "Clock",
-        "Profile",
-        "Debug",
-        "Admin",
-        "FindMarketAdmin",
-        "CharityNFT",
-        "FindViews",
-        "Dandy",
-        "FindMarket",
-        "FindMarketSale",
-        "FindMarketDirectOfferEscrow",
-        "FindMarketDirectOfferSoft",
-        "FindMarketAuctionEscrow",
-        "FindMarketAuctionSoft",
-        "Sender",
-        "FindRelatedAccounts",
-        "FTRegistry",
-        "FindForge",
-        "FindForgeOrder",
-        "FindForgeStruct",
-        "FindLeaseMarket",
-        "FindLeaseMarketSale",
-        "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft",
-        "ProfileCache",
-        "FindRulesCache",
-        "FINDNFTCatalog",
-        "FINDNFTCatalogAdmin",
-        "FindPack",
-        "FindVerifier",
-        "FindAirdropper",
-        "FindFurnace",
-        "FindThoughts",
-        "FindUtils",
-        "FindUserStatus",
-        "FindLostAndFoundWrapper",
-        "FindMarketCut",
-        "FindMarketCutStruct",
-        "FindMarketCutInterface",
-        "FindMarketInfrastructureCut",
-        "NameVoucher"
-      ],
-      "testnet-find-forge": ["NFGv3", "PartyFavorz", "PartyFavorzExtraData", "Flomies", "GeneratedExperiences"],
-      "testnet-emerald-identity": ["EmeraldIdentityLilico", "EmeraldIdentityDapper"]
-    },
     "emulator": {
-      "emulator-account": ["NonFungibleToken", "FUSD", "MetadataViews"],
-      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
-      "emulator-find": ["ExampleNFT", "FIND", "Clock", "Profile", "Debug", "Sender", "FindUtils"],
+      "emulator-account": [
+        "FUSD"
+      ],
+      "emulator-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Sender",
+        "FindUtils"
+      ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
       "emulator-find-lease": [],
