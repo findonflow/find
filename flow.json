@@ -1,728 +1,311 @@
 {
-	"emulators": {
-		"default": {
-			"port": 3569,
-			"serviceAccount": "emulator-account"
-		}
-	},
-	"contracts": {
-		"NonFungibleToken": {
-			"source": "./contracts/standard/NonFungibleToken.cdc",
-			"aliases": {
-				"testnet": "0x631e88ae7f1d7c20",
-				"mainnet": "0x1d7e57aa55817448"
-			}
-		},
-		"MetadataViews": {
-			"source": "./contracts/standard/MetadataViews.cdc",
-			"aliases": {
-				"mainnet": "0x1d7e57aa55817448",
-				"testnet": "0x631e88ae7f1d7c20"
-			}
-		},
-		"DapperStorageRent": {
-			"source": "./contracts/standard/DapperStorageRent.cdc",
-			"aliases": {
-				"testnet": "0x43ee8c22fcf94ea3",
-				"mainnet": "0xa08e88e23f332538"
-			}
-		},
-		"FUSD": {
-			"source": "./contracts/standard/FUSD.cdc",
-			"aliases": {
-				"testnet": "0xe223d8a629e49c68",
-				"mainnet": "0x3c5959b568896393"
-			}
-		},
-		"NFTStorefront": {
-			"source": "./contracts/standard/NFTStorefront.cdc",
-			"aliases": {
-				"testnet": "0x94b06cfca1d8a476",
-				"mainnet": "0x4eb8a10cb9f87357"
-			}
-		},
-		"NFTStorefrontV2": {
-			"source": "./contracts/standard/NFTStorefrontV2.cdc",
-			"aliases": {
-				"testnet": "0x2d55b98eb200daef",
-				"mainnet": "0x4eb8a10cb9f87357"
-			}
-		},
-		"CoatCheck": {
-			"source": "./contracts/community/CoatCheck.cdc",
-			"aliases": {
-				"testnet": "0xe1d43e0cfc237807",
-				"mainnet": "0x5c57f79c6694797f"
-			}
-		},
-		"FlowtyUtils": {
-			"source": "./contracts/community/FlowtyUtils.cdc",
-			"aliases": {
-				"testnet": "0xe1d43e0cfc237807",
-				"mainnet": "0x5c57f79c6694797f"
-			}
-		},
-		"FlowtyRentals": {
-			"source": "./contracts/community/FlowtyRentals.cdc",
-			"aliases": {
-				"testnet": "0xe1d43e0cfc237807",
-				"mainnet": "0x5c57f79c6694797f"
-			}
-		},
-		"Flowty": {
-			"source": "./contracts/community/Flowty.cdc",
-			"aliases": {
-				"testnet": "0xe1d43e0cfc237807",
-				"mainnet": "0x5c57f79c6694797f"
-			}
-		},
-		"Flovatar": {
-			"source": "./contracts/community/Flovatar.cdc",
-			"aliases": {
-				"testnet": "0x9392a4a7c3f49a0b",
-				"mainnet": "0x921ea449dffec68a"
-			}
-		},
-		"FlovatarComponent": {
-			"source": "./contracts/community/FlovatarComponent.cdc",
-			"aliases": {
-				"testnet": "0x9392a4a7c3f49a0b",
-				"mainnet": "0x921ea449dffec68a"
-			}
-		},
-		"FlovatarComponentTemplate": {
-			"source": "./contracts/community/FlovatarComponentTemplate.cdc",
-			"aliases": {
-				"testnet": "0x9392a4a7c3f49a0b",
-				"mainnet": "0x921ea449dffec68a"
-			}
-		},
-		"FlovatarMarketplace": {
-			"source": "./contracts/community/FlovatarMarketplace.cdc",
-			"aliases": {
-				"testnet": "0x9392a4a7c3f49a0b",
-				"mainnet": "0x921ea449dffec68a"
-			}
-		},
-		"FlovatarPack": {
-			"source": "./contracts/community/FlovatarPack.cdc",
-			"aliases": {
-				"testnet": "0x9392a4a7c3f49a0b",
-				"mainnet": "0x921ea449dffec68a"
-			}
-		},
-		"FungibleToken": {
-			"source": "./contracts/standard/FungibleToken.cdc",
-			"aliases": {
-				"testnet": "9a0766d93b6608b7",
-				"emulator": "ee82856bf20e2aa6",
-				"mainnet": "0xf233dcee88fe0abe"
-			}
-		},
-		"FungibleTokenSwitchboard": {
-			"source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
-			"aliases": {
-				"testnet": "9a0766d93b6608b7",
-				"mainnet": "0xf233dcee88fe0abe"
-			}
-		},
-		"FlowToken": {
-			"source": "./contracts/standard/FlowToken.cdc",
-			"aliases": {
-				"testnet": "0x7e60df042a9c0868",
-				"emulator": "0x0ae53cb6e3f42a79",
-				"mainnet": "0x1654653399040a61"
-			}
-		},
-		"FiatToken": {
-			"source": "./contracts/standard/FiatToken.cdc",
-			"aliases": {
-				"testnet": "0xa983fecbed621163",
-				"mainnet": "0xb19436aae4d94622"
-			}
-		},
-		"GrantedAccountAccess": {
-			"source": "./contracts/standard/GrantedAccountAccess.cdc",
-			"aliases": {
-				"mainnet": "0x2d4c3caffbeab845",
-				"testnet": "0x0afe396ebc8eee65"
-			}
-		},
-		"FLOAT": {
-			"source": "./contracts/standard/FLOAT.cdc",
-			"aliases": {
-				"mainnet": "0x2d4c3caffbeab845",
-				"testnet": "0x0afe396ebc8eee65"
-			}
-		},
-		"FLOATVerifiers": {
-			"source": "./contracts/standard/FLOATVerifiers.cdc",
-			"aliases": {
-				"mainnet": "0x2d4c3caffbeab845",
-				"testnet": "0x0afe396ebc8eee65"
-			}
-		},
-		"EmeraldIdentity": {
-			"source": "./contracts/standard/EmeraldIdentity.cdc",
-			"aliases": {
-				"mainnet": "0x39e42c67cc851cfb",
-				"testnet": "0xfe433270356d985c"
-			}
-		},
-		"EmeraldIdentityLilico": {
-			"source": "./contracts/standard/EmeraldIdentityLilico.cdc",
-			"aliases": {
-				"mainnet": "0x39e42c67cc851cfb"
-			}
-		},
-		"EmeraldIdentityDapper": {
-			"source": "./contracts/standard/EmeraldIdentityDapper.cdc",
-			"aliases": {
-				"mainnet": "0x39e42c67cc851cfb"
-			}
-		},
-		"FeeEstimator": {
-			"source": "./contracts/standard/FeeEstimator.cdc",
-			"aliases": {
-				"testnet": "0xbe4635353f55bbd4",
-				"mainnet": "0x473d6a2c37eab5be"
-			}
-		},
-		"FlowStorageFees": {
-			"source": "./contracts/standard/FlowStorageFees.cdc",
-			"aliases": {
-				"emulator": "0xf8d6e0586b0a20c7",
-				"testnet": "0x8c5303eaa26202d6",
-				"mainnet": "0xe467b9dd11fa00df"
-			}
-		},
-		"TopShot": {
-			"source": "./contracts/community/TopShot.cdc",
-			"aliases": {
-				"testnet": "0x877931736ee77cff",
-				"mainnet": "0x0b2a3299cc857e29"
-			}
-		},
-		"LostAndFound": {
-			"source": "./contracts/standard/LostAndFound.cdc",
-			"aliases": {
-				"testnet": "0xbe4635353f55bbd4",
-				"mainnet": "0x473d6a2c37eab5be"
-			}
-		},
-		"LostAndFoundHelper": {
-			"source": "./contracts/standard/LostAndFoundHelper.cdc",
-			"aliases": {
-				"testnet": "0xbe4635353f55bbd4",
-				"mainnet": "0x473d6a2c37eab5be"
-			}
-		},
-		"AlchemyMetadataWrapperMainnetShard1": {
-			"aliases": {
-				"mainnet": "0xeb8cb4c3157d5dac"
-			}
-		},
-		"AlchemyMetadataWrapperMainnetShard2": {
-			"aliases": {
-				"mainnet": "0xeb8cb4c3157d5dac"
-			}
-		},
-		"AlchemyMetadataWrapperMainnetShard3": {
-			"aliases": {
-				"mainnet": "0xeb8cb4c3157d5dac"
-			}
-		},
-		"AlchemyMetadataWrapperMainnetShard4": {
-			"aliases": {
-				"mainnet": "0xeb8cb4c3157d5dac"
-			}
-		},
-		"AlchemyMetadataWrapperTestnetShard1": {
-			"aliases": {
-				"testnet": "0x5ff2c7b4c40de11"
-			}
-		},
-		"AlchemyMetadataWrapperTestnetShard2": {
-			"aliases": {
-				"testnet": "0x5ff2c7b4c40de11"
-			}
-		},
-		"AlchemyMetadataWrapperTestnetShard3": {
-			"aliases": {
-				"testnet": "0x5ff2c7b4c40de11"
-			}
-		},
-		"DapperUtilityCoin": {
-			"source": "./contracts/standard/DapperUtilityCoin.cdc",
-			"aliases": {
-				"mainnet": "0xead892083b3e2c6c",
-				"testnet": "0x82ec283f88a62e65"
-			}
-		},
-		"FlowUtilityToken": {
-			"source": "./contracts/standard/FlowUtilityToken.cdc",
-			"aliases": {
-				"mainnet": "0xead892083b3e2c6c",
-				"testnet": "0x82ec283f88a62e65"
-			}
-		},
-		"TokenForwarding": {
-			"source": "./contracts/standard/TokenForwarding.cdc",
-			"aliases": {
-				"mainnet": "0xe544175ee0461c4b",
-				"testnet": "0x51ea0e37c27a1f1a"
-			}
-		},
-		"NFTCatalog": {
-			"source": "./contracts/standard/NFTCatalog.cdc",
-			"aliases": {
-				"mainnet": "0x49a7cda3a1eecc29",
-				"testnet": "0x324c34e1c517e4db"
-			}
-		},
-		"NFTCatalogAdmin": {
-			"source": "./contracts/standard/NFTCatalogAdmin.cdc",
-			"aliases": {
-				"mainnet": "0x49a7cda3a1eecc29",
-				"testnet": "0x324c34e1c517e4db"
-			}
-		},
-		"NFTRetrieval": {
-			"source": "./contracts/standard/NFTRetrieval.cdc",
-			"aliases": {
-				"mainnet": "0x49a7cda3a1eecc29",
-				"testnet": "0x324c34e1c517e4db"
-			}
-		},
-		"Bl0xPack": {
-			"source": "./contracts/Bl0xPack.cdc",
-			"aliases": {
-				"mainnet": "0x7620acf6d7f2468a",
-				"testnet": "0xe8124d8428980aa6"
-			}
-		},
-		"Bl0x": {
-			"source": "./contracts/Bl0x.cdc",
-			"aliases": {
-				"mainnet": "0x7620acf6d7f2468a",
-				"testnet": "0xe8124d8428980aa6"
-			}
-		},
-		"Wearables": {
-			"source": "./contracts/community/Wearables.cdc",
-			"aliases": {
-				"mainnet": "0xe81193c424cfd3fb",
-				"testnet": "0x1c5033ad60821c97"
-			}
-		},
-		"Templates": {
-			"source": "./contracts/community/Templates.cdc",
-			"aliases": {
-				"mainnet": "0xe81193c424cfd3fb",
-				"testnet": "0x1c5033ad60821c97"
-			}
-		},
-		"ProfileCache": "./contracts/ProfileCache.cdc",
-		"FIND": "./contracts/FIND.cdc",
-		"CollectionFactory": "./contracts/CollectionFactory.cdc",
-		"Dandy": "./contracts/Dandy.cdc",
-		"FindRulesCache": "./contracts/FindRulesCache.cdc",
-		"FindMarket": "./contracts/FindMarket.cdc",
-		"FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
-		"FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
-		"FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
-		"FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
-		"FindMarketSale": "./contracts/FindMarketSale.cdc",
-		"FindViews": "./contracts/FindViews.cdc",
-		"FindRelatedAccounts": "./contracts/FindRelatedAccounts.cdc",
-		"Sender": "./contracts/Sender.cdc",
-		"CharityNFT": "./contracts/CharityNFT.cdc",
-		"Admin": "./contracts/Admin.cdc",
-		"FindMarketAdmin": "./contracts/FindMarketAdmin.cdc",
-		"Clock": "./contracts/Clock.cdc",
-		"Profile": "./contracts/Profile.cdc",
-		"Debug": "./contracts/Debug.cdc",
-		"FTRegistry": "./contracts/FTRegistry.cdc",
-		"NFTRegistry": "./contracts/NFTRegistry.cdc",
-		"FindForge": "./contracts/FindForge.cdc",
-		"FindForgeOrder": "./contracts/FindForgeOrder.cdc",
-		"FindForgeStruct": "./contracts/FindForgeStruct.cdc",
-		"FindFooDIM": "./contracts/FindFooDIM.cdc",
-		"ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
-		"NFGv3": "./contracts/NFGv3.cdc",
-		"PartyFavorz": "./contracts/PartyFavorz.cdc",
-		"PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc",
-		"GeneratedExperiences": "./contracts/GeneratedExperiences.cdc",
-		"FindRewardToken": "./contracts/FindRewardToken.cdc",
-		"FindToken": "./contracts/FindToken.cdc",
-		"FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
-		"FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
-		"FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
-		"FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
-		"FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
-		"FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
-		"FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
-		"FindPack": "./contracts/FindPack.cdc",
-		"FindVerifier": "./contracts/FindVerifier.cdc",
-		"Flomies": "./contracts/Flomies.cdc",
-		"FindAirdropper": "./contracts/FindAirdropper.cdc",
-		"FindFurnace": "./contracts/FindFurnace.cdc",
-		"FindUtils": "./contracts/FindUtils.cdc",
-		"FindUserStatus": "./contracts/FindUserStatus.cdc",
-		"FindThoughts": "./contracts/FindThoughts.cdc",
-		"WearablesDev": "./contracts/community/WearablesDev.cdc",
-		"FindMarketCut": "./contracts/FindMarketCut.cdc",
-		"FindMarketCutInterface": "./contracts/FindMarketCutInterface.cdc",
-		"FindMarketCutStruct": "./contracts/FindMarketCutStruct.cdc",
-		"FindMarketInfrastructureCut": "./contracts/FindMarketInfrastructureCut.cdc",
-		"Dev": "./contracts/Dev.cdc",
-		"NameVoucher": "./contracts/NameVoucher.cdc"
-	},
-	"networks": {
-		"emulator": "127.0.0.1:3569",
-		"mainnet": "access.mainnet.nodes.onflow.org:9000",
-		"testnet": "access.devnet.nodes.onflow.org:9000"
-	},
-	"accounts": {
-		"emulator-account": {
-			"address": "f8d6e0586b0a20c7",
-			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
-		},
-		"emulator-dapper": {
-			"address": "01cf0e2f2f715450",
-			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
-		},
-		"emulator-find": {
-			"address": "179b6b1cb6755e31",
-			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
-		},
-		"emulator-find-admin": {
-			"address": "f3fcd2c1a78f5eee",
-			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
-		},
-		"emulator-find-forge": {
-			"address": "e03daebed8ca0615",
-			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
-		},
-		"emulator-find-lease": {
-			"address": "045a1763c93006ca",
-			"key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
-		},
-		"emulator-residual": {
-			"address": "120e725050340cab",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user1": {
-			"address": "f669cb8d41ce0c74",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user2": {
-			"address": "192440c99cb17282",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user3": {
-			"address": "fd43f9148d4b725d",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user4": {
-			"address": "eb179c27144f783c",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user5": {
-			"address": "0f7025fa05b578e3",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user6": {
-			"address": "e2f72218abeec2b9",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user7": {
-			"address": "06909bc5ba14c266",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user8": {
-			"address": "10c4fef62310c807",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"emulator-user9": {
-			"address": "f4a3472b32eac8d8",
-			"key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-		},
-		"testnet-account": {
-			"address": "0x1ff7e32d71183db0",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-find": {
-			"address": "35717efbbce11c74",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-find-lease": {
-			"address": "49d14b03d7411f53",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-find-admin": {
-			"address": "d116c726ad1b1cab",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-find-lost-and-found-wrapper": {
-			"address": "82836e61c008d6d1",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-emerald-identity": {
-			"address": "c9d218cc626cd7f5",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-find-forge": {
-			"address": "3e5b4c627064625d",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-find-dapper": {
-			"address": "695502f4d2ccd475",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"testnet-user1": {
-			"address": "0xffbdace90dd96d40",
-			"key": "${TESTNET_ACCOUNT}"
-		},
-		"mainnet-find": {
-			"address": "0x097bafa4e0b48eef",
-			"key": "${MAINNET_FIND}"
-		},
-		"mainnet-find-forge": {
-			"address": "0x123cb666996b8432",
-			"key": "${MAINNET_FIND}"
-		},
-		"mainnet-find-admin": {
-			"address": "0x09a86f2493ce2e9d",
-			"key": "${MAINNET_FIND_ADMIN}"
-		},
-		"mainnet-find-lease": {
-			"address": "0x8f8767d488332ac7",
-			"key": "${MAINNET_FIND_ADMIN}"
-		},
-		"mainnet-find-dapper": {
-			"address": "0x46b99041da7235e9",
-			"key": "${MAINNET_FIND_ADMIN}"
-		}
-	},
-	"deployments": {
-		"mainnet": {
-			"mainnet-find": [
-				"FIND",
-				"Clock",
-				"Profile",
-				"Debug",
-				"Admin",
-				"FindMarketAdmin",
-				"CharityNFT",
-				"FindViews",
-				"Dandy",
-				"FindMarket",
-				"FindMarketSale",
-				"FindMarketDirectOfferEscrow",
-				"FindMarketDirectOfferSoft",
-				"FindMarketAuctionEscrow",
-				"FindMarketAuctionSoft",
-				"FindLeaseMarket",
-				"FindLeaseMarketSale",
-				"FindLeaseMarketAuctionSoft",
-				"FindLeaseMarketDirectOfferSoft",
-				"Sender",
-				"FindRelatedAccounts",
-				"FTRegistry",
-				"FindForge",
-				"FindForgeOrder",
-				"FindForgeStruct",
-				"ProfileCache",
-				"FindRulesCache",
-				"FINDNFTCatalog",
-				"FINDNFTCatalogAdmin",
-				"FindLostAndFoundWrapper",
-				"FindPack",
-				"FindVerifier",
-				"FindAirdropper",
-				"FindFurnace",
-				"FindUtils",
-				"FindUserStatus",
-				"FindThoughts",
-				"FindMarketCut",
-				"FindMarketCutStruct",
-				"FindMarketCutInterface",
-				"FindMarketInfrastructureCut",
-				"NameVoucher"
-			],
-			"mainnet-find-forge": [
-				"NFGv3",
-				"PartyFavorz",
-				"PartyFavorzExtraData",
-				"Flomies",
-				"GeneratedExperiences"
-			]
-		},
-		"testnet": {
-			"testnet-find": [
-				"FIND",
-				"Clock",
-				"Profile",
-				"Debug",
-				"Admin",
-				"FindMarketAdmin",
-				"CharityNFT",
-				"FindViews",
-				"Dandy",
-				"FindMarket",
-				"FindMarketSale",
-				"FindMarketDirectOfferEscrow",
-				"FindMarketDirectOfferSoft",
-				"FindMarketAuctionEscrow",
-				"FindMarketAuctionSoft",
-				"Sender",
-				"FindRelatedAccounts",
-				"FTRegistry",
-				"FindForge",
-				"FindForgeOrder",
-				"FindForgeStruct",
-				"FindLeaseMarket",
-				"FindLeaseMarketSale",
-				"FindLeaseMarketAuctionSoft",
-				"FindLeaseMarketDirectOfferSoft",
-				"ProfileCache",
-				"FindRulesCache",
-				"FINDNFTCatalog",
-				"FINDNFTCatalogAdmin",
-				"FindPack",
-				"FindVerifier",
-				"FindAirdropper",
-				"FindFurnace",
-				"FindThoughts",
-				"FindUtils",
-				"FindUserStatus",
-				"FindLostAndFoundWrapper",
-				"FindMarketCut",
-				"FindMarketCutStruct",
-				"FindMarketCutInterface",
-				"FindMarketInfrastructureCut",
-				"NameVoucher"
-			],
-			"testnet-find-forge": [
-				"NFGv3",
-				"PartyFavorz",
-				"PartyFavorzExtraData",
-				"Flomies",
-				"GeneratedExperiences"
-
-			],
-			"testnet-emerald-identity": [
-				"EmeraldIdentityLilico",
-				"EmeraldIdentityDapper"
-			]
-		},
-		"emulator": {
-			"emulator-account": [
-				"NonFungibleToken",
-				"FungibleTokenSwitchboard",
-				"FUSD",
-				"FiatToken",
-				"MetadataViews",
-				"NFTStorefront",
-				"NFTStorefrontV2",
-				"TokenForwarding",
-				"NFTCatalog",
-				"NFTCatalogAdmin",
-				"FeeEstimator",
-				"LostAndFound",
-				"LostAndFoundHelper",
-				"FLOAT",
-				"GrantedAccountAccess",
-				"FLOATVerifiers",
-				"EmeraldIdentityLilico",
-				"EmeraldIdentityDapper",
-				"EmeraldIdentity",
-				"CoatCheck",
-				"Flowty",
-				"FlowtyRentals",
-				"Flovatar",
-				"FlovatarComponent",
-				"FlovatarMarketplace",
-				"FlovatarComponentTemplate",
-				"FlovatarPack",
-				"FlowtyUtils",
-				"DapperStorageRent",
-				"Templates",
-				"Wearables",
-				"WearablesDev",
-				"TopShot"
-			],
-			"emulator-dapper": [
-				"DapperUtilityCoin",
-				"FlowUtilityToken"
-			],
-			"emulator-find": [
-				"ExampleNFT",
-				"FIND",
-				"Clock",
-				"Profile",
-				"Debug",
-				"Admin",
-				"FindMarketAdmin",
-				"CharityNFT",
-				"FindViews",
-				"Dandy",
-				"FindMarket",
-				"FindMarketSale",
-				"FindMarketDirectOfferEscrow",
-				"FindMarketDirectOfferSoft",
-				"FindMarketAuctionEscrow",
-				"FindMarketAuctionSoft",
-				"FindLeaseMarket",
-				"FindLeaseMarketSale",
-				"FindLeaseMarketAuctionSoft",
-				"FindLeaseMarketDirectOfferSoft",
-				"Sender",
-				"FindRelatedAccounts",
-				"FTRegistry",
-				"FindForge",
-				"FindForgeOrder",
-				"FindForgeStruct",
-				"ProfileCache",
-				"FindRulesCache",
-				"FINDNFTCatalog",
-				"FINDNFTCatalogAdmin",
-				"FindLostAndFoundWrapper",
-				"FindPack",
-				"FindVerifier",
-				"FindAirdropper",
-				"FindFurnace",
-				"FindUtils",
-				"FindUserStatus",
-				"FindThoughts",
-				"FindMarketCut",
-				"FindMarketCutStruct",
-				"FindMarketCutInterface",
-				"FindMarketInfrastructureCut",
-				"Dev",
-				"NameVoucher"
-			],
-			"emulator-find-admin": [],
-			"emulator-find-forge": [
-				"NFGv3",
-				"PartyFavorz",
-				"PartyFavorzExtraData",
-				"Bl0x",
-				"Bl0xPack",
-				"GeneratedExperiences"
-			],
-			"emulator-find-lease": [],
-			"emulator-user1": [],
-			"emulator-user2": [],
-			"emulator-user3": [],
-			"emulator-user4": [],
-			"emulator-user5": [],
-			"emulator-user6": [],
-			"emulator-user7": [],
-			"emulator-user8": [],
-			"emulator-user9": [],
-			"emulator-residual": []
-		}
-	}
+  "emulators": {
+    "default": {
+      "port": 3569,
+      "serviceAccount": "emulator-account"
+    }
+  },
+  "contracts": {
+    "NonFungibleToken": {
+      "source": "./contracts/standard/NonFungibleToken.cdc",
+      "aliases": {
+        "testnet": "0x631e88ae7f1d7c20",
+        "mainnet": "0x1d7e57aa55817448"
+      }
+    },
+    "MetadataViews": {
+      "source": "./contracts/standard/MetadataViews.cdc",
+      "aliases": {
+        "mainnet": "0x1d7e57aa55817448",
+        "testnet": "0x631e88ae7f1d7c20"
+      }
+    },
+    "FUSD": {
+      "source": "./contracts/standard/FUSD.cdc",
+      "aliases": {
+        "testnet": "0xe223d8a629e49c68",
+        "mainnet": "0x3c5959b568896393"
+      }
+    },
+    "FungibleToken": {
+      "source": "./contracts/standard/FungibleToken.cdc",
+      "aliases": {
+        "testnet": "9a0766d93b6608b7",
+        "emulator": "ee82856bf20e2aa6",
+        "mainnet": "0xf233dcee88fe0abe"
+      }
+    },
+    "FlowToken": {
+      "source": "./contracts/standard/FlowToken.cdc",
+      "aliases": {
+        "testnet": "0x7e60df042a9c0868",
+        "emulator": "0x0ae53cb6e3f42a79",
+        "mainnet": "0x1654653399040a61"
+      }
+    },
+    "DapperUtilityCoin": {
+      "source": "./contracts/standard/DapperUtilityCoin.cdc",
+      "aliases": {
+        "mainnet": "0xead892083b3e2c6c",
+        "testnet": "0x82ec283f88a62e65"
+      }
+    },
+    "FlowUtilityToken": {
+      "source": "./contracts/standard/FlowUtilityToken.cdc",
+      "aliases": {
+        "mainnet": "0xead892083b3e2c6c",
+        "testnet": "0x82ec283f88a62e65"
+      }
+    },
+    "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
+    "ProfileCache": "./contracts/ProfileCache.cdc",
+    "FIND": "./contracts/FIND.cdc",
+    "Sender": "./contracts/Sender.cdc",
+    "Clock": "./contracts/Clock.cdc",
+    "Profile": "./contracts/Profile.cdc",
+    "Debug": "./contracts/Debug.cdc",
+    "FindUtils": "./contracts/FindUtils.cdc"
+  },
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-dapper": {
+      "address": "01cf0e2f2f715450",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-find": {
+      "address": "179b6b1cb6755e31",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-find-admin": {
+      "address": "f3fcd2c1a78f5eee",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-find-forge": {
+      "address": "e03daebed8ca0615",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-find-lease": {
+      "address": "045a1763c93006ca",
+      "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
+    },
+    "emulator-residual": {
+      "address": "120e725050340cab",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user1": {
+      "address": "f669cb8d41ce0c74",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user2": {
+      "address": "192440c99cb17282",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user3": {
+      "address": "fd43f9148d4b725d",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user4": {
+      "address": "eb179c27144f783c",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user5": {
+      "address": "0f7025fa05b578e3",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user6": {
+      "address": "e2f72218abeec2b9",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user7": {
+      "address": "06909bc5ba14c266",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user8": {
+      "address": "10c4fef62310c807",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "emulator-user9": {
+      "address": "f4a3472b32eac8d8",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "testnet-account": {
+      "address": "0x1ff7e32d71183db0",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find": {
+      "address": "35717efbbce11c74",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-lease": {
+      "address": "49d14b03d7411f53",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-admin": {
+      "address": "d116c726ad1b1cab",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-lost-and-found-wrapper": {
+      "address": "82836e61c008d6d1",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-emerald-identity": {
+      "address": "c9d218cc626cd7f5",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-forge": {
+      "address": "3e5b4c627064625d",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-dapper": {
+      "address": "695502f4d2ccd475",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-user1": {
+      "address": "0xffbdace90dd96d40",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "mainnet-find": {
+      "address": "0x097bafa4e0b48eef",
+      "key": "${MAINNET_FIND}"
+    },
+    "mainnet-find-forge": {
+      "address": "0x123cb666996b8432",
+      "key": "${MAINNET_FIND}"
+    },
+    "mainnet-find-admin": {
+      "address": "0x09a86f2493ce2e9d",
+      "key": "${MAINNET_FIND_ADMIN}"
+    },
+    "mainnet-find-lease": {
+      "address": "0x8f8767d488332ac7",
+      "key": "${MAINNET_FIND_ADMIN}"
+    },
+    "mainnet-find-dapper": {
+      "address": "0x46b99041da7235e9",
+      "key": "${MAINNET_FIND_ADMIN}"
+    }
+  },
+  "deployments": {
+    "mainnet": {
+      "mainnet-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Admin",
+        "FindMarketAdmin",
+        "CharityNFT",
+        "FindViews",
+        "Dandy",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "Sender",
+        "FindRelatedAccounts",
+        "FTRegistry",
+        "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
+        "ProfileCache",
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin",
+        "FindLostAndFoundWrapper",
+        "FindPack",
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindUtils",
+        "FindUserStatus",
+        "FindThoughts",
+        "FindMarketCut",
+        "FindMarketCutStruct",
+        "FindMarketCutInterface",
+        "FindMarketInfrastructureCut",
+        "NameVoucher"
+      ],
+      "mainnet-find-forge": ["NFGv3", "PartyFavorz", "PartyFavorzExtraData", "Flomies", "GeneratedExperiences"]
+    },
+    "testnet": {
+      "testnet-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Admin",
+        "FindMarketAdmin",
+        "CharityNFT",
+        "FindViews",
+        "Dandy",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "Sender",
+        "FindRelatedAccounts",
+        "FTRegistry",
+        "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "ProfileCache",
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin",
+        "FindPack",
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindThoughts",
+        "FindUtils",
+        "FindUserStatus",
+        "FindLostAndFoundWrapper",
+        "FindMarketCut",
+        "FindMarketCutStruct",
+        "FindMarketCutInterface",
+        "FindMarketInfrastructureCut",
+        "NameVoucher"
+      ],
+      "testnet-find-forge": ["NFGv3", "PartyFavorz", "PartyFavorzExtraData", "Flomies", "GeneratedExperiences"],
+      "testnet-emerald-identity": ["EmeraldIdentityLilico", "EmeraldIdentityDapper"]
+    },
+    "emulator": {
+      "emulator-account": ["NonFungibleToken", "FUSD", "MetadataViews"],
+      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
+      "emulator-find": ["ExampleNFT", "FIND", "Clock", "Profile", "Debug", "Sender", "FindUtils"],
+      "emulator-find-admin": [],
+      "emulator-find-forge": [],
+      "emulator-find-lease": [],
+      "emulator-user1": [],
+      "emulator-user2": [],
+      "emulator-user3": [],
+      "emulator-user4": [],
+      "emulator-user5": [],
+      "emulator-user6": [],
+      "emulator-user7": [],
+      "emulator-user8": [],
+      "emulator-user9": [],
+      "emulator-residual": []
+    }
+  }
 }
