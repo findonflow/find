@@ -59,6 +59,14 @@
         "testnet": "0x82ec283f88a62e65"
       }
     },
+    "FungibleTokenMetadataViews": {
+      "source": "./contracts/standard/FungibleTokenMetadataViews.cdc",
+      "aliases": {
+        "emulator": "0xf8d6e0586b0a20c7",
+        "mainnet": "0xf233dcee88fe0abe",
+        "testnet": "0x9a0766d93b6608b7"
+      }
+    },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
@@ -142,16 +150,18 @@
   },
   "deployments": {
     "emulator": {
-      "emulator-account": [
-        "FUSD"
-      ],
+      "emulator-account": ["FUSD", "FungibleToken", "NonFungibleToken", "MetadataViews", "FungibleTokenMetadataViews"],
       "emulator-find": [
         "FIND",
         "Clock",
         "Profile",
         "Debug",
         "Sender",
-        "FindUtils"
+        "FindUtils",
+        "FungibleToken",
+        "NonFungibleToken",
+        "MetadataViews",
+        "FungibleTokenMetadataViews"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
