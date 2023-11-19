@@ -5,7 +5,7 @@ import FungibleTokenMetadataViews from "./FungibleTokenMetadataViews.cdc"
 
 access(all) contract FUSD: ViewResolver {
 
- /// The event that is emitted when new tokens are minted
+    /// The event that is emitted when new tokens are minted
     access(all) event TokensMinted(amount: UFix64, type: String)
 
     /// Total supply of ExampleTokens in existence

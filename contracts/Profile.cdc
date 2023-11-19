@@ -6,37 +6,37 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import ProfileCache from "../contracts/ProfileCache.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 
-pub contract Profile {
-	pub let publicPath: PublicPath
-	pub let publicReceiverPath: PublicPath
-	pub let storagePath: StoragePath
+access(all) contract Profile {
+	access(all) let publicPath: PublicPath
+	access(all) let publicReceiverPath: PublicPath
+	access(all) let storagePath: StoragePath
 
 	//and event emitted when somebody follows another user
-	pub event Follow(follower:Address, following: Address, tags: [String])
+	access(all) event Follow(follower:Address, following: Address, tags: [String])
 
 	//an event emitted when somebody unfollows somebody
-	pub event Unfollow(follower:Address, unfollowing: Address)
+	access(all) event Unfollow(follower:Address, unfollowing: Address)
 
 	//and event emitted when a user verifies something
-	pub event Verification(account:Address, message:String)
+	access(all) event Verification(account:Address, message:String)
 
-	pub event Created(account:Address, userName:String, findName:String, createdAt:String)
-	pub event Updated(account:Address, userName:String, findName:String, thumbnail:String)
+	access(all) event Created(account:Address, userName:String, findName:String, createdAt:String)
+	access(all) event Updated(account:Address, userName:String, findName:String, thumbnail:String)
 
 	/*
 	Represents a Fungible token wallet with a name and a supported type.
 	*/
-	pub struct Wallet {
-		pub let name: String
-		pub let receiver: Capability<&{FungibleToken.Receiver}>
-		pub let balance: Capability<&{FungibleToken.Balance}>
-		pub let accept: Type
-		pub let tags: [String]
+	access(all) struct Wallet {
+		access(all) let name: String
+		access(all) let receiver: Capability<&{FungibleToken.Receiver}>
+		access(all) let balance: Capability<&{FungibleToken.Vault}>
+		access(all) let accept: Type
+		access(all) let tags: [String]
 
 		init(
 			name: String,
 			receiver: Capability<&{FungibleToken.Receiver}>,
-			balance: Capability<&{FungibleToken.Balance}>,
+			balance: Capability<&{FungibleToken.Vault}>,
 			accept: Type,
 			tags: [String]
 		) {
@@ -53,11 +53,11 @@ pub contract Profile {
 	Represent a collection of a Resource that you want to expose
 	Since NFT standard is not so great at just add Type and you have to use instanceOf to check for now
 	*/
-	pub struct ResourceCollection {
-		pub let collection: Capability
-		pub let tags: [String]
-		pub let type: Type
-		pub let name: String
+	access(all) struct ResourceCollection {
+		access(all) let collection: Capability
+		access(all) let tags: [String]
+		access(all) let type: Type
+		access(all) let name: String
 
 		init(name: String, collection:Capability, type: Type, tags: [String]) {
 			self.name=name
@@ -68,10 +68,10 @@ pub contract Profile {
 	}
 
 
-	pub struct CollectionProfile{
-		pub let tags: [String]
-		pub let type: String
-		pub let name: String
+	access(all) struct CollectionProfile{
+		access(all) let tags: [String]
+		access(all) let type: String
+		access(all) let name: String
 
 		init(_ collection: ResourceCollection){
 			self.name=collection.name
@@ -83,10 +83,10 @@ pub contract Profile {
 	/*
 	A link that you could add to your profile
 	*/
-	pub struct Link {
-		pub let url: String
-		pub let title: String
-		pub let type: String
+	access(all) struct Link {
+		access(all) let url: String
+		access(all) let title: String
+		access(all) let type: String
 
 		init(title: String, type: String, url: String) {
 			self.url=url
@@ -98,10 +98,10 @@ pub contract Profile {
 	/*
 	Information about a connection between one profile and another.
 	*/
-	pub struct FriendStatus {
-		pub let follower: Address
-		pub let following:Address
-		pub let tags: [String]
+	access(all) struct FriendStatus {
+		access(all) let follower: Address
+		access(all) let following:Address
+		access(all) let tags: [String]
 
 		init(follower: Address, following:Address, tags: [String]) {
 			self.follower=follower
@@ -110,35 +110,35 @@ pub contract Profile {
 		}
 	}
 
-	pub struct WalletProfile {
-		pub let name: String
-		pub let balance: UFix64
-		pub let accept:  String
-		pub let tags: [String]
+	access(all) struct WalletProfile {
+		access(all) let name: String
+		access(all) let balance: UFix64
+		access(all) let accept:  String
+		access(all) let tags: [String]
 
 		init(_ wallet: Wallet) {
 			self.name=wallet.name
-			self.balance=wallet.balance.borrow()?.balance ?? 0.0
+			self.balance=wallet.balance.borrow()?.getBalance() ?? 0.0
 			self.accept=wallet.accept.identifier
 			self.tags=wallet.tags
 		}
 	}
 
 	//This is the new return struct from the profile
-	pub struct UserReport {
-		pub let findName: String
-		pub let createdAt: String
-		pub let address: Address
-		pub let name: String
-		pub let gender: String
-		pub let description: String
-		pub let tags: [String]
-		pub let avatar: String
-		pub let links: {String:Link}
-		pub let wallets: [WalletProfile]
-		pub let following: [FriendStatus]
-		pub let followers: [FriendStatus]
-		pub let allowStoringFollowers: Bool
+	access(all) struct UserReport {
+		access(all) let findName: String
+		access(all) let createdAt: String
+		access(all) let address: Address
+		access(all) let name: String
+		access(all) let gender: String
+		access(all) let description: String
+		access(all) let tags: [String]
+		access(all) let avatar: String
+		access(all) let links: {String:Link}
+		access(all) let wallets: [WalletProfile]
+		access(all) let following: [FriendStatus]
+		access(all) let followers: [FriendStatus]
+		access(all) let allowStoringFollowers: Bool
 
 		init(
 			findName:String,
@@ -174,21 +174,21 @@ pub contract Profile {
 
 
 	//This format is deperated
-	pub struct UserProfile {
-		pub let findName: String
-		pub let createdAt: String
-		pub let address: Address
-		pub let name: String
-		pub let gender: String
-		pub let description: String
-		pub let tags: [String]
-		pub let avatar: String
-		pub let links: [Link]
-		pub let wallets: [WalletProfile]
-		pub let collections: [CollectionProfile]
-		pub let following: [FriendStatus]
-		pub let followers: [FriendStatus]
-		pub let allowStoringFollowers: Bool
+	access(all) struct UserProfile {
+		access(all) let findName: String
+		access(all) let createdAt: String
+		access(all) let address: Address
+		access(all) let name: String
+		access(all) let gender: String
+		access(all) let description: String
+		access(all) let tags: [String]
+		access(all) let avatar: String
+		access(all) let links: [Link]
+		access(all) let wallets: [WalletProfile]
+		access(all) let collections: [CollectionProfile]
+		access(all) let following: [FriendStatus]
+		access(all) let followers: [FriendStatus]
+		access(all) let allowStoringFollowers: Bool
 
 		init(
 			findName:String,
@@ -223,105 +223,105 @@ pub contract Profile {
 		}
 	}
 
-	pub resource interface Public{
-		pub fun getAddress() : Address
-		pub fun getName(): String
-		pub fun getFindName(): String
-		pub fun getCreatedAt(): String
-		pub fun getGender(): String
-		pub fun getDescription(): String
-		pub fun getTags(): [String]
-		pub fun getAvatar(): String
-		pub fun getCollections(): [ResourceCollection]
-		pub fun follows(_ address: Address) : Bool
-		pub fun getFollowers(): [FriendStatus]
-		pub fun getFollowing(): [FriendStatus]
-		pub fun getWallets() : [Wallet]
-		pub fun hasWallet(_ name: String) : Bool
-		pub fun getLinks() : [Link]
-		pub fun deposit(from: @FungibleToken.Vault)
-		pub fun supportedFungigleTokenTypes() : [Type]
-		pub fun asProfile() : UserProfile
-		pub fun asReport() : UserReport
-		pub fun isBanned(_ val: Address): Bool
-		pub fun isPrivateModeEnabled() : Bool
+	access(all) resource interface Public{
+		access(all) fun getAddress() : Address
+		access(all) fun getName(): String
+		access(all) fun getFindName(): String
+		access(all) fun getCreatedAt(): String
+		access(all) fun getGender(): String
+		access(all) fun getDescription(): String
+		access(all) fun getTags(): [String]
+		access(all) fun getAvatar(): String
+		access(all) fun getCollections(): [ResourceCollection]
+		access(all) fun follows(_ address: Address) : Bool
+		access(all) fun getFollowers(): [FriendStatus]
+		access(all) fun getFollowing(): [FriendStatus]
+		access(all) fun getWallets() : [Wallet]
+		access(all) fun hasWallet(_ name: String) : Bool
+		access(all) fun getLinks() : [Link]
+		access(all) fun deposit(from: @{FungibleToken.Vault})
+		access(all) fun supportedFungigleTokenTypes() : [Type]
+		access(all) fun asProfile() : UserProfile
+		access(all) fun asReport() : UserReport
+		access(all) fun isBanned(_ val: Address): Bool
+		access(all) fun isPrivateModeEnabled() : Bool
 
 		access(contract) fun internal_addFollower(_ val: FriendStatus)
 		access(contract) fun internal_removeFollower(_ address: Address)
 		access(account) fun setFindName(_ val: String)
 	}
 
-	pub resource interface Owner {
-		pub fun setName(_ val: String) {
+	access(all) resource interface Owner {
+		access(all) fun setName(_ val: String) {
 			pre {
 				val.length <= 64: "Name must be 64 or less characters"
 			}
 		}
 
-		pub fun setGender(_ val:String){
+		access(all) fun setGender(_ val:String){
 			pre {
 				val.length <= 64: "Gender must be 64 or less characters"
 			}
 		}
 
-		pub fun setAvatar(_ val: String){
+		access(all) fun setAvatar(_ val: String){
 			pre {
 				val.length <= 1024: "Avatar must be 1024 characters or less"
 			}
 		}
 
-		pub fun setTags(_ val: [String])  {
-			pre {
-				Profile.verifyTags(tags: val, tagLength:64, tagSize:32) : "cannot have more then 32 tags of length 64"
+		access(all) fun setTags(_ val: [String])  {
+			if (Profile.verifyTags(tags: val, tagLength:64, tagSize:32) == false){
+				panic("cannot have more then 32 tags of length 64")
 			}
 		}
 
 		//validate length of description to be 255 or something?
-		pub fun setDescription(_ val: String) {
+		access(all) fun setDescription(_ val: String) {
 			pre {
 				val.length <= 1024: "Description must be 1024 characters or less"
 			}
 		}
 
-		pub fun follow(_ address: Address, tags:[String]) {
-			pre {
-				Profile.verifyTags(tags: tags, tagLength:64, tagSize:32) : "cannot have more then 32 tags of length 64"
+		access(all) fun follow(_ address: Address, tags:[String]) {
+			if (Profile.verifyTags(tags: tags, tagLength:64, tagSize:32) == false){
+				panic("cannot have more then 32 tags of length 64")
 			}
 		}
-		pub fun unfollow(_ address: Address)
+		access(all) fun unfollow(_ address: Address)
 
-		pub fun removeCollection(_ val: String)
-		pub fun addCollection(_ val: ResourceCollection)
+		access(all) fun removeCollection(_ val: String)
+		access(all) fun addCollection(_ val: ResourceCollection)
 
-		pub fun addWallet(_ val : Wallet)
-		pub fun removeWallet(_ val: String)
-		pub fun setWallets(_ val: [Wallet])
-		pub fun hasWallet(_ name: String) : Bool
-		pub fun addLink(_ val: Link)
-		pub fun addLinkWithName(name:String, link:Link)
+		access(all) fun addWallet(_ val : Wallet)
+		access(all) fun removeWallet(_ val: String)
+		access(all) fun setWallets(_ val: [Wallet])
+		access(all) fun hasWallet(_ name: String) : Bool
+		access(all) fun addLink(_ val: Link)
+		access(all) fun addLinkWithName(name:String, link:Link)
 
-		pub fun removeLink(_ val: String)
+		access(all) fun removeLink(_ val: String)
 
 		//Verify that this user has signed something.
-		pub fun verify(_ val:String)
+		access(all) fun verify(_ val:String)
 
 		//A user must be able to remove a follower since this data in your account is added there by another user
-		pub fun removeFollower(_ val: Address)
+		access(all) fun removeFollower(_ val: Address)
 
 		//manage bans
-		pub fun addBan(_ val: Address)
-		pub fun removeBan(_ val: Address)
-		pub fun getBans(): [Address]
+		access(all) fun addBan(_ val: Address)
+		access(all) fun removeBan(_ val: Address)
+		access(all) fun getBans(): [Address]
 
 		//Set if user is allowed to store followers or now
-		pub fun setAllowStoringFollowers(_ val: Bool)
+		access(all) fun setAllowStoringFollowers(_ val: Bool)
 
 		//set if this user prefers sensitive information about his account to be kept private, no guarantee here but should be honored
-		pub fun setPrivateMode(_ val: Bool)
+		access(all) fun setPrivateMode(_ val: Bool)
 	}
 
 
-	pub resource User: Public, Owner, FungibleToken.Receiver {
+	access(all) resource User: Public, Owner, FungibleToken.Receiver {
 		access(self) var name: String
 		access(self) var findName: String
 		access(self) var createdAt: String
@@ -361,7 +361,7 @@ pub contract Profile {
 		}
 
 		/// We do not have a seperate field for this so we use the additionalProperties 'bag' to store this in
-		pub fun setPrivateMode(_ val: Bool) {
+		access(all) fun setPrivateMode(_ val: Bool) {
 			var private="true"
 			if !val{
 				private="false"
@@ -369,15 +369,15 @@ pub contract Profile {
 			self.additionalProperties["privateMode"]  = private
 		}
 
-		pub fun emitUpdatedEvent() {
+		access(all) fun emitUpdatedEvent() {
 			emit Updated(account:self.owner!.address, userName:self.name, findName:self.findName, thumbnail:self.avatar)
 		}
 
-		pub fun emitCreatedEvent() {
+		access(all) fun emitCreatedEvent() {
 			emit Created(account:self.owner!.address, userName:self.name, findName:self.findName, createdAt:self.createdAt)
 		}
 
-		pub fun isPrivateModeEnabled() : Bool {
+		access(all) fun isPrivateModeEnabled() : Bool {
 			let boolString= self.additionalProperties["privateMode"]
 			if boolString== nil || boolString=="false" {
 				return false
@@ -385,21 +385,21 @@ pub contract Profile {
 			return true
 		}
 
-		pub fun addBan(_ val: Address) { self.bans[val]= true}
-		pub fun removeBan(_ val:Address) { self.bans.remove(key: val) }
-		pub fun getBans() : [Address] { return self.bans.keys }
-		pub fun isBanned(_ val:Address) : Bool { return self.bans.containsKey(val)}
+		access(all) fun addBan(_ val: Address) { self.bans[val]= true}
+		access(all) fun removeBan(_ val:Address) { self.bans.remove(key: val) }
+		access(all) fun getBans() : [Address] { return self.bans.keys }
+		access(all) fun isBanned(_ val:Address) : Bool { return self.bans.containsKey(val)}
 
-		pub fun setAllowStoringFollowers(_ val: Bool) {
+		access(all) fun setAllowStoringFollowers(_ val: Bool) {
 			self.allowStoringFollowers=val
 		}
 
-		pub fun verify(_ val:String) {
+		access(all) fun verify(_ val:String) {
 			emit Verification(account: self.owner!.address, message:val)
 		}
 
 
-		pub fun asReport() : UserReport {
+		access(all) fun asReport() : UserReport {
 			let wallets: [WalletProfile]=[]
 			for w in self.wallets {
 				wallets.append(WalletProfile(w))
@@ -422,11 +422,11 @@ pub contract Profile {
 			)
 		}
 
-		pub fun getAddress() : Address {
+		access(all) fun getAddress() : Address {
 			return self.owner!.address
 		}
 
-		pub fun asProfile() : UserProfile {
+		access(all) fun asProfile() : UserProfile {
 			let wallets: [WalletProfile]=[]
 			for w in self.wallets {
 				wallets.append(WalletProfile(w))
@@ -455,27 +455,27 @@ pub contract Profile {
 			)
 		}
 
-		pub fun getLinksMap() : {String: Link} {
+		access(all) fun getLinksMap() : {String: Link} {
 			return self.links
 		}
 
-		pub fun getLinks() : [Link] {
+		access(all) fun getLinks() : [Link] {
 			return self.links.values
 		}
 
-		pub fun addLinkWithName(name:String, link:Link) {
+		access(all) fun addLinkWithName(name:String, link:Link) {
 			self.links[name]=link
 		}
 
-		pub fun addLink(_ val: Link) {
+		access(all) fun addLink(_ val: Link) {
 			self.links[val.title]=val
 		}
 
-		pub fun removeLink(_ val: String) {
+		access(all) fun removeLink(_ val: String) {
 			self.links.remove(key: val)
 		}
 
-		pub fun supportedFungigleTokenTypes() : [Type] {
+		access(all) fun supportedFungigleTokenTypes() : [Type] {
 			let types: [Type] =[]
 			for w in self.wallets {
 				if !types.contains(w.accept) {
@@ -485,12 +485,12 @@ pub contract Profile {
 			return types
 		}
 
-		pub fun deposit(from: @FungibleToken.Vault) {
+		access(all) fun deposit(from: @{FungibleToken.Vault}) {
 
 			let walletIndexCache = ProfileCache.getWalletIndex(address: self.owner!.address, walletType: from.getType())
 
 			if walletIndexCache != nil {
-				let ref = self.wallets[walletIndexCache!].receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
+				let ref = self.wallets[walletIndexCache!].receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.getBalance().toString()))
 				ref.deposit(from: <- from)
 				return
 			}
@@ -498,7 +498,7 @@ pub contract Profile {
 			for i , w in self.wallets {
 				if from.isInstance(w.accept) {
 					ProfileCache.setWalletIndexCache(address: self.owner!.address, walletType: from.getType(), index: i)
-					let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
+					let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.getBalance().toString()))
 					ref.deposit(from: <- from)
 					return
 				}
@@ -509,15 +509,15 @@ pub contract Profile {
 			// Check the vault type
 			var ref : &{FungibleToken.Receiver}? = nil
 			if FindUtils.contains(identifier, element: "FlowToken.Vault") {
-				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow()
+				ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 			} else if FindUtils.contains(identifier, element: "FiatToken.Vault") {
-				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/USDCVaultReceiver).borrow()
+				ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/USDCVaultReceiver)
 			} else if FindUtils.contains(identifier, element: "FUSD.Vault") {
-				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver).borrow()
+				ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 			} else if FindUtils.contains(identifier, element: "FlowUtilityToken.Vault") {
-				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver).borrow()
+				ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
 			} else if FindUtils.contains(identifier, element: "DapperUtilityCoin.Vault") {
-				ref = self.owner!.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow()
+				ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
 			}
 
 			if ref != nil {
@@ -532,7 +532,7 @@ pub contract Profile {
 		}
 
 
-		pub fun hasWallet(_ name: String) : Bool {
+		access(all) fun hasWallet(_ name: String) : Bool {
 			for wallet in self.wallets {
 				if wallet.name == name || wallet.accept.identifier == name {
 					return wallet.receiver.check()
@@ -541,9 +541,9 @@ pub contract Profile {
 			return false
 		}
 
-		pub fun getWallets() : [Wallet] { return self.wallets}
-		pub fun addWallet(_ val: Wallet) { self.wallets.append(val) }
-		pub fun removeWallet(_ val: String) {
+		access(all) fun getWallets() : [Wallet] { return self.wallets}
+		access(all) fun addWallet(_ val: Wallet) { self.wallets.append(val) }
+		access(all) fun removeWallet(_ val: String) {
 			let numWallets=self.wallets.length
 			var i=0
 			while(i < numWallets) {
@@ -556,46 +556,46 @@ pub contract Profile {
 			}
 		}
 
-		pub fun setWallets(_ val: [Wallet]) {
+		access(all) fun setWallets(_ val: [Wallet]) {
 			self.wallets=val
 			ProfileCache.resetWalletIndexCache(address: self.owner!.address)
 			}
 
-		pub fun removeFollower(_ val: Address) {
+		access(all) fun removeFollower(_ val: Address) {
 			self.followers.remove(key:val)
 		}
 
-		pub fun follows(_ address: Address) : Bool {
+		access(all) fun follows(_ address: Address) : Bool {
 			return self.following.containsKey(address)
 		}
 
-		pub fun getName(): String { return self.name }
-		pub fun getFindName(): String { return self.findName }
-		pub fun getCreatedAt(): String { return self.createdAt }
-		pub fun getGender() : String { return self.gender }
-		pub fun getDescription(): String{ return self.description}
-		pub fun getTags(): [String] { return self.tags}
-		pub fun getAvatar(): String { return self.avatar }
-		pub fun getFollowers(): [FriendStatus] { return self.followers.values }
-		pub fun getFollowing(): [FriendStatus] { return self.following.values }
+		access(all) fun getName(): String { return self.name }
+		access(all) fun getFindName(): String { return self.findName }
+		access(all) fun getCreatedAt(): String { return self.createdAt }
+		access(all) fun getGender() : String { return self.gender }
+		access(all) fun getDescription(): String{ return self.description}
+		access(all) fun getTags(): [String] { return self.tags}
+		access(all) fun getAvatar(): String { return self.avatar }
+		access(all) fun getFollowers(): [FriendStatus] { return self.followers.values }
+		access(all) fun getFollowing(): [FriendStatus] { return self.following.values }
 
-		pub fun setName(_ val: String) { self.name = val }
-		pub fun setFindName(_ val: String) {
+		access(all) fun setName(_ val: String) { self.name = val }
+		access(all) fun setFindName(_ val: String) {
 			emit Updated(account:self.owner!.address, userName:self.name, findName:val, thumbnail:self.avatar)
 			ProfileCache.resetLeaseCache(address: self.owner!.address, leaseName: self.findName)
 			self.findName = val
 		}
-		pub fun setGender(_ val: String) { self.gender = val }
-		pub fun setAvatar(_ val: String) { self.avatar = val }
-		pub fun setDescription(_ val: String) { self.description=val}
-		pub fun setTags(_ val: [String]) { self.tags=val}
+		access(all) fun setGender(_ val: String) { self.gender = val }
+		access(all) fun setAvatar(_ val: String) { self.avatar = val }
+		access(all) fun setDescription(_ val: String) { self.description=val}
+		access(all) fun setTags(_ val: [String]) { self.tags=val}
 
-		pub fun removeCollection(_ val: String) { self.collections.remove(key: val)}
-		pub fun addCollection(_ val: ResourceCollection) { self.collections[val.name]=val}
-		pub fun getCollections(): [ResourceCollection] { return self.collections.values}
+		access(all) fun removeCollection(_ val: String) { self.collections.remove(key: val)}
+		access(all) fun addCollection(_ val: ResourceCollection) { self.collections[val.name]=val}
+		access(all) fun getCollections(): [ResourceCollection] { return self.collections.values}
 
 
-		pub fun follow(_ address: Address, tags:[String]) {
+		access(all) fun follow(_ address: Address, tags:[String]) {
 			let friendProfile=Profile.find(address)
 			let owner=self.owner!.address
 			let status=FriendStatus(follower:owner, following:address, tags:tags)
@@ -605,7 +605,7 @@ pub contract Profile {
 			emit Follow(follower:owner, following: address, tags:tags)
 		}
 
-		pub fun unfollow(_ address: Address) {
+		access(all) fun unfollow(_ address: Address) {
 			self.following.remove(key: address)
 			Profile.find(address).internal_removeFollower(self.owner!.address)
 			emit Unfollow(follower: self.owner!.address, unfollowing:address)
@@ -623,37 +623,55 @@ pub contract Profile {
 			}
 		}
 
+		/// A getter function that returns the token types supported by this resource,
+        /// which can be deposited using the 'deposit' function.
+        ///
+        /// @return Dictionary of FT types that can be deposited.
+        access(all) view fun getSupportedVaultTypes(): {Type: Bool} { 
+            let supportedVaults: {Type: Bool} = {}
+            for w in self.wallets {
+                if w.receiver.check() {
+                    supportedVaults[w.accept] = true
+                }
+            }
+            return supportedVaults
+        }
+
+
+        /// Returns whether or not the given type is accepted by the Receiver
+        access(all) view fun isSupportedVaultType(type: Type): Bool {
+            let supportedVaults = self.getSupportedVaultTypes()
+            if let supported = supportedVaults[type] {
+                return supported
+            } else { return false }
+        }
 	}
 
-	pub fun findReceiverCapability(address: Address, path: PublicPath, type: Type) : Capability<&{FungibleToken.Receiver}>? {
+	access(all) fun findReceiverCapability(address: Address, path: PublicPath, type: Type) : Capability<&{FungibleToken.Receiver}>? {
 		let profileCap = self.findWalletCapability(address)
 		if profileCap.check() {
-			if let profile = getAccount(address).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() {
+			if let profile = getAccount(address).capabilities.borrow<&Profile.User>(Profile.publicPath) {
 				if profile.hasWallet(type.identifier) {
 					return profileCap
 				}
 			}
 		}
-		let cap = getAccount(address).getCapability<&{FungibleToken.Receiver}>(path)
-		if cap.check() {
-			return cap
-		}
-		return nil
+		let cap = getAccount(address).capabilities.get<&{FungibleToken.Receiver}>(path)
+		return cap
 	}
 
-	pub fun findWalletCapability(_ address: Address) : Capability<&{FungibleToken.Receiver}> {
+	access(all) fun findWalletCapability(_ address: Address) : Capability<&{FungibleToken.Receiver}> {
 		return getAccount(address)
-		.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 	}
 
-	pub fun find(_ address: Address) : &{Profile.Public} {
+	access(all) fun find(_ address: Address) : &{Profile.Public} {
 		return getAccount(address)
-		.getCapability<&{Profile.Public}>(Profile.publicPath)
-		.borrow()!
+		.capabilities.borrow<&{Profile.Public}>(Profile.publicPath)!
 	}
 
 
-	pub fun createUser(name: String, createdAt:String) : @Profile.User {
+	access(all) fun createUser(name: String, createdAt:String) : @Profile.User {
 
 		if name.length > 64 {
 			panic("Name must be 64 or less characters")
@@ -665,7 +683,7 @@ pub contract Profile {
 		return <- create Profile.User(name: name,createdAt: createdAt)
 	}
 
-	pub fun verifyTags(tags : [String], tagLength: Int, tagSize: Int): Bool {
+	access(all) fun verifyTags(tags : [String], tagLength: Int, tagSize: Int): Bool {
 		if tags.length > tagSize {
 			return false
 		}

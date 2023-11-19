@@ -1,6 +1,6 @@
-pub contract FindUtils {
+access(all) contract FindUtils {
 
-	pub fun deDupTypeArray(_ arr:[Type]) : [Type] {
+	access(all) fun deDupTypeArray(_ arr:[Type]) : [Type] {
 
 		let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
 			var i = arr.firstIndex(of: element)
@@ -25,7 +25,7 @@ pub contract FindUtils {
 
 	}
 
-	pub fun joinString(_ arr:[String], sep: String) : String {
+	access(all) fun joinString(_ arr:[String], sep: String) : String {
 		var message=""
 		for i, key in arr {
 			if i > 0 {
@@ -36,7 +36,7 @@ pub contract FindUtils {
 		return message
 	}
 
-	pub fun joinMapToString( _ map:{String:String}) : String {
+	access(all) fun joinMapToString( _ map:{String:String}) : String {
 		var message=""
 		for i, key in map.keys {
 			if i > 0 {
@@ -47,14 +47,14 @@ pub contract FindUtils {
 		return message
 	}
 
-    pub fun containsChar(_ string: String, char: Character) : Bool {
+    access(all) fun containsChar(_ string: String, char: Character) : Bool {
         if var index = string.utf8.firstIndex(of: char.toString().utf8[0]) {
             return true
         }
         return false
     }
 
-    pub fun contains(_ string: String, element: String) : Bool {
+    access(all) fun contains(_ string: String, element: String) : Bool {
         if element.length == 0 {
             return true
         }
@@ -70,7 +70,7 @@ pub contract FindUtils {
         return false
     }
 
-	pub fun trimSuffix(_ name: String, suffix: String) : String {
+	access(all) fun trimSuffix(_ name: String, suffix: String) : String {
 		if !self.hasSuffix(name, suffix:suffix) {
 			return name
 		}
@@ -78,21 +78,21 @@ pub contract FindUtils {
 		return name.slice(from: 0, upTo: pos)
 	}
 
-    pub fun hasSuffix(_ string: String, suffix: String) : Bool {
+    access(all) fun hasSuffix(_ string: String, suffix: String) : Bool {
         if suffix.length > string.length {
             return false
         }
         return string.slice(from: string.length - suffix.length, upTo: string.length) == suffix
     }
 
-    pub fun hasPrefix(_ string: String, prefix: String) : Bool {
+    access(all) fun hasPrefix(_ string: String, prefix: String) : Bool {
         if prefix.length > string.length {
             return false
         }
         return string.slice(from: 0, upTo: prefix.length) == prefix
     }
 
-    pub fun splitString(_ string: String, sep: Character) : [String] {
+    access(all) fun splitString(_ string: String, sep: Character) : [String] {
         if var index = string.utf8.firstIndex(of: sep.toString().utf8[0]) {
 			let first = string.slice(from: 0, upTo: index)
 			let second = string.slice(from: index + 1, upTo: string.length)
@@ -103,7 +103,7 @@ pub contract FindUtils {
         return [string]
     }
 
-    pub fun toUpper(_ string: String) : String {
+    access(all) fun toUpper(_ string: String) : String {
         let map = FindUtils.getLowerCaseToUpperCase()
         var res = ""
         var i = 0
@@ -115,7 +115,7 @@ pub contract FindUtils {
         return res
     }
 
-    pub fun firstUpperLetter(_ string: String) : String {
+    access(all) fun firstUpperLetter(_ string: String) : String {
         if string.length < 1 {
             return string
         }
@@ -127,7 +127,7 @@ pub contract FindUtils {
         return string
     }
 
-    pub fun to_snake_case(_ string: String) : String {
+    access(all) fun to_snake_case(_ string: String) : String {
         var res = ""
         var i = 0
         let map = FindUtils.getUpperCaseToLowerCase()
@@ -154,7 +154,7 @@ pub contract FindUtils {
         return res
     }
 
-    pub fun toCamelCase(_ string: String) : String {
+    access(all) fun toCamelCase(_ string: String) : String {
         var res = ""
         var i = 0
         let map = FindUtils.getLowerCaseToUpperCase()
@@ -180,7 +180,7 @@ pub contract FindUtils {
         return res
     }
 
-    pub fun getLowerCaseToUpperCase() : {String : String} {
+    access(all) fun getLowerCaseToUpperCase() : {String : String} {
         return {
             "a" : "A",
             "b" : "B",
@@ -211,7 +211,7 @@ pub contract FindUtils {
         }
     }
 
-    pub fun getUpperCaseToLowerCase() : {String : String} {
+    access(all) fun getUpperCaseToLowerCase() : {String : String} {
         return {
             "A" : "a",
             "B" : "b",

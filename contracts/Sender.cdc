@@ -1,11 +1,11 @@
-pub contract Sender {
+access(all) contract Sender {
 
-	pub let storagePath: StoragePath
+	access(all) let storagePath: StoragePath
 	
 	/// This is just an empty resource we create in storage, you can safely send a reference to it to obtain msg.sender
-	pub resource Token { }
+	access(all) resource Token { }
 
-	pub fun create() : @Sender.Token {
+	access(all) fun creatToken() : @Sender.Token {
 		return <- create Token()
 	}
 

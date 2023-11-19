@@ -8,7 +8,7 @@ use the tick method to tick the time.
 
 ```
 		//this is used to mock the clock, NB! Should consider removing this before deploying to mainnet?
-		pub fun tickClock(_ time: UFix64) {
+		access(all) fun tickClock(_ time: UFix64) {
 			pre {
 				self.capability != nil: "Cannot use AdminProxy, ste capability first"
 			}
@@ -42,7 +42,7 @@ Limitations:
  - all contracts must live in the same account to (ab)use this trick
 
 */
-pub contract Clock{
+access(all) contract Clock{
 	//want to mock time on emulator. 
 	access(contract) var fakeClock:UFix64
 	access(contract) var enabled:Bool
@@ -58,7 +58,7 @@ pub contract Clock{
 	}
 
 	//mocking the time! Should probably remove self.fakeClock in mainnet?
-	pub fun time() : UFix64 {
+	access(all) fun time() : UFix64 {
 		if self.enabled {
 			return self.fakeClock 
 		}
