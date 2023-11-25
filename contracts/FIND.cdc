@@ -169,8 +169,7 @@ access(all) contract FIND {
 		let leaseNameCache = ProfileCache.getAddressLeaseName(address)
 
 		if leaseNameCache == nil {
-			let account=getAccount(address)
-			let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let leaseCap = getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			if !leaseCap.check() {
 				return nil
@@ -316,7 +315,7 @@ access(all) contract FIND {
 		access(contract) var auctionDuration: UFix64
 		access(contract) var auctionMinBidIncrement: UFix64
 		access(contract) var auctionExtensionOnLateBid: UFix64
-		access(contract) var offerCallback: Capability<&BidCollection{BidCollectionPublic}>?
+		access(contract) var offerCallback: Capability<&BidCollection>?
 		access(contract) var addons: {String: Bool}
 
 		init(name:String, networkCap: Capability<&Network>) {
@@ -375,7 +374,7 @@ access(all) contract FIND {
 			self.auctionStartPrice=price
 		}
 
-		access(all) fun setCallback(_ callback: Capability<&BidCollection{BidCollectionPublic}>?) {
+		access(all) fun setCallback(_ callback: Capability<&BidCollection>?) {
 			self.offerCallback=callback
 		}
 
@@ -406,7 +405,8 @@ access(all) contract FIND {
 			let sender = Profile.find(senderAddress)
 			if sender.getFindName() == self.name {
 				let network = FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath) ?? panic("Network is not set up")
-				let leaseCol = getAccount(senderAddress).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()!
+				let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Could not borrow lease collection")
+				
 				let nameLeases = leaseCol.getNames()
 				for nameLease in nameLeases {
 
@@ -470,10 +470,10 @@ access(all) contract FIND {
 		access(contract) var endsAt: UFix64
 		access(contract) var startedAt: UFix64
 		access(contract) let extendOnLateBid: UFix64
-		access(contract) var latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>
+		access(contract) var latestBidCallback: Capability<&BidCollection>
 		access(contract) let name: String
 
-		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection{BidCollectionPublic}>, name: String) {
+		init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection>, name: String) {
 
 			if startedAt >= endsAt {
 				panic("Cannot start before it will end")
@@ -493,7 +493,7 @@ access(all) contract FIND {
 			return cb.getBalance(self.name)
 		}
 
-		access(all) fun addBid(callback: Capability<&BidCollection{BidCollectionPublic}>, timestamp: UFix64, lease: &Lease) {
+		access(all) fun addBid(callback: Capability<&BidCollection>, timestamp: UFix64, lease: &Lease) {
 			let offer=callback.borrow()!
 			offer.setBidType(name: self.name, type: "auction")
 
@@ -595,7 +595,7 @@ access(all) contract FIND {
 		access(contract) fun increaseBid(_ name: String, balance: UFix64)
 
 		//place a bid on a token
-		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>)
+		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection>)
 
 		//anybody should be able to fulfill an auction as long as it is done
 		access(all) fun fulfillAuction(_ name: String)
@@ -606,7 +606,7 @@ access(all) contract FIND {
 		access(all) fun checkAddon(name:String, addon: String) : Bool
 		access(account) fun getNames() : [String]
 		access(account) fun containsName(_ name: String) : Bool
-		access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>)
+		access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>)
 		access(all) fun getLeaseUUID(_ name: String) : UInt64
 	}
 
@@ -944,7 +944,7 @@ access(all) contract FIND {
 
 		}
 
-		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection{BidCollectionPublic}>) {
+		access(contract) fun registerBid(name: String, callback: Capability<&BidCollection>) {
 
 			if !self.leases.containsKey(name) {
 				panic("Invalid name=".concat(name))
@@ -1273,7 +1273,7 @@ access(all) contract FIND {
 		}
 
 		//note that when moving a name
-		access(all) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+		access(all) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
 
 			let lease = self.borrow(name)
 			if !lease.validate() {
@@ -1336,7 +1336,8 @@ access(all) contract FIND {
 		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
 		access(all) fun register(name: String, vault: @FUSD.Vault){
 			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
-			let leases= self.owner!.getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			
 
 			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
@@ -1350,7 +1351,7 @@ access(all) contract FIND {
 		//This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
 		access(all) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
 			let profileCap = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
-			let leases= self.owner!.getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
@@ -1394,7 +1395,7 @@ access(all) contract FIND {
 		access(all) let registeredTime: UFix64
 		access(all) var validUntil: UFix64
 		access(all) var lockedUntil: UFix64
-		access(all)(set) var profile: Capability<&{Profile.Public}>
+		access(all) var profile: Capability<&{Profile.Public}>
 		// This address is wrong for some account and can never be refered
 		access(all) var address: Address
 		access(all) var name: String
@@ -1428,6 +1429,8 @@ access(all) contract FIND {
 			}
 			return 	LeaseStatus.TAKEN
 		}
+
+
 	}
 
 
@@ -1486,8 +1489,8 @@ access(all) contract FIND {
 			self.addonPrices[name]=price
 		}
 
-		access(all) fun setPrice(default: UFix64, additionalPrices: {Int: UFix64}) {
-			self.defaultPrice=default
+		access(all) fun setPrice(defaultPrice: UFix64, additionalPrices: {Int: UFix64}) {
+			self.defaultPrice=defaultPrice
 			self.lengthPrices=additionalPrices
 		}
 
@@ -1571,7 +1574,7 @@ access(all) contract FIND {
 		}
 
 		//everybody can call register, normally done through the convenience method in the contract
-		access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+		access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection>) {
 
 			if name.length < 3 {
 				panic( "A FIND name has to be minimum 3 letters long")
@@ -1597,7 +1600,7 @@ access(all) contract FIND {
 		}
 
 		//everybody can call register, normally done through the convenience method in the contract
-		access(all) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+		access(all) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection>) {
 			FIND.checkMerchantAddress(merchAccount)
 
 			if name.length < 3 {
@@ -1626,7 +1629,7 @@ access(all) contract FIND {
 			self.internal_register(name: name, profile: profile, leases: leases)
 		}
 
-		access(account) fun internal_register(name: String, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+		access(account) fun internal_register(name: String, profile: Capability<&{Profile.Public}>,  leases: Capability<&LeaseCollection>) {
 
 			if name.length < 3 {
 				panic("A FIND name has to be minimum 3 letters long")
@@ -1763,13 +1766,13 @@ access(all) contract FIND {
 
 
 	access(all) resource Bid {
-		access(contract) let from: Capability<&LeaseCollection{LeaseCollectionPublic}>
+		access(contract) let from: Capability<&LeaseCollection>
 		access(contract) let name: String
 		access(contract) var type: String
 		access(contract) let vault: @FUSD.Vault
 		access(contract) var bidAt: UFix64
 
-		init(from: Capability<&LeaseCollection{LeaseCollectionPublic}>, name: String, vault: @FUSD.Vault){
+		init(from: Capability<&LeaseCollection>, name: String, vault: @FUSD.Vault){
 			self.vault <- vault
 			self.name=name
 			self.from=from
@@ -1803,9 +1806,9 @@ access(all) contract FIND {
 
 		access(contract) var bids : @{String: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-		access(contract) let leases: Capability<&LeaseCollection{LeaseCollectionPublic}>
+		access(contract) let leases: Capability<&LeaseCollection>
 
-		init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) {
+		init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) {
 			self.bids <- {}
 			self.receiver=receiver
 			self.leases=leases
@@ -1864,13 +1867,13 @@ access(all) contract FIND {
 				panic("cannot bid on your own name")
 			}
 
-			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let from=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
 			let bid <- create Bid(from: from, name:name, vault: <- vault)
 			let leaseCollection= from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
 
 
-			let callbackCapability =self.owner!.getCapability<&BidCollection{BidCollectionPublic}>(FIND.BidPublicPath)
+			let callbackCapability =self.owner!.capabilities.get<&{BidCollectionPublic}>(FIND.BidPublicPath)
 			let oldToken <- self.bids[bid.name] <- bid
 			//send info to leaseCollection
 			destroy oldToken
@@ -1884,13 +1887,13 @@ access(all) contract FIND {
 			if nameStatus.status ==  LeaseStatus.FREE {
 				panic("cannot increaseBid on name that is free")
 			}
-			let seller=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let seller=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			let balance = vault.balance
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
 			bid.vault.deposit(from: <- vault)
 
-			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let from=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			if !from.check() {
 				panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
 			}
@@ -1905,7 +1908,7 @@ access(all) contract FIND {
 				self.cancel(name)
 				return
 			}
-			let from=getAccount(nameStatus.owner!).getCapability<&LeaseCollection{LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let from=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 			if !from.check() {
 				panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
 			}
@@ -1932,7 +1935,7 @@ access(all) contract FIND {
 		}
 	}
 
-	access(all) fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection{LeaseCollectionPublic}>) : @BidCollection {
+	access(all) fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) : @BidCollection {
 		return <- create BidCollection(receiver: receiver,  leases: leases)
 	}
 
