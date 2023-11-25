@@ -140,12 +140,22 @@ access(all) contract FungibleToken {
         }
     }
 
+       access(all) resource interface Transferor {
+        /// Function for a direct transfer instead of having to do a deposit and withdrawal
+        ///
+        access(Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+            pre {
+                receiver.check(): "Could not borrow a reference to the NFT receiver"
+            }
+        }
+    }
+
     /// Vault
     ///
     /// Ideally, this interface would also conform to Receiver, Balance, Transferor, Provider, and Resolver
     /// but that is not supported yet
     ///
-    access(all) resource interface Vault: Receiver, Provider, ViewResolver.Resolver {
+    access(all) resource interface Vault: Receiver, Provider, Transferor, ViewResolver.Resolver {
 
         /// Get the balance of the vault
         access(all) view fun getBalance(): UFix64
@@ -214,6 +224,16 @@ access(all) contract FungibleToken {
             post {
                 self.getBalance() == before(self.getBalance()) + before(from.getBalance()):
                     "New Vault balance must be the sum of the previous balance and the deposited Vault"
+            }
+        }
+
+        /// Function for a direct transfer instead of having to do a deposit and withdrawal
+        ///
+        access(Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+            post {
+                self.getBalance() == before(self.getBalance()) - amount:
+                    "New Vault balance from the sender must be the difference of the previous balance and the withdrawn Vault balance"
+                //FungibleToken.emitTransferEvent(amount: amount, from: self.owner?.address, to: receiver.borrow()?.owner?.address, type: self.getType().identifier)
             }
         }
 

@@ -188,6 +188,19 @@ access(all) contract FUSD: ViewResolver {
             destroy vault
         }
 
+
+        access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+            let transferVault <- self.withdraw(amount: amount)
+
+            // Get a reference to the recipient's Receiver
+            let receiverRef = receiver.borrow()
+                ?? panic("Could not borrow receiver reference to the recipient's Vault")
+
+            // Deposit the withdrawn tokens in the recipient's receiver
+            receiverRef.deposit(from: <-transferVault)
+        }
+
+
         /// createEmptyVault
         ///
         /// Function that creates a new Vault with a balance of zero
