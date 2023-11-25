@@ -1430,7 +1430,9 @@ access(all) contract FIND {
 			return 	LeaseStatus.TAKEN
 		}
 
-
+		access(all) fun setProfile (_ profile: Capability<&{Profile.Public}>) {
+			self.profile=profile
+		}
 	}
 
 
