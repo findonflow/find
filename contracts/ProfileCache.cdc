@@ -59,14 +59,15 @@ access(all) contract ProfileCache {
 		return nil
 	}
 
-	access(account) fun resetLeaseCache(address: Address, leaseName: String) {
+	// TO:DO: Set to access(account)
+	access(all) fun resetLeaseCache(address: Address, leaseName: String) {
 		self.addressLeaseName.remove(key: address)
 		self.nameAddress.remove(key: leaseName)
 	}
 
 
-
-	access(account) fun setWalletIndexCache(address: Address, walletType: Type, index: Int) {
+	// TO:DO: Set to access(account) 
+	access(all) fun setWalletIndexCache(address: Address, walletType: Type, index: Int) {
 		if self.profileWalletIndex[address] == nil {
 			self.profileWalletIndex[address] = {}
 			self.profileWalletIndex[address]!.insert(key: walletType, index)
@@ -85,7 +86,8 @@ access(all) contract ProfileCache {
 		return self.profileWalletIndex[address]![walletType]
 	}
 
-	access(account) fun resetWalletIndexCache(address: Address) {
+	// TO:DO: Set to access(account) 
+	access(all) fun resetWalletIndexCache(address: Address) {
 		self.profileWalletIndex.remove(key: address)
 	}
 
