@@ -84,7 +84,8 @@
     "Profile": "./contracts/Profile.cdc",
     "Debug": "./contracts/Debug.cdc",
     "FindUtils": "./contracts/FindUtils.cdc",
-    "FTRegistry": "./contracts/FTRegistry.cdc"
+    "FTRegistry": "./contracts/FTRegistry.cdc",
+    "FindForge": "./contracts/FindForge.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -170,7 +171,8 @@
         "FindUtils",
         "ProfileCache",
         "Admin",
-        "FTRegistry"
+        "FTRegistry",
+        "FindForge"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
