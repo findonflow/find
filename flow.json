@@ -83,7 +83,8 @@
     "Clock": "./contracts/Clock.cdc",
     "Profile": "./contracts/Profile.cdc",
     "Debug": "./contracts/Debug.cdc",
-    "FindUtils": "./contracts/FindUtils.cdc"
+    "FindUtils": "./contracts/FindUtils.cdc",
+    "FTRegistry": "./contracts/FTRegistry.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -160,7 +161,17 @@
     "emulator": {
       "emulator-account": ["FUSD", "FungibleTokenMetadataViews", "DapperUtilityCoin"],
       "emulator-dapper": [],
-      "emulator-find": ["FIND", "Clock", "Profile", "Debug", "Sender", "FindUtils", "ProfileCache", "Admin"],
+      "emulator-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Sender",
+        "FindUtils",
+        "ProfileCache",
+        "Admin",
+        "FTRegistry"
+      ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
       "emulator-find-lease": [],

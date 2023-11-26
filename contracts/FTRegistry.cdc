@@ -1,9 +1,9 @@
-pub contract FTRegistry {
+access(all) contract FTRegistry {
 
     /* Event */
-    pub event ContractInitialized()
-    pub event FTInfoRegistered(alias: String, typeIdentifier: String)
-    pub event FTInfoRemoved(alias: String, typeIdentifier: String)
+    access(all) event ContractInitialized()
+    access(all) event FTInfoRegistered(alias: String, typeIdentifier: String)
+    access(all) event FTInfoRemoved(alias: String, typeIdentifier: String)
 
     /* Variables */
     // Mapping of {Type Identifier : FT Info Struct}
@@ -12,19 +12,19 @@ pub contract FTRegistry {
     access(contract) var aliasMap : {String : String}
 
     /* Struct */
-    pub struct FTInfo {
-        pub let alias : String
-        pub let type : Type
-        pub let typeIdentifier : String
+    access(all) struct FTInfo {
+        access(all) let alias : String
+        access(all) let type : Type
+        access(all) let typeIdentifier : String
         // Whether it is stable coin or other type of coins. 
-        pub let tag : [String ] 
-        pub let icon : String?
-        pub let receiverPath : PublicPath
-        pub let receiverPathIdentifier : String
-        pub let balancePath : PublicPath
-        pub let balancePathIdentifier : String
-        pub let vaultPath : StoragePath
-        pub let vaultPathIdentifier : String
+        access(all) let tag : [String ] 
+        access(all) let icon : String?
+        access(all) let receiverPath : PublicPath
+        access(all) let receiverPathIdentifier : String
+        access(all) let balancePath : PublicPath
+        access(all) let balancePathIdentifier : String
+        access(all) let vaultPath : StoragePath
+        access(all) let vaultPathIdentifier : String
 
         init(alias : String, type: Type, typeIdentifier: String, tag:[String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
             self.alias = alias
@@ -43,18 +43,18 @@ pub contract FTRegistry {
     } 
 
     /* getters */
-    pub fun getFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo? {
+    access(all) fun getFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo? {
         return FTRegistry.fungibleTokenList[typeIdentifier]
     }
 
-	pub fun getFTInfoByAlias(_ alias: String) : FTInfo? {
+	access(all) fun getFTInfoByAlias(_ alias: String) : FTInfo? {
 		  if let identifier = FTRegistry.aliasMap[alias] {
 				return FTRegistry.fungibleTokenList[identifier]
 			}
 			return nil
     }
 
-    pub fun getFTInfo(_ input: String) : FTInfo? {
+    access(all) fun getFTInfo(_ input: String) : FTInfo? {
         if let info = self.getFTInfoByAlias(input) {
             return info
         }
@@ -64,19 +64,19 @@ pub contract FTRegistry {
         return nil 
     }
 
-    pub fun getTypeIdentifier(_ alias: String) : String? {
+    access(all) fun getTypeIdentifier(_ alias: String) : String? {
         return FTRegistry.aliasMap[alias]
     }
 
-    pub fun getFTInfoAll() : {String : FTInfo} {
+    access(all) fun getFTInfoAll() : {String : FTInfo} {
         return FTRegistry.fungibleTokenList
     }
 
-    pub fun getSupportedFTAlias() : [String] {
+    access(all) fun getSupportedFTAlias() : [String] {
         return FTRegistry.aliasMap.keys
     }
 
-    pub fun getSupportedFTTypeIdentifier() : [String] {
+    access(all) fun getSupportedFTTypeIdentifier() : [String] {
         return FTRegistry.aliasMap.values
     }
 
