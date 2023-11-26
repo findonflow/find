@@ -15,16 +15,16 @@ transaction(dapperAddress: Address) {
 		acct.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
 		acct.link<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)
 
-		        // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC and FUT
+		// Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC and FUT
         let dapper = getAccount(dapperAddress)
 
         //FUSD
         let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         if !fusdReceiver.check() {
             let fusd <- FUSD.createEmptyVault()
-            acct.save(<- fusd, to: /storage/fusdVault)
-            acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-            acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+			acct.save(<- fusd, to: /storage/fusdVault)
+			let cap = acct.capabilities.storage.issue<&{FUSD.Vault}>(/storage/fusdVault)
+			acct.capabilities.publish(cap, at: /public/fusdReceiver)
         }
 
         //USDC

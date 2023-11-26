@@ -15,32 +15,32 @@ import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
 import FindViews from "./FindViews.cdc"
 import NameVoucher from "./NameVoucher.cdc"
 
-pub contract Admin {
+access(all) contract Admin {
 
 	//store the proxy for the admin
-	pub let AdminProxyPublicPath: PublicPath
-	pub let AdminProxyStoragePath: StoragePath
+	access(all) let AdminProxyPublicPath: PublicPath
+	access(all) let AdminProxyStoragePath: StoragePath
 
 	/// ===================================================================================
 	// Admin things
 	/// ===================================================================================
 
 	//Admin client to use for capability receiver pattern
-	pub fun createAdminProxyClient() : @AdminProxy {
+	access(all) fun createAdminProxyClient() : @AdminProxy {
 		return <- create AdminProxy()
 	}
 
 	//interface to use for capability receiver pattern
-	pub resource interface AdminProxyClient {
-		pub fun addCapability(_ cap: Capability<&FIND.Network>)
+	access(all) resource interface AdminProxyClient {
+		access(all) fun addCapability(_ cap: Capability<&FIND.Network>)
 	}
 
 	//admin proxy with capability receiver
-	pub resource AdminProxy: AdminProxyClient {
+	access(all) resource AdminProxy: AdminProxyClient {
 
 		access(self) var capability: Capability<&FIND.Network>?
 
-		pub fun addCapability(_ cap: Capability<&FIND.Network>) {
+		access(all) fun addCapability(_ cap: Capability<&FIND.Network>) {
 			pre {
 				cap.check() : "Invalid server capablity"
 				self.capability == nil : "Server already set"
@@ -48,7 +48,7 @@ pub contract Admin {
 			self.capability = cap
 		}
 
-		pub fun addPublicForgeType(name: String, forgeType : Type) {
+		access(all) fun addPublicForgeType(name: String, forgeType : Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -56,7 +56,7 @@ pub contract Admin {
 			FindForge.addPublicForgeType(forgeType: forgeType)
 		}
 
-		pub fun addPrivateForgeType(name: String, forgeType : Type) {
+		access(all) fun addPrivateForgeType(name: String, forgeType : Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -64,7 +64,7 @@ pub contract Admin {
 			FindForge.addPrivateForgeType(name: name, forgeType: forgeType)
 		}
 
-		pub fun removeForgeType(_ type : Type) {
+		access(all) fun removeForgeType(_ type : Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -72,7 +72,7 @@ pub contract Admin {
 			FindForge.removeForgeType(type: type)
 		}
 
-		pub fun addForgeContractData(lease: String, forgeType: Type , data: AnyStruct) {
+		access(all) fun addForgeContractData(lease: String, forgeType: Type , data: AnyStruct) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -80,7 +80,7 @@ pub contract Admin {
 			FindForge.adminAddContractData(lease: lease, forgeType: forgeType , data: data)
 		}
 
-		pub fun addForgeMintType(_ mintType: String) {
+		access(all) fun addForgeMintType(_ mintType: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -88,7 +88,7 @@ pub contract Admin {
 			FindForgeOrder.addMintType(mintType)
 		}
 
-		pub fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
+		access(all) fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -96,14 +96,14 @@ pub contract Admin {
 			FindForge.adminOrderForge(leaseName: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
 		}
 
-		pub fun cancelForgeOrder(leaseName: String, mintType: String){
+		access(all) fun cancelForgeOrder(leaseName: String, mintType: String){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindForge.cancelForgeOrder(leaseName: leaseName, mintType: mintType)
 		}
 
-		pub fun fulfillForgeOrder(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+		access(all) fun fulfillForgeOrder(contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -113,7 +113,7 @@ pub contract Admin {
 
 		/// Set the wallet used for the network
 		/// @param _ The FT receiver to send the money to
-		pub fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
+		access(all) fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -123,7 +123,7 @@ pub contract Admin {
 		}
 
 		/// Enable or disable public registration
-		pub fun setPublicEnabled(_ enabled: Bool) {
+		access(all) fun setPublicEnabled(_ enabled: Bool) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -132,7 +132,7 @@ pub contract Admin {
 			walletRef.setPublicEnabled(enabled)
 		}
 
-		pub fun setAddonPrice(name: String, price: UFix64) {
+		access(all) fun setAddonPrice(name: String, price: UFix64) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -141,16 +141,16 @@ pub contract Admin {
 			walletRef.setAddonPrice(name: name, price: price)
 		}
 
-		pub fun setPrice(default: UFix64, additional : {Int: UFix64}) {
+		access(all) fun setPrice(defaultPrice: UFix64, additional : {Int: UFix64}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 
 			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
-			walletRef.setPrice(default: default, additionalPrices: additional)
+			walletRef.setPrice(default: defaultPrice, additionalPrices: additional)
 		}
 
-		pub fun register(name: String, profile: Capability<&{Profile.Public}>, leases: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>){
+		access(all) fun register(name: String, profile: Capability<&{Profile.Public}>, leases: Capability<&FIND.LeaseCollectionPublic>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
@@ -160,18 +160,18 @@ pub contract Admin {
 			walletRef.internal_register(name:name, profile: profile, leases: leases)
 		}
 
-		pub fun addAddon(name:String, addon:String){
+		access(all) fun addAddon(name:String, addon:String){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
 
 			let user = FIND.lookupAddress(name) ?? panic("Cannot find lease owner. Lease : ".concat(name))
-			let ref = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
+			let ref = getAccount(user).capabilities.get<&FIND.LeaseCollectionPublic>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
 			ref.adminAddAddon(name:name, addon:addon)
 		}
 
-		pub fun adminSetMinterPlatform(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
+		access(all) fun adminSetMinterPlatform(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
@@ -180,7 +180,7 @@ pub contract Admin {
 			FindForge.adminSetMinterPlatform(leaseName: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
 		}
 
-		pub fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+		access(all) fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -188,7 +188,7 @@ pub contract Admin {
 			FindForge.mintAdmin(leaseName: name, forgeType: forgeType, data: data, receiver: receiver)
 		}
 
-		pub fun advanceClock(_ time: UFix64) {
+		access(all) fun advanceClock(_ time: UFix64) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -198,7 +198,7 @@ pub contract Admin {
 		}
 
 
-		pub fun debug(_ value: Bool) {
+		access(all) fun debug(_ value: Bool) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -206,7 +206,7 @@ pub contract Admin {
 		}
 
 		/*
-		pub fun setViewConverters(from: Type, converters: [{Dandy.ViewConverter}]) {
+		access(all) fun setViewConverters(from: Type, converters: [{Dandy.ViewConverter}]) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -220,7 +220,7 @@ pub contract Admin {
 		/// ===================================================================================
 
 		// Registry FungibleToken Information
-		pub fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
+		access(all) fun setFTInfo(alias: String, type: Type, tag: [String], icon: String?, receiverPath: PublicPath, balancePath: PublicPath, vaultPath: StoragePath) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -229,7 +229,7 @@ pub contract Admin {
 		}
 
 		// Remove FungibleToken Information by type identifier
-		pub fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) {
+		access(all) fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -238,7 +238,7 @@ pub contract Admin {
 
 
 		// Remove FungibleToken Information by alias
-		pub fun removeFTInfoByAlias(_ alias: String) {
+		access(all) fun removeFTInfoByAlias(_ alias: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -249,95 +249,95 @@ pub contract Admin {
 		// Find Pack
 		/// ===================================================================================
 
-		pub fun getAuthPointer(pathIdentifier: String, id: UInt64) : FindViews.AuthNFTPointer {
+		access(all) fun getAuthPointer(pathIdentifier: String, id: UInt64) : FindViews.AuthNFTPointer {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
 			let privatePath = PrivatePath(identifier: pathIdentifier)!
-			var cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
+			var cap = Admin.account.capabilities.get<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)!
 			if !cap.check() {
 				let storagePath = StoragePath(identifier: pathIdentifier)!
-				Admin.account.link<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath , target: storagePath)
-				cap = Admin.account.getCapability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)
+				cap = Admin.account.capabilities.storage.issue<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(storagePath)
+				Admin.account.capabilities.publish(cap, at: privatePath)
 			}
 			return FindViews.AuthNFTPointer(cap: cap, id: id)
 		}
 
-		pub fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
+		access(all) fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			return Admin.account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)
+			return Admin.account.capabilities.get<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)!
 		}
 
-		pub fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
+		access(all) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 			let pathIdentifier = FindPack.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
 			let path = PublicPath(identifier: pathIdentifier)!
-			let receiver = Admin.account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(path).borrow() ?? panic("Cannot borrow reference to admin find pack collection public from Path : ".concat(pathIdentifier))
+			let receiver = Admin.account.capabilities.borrow<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)! ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(path.toString()))
 			let mintPackData = FindPack.MintPackData(packTypeName: packTypeName, typeId: typeId, hash: hash, verifierRef: FindForge.borrowVerifier())
 			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
 		}
 
-		pub fun fulfillFindPack(packId:UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
+		access(all) fun fulfillFindPack(packId:UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 			FindPack.fulfill(packId:packId, types:types, rewardIds:rewardIds, salt:salt)
 		}
 
-		pub fun requeueFindPack(packId:UInt64) {
+		access(all) fun requeueFindPack(packId:UInt64) {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			let cap= Admin.account.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+			let cap= Admin.account.storage.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
 			cap.requeue(packId: packId)
 		}
 
-		pub fun getFindRoyaltyCap() : Capability<&{FungibleToken.Receiver}> {
+		access(all) fun getFindRoyaltyCap() : Capability<&{FungibleToken.Receiver}> {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			return Admin.account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return Admin.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		}
 
 		/// ===================================================================================
 		// FINDNFTCatalog
 		/// ===================================================================================
 
-		pub fun addCatalogEntry(collectionIdentifier : String, metadata : NFTCatalog.NFTCatalogMetadata) {
+		access(all) fun addCatalogEntry(collectionIdentifier : String, metadata : NFTCatalog.NFTCatalogMetadata) {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
+			let FINDCatalogAdmin = Admin.account.storage.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
         	FINDCatalogAdmin.addCatalogEntry(collectionIdentifier : collectionIdentifier, metadata : metadata)
 		}
 
-		pub fun removeCatalogEntry(collectionIdentifier : String) {
+		access(all) fun removeCatalogEntry(collectionIdentifier : String) {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			let FINDCatalogAdmin = Admin.account.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
+			let FINDCatalogAdmin = Admin.account.storage.borrow<&FINDNFTCatalogAdmin.Admin>(from: FINDNFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow reference to Find NFT Catalog admin resource")
         	FINDCatalogAdmin.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
 		}
 
-		pub fun getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
+		access(all) fun getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
 			// we hard code it here instead, to avoid importing just for path
-			return Admin.account.getCapability<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
+			return Admin.account.capabilities.get<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
 		}
 
 		/// ===================================================================================
 		// Name Voucher
 		/// ===================================================================================
 
-		pub fun mintNameVoucher(receiver : &{NonFungibleToken.Receiver}, minCharLength : UInt64) : UInt64  {
+		access(all) fun mintNameVoucher(receiver : &{NonFungibleToken.Receiver}, minCharLength : UInt64) : UInt64  {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
@@ -345,28 +345,24 @@ pub contract Admin {
 			return NameVoucher.mintNFT(recipient: receiver, minCharLength: minCharLength)
 		}
 
-		pub fun mintNameVoucherToFind(minCharLength : UInt64) : UInt64 {
+		access(all) fun mintNameVoucherToFind(minCharLength : UInt64) : UInt64 {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			let receiver = Admin.account.borrow<&NameVoucher.Collection{NonFungibleToken.Receiver}>(from: NameVoucher.CollectionStoragePath)!
+			let receiver = Admin.account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)!
 			return NameVoucher.mintNFT(recipient: receiver, minCharLength: minCharLength)
 		}
 
 		init() {
 			self.capability = nil
 		}
-
 	}
 
 
 	init() {
-
 		self.AdminProxyPublicPath= /public/findAdminProxy
 		self.AdminProxyStoragePath=/storage/findAdminProxy
-
 	}
-
 }
 

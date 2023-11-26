@@ -158,21 +158,9 @@
   },
   "deployments": {
     "emulator": {
-      "emulator-account": [
-        "FUSD",
-        "FungibleTokenMetadataViews",
-        "DapperUtilityCoin"
-      ],
+      "emulator-account": ["FUSD", "FungibleTokenMetadataViews", "DapperUtilityCoin"],
       "emulator-dapper": [],
-      "emulator-find": [
-        "FIND",
-        "Clock",
-        "Profile",
-        "Debug",
-        "Sender",
-        "FindUtils",
-        "ProfileCache"
-      ],
+      "emulator-find": ["FIND", "Clock", "Profile", "Debug", "Sender", "FindUtils", "ProfileCache", "Admin"],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
       "emulator-find-lease": [],
