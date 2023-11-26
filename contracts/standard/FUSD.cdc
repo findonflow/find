@@ -8,7 +8,7 @@ access(all) contract FUSD: ViewResolver {
     /// The event that is emitted when new tokens are minted
     access(all) event TokensMinted(amount: UFix64, type: String)
 
-    /// Total supply of ExampleTokens in existence
+    /// Total supply of fusds in existence
     access(all) var totalSupply: UFix64
 
     /// Admin Path
@@ -26,14 +26,14 @@ access(all) contract FUSD: ViewResolver {
     }
 
     access(all) view fun getViews(): [Type] {
-        let vaultRef = self.account.capabilities.borrow<&FUSD.Vault>(/public/exampleTokenVault)
+        let vaultRef = self.account.capabilities.borrow<&FUSD.Vault>(/public/fusdVault)
             ?? panic("Could not borrow a reference to the vault resolver")
         
         return vaultRef.getViews()
     }
 
     access(all) fun resolveView(_ view: Type): AnyStruct? {
-        let vaultRef = self.account.capabilities.borrow<&FUSD.Vault>(/public/exampleTokenVault)
+        let vaultRef = self.account.capabilities.borrow<&FUSD.Vault>(/public/fusdVault)
             ?? panic("Could not borrow a reference to the vault resolver")
         
         return vaultRef.resolveView(view)
@@ -116,7 +116,7 @@ access(all) contract FUSD: ViewResolver {
                         storagePath: self.storagePath,
                         receiverPath: self.receiverPath,
                         metadataPath: self.publicPath,
-                        providerPath: /private/exampleTokenVault,
+                        providerPath: /private/fusdVault,
                         receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
                         metadataLinkedType: Type<&FUSD.Vault>(),
                         providerLinkedType: Type<&FUSD.Vault>(),
@@ -146,10 +146,10 @@ access(all) contract FUSD: ViewResolver {
         // initialize the balance at resource creation time
         init(balance: UFix64) {
             self.balance = balance
-            let identifier = "exampleTokenVault"
+            let identifier = "fusdVault"
             self.storagePath = StoragePath(identifier: identifier)!
             self.publicPath = PublicPath(identifier: identifier)!
-            self.receiverPath = PublicPath(identifier: "exampleTokenReceiver")!
+            self.receiverPath = PublicPath(identifier: "fusdReceiver")!
         }
 
         /// Get the balance of the vault
@@ -263,7 +263,7 @@ access(all) contract FUSD: ViewResolver {
     init() {
         self.totalSupply = 1000.0
 
-        self.AdminStoragePath = /storage/exampleTokenAdmin 
+        self.AdminStoragePath = /storage/fusdAdmin 
 
         // Create the Vault with the total supply of tokens and save it in storage
         //
@@ -278,8 +278,8 @@ access(all) contract FUSD: ViewResolver {
         // the `deposit` method and getAcceptedTypes method through the `Receiver` interface
         // and the `getBalance()` method through the `Balance` interface
         //
-        let exampleTokenCap = self.account.capabilities.storage.issue<&Vault>(self.VaultStoragePath)
-        self.account.capabilities.publish(exampleTokenCap, at: self.VaultPublicPath)
+        let fusdCap = self.account.capabilities.storage.issue<&Vault>(self.VaultStoragePath)
+        self.account.capabilities.publish(fusdCap, at: self.VaultPublicPath)
         let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(self.VaultStoragePath)
         self.account.capabilities.publish(receiverCap, at: self.ReceiverPublicPath)
 
