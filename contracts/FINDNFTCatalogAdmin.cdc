@@ -7,31 +7,31 @@ import NFTCatalog from "./standard/NFTCatalog.cdc"
 // a proxy resource to receive a capability that lets you make changes to the NFT Catalog
 // and manage proposals
 
-pub contract FINDNFTCatalogAdmin {
+access(all) contract FINDNFTCatalogAdmin {
 
-    pub let AdminPrivatePath: PrivatePath
-    pub let AdminStoragePath: StoragePath
+    access(all) let AdminPrivatePath: PrivatePath
+    access(all) let AdminStoragePath: StoragePath
 
-    pub let AdminProxyPublicPath: PublicPath
-    pub let AdminProxyStoragePath: StoragePath
+    access(all) let AdminProxyPublicPath: PublicPath
+    access(all) let AdminProxyStoragePath: StoragePath
 
     // Admin
     // Admin resource to manage NFT Catalog
-    pub resource Admin {
+    access(all) resource Admin {
 
-        pub fun addCatalogEntry(collectionIdentifier: String, metadata : NFTCatalog.NFTCatalogMetadata) {
+        access(all) fun addCatalogEntry(collectionIdentifier: String, metadata : NFTCatalog.NFTCatalogMetadata) {
             FINDNFTCatalog.addCatalogEntry(collectionIdentifier: collectionIdentifier, metadata : metadata)
         }
 
-        pub fun updateCatalogEntry(collectionIdentifier : String , metadata : NFTCatalog.NFTCatalogMetadata) {
+        access(all) fun updateCatalogEntry(collectionIdentifier : String , metadata : NFTCatalog.NFTCatalogMetadata) {
             FINDNFTCatalog.updateCatalogEntry(collectionIdentifier: collectionIdentifier, metadata : metadata)
         }
 
-        pub fun removeCatalogEntry(collectionIdentifier : String) {
+        access(all) fun removeCatalogEntry(collectionIdentifier : String) {
             FINDNFTCatalog.removeCatalogEntry(collectionIdentifier : collectionIdentifier)
         }
 
-        pub fun approveCatalogProposal(proposalID : UInt64) {
+        access(all) fun approveCatalogProposal(proposalID : UInt64) {
             pre {
                 FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) != nil : "Invalid Proposal ID"
                 FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!.status == "IN_REVIEW" : "Invalid Proposal"
@@ -47,7 +47,7 @@ pub contract FINDNFTCatalogAdmin {
             }
         }
 
-        pub fun rejectCatalogProposal(proposalID : UInt64) {
+        access(all) fun rejectCatalogProposal(proposalID : UInt64) {
             pre {
                 FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) != nil : "Invalid Proposal ID"
                 FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!.status == "IN_REVIEW" : "Invalid Proposal"
@@ -57,7 +57,7 @@ pub contract FINDNFTCatalogAdmin {
             FINDNFTCatalog.updateCatalogProposal(proposalID : proposalID, proposalMetadata : newCatalogProposalEntry)
         }
 
-        pub fun removeCatalogProposal(proposalID : UInt64) {
+        access(all) fun removeCatalogProposal(proposalID : UInt64) {
             pre {
                 FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) != nil : "Invalid Proposal ID"
             }
@@ -71,16 +71,16 @@ pub contract FINDNFTCatalogAdmin {
     // AdminProxy
     // A proxy resource that can store
     // a capability to admin controls
-    pub resource interface IAdminProxy {
-        pub fun addCapability(capability : Capability<&Admin>)
-        pub fun hasCapability() : Bool
+    access(all) resource interface IAdminProxy {
+        access(all) fun addCapability(capability : Capability<&Admin>)
+        access(all) fun hasCapability() : Bool
     }
 
-    pub resource AdminProxy : IAdminProxy {
+    access(all) resource AdminProxy : IAdminProxy {
         
         access(self) var capability : Capability<&Admin>?
 
-        pub fun addCapability(capability : Capability<&Admin>) {
+        access(all) fun addCapability(capability : Capability<&Admin>) {
             pre {
                 capability.check() : "Invalid Admin Capability"
                 self.capability == nil : "Admin Proxy already set"
@@ -88,11 +88,11 @@ pub contract FINDNFTCatalogAdmin {
             self.capability = capability
         }
 
-        pub fun getCapability() : Capability<&Admin>? {
+        access(all) fun getCapability() : Capability<&Admin>? {
             return self.capability
         }
 
-        pub fun hasCapability() : Bool {
+        access(all) fun hasCapability() : Bool {
             return self.capability != nil
         }
 
@@ -102,7 +102,7 @@ pub contract FINDNFTCatalogAdmin {
         
     }
 
-    pub fun createAdminProxy() : @AdminProxy {
+    access(all) fun createAdminProxy() : @AdminProxy {
         return <- create AdminProxy()
     }
 

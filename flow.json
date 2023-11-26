@@ -87,7 +87,10 @@
     "FTRegistry": "./contracts/FTRegistry.cdc",
     "FindForge": "./contracts/FindForge.cdc",
     "FindPack": "./contracts/FindPack.cdc",
-    "FindForgeOrder": "./contracts/FindForgeOrder.cdc"
+    "FindForgeOrder": "./contracts/FindForgeOrder.cdc",
+    "NFTCatalog": "./contracts/standard/NFTCatalog.cdc",
+    "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
+    "FindViews": "./contracts/FindViews.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -162,7 +165,7 @@
   },
   "deployments": {
     "emulator": {
-      "emulator-account": ["FUSD", "FungibleTokenMetadataViews", "DapperUtilityCoin"],
+      "emulator-account": ["FUSD", "FungibleTokenMetadataViews", "DapperUtilityCoin", "NFTCatalog"],
       "emulator-dapper": [],
       "emulator-find": [
         "FIND",
@@ -176,7 +179,9 @@
         "FTRegistry",
         "FindForge",
         "FindForgeOrder",
-        "FindPack"
+        "FindPack",
+        "FINDNFTCatalogAdmin",
+        "FindViews"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
