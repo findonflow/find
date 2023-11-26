@@ -2051,6 +2051,28 @@ access(all) contract FIND {
 		self.BidPublicPath=/public/findBids
 		self.BidStoragePath=/storage/findBids
 
+		// Check if wallet is already initialized
+		if self.account.storage.borrow<&FUSD.Vault>(from: FUSD.VaultStoragePath) == nil {
+			// Initialize Wallet
+			let vault <- FUSD.createEmptyVault()
+
+			// Save the vault to storage
+			self.account.storage.save(<-vault, to: FUSD.VaultStoragePath)
+
+			// Create a public capability for the vault
+			let vaultCap = self.account.capabilities.storage.issue<&FUSD.Vault>(
+				FUSD.VaultStoragePath
+			)
+			self.account.capabilities.publish(vaultCap, at: FUSD.VaultPublicPath)
+
+			// Create a public Capability to the Vault's Receiver functionality
+			let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
+				FUSD.VaultStoragePath
+			)
+			self.account.capabilities.publish(receiverCap, at: FUSD.ReceiverPublicPath)
+		}
+
+		// Get
 		let wallet=self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)!
 
 		// these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
