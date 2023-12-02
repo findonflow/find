@@ -90,7 +90,10 @@
     "FindForgeOrder": "./contracts/FindForgeOrder.cdc",
     "NFTCatalog": "./contracts/standard/NFTCatalog.cdc",
     "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
-    "FindViews": "./contracts/FindViews.cdc"
+    "FindViews": "./contracts/FindViews.cdc",
+    "NameVoucher": "./contracts/NameVoucher.cdc",
+    "FindVerifier": "./contracts/FindVerifier.cdc",
+    "FLOAT": "./contracts/standard/FLOAT.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -181,7 +184,10 @@
         "FindForgeOrder",
         "FindPack",
         "FINDNFTCatalogAdmin",
-        "FindViews"
+        "FindViews",
+        "NameVoucher",
+        "FLOAT",
+        "FindVerifier"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],

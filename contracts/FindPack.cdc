@@ -4,7 +4,6 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import Crypto
 import Clock from "../contracts/Clock.cdc"
 import Debug from "./Debug.cdc"
-import FLOAT from "../contracts/standard/FLOAT.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 import FindVerifier from "../contracts/FindVerifier.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"

@@ -8,31 +8,31 @@ import FIND from "./FIND.cdc"
 import FindViews from "./FindViews.cdc"
 // import FindAirdropper from "./FindAirdropper.cdc"
 
-pub contract NameVoucher: NonFungibleToken {
+access(all) contract NameVoucher: NonFungibleToken {
 
-	pub var totalSupply: UInt64
+access(all) var totalSupply: UInt64
 
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id:UInt64, address:Address, minCharLength: UInt64)
+access(all) event ContractInitialized()
+access(all) event Withdraw(id: UInt64, from: Address?)
+access(all) event Deposit(id: UInt64, to: Address?)
+access(all) event Minted(id:UInt64, address:Address, minCharLength: UInt64)
 
-	pub event Destroyed(id: UInt64, address: Address?, minCharLength: UInt64)
-	pub event Redeemed(id: UInt64, address: Address?, minCharLength: UInt64, findName: String, action: String)
+access(all) event Destroyed(id: UInt64, address: Address?, minCharLength: UInt64)
+access(all) event Redeemed(id: UInt64, address: Address?, minCharLength: UInt64, findName: String, action: String)
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
-	pub let CollectionPrivatePath: PrivatePath
+access(all) let CollectionStoragePath: StoragePath
+access(all) let CollectionPublicPath: PublicPath
+access(all) let CollectionPrivatePath: PrivatePath
 
-	pub var royalties : [MetadataViews.Royalty]
-	pub var thumbnail : {MetadataViews.File}
+access(all) var royalties : [MetadataViews.Royalty]
+access(all) var thumbnail : {MetadataViews.File}
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+access(all) resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
 
-		pub let id:UInt64
-		pub var nounce:UInt64
+	access(all) let id:UInt64
+	access(all) var nounce:UInt64
 		// 3 characters voucher should be able to claim name with at LEAST 3 char and so on
-		pub let minCharLength:UInt64
+	access(all) let minCharLength:UInt64
 
 		init(
 			minCharLength: UInt64
@@ -46,7 +46,7 @@ pub contract NameVoucher: NonFungibleToken {
 			emit Destroyed(id: self.id, address: self.owner?.address, minCharLength: self.minCharLength)
 		}
 
-		pub fun getViews(): [Type] {
+	access(all) fun getViews(): [Type] {
 			return  [
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Royalties>(),
@@ -57,7 +57,7 @@ pub contract NameVoucher: NonFungibleToken {
 			]
 		}
 
-		pub fun resolveView(_ view: Type): AnyStruct? {
+	access(all) fun resolveView(_ view: Type): AnyStruct? {
 
 			var imageFile=NameVoucher.thumbnail
 
@@ -107,9 +107,9 @@ pub contract NameVoucher: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: NameVoucher.CollectionStoragePath,
 				publicPath: NameVoucher.CollectionPublicPath,
 				providerPath: NameVoucher.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
+				publicCollection: Type<&Collection>(),
+				publicLinkedType: Type<&Collection>(),
+				providerLinkedType: Type<&Collection>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- NameVoucher.createEmptyCollection()})
 
 			case Type<MetadataViews.Traits>():
@@ -131,17 +131,17 @@ pub contract NameVoucher: NonFungibleToken {
 
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+	access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		init () {
 			self.ownedNFTs <- {}
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+	access(all) fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -151,7 +151,7 @@ pub contract NameVoucher: NonFungibleToken {
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-		pub fun deposit(token: @NonFungibleToken.NFT) {
+	access(all) fun deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
 
 			let id: UInt64 = token.id
@@ -168,27 +168,27 @@ pub contract NameVoucher: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		pub fun getIDs(): [UInt64] {
+	access(all) fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
-		pub fun contains(_ id: UInt64) : Bool {
+	access(all) fun contains(_ id: UInt64) : Bool {
 			return self.ownedNFTs.containsKey(id)
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+	access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+	access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+			let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
 			let vr = nft as! &NFT
-			return vr as &AnyResource{MetadataViews.Resolver}
+			return vr as &{MetadataViews.Resolver}
 		}
 
-		pub fun redeem(id: UInt64, name: String) {
+	access(all) fun redeem(id: UInt64, name: String) {
 			let nft <- self.ownedNFTs.remove(key: id) ?? panic("Cannot find voucher with ID ".concat(id.toString()))
 			let typedNFT <- nft as! @NameVoucher.NFT
 			let nameLength = UInt64(name.length)
@@ -199,13 +199,13 @@ pub contract NameVoucher: NonFungibleToken {
 			destroy typedNFT
 
 			// get All the paths here for registration
-			let network = NameVoucher.account.borrow<&FIND.Network>(from: FIND.NetworkStoragePath) ?? panic("Cannot borrow find network for registration")
+			let network = NameVoucher.storage.borrow<&FIND.Network>(from: FIND.NetworkStoragePath) ?? panic("Cannot borrow find network for registration")
 			let status = FIND.status(name)
 
 			// If the lease is free, we register it
 			if status.status == FIND.LeaseStatus.FREE {
-				let profile = self.owner!.getCapability<&{Profile.Public}>(Profile.publicPath)
-				let lease = self.owner!.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+				let profile = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
+				let lease = self.owner!.capabilities.get<&{FIND.LeaseCollection}>(FIND.LeasePublicPath)!
 				network.internal_register(name: name, profile: profile,  leases: lease)
 				emit Redeemed(id: id, address: self.owner?.address, minCharLength: minLength, findName: name, action: "register")
 				return
@@ -227,7 +227,7 @@ pub contract NameVoucher: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+access(all) fun createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
@@ -264,7 +264,7 @@ pub contract NameVoucher: NonFungibleToken {
 		// Set Royalty cuts in a transaction
 		self.royalties = [
 			MetadataViews.Royalty(
-				receiver: NameVoucher.account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath),
+				receiver: NameVoucher.account.capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!	,
 				cut: 0.025,
 				description: "network"
 			)
@@ -278,14 +278,8 @@ pub contract NameVoucher: NonFungibleToken {
 		self.CollectionPrivatePath = /private/nameVoucher
 
 		self.account.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
-		self.account.link<&NameVoucher.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-			NameVoucher.CollectionPublicPath,
-			target: NameVoucher.CollectionStoragePath
-		)
-		self.account.link<&NameVoucher.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-			NameVoucher.CollectionPrivatePath,
-			target: NameVoucher.CollectionStoragePath
-		)
+		let collectionCap = self.account.capabilties.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
+		self.account.capabilities.publish(collectionCap, at: NameVoucher.CollectionPrivatePath)
 
 		emit ContractInitialized()
 	}

@@ -3,16 +3,16 @@ import FIND from "../contracts/FIND.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-pub contract FindVerifier {
+access(all) contract FindVerifier {
 
-	pub struct interface Verifier {
-		pub let description : String
-		pub fun verify(_ param: {String : AnyStruct}) : Bool 
+	access(all) struct interface Verifier {
+		access(all) let description : String
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool 
 	}
 
-	pub struct HasOneFLOAT : Verifier {
-		pub let floatEventIds : [UInt64] 
-		pub let description: String
+	access(all) struct HasOneFLOAT : Verifier {
+		access(all) let floatEventIds : [UInt64] 
+		access(all) let description: String
 
 		init(_ floatEventIds: [UInt64]) {
 			pre{
@@ -27,14 +27,14 @@ pub contract FindVerifier {
 			self.description = desc
 		}
 
-		pub fun verify(_ param: {String : AnyStruct}) : Bool {
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool {
 
 			if self.floatEventIds.length == 0 {
 				return true
 			}
 
 			let user : Address = param["address"]! as! Address 
-			let float = getAccount(user).getCapability(FLOAT.FLOATCollectionPublicPath).borrow<&FLOAT.Collection{FLOAT.CollectionPublic}>() 
+			let float = getAccount(user).capabilites.get(FLOAT.FLOATCollectionPublicPath)!.borrow<&FLOAT.Collection>() 
 
 			if float == nil {
 				return false
@@ -53,9 +53,9 @@ pub contract FindVerifier {
 
 	}
 
-	pub struct HasAllFLOAT : Verifier {
-		pub let floatEventIds : [UInt64] 
-		pub let description: String
+	access(all) struct HasAllFLOAT : Verifier {
+		access(all) let floatEventIds : [UInt64] 
+		access(all) let description: String
 
 		init(_ floatEventIds : [UInt64]) {
 			pre{
@@ -70,14 +70,14 @@ pub contract FindVerifier {
 			self.description = desc
 		}
 
-		pub fun verify(_ param: {String : AnyStruct}) : Bool {
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool {
 
 			if self.floatEventIds.length == 0 {
 				return true
 			}
 
 			let user : Address = param["address"]! as! Address 
-			let float = getAccount(user).getCapability(FLOAT.FLOATCollectionPublicPath).borrow<&FLOAT.Collection{FLOAT.CollectionPublic}>() 
+			let float = getAccount(user).capabilites.get(FLOAT.FLOATCollectionPublicPath)!.borrow<&FLOAT.Collection>() 
 
 			if float == nil {
 				return false
@@ -100,9 +100,9 @@ pub contract FindVerifier {
 		}
 	}
 
-	pub struct IsInWhiteList : Verifier {
-		pub let addressList : [Address] 
-		pub let description: String
+	access(all) struct IsInWhiteList : Verifier {
+		access(all) let addressList : [Address] 
+		access(all) let description: String
 
 		init(_ addressList: [Address]) {
 			pre{
@@ -117,16 +117,16 @@ pub contract FindVerifier {
 			self.description = desc
 		}
 
-		pub fun verify(_ param: {String : AnyStruct}) : Bool {
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool {
 			let user : Address = param["address"]! as! Address 
 			return self.addressList.contains(user)
 		}
 	}
 
 	// Has Find Name 
-	pub struct HasFINDName : Verifier {
-		pub let findNames: [String] 
-		pub let description: String
+	access(all) struct HasFINDName : Verifier {
+		access(all) let findNames: [String] 
+		access(all) let description: String
 
 		init(_ findNames: [String]) {
 			pre{
@@ -141,7 +141,7 @@ pub contract FindVerifier {
 			self.description = desc
 		}
 
-		pub fun verify(_ param: {String : AnyStruct}) : Bool {
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool {
 
 			if self.findNames.length == 0 {
 				return true
@@ -149,7 +149,7 @@ pub contract FindVerifier {
 
 			let user : Address = param["address"]! as! Address 
 
-			let cap = getAccount(user).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+			let cap = getAccount(user).capabilites.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
 			if !cap.check() {
 				return false
 			}
@@ -175,10 +175,10 @@ pub contract FindVerifier {
 	}
 
 	// Has a no. of NFTs in given path 
-	pub struct HasNFTsInPath : Verifier {
-		pub let path: PublicPath 
-		pub let threshold: Int 
-		pub let description: String
+	access(all) struct HasNFTsInPath : Verifier {
+		access(all) let path: PublicPath 
+		access(all) let threshold: Int 
+		access(all) let description: String
 
 		init(path: PublicPath , threshold: Int ) {
 			pre {
@@ -190,16 +190,16 @@ pub contract FindVerifier {
 			self.description = desc
 		}
 
-		pub fun verify(_ param: {String : AnyStruct}) : Bool {
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool {
 			if self.threshold == 0 {
 				return true
 			}
 
 			let user : Address = param["address"]! as! Address 
 
-			let cap = getAccount(user).getCapability<&{NonFungibleToken.CollectionPublic}>(self.path)
+			let cap = getAccount(user).capabilites.get<&{NonFungibleToken.CollectionPublic}>(self.path)
 			if !cap.check() {
-				let mvCap = getAccount(user).getCapability<&{MetadataViews.ResolverCollection}>(self.path)
+				let mvCap = getAccount(user).capabilites.get<&{MetadataViews.ResolverCollection}>(self.path)
 				if !mvCap.check() {
 					return false
 				}
@@ -210,11 +210,11 @@ pub contract FindVerifier {
 	}
 
 	// Has given NFTs in given path with rarity  (can cache this with uuid) 
-	pub struct HasNFTWithRarities : Verifier {
-		pub let path: PublicPath 
-		pub let rarities: [MetadataViews.Rarity]
+	access(all) struct HasNFTWithRarities : Verifier {
+		access(all) let path: PublicPath 
+		access(all) let rarities: [MetadataViews.Rarity]
 		access(self) let rarityIdentifiers: [String]
-		pub let description: String
+		access(all) let description: String
 
 		// leave this here for caching in case useful, but people might be able to change rarity
 		access(self) let cache : {UInt64 : Bool}
@@ -271,14 +271,14 @@ pub contract FindVerifier {
 				return rI
 		}
 
-		pub fun verify(_ param: {String : AnyStruct}) : Bool {
+		access(all) fun verify(_ param: {String : AnyStruct}) : Bool {
 			if self.rarities.length == 0 {
 				return true
 			}
 
 			let user : Address = param["address"]! as! Address 
 
-			let mvCap = getAccount(user).getCapability<&{MetadataViews.ResolverCollection}>(self.path)
+			let mvCap = getAccount(user).capabilites.get<&{MetadataViews.ResolverCollection}>(self.path)
 			if !mvCap.check() {
 				return false
 			}
