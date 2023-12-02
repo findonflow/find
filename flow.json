@@ -93,7 +93,9 @@
     "FindViews": "./contracts/FindViews.cdc",
     "NameVoucher": "./contracts/NameVoucher.cdc",
     "FindVerifier": "./contracts/FindVerifier.cdc",
-    "FLOAT": "./contracts/standard/FLOAT.cdc"
+    "FLOAT": "./contracts/standard/FLOAT.cdc",
+    "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
+    "FungibleTokenSwitchboard": "./contracts/standard/FungibleTokenSwitchboard.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -168,7 +170,13 @@
   },
   "deployments": {
     "emulator": {
-      "emulator-account": ["FUSD", "FungibleTokenMetadataViews", "DapperUtilityCoin", "NFTCatalog"],
+      "emulator-account": [
+        "FUSD",
+        "FungibleTokenMetadataViews",
+        "DapperUtilityCoin",
+        "NFTCatalog",
+        "FungibleTokenSwitchboard"
+      ],
       "emulator-dapper": [],
       "emulator-find": [
         "FIND",
@@ -187,7 +195,8 @@
         "FindViews",
         "NameVoucher",
         "FLOAT",
-        "FindVerifier"
+        "FindVerifier",
+        "FINDNFTCatalog"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],

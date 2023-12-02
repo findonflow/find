@@ -11,10 +11,10 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 // To make an addition to the catalog you can propose an NFT and provide its metadata.
 // An Admin can approve a proposal which would add the NFT to the catalog
 
-pub contract FINDNFTCatalog {
+access(all) contract FINDNFTCatalog {
     // EntryAdded
     // An NFT collection has been added to the catalog
-    pub event EntryAdded(
+    access(all) event EntryAdded(
         collectionIdentifier : String,
         contractName : String,
         contractAddress : Address,
@@ -31,7 +31,7 @@ pub contract FINDNFTCatalog {
 
     // EntryUpdated
     // An NFT Collection has been updated in the catalog
-    pub event EntryUpdated(
+    access(all) event EntryUpdated(
         collectionIdentifier : String,
         contractName : String,
         contractAddress : Address,
@@ -48,23 +48,23 @@ pub contract FINDNFTCatalog {
 
     // EntryRemoved
     // An NFT Collection has been removed from the catalog
-    pub event EntryRemoved(collectionIdentifier : String)
+    access(all) event EntryRemoved(collectionIdentifier : String)
 
     // ProposalEntryAdded
     // A new proposal to make an addtion to the catalog has been made
-    pub event ProposalEntryAdded(proposalID : UInt64, collectionIdentifier : String, message: String, status: String, proposer : Address)
+    access(all) event ProposalEntryAdded(proposalID : UInt64, collectionIdentifier : String, message: String, status: String, proposer : Address)
 
     // ProposalEntryUpdated
     // A proposal has been updated
-    pub event ProposalEntryUpdated(proposalID : UInt64, collectionIdentifier : String, message: String, status: String, proposer : Address)
+    access(all) event ProposalEntryUpdated(proposalID : UInt64, collectionIdentifier : String, message: String, status: String, proposer : Address)
 
     // ProposalEntryRemoved
     // A proposal has been removed from storage
-    pub event ProposalEntryRemoved(proposalID : UInt64)
+    access(all) event ProposalEntryRemoved(proposalID : UInt64)
 
-    pub let ProposalManagerStoragePath: StoragePath
+    access(all) let ProposalManagerStoragePath: StoragePath
 
-    pub let ProposalManagerPublicPath: PublicPath
+    access(all) let ProposalManagerPublicPath: PublicPath
 
     access(self) let catalog: {String : NFTCatalog.NFTCatalogMetadata} // { collectionIdentifier -> Metadata }
     access(self) let catalogTypeData: {String : {String : Bool}} // Additional view to go from { NFT Type Identifier -> {Collection Identifier : Bool } }
@@ -74,7 +74,7 @@ pub contract FINDNFTCatalog {
     access(self) var totalProposals : UInt64
 
     // Get FIND and Dapper NFTCatalog 
-    pub fun getCatalog() : {String : NFTCatalog.NFTCatalogMetadata} {
+    access(all) fun getCatalog() : {String : NFTCatalog.NFTCatalogMetadata} {
         let find = self.catalog 
         let dapper = NFTCatalog.getCatalog()
         for item in dapper.keys {
@@ -83,14 +83,14 @@ pub contract FINDNFTCatalog {
         return find
     }
 
-    pub fun getCatalogEntry(collectionIdentifier : String) : NFTCatalog.NFTCatalogMetadata? {
+    access(all) fun getCatalogEntry(collectionIdentifier : String) : NFTCatalog.NFTCatalogMetadata? {
         if let dapper = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier) {
             return dapper
         }
         return self.catalog[collectionIdentifier]
     }
 
-    pub fun getCollectionsForType(nftTypeIdentifier: String) : {String : Bool}? {
+    access(all) fun getCollectionsForType(nftTypeIdentifier: String) : {String : Bool}? {
         if let dapper = NFTCatalog.getCollectionsForType(nftTypeIdentifier: nftTypeIdentifier) {
             // If there's dappers input and Find input, dappers will overwrite what's on find
             if let find = self.catalogTypeData[nftTypeIdentifier] {
@@ -106,7 +106,7 @@ pub contract FINDNFTCatalog {
         return self.catalogTypeData[nftTypeIdentifier]
     }
 
-    pub fun getCatalogTypeData() : {String : {String : Bool}} {
+    access(all) fun getCatalogTypeData() : {String : {String : Bool}} {
         let find = self.catalogTypeData 
         let dapper = NFTCatalog.getCatalogTypeData()
         for item in dapper.keys {
@@ -116,7 +116,7 @@ pub contract FINDNFTCatalog {
     }
 
     // A helper function to get CollectionData directly from NFTIdentifier
-    pub fun getCollectionDataForType(nftTypeIdentifier: String) : NFTCatalog.NFTCollectionData? {
+    access(all) fun getCollectionDataForType(nftTypeIdentifier: String) : NFTCatalog.NFTCollectionData? {
         if let collections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftTypeIdentifier) {
             if collections.length < 1 {
                 return nil
@@ -129,7 +129,7 @@ pub contract FINDNFTCatalog {
     }
 
     // helper function to get Paths 
-    pub fun getMetadataFromType(_ t: Type) : NFTCatalog.NFTCatalogMetadata? {
+    access(all) fun getMetadataFromType(_ t: Type) : NFTCatalog.NFTCatalogMetadata? {
         let collectionIdentifier = self.getCollectionsForType(nftTypeIdentifier: t.identifier) 
         if collectionIdentifier == nil || collectionIdentifier!.length < 1 {
             return nil
@@ -138,19 +138,19 @@ pub contract FINDNFTCatalog {
     }
 
     // Get only FIND NFTCatalog
-    pub fun getFINDCatalog() : {String : NFTCatalog.NFTCatalogMetadata} {
+    access(all) fun getFINDCatalog() : {String : NFTCatalog.NFTCatalogMetadata} {
         return self.catalog
     }
 
-    pub fun getFINDCatalogEntry(collectionIdentifier : String) : NFTCatalog.NFTCatalogMetadata? {
+    access(all) fun getFINDCatalogEntry(collectionIdentifier : String) : NFTCatalog.NFTCatalogMetadata? {
         return self.catalog[collectionIdentifier]
     }
 
-    pub fun getFINDCollectionsForType(nftTypeIdentifier: String) : {String : Bool}? {
+    access(all) fun getFINDCollectionsForType(nftTypeIdentifier: String) : {String : Bool}? {
         return self.catalogTypeData[nftTypeIdentifier]
     }
 
-    pub fun getFINDCatalogTypeData() : {String : {String : Bool}} {
+    access(all) fun getFINDCatalogTypeData() : {String : {String : Bool}} {
         return self.catalogTypeData
     }
 
@@ -159,8 +159,8 @@ pub contract FINDNFTCatalog {
     // @param metadata: The Metadata for the NFT collection that will be stored in the catalog
     // @param message: A message to the catalog owners
     // @param proposer: Who is making the proposition(the address needs to be verified)
-    pub fun proposeNFTMetadata(collectionIdentifier : String, metadata : NFTCatalog.NFTCatalogMetadata, message : String, proposer : Address) : UInt64 {
-        let proposerManagerCap = getAccount(proposer).getCapability<&NFTCatalog.NFTCatalogProposalManager{NFTCatalog.NFTCatalogProposalManagerPublic}>(NFTCatalog.ProposalManagerPublicPath)
+    access(all) fun proposeNFTMetadata(collectionIdentifier : String, metadata : NFTCatalog.NFTCatalogMetadata, message : String, proposer : Address) : UInt64 {
+        let proposerManagerCap = getAccount(proposer).capabilities.get<&NFTCatalog.NFTCatalogProposalManager>(NFTCatalog.ProposalManagerPublicPath)!
 
         assert(proposerManagerCap.check(), message : "Proposer needs to set up a manager")
 
@@ -178,14 +178,14 @@ pub contract FINDNFTCatalog {
 
     // Withdraw a proposal from the catalog
     // @param proposalID: The ID of proposal you want to withdraw
-    pub fun withdrawNFTProposal(proposalID : UInt64) {
+    access(all) fun withdrawNFTProposal(proposalID : UInt64) {
         pre {
             self.catalogProposals[proposalID] != nil : "Invalid Proposal ID"
         }
         let proposal = self.catalogProposals[proposalID]!
         let proposer = proposal.proposer
 
-        let proposerManagerCap = getAccount(proposer).getCapability<&NFTCatalog.NFTCatalogProposalManager{NFTCatalog.NFTCatalogProposalManagerPublic}>(NFTCatalog.ProposalManagerPublicPath)
+        let proposerManagerCap = getAccount(proposer).capabilities.get<&NFTCatalog.NFTCatalogProposalManager>(NFTCatalog.ProposalManagerPublicPath)!
 
         assert(proposerManagerCap.check(), message : "Proposer needs to set up a manager")
 
@@ -196,15 +196,15 @@ pub contract FINDNFTCatalog {
         self.removeCatalogProposal(proposalID : proposalID)
     }
 
-    pub fun getCatalogProposals() : {UInt64 : NFTCatalog.NFTCatalogProposal} {
+    access(all) fun getCatalogProposals() : {UInt64 : NFTCatalog.NFTCatalogProposal} {
         return self.catalogProposals
     }
 
-    pub fun getCatalogProposalEntry(proposalID : UInt64) : NFTCatalog.NFTCatalogProposal? {
+    access(all) fun getCatalogProposalEntry(proposalID : UInt64) : NFTCatalog.NFTCatalogProposal? {
         return self.catalogProposals[proposalID]
     }
 
-    pub fun createNFTCatalogProposalManager(): @NFTCatalog.NFTCatalogProposalManager {
+    access(all) fun createNFTCatalogProposalManager(): @NFTCatalog.NFTCatalogProposalManager {
         return <- NFTCatalog.createNFTCatalogProposalManager()
     }
 
