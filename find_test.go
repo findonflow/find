@@ -12,14 +12,12 @@ import (
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
 func TestFIND(t *testing.T) {
-
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createUser(100.0, "user1").
 		registerUser("user1")
 
 	t.Run("Should be able to register a name", func(t *testing.T) {
-
 		// Can fix this with pointerWant
 		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
 			autogold.Want("allLeases", "user1"),
@@ -32,11 +30,9 @@ func TestFIND(t *testing.T) {
 			WithArg("name", "usr"),
 			WithArg("amount", 500.0),
 		).AssertFailure(t, "Amount withdrawn must be less than or equal than the balance of the Vault")
-
 	})
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
-
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "ur"),
@@ -50,11 +46,9 @@ func TestFIND(t *testing.T) {
 			WithArg("name", "user1"),
 			WithArg("amount", 5.0),
 		).AssertFailure(t, "Name already registered")
-
 	})
 
 	t.Run("Should allow registering a lease after it is freed", func(t *testing.T) {
-
 		otu.expireLease().tickClock(2.0)
 
 		otu.O.Tx(`
@@ -83,12 +77,10 @@ func TestFIND(t *testing.T) {
 	})
 
 	t.Run("Should be able to lookup address", func(t *testing.T) {
-
 		otu.assertLookupAddress("user1", otu.O.Address("user1"))
 	})
 
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
-
 		otu.expireLease().
 			tickClock(2.0)
 
@@ -96,11 +88,9 @@ func TestFIND(t *testing.T) {
 			WithArg("name", "user1"),
 		).
 			AssertWant(t, autogold.Want("getNameStatus n", nil))
-
 	})
 
 	t.Run("Admin should be able to register without paying FUSD", func(t *testing.T) {
-
 		otu.O.Tx("adminRegisterName",
 			WithSigner("find-admin"),
 			WithArg("names", `["find-admin"]`),
@@ -110,7 +100,6 @@ func TestFIND(t *testing.T) {
 			AssertEvent(t, otu.identifier("FIND", "Register"), map[string]interface{}{
 				"name": "find-admin",
 			})
-
 	})
 
 	otu.renewUserWithName("user1", "user1").
@@ -118,7 +107,6 @@ func TestFIND(t *testing.T) {
 		registerUser("user2")
 
 	t.Run("Should be able to send lease to another name", func(t *testing.T) {
-
 		otu.O.Tx("moveNameTO",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
@@ -128,22 +116,18 @@ func TestFIND(t *testing.T) {
 			AssertEvent(t, otu.identifier("FIND", "Moved"), map[string]interface{}{
 				"name": "user1",
 			})
-
 	})
 
 	t.Run("Should automatically set Find name to empty if sender have none", func(t *testing.T) {
-
 		otu.O.Script("getName",
 			WithArg("address", "user1"),
 		).
 			AssertWant(t, autogold.Want("getName empty", nil))
 
 		otu.moveNameTo("user2", "user1", "user1")
-
 	})
 
 	t.Run("Should automatically set Find Name if sender have one", func(t *testing.T) {
-
 		otu.registerUserWithName("user1", "name1").
 			moveNameTo("user1", "user2", "user1")
 
@@ -153,13 +137,11 @@ func TestFIND(t *testing.T) {
 			AssertWant(t, autogold.Want("getName empty", "name1"))
 
 		otu.moveNameTo("user2", "user1", "user1")
-
 	})
 
 	otu.setProfile("user2")
 
 	t.Run("Should be able to register related account and remove it", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "dapper"),
@@ -204,11 +186,9 @@ func TestFIND(t *testing.T) {
 		).
 			AssertWithPointerError(t, "/accounts",
 				"Object has no key 'accounts'")
-
 	})
 
 	t.Run("Should be able to set private mode", func(t *testing.T) {
-
 		otu.O.Tx("setPrivateMode",
 			WithSigner("user1"),
 			WithArg("mode", true),
@@ -232,11 +212,9 @@ func TestFIND(t *testing.T) {
 			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode false", false),
 			)
-
 	})
 
 	t.Run("Should be able to getFindStatus of new user", func(t *testing.T) {
-
 		nameAddress := otu.O.Address("user3")
 		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
@@ -251,7 +229,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	t.Run("Should be able to getFindPaths of a user", func(t *testing.T) {
-
 		nameAddress := otu.O.Address("user1")
 		otu.O.Script("getFindPaths",
 			WithArg("user", nameAddress),
@@ -265,7 +242,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
-
 		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
 		otu.O.Script("getFindStatus",
@@ -277,7 +253,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
-
 		otu.O.Tx("editProfile",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
@@ -323,11 +298,9 @@ func TestFIND(t *testing.T) {
 			"/profile/links/FindTwitter",
 			"Object has no key 'FindTwitter'",
 		)
-
 	})
 
 	t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
-
 		user := "user1"
 
 		otu.buyForge(user)
@@ -349,11 +322,9 @@ func TestFIND(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "This addon is not available.")
-
 	})
 
 	t.Run("Should be able to fund users without profile", func(t *testing.T) {
-
 		user := "user1"
 		otu.registerFtInRegistry()
 
@@ -371,7 +342,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	t.Run("Should be able to fund users with profile but without find name", func(t *testing.T) {
-
 		user := "user1"
 		otu.createUser(1000, "user3")
 
@@ -398,11 +368,9 @@ func TestFIND(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
-
 	})
 
 	t.Run("Should be able to fund users without profile wallet, but with vault proper set up", func(t *testing.T) {
-
 		user := "user1"
 
 		user3 := otu.O.Address("user3")
@@ -429,7 +397,6 @@ func TestFIND(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEmitEventName(t, "FungibleTokenSent")
-
 	})
 
 	t.Run("Should be able to resolve find name without .find", func(t *testing.T) {
@@ -437,7 +404,6 @@ func TestFIND(t *testing.T) {
 			WithArg("name", "user1.find"),
 		).
 			AssertWant(t, autogold.Want("user 1 address", otu.O.Address("user1")))
-
 	})
 
 	t.Run("Should panic if user pass in invalid character '.'", func(t *testing.T) {
@@ -448,7 +414,6 @@ func TestFIND(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid byte in hex string")
-
 	})
 
 	t.Run("Should be able to getFindStatus of an FREE lease", func(t *testing.T) {
@@ -501,7 +466,6 @@ func TestFIND(t *testing.T) {
 	otu.expireLease().tickClock(2.0)
 	otu.registerUser("user1")
 	t.Run("Should be able to register related account and mutually link it for trust", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "link"),
@@ -574,11 +538,9 @@ func TestFIND(t *testing.T) {
 			WithArg("address", user1Address),
 		).
 			AssertSuccess(t)
-
 	})
 
 	t.Run("Should be able to getFindStatus for trusted accounts", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "link"),
@@ -621,7 +583,6 @@ func TestFIND(t *testing.T) {
     "trusted": true,
   },
 }`))
-
 	})
 	otu.registerUser("user2")
 	t.Run("Should be able to follow someone", func(t *testing.T) {
@@ -690,11 +651,9 @@ func TestFIND(t *testing.T) {
 			WithArg("receiver", otu.O.Address("user3")),
 		).
 			AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-
 	})
 
 	t.Run("Should not be able to get old leases information", func(t *testing.T) {
-
 		otu.O.Script(`
 			import FIND from "../contracts/FIND.cdc"
 
@@ -706,11 +665,9 @@ func TestFIND(t *testing.T) {
 			WithArg("user", oldOwner),
 		).
 			AssertWant(t, autogold.Want("should be nil", nil))
-
 	})
 
 	t.Run("Should not be able to get old leases", func(t *testing.T) {
-
 		otu.O.Script(`
 			import FIND from "../contracts/FIND.cdc"
 
@@ -726,11 +683,9 @@ func TestFIND(t *testing.T) {
   "lease",
   "name1",
 }`))
-
 	})
 
 	t.Run("Should be able to get old leases in getInvalidatedLeases", func(t *testing.T) {
-
 		otu.O.Script(`
 			import FIND from "../contracts/FIND.cdc"
 
@@ -745,11 +700,9 @@ func TestFIND(t *testing.T) {
   "user2",
   "testingname",
 }`))
-
 	})
 
 	t.Run("Should not be able to list old leases for sale", func(t *testing.T) {
-
 		// should be able to list name for sale
 		otu.O.Tx("listNameForSale",
 			WithSigner(currentOwner),
@@ -764,11 +717,9 @@ func TestFIND(t *testing.T) {
 			WithArg("directSellPrice", 10.0),
 		).
 			AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-
 	})
 
 	t.Run("Should not be able to list old leases for auction", func(t *testing.T) {
-
 		// should be able to list name for auction
 		otu.O.Tx("listNameForAuction",
 			WithSigner(currentOwner),
@@ -790,11 +741,9 @@ func TestFIND(t *testing.T) {
 			WithArg("auctionExtensionOnLateBid", 300.0),
 		).
 			AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-
 	})
 
 	t.Run("Should be able to delist old leases for sale", func(t *testing.T) {
-
 		// should be able to delist name for sale
 		otu.O.Tx("delistNameSale",
 			WithSigner(currentOwner),
@@ -808,11 +757,9 @@ func TestFIND(t *testing.T) {
 			WithArg("names", []string{testingName}),
 		).
 			AssertSuccess(t)
-
 	})
 
 	t.Run("Should be able to delist old leases for auction", func(t *testing.T) {
-
 		otu.O.Tx("cancelNameAuction",
 			WithSigner(currentOwner),
 			WithArg("names", []string{testingName}),
@@ -835,5 +782,20 @@ func TestFIND(t *testing.T) {
 			WithSigner(oldOwner),
 			WithArg("names", []string{testingName}),
 		).AssertSuccess(t)
+	})
+
+	t.Run("Should be able to register a name with usdc", func(t *testing.T) {
+		otu.O.Tx("registerUSDC",
+			WithSigner("user1"),
+			WithArg("name", "fooobar"),
+			WithArg("amount", 5.0),
+		).AssertSuccess(t).
+			AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
+				"name": "fooobar",
+			}).
+			AssertEvent(otu.T, "FiatToken.TokensDeposited", map[string]interface{}{
+				"amount": 5.0,
+				"to":     otu.O.Address("find-admin"),
+			})
 	})
 }

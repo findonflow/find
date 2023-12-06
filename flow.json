@@ -104,6 +104,13 @@
         "mainnet": "0x921ea449dffec68a"
       }
     },
+    "SwapRouter": {
+      "source": "./contracts/community/SwapRouter.cdc",
+      "aliases": {
+        "mainnet": "0xa6850776a94e6551",
+        "testnet": "0x2f8af5ed05bbde0d"
+      }
+    },
     "FlovatarPack": {
       "source": "./contracts/community/FlovatarPack.cdc",
       "aliases": {
