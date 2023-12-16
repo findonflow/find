@@ -109,12 +109,11 @@ access(all) contract NFTCatalogAdmin {
         self.AdminProxyPublicPath = /public/nftCatalogAdminProxy
         self.AdminProxyStoragePath = /storage/nftCatalogAdminProxy
         
-        self.AdminPrivatePath = /private/nftCatalogAdmin
         self.AdminStoragePath = /storage/nftCatalogAdmin
 
         let admin    <- create Admin()
 
         self.account.save(<-admin, to: self.AdminStoragePath)
-        self.account.link<&Admin>(self.AdminPrivatePath, target: self.AdminStoragePath)
+        let adminCap = self.account.capabilities.storage.issue<&Admin>(AdminStoragePath)
     }
 }

@@ -135,7 +135,7 @@ access(all) contract FLOAT: NonFungibleToken {
         }
 
         // This is for the MetdataStandard
-        access(all) fun getViews(): [Type] {
+        access(all) view fun getViews(): [Type] {
              return [
                 Type<MetadataViews.Display>(),
                 Type<TokenIdentifier>()
@@ -211,7 +211,7 @@ access(all) contract FLOAT: NonFungibleToken {
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
-        access(all) fun deposit(token: @NonFungibleToken.NFT)
+        access(all) fun deposit(token: @{NonFungibleToken.NFT})
         access(all) view fun getIDs(): [UInt64]
         access(all) fun getAllIDs(): [UInt64]
         access(all) fun ownedIdsFromEvent(eventId: UInt64): [UInt64]
@@ -229,7 +229,7 @@ access(all) contract FLOAT: NonFungibleToken {
         access(account) var events: {UInt64: {UInt64: Bool}}
 
         // Deposits a FLOAT to the collection
-        access(all) fun deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let nft <- token as! @NFT
             let id = nft.id
             let eventId = nft.eventId
@@ -532,7 +532,7 @@ access(all) contract FLOAT: NonFungibleToken {
             return self.groups.keys
         }
 
-        access(all) fun getViews(): [Type] {
+        access(all) view fun getViews(): [Type] {
              return [
                 Type<MetadataViews.Display>()
             ]
@@ -551,7 +551,7 @@ access(all) contract FLOAT: NonFungibleToken {
                     return MetadataViews.Display(
                         name: self.name, 
                         description: self.description, 
-                        file: MetadataViews.IPFSFile(cid: self.image, path: nil)
+                        thumbnail: MetadataViews.IPFSFile(cid: self.image, path: nil)
                     )
             }
 
@@ -612,7 +612,7 @@ access(all) contract FLOAT: NonFungibleToken {
             )
 
             self.totalSupply = self.totalSupply + 1
-            recipient.deposit(token: <- token)
+            recipient.deposit(token: <- token as @{NonFungibleToken.NFT})
             return id
         }
 
@@ -627,7 +627,7 @@ access(all) contract FLOAT: NonFungibleToken {
                 let typedModules = (&self.verifiers[identifier] as &[{IVerifier}]?)!
                 var i = 0
                 while i < typedModules.length {
-                    let verifier = &typedModules[i] as &{IVerifier}
+                    let verifier = &typedModules[i]
                     verifier.verify(params)
                     i = i + 1
                 }
@@ -657,36 +657,39 @@ access(all) contract FLOAT: NonFungibleToken {
         // be passed in the `params`.
         access(all) fun claim(recipient: &Collection, params: {String: AnyStruct}) {
             pre {
-                self.getPrices() == nil:
-                    "You need to purchase this FLOAT."
                 self.claimed[recipient.owner!.address] == nil:
                     "This person already claimed their FLOAT!"
                 self.claimable: 
                     "This FLOATEvent is not claimable, and thus not currently active."
             }
-            
+
+            if (self.getPrices() != nil) {
+                panic("This FLOATEvent is not free. Use the purchase function instead.")
+            }
             self.verifyAndMint(recipient: recipient, params: params)
         }
  
-        access(all) fun purchase(recipient: &Collection, params: {String: AnyStruct}, payment: @FungibleToken.Vault) {
+        access(all) fun purchase(recipient: &Collection, params: {String: AnyStruct}, payment: @{FungibleToken.Vault}) {
             pre {
                 self.getPrices() != nil:
                     "Don't call this function. The FLOAT is free."
-                self.getPrices()![payment.getType().identifier] != nil:
-                    "This FLOAT does not support purchasing in the passed in token."
-                payment.balance == self.getPrices()![payment.getType().identifier]!.price:
-                    "You did not pass in the correct amount of tokens."
                 self.claimed[recipient.owner!.address] == nil:
                     "This person already claimed their FLOAT!"
                 self.claimable: 
                     "This FLOATEvent is not claimable, and thus not currently active."
+            }
+            if (self.getPrices()![payment.getType().identifier] == nil) {
+                 panic("This FLOAT does not support purchasing in the passed in token.")
+            }       
+            if (payment.getBalance() != self.getPrices()![payment.getType().identifier]!.price) {
+                panic("You did not pass in the correct amount of tokens.")
             }
             let royalty: UFix64 = 0.05
             let emeraldCityTreasury: Address = 0x5643fd47a29770e7
             let paymentType: String = payment.getType().identifier
             let tokenInfo: TokenInfo = self.getPrices()![paymentType]!
 
-            let EventHostVault = getAccount(self.host).capabilities.get(tokenInfo.path)
+            let EventHostVault = getAccount(self.host).capabilities.get(tokenInfo.path)!
                                     .borrow<&{FungibleToken.Receiver}>()
                                     ?? panic("Could not borrow the &{FungibleToken.Receiver} from the event host.")
 
@@ -695,7 +698,7 @@ access(all) contract FLOAT: NonFungibleToken {
                 message: "The event host's path is not associated with the intended token."
             )
             
-            let EmeraldCityVault = getAccount(emeraldCityTreasury).capabilities.get(tokenInfo.path)
+            let EmeraldCityVault = getAccount(emeraldCityTreasury).capabilities.get(tokenInfo.path)!
                                     .borrow<&{FungibleToken.Receiver}>() 
                                     ?? panic("Could not borrow the &{FungibleToken.Receiver} from Emerald City's Vault.")
 

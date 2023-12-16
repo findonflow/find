@@ -182,7 +182,7 @@ access(all) contract NFTCatalog {
     // @param message: A message to the catalog owners
     // @param proposer: Who is making the proposition(the address needs to be verified)
     access(all) fun proposeNFTMetadata(collectionIdentifier : String, metadata : NFTCatalogMetadata, message : String, proposer : Address) : UInt64 {
-        let proposerManagerCap = getAccount(proposer).capabilities.get<&NFTCatalogProposalManager>(NFTCatalog.ProposalManagerPublicPath)
+        let proposerManagerCap = getAccount(proposer).capabilities.get<&NFTCatalogProposalManager>(NFTCatalog.ProposalManagerPublicPath)!
 
         assert(proposerManagerCap.check(), message : "Proposer needs to set up a manager")
 

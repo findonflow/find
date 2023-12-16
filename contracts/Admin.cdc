@@ -265,11 +265,11 @@ access(all) contract Admin {
 			return FindViews.AuthNFTPointer(cap: cap, id: id)
 		}
 
-		access(all) fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> {
+		access(all) fun getProviderCap(_ path: StoragePath): Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			return Admin.account.capabilities.storage.get<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(path)!
+			return Admin.account.storage.capabilities.get<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(path)!
 		}
 
 		access(all) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {

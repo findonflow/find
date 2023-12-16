@@ -2,6 +2,7 @@ import FLOAT from "../contracts/standard/FLOAT.cdc"
 import FIND from "../contracts/FIND.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 access(all) contract FindVerifier {
 
@@ -285,7 +286,7 @@ access(all) contract FindVerifier {
 			let ref = mvCap.borrow()!
 
 			for id in ref.getIDs() {
-				let resolver = ref.borrowViewResolver(id: id)
+				let resolver = ref.borrowViewResolver(id: id)!
 				if let r = MetadataViews.getRarity(resolver) {
 					if self.rarityIdentifiers.contains(self.rarityToIdentifier(r)) {
 						return true

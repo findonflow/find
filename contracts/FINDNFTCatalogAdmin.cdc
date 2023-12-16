@@ -9,7 +9,6 @@ import NFTCatalog from "./standard/NFTCatalog.cdc"
 
 access(all) contract FINDNFTCatalogAdmin {
 
-    access(all) let AdminPrivatePath: PrivatePath
     access(all) let AdminStoragePath: StoragePath
 
     access(all) let AdminProxyPublicPath: PublicPath
@@ -110,13 +109,11 @@ access(all) contract FINDNFTCatalogAdmin {
         self.AdminProxyPublicPath = /public/FINDnftCatalogAdminProxy
         self.AdminProxyStoragePath = /storage/FINDnftCatalogAdminProxy
         
-        self.AdminPrivatePath = /private/FINDnftCatalogAdmin
         self.AdminStoragePath = /storage/FINDnftCatalogAdmin
 
         let admin    <- create Admin()
 
         self.account.storage.save(<-admin, to: self.AdminStoragePath)
-        let adminCap = self.account.capabilities.storage.issue<&Admin>(self.AdminPrivatePath)
-        self.account.capabilities.publish(adminCap, at:self.AdminPrivatePath)
+        let adminCap = self.account.capabilities.storage.issue<&Admin>(self.AdminStoragePath)
     }
 }

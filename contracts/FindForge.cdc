@@ -4,6 +4,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindForgeOrder from "../contracts/FindForgeOrder.cdc"
 import Profile from "../contracts/Profile.cdc"
+import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 
 access(all) contract FindForge {
@@ -44,7 +45,7 @@ access(all) contract FindForge {
 		}
 
 		access(all) fun getMinterFTReceiver() : Capability<&{FungibleToken.Receiver}> {
-			return getAccount(self.minter).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return getAccount(self.minter).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		}
 
 		access(all) fun updateExternalURL(_ d: String) {
@@ -76,7 +77,7 @@ access(all) contract FindForge {
 
 	// ForgeMinter Interface 
 	access(all) resource interface Forge{
-		access(all) fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @NonFungibleToken.NFT 
+		access(all) fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @{NonFungibleToken.NFT}
 		access(all) fun addContractData(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier)
 	}
 
@@ -288,12 +289,12 @@ access(all) contract FindForge {
 
 		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 
-		let id = nft.id 
+		let id = nft.getID()
 		let uuid = nft.uuid 
 		let nftType = nft.getType().identifier
 		receiver.deposit(token: <- nft)
 
-		let vr = receiver.borrowViewResolver(id: id)
+		let vr = (receiver as &{ViewResolver.ResolverCollection}).borrowViewResolver(id: id)!
 		let view = vr.resolveView(Type<MetadataViews.Display>())  ?? panic("The minting nft should implement MetadataViews Display view.") 
 		let display = view as! MetadataViews.Display
 		let nftName = display.name 
@@ -317,7 +318,7 @@ access(all) contract FindForge {
 			panic("The minter platform is not set. Please set up properly before adding contract data.")
 		}
 		let address = FIND.lookupAddress(lease) ?? panic("This name is not owned by anyone. Name : ".concat(lease))
-		let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
+		let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
 
 		if !leaseCol.checkAddon(name:lease, addon: "forge") && !leaseCol.checkAddon(name:lease, addon: "premiumForge") {
 			panic("Please purchase forge addon to start forging. Name: ".concat(lease))
@@ -364,7 +365,7 @@ access(all) contract FindForge {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
 			FindForge.minterPlatforms[forgeType] = {}
 		}
-		let receiverCap=FindForge.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=FindForge.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: nil ,description: "", externalURL: "", squareImage: "", bannerImage: "", socials: {}) 
 		FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
 	}
@@ -401,7 +402,7 @@ access(all) contract FindForge {
 	}
 
 	access(account) fun borrowVerifier() : &Verifier {
-		return (&self.verifier as &Verifier?)!
+		return &self.verifier as &Verifier
 	}
 
 	access(all) fun createForgeAdminProxyClient() : @ForgeAdminProxy {

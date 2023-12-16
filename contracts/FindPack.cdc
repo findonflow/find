@@ -498,7 +498,7 @@ access(all) contract FindPack: NonFungibleToken {
             return FindPack.getMetadataById(packTypeName: self.packTypeName, typeId: self.typeId)!
         }
 
-        access(all) fun getViews(): [Type] {
+        access(all) view fun getViews(): [Type] {
             return [
             Type<MetadataViews.Display>(),
             Type<Metadata>(),
@@ -572,7 +572,7 @@ access(all) contract FindPack: NonFungibleToken {
     }
 
     access(all) resource interface CollectionPublic {
-        access(all) fun deposit(token: @NonFungibleToken.NFT)
+        access(all) fun deposit(token: @{NonFungibleToken.NFT})
         access(all) view fun getIDs(): [UInt64]
         access(all) fun contains(_ id: UInt64): Bool
         access(all) fun getPacksLeft() : Int   // returns the no of a type
@@ -820,7 +820,7 @@ access(all) contract FindPack: NonFungibleToken {
         // Takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         //
-        access(all) fun deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @FindPack.NFT
 
             let id: UInt64 = token.id
@@ -895,7 +895,7 @@ access(all) contract FindPack: NonFungibleToken {
         return <- create Collection()
     }
 
-    access(account) fun mintNFT(packTypeName: String, typeId: UInt64, hash: String, royalties: [MetadataViews.Royalty]) : @NonFungibleToken.NFT {
+    access(account) fun mintNFT(packTypeName: String, typeId: UInt64, hash: String, royalties: [MetadataViews.Royalty]) : @{NonFungibleToken.NFT} {
 
         let nft <- create FindPack.NFT(packTypeName: packTypeName, typeId: typeId, hash:hash, royalties:royalties)
         emit Minted(id: nft.id, typeId:typeId)
@@ -1104,7 +1104,7 @@ access(all) contract FindPack: NonFungibleToken {
     }
 
     access(all) resource Forge: FindForge.Forge {
-        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
 
             let royalties : [MetadataViews.Royalty] = []
             // there should be no find cut for the pack.

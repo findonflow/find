@@ -16,7 +16,7 @@ access(all) contract FindViews {
 			self.mediaType=mediaType
 		}
 
-		access(all) fun uri(): String {
+		access(all) view fun uri(): String {
 			return "data:".concat(self.mediaType).concat(",").concat(self.content)
 		}
 	}
@@ -36,7 +36,7 @@ access(all) contract FindViews {
 			}
 		}
 
-		access(all) fun uri(): String {
+		access(all) view fun uri(): String {
 			let media = self.pointer.resolveView(Type<OnChainFile>())
 			if media == nil {
 				return ""
@@ -48,7 +48,7 @@ access(all) contract FindViews {
 	access(all) resource interface VaultViews {
         access(all) var balance: UFix64
 
-        access(all) fun getViews() : [Type]
+        access(all) view fun getViews() : [Type]
         access(all) fun resolveView(_ view: Type): AnyStruct?
     }
 
@@ -74,11 +74,11 @@ access(all) contract FindViews {
             receiverType: Type,
             balanceType: Type,
             providerType: Type,
-            createEmptyVault: (fun(): @FungibleToken.Vault)
+            createEmptyVault: (fun(): @{FungibleToken.Vault})
         ) {
             pre {
                 receiverType.isSubtype(of: Type<&{FungibleToken.Receiver}>()): "Receiver type must include FungibleToken.Receiver interfaces."
-                balanceType.isSubtype(of: Type<&{FungibleToken.Balance}>()): "Balance type must include FungibleToken.Balance interfaces."
+                balanceType.isSubtype(of: Type<&{FungibleToken.Vault}>()): "Balance type must include FungibleToken.Vault interfaces."
                 providerType.isSubtype(of: Type<&{FungibleToken.Provider}>()): "Provider type must include FungibleToken.Provider interface."
             }
             self.tokenAlias=tokenAlias
@@ -115,7 +115,7 @@ access(all) contract FindViews {
 		access(all) let id: UInt64
 		access(all) fun resolveView(_ type: Type) : AnyStruct?
 		access(all) fun getUUID() :UInt64
-		access(all) fun getViews() : [Type]
+		access(all) view fun getViews() : [Type]
 		access(all) fun owner() : Address
 		access(all) fun valid() : Bool
 		access(all) fun getItemType() : Type
@@ -151,7 +151,7 @@ access(all) contract FindViews {
 			if !self.cap.check() {
 				panic("The capability is not valid.")
 			}
-			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
+			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)!
 			let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
 			let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 			self.uuid=viewResolver.uuid
@@ -166,7 +166,7 @@ access(all) contract FindViews {
 			return self.uuid
 		}
 
-		access(all) fun getViews() : [Type]{
+		access(all) view fun getViews() : [Type]{
 			return self.getViewResolver().getViews()
 		}
 
@@ -201,7 +201,7 @@ access(all) contract FindViews {
 		}
 
 		access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
-			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
+			return self.cap.borrow()!.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
 		}
 
 		access(all) fun getDisplay() : MetadataViews.Display {
@@ -269,7 +269,7 @@ access(all) contract FindViews {
 			return self.uuid
 		}
 
-		access(all) fun getViews() : [Type]{
+		access(all) view fun getViews() : [Type]{
 			return self.getViewResolver().getViews()
 		}
 
@@ -345,7 +345,7 @@ access(all) contract FindViews {
 	}
 
 	access(all) fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-		let cap=	getAccount(address).getCapability<&{ViewResolver.ResolverCollection}>(path)
+		let cap=	getAccount(address).capabilities.get<&{ViewResolver.ResolverCollection}>(path)!
 		let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
 		return pointer
 	}

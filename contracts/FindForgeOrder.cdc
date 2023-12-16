@@ -49,7 +49,7 @@ access(all) contract FindForgeOrder {
 			self.collectionDisplay = collectionDisplay
 		}
 
-		access(all) fun getViews(): [Type] {
+		access(all) view fun getViews(): [Type] {
 			return [
 				Type<MetadataViews.Display>()
 			]

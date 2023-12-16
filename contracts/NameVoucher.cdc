@@ -47,7 +47,7 @@ access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 			emit Destroyed(id: self.id, address: self.owner?.address, minCharLength: self.minCharLength)
 		}
 
-	access(all) fun getViews(): [Type] {
+	access(all) view fun getViews(): [Type] {
 			return  [
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Royalties>(),
@@ -142,7 +142,7 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-	access(all) fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+	access(Withdrawable) fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -152,7 +152,7 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-	access(all) fun deposit(token: @NonFungibleToken.NFT) {
+	access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
 			let token <- token as! @NFT
 
 			let id: UInt64 = token.id
