@@ -10,7 +10,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 //this has to be called after we have listed it somewhere else because of cap
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
     let flowReceiver: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
-    let exampleNFTProvider: Capability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>
+    let exampleNFTProvider: Capability<&Dandy.Collection{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>
     let storefront: &NFTStorefront.Storefront
 
     prepare(acct: AuthAccount) {
@@ -35,7 +35,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
         if self.flowReceiver.borrow() == nil {
             panic("Missing or mis-typed FlowToken receiver")
         }
-        self.exampleNFTProvider = acct.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(Dandy.CollectionPrivatePath)
+        self.exampleNFTProvider = acct.getCapability<&Dandy.Collection{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(Dandy.CollectionPrivatePath)
         if self.exampleNFTProvider.borrow() == nil {
             panic("Missing or mis-typed ExampleNFT.Collection provider")
         }

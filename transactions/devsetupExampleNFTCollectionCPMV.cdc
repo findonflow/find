@@ -8,11 +8,11 @@ transaction() {
 		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
 		if !dandyCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPublicPath,
 				target: ExampleNFT.CollectionStoragePath
 			)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPrivatePath,
 				target: ExampleNFT.CollectionStoragePath
 			)

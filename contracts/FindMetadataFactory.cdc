@@ -43,7 +43,7 @@ pub contract FindMetadataFactory {
 
 
 		for nftInfo in NFTRegistry.getNFTInfoAll().values {
-			let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo.publicPath)
+			let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(nftInfo.publicPath)
 			if resolverCollectionCap.check() {
 				continue;
 			}
@@ -116,7 +116,7 @@ pub contract FindMetadataFactory {
 
 		let collections : {String:[UInt64]} ={}
 		for item in registryData.values {
-			let optCap = account.getCapability<&{MetadataViews.ResolverCollection}>(item.publicPath)
+			let optCap = account.getCapability<&{ViewResolver.ResolverCollection}>(item.publicPath)
 			if !optCap.check() {
 				continue
 			}

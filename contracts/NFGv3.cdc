@@ -44,7 +44,7 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
         pub let id: UInt64
 
         pub let info: Info
@@ -125,9 +125,9 @@ pub contract NFGv3: NonFungibleToken {
                     storagePath: NFGv3.CollectionStoragePath,
                     publicPath: NFGv3.CollectionPublicPath,
                     providerPath: NFGv3.CollectionPrivatePath,
-                    publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-                    publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-                    providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                    publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-NFGv3.createEmptyCollection()
                     })
@@ -165,7 +165,7 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -209,10 +209,10 @@ pub contract NFGv3: NonFungibleToken {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
             let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             let nfgNFT = nft as! &NFGv3.NFT
-            return nfgNFT as &AnyResource{MetadataViews.Resolver}
+            return nfgNFT as &AnyResource{ViewResolver.Resolver}
         }
 
         destroy() {
@@ -270,7 +270,7 @@ pub contract NFGv3: NonFungibleToken {
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        self.account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+        self.account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath
         )

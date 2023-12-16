@@ -24,7 +24,7 @@ pub contract NFTRetrieval {
         return []
     }
 
-    pub fun getNFTCountFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{MetadataViews.ResolverCollection}>) : UInt64 {
+    pub fun getNFTCountFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{ViewResolver.ResolverCollection}>) : UInt64 {
         pre {
             NFTCatalog.getCatalog()[collectionIdentifier] != nil : "Invalid collection identifier"
         }
@@ -51,7 +51,7 @@ pub contract NFTRetrieval {
         return 0 
     }
 
-    pub fun getNFTViewsFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{MetadataViews.ResolverCollection}>) : [MetadataViews.NFTView] {
+    pub fun getNFTViewsFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{ViewResolver.ResolverCollection}>) : [MetadataViews.NFTView] {
         pre {
             NFTCatalog.getCatalog()[collectionIdentifier] != nil : "Invalid collection identifier"
         }

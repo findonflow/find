@@ -195,7 +195,7 @@ pub contract CollectionFactory {
         let extraIDs : {String : [UInt64]} = {}
 
 	    for nftInfo in NFTRegistry.getNFTInfoAll().values {
-	    	let resolverCollectionCap= account!.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo.publicPath)
+	    	let resolverCollectionCap= account!.getCapability<&{ViewResolver.ResolverCollection}>(nftInfo.publicPath)
             if !resolverCollectionCap.check() { continue }
             
             let collectionRef = resolverCollectionCap.borrow()!
@@ -706,7 +706,7 @@ pub contract CollectionFactory {
 
             let collectionItems : [MetadataCollectionItem] = []
 
-	    	let resolverCollectionCap= account!.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo!.publicPath)
+	    	let resolverCollectionCap= account!.getCapability<&{ViewResolver.ResolverCollection}>(nftInfo!.publicPath)
             if !resolverCollectionCap.check() { continue }
             
             let collectionRef = resolverCollectionCap.borrow()!

@@ -14,6 +14,7 @@ import NFTCatalog from "./standard/NFTCatalog.cdc"
 import FINDNFTCatalogAdmin from "./FINDNFTCatalogAdmin.cdc"
 import FindViews from "./FindViews.cdc"
 import NameVoucher from "./NameVoucher.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 
 access(all) contract Admin {
 
@@ -180,7 +181,7 @@ access(all) contract Admin {
 			FindForge.adminSetMinterPlatform(leaseName: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
 		}
 
-		access(all) fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+		access(all) fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -255,20 +256,20 @@ access(all) contract Admin {
 			}
 
 			let privatePath = PrivatePath(identifier: pathIdentifier)!
-			var cap = Admin.account.capabilities.get<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)!
+			var cap = Admin.account.capabilities.get<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)!
 			if !cap.check() {
 				let storagePath = StoragePath(identifier: pathIdentifier)!
-				cap = Admin.account.capabilities.storage.issue<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(storagePath)
+				cap = Admin.account.capabilities.storage.issue<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(storagePath)
 				Admin.account.capabilities.publish(cap, at: privatePath)
 			}
 			return FindViews.AuthNFTPointer(cap: cap, id: id)
 		}
 
-		access(all) fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> {
+		access(all) fun getProviderCap(_ path: PrivatePath): Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			return Admin.account.capabilities.storage.get<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)!
+			return Admin.account.capabilities.storage.get<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(path)!
 		}
 
 		access(all) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
@@ -277,7 +278,7 @@ access(all) contract Admin {
 			}
 			let pathIdentifier = FindPack.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
 			let path = PublicPath(identifier: pathIdentifier)!
-			let receiver = Admin.account.capabilities.borrow<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path) ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(path.toString()))
+			let receiver = Admin.account.capabilities.borrow<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(path) ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(path.toString()))
 			let mintPackData = FindPack.MintPackData(packTypeName: packTypeName, typeId: typeId, hash: hash, verifierRef: FindForge.borrowVerifier())
 			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
 		}

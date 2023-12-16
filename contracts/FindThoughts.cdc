@@ -69,7 +69,7 @@ pub contract FindThoughts {
 		pub fun getHide() : Bool
 	}
 
-	pub resource Thought : ThoughtPublic , MetadataViews.Resolver {
+	pub resource Thought : ThoughtPublic , ViewResolver.Resolver {
 		pub let id: UInt64 
 		pub let creator: Address 
 		pub var header: String 
@@ -214,7 +214,7 @@ pub contract FindThoughts {
 		pub fun borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} 
 	}
 
-	pub resource Collection : CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
 		access(self) let ownedThoughts : @{UInt64 : FindThoughts.Thought}
 
 		access(self) let sequence : [UInt64] 
@@ -250,7 +250,7 @@ pub contract FindThoughts {
 			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
 		}
 
-        pub fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			pre{
 				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
 			}

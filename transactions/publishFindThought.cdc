@@ -12,7 +12,7 @@ transaction(header: String , body: String , tags: [String], mediaHash: String?, 
 		let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
 		if !thoughtsCap.check() {
 			account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
-			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , MetadataViews.ResolverCollection}>(
+			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , ViewResolver.ResolverCollection}>(
 				FindThoughts.CollectionPublicPath,
 				target: FindThoughts.CollectionStoragePath
 			)
@@ -36,7 +36,7 @@ transaction(header: String , body: String , tags: [String], mediaHash: String?, 
 		var nftPointer : FindViews.ViewReadPointer? = nil 
 		if quoteNFTOwner != nil {
 				let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
-				let cap = getAccount(quoteNFTOwner!).getCapability<&{MetadataViews.ResolverCollection}>(path)
+				let cap = getAccount(quoteNFTOwner!).getCapability<&{ViewResolver.ResolverCollection}>(path)
 				nftPointer = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
 		}
 

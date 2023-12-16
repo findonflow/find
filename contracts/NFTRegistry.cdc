@@ -24,7 +24,7 @@ pub contract NFTRegistry {
 		pub let icon : String?
 		pub let providerPath : PrivatePath
 		pub let providerPathIdentifier : String
-		// Must implement {MetadataViews.ResolverCollection}
+		// Must implement {ViewResolver.ResolverCollection}
 		pub let publicPath : PublicPath
 		pub let publicPathIdentifier : String
 		pub let storagePath : StoragePath

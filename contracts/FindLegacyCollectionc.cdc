@@ -259,17 +259,17 @@ pub contract FindLegacyCollectionc {
 			ids["GoatedGoatsTraitVoucher"] = goatsTraitVoucherCap.borrow()!.getIDs()
 		}
 
-		let goatsCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoats.CollectionPublicPath)
+		let goatsCap = account.getCapability<&{ViewResolver.ResolverCollection}>(GoatedGoats.CollectionPublicPath)
 		if goatsCap.check() {
 			ids["GoatedGoats"] = goatsCap.borrow()!.getIDs()
 		}
 
-		let goatsTraitCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoatsTrait.CollectionPublicPath)
+		let goatsTraitCap = account.getCapability<&{ViewResolver.ResolverCollection}>(GoatedGoatsTrait.CollectionPublicPath)
 		if goatsTraitCap.check() {
 			ids["GoatedGoatsTrait"] = goatsTraitCap.borrow()!.getIDs()
 		}
 
-		let goatsTraitPackCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoatsTraitPack.CollectionPublicPath)
+		let goatsTraitPackCap = account.getCapability<&{ViewResolver.ResolverCollection}>(GoatedGoatsTraitPack.CollectionPublicPath)
 		if goatsTraitPackCap.check() {
 			ids["GoatedGoatsTraitPack"] = goatsTraitPackCap.borrow()!.getIDs()
 		}
@@ -290,17 +290,17 @@ pub contract FindLegacyCollectionc {
 			ids["mynft"] = mynftCap.borrow()!.getIDs()
 		}
 
-		let neoAvatarCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoAvatar.CollectionPublicPath)
+		let neoAvatarCap = account.getCapability<&{ViewResolver.ResolverCollection}>(NeoAvatar.CollectionPublicPath)
 		if neoAvatarCap.check() {
 			ids["NeoAvatar"] = neoAvatarCap.borrow()!.getIDs()
 		}
 
-		let neoVoucherCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
+		let neoVoucherCap = account.getCapability<&{ViewResolver.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
 		if neoVoucherCap.check() {
 			ids["NeoVoucher"] = neoVoucherCap.borrow()!.getIDs()
 		}
 
-		let neoMemberCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
+		let neoMemberCap = account.getCapability<&{ViewResolver.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
 		if neoMemberCap.check() {
 			ids["NeoMember"] = neoVoucherCap.borrow()!.getIDs()
 		}
@@ -310,7 +310,7 @@ pub contract FindLegacyCollectionc {
 			ids["BarterYardClubPack"] = barterYardPackCap.borrow()!.getIDs()
 		}
 
-		let byCap = account.getCapability<&{MetadataViews.ResolverCollection}>(BarterYardClubWerewolf.CollectionPublicPath)
+		let byCap = account.getCapability<&{ViewResolver.ResolverCollection}>(BarterYardClubWerewolf.CollectionPublicPath)
 		if byCap.check() {
 			ids["BarterYardClubWerewolf"] = byCap.borrow()!.getIDs()
 		}
@@ -1563,7 +1563,7 @@ return MetadataCollections(items: resultMap, collections:results, curatedCollect
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
 pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
 	let items: [MetadataCollectionItem] = []
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(path)
 	if resolverCollectionCap.check() {
 		let collection = resolverCollectionCap.borrow()!
 		for id in collection.getIDs() {

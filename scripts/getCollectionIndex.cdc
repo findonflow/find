@@ -15,14 +15,14 @@ pub fun main(user: String) : {String : [UInt64]} {
 					continue
 				} else if subCollections.length == 1 {
 					let collection = nftInfo.nftType.identifier
-					let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+					let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 					if resolverCollectionCap.check() {
 						let collection = resolverCollectionCap.borrow()!
 						resultMap[nftInfo.collectionDisplay.name] = collection.getIDs()
 					}
 				} else {
 					let collection = nftInfo.nftType.identifier
-					let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+					let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 
 					let array : [UInt64] = []
 					if resolverCollectionCap.check() {

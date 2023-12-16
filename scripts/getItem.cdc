@@ -41,7 +41,7 @@ pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataColle
 	if account.balance == 0.0 {
 		return nil
 	}
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+	let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 	if !resolverCollectionCap.check() {
 		return nil
 	}

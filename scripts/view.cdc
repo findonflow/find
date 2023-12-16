@@ -8,7 +8,7 @@ pub fun main(user: Address, path:PublicPath, id: UInt64, identifier: String) : A
 	let address = user
 	let account=getAccount(address)
 
-	let collection= getAccount(address).getCapability(path).borrow<&{MetadataViews.ResolverCollection}>()!
+	let collection= getAccount(address).getCapability(path).borrow<&{ViewResolver.ResolverCollection}>()!
 
 	let nft=collection.borrowViewResolver(id: id)
 

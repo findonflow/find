@@ -54,7 +54,7 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 		let storagePath = catalogEntry.collectionData.storagePath
-		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
+		let ref= account.borrow<&{ViewResolver.ResolverCollection}>(from: storagePath)
 		if ref != nil{
 			for id in ids[collectionKey]! {
 				// results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))
@@ -300,7 +300,7 @@ pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
 	return MetadataViews.Traits(array)
 }
 
-pub fun getTrait(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Trait? {
+pub fun getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Trait? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Trait>()) {
 		if let v = view as? MetadataViews.Trait {
 			return v
@@ -309,7 +309,7 @@ pub fun getTrait(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Trai
 	return nil
 }
 
-pub fun getEdition(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Edition? {
+pub fun getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Edition? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Edition>()) {
 		if let v = view as? MetadataViews.Edition {
 			return v

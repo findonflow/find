@@ -27,7 +27,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 		let rarity = MetadataViews.Rarity(score:rarityNum, max: 100.0, description:rarity)
 
 		let receiver=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-		let nftReceiver=getAccount(to).getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
+		let nftReceiver=getAccount(to).getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
 		let traits = MetadataViews.Traits([])
 		traits.addTrait(MetadataViews.Trait(name: "Color", value: "Pearl", displayType:"String", rarity:nil))

@@ -284,7 +284,7 @@ func TestFindThought(t *testing.T) {
 			var nftPointer : FindViews.ViewReadPointer? = nil
 			if quoteNFTOwner != nil {
 					let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
-					let cap = getAccount(quoteNFTOwner!).getCapability<&{MetadataViews.ResolverCollection}>(path)
+					let cap = getAccount(quoteNFTOwner!).getCapability<&{ViewResolver.ResolverCollection}>(path)
 					nftPointer = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
 					let rv = nftPointer!.getViewResolver()
 					return FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true)

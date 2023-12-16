@@ -153,7 +153,7 @@ pub contract Flovatar: NonFungibleToken {
     }
 
     //The NFT resource that implements both Private and Public interfaces
-    pub resource NFT: NonFungibleToken.INFT, Public, Private, MetadataViews.Resolver {
+    pub resource NFT: NonFungibleToken.INFT, Public, Private, ViewResolver.Resolver {
         pub let id: UInt64
         access(contract) let metadata: Metadata
         access(contract) let royalties: Royalties
@@ -531,9 +531,9 @@ pub contract Flovatar: NonFungibleToken {
                 storagePath: Flovatar.CollectionStoragePath,
                 publicPath: Flovatar.CollectionPublicPath,
                 providerPath: /private/FlovatarCollection,
-                publicCollection: Type<&Flovatar.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Flovatar.CollectionPublic}>(),
-                publicLinkedType: Type<&Flovatar.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Flovatar.CollectionPublic}>(),
-                providerLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Flovatar.CollectionPublic}>(),
+                publicCollection: Type<&Flovatar.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                publicLinkedType: Type<&Flovatar.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                providerLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Flovatar.createEmptyCollection()}
                 )
             }
@@ -547,7 +547,7 @@ pub contract Flovatar: NonFungibleToken {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowFlovatar(id: UInt64): &Flovatar.NFT{Flovatar.Public, MetadataViews.Resolver}? {
+        pub fun borrowFlovatar(id: UInt64): &Flovatar.NFT{Flovatar.Public, ViewResolver.Resolver}? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
             post {
@@ -558,7 +558,7 @@ pub contract Flovatar: NonFungibleToken {
     }
 
     // Main Collection to manage all the Flovatar NFT
-    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -604,11 +604,11 @@ pub contract Flovatar: NonFungibleToken {
 
         // borrowFlovatar returns a borrowed reference to a Flovatar
         // so that the caller can read data and call methods from it.
-        pub fun borrowFlovatar(id: UInt64): &Flovatar.NFT{Flovatar.Public, MetadataViews.Resolver}? {
+        pub fun borrowFlovatar(id: UInt64): &Flovatar.NFT{Flovatar.Public, ViewResolver.Resolver}? {
             if self.ownedNFTs[id] != nil {
                 let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
                 let flovatarNFT = ref as! &Flovatar.NFT
-                return flovatarNFT as &Flovatar.NFT{Flovatar.Public, MetadataViews.Resolver}
+                return flovatarNFT as &Flovatar.NFT{Flovatar.Public, ViewResolver.Resolver}
             } else {
                 return nil
             }
@@ -629,13 +629,13 @@ pub contract Flovatar: NonFungibleToken {
             destroy self.ownedNFTs
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
             pre {
                 self.ownedNFTs[id] != nil : "NFT does not exist"
             }
             let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             let flovatarNFT = nft as! &Flovatar.NFT
-            return flovatarNFT as &AnyResource{MetadataViews.Resolver}
+            return flovatarNFT as &AnyResource{ViewResolver.Resolver}
         }
     }
 

@@ -49,7 +49,7 @@ pub contract Dandy: NonFungibleToken {
 			self.externalUrlPrefix=externalUrlPrefix 
 		}
 	}
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		pub let id: UInt64
 		access(self) var nounce: UInt64
 
@@ -193,9 +193,9 @@ pub contract Dandy: NonFungibleToken {
 					storagePath: Dandy.CollectionStoragePath,
 					publicPath: Dandy.CollectionPublicPath,
 					providerPath: Dandy.CollectionPrivatePath,
-					publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-					publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
-					providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Dandy.CollectionPublic}>(),
+					publicCollection: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Dandy.CollectionPublic}>(),
+					publicLinkedType: Type<&Dandy.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Dandy.CollectionPublic}>(),
+					providerLinkedType: Type<&Dandy.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Dandy.CollectionPublic}>(),
 					createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Dandy.createEmptyCollection()}
 				)
 			}
@@ -219,7 +219,7 @@ pub contract Dandy: NonFungibleToken {
 		pub fun getMinters(): [String] 
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection, CollectionPublic {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection, CollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -301,7 +301,7 @@ pub contract Dandy: NonFungibleToken {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			if self.ownedNFTs[id] == nil {
 				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}

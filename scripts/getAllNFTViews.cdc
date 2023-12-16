@@ -15,7 +15,7 @@ pub fun main(user: String, aliasOrIdentifier:String, id: UInt64) : {String : Any
 	if account.balance == 0.0 {
 		return {}
 	}
-	let collection= account.getCapability(pp).borrow<&{MetadataViews.ResolverCollection}>()!
+	let collection= account.getCapability(pp).borrow<&{ViewResolver.ResolverCollection}>()!
 
 	let nft=collection.borrowViewResolver(id: id)
 	let view : {String : AnyStruct} = {}

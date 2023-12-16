@@ -49,7 +49,7 @@ pub contract FlovatarComponent: NonFungibleToken {
 
 
     // The NFT resource that implements the Public interface as well
-    pub resource NFT: NonFungibleToken.INFT, Public, MetadataViews.Resolver {
+    pub resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
         pub let id: UInt64
         pub let templateId: UInt64
         pub let mint: UInt64
@@ -224,9 +224,9 @@ pub contract FlovatarComponent: NonFungibleToken {
                 storagePath: FlovatarComponent.CollectionStoragePath,
                 publicPath: FlovatarComponent.CollectionPublicPath,
                 providerPath: /private/FlovatarComponentCollection,
-                publicCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
-                publicLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
-                providerLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                publicCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                publicLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                providerLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- FlovatarComponent.createEmptyCollection()}
                 )
             }
@@ -251,7 +251,7 @@ pub contract FlovatarComponent: NonFungibleToken {
     }
 
     // Main Collection to manage all the Components NFT
-    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -310,13 +310,13 @@ pub contract FlovatarComponent: NonFungibleToken {
             destroy self.ownedNFTs
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
             pre {
                 self.ownedNFTs[id] != nil : "NFT does not exist"
             }
             let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             let componentNFT = nft as! &FlovatarComponent.NFT
-            return componentNFT as &AnyResource{MetadataViews.Resolver}
+            return componentNFT as &AnyResource{ViewResolver.Resolver}
         }
     }
 

@@ -82,7 +82,7 @@ pub fun getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
 		}
 
 		let storagePath = catalogEntry.collectionData.storagePath
-		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
+		let ref= account.borrow<&{ViewResolver.ResolverCollection}>(from: storagePath)
 		if ref != nil {
 			inventory[collectionKey] = NFTIDs(ids: ref!.getIDs(), collectionName: collectionName)
 		}

@@ -257,12 +257,12 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 	if account.balance > 0.0 {
 		// check link for market
-		let linkedForMarket = account.getCapability<&{MetadataViews.ResolverCollection}>(getPublicPath(project)).check()
+		let linkedForMarket = account.getCapability<&{ViewResolver.ResolverCollection}>(getPublicPath(project)).check()
 
 		let storagePath = getStoragePath(project)
 		let publicPath = PublicPath(identifier: "find_temp_path")!
-		account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
-		let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+		account.link<&{ViewResolver.ResolverCollection}>(publicPath, target: storagePath)
+		let cap = account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 		if !cap.check() {
 			panic("The user does not set up collection correctly.")
 		}
@@ -472,7 +472,7 @@ pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTD
 
 }
 
-pub fun getEdition(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Edition? {
+pub fun getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Edition? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Edition>()) {
 		if let v = view as? MetadataViews.Edition {
 			return v
@@ -481,7 +481,7 @@ pub fun getEdition(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Ed
 	return nil
 }
 
-pub fun getMedia(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Media? {
+pub fun getMedia(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Media? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Media>()) {
 		if let v = view as? MetadataViews.Media {
 			return v
@@ -490,7 +490,7 @@ pub fun getMedia(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Medi
 	return nil
 }
 
-pub fun getTrait(_ viewResolver: &{MetadataViews.Resolver}) : MetadataViews.Trait? {
+pub fun getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Trait? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Trait>()) {
 		if let v = view as? MetadataViews.Trait {
 			return v

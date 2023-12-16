@@ -340,14 +340,14 @@ access(all) contract FindPack: NonFungibleToken {
         access(all) let extraData : {String : AnyStruct}
 
         access(all) let itemTypes: [Type]
-        access(contract) let providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+        access(contract) let providerCaps: {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 
         access(contract) let primarySaleRoyalties : MetadataViews.Royalties
         access(contract) let royalties : MetadataViews.Royalties
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -432,7 +432,7 @@ access(all) contract FindPack: NonFungibleToken {
         return {}
     }
 
-    access(all) resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
         // The token's ID
         access(all) let id: UInt64
         access(all) let packTypeName: String
@@ -573,7 +573,7 @@ access(all) contract FindPack: NonFungibleToken {
 
     access(all) resource interface CollectionPublic {
         access(all) fun deposit(token: @NonFungibleToken.NFT)
-        access(all) fun getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) fun contains(_ id: UInt64): Bool
         access(all) fun getPacksLeft() : Int   // returns the no of a type
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
@@ -585,7 +585,7 @@ access(all) contract FindPack: NonFungibleToken {
     // Collection
     // A collection of FindPack NFTs owned by an account
     //
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic, MetadataViews.ResolverCollection {
+    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         //
@@ -837,7 +837,7 @@ access(all) contract FindPack: NonFungibleToken {
         // getIDs
         // Returns an array of the IDs that are in the collection
         //
-        access(all) fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -872,7 +872,7 @@ access(all) contract FindPack: NonFungibleToken {
             }
         }
 
-        access(all) view fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             let nft =  (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
             let exampleNFT = nft as! &NFT
             return exampleNFT
@@ -1104,7 +1104,7 @@ access(all) contract FindPack: NonFungibleToken {
     }
 
     access(all) resource Forge: FindForge.Forge {
-        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
+        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 
             let royalties : [MetadataViews.Royalty] = []
             // there should be no find cut for the pack.

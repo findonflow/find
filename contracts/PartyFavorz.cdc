@@ -41,7 +41,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 	}
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		pub let id: UInt64
 
 		pub let info: Info
@@ -128,9 +128,9 @@ pub contract PartyFavorz: NonFungibleToken {
 					storagePath: PartyFavorz.CollectionStoragePath,
 					publicPath: PartyFavorz.CollectionPublicPath,
 					providerPath: PartyFavorz.CollectionPrivatePath,
-					publicCollection: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					publicLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					providerLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+					publicCollection: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					publicLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					providerLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
 					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
 						return <-PartyFavorz.createEmptyCollection()
 					})
@@ -223,7 +223,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -267,10 +267,10 @@ pub contract PartyFavorz: NonFungibleToken {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let PartyFavorz = nft as! &PartyFavorz.NFT
-			return PartyFavorz as &AnyResource{MetadataViews.Resolver}
+			return PartyFavorz as &AnyResource{ViewResolver.Resolver}
 		}
 
 		destroy() {
@@ -338,7 +338,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		self.account.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
-		self.account.link<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+		self.account.link<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)

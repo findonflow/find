@@ -47,7 +47,7 @@ pub contract Flomies: NonFungibleToken {
 		}
 	}
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 		pub let id:UInt64
 		pub let serial:UInt64
@@ -142,9 +142,9 @@ pub contract Flomies: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: Flomies.CollectionStoragePath,
 				publicPath: Flomies.CollectionPublicPath,
 				providerPath: Flomies.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
+				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Flomies.createEmptyCollection()})
 
 			case Type<MetadataViews.Traits>():
@@ -195,7 +195,7 @@ pub contract Flomies: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -242,10 +242,10 @@ pub contract Flomies: NonFungibleToken {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let flomies = nft as! &NFT
-			return flomies as &AnyResource{MetadataViews.Resolver}
+			return flomies as &AnyResource{ViewResolver.Resolver}
 		}
 
 		destroy() {
@@ -367,11 +367,11 @@ pub contract Flomies: NonFungibleToken {
 		self.CollectionPrivatePath = /private/flomiesNFT
 
 		self.account.save<@NonFungibleToken.Collection>(<- Flomies.createEmptyCollection(), to: Flomies.CollectionStoragePath)
-		self.account.link<&Flomies.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.link<&Flomies.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Flomies.CollectionPublicPath,
 			target: Flomies.CollectionStoragePath
 		)
-		self.account.link<&Flomies.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.link<&Flomies.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Flomies.CollectionPrivatePath,
 			target: Flomies.CollectionStoragePath
 		)

@@ -14,7 +14,7 @@ pub contract CharityNFT: NonFungibleToken {
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id: UInt64, metadata: {String:String}, to:Address)
 
-	pub resource NFT: NonFungibleToken.INFT, Public, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
 		pub let id: UInt64
 
 		access(self) let metadata: {String: String}
@@ -80,8 +80,8 @@ pub contract CharityNFT: NonFungibleToken {
 						publicPath: CharityNFT.CollectionPublicPath,
 						providerPath: /private/findCharityCollection,
 						publicCollection: Type<&CharityNFT.Collection{CharityNFT.CollectionPublic}>(),
-						publicLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CharityNFT.CollectionPublic, MetadataViews.ResolverCollection}>(),
-						providerLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CharityNFT.CollectionPublic, MetadataViews.ResolverCollection}>(),
+						publicLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
+						providerLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
 						createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
 							return <- CharityNFT.createEmptyCollection()
 						}
@@ -152,7 +152,7 @@ pub contract CharityNFT: NonFungibleToken {
 		pub fun borrowCharity(id: UInt64): &{Public}?
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic , MetadataViews.ResolverCollection{
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic , ViewResolver.ResolverCollection{
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -207,7 +207,7 @@ pub contract CharityNFT: NonFungibleToken {
 		}
 
 		//borrow view resolver
-        pub fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			if self.ownedNFTs[id] == nil {
 				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}

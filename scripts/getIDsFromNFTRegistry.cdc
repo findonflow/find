@@ -22,7 +22,7 @@ pub fun main(user: String) : {String: [UInt64]} {
 	for key in registryData.keys {
 		let item = registryData[key]!
 
-		let cap = account.getCapability(item.publicPath).borrow<&{MetadataViews.ResolverCollection}>()!
+		let cap = account.getCapability(item.publicPath).borrow<&{ViewResolver.ResolverCollection}>()!
 		let ids=cap.getIDs()
 		let alias=item.alias
 		if ids.length != 0 {

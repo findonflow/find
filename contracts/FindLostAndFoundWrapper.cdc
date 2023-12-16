@@ -131,7 +131,7 @@ pub contract FindLostAndFoundWrapper {
     // Redeem 
     pub fun redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
 
-        let metadataViewsCap = getAccount(receiverAddress).getCapability<&{MetadataViews.ResolverCollection}>(collectionPublicPath)
+        let metadataViewsCap = getAccount(receiverAddress).getCapability<&{ViewResolver.ResolverCollection}>(collectionPublicPath)
 
         let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
         let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.CollectionPublic}>(collectionPublicPath)

@@ -13,7 +13,7 @@ transaction(info: FindPack.PackRegisterInfo) {
 
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
-	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let types : [Type]
 
 	prepare(account: AuthAccount) {
@@ -29,7 +29,7 @@ transaction(info: FindPack.PackRegisterInfo) {
 				panic("Type : ".concat(typeName).concat(" is not supported in NFTCatalog at the moment"))
 			}
 			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
-			let providerCap= account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)
+			let providerCap= account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(collectionInfo.privatePath)
 			let type = CompositeType(typeName)!
 			self.types.append(type)
 			self.providerCaps[type] = providerCap

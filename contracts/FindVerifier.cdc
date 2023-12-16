@@ -199,7 +199,7 @@ access(all) contract FindVerifier {
 
 			let cap = getAccount(user).capabilities.get<&{NonFungibleToken.CollectionPublic}>(self.path)!
 			if !cap.check() {
-				let mvCap = getAccount(user).capabilities.get<&{MetadataViews.ResolverCollection}>(self.path)!
+				let mvCap = getAccount(user).capabilities.get<&{ViewResolver.ResolverCollection}>(self.path)!
 				if !mvCap.check() {
 					return false
 				}
@@ -278,7 +278,7 @@ access(all) contract FindVerifier {
 
 			let user : Address = param["address"]! as! Address 
 
-			let mvCap = getAccount(user).capabilities.get<&{MetadataViews.ResolverCollection}>(self.path)!
+			let mvCap = getAccount(user).capabilities.get<&{ViewResolver.ResolverCollection}>(self.path)!
 			if !mvCap.check() {
 				return false
 			}

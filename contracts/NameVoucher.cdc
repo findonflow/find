@@ -169,7 +169,7 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-	access(all) fun getIDs(): [UInt64] {
+	access(all) view fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 

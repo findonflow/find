@@ -13,11 +13,11 @@ transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nf
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(PartyFavorz.CollectionPublicPath)
 		if !collectionCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
-			account.link<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				PartyFavorz.CollectionPublicPath,
 				target: PartyFavorz.CollectionStoragePath
 			)
-			account.link<&PartyFavorz.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&PartyFavorz.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				PartyFavorz.CollectionPrivatePath,
 				target: PartyFavorz.CollectionStoragePath
 			)
@@ -27,7 +27,7 @@ transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nf
 		let lease=finLeases.borrow(name)
 		let forgeType = PartyFavorz.getForgeType()
 
-		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(PartyFavorz.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to PartyFavorz collection.")
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(PartyFavorz.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to PartyFavorz collection.")
 
 		let royalties : [MetadataViews.Royalty] = []
 		for i , rec in royaltyReceivers {

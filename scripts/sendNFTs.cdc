@@ -92,7 +92,7 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 			}
 
 			var royalties : Royalties? = nil
-			let mv = account.borrow<&{MetadataViews.ResolverCollection}>(from: path.storagePath)
+			let mv = account.borrow<&{ViewResolver.ResolverCollection}>(from: path.storagePath)
 			if mv != nil {
 				let rv = mv!.borrowViewResolver(id: id)
 				if let r = MetadataViews.getRoyalties(rv) {

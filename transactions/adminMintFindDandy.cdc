@@ -17,7 +17,7 @@ transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:Stri
 		let mediaFullsize=MetadataViews.Media(file: fullsize, mediaType: "image/webp")
 		let mediaThumbnail=MetadataViews.Media(file: thumbNail, mediaType: "image/webp")
 
-		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
 		let traits = MetadataViews.Traits([])
 		traits.addTrait(MetadataViews.Trait(name: "Creator", value: ".find", displayType:"Author", rarity:nil))

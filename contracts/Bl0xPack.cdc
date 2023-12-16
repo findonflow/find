@@ -62,14 +62,14 @@ pub contract Bl0xPack: NonFungibleToken {
 
 		pub let storageRequirement: UInt64
 
-		access(contract) let providerCap: Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}> 
+		access(contract) let providerCap: Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
 
 		access(contract) let royaltyCap: Capability<&{FungibleToken.Receiver}>?
 		access(contract) let royaltyCut: UFix64
 
 		pub let requiresReservation: Bool
 
-		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
+		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
 			self.name = name
 			self.description = description
 			self.thumbnailUrl = thumbnailUrl
@@ -115,7 +115,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		return self.packMetadata[typeId]
 	}
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		// The token's ID
 		pub let id: UInt64
 
@@ -214,9 +214,9 @@ pub contract Bl0xPack: NonFungibleToken {
 					storagePath: Bl0xPack.CollectionStoragePath,
 					publicPath: Bl0xPack.CollectionPublicPath,
 					providerPath: /private/Bl0xPackCollection,
-					publicCollection: Type<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-					publicLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-					providerLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection, Bl0xPack.CollectionPublic}>(),
+					publicCollection: Type<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
+					publicLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
+					providerLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
 					createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
 						return <- Bl0xPack.createEmptyCollection()
 					}
@@ -246,7 +246,7 @@ pub contract Bl0xPack: NonFungibleToken {
 	// Collection
 	// A collection of Bl0xPack NFTs owned by an account
 	//
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		//
@@ -504,7 +504,7 @@ pub contract Bl0xPack: NonFungibleToken {
 			}
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let exampleNFT = nft as! &NFT
 			return exampleNFT 
@@ -692,17 +692,17 @@ pub contract Bl0xPack: NonFungibleToken {
 		// this contract will hold a Collection that Bl0xPack can be deposited to and Admins can Consume them to transfer nfts to the depositing account
 		let openedCollection <- create Collection()
 		self.account.save(<- openedCollection, to: self.OpenedCollectionStoragePath) 
-		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, Bl0xPack.CollectionPublic, MetadataViews.ResolverCollection}>(Bl0xPack.OpenedCollectionPublicPath, target: Bl0xPack.OpenedCollectionStoragePath)
+		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.OpenedCollectionPublicPath, target: Bl0xPack.OpenedCollectionStoragePath)
 
 
 		//a DLQ storage slot so that the opener can put items that cannot be opened/transferred here.
 		let dlqCollection <- create Collection()
 		self.account.save(<- dlqCollection, to: self.DLQCollectionStoragePath) 
-		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, Bl0xPack.CollectionPublic, MetadataViews.ResolverCollection}>(Bl0xPack.DLQCollectionPublicPath, target: Bl0xPack.DLQCollectionStoragePath)
+		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.DLQCollectionPublicPath, target: Bl0xPack.DLQCollectionStoragePath)
 
 		self.account.save<@NonFungibleToken.Collection>( <- self.createEmptyCollection(), to: self.CollectionStoragePath)
 
-		self.account.link<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, Bl0xPack.CollectionPublic, MetadataViews.ResolverCollection}>(
+		self.account.link<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(
 			Bl0xPack.CollectionPublicPath,
 			target: Bl0xPack.CollectionStoragePath
 		)

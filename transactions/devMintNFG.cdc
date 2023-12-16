@@ -13,11 +13,11 @@ transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:Str
 		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(NFGv3.CollectionPublicPath)
 		if !collectionCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
-			account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				NFGv3.CollectionPublicPath,
 				target: NFGv3.CollectionStoragePath
 			)
-			account.link<&NFGv3.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&NFGv3.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				NFGv3.CollectionPrivatePath,
 				target: NFGv3.CollectionStoragePath
 			)
@@ -27,7 +27,7 @@ transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:Str
 		let lease=finLeases.borrow(name)
 		let forgeType = NFGv3.getForgeType()
 
-		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(NFGv3.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to NFGv3 collection.")
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(NFGv3.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to NFGv3 collection.")
 
 		var i = UInt64(1)
 		let collection=collectionCap.borrow()!

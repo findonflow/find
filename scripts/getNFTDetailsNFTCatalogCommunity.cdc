@@ -42,8 +42,8 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 		let storagePath = getStoragePath(project)
 		let publicPath = PublicPath(identifier: "find_temp_path")!
-		account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
-		let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+		account.link<&{ViewResolver.ResolverCollection}>(publicPath, target: storagePath)
+		let cap = account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 		if !cap.check() {
 			panic("The user does not set up collection correctly.")
 		}

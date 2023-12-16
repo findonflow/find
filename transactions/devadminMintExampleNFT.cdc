@@ -33,7 +33,7 @@ transaction(name: String, artist:String, nftName:String, nftDescription:String, 
 		let creativeWork=
 		FindViews.CreativeWork(artist: artist, name: nftName, description: nftDescription, type:"image")
 
-		let nftReceiver=getAccount(address).getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(ExampleNFT.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to ExampleNFT collection.")
+		let nftReceiver=getAccount(address).getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(ExampleNFT.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to ExampleNFT collection.")
 
 		let description=creativeWork.description.concat( " edition ").concat("1 of 1")
 		

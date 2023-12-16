@@ -9,7 +9,7 @@ pub fun main(users:[Address]) : AnyStruct {
 	let addresses:  {Address: [String] }={}
 	for  user in users {
 		let account=getAccount(user)
-		let aeraCap = account.getCapability<&PartyFavorz.Collection{MetadataViews.ResolverCollection}>(
+		let aeraCap = account.getCapability<&PartyFavorz.Collection{ViewResolver.ResolverCollection}>(
 			PartyFavorz.CollectionPublicPath
 		)
 		if !aeraCap.check() {

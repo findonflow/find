@@ -114,7 +114,7 @@ access(all) contract FindForgeOrder {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		access(all) fun getIDs(): [UInt64] {
+		access(all) view fun getIDs(): [UInt64] {
 			return self.orders.keys
 		}
 

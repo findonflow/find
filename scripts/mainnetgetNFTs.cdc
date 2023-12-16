@@ -1146,7 +1146,7 @@ pub fun	getBl0x(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
 pub fun getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, externalFixedUrl: String, id:UInt64) : MetadataCollectionItem? {
-	let resolverCollectionCap= owner.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	let resolverCollectionCap= owner.getCapability<&{ViewResolver.ResolverCollection}>(path)
 	if !resolverCollectionCap.check() {
 		return nil
 	}

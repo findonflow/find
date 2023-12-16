@@ -77,11 +77,11 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 					nfts[nftAliasOrIdentifiers[counter]] = nft
 				}
 
-				var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
+				var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
 
 				/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
 				if !providerCap.check() {
-					let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 							nft!.privatePath,
 							target: nft!.storagePath
 					)
@@ -89,11 +89,11 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 						// If linking is not successful, we link it using finds custom link
 						let pathIdentifier = nft!.privatePath.toString()
 						let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-						account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+						account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 							findPath,
 							target: nft!.storagePath
 						)
-						providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+						providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
 					}
 				}
 				// Get the salesItemRef from tenant

@@ -45,7 +45,7 @@ pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 	for collectionKey in ids.keys {
 		let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 		let storagePath = catalogEntry.collectionData.storagePath
-		let ref= account.borrow<&{MetadataViews.ResolverCollection}>(from: storagePath)
+		let ref= account.borrow<&{ViewResolver.ResolverCollection}>(from: storagePath)
 		if ref != nil{
 			for id in ids[collectionKey]! {
 				// results.append(MetadataViews.getNFTView(id:id, viewResolver: ref!.borrowViewResolver(id:id)!))

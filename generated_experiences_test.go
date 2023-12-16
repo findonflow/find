@@ -146,7 +146,7 @@ func TestGeneratedExperiences(t *testing.T) {
 		pub fun main(user: Address): AnyStruct {
 			let acct = getAccount(user)
 			let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
-				.borrow<&{MetadataViews.ResolverCollection}>()
+				.borrow<&{ViewResolver.ResolverCollection}>()
 				?? panic("Could not borrow capability from public collection")
 
 			let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[0])
@@ -205,7 +205,7 @@ func TestGeneratedExperiences(t *testing.T) {
 	pub fun main(user: Address, view: String): AnyStruct {
 		let acct = getAccount(user)
 		let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
-			.borrow<&{MetadataViews.ResolverCollection}>()
+			.borrow<&{ViewResolver.ResolverCollection}>()
 			?? panic("Could not borrow capability from public collection")
 
 		let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[1])

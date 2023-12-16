@@ -322,7 +322,7 @@ pub contract Wearables: NonFungibleToken {
 
 	// A resource on flow https://developers.flow.com/cadence/language/resources is kind of like a struct just with way stronger semantics and rules around security
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 		//the unique id of a NFT, Wearables uses UUID so this id is unique across _all_ resources on flow
 		pub let id:UInt64
@@ -496,9 +496,9 @@ pub contract Wearables: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: Wearables.CollectionStoragePath,
 				publicPath: Wearables.CollectionPublicPath,
 				providerPath: Wearables.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
+				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Wearables.createEmptyCollection()})
 
 			case Type<MetadataViews.Editions>() :
@@ -631,7 +631,7 @@ pub contract Wearables: NonFungibleToken {
 
 
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection  {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection  {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -676,7 +676,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		//a borrow method for the generic view resolver pattern
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let wearable = nft as! &NFT
 			return wearable
@@ -884,11 +884,11 @@ pub contract Wearables: NonFungibleToken {
 		self.CollectionPrivatePath = /private/wearables
 
 		self.account.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
-		self.account.link<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.link<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPublicPath,
 			target: Wearables.CollectionStoragePath
 		)
-		self.account.link<&Wearables.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.link<&Wearables.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPrivatePath,
 			target: Wearables.CollectionStoragePath
 		)

@@ -236,12 +236,12 @@ pub fun main(user: String) : Report? {
 				readyForWearables = false
 			}
 
-			let wearablesCap= wearableAccount.getCapability<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Wearables.CollectionPublicPath)
+			let wearablesCap= wearableAccount.getCapability<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Wearables.CollectionPublicPath)
 			if !wearablesCap.check() {
 				readyForWearables = false
 			}
 
-			let wearablesProviderCap= wearableAccount.getCapability<&Wearables.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Wearables.CollectionPrivatePath)
+			let wearablesProviderCap= wearableAccount.getCapability<&Wearables.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Wearables.CollectionPrivatePath)
 			if !wearablesCap.check() {
 				readyForWearables = false
 			}

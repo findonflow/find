@@ -15,11 +15,11 @@ transaction(name: String, data: [AnyStruct], receivers: [String]) {
 		let nftCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(FindFooDIM.CollectionPublicPath)
 		if !nftCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- FindFooDIM.createEmptyCollection(), to: FindFooDIM.CollectionStoragePath)
-			account.link<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindFooDIM.CollectionPublicPath,
 				target: FindFooDIM.CollectionStoragePath
 			)
-			account.link<&FindFooDIM.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&FindFooDIM.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindFooDIM.CollectionPrivatePath,
 				target: FindFooDIM.CollectionStoragePath
 			)
@@ -40,7 +40,7 @@ transaction(name: String, data: [AnyStruct], receivers: [String]) {
 		let forgeType = FindFooDIM.getForgeType()
 		for i, d in data {
 			let addr = self.addresses[i]
-			let r = getAccount(addr).getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(FindFooDIM.CollectionPublicPath).borrow() ?? panic("User does not setup FindFooDIM collection properly. User : ".concat(addr.toString()))
+			let r = getAccount(addr).getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(FindFooDIM.CollectionPublicPath).borrow() ?? panic("User does not setup FindFooDIM collection properly. User : ".concat(addr.toString()))
 			FindForge.mint(lease: self.lease, forgeType: forgeType , data: d, receiver: r)
 		}
 	}

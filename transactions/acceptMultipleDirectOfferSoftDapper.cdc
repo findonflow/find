@@ -40,7 +40,7 @@ transaction(ids: [UInt64]) {
 				nfts[nftIdentifier] = nft
 			}
 
-			let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
+			let providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
 			let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
 			self.pointer.append(pointer)
 			counter = counter + 1

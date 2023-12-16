@@ -17,7 +17,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 	let admin: &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
 	let royaltyWallet: Capability<&{FungibleToken.Receiver}>
-	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let itemTypes : [Type]
 
 	prepare(account: AuthAccount) {
@@ -33,7 +33,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 				panic("Type : ".concat(type.identifier).concat(" is not supported in NFTCatalog at the moment"))
 			}
 			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
-			let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)	
+			let providerCap = account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(collectionInfo.privatePath)	
 
 			self.providerCaps[type] = providerCap
 		}

@@ -12,8 +12,8 @@ transaction(name: String, info: [GeneratedExperiences.Info]) {
 		if account.borrow<&GeneratedExperiences.Collection>(from: GeneratedExperiences.CollectionStoragePath) == nil {
 			let collection <- GeneratedExperiences.createEmptyCollection()
 			account.save(<-collection, to: GeneratedExperiences.CollectionStoragePath)
-			account.link<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(GeneratedExperiences.CollectionPublicPath, target: GeneratedExperiences.CollectionStoragePath)
-			account.link<&GeneratedExperiences.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(GeneratedExperiences.CollectionPrivatePath, target: GeneratedExperiences.CollectionStoragePath)
+			account.link<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(GeneratedExperiences.CollectionPublicPath, target: GeneratedExperiences.CollectionStoragePath)
+			account.link<&GeneratedExperiences.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(GeneratedExperiences.CollectionPrivatePath, target: GeneratedExperiences.CollectionStoragePath)
 		}
 
         let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
@@ -31,7 +31,7 @@ transaction(name: String, info: [GeneratedExperiences.Info]) {
 										socials: {})
 		}
 
-		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(GeneratedExperiences.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to ExampleNFT collection.")
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(GeneratedExperiences.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to ExampleNFT collection.")
 
 		for i in info {
 			adminRef.mintForge(name: name, forgeType: forgeType, data: i, receiver: nftReceiver)

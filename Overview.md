@@ -6,26 +6,26 @@ If you have questions implementing .find services, please reach out to any of us
 
 # Product.find
 
- - Name Services
- - Assets Browser
- - Marketplace
- - Launchpad
- - Find Thoughts
+- Name Services
+- Assets Browser
+- Marketplace
+- Launchpad
+- Find Thoughts
 
 Find out more by surfing find.xyz
 
 # Infrastructures.find
- - Name services
- - Asset Management
- - Onchain Identity
-	- Profile
-	- Related Accounts
- - Marketplace
- - NFT Batch Minter
- - NFT Pack
- - Community Tools Wrapper
- - Social Networking Tools (Thoughts)
 
+- Name services
+- Asset Management
+- Onchain Identity
+  - Profile
+  - Related Accounts
+- Marketplace
+- NFT Batch Minter
+- NFT Pack
+- Community Tools Wrapper
+- Social Networking Tools (Thoughts)
 
 # Name services Contracts
 
@@ -35,9 +35,11 @@ It defines a name lease (which is not implementing NFT standard therefore it is 
 A Lease is a permission to own and use the domain name within a period of time (in .find's case that would be an year since register in general.) Lease owner can link themselves and their wallet address with ${name}.find. Smart contracts that implement FIND can resolve the lease owner address and tell who that is without sending in the clumsy and unreadable length wallet address.
 
 ## Lease Attribute
+
 Leases are created and handled as resource on flow. So that they are properly handled and stored.
 
 ### Attributes :
+
 name - name of the lease
 networkCap - link to the network (In find we support multiple tenant, so lease can be connected to different network at creation, creating name services for different tenant)
 market information - sale / auction / offer prices and details
@@ -77,9 +79,11 @@ addons - .find leases can support add ons to the name itself.
 ## Interaction Templates
 
 Some example scripts to show how easy it is to implement FIND
+
 - get the owner from an address or find name
 
 [resolve](scripts/resolve.cdc)
+
 ```cadence
 import FIND
 
@@ -91,6 +95,7 @@ pub fun main(name: String) : Address? {
 - get the name of an account
 
 [reverseLookup](scripts/reverseLookup.cdc)
+
 ```cadence
 pub fun main(input: Address) : String? {
 	return FIND.reverseLookup(input)
@@ -98,10 +103,10 @@ pub fun main(input: Address) : String? {
 ```
 
 # Identity (Profile)
+
 Identity and Personalized descriptions are important assets and features to .find and users. They show how a User want themselves to look like on chain and identify who they are besides the lengthy address.
 
 The information is stored under Profile resource in [Profile](./contracts/Profile.cdc) contract.
-
 
 We have a primary social tools which users can follow / unfollow / setPrivate or ban other users.
 
@@ -166,6 +171,7 @@ transaction(
 ```
 
 [register](transactions/register.cdc)
+
 ```cadence
 transaction(
 	// This is the find name to be purchased
@@ -209,6 +215,7 @@ transaction(
 ```
 
 [follow](transactions/follow.cdc)
+
 ```cadence
 transaction(
 	// map of {User in string (find name or address) : [tag]}
@@ -218,6 +225,7 @@ transaction(
 ```
 
 [unfollow](transactions/unfollow.cdc)
+
 ```cadence
 transaction(
 // array of [User in string (find name or address)]
@@ -226,13 +234,11 @@ transaction(
 
 ```
 
-
 # Identity (Related Account)
 
 Related Accounts enable user to build their own social networks and wallets on flow and on other chains.
 
 User can add their flow wallets / wallets on other chains by network and name. They can also add others wallet as "contact". Currently, if both accounts added each other as related wallet, we would take that as a "verified" trust.
-
 
 ## Contract Functions
 
@@ -325,6 +331,7 @@ transaction(
 ### Scripts
 
 [getAllRelatedAccounts](scripts/getAllRelatedAccounts.cdc)
+
 ```cadence
 pub fun main(
 	user: Address
@@ -338,6 +345,7 @@ Related accounts are also exposed in getStatus script under accounts with Emeral
 Report -> FINDReport -> accounts
 
 [getAllRelatedAccounts](scripts/getAllRelatedAccounts.cdc)
+
 ```cadence
 pub fun main(
 	user: String
@@ -364,11 +372,12 @@ pub struct AccountInformation {
 # Asset Management
 
 ## FungibleToken
+
 FungibleTokens are exposed under Find Profile contracts.
 As soon as a user adds his/her wallet to Profile, it can be viewable in Profile report. By default we always add FUSD / USDC / Flow token for non-Dapper Users if they initiate their account on .find page.
 
-
 ## NonFungibleToken
+
 We fetch users NonFungibleTokens(NFT) by looking up registered collections on NFTCatalog. NFTCatalog is a collection book of NFTs created by the flow team and tells where a collection should be in the user storage. By iterating through the catalog, we can tell if user has that collection and fetch information from it.
 
 It is a little more complicated to handle NFT information because it can come in all sorts of format. But we have some scripts ready to help you on this.
@@ -417,10 +426,11 @@ It is a little more complicated to handle NFT information because it can come in
 ```
 
 ### Scripts
+
 NFTs can be fetched from these scripts
 
 - NFT script to fetch user collection with only IDs
-[getNFTCatalogIDs](./scripts/getNFTCatalogIDs.cdc)
+  [getNFTCatalogIDs](./scripts/getNFTCatalogIDs.cdc)
 
 ```cadence
 // User : String address or find name
@@ -446,7 +456,7 @@ pub struct ItemReport {
 ```
 
 - NFT script to fetch user collection with only IDs
-[getNFTDetailsNFTCatalog](./scripts/getNFTDetailsNFTCatalog.cdc)
+  [getNFTDetailsNFTCatalog](./scripts/getNFTDetailsNFTCatalog.cdc)
 
 ```cadence
 // User : String address or find name
@@ -659,7 +669,7 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 
 		// getProvider private capability of the selling NFT
-		var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(${NFT_Provider_Private_Path})
+		var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(${NFT_Provider_Private_Path})
 
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 		self.vaultType= Type<@FlowToken.Vault>()
@@ -743,10 +753,10 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 ```
 
-
 More Interaction templates can be found in the repo.
 
 ### FindMarketSale
+
 [list](transactions/listNFTForSale.cdc)
 
 ```cadence
@@ -762,6 +772,7 @@ transaction(
 ```
 
 [buy](transactions/buyNFTForSale.cdc)
+
 ```cadence
 transaction(
 	user: String,
@@ -774,6 +785,7 @@ transaction(
 ```
 
 [delist](transactions/delistNFTSale.cdc)
+
 ```cadence
 transaction(
 	// This is the UUID of the NFT
@@ -854,6 +866,7 @@ transaction(
 [cancelMarketAuctionEscrowed](transactions/cancelMarketAuctionEscrowed.cdc)
 
 [cancelMarketAuctionSoft](transactions/cancelMarketAuctionSoft.cdc)
+
 ```cadence
 transaction(
 	// This is the UUID of the NFT
@@ -867,7 +880,6 @@ transaction(
 ### FindMarketDirectOffer (Escrowed And Soft)
 
 [bidMarketDirectOfferEscrowed](transactions/bidMarketDirectOfferEscrowed.cdc)
-
 
 [bidMarketDirectOfferSoft](transactions/bidMarketDirectOfferSoft.cdc)
 
@@ -923,6 +935,7 @@ Thoughts are still in alpha stage, we are still forging the ability to share and
 This will be very important part of social mapping
 
 ## Contract Function
+
 ```cadence
 // ** Thoughts are NOT NFTs as they are not meant to be.
 // They should not be freely moved or regarded as NFT assets
@@ -958,7 +971,7 @@ pub contract FindThoughts {
 	}
 
 	// Collection
-	pub resource Collection : CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
 		// Publish a thought with optional media, NFTPointer or quotes
 		pub fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
 		pub fun delete(_ id: UInt64)
@@ -1055,6 +1068,7 @@ transaction(
 ```
 
 ### Scripts
+
 Scripts to fetch different user's thoughts
 
 [getFindThoughts](scripts/getFindThoughts.cdc)
@@ -1080,8 +1094,8 @@ pub fun main(
 
 ```
 
-
 returning object
+
 ```cadence
 pub struct Thought {
 	pub let id: UInt64
@@ -1104,14 +1118,12 @@ pub struct Thought {
 	}
 ```
 
-
 # Name Voucher
 
 Name voucher is an NFT that enables owner to register / renew / extend a .find name lease.
 They are restricted by the minimum number of characters
 E.g. voucher with 3-characters can renew any lease / register any FREE lease ,
 voucher with 4-characters can only do so to 4-characters or above leases
-
 
 ### Interaction Template
 

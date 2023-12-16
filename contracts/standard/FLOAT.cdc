@@ -212,7 +212,7 @@ access(all) contract FLOAT: NonFungibleToken {
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) fun deposit(token: @NonFungibleToken.NFT)
-        access(all) fun getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) fun getAllIDs(): [UInt64]
         access(all) fun ownedIdsFromEvent(eventId: UInt64): [UInt64]
     }
@@ -284,7 +284,7 @@ access(all) contract FLOAT: NonFungibleToken {
 
         // Only returns the FLOATs for which we can still
         // access data about their event.
-        access(all) fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             let ids: [UInt64] = []
             for key in self.ownedNFTs.keys {
                 let nftRef = self.borrowFLOAT(id: key)!
@@ -789,7 +789,7 @@ access(all) contract FLOAT: NonFungibleToken {
         // Public Getters
         access(all) fun borrowPublicEventRef(eventId: UInt64): &FLOATEvent?
         access(all) fun getAllEvents(): {UInt64: String}
-        access(all) fun getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) fun getGroup(groupName: String): &Group?
         access(all) fun getGroups(): [String]
         // Account Getters
@@ -955,7 +955,7 @@ access(all) contract FLOAT: NonFungibleToken {
             return nil
         }
 
-        access(all) fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.events.keys
         }
 

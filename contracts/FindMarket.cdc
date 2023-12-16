@@ -1466,7 +1466,7 @@ pub contract FindMarket {
 		pub var collectionName: String?
 		pub var collectionDescription: String?
 
-		init(_ item: &{MetadataViews.Resolver}, id: UInt64, detail: Bool){
+		init(_ item: &{ViewResolver.Resolver}, id: UInt64, detail: Bool){
 
 			self.tags = {}
 

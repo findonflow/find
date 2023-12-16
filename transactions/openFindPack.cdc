@@ -34,12 +34,12 @@ transaction(packId:UInt64) {
             if storage == nil {
                 let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
                 account.save(<- newCollection, to: collectionInfo.storagePath)
-                account.link<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath)
+                account.link<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath)
             }
 
             if !cap.check() {
                 account.unlink(collectionInfo.publicPath)
-                account.link<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath) 
+                account.link<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath) 
             }
             self.receiver[type] = cap
         }

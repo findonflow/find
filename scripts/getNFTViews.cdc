@@ -11,7 +11,7 @@ pub fun main(user: String, aliasOrIdentifier:String, id: UInt64) : [String] {
 	if resolveAddress == nil {return []}
 	let address = resolveAddress!
 	let pp = nftInfo.publicPath
-	let collection= getAccount(address).getCapability(pp).borrow<&{MetadataViews.ResolverCollection}>()!
+	let collection= getAccount(address).getCapability(pp).borrow<&{ViewResolver.ResolverCollection}>()!
 	let nft=collection.borrowViewResolver(id: id)
 	let views:[String]=[]
 	for v in nft.getViews() {

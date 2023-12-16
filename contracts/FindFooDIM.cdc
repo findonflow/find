@@ -23,7 +23,7 @@ pub contract FindFooDIM: NonFungibleToken {
 	pub let CollectionPublicPath: PublicPath
 	pub let MinterStoragePath: StoragePath
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		pub let id: UInt64
 
 		pub let info: FindForgeStruct.FindDIM
@@ -143,9 +143,9 @@ pub contract FindFooDIM: NonFungibleToken {
 					storagePath: FindFooDIM.CollectionStoragePath,
 					publicPath: FindFooDIM.CollectionPublicPath,
 					providerPath: FindFooDIM.CollectionPrivatePath,
-					publicCollection: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					publicLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-					providerLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+					publicCollection: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					publicLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					providerLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
 					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
 						return <-FindFooDIM.createEmptyCollection()
 					})
@@ -157,7 +157,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -201,10 +201,10 @@ pub contract FindFooDIM: NonFungibleToken {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let nfgNFT = nft as! &FindFooDIM.NFT
-			return nfgNFT as &AnyResource{MetadataViews.Resolver}
+			return nfgNFT as &AnyResource{ViewResolver.Resolver}
 		}
 
 		destroy() {
@@ -265,7 +265,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		self.account.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
-		self.account.link<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+		self.account.link<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)

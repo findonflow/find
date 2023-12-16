@@ -188,7 +188,7 @@ access(all) contract FindForge {
 		FindForge.minterPlatforms[forgeType]!.remove(key: name)
 	}
 
-	access(account) fun mintAdmin(leaseName: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+	access(account) fun mintAdmin(leaseName: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}) {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
 			panic("The minter platform is not set. Please set up properly before mint.")
 		}
@@ -260,12 +260,12 @@ access(all) contract FindForge {
 		return c
 	}
 
-	access(all) fun mint (lease: &FIND.Lease, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}) {
+	access(all) fun mint (lease: &FIND.Lease, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}) {
 		let leaseName = lease.getName()
 		FindForge.adminMint(lease: leaseName, forgeType: forgeType , data: data, receiver: receiver)
 	}
 
-	access(account) fun adminMint(lease: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}){
+	access(account) fun adminMint(lease: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}){
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
 			panic("The minter platform is not set. Please set up properly before adding contract data.")
 		}

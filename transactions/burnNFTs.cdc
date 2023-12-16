@@ -28,9 +28,9 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
 			let path = data!.collectionData
 
-			var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(path.privatePath)
+			var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(path.privatePath)
 			if !providerCap.check() {
-				let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 					path.privatePath,
 					target: path.storagePath
 				)
@@ -38,11 +38,11 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 					// If linking is not successful, we link it using finds custom link 
 					let pathIdentifier = path.privatePath.toString()
 					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 						findPath,
 						target: path.storagePath
 					)
-					providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+					providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
 				}
 			}
 			let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])

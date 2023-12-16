@@ -91,7 +91,7 @@ pub fun main(user: String) : MetadataCollections? {
 
 	for nftInfo in NFTRegistry.getNFTInfoAll().values {
 		let items: [String] = []
-		let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(nftInfo.publicPath)
+		let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(nftInfo.publicPath)
 		if resolverCollectionCap.check() {
 			let collection = resolverCollectionCap.borrow()!
 			for id in collection.getIDs() {

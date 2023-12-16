@@ -23,7 +23,7 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
 		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(FindPack.CollectionPublicPath)
 		if !findPackCap.check() {
 			account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
-			account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+			account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindPack.CollectionPublicPath,
 				target: FindPack.CollectionStoragePath
 			)
