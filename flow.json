@@ -95,7 +95,8 @@
     "FindVerifier": "./contracts/FindVerifier.cdc",
     "FLOAT": "./contracts/standard/FLOAT.cdc",
     "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
-    "FungibleTokenSwitchboard": "./contracts/standard/FungibleTokenSwitchboard.cdc"
+    "FungibleTokenSwitchboard": "./contracts/standard/FungibleTokenSwitchboard.cdc",
+    "GrantedAccountAccess": "./contracts/standard/GrantedAccountAccess.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -196,7 +197,8 @@
         "NameVoucher",
         "FLOAT",
         "FindVerifier",
-        "FINDNFTCatalog"
+        "FINDNFTCatalog",
+        "GrantedAccountAccess"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
