@@ -7,6 +7,7 @@ import Debug from "./Debug.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 import FindVerifier from "../contracts/FindVerifier.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 access(all) contract FindPack: NonFungibleToken {
     // Events
@@ -906,7 +907,7 @@ access(all) contract FindPack: NonFungibleToken {
 
     access(account) fun fulfill(packId: UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 
-        let openedPacksCollection = FindPack.account.borrow<&FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
+        let openedPacksCollection = FindPack.account.storage.borrow<&FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
         let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
         let packTypeName = pack.packTypeName
         let packTypeId = pack.getTypeID()
@@ -1009,7 +1010,7 @@ access(all) contract FindPack: NonFungibleToken {
     }
 
     access(account) fun transferToDLQ(_ pack: @NFT) {
-        let dlq = FindPack.account.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+        let dlq = FindPack.account.storage.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
         dlq.deposit(token: <- pack)
     }
 

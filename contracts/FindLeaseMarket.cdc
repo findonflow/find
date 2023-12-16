@@ -670,7 +670,7 @@ pub contract FindLeaseMarket {
 	}
 
 	access(contract) fun getNetwork() : &FIND.Network {
-		return FindLeaseMarket.account.borrow<&FIND.Network>(from : FIND.NetworkStoragePath) ?? panic("Network is not up")
+		return FindLeaseMarket.account.storage.borrow<&FIND.Network>(from : FIND.NetworkStoragePath) ?? panic("Network is not up")
 	}
 
 	/* Admin Function */

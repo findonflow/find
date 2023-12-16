@@ -385,7 +385,7 @@ pub contract LostAndFound {
     }
 
     access(contract) fun getFlowProvider(): &FlowToken.Vault{FungibleToken.Provider} {
-        return self.account.borrow<&FlowToken.Vault{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
+        return self.account.storage.borrow<&FlowToken.Vault{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
     }
 
     // ShelfManager is a light-weight wrapper to get our shelves into storage.

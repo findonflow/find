@@ -59,7 +59,7 @@ pub contract FindMarketAdmin {
 			}
 
       		let path = FindMarket.TenantClientStoragePath
-      		return FindMarketAdmin.account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Find market tenant client Reference.")
+      		return FindMarketAdmin.account.storage.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Find market tenant client Reference.")
 		}
 
 		/// ===================================================================================

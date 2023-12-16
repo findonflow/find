@@ -1141,7 +1141,7 @@ pub contract FlowtyRentals {
     }
 
     access(account) fun borrowMarketplace(): &FlowtyRentals.FlowtyRentalsMarketplace {
-        return self.account.borrow<&FlowtyRentals.FlowtyRentalsMarketplace>(from: FlowtyRentals.FlowtyRentalsMarketplaceStoragePath)!
+        return self.account.storage.borrow<&FlowtyRentals.FlowtyRentalsMarketplace>(from: FlowtyRentals.FlowtyRentalsMarketplaceStoragePath)!
     }
 
     pub resource FlowtyRentalsAdmin {

@@ -141,14 +141,14 @@ access(all) contract FindForgeOrder {
 		} 
 		emit ForgeOrdered(lease: leaseName, mintType: mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s)
 		FindForgeOrder.contractNames[order.contractName] = order.id
-		let col = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+		let col = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
 		col.deposit(token: <- order)
 	}
 
 	access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
 		let contractName = "Find".concat(FindUtils.firstUpperLetter(leaseName)).concat(mintType)
 		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
-		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+		let queuedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
 		let order <- queuedCol.withdraw(withdrawID: id) 
 		let c = order.collectionDisplay
 		let s : {String : String} = {}
@@ -162,7 +162,7 @@ access(all) contract FindForgeOrder {
 	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
 		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
 
-		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+		let queuedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
 		let order <- queuedCol.withdraw(withdrawID: id) 
 		let c = order.collectionDisplay
 		let s : {String : String} = {}
@@ -171,7 +171,7 @@ access(all) contract FindForgeOrder {
 		} 
 		emit ForgeOrderCompleted(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
 
-		let completedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
+		let completedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
 		completedCol.deposit(token: <- order)
 		let ref = completedCol.borrow(id)
 		return ref

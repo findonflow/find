@@ -78,12 +78,12 @@ pub contract EmeraldIdentity {
     /*** USE THE BELOW FUNCTIONS FOR SECURE VERIFICATION OF ID ***/ 
 
     pub fun getDiscordFromAccount(account: Address): String?  {
-        let admin = EmeraldIdentity.account.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
+        let admin = EmeraldIdentity.account.storage.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
         return admin.accountToDiscord[account]
     }
 
     pub fun getAccountFromDiscord(discordID: String): Address? {
-        let admin = EmeraldIdentity.account.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
+        let admin = EmeraldIdentity.account.storage.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
         return admin.discordToAccount[discordID]
     }
 

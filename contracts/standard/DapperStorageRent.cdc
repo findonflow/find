@@ -70,7 +70,7 @@ pub contract DapperStorageRent {
 		destroy tokens
 
 		/*
-      let privateForwardingSenderRef = self.account.borrow<&PrivateReceiverForwarder.Sender>(from: PrivateReceiverForwarder.SenderStoragePath)!
+      let privateForwardingSenderRef = self.account.storage.borrow<&PrivateReceiverForwarder.Sender>(from: PrivateReceiverForwarder.SenderStoragePath)!
       privateForwardingSenderRef!.sendPrivateTokens(address,tokens:<-tokens)
 			*/
   }
@@ -118,13 +118,13 @@ pub contract DapperStorageRent {
 
     // If the user is below the threshold PrivateReceiverForwarder will send 0.06 Flow tokens for about 6MB of storage
     if high - low < self.StorageRentRefillThreshold {
-      let vaultRef = self.account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
+      let vaultRef = self.account.storage.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
       if vaultRef == nil {
         emit RefilledFailed(address: address, reason: "Couldn't borrow the Accounts FlowToken.Vault")
         return
       }
 
-      let privateForwardingSenderRef = self.account.borrow<&PrivateReceiverForwarder.Sender>(from: PrivateReceiverForwarder.SenderStoragePath)
+      let privateForwardingSenderRef = self.account.storage.borrow<&PrivateReceiverForwarder.Sender>(from: PrivateReceiverForwarder.SenderStoragePath)
       if privateForwardingSenderRef == nil {
         emit RefilledFailed(address: address, reason: "Couldn't borrow the Accounts PrivateReceiverForwarder")
         return

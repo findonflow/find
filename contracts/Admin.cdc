@@ -148,14 +148,17 @@ access(all) contract Admin {
 			}
 
 			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
-			walletRef.setPrice(default: defaultPrice, additionalPrices: additional)
+			walletRef.setPrice(defaultPrice: defaultPrice, additionalPrices: additional)
 		}
 
-		access(all) fun register(name: String, profile: Capability<&{Profile.Public}>, leases: Capability<&FIND.LeaseCollectionPublic>){
+		access(all) fun register(name: String, profile: Capability<&{Profile.Public}>, leases: Capability<&{FIND.LeaseCollectionPublic}>){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
-				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
 			}
+
+			if !FIND.validateFindName(name) {
+				panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
+			} 
 
 			let walletRef = self.capability!.borrow() ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(self.capability!.address.toString()))
 			walletRef.internal_register(name:name, profile: profile, leases: leases)
@@ -164,18 +167,24 @@ access(all) contract Admin {
 		access(all) fun addAddon(name:String, addon:String){
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
-				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+			}
+
+			if !FIND.validateFindName(name) {
+				panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 			}
 
 			let user = FIND.lookupAddress(name) ?? panic("Cannot find lease owner. Lease : ".concat(name))
-			let ref = getAccount(user).capabilities.get<&FIND.LeaseCollectionPublic>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
+			let ref = getAccount(user).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow reference to lease collection of user : ".concat(name))
 			ref.adminAddAddon(name:name, addon:addon)
 		}
 
 		access(all) fun adminSetMinterPlatform(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
-				FIND.validateFindName(name) : "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters"
+			}
+
+			if !FIND.validateFindName(name) {
+				panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 			}
 
 			FindForge.adminSetMinterPlatform(leaseName: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
@@ -255,13 +264,8 @@ access(all) contract Admin {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
 
-			let privatePath = PrivatePath(identifier: pathIdentifier)!
-			var cap = Admin.account.capabilities.get<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(privatePath)!
-			if !cap.check() {
-				let storagePath = StoragePath(identifier: pathIdentifier)!
-				cap = Admin.account.capabilities.storage.issue<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(storagePath)
-				Admin.account.capabilities.publish(cap, at: privatePath)
-			}
+			let storagePath = StoragePath(identifier: pathIdentifier)!
+			var cap = Admin.account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>(storagePath)!
 			return FindViews.AuthNFTPointer(cap: cap, id: id)
 		}
 
@@ -269,7 +273,7 @@ access(all) contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			return Admin.account.storage.capabilities.get<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(path)!
+			return Admin.account.capabilities.storage.issue<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider}>(path)!
 		}
 
 		access(all) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {

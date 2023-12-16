@@ -36,12 +36,9 @@ access(all) contract FindViews {
 			}
 		}
 
+		// todo: this is not working so we have a workaround in the contract
 		access(all) view fun uri(): String {
-			let media = self.pointer.resolveView(Type<OnChainFile>())
-			if media == nil {
-				return ""
-			}
-			return (media as! OnChainFile).uri()
+			return "data:".concat(self.mediaType).concat(",").concat(self.protocol)
 		}
 	}
 
@@ -115,7 +112,7 @@ access(all) contract FindViews {
 		access(all) let id: UInt64
 		access(all) fun resolveView(_ type: Type) : AnyStruct?
 		access(all) fun getUUID() :UInt64
-		access(all) view fun getViews() : [Type]
+		access(all) fun getViews() : [Type]
 		access(all) fun owner() : Address
 		access(all) fun valid() : Bool
 		access(all) fun getItemType() : Type
@@ -166,7 +163,7 @@ access(all) contract FindViews {
 			return self.uuid
 		}
 
-		access(all) view fun getViews() : [Type]{
+		access(all) fun getViews() : [Type]{
 			return self.getViewResolver().getViews()
 		}
 
@@ -235,13 +232,13 @@ access(all) contract FindViews {
 
 
 	access(all) struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>
+		access(self) let cap: Capability<auth(NonFungibleToken.Withdrawable) &{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>
 		access(all) let id: UInt64
 		access(all) let nounce: UInt64
 		access(all) let uuid: UInt64
 		access(all) let itemType: Type
 
-		init(cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>, id: UInt64) {
+		init(cap: Capability<auth(NonFungibleToken.Withdrawable) &{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 
@@ -269,7 +266,7 @@ access(all) contract FindViews {
 			return self.uuid
 		}
 
-		access(all) view fun getViews() : [Type]{
+		access(all) fun getViews() : [Type]{
 			return self.getViewResolver().getViews()
 		}
 

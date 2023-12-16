@@ -1228,7 +1228,7 @@ pub contract Flowty {
 
             // Listing fee
             // let listingFee <- payment.withdraw(amount: Flowty.ListingFee)
-            // let flowtyFusdReceiver = Flowty.account.borrow<&FUSD.Vault{FungibleToken.Receiver}>(from: Flowty.FusdVaultStoragePath)
+            // let flowtyFusdReceiver = Flowty.account.storage.borrow<&FUSD.Vault{FungibleToken.Receiver}>(from: Flowty.FusdVaultStoragePath)
             //     ?? panic("Missing or mis-typed FUSD Reveiver")
             // flowtyFusdReceiver.deposit(from: <-listingFee)
             destroy payment
@@ -1328,7 +1328,7 @@ pub contract Flowty {
     }
 
     access(account) fun borrowMarketplace(): &Flowty.FlowtyMarketplace {
-        return self.account.borrow<&Flowty.FlowtyMarketplace>(from: Flowty.FlowtyMarketplaceStoragePath)!
+        return self.account.storage.borrow<&Flowty.FlowtyMarketplace>(from: Flowty.FlowtyMarketplaceStoragePath)!
     }
 
     pub fun getRoyalty(nftTypeIdentifier: String): Royalty {

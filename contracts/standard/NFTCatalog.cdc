@@ -207,7 +207,7 @@ access(all) contract NFTCatalog {
         let proposal = self.catalogProposals[proposalID]!
         let proposer = proposal.proposer
 
-        let proposerManagerCap = getAccount(proposer).capabilities.get<&NFTCatalogProposalManager>(NFTCatalog.ProposalManagerPublicPath)
+        let proposerManagerCap = getAccount(proposer).capabilities.get<&NFTCatalogProposalManager>(NFTCatalog.ProposalManagerPublicPath)!
 
         assert(proposerManagerCap.check(), message : "Proposer needs to set up a manager")
 

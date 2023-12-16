@@ -539,7 +539,7 @@ pub contract Bl0xPack: NonFungibleToken {
 
 	access(account) fun fulfill(packId: UInt64, rewardIds:[UInt64], salt:String) {
 
-		let openedPacksCollection = Bl0xPack.account.borrow<&Bl0xPack.Collection>(from: Bl0xPack.OpenedCollectionStoragePath)!
+		let openedPacksCollection = Bl0xPack.account.storage.borrow<&Bl0xPack.Collection>(from: Bl0xPack.OpenedCollectionStoragePath)!
 		let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @Bl0xPack.NFT
 
 		let receiver= pack.getOpenedBy()
@@ -600,7 +600,7 @@ pub contract Bl0xPack: NonFungibleToken {
 	}
 
 	access(account) fun transferToDLQ(_ pack: @NFT) {
-		let dlq = Bl0xPack.account.borrow<&Bl0xPack.Collection>(from: Bl0xPack.DLQCollectionStoragePath)!
+		let dlq = Bl0xPack.account.storage.borrow<&Bl0xPack.Collection>(from: Bl0xPack.DLQCollectionStoragePath)!
 		dlq.deposit(token: <- pack)
 	}
 
