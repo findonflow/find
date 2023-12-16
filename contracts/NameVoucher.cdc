@@ -2,6 +2,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 import FungibleTokenSwitchboard from "./standard/FungibleTokenSwitchboard.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
@@ -27,7 +28,7 @@ access(all) let CollectionPrivatePath: PrivatePath
 access(all) var royalties : [MetadataViews.Royalty]
 access(all) var thumbnail : {MetadataViews.File}
 
-access(all) resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 	access(all) let id:UInt64
 	access(all) var nounce:UInt64
@@ -131,7 +132,7 @@ access(all) resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
 
 	}
 
-access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 	access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -182,10 +183,10 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
 		}
 
-	access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+	access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
 			let vr = nft as! &NFT
-			return vr as &{MetadataViews.Resolver}
+			return vr as &{ViewResolver.Resolver}
 		}
 
 	access(all) fun redeem(id: UInt64, name: String) {

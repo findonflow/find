@@ -1,6 +1,7 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 access(all) contract FindViews {
 
@@ -118,7 +119,7 @@ access(all) contract FindViews {
 		access(all) fun owner() : Address
 		access(all) fun valid() : Bool
 		access(all) fun getItemType() : Type
-		access(all) fun getViewResolver() : &{MetadataViews.Resolver}
+		access(all) fun getViewResolver() : &{ViewResolver.Resolver}
 
 		//There are just convenience functions for shared views in the standard
 		access(all) fun getRoyalty() : MetadataViews.Royalties
@@ -138,12 +139,12 @@ access(all) contract FindViews {
 	}
 
 	access(all) struct ViewReadPointer : Pointer {
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
+		access(self) let cap: Capability<&{ViewResolver.ResolverCollection}>
 		access(all) let id: UInt64
 		access(all) let uuid: UInt64
 		access(all) let itemType: Type
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
+		init(cap: Capability<&{ViewResolver.ResolverCollection}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 
@@ -199,7 +200,7 @@ access(all) contract FindViews {
 			return self.itemType
 		}
 
-		access(all) fun getViewResolver() : &{MetadataViews.Resolver} {
+		access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
 			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
 		}
 
@@ -223,7 +224,7 @@ access(all) contract FindViews {
 	}
 
 
-	access(all) fun getNounce(_ viewResolver: &{MetadataViews.Resolver}) : UInt64 {
+	access(all) fun getNounce(_ viewResolver: &{ViewResolver.Resolver}) : UInt64 {
 		if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
 			if let v = nounce as? FindViews.Nounce {
 				return v.nounce
@@ -234,13 +235,13 @@ access(all) contract FindViews {
 
 
 	access(all) struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+		access(self) let cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
 		access(all) let id: UInt64
 		access(all) let nounce: UInt64
 		access(all) let uuid: UInt64
 		access(all) let itemType: Type
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
+		init(cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 
@@ -256,7 +257,7 @@ access(all) contract FindViews {
 			self.itemType=viewResolver.getType()
 		}
 
-		access(all) fun getViewResolver() : &{MetadataViews.Resolver} {
+		access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
 			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
 		}
 
@@ -344,7 +345,7 @@ access(all) contract FindViews {
 	}
 
 	access(all) fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-		let cap=	getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
+		let cap=	getAccount(address).getCapability<&{ViewResolver.ResolverCollection}>(path)
 		let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
 		return pointer
 	}
@@ -367,7 +368,7 @@ access(all) contract FindViews {
 		}
 	}
 
-	access(all) fun checkSoulBound(_ viewResolver: &{MetadataViews.Resolver}) : Bool {
+	access(all) fun checkSoulBound(_ viewResolver: &{ViewResolver.Resolver}) : Bool {
 		if let soulBound = viewResolver.resolveView(Type<FindViews.SoulBound>()) {
 			if let v = soulBound as? FindViews.SoulBound {
 				return true

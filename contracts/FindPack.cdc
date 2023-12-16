@@ -1104,7 +1104,7 @@ access(all) contract FindPack: NonFungibleToken {
     }
 
     access(all) resource Forge: FindForge.Forge {
-        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
 
             let royalties : [MetadataViews.Royalty] = []
             // there should be no find cut for the pack.

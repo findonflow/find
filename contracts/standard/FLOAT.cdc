@@ -29,6 +29,7 @@
 
 import NonFungibleToken from "./NonFungibleToken.cdc"
 import MetadataViews from "./MetadataViews.cdc"
+import ViewResolver from "./ViewResolver.cdc"
 import GrantedAccountAccess from "./GrantedAccountAccess.cdc"
 import FungibleToken from "./FungibleToken.cdc"
 import FlowToken from "./FlowToken.cdc"
@@ -101,7 +102,7 @@ access(all) contract FLOAT: NonFungibleToken {
     }
 
     // Represents a FLOAT
-    access(all) resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
         // The `uuid` of this resource
         access(all) let id: UInt64
 
@@ -209,7 +210,7 @@ access(all) contract FLOAT: NonFungibleToken {
     access(all) resource interface CollectionPublic {
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
-        access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver}
+        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) fun deposit(token: @NonFungibleToken.NFT)
         access(all) fun getIDs(): [UInt64]
         access(all) fun getAllIDs(): [UInt64]
@@ -218,7 +219,7 @@ access(all) contract FLOAT: NonFungibleToken {
 
     // A Collection that holds all of the users FLOATs.
     // Withdrawing is not allowed. You can only transfer.
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection, CollectionPublic {
+    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection, CollectionPublic {
         // Maps a FLOAT id to the FLOAT itself
         access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
         // Maps an eventId to the ids of FLOATs that
@@ -331,10 +332,10 @@ access(all) contract FLOAT: NonFungibleToken {
             return nil
         }
 
-        access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             let tokenRef = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
             let nftRef = tokenRef as! &NFT
-            return nftRef as &{MetadataViews.Resolver}
+            return nftRef as &{ViewResolver.Resolver}
         }
 
         init() {
@@ -388,7 +389,7 @@ access(all) contract FLOAT: NonFungibleToken {
     //
     // FLOATEvent
     //
-    access(all) resource FLOATEvent: FLOATEventPublic, MetadataViews.Resolver {
+    access(all) resource FLOATEvent: FLOATEventPublic, ViewResolver.Resolver {
         // Whether or not users can claim from our event (can be toggled
         // at any time)
         access(all) var claimable: Bool
@@ -796,7 +797,7 @@ access(all) contract FLOAT: NonFungibleToken {
     }
 
     // A "Collection" of FLOAT Events
-    access(all) resource FLOATEvents: FLOATEventsPublic, MetadataViews.ResolverCollection {
+    access(all) resource FLOATEvents: FLOATEventsPublic, ViewResolver.ResolverCollection {
         // All the FLOAT Events this collection stores
         access(account) var events: @{UInt64: FLOATEvent}
         // All the Groups this collection stores
@@ -969,8 +970,8 @@ access(all) contract FLOAT: NonFungibleToken {
             return answer
         }
 
-        access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
-            return (&self.events[id] as &{MetadataViews.Resolver}?)!
+        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+            return (&self.events[id] as &{ViewResolver.Resolver}?)!
         }
 
         init() {
