@@ -116,7 +116,7 @@ access(all) contract FINDNFTCatalogAdmin {
         let admin    <- create Admin()
 
         self.account.storage.save(<-admin, to: self.AdminStoragePath)
-        let adminCap = self.account.capabilities.issue<&Admin>(self.AdminPrivatePath)
+        let adminCap = self.account.capabilities.storage.issue<&Admin>(self.AdminPrivatePath)
         self.account.capabilities.publish(adminCap, at:self.AdminPrivatePath)
     }
 }

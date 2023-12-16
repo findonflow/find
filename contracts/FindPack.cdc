@@ -406,8 +406,8 @@ access(all) contract FindPack: NonFungibleToken {
             let storagePath = StoragePath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
             let publicPath = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
             FindPack.account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: storagePath)
-            let cap = FindPack.account.capabilites.storage.issue<&FindPack.Collection>(storagePath)
-            FindPack.account.capabilites.publish(cap, at: publicPath)
+            let cap = FindPack.account.capabilities.storage.issue<&FindPack.Collection>(storagePath)
+            FindPack.account.capabilities.publish(cap, at: publicPath)
         }
 
         mappingMetadata[typeId] = metadata
@@ -596,7 +596,7 @@ access(all) contract FindPack: NonFungibleToken {
             let token <- self.withdraw(withdrawID: packId) as! @NFT
 
             let address=token.resetOpenedBy()
-            let cap=getAccount(address).capabilites.get<&Collection>(FindPack.CollectionPublicPath)!
+            let cap=getAccount(address).capabilities.get<&Collection>(FindPack.CollectionPublicPath)!
             let receiver = cap.borrow()!
             receiver.deposit(token: <- token)
             emit Requeued(packId:packId, address: cap.address)
@@ -618,7 +618,7 @@ access(all) contract FindPack: NonFungibleToken {
             token.setOpenedBy(receiverCap)
 
             // establish the receiver for Redeeming FindPack
-            let receiver = FindPack.account.capabilites.get<&{NonFungibleToken.Receiver}>(FindPack.OpenedCollectionPublicPath)!.borrow()!
+            let receiver = FindPack.account.capabilities.get<&{NonFungibleToken.Receiver}>(FindPack.OpenedCollectionPublicPath)!.borrow()!
 
             let typeId=token.getTypeID()
             let packTypeName=token.packTypeName
@@ -710,7 +710,7 @@ access(all) contract FindPack: NonFungibleToken {
                 }
             }
 
-            let wallet = getAccount(FindPack.account.address).capabilites.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+            let wallet = getAccount(FindPack.account.address).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
             if wallet.check() {
                 let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
                 r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * r.cut))
@@ -784,7 +784,7 @@ access(all) contract FindPack: NonFungibleToken {
 
             //TODO: REMOVE THIS
             if !royaltiesPaid {
-                let wallet = getAccount(FindPack.account.address).capabilites.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+                let wallet = getAccount(FindPack.account.address).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
                 if wallet.check() {
                     let r = MetadataViews.Royalty(receiver: wallet, cut: 0.10, description: ".find")
                     r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * r.cut))
@@ -872,7 +872,7 @@ access(all) contract FindPack: NonFungibleToken {
             }
         }
 
-        access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+        access(all) view fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
             let nft =  (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
             let exampleNFT = nft as! &NFT
             return exampleNFT
@@ -1021,7 +1021,7 @@ access(all) contract FindPack: NonFungibleToken {
 
         let pathIdentifier = self.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: packTypeId)
         let path = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
-        return FindPack.account.capabilites.get<&FindPack.Collection>(path)!.borrow() ?? panic("Could not borow FindPack collection for path : ".concat(pathIdentifier))
+        return FindPack.account.capabilities.get<&FindPack.Collection>(path)!.borrow() ?? panic("Could not borow FindPack collection for path : ".concat(pathIdentifier))
     }
 
     // given a path, lookin to the NFT Collection and return a new empty collection
@@ -1100,7 +1100,7 @@ access(all) contract FindPack: NonFungibleToken {
     }
 
     access(all) fun getOwnerCollection() : Capability<&FindPack.Collection> {
-        return FindPack.account.capabilites.get<&FindPack.Collection>(FindPack.CollectionPublicPath)
+        return FindPack.account.capabilities.get<&FindPack.Collection>(FindPack.CollectionPublicPath)
     }
 
     access(all) resource Forge: FindForge.Forge {
@@ -1159,14 +1159,14 @@ access(all) contract FindPack: NonFungibleToken {
         // this contract will hold a Collection that FindPack can be deposited to and Admins can Consume them to transfer nfts to the depositing account
         let openedCollection <- create Collection()
         self.account.save(<- openedCollection, to: self.OpenedCollectionStoragePath)
-        let cap = self.account.capabilites.storage.issue<&Collection>(self.OpenedCollectionStoragePath)
-        self.account.capabilites.publish(cap, at: self.OpenedCollectionPublicPath)
+        let cap = self.account.capabilities.storage.issue<&Collection>(self.OpenedCollectionStoragePath)
+        self.account.capabilities.publish(cap, at: self.OpenedCollectionPublicPath)
 
         //a DLQ storage slot so that the opener can put items that cannot be opened/transferred here.
         let dlqCollection <- create Collection()
         self.account.save(<- dlqCollection, to: self.DLQCollectionStoragePath)
-        let dlqCap = self.account.capabilites.storage.issue<&Collection>(self.DLQCollectionStoragePath)
-        self.account.capabilites.publish(dlqCap, at: self.DLQCollectionPublicPath)
+        let dlqCap = self.account.capabilities.storage.issue<&Collection>(self.DLQCollectionStoragePath)
+        self.account.capabilities.publish(dlqCap, at: self.DLQCollectionPublicPath)
 
         FindForge.addForgeType(<- create Forge())
 

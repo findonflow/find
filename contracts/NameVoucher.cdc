@@ -183,7 +183,7 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
 		}
 
-	access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+	access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
 			let vr = nft as! &NFT
 			return vr as &{ViewResolver.Resolver}

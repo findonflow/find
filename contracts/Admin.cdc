@@ -268,7 +268,7 @@ access(all) contract Admin {
 			pre {
 				self.capability != nil: "Cannot create Admin, capability is not set"
 			}
-			return Admin.account.capabilities.get<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)!
+			return Admin.account.capabilities.storage.get<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)!
 		}
 
 		access(all) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {
@@ -277,7 +277,7 @@ access(all) contract Admin {
 			}
 			let pathIdentifier = FindPack.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
 			let path = PublicPath(identifier: pathIdentifier)!
-			let receiver = Admin.account.capabilities.borrow<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path)! ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(path.toString()))
+			let receiver = Admin.account.capabilities.borrow<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(path) ?? panic("Cannot borrow reference to receiver. receiver address: ".concat(path.toString()))
 			let mintPackData = FindPack.MintPackData(packTypeName: packTypeName, typeId: typeId, hash: hash, verifierRef: FindForge.borrowVerifier())
 			FindForge.adminMint(lease: packTypeName, forgeType: Type<@FindPack.Forge>() , data: mintPackData, receiver: receiver)
 		}
@@ -330,7 +330,7 @@ access(all) contract Admin {
 
 		access(all) fun getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
 			// we hard code it here instead, to avoid importing just for path
-			return Admin.account.capabilities.get<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
+			return Admin.account.capabilities.get<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)!
 		}
 
 		/// ===================================================================================

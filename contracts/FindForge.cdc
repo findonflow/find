@@ -44,7 +44,7 @@ access(all) contract FindForge {
 		}
 
 		access(all) fun getMinterFTReceiver() : Capability<&{FungibleToken.Receiver}> {
-			return getAccount(self.minter).capabilites.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+			return getAccount(self.minter).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		}
 
 		access(all) fun updateExternalURL(_ d: String) {
@@ -125,7 +125,7 @@ access(all) contract FindForge {
 
 		// If they have a premium forge, platform will not take any royalty
 		if lease.checkAddon(addon: "premiumForge") {
-			let receiverCap=FindForge.account.capabilites.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+			let receiverCap=FindForge.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: 0.0, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
 			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
@@ -133,7 +133,7 @@ access(all) contract FindForge {
 		}
 
 		if lease.checkAddon(addon: "forge") {
-			let receiverCap=FindForge.account.capabilites.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+			let receiverCap=FindForge.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 			let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
 			FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
@@ -165,7 +165,7 @@ access(all) contract FindForge {
 		}
 
 		if leaseCollection.checkAddon(name: leaseName, addon: "forge") {
-			let receiverCap=FindForge.account.capabilites.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+			let receiverCap=FindForge.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 			let minterPlatform = MinterPlatform(name:leaseName, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: minterCut ,description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials) 
 
 			FindForge.minterPlatforms[forgeType]!.insert(key: leaseName, minterPlatform)
@@ -270,7 +270,7 @@ access(all) contract FindForge {
 			panic("The minter platform is not set. Please set up properly before adding contract data.")
 		}
 		let address = FIND.lookupAddress(lease) ?? panic("This name is not owned by anyone. Name : ".concat(lease))
-		let leaseCol = getAccount(address).capabilites.get<&{FIND.LeaseCollectionCollectionPublic}>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
+		let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionCollectionPublic}>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
 
 		if !leaseCol.checkAddon(name:lease, addon: "forge") && !leaseCol.checkAddon(name:lease, addon: "premiumForge") {
 			panic("Please purchase forge addon to start forging. Name: ".concat(lease))
@@ -317,7 +317,7 @@ access(all) contract FindForge {
 			panic("The minter platform is not set. Please set up properly before adding contract data.")
 		}
 		let address = FIND.lookupAddress(lease) ?? panic("This name is not owned by anyone. Name : ".concat(lease))
-		let leaseCol = getAccount(address).capabilites.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
+		let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
 
 		if !leaseCol.checkAddon(name:lease, addon: "forge") && !leaseCol.checkAddon(name:lease, addon: "premiumForge") {
 			panic("Please purchase forge addon to start forging. Name: ".concat(lease))
@@ -364,7 +364,7 @@ access(all) contract FindForge {
 		if !FindForge.minterPlatforms.containsKey(forgeType) {
 			FindForge.minterPlatforms[forgeType] = {}
 		}
-		let receiverCap=FindForge.account.capabilites.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=FindForge.account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
 		let minterPlatform = MinterPlatform(name:name, platform:receiverCap, platformPercentCut: FindForge.platformCut, minterCut: nil ,description: "", externalURL: "", squareImage: "", bannerImage: "", socials: {}) 
 		FindForge.minterPlatforms[forgeType]!.insert(key: name, minterPlatform)
 	}

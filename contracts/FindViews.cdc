@@ -62,7 +62,7 @@ access(all) contract FindViews {
         access(all) let receiverType: Type
         access(all) let balanceType: Type
         access(all) let providerType: Type
-        access(all) let createEmptyVault: (fun(): @FungibleToken.Vault)
+        access(all) let createEmptyVault: (fun(): @{FungibleToken.Vault})
 
         init(
             tokenAlias: String,
@@ -235,13 +235,13 @@ access(all) contract FindViews {
 
 
 	access(all) struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+		access(self) let cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>
 		access(all) let id: UInt64
 		access(all) let nounce: UInt64
 		access(all) let uuid: UInt64
 		access(all) let itemType: Type
 
-		init(cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
+		init(cap: Capability<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>, id: UInt64) {
 			self.cap=cap
 			self.id=id
 
@@ -317,14 +317,14 @@ access(all) contract FindViews {
 			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
 		}
 
-		access(all) fun withdraw() :@NonFungibleToken.NFT {
+		access(all) fun withdraw() :@{NonFungibleToken.NFT} {
 			if !self.cap.check() {
 				panic("The pointer capability is invalid.")
 			}
 			return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
 		}
 
-		access(all) fun deposit(_ nft: @NonFungibleToken.NFT){
+		access(all) fun deposit(_ nft: @{NonFungibleToken.NFT}){
             if !self.cap.check(){
                 panic("The pointer capablity is invalid.")
             }

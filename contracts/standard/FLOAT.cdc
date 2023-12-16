@@ -175,7 +175,7 @@ access(all) contract FLOAT: NonFungibleToken {
 
             // Stores a capability to the FLOATEvents of its creator
             self.eventsCap = getAccount(_eventHost)
-                .capabilites.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)
+                .capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)
             
             emit FLOATMinted(
                 id: self.id, 
@@ -210,7 +210,7 @@ access(all) contract FLOAT: NonFungibleToken {
     access(all) resource interface CollectionPublic {
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
-        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) fun deposit(token: @NonFungibleToken.NFT)
         access(all) fun getIDs(): [UInt64]
         access(all) fun getAllIDs(): [UInt64]
@@ -332,7 +332,7 @@ access(all) contract FLOAT: NonFungibleToken {
             return nil
         }
 
-        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             let tokenRef = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
             let nftRef = tokenRef as! &NFT
             return nftRef as &{ViewResolver.Resolver}
@@ -495,7 +495,7 @@ access(all) contract FLOAT: NonFungibleToken {
                     "This serial has not been created yet."
             }
             let data = self.currentHolders[serial]!
-            let collection = getAccount(data.address).capabilites.get(FLOAT.FLOATCollectionPublicPath)!.borrow<&Collection>() 
+            let collection = getAccount(data.address).capabilities.get(FLOAT.FLOATCollectionPublicPath)!.borrow<&Collection>() 
             if collection?.borrowFLOAT(id: data.id) != nil {
                 return data
             }
@@ -686,7 +686,7 @@ access(all) contract FLOAT: NonFungibleToken {
             let paymentType: String = payment.getType().identifier
             let tokenInfo: TokenInfo = self.getPrices()![paymentType]!
 
-            let EventHostVault = getAccount(self.host).capabilites.get(tokenInfo.path)
+            let EventHostVault = getAccount(self.host).capabilities.get(tokenInfo.path)
                                     .borrow<&{FungibleToken.Receiver}>()
                                     ?? panic("Could not borrow the &{FungibleToken.Receiver} from the event host.")
 
@@ -695,7 +695,7 @@ access(all) contract FLOAT: NonFungibleToken {
                 message: "The event host's path is not associated with the intended token."
             )
             
-            let EmeraldCityVault = getAccount(emeraldCityTreasury).capabilites.get(tokenInfo.path)
+            let EmeraldCityVault = getAccount(emeraldCityTreasury).capabilities.get(tokenInfo.path)
                                     .borrow<&{FungibleToken.Receiver}>() 
                                     ?? panic("Could not borrow the &{FungibleToken.Receiver} from Emerald City's Vault.")
 
@@ -919,14 +919,14 @@ access(all) contract FLOAT: NonFungibleToken {
         // in the GrantedAccountAccess.cdc contract, you can get a reference
         // to their FLOATEvents here and do pretty much whatever you want.
         access(all) fun borrowSharedRef(fromHost: Address): &FLOATEvents {
-            let sharedInfo = getAccount(fromHost).capabilites.get(GrantedAccountAccess.InfoPublicPath)!
+            let sharedInfo = getAccount(fromHost).capabilities.get(GrantedAccountAccess.InfoPublicPath)!
                                 .borrow<&GrantedAccountAccess.Info>() 
                                 ?? panic("Cannot borrow the InfoPublic from the host")
             assert(
                 sharedInfo.isAllowed(account: self.owner!.address),
                 message: "This account owner does not share their account with you."
             )
-            let otherFLOATEvents = getAccount(fromHost).capabilites.get(FLOAT.FLOATEventsPublicPath)!
+            let otherFLOATEvents = getAccount(fromHost).capabilities.get(FLOAT.FLOATEventsPublicPath)!
                                     .borrow<&FLOATEvents>()
                                     ?? panic("Could not borrow the public FLOATEvents.")
             return otherFLOATEvents.borrowEventsRef()
@@ -970,7 +970,7 @@ access(all) contract FLOAT: NonFungibleToken {
             return answer
         }
 
-        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             return (&self.events[id] as &{ViewResolver.Resolver}?)!
         }
 

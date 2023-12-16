@@ -1,6 +1,7 @@
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 import FIND from "./FIND.cdc"
 import FindUtils from "./FindUtils.cdc"
 
@@ -22,7 +23,7 @@ access(all) contract FindForgeOrder {
 	// contractName : Resource UUID
 	access(all) let contractNames : {String : UInt64}
 	
-	access(all) resource Order: MetadataViews.Resolver {
+	access(all) resource Order: ViewResolver.Resolver {
 		access(all) let id: UInt64
 		access(all) let leaseName: String 
 		access(all) let mintType: String 
@@ -69,9 +70,9 @@ access(all) contract FindForgeOrder {
 			//		storagePath: NFGv3.CollectionStoragePath,
 			//		publicPath: NFGv3.CollectionPublicPath,
 			//		providerPath: NFGv3.CollectionPrivatePath,
-			//		publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-			//		publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-			//		providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+			//		publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+			//		publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+			//		providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
 			//		createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
 			//			return <-NFGv3.createEmptyCollection()
 			//		})
@@ -83,7 +84,7 @@ access(all) contract FindForgeOrder {
 		}
 	}
 
-	access(all) resource Collection : MetadataViews.ResolverCollection {
+	access(all) resource Collection : ViewResolver.ResolverCollection {
 		access(all) let orders: @{UInt64: FindForgeOrder.Order}
 
 		init () {
@@ -123,9 +124,9 @@ access(all) contract FindForgeOrder {
 			return &self.orders[id] as &{FindForgeOrder.Order}?
 		}
 
-		access(all) fun borrowViewResolver(id: UInt64): &{MetadataViews.Resolver} {
+		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			let nft = &self.orders[id] as &{FindForgeOrder.Order}?
-			return nft! as &{MetadataViews.Resolver}
+			return nft! as &{ViewResolver.Resolver}
 		}
 
 	}
@@ -212,16 +213,16 @@ access(all) contract FindForgeOrder {
 		self.account.save(<-queuedCollection, to: self.QueuedCollectionStoragePath)
 
 		// create a public capability for the collection
-		let cap = self.account.capabilites.issue<&{FindForgeOrder.Collection}>(self.QueuedCollectionStoragePath)
-		self.account.capabilites.publish(cap, at: self.QueuedCollectionPublicPath)
+		let cap = self.account.capabilities.storage.issue<&{FindForgeOrder.Collection}>(self.QueuedCollectionStoragePath)
+		self.account.capabilities.publish(cap, at: self.QueuedCollectionPublicPath)
 
 		// Create a Collection resource and save it to storage
 		let completedCollection <- create Collection()
 		self.account.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
 
 		// create a public capability for the collection
-		let cap2 = self.account.capabilites.issue<&{FindForgeOrder.Collection}>(self.CompletedCollectionStoragePath)
-		self.account.capabilites.publish(cap2, at: self.CompletedCollectionPublicPath)
+		let cap2 = self.account.capabilities.storage.issue<&{FindForgeOrder.Collection}>(self.CompletedCollectionStoragePath)
+		self.account.capabilities.publish(cap2, at: self.CompletedCollectionPublicPath)
 	}
 }
 
