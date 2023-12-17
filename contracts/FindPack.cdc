@@ -817,18 +817,39 @@ access(all) contract FindPack {
             return <-nft
         }
 
-        // withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+        access(all) fun getSupportedNFTTypes() : [Type] {
+            return [
+            Type<@FindPack.NFT>()
+            ]
         }
 
-        /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdrawable) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(all) fun isSupportedNFTType(_ type: Type) : Bool {
+            return type == Type<@FindPack.NFT>()
         }
 
-        /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdrawable) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- (create Collection() as @{NonFungibleToken.Collection})
+        }
+
+        access(NonFungibleToken.Withdrawable) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+            let token <- self.ownedNFTs.remove(key: id) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            receiver.borrow().deposit(token: <-nft)
+
+            return true
+        }
+
+        access(all) view fun getLength() : Int {
+            return self.ownedNFTs.length
+        }
+
+        access(all) view fun getIDsWithTypes() : [{UInt64 : Type}] {
+            let ids : [{UInt64 : Type}] = []
+            return ids
         }
 
         // deposit
