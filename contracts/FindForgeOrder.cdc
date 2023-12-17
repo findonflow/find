@@ -22,8 +22,17 @@ access(all) contract FindForgeOrder {
 	access(all) let mintTypes : [String]
 	// contractName : Resource UUID
 	access(all) let contractNames : {String : UInt64}
+
+	access(all) resource interface Order:  ViewResolver.Resolver {
+		access(all) fun getID(): UInt64
+		access(all) fun getLeaseName(): String
+		access(all) fun getMintType(): String
+		access(all) fun getContractName(): String
+		access(all) fun getMinterCut(): UFix64?
+		access(all) fun getCollectionDisplay(): MetadataViews.NFTCollectionDisplay
+	}
 	
-	access(all) resource Order: ViewResolver.Resolver {
+	access(all) resource OrderResource: Order {
 		access(all) let id: UInt64
 		access(all) let leaseName: String 
 		access(all) let mintType: String 
@@ -82,10 +91,37 @@ access(all) contract FindForgeOrder {
 			}
 			return nil
 		}
+
+		access(all) fun getID(): UInt64 {
+			return self.id
+		}
+		access(all) fun getLeaseName(): String {
+			return self.leaseName
+		}
+		access(all) fun getMintType(): String {
+			return self.mintType
+		}
+		access(all) fun getContractName(): String {
+			return self.contractName
+		}
+		access(all) fun getMinterCut(): UFix64? {
+			return self.minterCut
+		}
+		access(all) fun getCollectionDisplay(): MetadataViews.NFTCollectionDisplay {
+			return self.collectionDisplay
+		}
 	}
 
-	access(all) resource Collection : ViewResolver.ResolverCollection {
-		access(all) let orders: @{UInt64: FindForgeOrder.Order}
+	access(all) resource interface OrderCollection {
+		access(all) fun borrow(_ id: UInt64): &{FindForgeOrder.Order}?
+		access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
+		access(all) view fun getIDs(): [UInt64]
+		access(all) fun withdraw(withdrawID: UInt64): @{FindForgeOrder.Order}
+		access(all) fun deposit(token: @{FindForgeOrder.Order})
+	}
+
+	access(all) resource Collection : OrderCollection, ViewResolver.ResolverCollection {
+		access(all) let orders: @{UInt64: {FindForgeOrder.Order}}
 
 		init () {
 			self.orders <- {}
@@ -96,21 +132,21 @@ access(all) contract FindForgeOrder {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(all) fun withdraw(withdrawID: UInt64): @FindForgeOrder.Order {
+		access(all) fun withdraw(withdrawID: UInt64): @{FindForgeOrder.Order} {
 			let token <- self.orders.remove(key: withdrawID) ?? panic("missing Order : ".concat(withdrawID.toString()))
 
-			emit Withdraw(id: token.id, from: self.owner?.address)
+			emit Withdraw(id: token.getID(), from: self.owner?.address)
 
 			return <-token
 		}
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-		access(all) fun deposit(token: @FindForgeOrder.Order) {
+		access(all) fun deposit(token: @{FindForgeOrder.Order}) {
 
-			emit Deposit(id: token.id, to: self.owner?.address)
+			emit Deposit(id: token.getID(), to: self.owner?.address)
 
-			self.orders[token.id] <-! token
+			self.orders[token.getID()] <-! token
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
@@ -120,12 +156,12 @@ access(all) contract FindForgeOrder {
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		access(all) fun borrow(_ id: UInt64): &FindForgeOrder.Order {
+		access(all) fun borrow(_ id: UInt64): &{FindForgeOrder.Order}? {
 			return &self.orders[id] as &{FindForgeOrder.Order}?
 		}
 
 		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-			let nft = &self.orders[id] as &{FindForgeOrder.Order}?
+			let nft = &self.orders[id] as &{ViewResolver.Resolver}?
 			return nft! as &{ViewResolver.Resolver}
 		}
 
@@ -133,7 +169,7 @@ access(all) contract FindForgeOrder {
 
 	access(account) fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
 
-		let order <- create FindForgeOrder.Order(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+		let order <- create FindForgeOrder.OrderResource(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
 		let c = collectionDisplay
 		let s : {String : String} = {}
 		for social in c.socials.keys {
@@ -150,31 +186,31 @@ access(all) contract FindForgeOrder {
 		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
 		let queuedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
 		let order <- queuedCol.withdraw(withdrawID: id) 
-		let c = order.collectionDisplay
+		let c = order.getCollectionDisplay()
 		let s : {String : String} = {}
 		for social in c.socials.keys {
 			s[social] = c.socials[social]!.url
 		} 
-		emit ForgeOrderCancelled(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
+		emit ForgeOrderCancelled(lease: order.getLeaseName(), mintType: order.getMintType(), collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
 		destroy order
 	}
 
-	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
+	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &{FindForgeOrder.Order} {
 		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
 
 		let queuedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
 		let order <- queuedCol.withdraw(withdrawID: id) 
-		let c = order.collectionDisplay
+		let c = order.getCollectionDisplay()
 		let s : {String : String} = {}
 		for social in c.socials.keys {
 			s[social] = c.socials[social]!.url
 		} 
-		emit ForgeOrderCompleted(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
+		emit ForgeOrderCompleted(lease: order.getLeaseName(), mintType: order.getMintType(), collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
 
 		let completedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
 		completedCol.deposit(token: <- order)
 		let ref = completedCol.borrow(id)
-		return ref
+		return ref!
 	}
 
 	access(account) fun addMintType(_ mintType: String) {
@@ -193,7 +229,7 @@ access(all) contract FindForgeOrder {
 
 
 	// public function that anyone can call to create a new empty collection
-	access(all) fun createEmptyCollection(): @FindForgeOrder.Collection {
+	access(all) fun createEmptyCollection(): @{FindForgeOrder.OrderCollection} {
 		return <- create Collection()
 	}
 
@@ -210,18 +246,18 @@ access(all) contract FindForgeOrder {
 
 		// Create a Collection resource and save it to storage
 		let queuedCollection <- create Collection()
-		self.account.save(<-queuedCollection, to: self.QueuedCollectionStoragePath)
+		self.account.storage.save(<-queuedCollection, to: self.QueuedCollectionStoragePath)
 
 		// create a public capability for the collection
-		let cap = self.account.capabilities.storage.issue<&{FindForgeOrder.Collection}>(self.QueuedCollectionStoragePath)
+		let cap = self.account.capabilities.storage.issue<&{FindForgeOrder.OrderCollection}>(self.QueuedCollectionStoragePath)
 		self.account.capabilities.publish(cap, at: self.QueuedCollectionPublicPath)
 
 		// Create a Collection resource and save it to storage
 		let completedCollection <- create Collection()
-		self.account.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
+		self.account.storage.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
 
 		// create a public capability for the collection
-		let cap2 = self.account.capabilities.storage.issue<&{FindForgeOrder.Collection}>(self.CompletedCollectionStoragePath)
+		let cap2 = self.account.capabilities.storage.issue<&{FindForgeOrder.OrderCollection}>(self.CompletedCollectionStoragePath)
 		self.account.capabilities.publish(cap2, at: self.CompletedCollectionPublicPath)
 	}
 }
