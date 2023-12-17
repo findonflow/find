@@ -184,9 +184,9 @@ pub contract Bl0x: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: Bl0x.CollectionStoragePath,
 				publicPath: Bl0x.CollectionPublicPath,
 				providerPath: Bl0x.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicCollection: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicLinkedType: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Bl0x.createEmptyCollection()})
 
 			case Type<MetadataViews.Rarity>(): 
@@ -272,7 +272,7 @@ pub contract Bl0x: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -434,11 +434,11 @@ pub contract Bl0x: NonFungibleToken {
 			self.CollectionPrivatePath = /private/bl0xNFTs
 
 			self.account.save<@NonFungibleToken.Collection>(<- Bl0x.createEmptyCollection(), to: Bl0x.CollectionStoragePath)
-			self.account.link<&Bl0x.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			self.account.link<&Bl0x.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				Bl0x.CollectionPublicPath,
 				target: Bl0x.CollectionStoragePath
 			)
-			self.account.link<&Bl0x.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			self.account.link<&Bl0x.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				Bl0x.CollectionPrivatePath,
 				target: Bl0x.CollectionStoragePath
 			)

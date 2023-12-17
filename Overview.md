@@ -669,7 +669,7 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 
 		// getProvider private capability of the selling NFT
-		var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(${NFT_Provider_Private_Path})
+		var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(${NFT_Provider_Private_Path})
 
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 		self.vaultType= Type<@FlowToken.Vault>()

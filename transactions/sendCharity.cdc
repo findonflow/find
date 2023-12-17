@@ -6,12 +6,12 @@ transaction(
 	id: UInt64,
 	recipient: Address
 ) {
-	let receiverCap: Capability<&{NonFungibleToken.CollectionPublic}>
+	let receiverCap: Capability<&{NonFungibleToken.Collection}>
 	let charityCollection: &NonFungibleToken.Collection
 
 	prepare(account: AuthAccount) {
 		self.charityCollection =account.borrow<&NonFungibleToken.Collection>(from: CharityNFT.CollectionStoragePath)!
-		self.receiverCap= getAccount(recipient).getCapability<&{NonFungibleToken.CollectionPublic}>(CharityNFT.CollectionPublicPath)
+		self.receiverCap= getAccount(recipient).getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 	}
 
 	pre{

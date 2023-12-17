@@ -76,7 +76,7 @@ pub contract FindLostAndFoundWrapper {
             }
         }
 
-        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.CollectionPublic}>(collectionPublicPath)
+        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Collection}>(collectionPublicPath)
         if collectionPublicCap.check() {
             // If the receiver has sufficient storage, then subsidize it
             var readyToSend = true
@@ -134,7 +134,7 @@ pub contract FindLostAndFoundWrapper {
         let metadataViewsCap = getAccount(receiverAddress).getCapability<&{ViewResolver.ResolverCollection}>(collectionPublicPath)
 
         let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
-        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.CollectionPublic}>(collectionPublicPath)
+        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Collection}>(collectionPublicPath)
 
         if !receiverCap.check() && !collectionPublicCap.check() {
             emit TicketRedeemFailed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier, remark: "invalid capability")

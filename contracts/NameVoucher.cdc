@@ -9,7 +9,7 @@ import FIND from "./FIND.cdc"
 import FindViews from "./FindViews.cdc"
 // import FindAirdropper from "./FindAirdropper.cdc"
 
-access(all) contract NameVoucher: NonFungibleToken {
+access(all) contract NameVoucher {
 
 access(all) var totalSupply: UInt64
 
@@ -28,7 +28,7 @@ access(all) let CollectionPrivatePath: PrivatePath
 access(all) var royalties : [MetadataViews.Royalty]
 access(all) var thumbnail : {MetadataViews.File}
 
-access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 
 	access(all) let id:UInt64
 	access(all) var nounce:UInt64
@@ -132,17 +132,17 @@ access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 	}
 
-access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-	access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
 		init () {
 			self.ownedNFTs <- {}
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-	access(Withdrawable) fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -152,7 +152,7 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-	access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
+		access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
 			let token <- token as! @NFT
 
 			let id: UInt64 = token.id
@@ -167,29 +167,36 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 
 			destroy oldToken
 		}
+	
+		access(NonFungibleToken.Withdrawable) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+				let token <- self.ownedNFTs.remove(key: id) ?? panic("missing NFT")
+				let receiver = receiver as! &{NonFungibleToken.Receiver}
+				receiver.deposit(token: <-token)
+				return true
+		}
 
 		// getIDs returns an array of the IDs that are in the collection
-	access(all) view fun getIDs(): [UInt64] {
+		access(all) view fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
-	access(all) fun contains(_ id: UInt64) : Bool {
+		access(all) fun contains(_ id: UInt64) : Bool {
 			return self.ownedNFTs.containsKey(id)
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-	access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		access(all) view fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT} {
 			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
 		}
 
-	access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
 			let vr = nft as! &NFT
 			return vr as &{ViewResolver.Resolver}
 		}
 
-	access(all) fun redeem(id: UInt64, name: String) {
+		access(all) fun redeem(id: UInt64, name: String) {
 			let nft <- self.ownedNFTs.remove(key: id) ?? panic("Cannot find voucher with ID ".concat(id.toString()))
 			let typedNFT <- nft as! @NameVoucher.NFT
 			let nameLength = UInt64(name.length)
@@ -200,13 +207,13 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 			destroy typedNFT
 
 			// get All the paths here for registration
-			let network = NameVoucher.storage.borrow<&FIND.Network>(from: FIND.NetworkStoragePath) ?? panic("Cannot borrow find network for registration")
+			let network = NameVoucher.account.storage.borrow<&FIND.Network>(from: FIND.NetworkStoragePath) ?? panic("Cannot borrow find network for registration")
 			let status = FIND.status(name)
 
 			// If the lease is free, we register it
 			if status.status == FIND.LeaseStatus.FREE {
 				let profile = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
-				let lease = self.owner!.capabilities.get<&{FIND.LeaseCollection}>(FIND.LeasePublicPath)!
+				let lease = self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
 				network.internal_register(name: name, profile: profile,  leases: lease)
 				emit Redeemed(id: id, address: self.owner?.address, minCharLength: minLength, findName: name, action: "register")
 				return
@@ -225,11 +232,33 @@ access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Rec
 		destroy() {
 			destroy self.ownedNFTs
 		}
-	}
 
-	// public function that anyone can call to create a new empty collection
-access(all) fun createEmptyCollection(): @NonFungibleToken.Collection {
-		return <- create Collection()
+		// public function that anyone can call to create a new empty collection
+		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+			return <- create Collection()
+		}
+
+		access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+			let supportedTypes: {Type: Bool} = {}
+            return supportedTypes
+        }
+
+        /// Returns whether or not the given type is accepted by the collection
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            return type == Type<@NameVoucher.NFT>()
+        }
+
+		/// Gets the amount of NFTs stored in the collection
+        access(all) view fun getLength(): Int {
+			return self.ownedNFTs.length
+		}
+
+        /// getIDsWithTypes returns a list of IDs that are in the collection, keyed by type
+        /// Should only be used by collections that can store multiple NFT types
+        access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
+			let ids: {Type: [UInt64]} = {}
+			return ids
+		}
 	}
 
 	// Internal mint NFT is used inside the contract as a helper function
@@ -248,7 +277,7 @@ access(all) fun createEmptyCollection(): @NonFungibleToken.Collection {
 			minCharLength: minCharLength
 		)
 
-		let id = newNFT.id
+		let id = newNFT.getID()
 		recipient.deposit(token: <-newNFT)
 		emit Minted(id: id, address: recipient.owner!.address, minCharLength: minCharLength)
 		return id

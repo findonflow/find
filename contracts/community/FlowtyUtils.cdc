@@ -63,7 +63,7 @@ pub contract FlowtyUtils {
         }
     }
 
-    access(account) fun trySendNFT(nft: @NonFungibleToken.NFT, receiver: Capability<&{NonFungibleToken.CollectionPublic}>) {
+    access(account) fun trySendNFT(nft: @NonFungibleToken.NFT, receiver: Capability<&{NonFungibleToken.Collection}>) {
         let redeemer = receiver.address
         if !receiver.check() {
             let valet = CoatCheck.getValet()

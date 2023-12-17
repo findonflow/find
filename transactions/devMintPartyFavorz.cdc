@@ -10,14 +10,14 @@ import FindForge from "../contracts/FindForge.cdc"
 transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String, season: UInt64, royaltyReceivers: [Address], royaltyCuts: [UFix64], royaltyDescs: [String], squareImage: String, bannerImage: String) {
 	prepare(account: AuthAccount) {
 
-		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(PartyFavorz.CollectionPublicPath)
+		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(PartyFavorz.CollectionPublicPath)
 		if !collectionCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
-			account.link<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&PartyFavorz.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				PartyFavorz.CollectionPublicPath,
 				target: PartyFavorz.CollectionStoragePath
 			)
-			account.link<&PartyFavorz.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&PartyFavorz.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				PartyFavorz.CollectionPrivatePath,
 				target: PartyFavorz.CollectionStoragePath
 			)

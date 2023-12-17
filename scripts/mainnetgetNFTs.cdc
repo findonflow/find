@@ -299,7 +299,7 @@ pub fun	getVersus(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 pub fun	getGoober(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
-	let goobersCap = owner.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
+	let goobersCap = owner.getCapability<&GooberXContract.Collection{NonFungibleToken.Collection, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 	if !goobersCap.check() {
 		return nil
 	}
@@ -635,7 +635,7 @@ pub fun	getMatrixWorldFlowFest(owner:PublicAccount, id:UInt64) : MetadataCollect
 
 pub fun	getMatrixWorldAssets(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
-	let matrixworldAsset = owner.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+	let matrixworldAsset = owner.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.Collection}>(MatrixWorldAssetsNFT.collectionPublicPath)
 	if !matrixworldAsset.check() {
 		return nil
 	}
@@ -726,7 +726,7 @@ pub fun	getEvolution(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 }
 
 pub fun	getGeniace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
-	let geniaceCap = owner.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+	let geniaceCap = owner.getCapability<&GeniaceNFT.Collection{NonFungibleToken.Collection, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if !geniaceCap.check() {
 		return nil
 	}
@@ -1041,7 +1041,7 @@ pub fun	getNecryptolis(owner:PublicAccount, id:UInt64) : MetadataCollectionItem?
 }
 
 pub fun	getFlowverseSocks(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
-	let raribleCap = owner.getCapability<&{NonFungibleToken.CollectionPublic}>(RaribleNFT.collectionPublicPath)
+	let raribleCap = owner.getCapability<&{NonFungibleToken.Collection}>(RaribleNFT.collectionPublicPath)
 	if !raribleCap.check() {
 		return nil
 	}

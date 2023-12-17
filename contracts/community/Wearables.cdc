@@ -496,9 +496,9 @@ pub contract Wearables: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: Wearables.CollectionStoragePath,
 				publicPath: Wearables.CollectionPublicPath,
 				providerPath: Wearables.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicCollection: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicLinkedType: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Wearables.createEmptyCollection()})
 
 			case Type<MetadataViews.Editions>() :
@@ -631,7 +631,7 @@ pub contract Wearables: NonFungibleToken {
 
 
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection  {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection  {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -884,11 +884,11 @@ pub contract Wearables: NonFungibleToken {
 		self.CollectionPrivatePath = /private/wearables
 
 		self.account.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
-		self.account.link<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+		self.account.link<&Wearables.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPublicPath,
 			target: Wearables.CollectionStoragePath
 		)
-		self.account.link<&Wearables.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+		self.account.link<&Wearables.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPrivatePath,
 			target: Wearables.CollectionStoragePath
 		)

@@ -49,7 +49,7 @@ pub contract FindAirdropper {
             receiverCap.borrow()!.deposit(token: <- item)
             return
         } else {
-            let collectionPublicCap = getAccount(receiver).getCapability<&{NonFungibleToken.CollectionPublic}>(path)
+            let collectionPublicCap = getAccount(receiver).getCapability<&{NonFungibleToken.Collection}>(path)
             if collectionPublicCap.check() {
 
                 let from = pointer.owner()

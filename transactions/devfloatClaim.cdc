@@ -16,7 +16,7 @@
           // SETUP COLLECTION
           if acct.borrow<&FLOAT.Collection>(from: FLOAT.FLOATCollectionStoragePath) == nil {
               acct.save(<- FLOAT.createEmptyCollection(), to: FLOAT.FLOATCollectionStoragePath)
-              acct.link<&FLOAT.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection, FLOAT.CollectionPublic}>
+              acct.link<&FLOAT.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, FLOAT.CollectionPublic}>
                       (FLOAT.FLOATCollectionPublicPath, target: FLOAT.FLOATCollectionStoragePath)
           }
       

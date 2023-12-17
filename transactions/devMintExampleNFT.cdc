@@ -11,14 +11,14 @@ import FindForge from "../contracts/FindForge.cdc"
 transaction(name: String, artist:String, nftName:String, nftDescription:String, traits: [UInt64], nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
 	prepare(account: AuthAccount) {
 
-		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
+		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !collectionCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPublicPath,
 				target: ExampleNFT.CollectionStoragePath
 			)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPrivatePath,
 				target: ExampleNFT.CollectionStoragePath
 			)

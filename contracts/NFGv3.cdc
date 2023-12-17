@@ -125,9 +125,9 @@ pub contract NFGv3: NonFungibleToken {
                     storagePath: NFGv3.CollectionStoragePath,
                     publicPath: NFGv3.CollectionPublicPath,
                     providerPath: NFGv3.CollectionPrivatePath,
-                    publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+                    publicCollection: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-NFGv3.createEmptyCollection()
                     })
@@ -165,7 +165,7 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -270,7 +270,7 @@ pub contract NFGv3: NonFungibleToken {
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        self.account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
+        self.account.link<&NFGv3.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath
         )

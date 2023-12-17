@@ -293,8 +293,8 @@ pub contract FlowtyRentals {
         pub fun rent(
             payment: @FungibleToken.Vault,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
-            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider}>?
+            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
         )
 
         pub fun getDetails(): ListingDetails
@@ -326,10 +326,10 @@ pub contract FlowtyRentals {
         // This capability allows the resource to withdraw *any* NFT, so you should be careful when giving
         // such a capability to a resource and always check its code to make sure it will use it in the
         // way that it claims.
-        access(contract) let nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+        access(contract) let nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
         // A capability allowing this resource to access the owner's NFT public collection
-        access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // reference to the owner's fungibleTokenReceiver to pay them in the event of a settlement.
         access(contract) let ownerFungibleTokenReceiver: Capability<&AnyResource{FungibleToken.Receiver}>
@@ -366,8 +366,8 @@ pub contract FlowtyRentals {
         pub fun rent(
             payment: @FungibleToken.Vault,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
-            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider}>?
+            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
         ) {
             pre {
                 self.isRentingEnabled(): "Renting is not enabled or this listing has expired"
@@ -497,8 +497,8 @@ pub contract FlowtyRentals {
         }
 
         init (
-            nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&AnyResource{FungibleToken.Receiver}>,
             nftType: Type,
             nftID: UInt64,
@@ -644,7 +644,7 @@ pub contract FlowtyRentals {
         access(contract) var depositedFungibleTokens: @FungibleToken.Vault?
 
         // reference to the original owner of the nft which was rented
-        access(contract) let ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.Collection}>
         // reference to pay the original owner in the event that the rented NFT is not returned
         access(contract) let ownerFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>
 
@@ -652,10 +652,10 @@ pub contract FlowtyRentals {
         access(contract) let renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>
 
         // Capability used to transfer the rented nft to our renter
-        access(contract) let renterNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // optional capability to automatically return the asset on settlement
-        access(contract) let renterNFTProvider: Capability<&AnyResource{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider}>?
+        access(contract) let renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
 
         init (
             // Rental details
@@ -668,12 +668,12 @@ pub contract FlowtyRentals {
             listingDetails: ListingDetails,
 
             // Rental resource
-            ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.Collection}>,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             ownerFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             depositedFungibleTokens: @FungibleToken.Vault?,
-            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider}>?
+            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
         ) {
             self.ownerNFTCollectionPublic = ownerNFTCollectionPublic
             self.renterFungibleTokenReceiver = renterFungibleTokenReceiver
@@ -871,12 +871,12 @@ pub contract FlowtyRentals {
             paymentVaultType: Type,
             term: UFix64,
             listingDetails: ListingDetails,
-            ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             depositedFungibleTokens: @FungibleToken.Vault?,
-            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider}>?
+            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
         ): UInt64
         // removeRental
         // Allows the FlowtyRentalsMarketplace owner to remove any rental resource.
@@ -903,12 +903,12 @@ pub contract FlowtyRentals {
             paymentVaultType: Type,
             term: UFix64,
             listingDetails: ListingDetails,
-            ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollectionPublic: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             depositedFungibleTokens: @FungibleToken.Vault?,
-            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider}>?
+            renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
          ): UInt64 {
             let renter = renterFungibleTokenReceiver.address
             let owner = ownerNFTCollectionPublic.address
@@ -988,8 +988,8 @@ pub contract FlowtyRentals {
 
     pub resource interface FlowtyRentalsStorefrontManager {
         pub fun createListing(
-            nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&AnyResource{FungibleToken.Receiver}>,
             nftType: Type,
             nftID: UInt64,
@@ -1019,8 +1019,8 @@ pub contract FlowtyRentals {
        // create a new listing. Takes in a provider to withdraw the listed nft, and details
        // about the terms of the rental and ways to send out payment
        pub fun createListing(
-            nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&AnyResource{FungibleToken.Receiver}>,
             nftType: Type,
             nftID: UInt64,

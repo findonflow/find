@@ -12,14 +12,14 @@ transaction(name: String, data: [AnyStruct], receivers: [String]) {
 
     prepare(account: AuthAccount){
 
-		let nftCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(FindFooDIM.CollectionPublicPath)
+		let nftCap= account.getCapability<&{NonFungibleToken.Collection}>(FindFooDIM.CollectionPublicPath)
 		if !nftCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- FindFooDIM.createEmptyCollection(), to: FindFooDIM.CollectionStoragePath)
-			account.link<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&FindFooDIM.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindFooDIM.CollectionPublicPath,
 				target: FindFooDIM.CollectionStoragePath
 			)
-			account.link<&FindFooDIM.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&FindFooDIM.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindFooDIM.CollectionPrivatePath,
 				target: FindFooDIM.CollectionStoragePath
 			)

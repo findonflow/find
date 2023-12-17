@@ -11,11 +11,11 @@ transaction(user: String,
         traits: [UInt64]
 		) {
 	let address : Address
-	let cap : Capability<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic}>
+	let cap : Capability<&ExampleNFT.Collection{NonFungibleToken.Collection}>
 
 	prepare(account: AuthAccount) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
-		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
+		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 	}
 
 	pre{

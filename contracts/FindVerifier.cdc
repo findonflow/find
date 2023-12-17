@@ -150,7 +150,7 @@ access(all) contract FindVerifier {
 
 			let user : Address = param["address"]! as! Address 
 
-			let cap = getAccount(user).capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)!
+			let cap = getAccount(user).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
 			if !cap.check() {
 				return false
 			}
@@ -198,7 +198,7 @@ access(all) contract FindVerifier {
 
 			let user : Address = param["address"]! as! Address 
 
-			let cap = getAccount(user).capabilities.get<&{NonFungibleToken.CollectionPublic}>(self.path)!
+			let cap = getAccount(user).capabilities.get<&{NonFungibleToken.Collection}>(self.path)!
 			if !cap.check() {
 				let mvCap = getAccount(user).capabilities.get<&{ViewResolver.ResolverCollection}>(self.path)!
 				if !mvCap.check() {

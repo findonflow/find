@@ -11,12 +11,12 @@ transaction(
 	description: String,
 	recipient: Address
 ) {
-	let receiverCap: Capability<&{NonFungibleToken.CollectionPublic}>
+	let receiverCap: Capability<&{NonFungibleToken.Collection}>
 	let client: &Admin.AdminProxy
 
 	prepare(account: AuthAccount) {
 		self.client= account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
-		self.receiverCap= getAccount(recipient).getCapability<&{NonFungibleToken.CollectionPublic}>(CharityNFT.CollectionPublicPath)
+		self.receiverCap= getAccount(recipient).getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 	}
 
 	execute {

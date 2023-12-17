@@ -4,14 +4,14 @@ import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 
 transaction() {
 	prepare(account: AuthAccount) {
-		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
+		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !dandyCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Collection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPublicPath,
 				target: ExampleNFT.CollectionStoragePath
 			)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPrivatePath,
 				target: ExampleNFT.CollectionStoragePath
 			)

@@ -11,7 +11,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 	prepare(account: AuthAccount) {
 
 		let dancyReceiver =getAccount(to)
-		let dandyCap= dancyReceiver.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		let dandyCap= dancyReceiver.getCapability<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 		if !dandyCap.check() {
 			panic("need dandy receicer")
 		}

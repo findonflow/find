@@ -64,14 +64,14 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 				if let st = account.borrow<&TopShot.Collection>(from: cd.storagePath) {
 					// here means the topShot is not linked in the way it should be. We can relink that for our use
 					account.unlink(cd.publicPath)
-					account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+					account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
 				} else {
 					panic("This collection public link is not set up properly.")
 				}
 			} else {
 				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+				account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 			}
 		}
 

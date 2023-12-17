@@ -70,9 +70,9 @@ access(all) contract FindForgeOrder {
 			//		storagePath: NFGv3.CollectionStoragePath,
 			//		publicPath: NFGv3.CollectionPublicPath,
 			//		providerPath: NFGv3.CollectionPrivatePath,
-			//		publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-			//		publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-			//		providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+			//		publicCollection: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+			//		publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+			//		providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
 			//		createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
 			//			return <-NFGv3.createEmptyCollection()
 			//		})

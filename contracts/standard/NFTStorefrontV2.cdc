@@ -260,7 +260,7 @@ pub contract NFTStorefrontV2 {
         /// This capability allows the resource to withdraw *any* NFT, so you should be careful when giving
         /// such a capability to a resource and always check its code to make sure it will use it in the
         /// way that it claims.
-        access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+        access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
         /// An optional list of marketplaces capabilities that are approved 
         /// to receive the marketplace commission.
@@ -433,7 +433,7 @@ pub contract NFTStorefrontV2 {
         /// initializer
         ///
         init (
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
             nftType: Type,
             nftUUID: UInt64,
             nftID: UInt64,
@@ -484,7 +484,7 @@ pub contract NFTStorefrontV2 {
         /// Allows the Storefront owner to create and insert Listings.
         ///
         pub fun createListing(
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
             nftType: Type,
             nftID: UInt64,
             salePaymentVaultType: Type,
@@ -530,7 +530,7 @@ pub contract NFTStorefrontV2 {
         /// Create and publish a Listing for an NFT.
         ///
          pub fun createListing(
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
             nftType: Type,
             nftID: UInt64,
             salePaymentVaultType: Type,

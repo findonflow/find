@@ -214,9 +214,9 @@ pub contract Bl0xPack: NonFungibleToken {
 					storagePath: Bl0xPack.CollectionStoragePath,
 					publicPath: Bl0xPack.CollectionPublicPath,
 					providerPath: /private/Bl0xPackCollection,
-					publicCollection: Type<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-					publicLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-					providerLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
+					publicCollection: Type<&Bl0xPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
+					publicLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
+					providerLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
 					createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
 						return <- Bl0xPack.createEmptyCollection()
 					}
@@ -246,7 +246,7 @@ pub contract Bl0xPack: NonFungibleToken {
 	// Collection
 	// A collection of Bl0xPack NFTs owned by an account
 	//
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic, ViewResolver.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		//
@@ -692,17 +692,17 @@ pub contract Bl0xPack: NonFungibleToken {
 		// this contract will hold a Collection that Bl0xPack can be deposited to and Admins can Consume them to transfer nfts to the depositing account
 		let openedCollection <- create Collection()
 		self.account.save(<- openedCollection, to: self.OpenedCollectionStoragePath) 
-		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.OpenedCollectionPublicPath, target: Bl0xPack.OpenedCollectionStoragePath)
+		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.OpenedCollectionPublicPath, target: Bl0xPack.OpenedCollectionStoragePath)
 
 
 		//a DLQ storage slot so that the opener can put items that cannot be opened/transferred here.
 		let dlqCollection <- create Collection()
 		self.account.save(<- dlqCollection, to: self.DLQCollectionStoragePath) 
-		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.DLQCollectionPublicPath, target: Bl0xPack.DLQCollectionStoragePath)
+		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.DLQCollectionPublicPath, target: Bl0xPack.DLQCollectionStoragePath)
 
 		self.account.save<@NonFungibleToken.Collection>( <- self.createEmptyCollection(), to: self.CollectionStoragePath)
 
-		self.account.link<&Bl0xPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(
+		self.account.link<&Bl0xPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(
 			Bl0xPack.CollectionPublicPath,
 			target: Bl0xPack.CollectionStoragePath
 		)

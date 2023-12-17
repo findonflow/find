@@ -531,9 +531,9 @@ pub contract Flovatar: NonFungibleToken {
                 storagePath: Flovatar.CollectionStoragePath,
                 publicPath: Flovatar.CollectionPublicPath,
                 providerPath: /private/FlovatarCollection,
-                publicCollection: Type<&Flovatar.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
-                publicLinkedType: Type<&Flovatar.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
-                providerLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                publicCollection: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                publicLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                providerLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Flovatar.createEmptyCollection()}
                 )
             }
@@ -558,7 +558,7 @@ pub contract Flovatar: NonFungibleToken {
     }
 
     // Main Collection to manage all the Flovatar NFT
-    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}

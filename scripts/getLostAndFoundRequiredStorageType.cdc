@@ -40,7 +40,7 @@ pub fun main(user: String) : Report {
             } else {
 
                 // check if relink needed
-                if account.getCapability<&{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(nftInfo!.publicPath).check() {
+                if account.getCapability<&{NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(nftInfo!.publicPath).check() {
                     initiatedStorage.append(type.identifier)
                 } else {
                     relinkableStorage.append(type.identifier)

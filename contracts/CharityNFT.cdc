@@ -80,8 +80,8 @@ pub contract CharityNFT: NonFungibleToken {
 						publicPath: CharityNFT.CollectionPublicPath,
 						providerPath: /private/findCharityCollection,
 						publicCollection: Type<&CharityNFT.Collection{CharityNFT.CollectionPublic}>(),
-						publicLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
-						providerLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
+						publicLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
+						providerLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
 						createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
 							return <- CharityNFT.createEmptyCollection()
 						}
@@ -152,7 +152,7 @@ pub contract CharityNFT: NonFungibleToken {
 		pub fun borrowCharity(id: UInt64): &{Public}?
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic , ViewResolver.ResolverCollection{
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -229,7 +229,7 @@ pub contract CharityNFT: NonFungibleToken {
 
 	// mintNFT mints a new NFT with a new ID
 	// and deposit it in the recipients collection using their collection reference
-	access(account) fun mintCharity(metadata: {String:String}, recipient: Capability<&{NonFungibleToken.CollectionPublic}>) {
+	access(account) fun mintCharity(metadata: {String:String}, recipient: Capability<&{NonFungibleToken.Collection}>) {
 
 		// create a new NFT
 		var newNFT <- create NFT(initID: CharityNFT.totalSupply, metadata:metadata)

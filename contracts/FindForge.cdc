@@ -206,7 +206,7 @@ access(all) contract FindForge {
 
 		let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 
-		let id = nft.id 
+		let id = nft.getID()
 		let uuid = nft.uuid 
 		let nftType = nft.getType().identifier
 		receiver.deposit(token: <- nft)
@@ -271,7 +271,7 @@ access(all) contract FindForge {
 			panic("The minter platform is not set. Please set up properly before adding contract data.")
 		}
 		let address = FIND.lookupAddress(lease) ?? panic("This name is not owned by anyone. Name : ".concat(lease))
-		let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionCollectionPublic}>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
+		let leaseCol = getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!.borrow() ?? panic("Cannot borrow lease collection to lease owner. Owner : ".concat(address.toString()))
 
 		if !leaseCol.checkAddon(name:lease, addon: "forge") && !leaseCol.checkAddon(name:lease, addon: "premiumForge") {
 			panic("Please purchase forge addon to start forging. Name: ".concat(lease))

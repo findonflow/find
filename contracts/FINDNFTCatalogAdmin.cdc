@@ -31,9 +31,11 @@ access(all) contract FINDNFTCatalogAdmin {
         }
 
         access(all) fun approveCatalogProposal(proposalID : UInt64) {
-            pre {
-                FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) != nil : "Invalid Proposal ID"
-                FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!.status == "IN_REVIEW" : "Invalid Proposal"
+            if (FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) == nil) {
+                panic("Invalid Proposal ID")
+            }
+            if (FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!.status != "IN_REVIEW") {
+                panic("Invalid Proposal")
             }
             let catalogProposalEntry = FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!
             let newCatalogProposalEntry = NFTCatalog.NFTCatalogProposal(collectionIdentifier : catalogProposalEntry.collectionIdentifier, metadata : catalogProposalEntry.metadata, message : catalogProposalEntry.message, status: "APPROVED", proposer: catalogProposalEntry.proposer)
@@ -47,9 +49,11 @@ access(all) contract FINDNFTCatalogAdmin {
         }
 
         access(all) fun rejectCatalogProposal(proposalID : UInt64) {
-            pre {
-                FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) != nil : "Invalid Proposal ID"
-                FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!.status == "IN_REVIEW" : "Invalid Proposal"
+            if (FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) == nil) {
+                panic("Invalid Proposal ID")
+            }
+            if (FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!.status != "IN_REVIEW") {
+                panic("Invalid Proposal")
             }
             let catalogProposalEntry = FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID)!
             let newCatalogProposalEntry = NFTCatalog.NFTCatalogProposal(collectionIdentifier : catalogProposalEntry.collectionIdentifier, metadata : catalogProposalEntry.metadata, message : catalogProposalEntry.message, status: "REJECTED", proposer: catalogProposalEntry.proposer)
@@ -57,8 +61,8 @@ access(all) contract FINDNFTCatalogAdmin {
         }
 
         access(all) fun removeCatalogProposal(proposalID : UInt64) {
-            pre {
-                FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) != nil : "Invalid Proposal ID"
+            if (FINDNFTCatalog.getCatalogProposalEntry(proposalID : proposalID) == nil) {
+                panic("Invalid Proposal ID")
             }
             FINDNFTCatalog.removeCatalogProposal(proposalID : proposalID)
         }

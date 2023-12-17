@@ -20,10 +20,10 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 
 	prepare(account: AuthAccount) {
 
-		let findPackCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(FindPack.CollectionPublicPath)
+		let findPackCap= account.getCapability<&{NonFungibleToken.Collection}>(FindPack.CollectionPublicPath)
 		if !findPackCap.check() {
 			account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
-			account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&FindPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindPack.CollectionPublicPath,
 				target: FindPack.CollectionStoragePath
 			)

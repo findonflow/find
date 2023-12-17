@@ -83,7 +83,7 @@ pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] ,
 
 			// check receiver account storage
 			let receiverCap = getAccount(user!).getCapability<&{NonFungibleToken.Receiver}>(path.publicPath)
-			let collectionPublicCap = getAccount(user!).getCapability<&{NonFungibleToken.CollectionPublic}>(path.publicPath)
+			let collectionPublicCap = getAccount(user!).getCapability<&{NonFungibleToken.Collection}>(path.publicPath)
 			let storage = getAuthAccount(user!).type(at: path.storagePath)
 
 			var storageInited = false

@@ -533,7 +533,7 @@ pub contract FindMarketDirectOfferEscrow {
 
 			let nftCap = bid.nftCap
 			if !nftCap.check() {
-				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.CollectionPublic}>(path)
+				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.Collection}>(path)
 				 if !cpCap.check() {
 					panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))
 				} else {

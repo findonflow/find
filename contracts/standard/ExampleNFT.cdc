@@ -173,7 +173,7 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
     /// In order to be able to manage NFTs any account will need to create
     /// an empty collection first
     ///
-    access(all) resource Collection: ExampleNFTCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+    access(all) resource Collection: ExampleNFTCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -295,7 +295,7 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         /// @param royalties: An array of Royalty structs, see MetadataViews docs
         ///
         access(all) fun mintNFT(
-            recipient: &{NonFungibleToken.CollectionPublic},
+            recipient: &{NonFungibleToken.Collection},
             name: String,
             description: String,
             thumbnail: String,
@@ -340,8 +340,8 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
                     publicPath: ExampleNFT.CollectionPublicPath,
                     providerPath: /private/exampleNFTCollection,
                     publicCollection: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic}>(),
-                    publicLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    providerLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+                    publicLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    providerLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun(): @NonFungibleToken.Collection {
                         return <-ExampleNFT.createEmptyCollection()
                     })
@@ -393,7 +393,7 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        self.account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic, ViewResolver.ResolverCollection}>(
+        self.account.link<&ExampleNFT.Collection{NonFungibleToken.Collection, ExampleNFT.ExampleNFTCollectionPublic, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath
         )

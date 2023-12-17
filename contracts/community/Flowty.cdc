@@ -366,7 +366,7 @@ pub contract Flowty {
         //
         pub fun fund(payment: @FungibleToken.Vault, 
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>, 
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>)
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>)
 
         // getDetails
         //
@@ -398,10 +398,10 @@ pub contract Flowty {
         // This capability allows the resource to withdraw *any* NFT, so you should be careful when giving
         // such a capability to a resource and always check its code to make sure it will use it in the
         // way that it claims.
-        access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+        access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
         // A capability allowing this resource to access the owner's NFT public collection 
-        access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>
 
 
         // A capability allowing this resource to withdraw `FungibleToken`s from borrower account.
@@ -435,7 +435,7 @@ pub contract Flowty {
         //
         pub fun fund(payment: @FungibleToken.Vault, 
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>) {
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>) {
             pre {
                 self.isFundingEnabled(): "Funding is not enabled or this listing has expired"
                 self.details.funded == false: "listing has already been funded"
@@ -556,8 +556,8 @@ pub contract Flowty {
         // initializer
         //
         init (
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             fusdProviderCapability: Capability<&{FungibleToken.Provider}>?,
             nftType: Type,
             nftID: UInt64,
@@ -714,10 +714,10 @@ pub contract Flowty {
         access(self) let listingDetails: ListingDetails
 
         // A capability allowing this resource to access the owner's NFT public collection 
-        access(contract) let ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // A capability allowing this resource to access the lender's NFT public collection 
-        access(contract) let lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // The receiver for the repayment.
         access(contract) let lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>
@@ -900,8 +900,8 @@ pub contract Flowty {
         init (
             flowtyStorefrontID: UInt64,
             listingResourceID: UInt64,
-            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             NFT: @NonFungibleToken.NFT,
             paymentVaultType: Type,
             repaymentAmount: UFix64,
@@ -956,8 +956,8 @@ pub contract Flowty {
         access(contract) fun createFunding(
             flowtyStorefrontID: UInt64, 
             listingResourceID: UInt64,
-            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             NFT: @NonFungibleToken.NFT,
             paymentVaultType: Type,
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
@@ -999,8 +999,8 @@ pub contract Flowty {
         access(contract) fun createFunding(
             flowtyStorefrontID: UInt64, 
             listingResourceID: UInt64,
-            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             NFT: @NonFungibleToken.NFT,
             paymentVaultType: Type,
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
@@ -1133,8 +1133,8 @@ pub contract Flowty {
         //
         pub fun createListing(
             payment: @FungibleToken.Vault,
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             fusdProviderCapability: Capability<&{FungibleToken.Provider}>?,
             nftType: Type,
             nftID: UInt64,
@@ -1175,8 +1175,8 @@ pub contract Flowty {
         //
          pub fun createListing(
             payment: @FungibleToken.Vault,
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             fusdProviderCapability: Capability<&{FungibleToken.Provider}>?,
             nftType: Type,
             nftID: UInt64,

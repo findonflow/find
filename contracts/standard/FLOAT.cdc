@@ -34,7 +34,7 @@ import GrantedAccountAccess from "./GrantedAccountAccess.cdc"
 import FungibleToken from "./FungibleToken.cdc"
 import FlowToken from "./FlowToken.cdc"
 
-access(all) contract FLOAT: NonFungibleToken {
+access(all) contract FLOAT {
 
     /***********************************************/
     /******************** PATHS ********************/
@@ -102,7 +102,7 @@ access(all) contract FLOAT: NonFungibleToken {
     }
 
     // Represents a FLOAT
-    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
         // The `uuid` of this resource
         access(all) let id: UInt64
 
@@ -175,7 +175,7 @@ access(all) contract FLOAT: NonFungibleToken {
 
             // Stores a capability to the FLOATEvents of its creator
             self.eventsCap = getAccount(_eventHost)
-                .capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)
+                .capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)!
             
             emit FLOATMinted(
                 id: self.id, 
@@ -208,7 +208,7 @@ access(all) contract FLOAT: NonFungibleToken {
 
     // A public interface for people to call into our Collection
     access(all) resource interface CollectionPublic {
-        access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        access(all) fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT}
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) fun deposit(token: @{NonFungibleToken.NFT})
@@ -219,9 +219,9 @@ access(all) contract FLOAT: NonFungibleToken {
 
     // A Collection that holds all of the users FLOATs.
     // Withdrawing is not allowed. You can only transfer.
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection, CollectionPublic {
+    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, CollectionPublic {
         // Maps a FLOAT id to the FLOAT itself
-        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
         // Maps an eventId to the ids of FLOATs that
         // this user owns from that event. It's possible
         // for it to be out of sync until June 2022 spork, 
@@ -373,7 +373,7 @@ access(all) contract FLOAT: NonFungibleToken {
         access(all) var transferrable: Bool
         access(all) let url: String
         access(all) fun claim(recipient: &Collection, params: {String: AnyStruct})
-        access(all) fun purchase(recipient: &Collection, params: {String: AnyStruct}, payment: @FungibleToken.Vault)
+        access(all) fun purchase(recipient: &Collection, params: {String: AnyStruct}, payment: @{FungibleToken.Vault})
         access(all) fun getClaimed(): {Address: TokenIdentifier}
         access(all) fun getCurrentHolders(): {UInt64: TokenIdentifier}
         access(all) fun getCurrentHolder(serial: UInt64): TokenIdentifier?
@@ -790,7 +790,7 @@ access(all) contract FLOAT: NonFungibleToken {
     //
     access(all) resource interface FLOATEventsPublic {
         // Public Getters
-        access(all) fun borrowPublicEventRef(eventId: UInt64): &FLOATEvent?
+        access(all) fun borrowPublicEventRef(eventId: UInt64): &{FLOATEvent}?
         access(all) fun getAllEvents(): {UInt64: String}
         access(all) view fun getIDs(): [UInt64]
         access(all) fun getGroup(groupName: String): &Group?

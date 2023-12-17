@@ -11,7 +11,7 @@ transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:Stri
 		let lease=finLeases.borrow(name)
 		let forgeType = Dandy.getForgeType()
 
-		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 		let thumbNail=MetadataViews.IPFSFile(cid:folderHash, path: "thumbnail.webp")
 		let fullsize=MetadataViews.IPFSFile(cid:folderHash, path: "fullsize.webp")
 		let mediaFullsize=MetadataViews.Media(file: fullsize, mediaType: "image/webp")

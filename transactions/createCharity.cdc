@@ -6,10 +6,10 @@ import CharityNFT from "../contracts/CharityNFT.cdc"
 transaction() {
 	prepare(account: AuthAccount) {
 
-		let stdCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(CharityNFT.CollectionPublicPath)
+		let stdCap= account.getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 		if !stdCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- CharityNFT.createEmptyCollection(), to: CharityNFT.CollectionStoragePath)
-			account.link<&{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(CharityNFT.CollectionPublicPath, target: CharityNFT.CollectionStoragePath)
+			account.link<&{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(CharityNFT.CollectionPublicPath, target: CharityNFT.CollectionStoragePath)
 		}
 
 		let charityCap = account.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)

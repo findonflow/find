@@ -142,7 +142,7 @@ pub contract FindLegacyCollectionc {
 			ids["Versus"]=versusArtCap.borrow()!.getIDs()
 		}
 
-		let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
+		let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.Collection, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 		if goobersCap.check() {
 			ids["Gooberz"] = goobersCap.borrow()!.getIDs()
 		}
@@ -204,7 +204,7 @@ pub contract FindLegacyCollectionc {
 			ids["JambbVoucher"] = voucherCap.borrow()!.getIDs()
 		}
 
-		let mwaCap = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+		let mwaCap = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.Collection}>(MatrixWorldAssetsNFT.collectionPublicPath)
 		if mwaCap.check() {
 			ids["MatrixWorldAssets"] = mwaCap.borrow()!.getIDs()
 		}
@@ -229,7 +229,7 @@ pub contract FindLegacyCollectionc {
 			ids["Evolution"] = evolutionCap.borrow()!.getIDs()
 		}
 
-		let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+		let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.Collection, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 		if geniaceCap.check() {
 			ids["Geniace"] = geniaceCap.borrow()!.getIDs()
 		}
@@ -462,7 +462,7 @@ pub fun main(user: String) : MetadataCollections? {
 
 
 	let partyMansion: [String] = []
-	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
+	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.Collection, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 	if goobersCap.check() {
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
@@ -936,7 +936,7 @@ pub fun main(user: String) : MetadataCollections? {
 
 	}
 
-	let matrixworldAsset = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+	let matrixworldAsset = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.Collection}>(MatrixWorldAssetsNFT.collectionPublicPath)
 	if matrixworldAsset.check() {
 		let collection = matrixworldAsset.borrow()!
 		for id in collection.getIDs() {
@@ -1059,7 +1059,7 @@ pub fun main(user: String) : MetadataCollections? {
 	}
 
 
-	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.Collection, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if geniaceCap.check() {
 		let geniace=geniaceCap.borrow()!
 		let nfts = geniace.getIDs()

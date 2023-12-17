@@ -154,9 +154,9 @@ pub contract GeneratedExperiences: NonFungibleToken {
                     storagePath: GeneratedExperiences.CollectionStoragePath,
                     publicPath: GeneratedExperiences.CollectionPublicPath,
                     providerPath: GeneratedExperiences.CollectionPrivatePath,
-                    publicCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    publicLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    providerLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+                    publicCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    providerLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-GeneratedExperiences.createEmptyCollection()
                     })
@@ -206,7 +206,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -324,7 +324,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        self.account.link<&GeneratedExperiences.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
+        self.account.link<&GeneratedExperiences.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath
         )

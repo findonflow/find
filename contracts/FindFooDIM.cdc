@@ -143,9 +143,9 @@ pub contract FindFooDIM: NonFungibleToken {
 					storagePath: FindFooDIM.CollectionStoragePath,
 					publicPath: FindFooDIM.CollectionPublicPath,
 					providerPath: FindFooDIM.CollectionPrivatePath,
-					publicCollection: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-					publicLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-					providerLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+					publicCollection: Type<&FindFooDIM.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					publicLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					providerLinkedType: Type<&FindFooDIM.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
 					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
 						return <-FindFooDIM.createEmptyCollection()
 					})
@@ -157,7 +157,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -265,7 +265,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		self.account.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
-		self.account.link<&FindFooDIM.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
+		self.account.link<&FindFooDIM.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)

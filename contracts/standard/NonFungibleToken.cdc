@@ -156,32 +156,6 @@ access(all) contract NonFungibleToken {
 
         /// TODO: These will eventually have optional return types, but don't right now
         /// because of a bug in Cadence
-
-        /// withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
-        access(Withdrawable) fun withdrawWithUUID(_ uuid: UInt64): @{NFT} {
-            post {
-                result == nil || result!.uuid == uuid: "The ID of the withdrawn token must be the same as the requested ID"
-                NonFungibleToken.emitNFTWithdraw(id: result.getID(), uuid: result.uuid, from: self.owner?.address, type: result.getType().identifier)
-            }
-        }
-
-        /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(Withdrawable) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NFT} {
-            post {
-                result == nil || result.getID() == withdrawID: "The ID of the withdrawn token must be the same as the requested ID"
-                NonFungibleToken.emitNFTWithdraw(id: result.getID(), uuid: result.uuid, from: self.owner?.address, type: result.getType().identifier)
-            }
-        }
-
-        /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(Withdrawable) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NFT} {
-            post {
-                result == nil || result!.uuid == uuid: "The ID of the withdrawn token must be the same as the requested ID"
-                NonFungibleToken.emitNFTWithdraw(id: result.getID(), uuid: result.uuid, from: self.owner?.address, type: result.getType().identifier)
-            }
-        }
     }
 
     /// Interface to mediate transfers between Collections

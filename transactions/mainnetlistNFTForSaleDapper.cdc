@@ -52,10 +52,10 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
 		}
 
 
-		let providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft.privatePath)
+		let providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft.privatePath)
 
 		if !providerCap.check() {
-			account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				nft.privatePath,
 				target: nft.storagePath
 			)

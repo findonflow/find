@@ -60,8 +60,8 @@ pub contract TopShot: NonFungibleToken {
                         publicPath: /public/MomentCollection,
                         providerPath: /private/MomentCollection,
                         publicCollection: Type<&TopShot.Collection{TopShot.MomentCollectionPublic}>(),
-                        publicLinkedType: Type<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,ViewResolver.ResolverCollection}>(),
-                        providerLinkedType: Type<&TopShot.Collection{NonFungibleToken.Provider,TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,ViewResolver.ResolverCollection}>(),
+                        publicLinkedType: Type<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
+                        providerLinkedType: Type<&TopShot.Collection{NonFungibleToken.Provider,TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
                         createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                             return <-TopShot.createEmptyCollection()
                         })
@@ -114,7 +114,7 @@ pub contract TopShot: NonFungibleToken {
     // Collection is a resource that every user who owns NFTs
     // will store in their account to manage their NFTS
     //
-    pub resource Collection: MomentCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+    pub resource Collection: MomentCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // Dictionary of Moment conforming tokens
         // NFT is a resource type with a UInt64 ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}

@@ -128,9 +128,9 @@ pub contract PartyFavorz: NonFungibleToken {
 					storagePath: PartyFavorz.CollectionStoragePath,
 					publicPath: PartyFavorz.CollectionPublicPath,
 					providerPath: PartyFavorz.CollectionPrivatePath,
-					publicCollection: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-					publicLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-					providerLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+					publicCollection: Type<&PartyFavorz.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					publicLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+					providerLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
 					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
 						return <-PartyFavorz.createEmptyCollection()
 					})
@@ -223,7 +223,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -338,7 +338,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		self.account.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
-		self.account.link<&PartyFavorz.Collection{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}>(
+		self.account.link<&PartyFavorz.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)

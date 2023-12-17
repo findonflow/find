@@ -5,12 +5,12 @@ import Dandy from "../contracts/Dandy.cdc"
 transaction(user: String, id: UInt64) {
 
 	let address : Address
-	let cap : Capability<&Dandy.Collection{NonFungibleToken.CollectionPublic}>
+	let cap : Capability<&Dandy.Collection{NonFungibleToken.Collection}>
 	let senderRef : &Dandy.Collection
 
 	prepare(account: AuthAccount) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
-		self.cap = getAccount(self.address).getCapability<&Dandy.Collection{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		self.cap = getAccount(self.address).getCapability<&Dandy.Collection{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 
 		self.senderRef = account.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
 	}

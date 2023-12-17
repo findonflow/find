@@ -148,7 +148,7 @@ pub contract LostAndFound {
             let cap = receiver.borrow<&AnyResource>()!
 
             if cap.isInstance(Type<@NonFungibleToken.Collection>()) {
-                let target = receiver.borrow<&AnyResource{NonFungibleToken.CollectionPublic}>()!
+                let target = receiver.borrow<&AnyResource{NonFungibleToken.Collection}>()!
                 let token <- redeemableItem  as! @NonFungibleToken.NFT?
                 self.redeemed = true
                 emit TicketRedeemed(redeemer: self.redeemer, ticketID: self.uuid, type: token.getType())
@@ -556,9 +556,9 @@ pub contract LostAndFound {
                 display: MetadataViews.Display?
         ) {
 
-            if cap.check<&{NonFungibleToken.CollectionPublic}>() {
+            if cap.check<&{NonFungibleToken.Collection}>() {
                 let nft <- item as! @NonFungibleToken.NFT
-                cap.borrow<&{NonFungibleToken.CollectionPublic}>()!.deposit(token: <-nft)
+                cap.borrow<&{NonFungibleToken.Collection}>()!.deposit(token: <-nft)
             } else if cap.check<&{NonFungibleToken.Receiver}>() {
                 let nft <- item as! @NonFungibleToken.NFT
                 cap.borrow<&{NonFungibleToken.Receiver}>()!.deposit(token: <-nft)
@@ -724,9 +724,9 @@ pub contract LostAndFound {
         storagePayment: &FungibleToken.Vault,
         flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
     ) {
-        if cap.check<&{NonFungibleToken.CollectionPublic}>() {
+        if cap.check<&{NonFungibleToken.Collection}>() {
             let nft <- resource as! @NonFungibleToken.NFT
-            cap.borrow<&{NonFungibleToken.CollectionPublic}>()!.deposit(token: <-nft)
+            cap.borrow<&{NonFungibleToken.Collection}>()!.deposit(token: <-nft)
         } else if cap.check<&{NonFungibleToken.Receiver}>() {
             let nft <- resource as! @NonFungibleToken.NFT
             cap.borrow<&{NonFungibleToken.Receiver}>()!.deposit(token: <-nft)

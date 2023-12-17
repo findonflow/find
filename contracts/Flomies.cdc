@@ -142,9 +142,9 @@ pub contract Flomies: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: Flomies.CollectionStoragePath,
 				publicPath: Flomies.CollectionPublicPath,
 				providerPath: Flomies.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicCollection: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicLinkedType: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Flomies.createEmptyCollection()})
 
 			case Type<MetadataViews.Traits>():
@@ -195,7 +195,7 @@ pub contract Flomies: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -367,11 +367,11 @@ pub contract Flomies: NonFungibleToken {
 		self.CollectionPrivatePath = /private/flomiesNFT
 
 		self.account.save<@NonFungibleToken.Collection>(<- Flomies.createEmptyCollection(), to: Flomies.CollectionStoragePath)
-		self.account.link<&Flomies.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+		self.account.link<&Flomies.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Flomies.CollectionPublicPath,
 			target: Flomies.CollectionStoragePath
 		)
-		self.account.link<&Flomies.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+		self.account.link<&Flomies.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Flomies.CollectionPrivatePath,
 			target: Flomies.CollectionStoragePath
 		)

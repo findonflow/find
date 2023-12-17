@@ -25,7 +25,7 @@ pub contract CoatCheck {
     pub event CoatCheckInitialized(resourceID: UInt64)
 
     pub resource interface TicketPublic {
-        pub fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.CollectionPublic}?)
+        pub fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)
         pub fun getDetails(): CoatCheck.TicketDetails
     }
 
@@ -118,7 +118,7 @@ pub contract CoatCheck {
 
         // redeem the ticket using an optional receiver for fungible tokens and non-fungible tokens. The supplied receivers must be
         // owned by the redeemer of this ticket.
-        pub fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.CollectionPublic}?) {
+        pub fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?) {
             pre {
                 fungibleTokenReceiver == nil || (fungibleTokenReceiver!.owner!.address == self.details.redeemer) : "incorrect owner"
                 nonFungibleTokenReceiver == nil || (nonFungibleTokenReceiver!.owner!.address == self.details.redeemer) : "incorrect owner"
@@ -177,7 +177,7 @@ pub contract CoatCheck {
         pub fun redeemTicket(
             ticketID: UInt64, 
             fungibleTokenReceiver: &{FungibleToken.Receiver}?,
-            nonFungibleTokenReceiver: &{NonFungibleToken.CollectionPublic}?,
+            nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?,
         )
         pub fun borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}?
         
@@ -229,7 +229,7 @@ pub contract CoatCheck {
         pub fun redeemTicket(
             ticketID: UInt64, 
             fungibleTokenReceiver: &{FungibleToken.Receiver}?,
-            nonFungibleTokenReceiver: &{NonFungibleToken.CollectionPublic}?
+            nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?
         ) {
             pre {
                 self.tickets[ticketID] != nil : "ticket does not exist"

@@ -235,7 +235,7 @@ pub contract FindMarketSale {
 
 
 			if !nftCap.check() {
-				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.CollectionPublic}>(saleItem.getNFTCollectionData().publicPath)
+				 let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.Collection}>(saleItem.getNFTCollectionData().publicPath)
 				 if !cpCap.check() {
 					panic("The nft receiver capability passed in is invalid.")
 				} else {

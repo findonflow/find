@@ -224,9 +224,9 @@ pub contract FlovatarComponent: NonFungibleToken {
                 storagePath: FlovatarComponent.CollectionStoragePath,
                 publicPath: FlovatarComponent.CollectionPublicPath,
                 providerPath: /private/FlovatarComponentCollection,
-                publicCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
-                publicLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
-                providerLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                publicCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                publicLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                providerLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- FlovatarComponent.createEmptyCollection()}
                 )
             }
@@ -251,7 +251,7 @@ pub contract FlovatarComponent: NonFungibleToken {
     }
 
     // Main Collection to manage all the Components NFT
-    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection {
+    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}

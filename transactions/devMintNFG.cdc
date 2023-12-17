@@ -10,14 +10,14 @@ import FindForge from "../contracts/FindForge.cdc"
 transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, externalURL: String, traits: {String: String}, birthday: UFix64, levels: {String: UFix64}, scalars : {String:UFix64}, medias:{String:String}) {
 	prepare(account: AuthAccount) {
 
-		let collectionCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(NFGv3.CollectionPublicPath)
+		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(NFGv3.CollectionPublicPath)
 		if !collectionCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
-			account.link<&NFGv3.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&NFGv3.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				NFGv3.CollectionPublicPath,
 				target: NFGv3.CollectionStoragePath
 			)
-			account.link<&NFGv3.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
+			account.link<&NFGv3.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				NFGv3.CollectionPrivatePath,
 				target: NFGv3.CollectionStoragePath
 			)
