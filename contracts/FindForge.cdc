@@ -245,14 +245,14 @@ access(all) contract FindForge {
 
 	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
 		let order = FindForgeOrder.fulfillForgeOrder(contractName, forgeType: forgeType)
-		let c = order.collectionDisplay
+		let c = order.getCollectionDisplay()
 		let s : {String : String} = {}
 		for social in c.socials.keys {
 			s[social] = c.socials[social]!.url
 		} 
-		FindForge.adminSetMinterPlatform(leaseName: order.leaseName, 
+		FindForge.adminSetMinterPlatform(leaseName: order.getLeaseName(), 
 							forgeType: forgeType, 
-							minterCut: order.minterCut, 
+							minterCut: order.getMinterCut(), 
 							description: c.description, 
 							externalURL: c.externalURL.url, 
 							squareImage: c.squareImage.file.uri(), 
