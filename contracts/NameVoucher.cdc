@@ -111,7 +111,7 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 				publicCollection: Type<&Collection>(),
 				publicLinkedType: Type<&Collection>(),
 				providerLinkedType: Type<&Collection>(),
-				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- NameVoucher.createEmptyCollection()})
+				createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection} {return <- NameVoucher.createEmptyCollection()})
 
 			case Type<MetadataViews.Traits>():
 				return MetadataViews.Traits([
@@ -145,7 +145,7 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
-			emit Withdraw(id: token.id, from: self.owner?.address)
+			emit Withdraw(id: token.getID(), from: self.owner?.address)
 
 			return <-token
 		}
@@ -186,7 +186,7 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		access(all) view fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT} {
+		access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} {
 			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
 		}
 
@@ -233,11 +233,6 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 			destroy self.ownedNFTs
 		}
 
-		// public function that anyone can call to create a new empty collection
-		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-			return <- create Collection()
-		}
-
 		access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
 			let supportedTypes: {Type: Bool} = {}
             return supportedTypes
@@ -258,6 +253,11 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
         access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
 			let ids: {Type: [UInt64]} = {}
 			return ids
+		}
+
+		// public function that anyone can call to create a new empty collection
+		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+			return <- NameVoucher.createEmptyCollection()
 		}
 	}
 
@@ -287,11 +287,45 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 		NameVoucher.royalties = cutInfo
 	}
 
+	// public function that anyone can call to create a new empty collection
+	access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+		return <- create Collection()
+	}
+
 	init() {
 		// Initialize the total supply
 		self.totalSupply = 0
 
+		// Check if the account already has a Switchboard resource
+        if self.account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath) == nil {
+			// Create a new Switchboard resource and put it into storage
+			self.account.storage.save(
+				<- FungibleTokenSwitchboard.createSwitchboard(),
+				to: FungibleTokenSwitchboard.StoragePath
+			)
+
+			// Clear existing Capabilities at canonical paths
+			self.account.capabilities.unpublish(FungibleTokenSwitchboard.ReceiverPublicPath)
+			self.account.capabilities.unpublish(FungibleTokenSwitchboard.PublicPath)
+
+			// Create a public capability to the Switchboard exposing the deposit
+			// function through the {FungibleToken.Receiver} interface
+			let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
+					FungibleTokenSwitchboard.StoragePath
+				)
+			self.account.capabilities.publish(receiverCap, at: FungibleTokenSwitchboard.ReceiverPublicPath)
+			
+			// Create a public capability to the Switchboard exposing both the
+			// {FungibleTokenSwitchboard.SwitchboardPublic} and the 
+			// {FungibleToken.Receiver} interfaces
+			let switchboardPublicCap = self.account.capabilities.storage.issue<&{FungibleTokenSwitchboard.SwitchboardPublic, FungibleToken.Receiver}>(
+					FungibleTokenSwitchboard.StoragePath
+				)
+			self.account.capabilities.publish(switchboardPublicCap, at: FungibleTokenSwitchboard.PublicPath)
+        }
+
 		// Set Royalty cuts in a transaction
+
 		self.royalties = [
 			MetadataViews.Royalty(
 				receiver: NameVoucher.account.capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!	,
@@ -299,6 +333,7 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 				description: "network"
 			)
 		]
+
 		// 5 - letter Thumbnail
 		self.thumbnail = MetadataViews.IPFSFile(cid: "QmWj3bwRfksGXvFQYoWtjdycD68cp4xRGMJonnDibsN6Rz", path: nil)
 
@@ -307,9 +342,8 @@ access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 		self.CollectionPublicPath = /public/nameVoucher
 		self.CollectionPrivatePath = /private/nameVoucher
 
-		self.account.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
-		let collectionCap = self.account.capabilties.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
-		self.account.capabilities.publish(collectionCap, at: NameVoucher.CollectionPrivatePath)
+		self.account.storage.save<@{NonFungibleToken.Collection}>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
+		let collectionCap = self.account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
 
 		emit ContractInitialized()
 	}
