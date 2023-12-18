@@ -8,7 +8,7 @@ transaction(user: String, id: UInt64) {
 	let cap : Capability<&Dandy.Collection{NonFungibleToken.Collection}>
 	let senderRef : &Dandy.Collection
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
 		self.cap = getAccount(self.address).getCapability<&Dandy.Collection{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 

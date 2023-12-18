@@ -3,7 +3,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
 
 transaction() {
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue) &Account) {
 
         let sender <- acct.load<@FlowToken.Vault>(from: /storage/unusedFlow)
             ?? panic("Cannot load FlowToken vault from temp flow storage")

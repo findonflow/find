@@ -9,7 +9,7 @@ transaction(id: UInt64, amount: UFix64) {
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection
 	let balanceBeforeBid: UFix64
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() ?? panic("Cannot borrow reference to tenant")
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())

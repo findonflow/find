@@ -10,7 +10,7 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 
 
 transaction(tenant: Address, market: String){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         var marketType : [Type] = [Type<@FindMarketSale.SaleItem>()]

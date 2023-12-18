@@ -16,7 +16,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 	let saleItems: [&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}]
 	var totalPrice : UFix64
 	let prices : [UFix64]
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {

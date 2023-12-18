@@ -6,7 +6,7 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

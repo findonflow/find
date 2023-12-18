@@ -19,7 +19,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 	let vaultRefs: {String : &FungibleToken.Vault}
 	var token : &Sender.Token
 
-	prepare(account : AuthAccount) {
+	prepare(account : auth(BorrowValue) &Account) {
 
 		self.authPointers = []
 		self.paths = []

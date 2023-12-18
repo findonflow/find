@@ -11,7 +11,7 @@ import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 
 transaction(tenant: Address, market: String, merchAddress: Address){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let tenantRef = adminRef.getTenantRef(tenant)

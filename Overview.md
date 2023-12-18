@@ -656,7 +656,7 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 	let saleItems : &FindMarketSale.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		// Get tenant from marketplace address
 		let marketplace = FindMarket.getFindTenantAddress()
@@ -709,7 +709,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		// resolve user address here (it supports string address and find names)

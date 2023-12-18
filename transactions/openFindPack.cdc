@@ -12,7 +12,7 @@ transaction(packId:UInt64) {
     let packs: &FindPack.Collection
     let receiver: { Type : Capability<&{NonFungibleToken.Receiver}>}
 
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue) &Account) {
         self.packs=account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
 
         let packData = self.packs.borrowFindPack(id: packId) ?? panic("You do not own this pack. ID : ".concat(packId.toString()))

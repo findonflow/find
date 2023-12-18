@@ -8,7 +8,7 @@ import FindForge from "../contracts/FindForge.cdc"
 
 
 transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String, season: UInt64, royaltyReceivers: [Address], royaltyCuts: [UFix64], royaltyDescs: [String], squareImage: String, bannerImage: String) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(PartyFavorz.CollectionPublicPath)
 		if !collectionCap.check() {

@@ -6,7 +6,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 transaction(tenant: Address) {
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let rules = [

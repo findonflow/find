@@ -6,7 +6,7 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
 transaction(tenant: Address, merchAddress: Address, findCut: UFix64){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		// Set up DUC cut

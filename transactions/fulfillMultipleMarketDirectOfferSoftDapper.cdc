@@ -10,7 +10,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 	let requiredAmount: [UFix64]
 	let balanceBeforeTransfer: {Type : UFix64}
 
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())

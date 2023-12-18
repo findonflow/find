@@ -2,7 +2,7 @@ import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 
 transaction() {
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let relatedAccounts= account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		if relatedAccounts == nil {

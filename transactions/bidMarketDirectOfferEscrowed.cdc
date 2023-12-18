@@ -16,7 +16,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
 	let pointer: FindViews.ViewReadPointer
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)

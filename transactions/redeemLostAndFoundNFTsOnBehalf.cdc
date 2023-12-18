@@ -15,7 +15,7 @@ transaction(receiverAddress: Address, ids: {String : [UInt64]}) {
 	let nftInfos : {String : NFTCatalog.NFTCollectionData}
 	let receiverAddress : Address
 
-	prepare(account: AuthAccount){
+	prepare(account: auth(BorrowValue) &Account){
 
 		self.receiverAddress = receiverAddress
 

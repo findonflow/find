@@ -8,7 +8,7 @@ transaction(merchAccount: Address, name: String, addon:String, amount:UFix64) {
 	let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
 	let balanceBeforeTransfer: UFix64
 
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 		self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
 		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
 		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")

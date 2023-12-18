@@ -1,7 +1,7 @@
 import Admin from "../contracts/Admin.cdc"
 
 transaction(rewards:{UInt64 : [UInt64]}, types: {UInt64 : [String]}, salts: {UInt64:String}) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 

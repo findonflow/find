@@ -10,7 +10,7 @@ transaction(id: UInt64) {
 	let market : &FindMarketDirectOfferSoft.SaleItemCollection
 	let pointer : FindViews.AuthNFTPointer
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())

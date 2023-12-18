@@ -14,7 +14,7 @@ transaction(leaseName: String, amount: UFix64) {
 	let balanceBeforeBid: UFix64
 	let ftVaultType: Type
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let resolveAddress = FIND.resolve(leaseName)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}

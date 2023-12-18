@@ -5,7 +5,7 @@ transaction(ids: [UInt64]) {
 
 	let saleItems : &FindMarketAuctionEscrow.SaleItemCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

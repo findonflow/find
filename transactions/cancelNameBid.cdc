@@ -4,7 +4,7 @@ transaction(names: [String]) {
 
 	let bids : &FIND.BidCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		self.bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
 	}
 

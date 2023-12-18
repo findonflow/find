@@ -3,7 +3,7 @@ import FIND from "../contracts/FIND.cdc"
 
 
 transaction(name: String) {
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 
 
 		let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!

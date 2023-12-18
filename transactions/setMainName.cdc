@@ -7,7 +7,7 @@ transaction(name: String) {
 	let leaseCollectionOwner : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 	let profile : &Profile.User
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 		self.leaseCollectionOwner = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		self.profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
 	}

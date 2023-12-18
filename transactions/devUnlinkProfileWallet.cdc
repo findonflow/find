@@ -2,7 +2,7 @@ import Profile from "../contracts/Profile.cdc"
 
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		account.unlink(Profile.publicReceiverPath)
 	}
 }

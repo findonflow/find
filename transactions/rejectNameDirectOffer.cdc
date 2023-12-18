@@ -4,7 +4,7 @@ transaction(names: [String]) {
 
 	let finLeases : &FIND.LeaseCollection? 
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
 	}
 

@@ -11,7 +11,7 @@ transaction(id: UInt64, amount:UFix64) {
 	let mainDapperCoinVault: &FungibleToken.Vault
 	let balanceBeforeTransfer: UFix64
 
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

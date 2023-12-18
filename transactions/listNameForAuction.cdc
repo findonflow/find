@@ -4,7 +4,7 @@ transaction(name: String, auctionStartPrice: UFix64, auctionReservePrice: UFix64
 	
 	let finLeases : &FIND.LeaseCollection?
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
 	}
 

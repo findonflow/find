@@ -10,7 +10,7 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
 
 transaction(market: String, merchAddress: Address, tenantCut: UFix64){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
 
 		// emulator

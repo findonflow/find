@@ -17,7 +17,7 @@ transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftA
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
 	let pointer: [FindViews.ViewReadPointer]
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		if nftAliasOrIdentifiers.length != users.length {
 			panic("The length of arrays passed in has to be the same")

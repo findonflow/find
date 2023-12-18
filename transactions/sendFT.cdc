@@ -9,7 +9,7 @@ transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: Stri
 	var token : &Sender.Token
 	let walletReference : &FungibleToken.Vault? 
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath)

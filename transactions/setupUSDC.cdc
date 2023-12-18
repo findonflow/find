@@ -3,7 +3,7 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 
 transaction() {
 
-    prepare(signer: AuthAccount) {
+    prepare(signer: auth(BorrowValue) &Account) {
 
         // Return early if the account already stores a FiatToken Vault
         if signer.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath) != nil {

@@ -17,7 +17,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 	let vaultTypes : [Type]
 	let finLeases : &FIND.LeaseCollection
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!

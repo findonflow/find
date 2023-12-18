@@ -5,7 +5,7 @@ import FIND from "../contracts/FIND.cdc"
 transaction(ownerAddress: Address) {
 
     //versus account
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue) &Account) {
 
         let owner= getAccount(ownerAddress)
         let client= owner.getCapability<&{FindForge.ForgeAdminProxyClient}>(/public/findForgeAdminProxy)

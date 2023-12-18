@@ -18,7 +18,7 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 	let paymentVault: @FungibleToken.Vault
 	let balanceBeforeTransfer:UFix64
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
 		let findPackCap= account.getCapability<&{NonFungibleToken.Collection}>(FindPack.CollectionPublicPath)
 		if !findPackCap.check() {

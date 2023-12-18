@@ -3,7 +3,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		// Get all the saleItems Id
 
 		let tenant = FindMarket.getTenant(FindMarket.getFindTenantAddress())
