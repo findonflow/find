@@ -126,7 +126,7 @@ func main() {
 	prices = prices + ` ]`
 
 	returnTime, _ := o.Script(`import Clock from "../contracts/Clock.cdc"
-	access(all) main() :  UFix64 {
+	pub fun main() :  UFix64 {
 		return Clock.time()
 	}`).GetAsJson()
 

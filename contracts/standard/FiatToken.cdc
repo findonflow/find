@@ -54,7 +54,7 @@ pub contract FiatToken: FungibleToken {
     //
 
 		pub resource interface ResourceId {
-        access(all) UUID(): UInt64
+        pub fun UUID(): UInt64
     }
 
     pub resource Vault: ResourceId, FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance {
@@ -67,7 +67,7 @@ pub contract FiatToken: FungibleToken {
             self.balance = balance
         }
 
-				 access(all) UUID(): UInt64 {
+				 pub fun UUID(): UInt64 {
             return self.uuid
         }
         // withdraw
@@ -79,7 +79,7 @@ pub contract FiatToken: FungibleToken {
         // created Vault to the context that called so it can be deposited
         // elsewhere.
         //
-        access(all) withdraw(amount: UFix64): @FungibleToken.Vault {
+        pub fun withdraw(amount: UFix64): @FungibleToken.Vault {
             self.balance = self.balance - amount
             emit TokensWithdrawn(amount: amount, from: self.owner?.address)
             return <-create Vault(balance: amount)
@@ -92,7 +92,7 @@ pub contract FiatToken: FungibleToken {
         // It is allowed to destroy the sent Vault because the Vault
         // was a temporary holder of the tokens. The Vault's balance has
         // been consumed and therefore can be destroyed.
-        access(all) deposit(from: @FungibleToken.Vault) {
+        pub fun deposit(from: @FungibleToken.Vault) {
             let vault <- from as! @FiatToken.Vault
             self.balance = self.balance + vault.balance
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
@@ -112,7 +112,7 @@ pub contract FiatToken: FungibleToken {
     // and store the returned Vault in their storage in order to allow their
     // account to be able to receive deposits of this token type.
     //
-    access(all) createEmptyVault(): @FiatToken.Vault {
+    pub fun createEmptyVault(): @FiatToken.Vault {
         return <-create Vault(balance: 0.0)
     }
 
@@ -128,7 +128,7 @@ pub contract FiatToken: FungibleToken {
         // Function that mints new tokens, adds them to the total supply,
         // and returns them to the calling context.
         //
-        access(all) mintTokens(amount: UFix64): @Vault {
+        pub fun mintTokens(amount: UFix64): @Vault {
             pre {
                 amount > 0.0: "Amount minted must be greater than zero"
             }
@@ -140,7 +140,7 @@ pub contract FiatToken: FungibleToken {
     }
 
     pub resource interface MinterProxyPublic {
-        access(all) setMinterCapability(cap: Capability<&Minter>)
+        pub fun setMinterCapability(cap: Capability<&Minter>)
     }
 
     // MinterProxy
@@ -156,11 +156,11 @@ pub contract FiatToken: FungibleToken {
 
         // Anyone can call this, but only the admin can create Minter capabilities,
         // so the type system constrains this to being called by the admin.
-        access(all) setMinterCapability(cap: Capability<&Minter>) {
+        pub fun setMinterCapability(cap: Capability<&Minter>) {
             self.minterCapability = cap
         }
 
-        access(all) mintTokens(amount: UFix64): @FiatToken.Vault {
+        pub fun mintTokens(amount: UFix64): @FiatToken.Vault {
             return <- self.minterCapability!
             .borrow()!
             .mintTokens(amount:amount)
@@ -178,7 +178,7 @@ pub contract FiatToken: FungibleToken {
     // Anyone can call this, but the MinterProxy cannot mint without a Minter capability,
     // and only the admin can provide that.
     //
-    access(all) createMinterProxy(): @MinterProxy {
+    pub fun createMinterProxy(): @MinterProxy {
         return <- create MinterProxy()
     }
 
@@ -192,7 +192,7 @@ pub contract FiatToken: FungibleToken {
     // and cache all of this information to enable easy revocation but String/Path comversion isn't yet supported.
     //
     pub resource Administrator {
-        access(all) createNewMinter(): @Minter {
+        pub fun createNewMinter(): @Minter {
             emit MinterCreated()
             return <- create Minter()
         }

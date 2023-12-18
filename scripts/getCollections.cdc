@@ -73,7 +73,7 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-access(all) main(user: String) : MetadataCollections? {
+pub fun main(user: String) : MetadataCollections? {
 
 	let resolvingAddress = FIND.resolve(user)
 	if resolvingAddress == nil {

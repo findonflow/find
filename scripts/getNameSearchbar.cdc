@@ -1,7 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
 import Profile from "../contracts/Profile.cdc"
 
-access(all) main(name: String) : NameReport? {
+pub fun main(name: String) : NameReport? {
 
 	if FIND.validateFindName(name) {
 		let status = FIND.status(name)

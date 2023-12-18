@@ -4,7 +4,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 //get all the views for an nft and address/path/id
-access(all) main(user: String, aliasOrIdentifier:String, id: UInt64) : [String] {
+pub fun main(user: String, aliasOrIdentifier:String, id: UInt64) : [String] {
 	let nftInfo = getCollectionData(aliasOrIdentifier) 
 
 	let resolveAddress = FIND.resolve(user) 
@@ -20,7 +20,7 @@ access(all) main(user: String, aliasOrIdentifier:String, id: UInt64) : [String] 
 	return views
 }
 
-access(all) getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
+pub fun getCollectionData(_ nftIdentifier: String) : NFTCatalog.NFTCollectionData {
 	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData

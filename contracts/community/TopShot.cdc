@@ -26,7 +26,7 @@ pub contract TopShot: NonFungibleToken {
         }
 
         // All supported metadata views for the Moment including the Core NFT Views
-        access(all) getViews(): [Type] {
+        pub fun getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
                 Type<MetadataViews.Royalties>(),
@@ -38,7 +38,7 @@ pub contract TopShot: NonFungibleToken {
 
 
 
-        access(all) resolveView(_ view: Type): AnyStruct? {
+        pub fun resolveView(_ view: Type): AnyStruct? {
             switch view {
                 case Type<MetadataViews.Display>():
                     return MetadataViews.Display(
@@ -98,10 +98,10 @@ pub contract TopShot: NonFungibleToken {
 	}
 
     pub resource interface MomentCollectionPublic {
-        access(all) deposit(token: @NonFungibleToken.NFT)
-        access(all) getIDs(): [UInt64]
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        access(all) borrowMoment(id: UInt64): &TopShot.NFT? {
+        pub fun deposit(token: @NonFungibleToken.NFT)
+        pub fun getIDs(): [UInt64]
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        pub fun borrowMoment(id: UInt64): &TopShot.NFT? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
             post {
@@ -129,7 +129,7 @@ pub contract TopShot: NonFungibleToken {
         // that is to be removed from the Collection
         //
         // returns: @NonFungibleToken.NFT the token that was withdrawn
-        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 
             // Borrow nft and check if locked
             let nft = self.borrowNFT(id: withdrawID)
@@ -148,7 +148,7 @@ pub contract TopShot: NonFungibleToken {
         //
         // Paramters: token: the NFT to be deposited in the collection
         //
-        access(all) deposit(token: @NonFungibleToken.NFT) {
+        pub fun deposit(token: @NonFungibleToken.NFT) {
 
             // Cast the deposited token as a TopShot NFT to make sure
             // it is the correct type
@@ -171,7 +171,7 @@ pub contract TopShot: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the Collection
-        access(all) getIDs(): [UInt64] {
+        pub fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -186,7 +186,7 @@ pub contract TopShot: NonFungibleToken {
         // not any topshot specific data. Please use borrowMoment to
         // read Moment data.
         //
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
@@ -200,7 +200,7 @@ pub contract TopShot: NonFungibleToken {
         // Parameters: id: The ID of the NFT to get the reference for
         //
         // Returns: A reference to the NFT
-        access(all) borrowMoment(id: UInt64): &TopShot.NFT? {
+        pub fun borrowMoment(id: UInt64): &TopShot.NFT? {
             if self.ownedNFTs[id] != nil {
                 let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
                 return ref as! &TopShot.NFT
@@ -209,7 +209,7 @@ pub contract TopShot: NonFungibleToken {
             }
         }
 
-        access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
             let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             let topShotNFT = nft as! &TopShot.NFT
             return topShotNFT as &AnyResource{ViewResolver.Resolver}
@@ -225,7 +225,7 @@ pub contract TopShot: NonFungibleToken {
         }
     }
 
-	access(all) createEmptyCollection() : @NonFungibleToken.Collection {
+	pub fun createEmptyCollection() : @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 

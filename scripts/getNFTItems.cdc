@@ -4,7 +4,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
 	let report : { String: [MetadataCollectionItem]}= { }
 	let address = FIND.resolve(user)
@@ -87,7 +87,7 @@ pub struct MetadataCollectionItem {
 	}
 }
 
-access(all) getDisplay(_ nft: &NonFungibleToken.NFT) : MetadataViews.Display? {
+pub fun getDisplay(_ nft: &NonFungibleToken.NFT) : MetadataViews.Display? {
 	if let data = nft.resolveView(Type<MetadataViews.Display>()) {
 		if let d = data as? MetadataViews.Display {
 			return d
@@ -96,7 +96,7 @@ access(all) getDisplay(_ nft: &NonFungibleToken.NFT) : MetadataViews.Display? {
 	return nil
 }
 
-access(all) getCollectionDisplay(_ nft: &NonFungibleToken.NFT) : MetadataViews.NFTCollectionDisplay? {
+pub fun getCollectionDisplay(_ nft: &NonFungibleToken.NFT) : MetadataViews.NFTCollectionDisplay? {
 	if let data = nft.resolveView(Type<MetadataViews.NFTCollectionDisplay>()) {
 		if let d = data as? MetadataViews.NFTCollectionDisplay {
 			return d

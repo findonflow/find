@@ -2,7 +2,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-access(all) main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {
+pub fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {
 
 	let address =FIND.resolve(name)!
 
@@ -14,7 +14,7 @@ access(all) main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIde
 	return nft.resolveView(CompositeType(viewIdentifier)!)
 }
 
-access(all) getPublicPath(_ nftIdentifier: String) : StoragePath {
+pub fun getPublicPath(_ nftIdentifier: String) : StoragePath {
 	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData.storagePath

@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(name:String) : Address?{
+pub fun main(name:String) : Address?{
 
 	return FIND.resolve(name)
 

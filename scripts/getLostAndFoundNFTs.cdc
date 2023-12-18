@@ -4,7 +4,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-access(all) main(user: String) : Report {
+pub fun main(user: String) : Report {
 
 	if let address = FIND.resolve(user) {
 		let runTimeType = Type<@NonFungibleToken.NFT>()
@@ -57,6 +57,6 @@ pub struct Report {
 	}
 }
 
-access(all) logErr(_ err: String) : Report {
+pub fun logErr(_ err: String) : Report {
 	return Report(nftCatalogTicketInfo: {}, ticketInfo : {}, ticketIds : {} , error: err)
 }

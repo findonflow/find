@@ -127,7 +127,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Get all collections 
     //////////////////////////////////////////////////////////////
-    access(all) getCollections(user: String, maxItems: Int, collections: [String], shard: String) : CollectionReport? {
+    pub fun getCollections(user: String, maxItems: Int, collections: [String], shard: String) : CollectionReport? {
         switch shard {
 					
             // case "Alchemy-shard1": 
@@ -148,7 +148,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Get specific collections 
     //////////////////////////////////////////////////////////////
-    access(all) getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : {String : [MetadataCollectionItem]} {
+    pub fun getCollection(user: String, collectionIDs: {String : [UInt64]}, shard: String) : {String : [MetadataCollectionItem]} {
         switch shard {
 					
             // case "Alchemy-shard1": 
@@ -171,7 +171,7 @@ pub contract CollectionFactory {
 
     // Helper function 
 
-    access(all) resolveAddress(user: String) : PublicAccount? {
+    pub fun resolveAddress(user: String) : PublicAccount? {
 	    let address = FIND.resolve(user)
 	    if address == nil {
 	    	return nil
@@ -182,7 +182,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in NFTRegistry
     //////////////////////////////////////////////////////////////
-    access(all) fetchNFTRegistry(user: String, maxItems: Int, targetCollections:[String]) : CollectionReport? {
+    pub fun fetchNFTRegistry(user: String, maxItems: Int, targetCollections:[String]) : CollectionReport? {
         let source = "NFTRegistry"
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -300,7 +300,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    // access(all) fetchAlchemyShard1(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    // pub fun fetchAlchemyShard1(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
     //     let source = "Alchemy-shard1"
     //     let account = self.resolveAddress(user: user)
     //     if account == nil { return nil }
@@ -396,7 +396,7 @@ pub contract CollectionFactory {
     // ////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 2
     // ////////////////////////////////////////////////////////////
-    // access(all) fetchAlchemyShard2(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    // pub fun fetchAlchemyShard2(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
     //     let source = "Alchemy-shard2"
     //     let account = self.resolveAddress(user: user)
     //     if account == nil { return nil }
@@ -492,7 +492,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    // access(all) fetchAlchemyShard3(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    // pub fun fetchAlchemyShard3(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
     //     let source = "Alchemy-shard3"
     //     let account = self.resolveAddress(user: user)
     //     if account == nil { return nil }
@@ -590,7 +590,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch All Collections in Shard 4
     //////////////////////////////////////////////////////////////
-    access(all) fetchAlchemyShard4(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
+    pub fun fetchAlchemyShard4(user: String, maxItems: Int, targetCollections: [String]) : CollectionReport? {
         let source = "Alchemy-shard4"
         let account = self.resolveAddress(user: user)
         if account == nil { return nil }
@@ -689,7 +689,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in NFTRegistry
     //////////////////////////////////////////////////////////////
-    access(all) fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    pub fun fetchNFTRegistryCollection(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
         let source = "NFTRegistry"
         let account = self.resolveAddress(user: user)
         if account == nil { return {} }
@@ -769,7 +769,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    // access(all) fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    // pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
     //     let source = "Alchemy-shard1"
     //     let account = self.resolveAddress(user: user)
     //     if account == nil { return {} }
@@ -828,7 +828,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 2
     //////////////////////////////////////////////////////////////
-    // access(all) fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    // pub fun fetchAlchemyCollectionShard2(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
     //     let source = "Alchemy-shard2"
     //     let account = self.resolveAddress(user: user)
     //     if account == nil { return {} }
@@ -887,7 +887,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 3
     //////////////////////////////////////////////////////////////
-    // access(all) fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    // pub fun fetchAlchemyCollectionShard3(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
     //     let source = "Alchemy-shard3"
     //     let account = self.resolveAddress(user: user)
     //     if account == nil { return {} }
@@ -948,7 +948,7 @@ pub contract CollectionFactory {
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 4
     //////////////////////////////////////////////////////////////
-    access(all) fetchAlchemyCollectionShard4(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    pub fun fetchAlchemyCollectionShard4(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
         let source = "Alchemy-shard4"
         let account = self.resolveAddress(user: user)
         if account == nil { return {} }

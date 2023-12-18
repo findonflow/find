@@ -4,7 +4,7 @@ import FindViews from "../contracts/FindViews.cdc"
 
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 	return fetchNFTCatalog(user: user, collectionIDs: collectionIDs)
 }
 
@@ -42,7 +42,7 @@ pub struct NFTView {
 	}
 }
 
-access(all) getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
+pub fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 
 	let account = getAuthAccount(ownerAddress)
 
@@ -191,7 +191,7 @@ pub struct MetadataCollectionItem {
 
 // Helper function 
 
-access(all) resolveAddress(user: String) : PublicAccount? {
+pub fun resolveAddress(user: String) : PublicAccount? {
 	let address = FIND.resolve(user)
 	if address == nil {
 		return nil
@@ -203,7 +203,7 @@ access(all) resolveAddress(user: String) : PublicAccount? {
 //////////////////////////////////////////////////////////////
 // Fetch Specific Collections in Find Catalog
 //////////////////////////////////////////////////////////////
-access(all) fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 	let source = "NFTCatalog"
 	let account = resolveAddress(user: user)
 	if account == nil { return {} }
@@ -270,7 +270,7 @@ access(all) fetchNFTCatalog(user: String, collectionIDs: {String : [UInt64]}) : 
 	return items
 }
 
-access(all) cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
+pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
 	let dateValues  = {"Date" : true, "Numeric":false, "Number":false, "date":true, "numeric":false, "number":false}
 
 	let array : [MetadataViews.Trait] = []
@@ -300,7 +300,7 @@ access(all) cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Trait
 	return MetadataViews.Traits(array)
 }
 
-access(all) getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Trait? {
+pub fun getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Trait? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Trait>()) {
 		if let v = view as? MetadataViews.Trait {
 			return v
@@ -309,7 +309,7 @@ access(all) getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.T
 	return nil
 }
 
-access(all) getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Edition? {
+pub fun getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Edition? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Edition>()) {
 		if let v = view as? MetadataViews.Edition {
 			return v

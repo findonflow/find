@@ -28,10 +28,10 @@ pub contract RelatedAccounts {
 	}
 
 	pub resource interface Public{
-		access(all) getFlowAccounts() : {String: Address} 
-		access(all) getRelatedAccounts(_ network: String) : {String : String} 
-		access(all) getAllRelatedAccounts() : {String : {String : String}}
-		access(all) verify(network: String, address: String) : Bool 
+		pub fun getFlowAccounts() : {String: Address} 
+		pub fun getRelatedAccounts(_ network: String) : {String : String} 
+		pub fun getAllRelatedAccounts() : {String : {String : String}}
+		pub fun verify(network: String, address: String) : Bool 
 	}
 
 	/// This is just an empty resource we create in storage, you can safely send a reference to it to obtain msg.sender
@@ -39,7 +39,7 @@ pub contract RelatedAccounts {
 
 		access(self) let accounts: { String: AccountInformation}
 
-		access(all) verify(network: String, address: String) : Bool {
+		pub fun verify(network: String, address: String) : Bool {
 			for account in self.accounts.keys {
 				let item = self.accounts[account]!
 				let addr = item.address?.toString() ?? item.otherAddress! 
@@ -50,7 +50,7 @@ pub contract RelatedAccounts {
 			return false
 		}
 
-		access(all) getFlowAccounts() : {String: Address} {
+		pub fun getFlowAccounts() : {String: Address} {
 			let items : {String: Address} ={}
 			for account in self.accounts.keys {
 				let item = self.accounts[account]!
@@ -61,7 +61,7 @@ pub contract RelatedAccounts {
 			return items
 		}
 
-		access(all) getRelatedAccounts(_ network: String) : {String : String} {
+		pub fun getRelatedAccounts(_ network: String) : {String : String} {
 			let items : {String: String} ={}
 			for account in self.accounts.keys {
 				let item = self.accounts[account]!
@@ -73,7 +73,7 @@ pub contract RelatedAccounts {
 			return items
 		}
 
-		access(all) getAllRelatedAccounts() : {String : {String : String}} {
+		pub fun getAllRelatedAccounts() : {String : {String : String}} {
 			let items : {String: {String : String}} ={}
 			for account in self.accounts.keys {
 				let item = self.accounts[account]!
@@ -90,17 +90,17 @@ pub contract RelatedAccounts {
 			return items
 		}
 
-		access(all) setFlowAccount(name: String, address:Address) {
+		pub fun setFlowAccount(name: String, address:Address) {
 			self.accounts[name] = AccountInformation(name: name, address:address, network: "Flow", otherAddress:nil)
 			emit RelatedAccountAdded(name:name, address: self.owner!.address, related:address.toString(), network: "Flow")
 		}
 
-		access(all) setRelatedAccount(name: String, address: String, network: String) {
+		pub fun setRelatedAccount(name: String, address: String, network: String) {
 			self.accounts[name] = AccountInformation(name: name, address:nil, network: network, otherAddress:address)
 			emit RelatedAccountAdded(name:name, address: self.owner!.address, related:address, network: network)
 		}
 
-		access(all) deleteAccount(name: String) {
+		pub fun deleteAccount(name: String) {
 			let item =self.accounts.remove(key: name)!
 			emit RelatedAccountRemoved(name:name,address: self.owner!.address, related: item.address?.toString() ?? item.otherAddress!, network: "Flow")
 		}
@@ -110,11 +110,11 @@ pub contract RelatedAccounts {
 		}
 	}
 
-	access(all) createEmptyAccounts() : @Accounts{
+	pub fun createEmptyAccounts() : @Accounts{
 		return <- create Accounts()
 	}
 
-	access(all) findRelatedFlowAccounts(address:Address) : { String: Address} {
+	pub fun findRelatedFlowAccounts(address:Address) : { String: Address} {
 		let cap = getAccount(address).getCapability<&Accounts{Public}>(self.publicPath)
 		if !cap.check(){
 			return {}

@@ -25,8 +25,8 @@ pub contract CoatCheck {
     pub event CoatCheckInitialized(resourceID: UInt64)
 
     pub resource interface TicketPublic {
-        access(all) redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)
-        access(all) getDetails(): CoatCheck.TicketDetails
+        pub fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)
+        pub fun getDetails(): CoatCheck.TicketDetails
     }
 
     pub struct TicketDetails {
@@ -118,7 +118,7 @@ pub contract CoatCheck {
 
         // redeem the ticket using an optional receiver for fungible tokens and non-fungible tokens. The supplied receivers must be
         // owned by the redeemer of this ticket.
-        access(all) redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?) {
+        pub fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?) {
             pre {
                 fungibleTokenReceiver == nil || (fungibleTokenReceiver!.owner!.address == self.details.redeemer) : "incorrect owner"
                 nonFungibleTokenReceiver == nil || (nonFungibleTokenReceiver!.owner!.address == self.details.redeemer) : "incorrect owner"
@@ -155,7 +155,7 @@ pub contract CoatCheck {
             destroy tokens
         }
 
-        access(all) getDetails(): CoatCheck.TicketDetails {
+        pub fun getDetails(): CoatCheck.TicketDetails {
             return self.details
         }
 
@@ -174,12 +174,12 @@ pub contract CoatCheck {
     pub resource interface ValetPublic {
         // redeem a ticket, supplying an optional receiver to use for depositing
         // any fts or nfts in the ticket
-        access(all) redeemTicket(
+        pub fun redeemTicket(
             ticketID: UInt64, 
             fungibleTokenReceiver: &{FungibleToken.Receiver}?,
             nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?,
         )
-        access(all) borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}?
+        pub fun borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}?
         
     }
 
@@ -215,7 +215,7 @@ pub contract CoatCheck {
             destroy oldTicket
         }
 
-        access(all) borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}? {
+        pub fun borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}? {
              if self.tickets[ticketID] != nil {
                 return &self.tickets[ticketID] as! &Ticket{TicketPublic}?
             } else {
@@ -226,7 +226,7 @@ pub contract CoatCheck {
         // redeem the ticket using supplied receivers.
         // if a ticket has fungible tokens, the fungibleTokenReceiver is required.
         // if a ticket has nfts, the nonFungibleTokenReceiver is required.
-        access(all) redeemTicket(
+        pub fun redeemTicket(
             ticketID: UInt64, 
             fungibleTokenReceiver: &{FungibleToken.Receiver}?,
             nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?
@@ -246,7 +246,7 @@ pub contract CoatCheck {
         }
     }
 
-    access(all) getValetPublic(): &CoatCheck.Valet{CoatCheck.ValetPublic} {
+    pub fun getValetPublic(): &CoatCheck.Valet{CoatCheck.ValetPublic} {
         return &self.valet as &CoatCheck.Valet{CoatCheck.ValetPublic}
     }
 

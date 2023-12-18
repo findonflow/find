@@ -2,7 +2,7 @@ import NFTCatalog from 0x49a7cda3a1eecc29
 import FindMarket from 0x097bafa4e0b48eef
 import FindMarketSale from 0x097bafa4e0b48eef
 
-access(all) main():AnyStruct {
+pub fun main():AnyStruct {
 	let r : {String : String} = {}
 
 	let tenant = "Dapper"

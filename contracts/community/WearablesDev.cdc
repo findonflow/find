@@ -8,7 +8,7 @@ pub contract WearablesDev {
 
 	pub var initiated: Bool
 
-	access(all) mintWearablesForTest(receiver: Address) {
+	pub fun mintWearablesForTest(receiver: Address) {
 		self.initialize()
 		let account = getAccount(receiver)
 		let wearable= account.getCapability<&Wearables.Collection{NonFungibleToken.Receiver}>(Wearables.CollectionPublicPath).borrow() ?? panic("cannot borrow werable cap")

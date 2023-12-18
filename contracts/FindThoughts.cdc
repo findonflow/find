@@ -29,7 +29,7 @@ pub contract FindThoughts {
 			self.id = id 
 		}
 
-		access(all) borrowThoughtPublic() : &{ThoughtPublic}? {
+		pub fun borrowThoughtPublic() : &{ThoughtPublic}? {
 			if self.cap.check() {
 				let ref = self.cap.borrow()!
 				if ref.contains(self.id) {
@@ -39,14 +39,14 @@ pub contract FindThoughts {
 			return nil
 		}
 
-		access(all) valid() : Bool {
+		pub fun valid() : Bool {
 			if self.borrowThoughtPublic() != nil {
 				return true
 			}
 			return false
 		}
 
-		access(all) owner() : Address {
+		pub fun owner() : Address {
 			return self.cap.address
 		}
 	}
@@ -65,8 +65,8 @@ pub contract FindThoughts {
 		pub var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?) 
-		access(all) getQuotedThought() : ThoughtPointer? 
-		access(all) getHide() : Bool
+		pub fun getQuotedThought() : ThoughtPointer? 
+		pub fun getHide() : Bool
 	}
 
 	pub resource Thought : ThoughtPublic , ViewResolver.Resolver {
@@ -126,21 +126,21 @@ pub contract FindThoughts {
 			emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
 		}
 
-		access(all) getQuotedThought() : ThoughtPointer? {
+		pub fun getQuotedThought() : ThoughtPointer? {
 			if let r = self.extras["quote"] {
 				return r as! ThoughtPointer
 			}
 			return nil
 		}
 
-		access(all) getHide() : Bool {
+		pub fun getHide() : Bool {
 			if let r = self.extras["hidden"] {
 				return r as! Bool
 			}
 			return false
 		}
 
-		access(all) hide(_ hide: Bool) {
+		pub fun hide(_ hide: Bool) {
 			self.extras["hidden"] = hide
 			let medias : [String] = []
 			for m in self.medias {
@@ -149,7 +149,7 @@ pub contract FindThoughts {
 			emit Edited(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, hide: hide, tags: self.tags)
 		}
 
-		access(all) edit(header: String , body: String, tags: [String]) {
+		pub fun edit(header: String , body: String, tags: [String]) {
 			self.header = header 
 			self.body = body 
 			self.tags = tags 
@@ -184,13 +184,13 @@ pub contract FindThoughts {
 			emit Reacted(id: self.id, by: user, byName: FIND.reverseLookup(user), creator: owner, creatorName: FIND.reverseLookup(owner), header: self.header, reaction: reaction, totalCount: self.reactions)
 		}
 
-        access(all) getViews(): [Type] {
+        pub fun getViews(): [Type] {
 			return [
 				Type<MetadataViews.Display>()
 			]
 		}
 
-		access(all) resolveView(_ type: Type) : AnyStruct? {
+		pub fun resolveView(_ type: Type) : AnyStruct? {
 			switch type {
 			
 				case Type<MetadataViews.Display>(): 
@@ -209,9 +209,9 @@ pub contract FindThoughts {
 	}
 
 	pub resource interface CollectionPublic {
-		access(all) contains(_ id: UInt64) : Bool 
-		access(all) getIDs() : [UInt64]
-		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} 
+		pub fun contains(_ id: UInt64) : Bool 
+		pub fun getIDs() : [UInt64]
+		pub fun borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} 
 	}
 
 	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
@@ -228,29 +228,29 @@ pub contract FindThoughts {
 			destroy self.ownedThoughts
 		}
 
-		access(all) contains(_ id: UInt64) : Bool {
+		pub fun contains(_ id: UInt64) : Bool {
 			return self.ownedThoughts.containsKey(id)
 		}
 
-		access(all) getIDs() : [UInt64] {
+		pub fun getIDs() : [UInt64] {
 			return self.ownedThoughts.keys
 		}
 
-		access(all) borrow(_ id: UInt64) : &FindThoughts.Thought {
+		pub fun borrow(_ id: UInt64) : &FindThoughts.Thought {
 			pre{
 				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
 			}
 			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
 		}
 
-		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} {
+		pub fun borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} {
 			pre{
 				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
 			}
 			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
 		}
 
-        access(all) borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			pre{
 				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
 			}
@@ -259,7 +259,7 @@ pub contract FindThoughts {
 
 		// TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
 		// So take pointer, thought pointer and media
-		access(all) publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
+		pub fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
 			let medias : [MetadataViews.Media] = []
 			let m : [String] = []
 			if media != nil {
@@ -286,7 +286,7 @@ pub contract FindThoughts {
 			self.ownedThoughts[thought.uuid] <-! thought
 		}
 
-		access(all) delete(_ id: UInt64) {
+		pub fun delete(_ id: UInt64) {
 			pre{
 				self.ownedThoughts.containsKey(id) : "Does not contains Thought with ID : ".concat(id.toString())
 			}
@@ -298,7 +298,7 @@ pub contract FindThoughts {
 			destroy thought
 		}
 
-		access(all) react(user: Address, id: UInt64, reaction: String?) {
+		pub fun react(user: Address, id: UInt64, reaction: String?) {
 			let cap = FindThoughts.getFindThoughtsCapability(user)
 			let ref = cap.borrow() ?? panic("Cannot borrow reference to Find Thoughts Collection from user : ".concat(user.toString()))
 
@@ -306,18 +306,18 @@ pub contract FindThoughts {
 			thought.internal_react(user: self.owner!.address, reaction: reaction)
 		}
 
-		access(all) hide(id: UInt64, hide: Bool) {
+		pub fun hide(id: UInt64, hide: Bool) {
 			let thought = self.borrow(id)
 			thought.hide(hide)
 		}
 
 	}
 
-	access(all) createEmptyCollection() : @FindThoughts.Collection {
+	pub fun createEmptyCollection() : @FindThoughts.Collection {
 		return <- create Collection()
 	}
 
-	access(all) getFindThoughtsCapability(_ user: Address) : Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}> {
+	pub fun getFindThoughtsCapability(_ user: Address) : Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}> {
 		return getAccount(user).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
 	}
 

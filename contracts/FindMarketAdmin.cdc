@@ -15,13 +15,13 @@ pub contract FindMarketAdmin {
 	/// ===================================================================================
 
 	//Admin client to use for capability receiver pattern
-	access(all) createAdminProxyClient() : @AdminProxy {
+	pub fun createAdminProxyClient() : @AdminProxy {
 		return <- create AdminProxy()
 	}
 
 	//interface to use for capability receiver pattern
 	pub resource interface AdminProxyClient {
-		access(all) addCapability(_ cap: Capability<&FIND.Network>)
+		pub fun addCapability(_ cap: Capability<&FIND.Network>)
 	}
 
 	//admin proxy with capability receiver
@@ -29,7 +29,7 @@ pub contract FindMarketAdmin {
 
 		access(self) var capability: Capability<&FIND.Network>?
 
-		access(all) addCapability(_ cap: Capability<&FIND.Network>) {
+		pub fun addCapability(_ cap: Capability<&FIND.Network>) {
 			pre {
 				cap.check() : "Invalid server capablity"
 				self.capability == nil : "Server already set"
@@ -37,7 +37,7 @@ pub contract FindMarketAdmin {
 			self.capability = cap
 		}
 
-		access(all) createFindMarket(name: String, address:Address, findCutSaleItem: FindMarket.TenantSaleItem?) : Capability<&FindMarket.Tenant> {
+		pub fun createFindMarket(name: String, address:Address, findCutSaleItem: FindMarket.TenantSaleItem?) : Capability<&FindMarket.Tenant> {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -45,7 +45,7 @@ pub contract FindMarketAdmin {
 			return  FindMarket.createFindMarket(name:name, address:address, findCutSaleItem: findCutSaleItem)
 		}
 
-		access(all) removeFindMarketTenant(tenant: Address) {
+		pub fun removeFindMarketTenant(tenant: Address) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -53,7 +53,7 @@ pub contract FindMarketAdmin {
 			FindMarket.removeFindMarketTenant(tenant: tenant)
 		}
 
-		access(all) getFindMarketClient():  &FindMarket.TenantClient{
+		pub fun getFindMarketClient():  &FindMarket.TenantClient{
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -65,56 +65,56 @@ pub contract FindMarketAdmin {
 		/// ===================================================================================
 		// Find Market Options
 		/// ===================================================================================
-		access(all) addSaleItemType(_ type: Type) {
+		pub fun addSaleItemType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.addSaleItemType(type)
 		}
 
-		access(all) addMarketBidType(_ type: Type) {
+		pub fun addMarketBidType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.addMarketBidType(type)
 		}
 
-		access(all) addSaleItemCollectionType(_ type: Type) {
+		pub fun addSaleItemCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.addSaleItemCollectionType(type)
 		}
 
-		access(all) addMarketBidCollectionType(_ type: Type) {
+		pub fun addMarketBidCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.addMarketBidCollectionType(type)
 		}
 
-		access(all) removeSaleItemType(_ type: Type) {
+		pub fun removeSaleItemType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.removeSaleItemType(type)
 		}
 
-		access(all) removeMarketBidType(_ type: Type) {
+		pub fun removeMarketBidType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.removeMarketBidType(type)
 		}
 
-		access(all) removeSaleItemCollectionType(_ type: Type) {
+		pub fun removeSaleItemCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.removeSaleItemCollectionType(type)
 		}
 
-		access(all) removeMarketBidCollectionType(_ type: Type) {
+		pub fun removeMarketBidCollectionType(_ type: Type) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -124,7 +124,7 @@ pub contract FindMarketAdmin {
 		/// ===================================================================================
 		// Tenant Rules Management
 		/// ===================================================================================
-		access(all) getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
+		pub fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -134,7 +134,7 @@ pub contract FindMarketAdmin {
 			return cap.borrow() ?? panic("Cannot borrow tenant reference from path. Path : ".concat(pp.toString()) )
 		}
 
-		access(all) addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
+		pub fun addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -142,7 +142,7 @@ pub contract FindMarketAdmin {
 			tenant.addSaleItem(item, type: "find")
 		}
 
-		access(all) removeFindBlockItem(tenant: Address, name: String) {
+		pub fun removeFindBlockItem(tenant: Address, name: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -150,7 +150,7 @@ pub contract FindMarketAdmin {
 			tenant.removeSaleItem(name, type: "find")
 		}
 
-		access(all) setFindCut(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
+		pub fun setFindCut(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -158,7 +158,7 @@ pub contract FindMarketAdmin {
 			tenant.addSaleItem(saleItem, type: "cut")
 		}
 
-		access(all) setExtraCut(tenant: Address, types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+		pub fun setExtraCut(tenant: Address, types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -166,7 +166,7 @@ pub contract FindMarketAdmin {
 			tenant.setExtraCut(types: types, category: category, cuts: cuts)
 		}
 
-		access(all) setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
+		pub fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -175,7 +175,7 @@ pub contract FindMarketAdmin {
 			//Emit Event here
 		}
 
-		access(all) removeMarketOption(tenant: Address, name: String) {
+		pub fun removeMarketOption(tenant: Address, name: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -183,7 +183,7 @@ pub contract FindMarketAdmin {
 			tenant.removeSaleItem(name, type: "tenant")
 		}
 
-		access(all) enableMarketOption(tenant: Address, name: String) {
+		pub fun enableMarketOption(tenant: Address, name: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -191,7 +191,7 @@ pub contract FindMarketAdmin {
 			tenant.alterMarketOption(name: name, status: "active")
 		}
 
-		access(all) deprecateMarketOption(tenant: Address, name: String) {
+		pub fun deprecateMarketOption(tenant: Address, name: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -199,7 +199,7 @@ pub contract FindMarketAdmin {
 			tenant.alterMarketOption(name: name, status: "deprecated")
 		}
 
-		access(all) stopMarketOption(tenant: Address, name: String) {
+		pub fun stopMarketOption(tenant: Address, name: String) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -207,7 +207,7 @@ pub contract FindMarketAdmin {
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
-		access(all) setupSwitchboardCut(tenant: Address) {
+		pub fun setupSwitchboardCut(tenant: Address) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
@@ -219,14 +219,14 @@ pub contract FindMarketAdmin {
 		// Royalty Residual
 		/// ===================================================================================
 
-		access(all) setResidualAddress(_ address: Address) {
+		pub fun setResidualAddress(_ address: Address) {
 			pre {
 				self.capability != nil: "Cannot create FIND, capability is not set"
 			}
 			FindMarket.setResidualAddress(address)
 		}
 
-		access(all) getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
+		pub fun getSwitchboardReceiverPublic() : Capability<&{FungibleToken.Receiver}> {
 			// we hard code it here instead, to avoid importing just for path
 			return FindMarketAdmin.account.getCapability<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
 		}

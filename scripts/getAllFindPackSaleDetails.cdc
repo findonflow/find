@@ -2,7 +2,7 @@ import FindPack from "../contracts/FindPack.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-access(all) main(packTypeName: String) : {UInt64 : Report} {
+pub fun main(packTypeName: String) : {UInt64 : Report} {
 	let packs = FindPack.getMetadataByName(packTypeName: packTypeName)
 	let packData : {UInt64 : Report} = {}
 	for packTypeId in packs.keys {
@@ -98,7 +98,7 @@ pub struct SaleInfo {
 		}
 }
 
-access(all) convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
+pub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
 	let res : [SaleInfo] = []
 	for i in info {
 		res.append(SaleInfo(i))

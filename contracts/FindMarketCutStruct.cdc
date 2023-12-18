@@ -12,7 +12,7 @@ pub contract FindMarketCutStruct {
 			self.extra = {}
 		}
 
-		access(all) getEventSafeCuts() : [EventSafeCut] {
+		pub fun getEventSafeCuts() : [EventSafeCut] {
 			let cuts : [EventSafeCut] = []
 			for c in self.cuts {
 				cuts.append(c.getEventSafeCut())
@@ -38,27 +38,27 @@ pub contract FindMarketCutStruct {
 	}
 
 	pub struct interface Cut {
-		access(all) getName() : String
-		access(all) getReceiverCap() : Capability<&{FungibleToken.Receiver}>
-		access(all) getCut() : UFix64
-		access(all) getAddress() : Address
-		access(all) getDescription() : String
-		access(all) getPayableLogic() : ((UFix64) : UFix64?)
-		access(all) getExtra() : {String : String}
+		pub fun getName() : String
+		pub fun getReceiverCap() : Capability<&{FungibleToken.Receiver}>
+		pub fun getCut() : UFix64
+		pub fun getAddress() : Address
+		pub fun getDescription() : String
+		pub fun getPayableLogic() : ((UFix64) : UFix64?)
+		pub fun getExtra() : {String : String}
 
-		access(all) getRoyalty() : MetadataViews.Royalty {
+		pub fun getRoyalty() : MetadataViews.Royalty {
 			let cap = self.getReceiverCap()
 			return MetadataViews.Royalty(receiver: cap, cut: self.getCut(), description: self.getName())
 		}
 
-		access(all) getAmountPayable(_ salePrice: UFix64) : UFix64? {
+		pub fun getAmountPayable(_ salePrice: UFix64) : UFix64? {
 			if let cut = self.getPayableLogic()(salePrice) {
 				return cut
 			}
 			return nil
 		}
 
-		access(all) getEventSafeCut() : EventSafeCut {
+		pub fun getEventSafeCut() : EventSafeCut {
 			return EventSafeCut(
 				name: self.getName(),
 				description: self.getDescription(),
@@ -86,26 +86,26 @@ pub contract FindMarketCutStruct {
 			self.extra = {}
 		}
 
-		access(all) getReceiverCap() : Capability<&{FungibleToken.Receiver}> {
+		pub fun getReceiverCap() : Capability<&{FungibleToken.Receiver}> {
 			return self.cap
 		}
-		access(all) getName() : String {
+		pub fun getName() : String {
 			return self.name
 		}
-		access(all) getCut() : UFix64 {
+		pub fun getCut() : UFix64 {
 			return self.cut
 		}
-		access(all) getAddress() : Address {
+		pub fun getAddress() : Address {
 			return self.cap.address
 		}
-		access(all) getDescription() : String {
+		pub fun getDescription() : String {
 			return self.description
 		}
-		access(all) getExtra() : {String : String} {
+		pub fun getExtra() : {String : String} {
 			return {}
 		}
 
-		access(all) getPayableLogic() : ((UFix64) : UFix64?) {
+		pub fun getPayableLogic() : ((UFix64) : UFix64?) {
 			return fun(_ salePrice : UFix64) : UFix64? {
 				return salePrice * self.cut
 			}
@@ -133,27 +133,27 @@ pub contract FindMarketCutStruct {
 			self.extra = {}
 		}
 
-		access(all) getReceiverCap() : Capability<&{FungibleToken.Receiver}> {
+		pub fun getReceiverCap() : Capability<&{FungibleToken.Receiver}> {
 			let pp = PublicPath(identifier: self.publicPath)!
 			return getAccount(self.address).getCapability<&{FungibleToken.Receiver}>(pp)
 		}
-		access(all) getName() : String {
+		pub fun getName() : String {
 			return self.name
 		}
-		access(all) getCut() : UFix64 {
+		pub fun getCut() : UFix64 {
 			return self.cut
 		}
-		access(all) getAddress() : Address {
+		pub fun getAddress() : Address {
 			return self.address
 		}
-		access(all) getDescription() : String {
+		pub fun getDescription() : String {
 			return self.description
 		}
-		access(all) getExtra() : {String : String} {
+		pub fun getExtra() : {String : String} {
 			return {}
 		}
 
-		access(all) getPayableLogic() : ((UFix64) : UFix64?) {
+		pub fun getPayableLogic() : ((UFix64) : UFix64?) {
 			return fun(_ salePrice : UFix64) : UFix64? {
 				let rPayable = salePrice * self.cut
 				if rPayable < self.minimumPayment {

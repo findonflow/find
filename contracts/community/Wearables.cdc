@@ -61,20 +61,20 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		access(all) getCreator() : String {
+		pub fun getCreator() : String {
 			return self.creator
 		}
 
 
-		access(all) getClassifier() : String{
+		pub fun getClassifier() : String{
 			return "set"
 		}
 
-		access(all) getCounterSuffix() : String {
+		pub fun getCounterSuffix() : String {
 			return self.name
 		}
 
-		access(all) getContract() : String {
+		pub fun getContract() : String {
 			return "wearable"
 		}
 	}
@@ -119,7 +119,7 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		access(all) getName(_ index: Int) :String {
+		pub fun getName(_ index: Int) :String {
 			if self.classifiers.length==0 {
 				return self.name
 			}
@@ -128,7 +128,7 @@ pub contract Wearables: NonFungibleToken {
 			return self.name.concat("_").concat(classifier)
 		}
 
-		access(all) getPositionCount() :Int{
+		pub fun getPositionCount() :Int{
 			let length=self.classifiers.length
 			if length==0 {
 				return 1
@@ -136,15 +136,15 @@ pub contract Wearables: NonFungibleToken {
 			return length
 		}
 
-		access(all) getClassifier() :String {
+		pub fun getClassifier() :String {
 			return "position"
 		}
 
-		access(all) getCounterSuffix() : String {
+		pub fun getCounterSuffix() : String {
 			return self.name
 		}
 
-		access(all) getContract() : String {
+		pub fun getContract() : String {
 			return "wearable"
 		}
 	}
@@ -205,7 +205,7 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		access(all) getTags() : [String] {
+		pub fun getTags() : [String] {
 			let t : [String] = []
 			for tag in self.tags {
 				t.append(tag.getCounterSuffix())
@@ -213,48 +213,48 @@ pub contract Wearables: NonFungibleToken {
 			return t
 		}
 
-		access(all) getPlural() : Bool {
+		pub fun getPlural() : Bool {
 			return self.plural
 		}
 
-		access(all) getHidden() : Bool {
+		pub fun getHidden() : Bool {
 				return self.hidden
 		}
 
-		access(all) getIdentifier() : String {
+		pub fun getIdentifier() : String {
 			return self.name
 		}
 
-		access(all) getClassifier() :String {
+		pub fun getClassifier() :String {
 			return "template"
 		}
 
 		// Trim is not a unique identifier here
-		access(all) getCounterSuffix() : String {
+		pub fun getCounterSuffix() : String {
 			return self.name
 		}
 
-		access(all) getContract() : String {
+		pub fun getContract() : String {
 			return "wearable"
 		}
 
-		access(all) getPositionName(_ index:Int) : String {
+		pub fun getPositionName(_ index:Int) : String {
 			return Wearables.positions[self.position]!.getName(index)
 		}
 
-		access(all) getPosition() : Wearables.Position {
+		pub fun getPosition() : Wearables.Position {
 			return Wearables.positions[self.position]!
 		}
 
-		access(all) getSetName() : String {
+		pub fun getSetName() : String {
 			return Wearables.sets[self.set]!.name
 		}
 
-		access(all) getSet() : Wearables.Set {
+		pub fun getSet() : Wearables.Set {
 			return Wearables.sets[self.set]!
 		}
 
-		access(all) getRoyalties() : [MetadataViews.Royalty] {
+		pub fun getRoyalties() : [MetadataViews.Royalty] {
 			return Wearables.sets[self.set]!.getRoyalties()
 		}
 
@@ -281,20 +281,20 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		access(all) getValue() : String {
+		pub fun getValue() : String {
 			return self.value
 		}
 
-		access(all) getCounterSuffix() : String {
+		pub fun getCounterSuffix() : String {
 			return self.value
 		}
 
 		// e.g. set , position
-		access(all) getClassifier() : String {
+		pub fun getClassifier() : String {
 			return "tag_".concat(self.value)
 		}
 		// e.g. character, wearable
-		access(all) getContract() : String {
+		pub fun getContract() : String {
 			return "wearable"
 		}
 	}
@@ -361,11 +361,11 @@ pub contract Wearables: NonFungibleToken {
 			self.editions=editions
 		}
 
-		access(all) getContext() : {String:String} {
+		pub fun getContext() : {String:String} {
 			return self.context
 		}
 
-		access(all) getViews(): [Type] {
+		pub fun getViews(): [Type] {
 			return  [
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Royalties>(),
@@ -378,22 +378,22 @@ pub contract Wearables: NonFungibleToken {
 			]
 		}
 
-		access(all) getTemplateActive() : Bool {
+		pub fun getTemplateActive() : Bool {
 			let t = Wearables.templates[self.template.id]!
 			return t.active
 		}
 
-		access(all) getPositionActive() : Bool {
+		pub fun getPositionActive() : Bool {
 			let p = self.template.getPosition()
 			return p.active
 		}
 
-		access(all) getSetActive() : Bool {
+		pub fun getSetActive() : Bool {
 			let s = self.template.getSet()
 			return s.active
 		}
 
-		access(all) getActive(_ classifier: String) : Bool {
+		pub fun getActive(_ classifier: String) : Bool {
 			switch classifier {
 
 				case "wearable" :
@@ -411,7 +411,7 @@ pub contract Wearables: NonFungibleToken {
 			return true
 		}
 
-		access(all) getLastInteraction() : Pointer? {
+		pub fun getLastInteraction() : Pointer? {
 			if self.interactions.length == 0 {
 				return nil
 			}
@@ -429,18 +429,18 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		//the thumbnail is a png but the image is a SVG, it was decided after deployment that the svg is what we will use for thumbnail and ignore the image
-		access(all) getThumbnail() : {MetadataViews.File} {
+		pub fun getThumbnail() : {MetadataViews.File} {
 				let ipfsFile =self.template.image.file as! MetadataViews.IPFSFile
 				let httpFile= MetadataViews.HTTPFile(url:"https://wcnft.mypinata.cloud/ipfs/".concat(ipfsFile.cid))
 				return httpFile
 		}
 
-		access(all) getThumbnailUrl() : String{
+		pub fun getThumbnailUrl() : String{
 			return self.getThumbnail().uri()
 		}
 
 
-		access(all) getName() : String {
+		pub fun getName() : String {
 			if self.template.tags.length == 0 {
 				return self.template.name
 			}
@@ -450,7 +450,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 
-		access(all) getDescription() : String {
+		pub fun getDescription() : String {
 			var plural=self.template.getPlural()
 
 			var first="This"
@@ -464,7 +464,7 @@ pub contract Wearables: NonFungibleToken {
 
 		}
 
-		access(all) resolveView(_ view: Type): AnyStruct? {
+		pub fun resolveView(_ view: Type): AnyStruct? {
 			let description= self.getDescription()
 
 			switch view {
@@ -523,7 +523,7 @@ pub contract Wearables: NonFungibleToken {
 			self.nounce=self.nounce+1
 		}
 
-		access(all) getAllTraitsMetadata() : [MetadataViews.Trait] {
+		pub fun getAllTraitsMetadata() : [MetadataViews.Trait] {
 			var rarity : MetadataViews.Rarity? = nil
 
 			let traits : [MetadataViews.Trait]= []
@@ -623,7 +623,7 @@ pub contract Wearables: NonFungibleToken {
 			self.extra = {}
 		}
 
-		access(all) isNewInteraction(owner: Address, characterId: UInt64) : Bool {
+		pub fun isNewInteraction(owner: Address, characterId: UInt64) : Bool {
 			return self.address == owner && self.characterId == characterId
 		}
 	}
@@ -641,7 +641,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -650,7 +650,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		// deposit moves an NFT into this collection
-		access(all) deposit(token: @NonFungibleToken.NFT) {
+		pub fun deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
 
 			let id: UInt64 = token.id
@@ -665,18 +665,18 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		access(all) getIDs(): [UInt64] {
+		pub fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		//a borrow method for the generic view resolver pattern
-		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let wearable = nft as! &NFT
 			return wearable
@@ -695,7 +695,7 @@ pub contract Wearables: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 

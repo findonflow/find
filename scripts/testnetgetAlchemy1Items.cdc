@@ -13,7 +13,7 @@ import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
     return fetchAlchemyCollectionShard1(user: user, collectionIDs: collectionIDs)
 }
 
@@ -54,7 +54,7 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
 
     // Helper function
 
-    access(all) resolveAddress(user: String) : PublicAccount? {
+    pub fun resolveAddress(user: String) : PublicAccount? {
 	    let address = FIND.resolve(user)
 	    if address == nil {
 	    	return nil
@@ -66,7 +66,7 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
     //////////////////////////////////////////////////////////////
     // Fetch Specific Collections in Shard 1
     //////////////////////////////////////////////////////////////
-    access(all) fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+    pub fun fetchAlchemyCollectionShard1(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
         let source = "getNFTDetailsShard1"
         let account = resolveAddress(user: user)
         if account == nil { return {} }

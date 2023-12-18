@@ -14,7 +14,7 @@ pub contract FindAirdropper {
     pub event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, id: UInt64, type: String, context: {String : String}, reason: String)
 
     // The normal way of airdrop. If the user didn't init account, they cannot receive it
-    access(all) safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, deepValidation: Bool) {
+    pub fun safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, deepValidation: Bool) {
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)
@@ -63,7 +63,7 @@ pub contract FindAirdropper {
         pointer.deposit(<- item)
     }
 
-    access(all) forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, deepValidation: Bool) {
+    pub fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, deepValidation: Bool) {
 
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
@@ -97,7 +97,7 @@ pub contract FindAirdropper {
         emit AirdroppedToLostAndFound(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, remark: nil, ticketID: ticketID!)
     }
 
-    access(all) subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, deepValidation: Bool) {
+    pub fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: &FungibleToken.Vault, flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, deepValidation: Bool) {
 
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()

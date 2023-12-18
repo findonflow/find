@@ -34,7 +34,7 @@ pub contract EmeraldIdentity {
         // 1-to-1
         access(account) var discordToAccount: {String: Address}
 
-        access(all) createEmeraldID(account: Address, discordID: String) {
+        pub fun createEmeraldID(account: Address, discordID: String) {
             pre {
                 EmeraldIdentity.getAccountFromDiscord(discordID: discordID) == nil:
                     "The old discordID must remove their EmeraldID first."
@@ -48,12 +48,12 @@ pub contract EmeraldIdentity {
             emit EmeraldIDCreated(account: account, discordID: discordID)
         }
 
-        access(all) removeByAccount(account: Address) {
+        pub fun removeByAccount(account: Address) {
             let discordID = EmeraldIdentity.getDiscordFromAccount(account: account) ?? panic("This EmeraldID does not exist!")
             self.remove(account: account, discordID: discordID)
         }
 
-        access(all) removeByDiscord(discordID: String) {
+        pub fun removeByDiscord(discordID: String) {
             let account = EmeraldIdentity.getAccountFromDiscord(discordID: discordID) ?? panic("This EmeraldID does not exist!")
             self.remove(account: account, discordID: discordID)
         }
@@ -65,7 +65,7 @@ pub contract EmeraldIdentity {
             emit EmeraldIDRemoved(account: account, discordID: discordID)
         }
 
-        access(all) createAdministrator(): Capability<&Administrator> {
+        pub fun createAdministrator(): Capability<&Administrator> {
             return EmeraldIdentity.account.getCapability<&Administrator>(EmeraldIdentity.AdministratorPrivatePath)
         }
 
@@ -77,12 +77,12 @@ pub contract EmeraldIdentity {
 
     /*** USE THE BELOW FUNCTIONS FOR SECURE VERIFICATION OF ID ***/ 
 
-    access(all) getDiscordFromAccount(account: Address): String?  {
+    pub fun getDiscordFromAccount(account: Address): String?  {
         let admin = EmeraldIdentity.account.storage.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
         return admin.accountToDiscord[account]
     }
 
-    access(all) getAccountFromDiscord(discordID: String): Address? {
+    pub fun getAccountFromDiscord(discordID: String): Address? {
         let admin = EmeraldIdentity.account.storage.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
         return admin.discordToAccount[discordID]
     }

@@ -49,18 +49,18 @@ addons - .find leases can support add ons to the name itself.
 
 ```cadence
 	// resolve takes a string address or a find name and returns an address if valid
-	access(all) resolve(_ input:String) : Address?
+	pub fun resolve(_ input:String) : Address?
 
 	// lookupAddress look up the address of a find name, and return the owner if there is one (and if the lease is still valid / active)
-	access(all) lookupAddress(_ name:String): Address?
+	pub fun lookupAddress(_ name:String): Address?
 
 	// lookup looks up the find name owner's profile public interface if there is one
-	access(all) lookup(_ input:String): &{Profile.Public}?
+	pub fun lookup(_ input:String): &{Profile.Public}?
 
 	// reverse lookup looks up the address for the user's find name
 	// If they have set a find name, then return the find name
 	// If they haven't set a find name, return the first name that comes up in the array
-	access(all) reverseLookup(_ address:Address): String?
+	pub fun reverseLookup(_ address:Address): String?
 
 	// status returns the status of a find name
 	// For find lease we have 3 states
@@ -68,12 +68,12 @@ addons - .find leases can support add ons to the name itself.
 	// pub case TAKEN - It is already taken and in use by someone
 	// pub case LOCKED - The lease is expired now, but the lease will be locked only to the previous owner who has 3-month-time to renew it
 	//
-	access(all) status(_ name: String): NameStatus
+	pub fun status(_ name: String): NameStatus
 
 	// depositWithTagAndMessage sends fund from sender to user with / without profile and emit very good events
 	// for users with profile, it supports as much FT as they've set up wallets in profile
 	// for users without profile, we support flow and FUSD at the moment but it can be extended pretty easily
-	access(all) depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token)
+	pub fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token)
 ```
 
 ## Interaction Templates
@@ -87,7 +87,7 @@ Some example scripts to show how easy it is to implement FIND
 ```cadence
 import FIND
 
-access(all) main(name: String) : Address? {
+pub fun main(name: String) : Address? {
 	return FIND.resolve(name)
 }
 ```
@@ -97,7 +97,7 @@ access(all) main(name: String) : Address? {
 [reverseLookup](scripts/reverseLookup.cdc)
 
 ```cadence
-access(all) main(input: Address) : String? {
+pub fun main(input: Address) : String? {
 	return FIND.reverseLookup(input)
 }
 ```
@@ -123,14 +123,14 @@ We have a primary social tools which users can follow / unfollow / setPrivate or
 			// asReport returns all User Profile information including
 			// address, profile name, find name, description, tags etc.
 			// and wallet information
-			access(all) asReport() : UserReport
+			pub fun asReport() : UserReport
 
 			// Primary social graphing functions are also exposed under the interface
-			access(all) isBanned(_ val: Address): Bool
-			access(all) isPrivateModeEnabled() : Bool
-			access(all) getFollowers(): [FriendStatus]
-			access(all) getFollowing(): [FriendStatus]
-			access(all) getLinks() : [Link]
+			pub fun isBanned(_ val: Address): Bool
+			pub fun isPrivateModeEnabled() : Bool
+			pub fun getFollowers(): [FriendStatus]
+			pub fun getFollowing(): [FriendStatus]
+			pub fun getLinks() : [Link]
 		}
 
 		// User resource is the Profile that we are referring to.
@@ -140,20 +140,20 @@ We have a primary social tools which users can follow / unfollow / setPrivate or
 			// In deposit function,
 			// The profile is smart enough to identify the vault type and deposit to corresponding FT vault.
 			// Even if the wallet is not set to link with profile, we still tries to borrow vaults from standard path and deposit it.
-			access(all) deposit(from: @FungibleToken.Vault)
+			pub fun deposit(from: @FungibleToken.Vault)
 
 			// Wallets related functions
-			access(all) hasWallet(_ name: String) : Bool
-			access(all) getWallets() : [Wallet]
-			access(all) addWallet(_ val: Wallet)
-			access(all) removeWallet(_ val: String)
-			access(all) setWallets(_ val: [Wallet])
+			pub fun hasWallet(_ name: String) : Bool
+			pub fun getWallets() : [Wallet]
+			pub fun addWallet(_ val: Wallet)
+			pub fun removeWallet(_ val: String)
+			pub fun setWallets(_ val: [Wallet])
 
 			// Followers related functions
-			access(all) removeFollower(_ val: Address)
-			access(all) follows(_ address: Address) : Bool
-			access(all) follow(_ address: Address, tags:[String])
-			access(all) unfollow(_ address: Address)
+			pub fun removeFollower(_ val: Address)
+			pub fun follows(_ address: Address) : Bool
+			pub fun follow(_ address: Address, tags:[String])
+			pub fun unfollow(_ address: Address)
 		}
 	}
 ```
@@ -247,19 +247,19 @@ User can add their flow wallets / wallets on other chains by network and name. T
 	pub contract FindRelatedAccounts {
 		pub resource interface Public{
 			// get all registered related flow accounts
-			access(all) getFlowAccounts() : {String: [Address]}
+			pub fun getFlowAccounts() : {String: [Address]}
 			// get all registered related accounts in specific network
-			access(all) getRelatedAccounts(_ network: String) : {String : [String]}
+			pub fun getRelatedAccounts(_ network: String) : {String : [String]}
 			// get all registered related accounts : {Network : Addresses}
-			access(all) getAllRelatedAccounts() : {String : {String : [String]}}
+			pub fun getAllRelatedAccounts() : {String : {String : [String]}}
 			// get all registered related accounts : {Network : AccountInfo struct}
-			access(all) getAllRelatedAccountInfo() : {String : AccountInformation}
+			pub fun getAllRelatedAccountInfo() : {String : AccountInformation}
 			// verify ensure this wallet address exist under the network
-			access(all) verify(network: String, address: String) : Bool
+			pub fun verify(network: String, address: String) : Bool
 			// linked ensure this wallet is linked in both wallet with the same name (but not socially linked only)
 			// only supports flow for now
-			access(all) linked(name: String, network: String, address: Address) : Bool
-			access(all) getAccount(name: String, network: String, address: String) : AccountInformation?
+			pub fun linked(name: String, network: String, address: Address) : Bool
+			pub fun getAccount(name: String, network: String, address: String) : AccountInformation?
 		}
 
 	}
@@ -333,7 +333,7 @@ transaction(
 [getAllRelatedAccounts](scripts/getAllRelatedAccounts.cdc)
 
 ```cadence
-access(all) main(
+pub fun main(
 	user: Address
 	// @return : {Network : {Wallet : [wallet address]}}
 	) : {String : {String : [String]}}
@@ -347,7 +347,7 @@ Report -> FINDReport -> accounts
 [getAllRelatedAccounts](scripts/getAllRelatedAccounts.cdc)
 
 ```cadence
-access(all) main(
+pub fun main(
 	user: String
 	) : Report?
 
@@ -395,14 +395,14 @@ It is a little more complicated to handle NFT information because it can come in
 			// asReport returns all User Profile information including
 			// address, profile name, find name, description, tags etc.
 			// and wallet information
-			access(all) asReport() : UserReport
+			pub fun asReport() : UserReport
 
 			// Primary social graphing functions are also exposed under the interface
-			access(all) isBanned(_ val: Address): Bool
-			access(all) isPrivateModeEnabled() : Bool
-			access(all) getFollowers(): [FriendStatus]
-			access(all) getFollowing(): [FriendStatus]
-			access(all) getLinks() : [Link]
+			pub fun isBanned(_ val: Address): Bool
+			pub fun isPrivateModeEnabled() : Bool
+			pub fun getFollowers(): [FriendStatus]
+			pub fun getFollowing(): [FriendStatus]
+			pub fun getLinks() : [Link]
 		}
 
 		pub struct UserReport {
@@ -437,7 +437,7 @@ NFTs can be fetched from these scripts
 // collections : target collection or empty if no specific collection wanted
 
 // @return a map of collection to ids
-access(all) main(
+pub fun main(
 	user: String,
 	collections: [String]
 	) : {String : ItemReport}
@@ -484,7 +484,7 @@ pub struct ItemReport {
 	Find Market Doable actions
 	Community Listings (Flovatar market, Flowty rental and borrow market, StoreFront market)
 */
-access(all) main(
+pub fun main(
 	user: String,
 	project:String,
 	id: UInt64,
@@ -539,8 +539,8 @@ The configuration enables us to add as many more as we want on top
 		pub resource Tenant {
 			// in the tenant reference, call getStoragePath or getPublicPath by sending in the Market Option SaleItemCollection Type, will give you the path to SaleItemCollection
 			// Example will demonstrate how to get the target saleItemCollection form a tenant name / address
-			access(all) getStoragePath(_ type: Type) : StoragePath
-			access(all) getPublicPath(_ type: Type) : PublicPath
+			pub fun getStoragePath(_ type: Type) : StoragePath
+			pub fun getPublicPath(_ type: Type) : PublicPath
 		}
 
 		// TenantClient resource will be stored in tenant account storage.
@@ -554,14 +554,14 @@ The configuration enables us to add as many more as we want on top
 		// getTenantAddress can get tenant address from a tenant name
 		// Please be reminded that this name IS NOT the find name and can be anything, .find team has exclusive control over tenant creation and therefore it will not be a problem
 		// currently "find" will be the tenant name for find tenant or you can also call the beflow function to get "find" marketplace address
-		access(all) getTenantAddress(_ name: String) : Address?
+		pub fun getTenantAddress(_ name: String) : Address?
 
-		access(all) getFindTenantAddress() : Address
+		pub fun getFindTenantAddress() : Address
 
 
 		// public function to get tenant referece with public interface
 		// the tenant reference and address are vital to do market operations on that particular tenant
-		access(all) getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic}
+		pub fun getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic}
 	}
 
 ```
@@ -596,13 +596,13 @@ pub contract FindMarketSale {
 	// This is a public interface that expose needed information and required function to execute market interaction.
 	pub resource interface SaleItemCollectionPublic {
 		// fetch all the tokens in the collection
-		access(all) getIds(): [UInt64]
+		pub fun getIds(): [UInt64]
 		// borrow specific saleItem so as to get detail listing info
-		access(all) borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem}
+		pub fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem}
 		// containsId is a gas efficient way to check if a listing is there. Other than getting all ids and check contains
-		access(all) containsId(_ id: UInt64): Bool
+		pub fun containsId(_ id: UInt64): Bool
 		// buy function is exposed here so people can access the seller's saleItemCollection and buy the item.
-		access(all) buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>)
+		pub fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>)
 	}
 
 	// SaleItemCollection is similar to Collection to NFTs, it is a collection of all user's saleItmem in that market option type.
@@ -613,23 +613,23 @@ pub contract FindMarketSale {
 		// It requires user to setup a provider private capability and store it in the AuthPointer struct.
 		// The AuthPointer struct secures it and ensure it will only be used to withdraw the dedicated NFT
 
-		access(all) listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct})
+		pub fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct})
 
 		// delist takes the listing id (NFT uuid)
-		access(all) delist(_ id: UInt64)
+		pub fun delist(_ id: UInt64)
 
 		// relist is a helper function to revalidate the listing.
 		// It only takes the listing id and will try to relist for you.
 		// Cases that this would be useful and handy would be :
 		// 1. royalty of the NFT changed
 		// 2. listing expires and would like to relist
-		access(all) relist(_ id: UInt64)
+		pub fun relist(_ id: UInt64)
 
 	}
 
 	// contract level function
 	// getSaleItemCapability takes the marketplace (tenant) address and the user address, and return the saleItemCapability for fetching information and call buy function
-	access(all) getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>?
+	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>?
 }
 ```
 
@@ -959,26 +959,26 @@ pub contract FindThoughts {
 		pub var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?)
-		access(all) getQuotedThought() : ThoughtPointer?
-		access(all) getHide() : Bool
+		pub fun getQuotedThought() : ThoughtPointer?
+		pub fun getHide() : Bool
 	}
 
 	// CollectionPublic interface exposes below functions to the public
 	pub resource interface CollectionPublic {
-		access(all) contains(_ id: UInt64) : Bool
-		access(all) getIDs() : [UInt64]
-		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic}
+		pub fun contains(_ id: UInt64) : Bool
+		pub fun getIDs() : [UInt64]
+		pub fun borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic}
 	}
 
 	// Collection
 	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
 		// Publish a thought with optional media, NFTPointer or quotes
-		access(all) publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
-		access(all) delete(_ id: UInt64)
-		access(all) hide(id: UInt64, hide: Bool)
+		pub fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
+		pub fun delete(_ id: UInt64)
+		pub fun hide(id: UInt64, hide: Bool)
 
 		// react to OTHER user's thought
-		access(all) react(user: Address, id: UInt64, reaction: String?)
+		pub fun react(user: Address, id: UInt64, reaction: String?)
 	}
 
 }
@@ -1074,7 +1074,7 @@ Scripts to fetch different user's thoughts
 [getFindThoughts](scripts/getFindThoughts.cdc)
 
 ```cadence
-access(all) main(
+pub fun main(
 	// owner of the thought
 	addresses: [Address],
 	// corresponding thought IDs
@@ -1087,7 +1087,7 @@ Scripts to fetch one user's all thoughts
 [getOwnedFindThoughts](scripts/getOwnedFindThoughts.cdc)
 
 ```cadence
-access(all) main(
+pub fun main(
 	// owner of the thought
 	address: Address
 	) : [Thought]

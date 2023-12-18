@@ -8,7 +8,7 @@ import NFTCatalog from "./NFTCatalog.cdc"
 
 pub contract NFTRetrieval {
     
-    access(all) getRecommendedViewsTypes(version: String) : [Type] {
+    pub fun getRecommendedViewsTypes(version: String) : [Type] {
         switch version {
             case "v1":
                 return [
@@ -24,7 +24,7 @@ pub contract NFTRetrieval {
         return []
     }
 
-    access(all) getNFTCountFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{ViewResolver.ResolverCollection}>) : UInt64 {
+    pub fun getNFTCountFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{ViewResolver.ResolverCollection}>) : UInt64 {
         pre {
             NFTCatalog.getCatalog()[collectionIdentifier] != nil : "Invalid collection identifier"
         }
@@ -51,7 +51,7 @@ pub contract NFTRetrieval {
         return 0 
     }
 
-    access(all) getNFTViewsFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{ViewResolver.ResolverCollection}>) : [MetadataViews.NFTView] {
+    pub fun getNFTViewsFromCap(collectionIdentifier: String, collectionCap : Capability<&AnyResource{ViewResolver.ResolverCollection}>) : [MetadataViews.NFTView] {
         pre {
             NFTCatalog.getCatalog()[collectionIdentifier] != nil : "Invalid collection identifier"
         }

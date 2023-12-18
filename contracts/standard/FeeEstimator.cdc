@@ -21,7 +21,7 @@ pub contract FeeEstimator {
             self.storageFee = storageFee
         }
 
-        access(all) withdraw(): @AnyResource {
+        pub fun withdraw(): @AnyResource {
             let resource <- self.item <- nil
             return <-resource!
         }
@@ -35,11 +35,11 @@ pub contract FeeEstimator {
         }
     }
 
-    access(all) hasStorageCapacity(_ addr: Address, _ storageFee: UFix64): Bool {
+    pub fun hasStorageCapacity(_ addr: Address, _ storageFee: UFix64): Bool {
         return FlowStorageFees.defaultTokenAvailableBalance(addr) > storageFee
     }
 
-    access(all) estimateDeposit(
+    pub fun estimateDeposit(
         item: @AnyResource,
     ): @DepositEstimate {
         let storageUsedBefore = FeeEstimator.account.storageUsed
@@ -53,7 +53,7 @@ pub contract FeeEstimator {
         return <- estimate
     }
 
-    access(all) storageUsedToFlowAmount(_ storageUsed: UInt64): UFix64 {
+    pub fun storageUsedToFlowAmount(_ storageUsed: UInt64): UFix64 {
         let storageMB = FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(storageUsed)
         return FlowStorageFees.storageCapacityToFlow(storageMB)
     }

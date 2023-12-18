@@ -1,6 +1,6 @@
 import FindVerifier from "../contracts/FindVerifier.cdc"
 
-access(all) main(user: Address, findNames: [String]) : Result {
+pub fun main(user: Address, findNames: [String]) : Result {
     let verifier = FindVerifier.HasFINDName(findNames)
     let input : {String : AnyStruct} = {"address" : user}
     return Result(verifier, input: input)

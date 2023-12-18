@@ -36,83 +36,83 @@ pub contract FindLeaseMarketSale {
 			self.saleItemExtraField=saleItemExtraField
 		}
 
-		access(all) getSaleType() : String {
+		pub fun getSaleType() : String {
 			return "active_listed"
 		}
 
-		access(all) getListingType() : Type {
+		pub fun getListingType() : Type {
 			return Type<@SaleItem>()
 		}
 
-		access(all) getListingTypeIdentifier(): String {
+		pub fun getListingTypeIdentifier(): String {
 			return Type<@SaleItem>().identifier
 		}
 
-		access(all) setBuyer(_ address:Address) {
+		pub fun setBuyer(_ address:Address) {
 			self.buyer=address
 		}
 
-		access(all) getBuyer(): Address? {
+		pub fun getBuyer(): Address? {
 			return self.buyer
 		}
 
-		access(all) getBuyerName() : String? {
+		pub fun getBuyerName() : String? {
 			if let address = self.buyer {
 				return FIND.reverseLookup(address)
 			}
 			return nil
 		}
 
-		access(all) getLeaseName() : String {
+		pub fun getLeaseName() : String {
 			return self.pointer.name
 		}
 
-		access(all) getItemType() : Type {
+		pub fun getItemType() : Type {
 			return Type<@FIND.Lease>()
 		}
 
-		access(all) getId() : UInt64 {
+		pub fun getId() : UInt64 {
 			return self.pointer.getUUID()
 		}
 
-		access(all) getSeller() : Address {
+		pub fun getSeller() : Address {
 			return self.pointer.owner()
 		}
 
-		access(all) getSellerName() : String? {
+		pub fun getSellerName() : String? {
 			let address = self.pointer.owner()
 			return FIND.reverseLookup(address)
 		}
 
-		access(all) getBalance() : UFix64 {
+		pub fun getBalance() : UFix64 {
 			return self.salePrice
 		}
 
-		access(all) getAuction(): FindLeaseMarket.AuctionItem? {
+		pub fun getAuction(): FindLeaseMarket.AuctionItem? {
 			return nil
 		}
 
-		access(all) getFtType() : Type  {
+		pub fun getFtType() : Type  {
 			return self.vaultType
 		}
 
-		access(all) setValidUntil(_ time: UFix64?) {
+		pub fun setValidUntil(_ time: UFix64?) {
 			self.validUntil=time
 		}
 
-		access(all) getValidUntil() : UFix64? {
+		pub fun getValidUntil() : UFix64? {
 			return self.validUntil
 		}
 
-		access(all) toLeaseInfo() : FindLeaseMarket.LeaseInfo {
+		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo {
 			return FindLeaseMarket.LeaseInfo(self.pointer)
 		}
 
-		access(all) checkPointer() : Bool {
+		pub fun checkPointer() : Bool {
 			return self.pointer.valid()
 		}
 
-		access(all) getSaleItemExtraField() : {String : AnyStruct} {
+		pub fun getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
 
@@ -120,10 +120,10 @@ pub contract FindLeaseMarketSale {
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
-		access(all) getNameSales(): [String]
-		access(all) containsNameSale(_ name: String): Bool
-		access(all) borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem}
-		access(all) buy(name: String, vault: @FungibleToken.Vault, to: Address)
+		pub fun getNameSales(): [String]
+		pub fun containsNameSale(_ name: String): Bool
+		pub fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem}
+		pub fun buy(name: String, vault: @FungibleToken.Vault, to: Address)
 	}
 
 	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic {
@@ -144,11 +144,11 @@ pub contract FindLeaseMarketSale {
 			return self.tenantCapability.borrow()!
 		}
 
-		access(all) getListingType() : Type {
+		pub fun getListingType() : Type {
 			return Type<@SaleItem>()
 		}
 
-		access(all) buy(name: String, vault: @FungibleToken.Vault, to: Address)  {
+		pub fun buy(name: String, vault: @FungibleToken.Vault, to: Address)  {
 			pre {
 				self.items.containsKey(name) : "Invalid name=".concat(name)
 				self.owner!.address != to : "You cannot buy your own listing"
@@ -195,7 +195,7 @@ pub contract FindLeaseMarketSale {
 			destroy <- self.items.remove(key: name)
 		}
 
-		access(all) listForSale(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
+		pub fun listForSale(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
 
 			// ensure it is not a 0 dollar listing
 			if directSellPrice <= 0.0 {
@@ -222,7 +222,7 @@ pub contract FindLeaseMarketSale {
 
 		}
 
-		access(all) delist(_ name: String) {
+		pub fun delist(_ name: String) {
 			pre {
 				self.items.containsKey(name) : "Unknown name lease=".concat(name)
 			}
@@ -250,19 +250,19 @@ pub contract FindLeaseMarketSale {
 			destroy saleItem
 		}
 
-		access(all) getNameSales(): [String] {
+		pub fun getNameSales(): [String] {
 			return self.items.keys
 		}
 
-		access(all) containsNameSale(_ name: String): Bool {
+		pub fun containsNameSale(_ name: String): Bool {
 			return self.items.containsKey(name)
 		}
 
-		access(all) borrow(_ name: String): &SaleItem {
+		pub fun borrow(_ name: String): &SaleItem {
 			return (&self.items[name] as &SaleItem?)!
 		}
 
-		access(all) borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
+		pub fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
 			pre{
 				self.items.containsKey(name) : "This name sale does not exist : ".concat(name)
 			}
@@ -275,11 +275,11 @@ pub contract FindLeaseMarketSale {
 	}
 
 	//Create an empty lease collection that store your leases to a name
-	access(all) createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
+	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
 		return <- create SaleItemCollection(tenantCapability)
 	}
 
-	access(all) getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
+	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
 		pre{
 			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}

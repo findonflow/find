@@ -33,7 +33,7 @@ We have tried to make it easy to use .find in cadence so most functions are onel
 ```cadence
 import FIND from 0x097bafa4e0b48eef
 
-access(all) main(name: String) : Address?  {
+pub fun main(name: String) : Address?  {
   return FIND.lookupAddress(name)
 }
 ```
@@ -42,7 +42,7 @@ If you want the read-only profile of a user for displaying in your solution you 
 ```cadence
 import FIND, Profile from 0x097bafa4e0b48eef
 
-access(all) main(name: String) :  Profile.UserProfile? {
+pub fun main(name: String) :  Profile.UserProfile? {
     return FIND.lookup(name)?.asProfile()
 }
 ```
@@ -52,7 +52,7 @@ access(all) main(name: String) :  Profile.UserProfile? {
 ```cadence
 import FIND, Profile from 0x097bafa4e0b48eef
 
-access(all) main(address: Address) :  String? {
+pub fun main(address: Address) :  String? {
     return FIND.reverseLookup(address)
 }
 ```

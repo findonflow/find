@@ -30,7 +30,7 @@ import FIND from 0x37a05b1ecacc80f7
 //mainnet
 //import FIND from ??
 
-access(all) main(name: String) :  Address? {
+pub fun main(name: String) :  Address? {
     return FIND.lookupAddress(name)
 }
 ```

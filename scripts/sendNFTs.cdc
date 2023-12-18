@@ -11,7 +11,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 
-access(all) main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
+pub fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
 
  	fun logErr(_ i: Int , err: String) : Report {
 		return Report(receiver: allReceivers[i] , address: nil, inputName: nil, findName: nil, avatar: nil, isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, royalties: nil, err: err)
@@ -210,7 +210,7 @@ pub struct Royalty {
 	}
 }
 
-access(all) checkSameContract(collection: Type, nft: Type) : Bool {
+pub fun checkSameContract(collection: Type, nft: Type) : Bool {
 	let colType = collection.identifier
 	let croppedCol = colType.slice(from: 0 , upTo : colType.length - "collection".length)
 	let nftType = nft.identifier

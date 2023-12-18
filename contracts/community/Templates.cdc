@@ -29,13 +29,13 @@ pub contract Templates {
 
 	pub struct interface Editionable {
 
-		access(all) getCounterSuffix() : String
+		pub fun getCounterSuffix() : String
 		// e.g. set , position
-		access(all) getClassifier() : String
+		pub fun getClassifier() : String
 		// e.g. character, wearable
-		access(all) getContract() : String
+		pub fun getContract() : String
 
-		access(all) getCounter() : String {
+		pub fun getCounter() : String {
 			return self.getContract().concat("_").concat(self.getClassifier()).concat("_").concat(self.getCounterSuffix())
 		}
 
@@ -43,7 +43,7 @@ pub contract Templates {
 			return Templates.createEditionInfoManually(name:self.getClassifier(), counter:self.getCounter(), edition:edition)
 		}
 
-		access(all) getCurrentCount() : UInt64 {
+		pub fun getCurrentCount() : UInt64 {
 			return Templates.counters[self.getCounter()] ?? 0
 		}
 
@@ -53,9 +53,9 @@ pub contract Templates {
 
 		pub var active:Bool
 
-		access(all) getCounterSuffix() : String
-		access(all) getClassifier() : String
-		access(all) getContract() : String
+		pub fun getCounterSuffix() : String
+		pub fun getClassifier() : String
+		pub fun getContract() : String
 
 		access(account) fun enable(_ bool : Bool) {
 			pre{
@@ -68,7 +68,7 @@ pub contract Templates {
 	pub struct interface RoyaltyHolder {
 		pub let royalties: [Templates.Royalty]
 
-		access(all) getRoyalties() : [MetadataViews.Royalty] {
+		pub fun getRoyalties() : [MetadataViews.Royalty] {
 			let royalty : [MetadataViews.Royalty] = []
 			for r in self.royalties {
 				royalty.append(r.getRoyalty())
@@ -88,11 +88,11 @@ pub contract Templates {
 			self.number=number
 		}
 
-		access(all) getSupply() : UInt64 {
+		pub fun getSupply() : UInt64 {
 			return Templates.counters[self.counter] ?? 0
 		}
 
-		access(all) getAsMetadataEdition(_ active:Bool) : MetadataViews.Edition {
+		pub fun getAsMetadataEdition(_ active:Bool) : MetadataViews.Edition {
 			var max : UInt64?=nil
 			if !active  {
 				max=Templates.counters[self.counter]
@@ -100,7 +100,7 @@ pub contract Templates {
 			return MetadataViews.Edition(name:self.name, number:self.number, max:max)
 		}
 
-		access(all) getMaxEdition() : UInt64 {
+		pub fun getMaxEdition() : UInt64 {
 			return Templates.counters[self.counter]!
 		}
 
@@ -121,22 +121,22 @@ pub contract Templates {
 			self.publicPath = publicPath
 		}
 
-		access(all) getPublicPath() : PublicPath {
+		pub fun getPublicPath() : PublicPath {
 			return PublicPath(identifier: self.publicPath)!
 		}
 
-		access(all) getRoyalty() : MetadataViews.Royalty {
+		pub fun getRoyalty() : MetadataViews.Royalty {
 			let cap = getAccount(self.address).getCapability<&{FungibleToken.Receiver}>(self.getPublicPath())
 			return MetadataViews.Royalty(receiver: cap, cut: self.cut, description: self.name)
 		}
 
 	}
 
-	access(all) featureEnabled(_ action: String) : Bool {
+	pub fun featureEnabled(_ action: String) : Bool {
 		return self.features[action] ?? false
 	}
 
-	access(all) assertFeatureEnabled(_ action: String) {
+	pub fun assertFeatureEnabled(_ action: String) {
 		if !Templates.featureEnabled(action) {
 			panic("Action cannot be taken, feature is not enabled : ".concat(action))
 		}

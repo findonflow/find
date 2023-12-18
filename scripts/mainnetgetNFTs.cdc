@@ -99,7 +99,7 @@ pub struct MetadataCollectionItem {
 //TODO:missing some from mainnet
 
 // Same method signature as getNFTs.cdc for backwards-compatability.
-access(all) getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 	let NFTs: [MetadataCollectionItem] = []
 	let owner = getAccount(ownerAddress)
 	if owner.balance == 0.0 {
@@ -175,7 +175,7 @@ access(all) getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCol
 	return NFTs
 }
 
-access(all)	getFlovatar(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getFlovatar(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let flovatarCap = owner.getCapability<&{Flovatar.CollectionPublic}>(Flovatar.CollectionPublicPath)  
 	if !flovatarCap.check(){
@@ -213,7 +213,7 @@ access(all)	getFlovatar(owner:PublicAccount, id:UInt64) : MetadataCollectionItem
 	)
 }
 
-access(all)	getFlovatarSale(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getFlovatarSale(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let flovatarMarketCap = owner.getCapability<&{FlovatarMarketplace.SalePublic}>(FlovatarMarketplace.CollectionPublicPath)  
 	if !flovatarMarketCap.check(){
 		return nil
@@ -253,7 +253,7 @@ access(all)	getFlovatarSale(owner:PublicAccount, id:UInt64) : MetadataCollection
 	)
 }
 
-access(all)	getVersusSale(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getVersusSale(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let versusImageUrlPrefix = "https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 	let versusMarketplace = owner.getCapability<&{Marketplace.SalePublic}>(Marketplace.CollectionPublicPath)
@@ -275,7 +275,7 @@ access(all)	getVersusSale(owner:PublicAccount, id:UInt64) : MetadataCollectionIt
 	)
 }
 
-access(all)	getVersus(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getVersus(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let versusArtCap=owner.getCapability<&{Art.CollectionPublic}>(Art.CollectionPublicPath)
 	let versusImageUrlPrefix = "https://res.cloudinary.com/dxra4agvf/image/upload/c_fill,w_600/f_auto/maincache"
 	if !versusArtCap.check(){
@@ -297,7 +297,7 @@ access(all)	getVersus(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? 
 	)
 }
 
-access(all)	getGoober(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGoober(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let goobersCap = owner.getCapability<&GooberXContract.Collection{NonFungibleToken.Collection, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 	if !goobersCap.check() {
@@ -318,7 +318,7 @@ access(all)	getGoober(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? 
 	)
 } 
 
-access(all)	getPartyBeers(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getPartyBeers(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let partyMansionDrinksCap = owner.getCapability<&{PartyMansionDrinksContract.DrinkCollectionPublic}>(PartyMansionDrinksContract.CollectionPublicPath)
 	if !partyMansionDrinksCap.check() {
@@ -339,7 +339,7 @@ access(all)	getPartyBeers(owner:PublicAccount, id:UInt64) : MetadataCollectionIt
 	)
 } 
 
-access(all)	getRareRooms(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getRareRooms(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let rareRoomCap = owner.getCapability<&RareRooms_NFT.Collection{RareRooms_NFT.RareRooms_NFTCollectionPublic}>(RareRooms_NFT.CollectionPublicPath)
 	if !rareRoomCap.check() {
 		return nil
@@ -360,7 +360,7 @@ access(all)	getRareRooms(owner:PublicAccount, id:UInt64) : MetadataCollectionIte
 
 
 } 
-access(all)	getCNN(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getCNN(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let cnnCap = owner.getCapability<&CNN_NFT.Collection{CNN_NFT.CNN_NFTCollectionPublic}>(CNN_NFT.CollectionPublicPath)
 	if !cnnCap.check() {
 		return nil
@@ -385,7 +385,7 @@ access(all)	getCNN(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	)
 } 
 
-access(all)	getCanesVault(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getCanesVault(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let canesVaultCap = owner.getCapability<&Canes_Vault_NFT.Collection{Canes_Vault_NFT.Canes_Vault_NFTCollectionPublic}>(Canes_Vault_NFT.CollectionPublicPath)
 	if !canesVaultCap.check() {
 		return nil
@@ -407,7 +407,7 @@ access(all)	getCanesVault(owner:PublicAccount, id:UInt64) : MetadataCollectionIt
 	)
 }
 
-access(all)	getDGD(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getDGD(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let dgdCap = owner.getCapability<&DGD_NFT.Collection{DGD_NFT.DGD_NFTCollectionPublic}>(DGD_NFT.CollectionPublicPath)
 	if !dgdCap.check() {
 		return nil
@@ -430,7 +430,7 @@ access(all)	getDGD(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	)
 } 
 
-access(all)	getRaceDay(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getRaceDay(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let raceDayCap = owner.getCapability<&RaceDay_NFT.Collection{RaceDay_NFT.RaceDay_NFTCollectionPublic}>(RaceDay_NFT.CollectionPublicPath)
 	if !raceDayCap.check() {
 		return nil
@@ -453,7 +453,7 @@ access(all)	getRaceDay(owner:PublicAccount, id:UInt64) : MetadataCollectionItem?
 	)
 } 
 
-access(all)	getTheNextCartel(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getTheNextCartel(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let nextCartelCap = owner.getCapability<&The_Next_Cartel_NFT.Collection{The_Next_Cartel_NFT.The_Next_Cartel_NFTCollectionPublic}>(The_Next_Cartel_NFT.CollectionPublicPath)
 	if !nextCartelCap.check() {
 		return nil
@@ -476,7 +476,7 @@ access(all)	getTheNextCartel(owner:PublicAccount, id:UInt64) : MetadataCollectio
 	)
 }
 
-access(all)	getUFC(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getUFC(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let ufcCap = owner.getCapability<&UFC_NFT.Collection{UFC_NFT.UFC_NFTCollectionPublic}>(UFC_NFT.CollectionPublicPath)
 	if !ufcCap.check() {
 		return nil
@@ -500,7 +500,7 @@ access(all)	getUFC(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 
 }
-access(all)	getMotoGP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getMotoGP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let motoGPCollection = owner.getCapability<&MotoGPCard.Collection{MotoGPCard.ICardCollectionPublic}>(/public/motogpCardCollection)
 	if !motoGPCollection.check() {
 		return nil
@@ -520,7 +520,7 @@ access(all)	getMotoGP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? 
 		rarity: ""
 	)
 }
-access(all)	getGaia(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGaia(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let gaiaCollection = owner.getCapability<&{Gaia.CollectionPublic}>(Gaia.CollectionPublicPath)
 	if !gaiaCollection.check() {
 		return nil
@@ -570,7 +570,7 @@ return MetadataCollectionItem(
 )
 } 
 
-access(all)	getJambb(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getJambb(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let jambbCap = owner.getCapability<&Moments.Collection{Moments.CollectionPublic}>(Moments.CollectionPublicPath)
 	if !jambbCap.check() {
 		return nil
@@ -590,7 +590,7 @@ access(all)	getJambb(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	)
 } 
 
-access(all)	getJambbVoucher(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getJambbVoucher(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let voucherCap = owner.getCapability<&{Vouchers.CollectionPublic}>(Vouchers.CollectionPublicPath)
 	if !voucherCap.check() {
 		return nil
@@ -612,7 +612,7 @@ access(all)	getJambbVoucher(owner:PublicAccount, id:UInt64) : MetadataCollection
 	)
 } 
 
-access(all)	getMatrixWorldFlowFest(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getMatrixWorldFlowFest(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let mwaCap = owner.getCapability<&{MatrixWorldFlowFestNFT.MatrixWorldFlowFestNFTCollectionPublic}>(MatrixWorldFlowFestNFT.CollectionPublicPath)
 	if !mwaCap.check() {
 		return nil
@@ -633,7 +633,7 @@ access(all)	getMatrixWorldFlowFest(owner:PublicAccount, id:UInt64) : MetadataCol
 	)
 } 
 
-access(all)	getMatrixWorldAssets(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getMatrixWorldAssets(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let matrixworldAsset = owner.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.Collection}>(MatrixWorldAssetsNFT.collectionPublicPath)
 	if !matrixworldAsset.check() {
@@ -653,7 +653,7 @@ access(all)	getMatrixWorldAssets(owner:PublicAccount, id:UInt64) : MetadataColle
 	)
 } 
 
-access(all)	getSturdyItems(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getSturdyItems(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let sturdyCollectionCap = owner.getCapability<&SturdyItems.Collection{SturdyItems.SturdyItemsCollectionPublic}>(SturdyItems.CollectionPublicPath)
 	if !sturdyCollectionCap.check() {
@@ -683,7 +683,7 @@ access(all)	getSturdyItems(owner:PublicAccount, id:UInt64) : MetadataCollectionI
 	)
 } 
 
-access(all)	getFindCharity(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getFindCharity(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let charityCap = owner.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)
 	if !charityCap.check() {
 		return nil
@@ -703,7 +703,7 @@ access(all)	getFindCharity(owner:PublicAccount, id:UInt64) : MetadataCollectionI
 	)
 }
 
-access(all)	getEvolution(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getEvolution(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let evolutionCap=owner.getCapability<&{Evolution.EvolutionCollectionPublic}>(/public/f4264ac8f3256818_Evolution_Collection)
 	if !evolutionCap.check() {
 		return nil
@@ -725,7 +725,7 @@ access(all)	getEvolution(owner:PublicAccount, id:UInt64) : MetadataCollectionIte
 	)
 }
 
-access(all)	getGeniace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGeniace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let geniaceCap = owner.getCapability<&GeniaceNFT.Collection{NonFungibleToken.Collection, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if !geniaceCap.check() {
 		return nil
@@ -755,7 +755,7 @@ access(all)	getGeniace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem?
 	)
 } 
 
-access(all)	getOneFootballCollectible(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getOneFootballCollectible(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let address=owner.address!
 	let oneFootballCollectibleCap = owner.getCapability<&OneFootballCollectible.Collection{OneFootballCollectible.OneFootballCollectibleCollectionPublic}>(OneFootballCollectible.CollectionPublicPath)
 	if !oneFootballCollectibleCap.check() {
@@ -777,7 +777,7 @@ access(all)	getOneFootballCollectible(owner:PublicAccount, id:UInt64) : Metadata
 	)
 } 
 
-access(all)	getCryptoPiggoes(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getCryptoPiggoes(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let cryptoPiggoCap = owner.getCapability<&{CryptoPiggo.CryptoPiggoCollectionPublic}>(CryptoPiggo.CollectionPublicPath)
 	if !cryptoPiggoCap.check() {
 		return nil
@@ -796,7 +796,7 @@ access(all)	getCryptoPiggoes(owner:PublicAccount, id:UInt64) : MetadataCollectio
 	)
 } 
 
-access(all)	getXtingles(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getXtingles(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let xtinglesCap= owner.getCapability<&{Collectible.CollectionPublic}>(Collectible.CollectionPublicPath)
 	if !xtinglesCap.check() {
 		return nil
@@ -822,7 +822,7 @@ access(all)	getXtingles(owner:PublicAccount, id:UInt64) : MetadataCollectionItem
 	)
 } 
 
-access(all)	getGGVouhcer(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGGVouhcer(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let goatsCap = owner.getCapability<&{GoatedGoatsVouchers.GoatsVoucherCollectionPublic}>(GoatedGoatsVouchers.CollectionPublicPath)
 	if !goatsCap.check() {
 		return nil
@@ -841,7 +841,7 @@ access(all)	getGGVouhcer(owner:PublicAccount, id:UInt64) : MetadataCollectionIte
 
 	)
 }
-access(all)	getGGTraitVoucher(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGGTraitVoucher(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let goatsTraitCap = owner.getCapability<&{TraitPacksVouchers.PackVoucherCollectionPublic}>(TraitPacksVouchers.CollectionPublicPath)
 	if !goatsTraitCap.check() {
 		return nil
@@ -862,19 +862,19 @@ access(all)	getGGTraitVoucher(owner:PublicAccount, id:UInt64) : MetadataCollecti
 
 } 
 
-access(all)	getGG(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGG(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: GoatedGoats.CollectionPublicPath, owner: owner, externalFixedUrl: "https://goatedgoats.com", id:id)
 } 
 
-access(all)	getGGT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGGT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: GoatedGoatsTrait.CollectionPublicPath, owner: owner, externalFixedUrl: "https://goatedgoats.com", id:id)
 } 
 
-access(all)	getGGTP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getGGTP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return  getItemForMetadataStandard(path: GoatedGoatsTraitPack.CollectionPublicPath, owner: owner, externalFixedUrl: "https://goatedgoats.com", id:id)
 } 
 
-access(all)	getBitku(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getBitku(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let address=owner.address!
 	let bitkuCap = owner.getCapability<&{HaikuNFT.HaikuCollectionPublic}>(HaikuNFT.HaikuCollectionPublicPath)
@@ -895,7 +895,7 @@ access(all)	getBitku(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	)
 } 
 
-access(all)	getKLKNT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getKLKNT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let klktnCap = owner.getCapability<&{KlktnNFT.KlktnNFTCollectionPublic}>(KlktnNFT.CollectionPublicPath)
 	if !klktnCap.check() {
 		return nil
@@ -920,7 +920,7 @@ access(all)	getKLKNT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	)
 }
 
-access(all)	getMynft(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getMynft(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let mynftCap = owner.getCapability<&{Mynft.MynftCollectionPublic}>(Mynft.CollectionPublicPath)
 	if !mynftCap.check() {
 		return nil
@@ -946,20 +946,20 @@ access(all)	getMynft(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	)
 }
 
-access(all)	getNeoA(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getNeoA(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: NeoAvatar.CollectionPublicPath, owner: owner, externalFixedUrl: "https://neocollectibles.xyz", id:id)
 }
-access(all)	getNeoV(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getNeoV(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let address=owner.address!
 	return getItemForMetadataStandard(path: NeoVoucher.CollectionPublicPath, owner: owner, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()), id:id)
 }
 
-access(all)	getNeoM(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getNeoM(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let address=owner.address!
 	return getItemForMetadataStandard(path: NeoMember.CollectionPublicPath, owner: owner, externalFixedUrl: "https://neocollectibles.xyz/member/".concat(address.toString()), id:id)
 } 
 
-access(all)	getBYCP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getBYCP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let barterYardCap= owner.getCapability<&{BarterYardPackNFT.BarterYardPackNFTCollectionPublic}>(BarterYardPackNFT.CollectionPublicPath)
 	if !barterYardCap.check() {
 		return nil
@@ -983,11 +983,11 @@ access(all)	getBYCP(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return nil
 } 
 
-access(all)	getBYCW(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getBYCW(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: BarterYardClubWerewolf.CollectionPublicPath, owner: owner, externalFixedUrl: "https://barteryard.club", id:id)
 } 
 
-access(all)	getMomentables(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getMomentables(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let momentablesCap = owner.getCapability<&{Momentables.MomentablesCollectionPublic}>(Momentables.CollectionPublicPath)
 	if !momentablesCap.check() {
 		return nil
@@ -1010,7 +1010,7 @@ access(all)	getMomentables(owner:PublicAccount, id:UInt64) : MetadataCollectionI
 	)
 } 
 
-access(all)	getZeeds(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getZeeds(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 
 	let zeedzCap = owner.getCapability<&{ZeedzINO.ZeedzCollectionPublic}>(ZeedzINO.CollectionPublicPath)
 	if !zeedzCap.check() {
@@ -1032,15 +1032,15 @@ access(all)	getZeeds(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 }
 
 
-access(all)	getDayNFT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getDayNFT(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: DayNFT.CollectionPublicPath, owner: owner, externalFixedUrl: "https://day-nft.io", id:id)
 } 
 
-access(all)	getNecryptolis(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getNecryptolis(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: Necryptolis.ResolverCollectionPublicPath, owner: owner, externalFixedUrl: "https://www.necryptolis.com", id:id)
 }
 
-access(all)	getFlowverseSocks(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getFlowverseSocks(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let raribleCap = owner.getCapability<&{NonFungibleToken.Collection}>(RaribleNFT.collectionPublicPath)
 	if !raribleCap.check() {
 		return nil
@@ -1067,12 +1067,12 @@ access(all)	getFlowverseSocks(owner:PublicAccount, id:UInt64) : MetadataCollecti
 	)
 }
 
-access(all)	getFloat(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getFloat(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let address=owner.address!
 	return getItemForMetadataStandard(path: FLOAT.FLOATCollectionPublicPath, owner: owner, externalFixedUrl: "https://floats.city/".concat(address.toString()), id:id)
 }
 
-access(all)	getMintStore(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getMintStore(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let mintStoreCap = owner.getCapability<&{MintStoreItem.MintStoreItemCollectionPublic}>(MintStoreItem.CollectionPublicPath)
 	if !mintStoreCap.check() {
 		return nil
@@ -1112,7 +1112,7 @@ access(all)	getMintStore(owner:PublicAccount, id:UInt64) : MetadataCollectionIte
 	)
 }
 
-access(all)	getSomePlace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getSomePlace(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	let somePlaceCap =owner.getCapability<&{SomePlaceCollectible.CollectibleCollectionPublic}>(SomePlaceCollectible.CollectionPublicPath)
 	if !somePlaceCap.check() {
 		return nil
@@ -1135,17 +1135,17 @@ access(all)	getSomePlace(owner:PublicAccount, id:UInt64) : MetadataCollectionIte
 }
 
 
-access(all)	getBl0xPack(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getBl0xPack(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: Bl0xPack.CollectionPublicPath, owner: owner, externalFixedUrl: "http://bl0x.xyz", id:id)
 }
 
-access(all)	getBl0x(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
+pub fun	getBl0x(owner:PublicAccount, id:UInt64) : MetadataCollectionItem? {
 	return getItemForMetadataStandard(path: Bl0x.CollectionPublicPath, owner: owner, externalFixedUrl: "http://bl0x.xyz", id:id)
 }
 
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-access(all) getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, externalFixedUrl: String, id:UInt64) : MetadataCollectionItem? {
+pub fun getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, externalFixedUrl: String, id:UInt64) : MetadataCollectionItem? {
 	let resolverCollectionCap= owner.getCapability<&{ViewResolver.ResolverCollection}>(path)
 	if !resolverCollectionCap.check() {
 		return nil
@@ -1176,7 +1176,7 @@ access(all) getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, ex
 }
 
 /*
-access(all) main(user: String) : {String: [UInt64]} {
+pub fun main(user: String) : {String: [UInt64]} {
 	let resolvingAddress = FIND.resolve(user)
 	if resolvingAddress == nil {
 		return {}
@@ -1188,7 +1188,7 @@ access(all) main(user: String) : {String: [UInt64]} {
 */
 
 
-access(all) main(address: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+pub fun main(address: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 
 	return getNFTs(ownerAddress:address, ids:ids)
 }

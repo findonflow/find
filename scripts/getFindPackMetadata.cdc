@@ -4,7 +4,7 @@ import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(packTypeName: String, packTypeId: UInt64) : AnyStruct? {
+pub fun main(packTypeName: String, packTypeId: UInt64) : AnyStruct? {
     return FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) 
 }
 

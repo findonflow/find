@@ -30,7 +30,7 @@ pub struct MetadataCollectionItem {
 }
 
 
-access(all) main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
+pub fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
 
 	let publicPath = getPublicPath(aliasOrIdentifier)
 
@@ -74,7 +74,7 @@ access(all) main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataC
 	return nil
 }
 
-access(all) getPublicPath(_ nftIdentifier: String) : PublicPath {
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
 	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData.publicPath

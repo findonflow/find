@@ -97,7 +97,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
             self.info=info
         }
 
-        access(all) getViews(): [Type] {
+        pub fun getViews(): [Type] {
             return [
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>(),
@@ -112,7 +112,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
             ]
         }
 
-        access(all) resolveView(_ view: Type): AnyStruct? {
+        pub fun resolveView(_ view: Type): AnyStruct? {
 
             let collection = GeneratedExperiences.collectionInfo[self.info.season]!
 
@@ -216,7 +216,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             emit Withdraw(id: token.id, from: self.owner?.address)
@@ -226,7 +226,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
 
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
-        access(all) deposit(token: @NonFungibleToken.NFT) {
+        pub fun deposit(token: @NonFungibleToken.NFT) {
             let token <- token as! @GeneratedExperiences.NFT
 
             let id: UInt64 = token.id
@@ -240,17 +240,17 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        pub fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
-        access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
             let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             let ge = nft as! &GeneratedExperiences.NFT
             return ge as &AnyResource{ViewResolver.Resolver}
@@ -262,12 +262,12 @@ pub contract GeneratedExperiences: NonFungibleToken {
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
     pub resource Forge: FindForge.Forge {
-        access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+        pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
             let info = data as? Info ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<Info>().identifier))
 
             // create a new NFT
@@ -280,7 +280,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
             return <- newNFT
         }
 
-        access(all) addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let collectionInfo = data as? CollectionInfo ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<CollectionInfo>().identifier))
 
             // We cannot send in royalties directly, therefore we have to send in FindPack Royalties and generate it during minting
@@ -302,7 +302,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    access(all) getForgeType() : Type {
+    pub fun getForgeType() : Type {
         return Type<@Forge>()
     }
 

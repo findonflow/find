@@ -23,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	//access(all) main(address: Address, targetPaths: [String]): {String : Report}{
+	//pub fun main(address: Address, targetPaths: [String]): {String : Report}{
 	ids := o.Script("getNFTIDs", overflow.WithArg("address", address), overflow.WithArg("targetPaths", res.Paths))
 
 	ids.Print()

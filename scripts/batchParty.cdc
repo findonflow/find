@@ -1,7 +1,7 @@
 import MetadataViews from  "../contracts/standard/MetadataViews.cdc"
 import PartyFavorz from "../contracts/PartyFavorz.cdc"
 
-access(all) main(users:[Address]) : AnyStruct {
+pub fun main(users:[Address]) : AnyStruct {
 
 	let viewType= Type<MetadataViews.Display>()
 

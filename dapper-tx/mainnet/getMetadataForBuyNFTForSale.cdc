@@ -1,7 +1,7 @@
 import FindMarket from 0x097bafa4e0b48eef
 import FindMarketSale from 0x097bafa4e0b48eef
 
-access(all) main(address: Address, id: UInt64, amount: UFix64) : PurchaseData {
+pub fun main(address: Address, id: UInt64, amount: UFix64) : PurchaseData {
 
     let marketplace = FindMarket.getFindTenantAddress()
     let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())

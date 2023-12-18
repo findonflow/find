@@ -1,6 +1,6 @@
 import FindVerifier from "../contracts/FindVerifier.cdc"
 
-access(all) main(user: Address, floatIDs: [UInt64]) : Result {
+pub fun main(user: Address, floatIDs: [UInt64]) : Result {
     let verifier = FindVerifier.HasAllFLOAT(floatIDs)
     let input : {String : AnyStruct} = {"address" : user}
     return Result(verifier, input: input)

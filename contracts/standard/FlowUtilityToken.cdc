@@ -57,7 +57,7 @@ pub contract FlowUtilityToken: FungibleToken {
         // created Vault to the context that called so it can be deposited
         // elsewhere.
         //
-        access(all) withdraw(amount: UFix64): @FungibleToken.Vault {
+        pub fun withdraw(amount: UFix64): @FungibleToken.Vault {
             self.balance = self.balance - amount
             emit TokensWithdrawn(amount: amount, from: self.owner?.address)
             return <-create Vault(balance: amount)
@@ -70,7 +70,7 @@ pub contract FlowUtilityToken: FungibleToken {
         // It is allowed to destroy the sent Vault because the Vault
         // was a temporary holder of the tokens. The Vault's balance has
         // been consumed and therefore can be destroyed.
-        access(all) deposit(from: @FungibleToken.Vault) {
+        pub fun deposit(from: @FungibleToken.Vault) {
             let vault <- from as! @FlowUtilityToken.Vault
             self.balance = self.balance + vault.balance
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
@@ -90,7 +90,7 @@ pub contract FlowUtilityToken: FungibleToken {
     // and store the returned Vault in their storage in order to allow their
     // account to be able to receive deposits of this token type.
     //
-    access(all) createEmptyVault(): @FungibleToken.Vault {
+    pub fun createEmptyVault(): @FungibleToken.Vault {
         return <-create Vault(balance: 0.0)
     }
 
@@ -99,7 +99,7 @@ pub contract FlowUtilityToken: FungibleToken {
         //
         // Function that creates and returns a new minter resource
         //
-        access(all) createNewMinter(allowedAmount: UFix64): @Minter {
+        pub fun createNewMinter(allowedAmount: UFix64): @Minter {
             emit MinterCreated(allowedAmount: allowedAmount)
             return <-create Minter(allowedAmount: allowedAmount)
         }
@@ -108,7 +108,7 @@ pub contract FlowUtilityToken: FungibleToken {
         //
         // Function that creates and returns a new burner resource
         //
-        access(all) createNewBurner(): @Burner {
+        pub fun createNewBurner(): @Burner {
             emit BurnerCreated()
             return <-create Burner()
         }
@@ -128,7 +128,7 @@ pub contract FlowUtilityToken: FungibleToken {
         // Function that mints new tokens, adds them to the total supply,
         // and returns them to the calling context.
         //
-        access(all) mintTokens(amount: UFix64): @FlowUtilityToken.Vault {
+        pub fun mintTokens(amount: UFix64): @FlowUtilityToken.Vault {
             pre {
                 amount > UFix64(0): "Amount minted must be greater than zero"
                 amount <= self.allowedAmount: "Amount minted must be less than the allowed amount"
@@ -157,7 +157,7 @@ pub contract FlowUtilityToken: FungibleToken {
         // Note: the burned tokens are automatically subtracted from the
         // total supply in the Vault destructor.
         //
-        access(all) burnTokens(from: @FungibleToken.Vault) {
+        pub fun burnTokens(from: @FungibleToken.Vault) {
             let vault <- from as! @FlowUtilityToken.Vault
             let amount = vault.balance
             destroy vault

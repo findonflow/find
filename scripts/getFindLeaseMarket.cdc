@@ -19,7 +19,7 @@ pub struct FINDReport{
 }
 
 
-access(all) main(user: String) : FINDReport? {
+pub fun main(user: String) : FINDReport? {
 
 	let maybeAddress=FIND.resolve(user)
 	if maybeAddress == nil{
@@ -55,7 +55,7 @@ pub struct SaleItemCollectionReport {
 		self.ghosts=ghosts
 	}
 
-	access(all) combine(_ s: SaleItemCollectionReport?) {
+	pub fun combine(_ s: SaleItemCollectionReport?) {
 		if s == nil {
 			return
 		}
@@ -156,7 +156,7 @@ pub struct LeaseInfo {
 
 }
 
-access(all) LeaseInfoFromFindLeaseMarket(_ l: FindLeaseMarket.LeaseInfo?) : LeaseInfo? {
+pub fun LeaseInfoFromFindLeaseMarket(_ l: FindLeaseMarket.LeaseInfo?) : LeaseInfo? {
 	if l == nil {
 		return nil
 	}
@@ -171,7 +171,7 @@ access(all) LeaseInfoFromFindLeaseMarket(_ l: FindLeaseMarket.LeaseInfo?) : Leas
 	)
 }
 
-access(all) LeaseInfoFromFIND(_ l: FIND.LeaseInformation?) : LeaseInfo? {
+pub fun LeaseInfoFromFIND(_ l: FIND.LeaseInformation?) : LeaseInfo? {
 	if l == nil {
 		return nil
 	}
@@ -186,7 +186,7 @@ access(all) LeaseInfoFromFIND(_ l: FIND.LeaseInformation?) : LeaseInfo? {
 	)
 }
 
-access(all) SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemInformation) : SaleItemInformation {
+pub fun SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemInformation) : SaleItemInformation {
 	return SaleItemInformation(
 		leaseIdentifier: s.leaseIdentifier,
 		leaseName: s.leaseName,
@@ -209,7 +209,7 @@ access(all) SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItem
 	)
 }
 
-access(all) SaleReportFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemCollectionReport) : SaleItemCollectionReport {
+pub fun SaleReportFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemCollectionReport) : SaleItemCollectionReport {
 
 	var listing: [SaleItemInformation] = []
 	for i in s.items {
@@ -219,7 +219,7 @@ access(all) SaleReportFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemCollectio
 
 }
 
-access(all) transformLeaseSale(_ leases: [FIND.LeaseInformation]) : {String : SaleItemCollectionReport} {
+pub fun transformLeaseSale(_ leases: [FIND.LeaseInformation]) : {String : SaleItemCollectionReport} {
 	let output : {String : SaleItemCollectionReport} = {}
 	let saleCollection : [SaleItemInformation] = []
 	let auctionCollection : [SaleItemInformation] = []
@@ -335,7 +335,7 @@ access(all) transformLeaseSale(_ leases: [FIND.LeaseInformation]) : {String : Sa
 	return output
 }
 
-access(all) addLeasesSale(_ leases: [FIND.LeaseInformation], _ sales : {String : FindLeaseMarket.SaleItemCollectionReport}) : {String : SaleItemCollectionReport} {
+pub fun addLeasesSale(_ leases: [FIND.LeaseInformation], _ sales : {String : FindLeaseMarket.SaleItemCollectionReport}) : {String : SaleItemCollectionReport} {
 
 	let FINDLeasesSale = transformLeaseSale(leases)
 	let s : {String : SaleItemCollectionReport} = {}
@@ -383,7 +383,7 @@ pub struct BidInfo{
 	}
 }
 
-access(all) BidInfoFromFindLeaseMarket(_ b: FindLeaseMarket.BidInfo) : BidInfo {
+pub fun BidInfoFromFindLeaseMarket(_ b: FindLeaseMarket.BidInfo) : BidInfo {
 	let i = SaleItemInformationFromFindLeaseMarket(b.item)
 	return BidInfo(
 		name: b.name,
@@ -404,7 +404,7 @@ pub struct BidItemCollectionReport {
 		self.ghosts=ghosts
 	}
 
-	access(all) combine(_ s: BidItemCollectionReport?) {
+	pub fun combine(_ s: BidItemCollectionReport?) {
 		if s == nil {
 			return
 		}
@@ -413,7 +413,7 @@ pub struct BidItemCollectionReport {
 	}
 }
 
-access(all) BidReportFromFindLeaseMarket(_ s: FindLeaseMarket.BidItemCollectionReport) : BidItemCollectionReport {
+pub fun BidReportFromFindLeaseMarket(_ s: FindLeaseMarket.BidItemCollectionReport) : BidItemCollectionReport {
 
 	var listing: [BidInfo] = []
 	for i in s.items {
@@ -423,7 +423,7 @@ access(all) BidReportFromFindLeaseMarket(_ s: FindLeaseMarket.BidItemCollectionR
 
 }
 
-access(all) transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectionReport} {
+pub fun transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectionReport} {
 	let output : {String : BidItemCollectionReport} = {}
 	let auctionCollection : [BidInfo] = []
 	let OfferCollection : [BidInfo] = []
@@ -531,7 +531,7 @@ access(all) transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemColle
 	return output
 }
 
-access(all) addLeasesBid(_ leases: [FIND.BidInfo], _ sales : {String : FindLeaseMarket.BidItemCollectionReport}) : {String : BidItemCollectionReport} {
+pub fun addLeasesBid(_ leases: [FIND.BidInfo], _ sales : {String : FindLeaseMarket.BidItemCollectionReport}) : {String : BidItemCollectionReport} {
 
 	let FINDLeasesSale = transformLeaseBid(leases)
 	let s : {String : BidItemCollectionReport} = {}

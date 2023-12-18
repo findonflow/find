@@ -25,7 +25,7 @@ pub struct Listing {
 	}
 }
 
-access(all) main(user: String): {UInt64 :[Listing]} {
+pub fun main(user: String): {UInt64 :[Listing]} {
 
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return {}}

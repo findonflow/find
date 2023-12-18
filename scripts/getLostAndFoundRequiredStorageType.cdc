@@ -4,7 +4,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String) : Report {
+pub fun main(user: String) : Report {
 
     if let address = FIND.resolve(user){
         let runTimeType : Type = Type<@NonFungibleToken.NFT>()
@@ -75,6 +75,6 @@ pub struct Report {
 
 }
 
-access(all) logErr(_ err: String) : Report {
+pub fun logErr(_ err: String) : Report {
     return Report(initiableStorage: [] , relinkableStorage : [] , initiatedStorage : [] , problematicStorage: [], notSupportedType: [], err: err)
 }

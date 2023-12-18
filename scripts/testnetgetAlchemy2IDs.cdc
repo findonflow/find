@@ -12,7 +12,7 @@ import FIND from "../contracts/FIND.cdc"
 import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
-    access(all) main(user: String, collections: [String]) : {String : ItemReport} {
+    pub fun main(user: String, collections: [String]) : {String : ItemReport} {
         return fetchAlchemyShard2(user: user, targetCollections:collections)
     }
 
@@ -34,12 +34,12 @@ import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 
     // Helper function 
 
-    access(all) resolveAddress(user: String) : Address? {
+    pub fun resolveAddress(user: String) : Address? {
 	    return FIND.resolve(user)
     }
 
 
-    access(all) fetchAlchemyShard2(user: String, targetCollections: [String]) : {String : ItemReport} {
+    pub fun fetchAlchemyShard2(user: String, targetCollections: [String]) : {String : ItemReport} {
         let source = "Shard2"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
@@ -71,7 +71,7 @@ import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 
     }
 
-    access(all) rename(_ name: String) : String {
+    pub fun rename(_ name: String) : String {
         if name == "MintStoreItem.NBA ALL STAR " {
             return "MintStoreItem"
         }

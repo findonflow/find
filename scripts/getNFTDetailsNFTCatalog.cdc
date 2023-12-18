@@ -247,7 +247,7 @@ pub struct NFTCollectionDisplay {
 	}
 }
 
-access(all) main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
+pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user)
 	if resolveAddress == nil {
 		return nil
@@ -313,7 +313,7 @@ pub let resolvedAddresses : {Address : String} = {}
 
 pub var nftRoyalties : [Royalties]? = nil
 
-access(all) reverseLookup(_ addr: Address) : String? {
+pub fun reverseLookup(_ addr: Address) : String? {
 
 	if let name = resolvedAddresses[addr] {
 		if name == "" {
@@ -332,7 +332,7 @@ access(all) reverseLookup(_ addr: Address) : String? {
 
 }
 
-access(all) getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTDetail? {
+pub fun getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : NFTDetail? {
 
 	if !pointer.valid() {
 		return nil
@@ -473,7 +473,7 @@ access(all) getNFTDetail(pointer: FindViews.ViewReadPointer, views: [String]) : 
 
 }
 
-access(all) getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Edition? {
+pub fun getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Edition? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Edition>()) {
 		if let v = view as? MetadataViews.Edition {
 			return v
@@ -482,7 +482,7 @@ access(all) getEdition(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews
 	return nil
 }
 
-access(all) getMedia(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Media? {
+pub fun getMedia(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Media? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Media>()) {
 		if let v = view as? MetadataViews.Media {
 			return v
@@ -491,7 +491,7 @@ access(all) getMedia(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.M
 	return nil
 }
 
-access(all) getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Trait? {
+pub fun getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.Trait? {
 	if let view = viewResolver.resolveView(Type<MetadataViews.Trait>()) {
 		if let v = view as? MetadataViews.Trait {
 			return v
@@ -501,7 +501,7 @@ access(all) getTrait(_ viewResolver: &{ViewResolver.Resolver}) : MetadataViews.T
 }
 
 /* Helper Function */
-access(all) resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
+pub fun resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties] {
 	let array : [Royalties] = []
 	for royalty in pointer.getRoyalty().getRoyalties() {
 		let address = royalty.receiver.address
@@ -511,7 +511,7 @@ access(all) resolveRoyalties(_ pointer: FindViews.ViewReadPointer) : [Royalties]
 	return array
 }
 
-access(all) resolveMarketplaceRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
+pub fun resolveMarketplaceRoyalties(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, listing: Type, nft: Type, ft: Type) : [Royalties] {
 
 	let cuts = tenantRef.getCuts(name:"", listingType: listing, nftType:nft, ftType:ft)
 
@@ -526,7 +526,7 @@ access(all) resolveMarketplaceRoyalties(tenantRef: &FindMarket.Tenant{FindMarket
 	return royalties
 }
 
-access(all) createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, pointer: FindViews.ViewReadPointer, tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, dapper: Bool) : ListingTypeReport? {
+pub fun createListingTypeReport(_ allowedListing: FindMarket.AllowedListing, pointer: FindViews.ViewReadPointer, tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, dapper: Bool) : ListingTypeReport? {
 	let listingType = allowedListing.listingType.identifier
 	var ftAlias : [String] = []
 	var ftIdentifier : [String] = []
@@ -569,7 +569,7 @@ access(all) createListingTypeReport(_ allowedListing: FindMarket.AllowedListing,
 	return ListingTypeReport(listingType: listingType, ftAlias: ftAlias, ftIdentifiers: ftIdentifier,  status: allowedListing.status , ListingDetails: listingDetails)
 }
 
-access(all) defaultViews() : [Type] {
+pub fun defaultViews() : [Type] {
 	return [
 	Type<MetadataViews.Display>() ,
 	Type<MetadataViews.Editions>() ,
@@ -587,7 +587,7 @@ access(all) defaultViews() : [Type] {
 	]
 }
 
-access(all) getStoragePath(_ nftIdentifier: String) : StoragePath {
+pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		return collection.collectionData.storagePath
@@ -599,7 +599,7 @@ access(all) getStoragePath(_ nftIdentifier: String) : StoragePath {
 	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
 }
 
-access(all) getPublicPath(_ nftIdentifier: String) : PublicPath {
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		return collection.collectionData.publicPath
@@ -611,7 +611,7 @@ access(all) getPublicPath(_ nftIdentifier: String) : PublicPath {
 	panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier))
 }
 
-access(all) cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
+pub fun cleanUpTraits(_ traits: [MetadataViews.Trait]) : MetadataViews.Traits {
 	let dateValues  = {"Date" : true, "Numeric":false, "Number":false, "date":true, "numeric":false, "number":false}
 
 	let array : [MetadataViews.Trait] = []

@@ -4,13 +4,13 @@ import FIND from "../contracts/FIND.cdc"
 
 import RaribleNFT from 0x01ab36aaf654a13e
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
 	return fetchRaribleNFTs(user: user, collectionIDs: collectionIDs)
 }
 pub let FlowverseSocksIds : [UInt64] = [14813, 15013, 14946, 14808, 14899, 14792, 15016, 14961, 14816, 14796, 14992, 14977, 14815, 14863, 14817, 14814, 14875, 14960, 14985, 14850, 14849, 14966, 14826, 14972, 14795, 15021, 14950, 14847, 14970, 14833, 14786, 15010, 14953, 14799, 14883, 14947, 14844, 14801, 14886, 15015, 15023, 15027, 15029, 14802, 14810, 14948, 14955, 14957, 14988, 15007, 15009, 14837, 15024, 14803, 14973, 14969, 15002, 15017, 14797, 14894, 14881, 15025, 14791, 14979, 14789, 14993, 14873, 14939, 15005, 15006, 14869, 14889, 15004, 15008, 15026, 14990, 14998, 14898, 14819, 14840, 14974, 15019, 14856, 14838, 14787, 14876, 14996, 14798, 14855, 14824, 14843, 14959, 15020, 14862, 14822, 14897, 14830, 14790, 14867, 14878, 14991, 14835, 14818, 14892, 14800, 15000, 14857, 14986, 14805, 14812, 14962]
 
-access(all) getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTView] {
+pub fun getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTView] {
 
 	let account = getAuthAccount(ownerAddress)
 	let results : [MetadataViews.NFTView] = []
@@ -87,7 +87,7 @@ pub struct MetadataCollectionItem {
 
 // Helper function
 
-access(all) resolveAddress(user: String) : PublicAccount? {
+pub fun resolveAddress(user: String) : PublicAccount? {
 	let address = FIND.resolve(user)
 	if address == nil {
 		return nil
@@ -95,7 +95,7 @@ access(all) resolveAddress(user: String) : PublicAccount? {
 	return getAccount(address!)
 }
 
-access(all) fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun fetchRaribleNFTs(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 	let source = "getNFTDetailsSocks"
 	let acct = resolveAddress(user: user)
 	if acct == nil { return {} }

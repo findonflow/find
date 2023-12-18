@@ -3,7 +3,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import RaribleNFT from 0x01ab36aaf654a13e
 
-access(all) main(user: String, collections: [String]) : {String : ItemReport} {
+pub fun main(user: String, collections: [String]) : {String : ItemReport} {
 	return fetchRaribleNFT(user: user, targetCollections: collections)
 }
 
@@ -27,11 +27,11 @@ pub let FlowverseSocksIds : [UInt64] = [14813, 15013, 14946, 14808, 14899, 14792
 
 // Helper function
 
-access(all) resolveAddress(user: String) : Address? {
+pub fun resolveAddress(user: String) : Address? {
 	return FIND.resolve(user)
 }
 
-access(all) getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
+pub fun getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 
 	let account = getAuthAccount(ownerAddress)
 
@@ -60,7 +60,7 @@ access(all) getNFTIDs(ownerAddress: Address) : {String:[UInt64]} {
 	return inventory
 }
 
-access(all) fetchRaribleNFT(user: String, targetCollections: [String]) : {String : ItemReport} {
+pub fun fetchRaribleNFT(user: String, targetCollections: [String]) : {String : ItemReport} {
 	let source = "RaribleNFT"
 	let account = resolveAddress(user: user)
 	if account == nil { return {} }

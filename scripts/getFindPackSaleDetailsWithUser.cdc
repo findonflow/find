@@ -4,7 +4,7 @@ import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
+pub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
 		let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()
 		return Report(metadata, user: user, packsLeft:packsLeft)
@@ -80,7 +80,7 @@ pub struct UserSaleInfo {
 		}
 }
 
-access(all) getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {
+pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {
 	let res : [UserSaleInfo] = []
 	let currentTime = getCurrentBlock().timestamp
 	var availableOption : FindPack.SaleInfo? = nil 
@@ -117,7 +117,7 @@ access(all) getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address)
 	return nil
 }
 
-access(all) getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {
+pub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {
 
 	let account = getAccount(user)
 	if account.storageCapacity > account.storageUsed {
@@ -155,7 +155,7 @@ pub struct SaleInfo {
 		}
 }
 
-access(all) convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
+pub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
 	let res : [SaleInfo] = []
 	for i in info {
 		res.append(SaleInfo(i))

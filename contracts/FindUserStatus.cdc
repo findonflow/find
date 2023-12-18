@@ -237,7 +237,7 @@ pub contract FindUserStatus {
 		}
 	}
 
-	access(all) getStorefrontListing(user: Address, id: UInt64, type: Type) : StorefrontListing? {
+	pub fun getStorefrontListing(user: Address, id: UInt64, type: Type) : StorefrontListing? {
 	
 		var listingsV1 : StorefrontListing? = nil
 		let account = getAccount(user)
@@ -272,7 +272,7 @@ pub contract FindUserStatus {
 	}
 
 
-	access(all) getStorefrontV2Listing(user: Address, id: UInt64, type: Type) : StorefrontListing? {
+	pub fun getStorefrontV2Listing(user: Address, id: UInt64, type: Type) : StorefrontListing? {
 		var listingsV2 : StorefrontListing? = nil
 		let account = getAccount(user)
 		let storefrontV2Cap = account.getCapability<&NFTStorefrontV2.Storefront{NFTStorefrontV2.StorefrontPublic}>(NFTStorefrontV2.StorefrontPublicPath)
@@ -304,7 +304,7 @@ pub contract FindUserStatus {
 		return nil
 	}
 
-	access(all) getFlowtyListing(user: Address, id: UInt64, type: Type) : FlowtyListing? {
+	pub fun getFlowtyListing(user: Address, id: UInt64, type: Type) : FlowtyListing? {
 		var flowty : FlowtyListing? = nil
 		let account = getAccount(user)
 		let flowtyCap = account.getCapability<&Flowty.FlowtyStorefront{Flowty.FlowtyStorefrontPublic}>(Flowty.FlowtyStorefrontPublicPath)
@@ -336,7 +336,7 @@ pub contract FindUserStatus {
 		return nil
 	}
 
-	access(all) getFlowtyRentals(user: Address, id: UInt64, type: Type) : FlowtyRental? {
+	pub fun getFlowtyRentals(user: Address, id: UInt64, type: Type) : FlowtyRental? {
 
 		var flowtyRental : FlowtyRental? = nil
 		let account = getAccount(user)
@@ -369,7 +369,7 @@ pub contract FindUserStatus {
 		return nil
 	}
 
-	access(all) getFlovatarListing(user: Address, id: UInt64, type: Type) : FlovatarListing? {
+	pub fun getFlovatarListing(user: Address, id: UInt64, type: Type) : FlovatarListing? {
 		let nftType = Type<@Flovatar.NFT>()
 		if type != nftType {
 			return nil
@@ -395,7 +395,7 @@ pub contract FindUserStatus {
 		return FlovatarListing(storefrontID: f.id, nftType: nftType.identifier, nftID: f.id, salePaymentVaultType: Type<@FlowToken.Vault>().identifier, salePrice: f.price, saleCuts: saleCuts, flovatarMetadata: f)
 	}
 
-	access(all) getFlovatarComponentListing(user: Address, id: UInt64, type: Type) : FlovatarComponentListing? {
+	pub fun getFlovatarComponentListing(user: Address, id: UInt64, type: Type) : FlovatarComponentListing? {
 		let nftType = Type<@FlovatarComponent.NFT>()
 		if type != nftType {
 			return nil

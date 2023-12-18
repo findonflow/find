@@ -230,13 +230,13 @@ pub contract FlowtyRentals {
         // This is how we achieve private listings.
         pub var renter: Address?
 
-        access(all) getPaymentCut(): Flowty.PaymentCut {
+        pub fun getPaymentCut(): Flowty.PaymentCut {
             return self.paymentCut
         }
 
         // getTotalPayment
         // get the total amount needed to rent this listing.
-        access(all) getTotalPayment(): UFix64 {
+        pub fun getTotalPayment(): UFix64 {
             return self.amount + self.deposit
         }
 
@@ -283,36 +283,36 @@ pub contract FlowtyRentals {
         // This will assert in the same way as the NFT standard borrowNFT()
         // if the NFT is absent, for example if it has been sold via another listing.
         //
-        access(all) borrowNFT(): &NonFungibleToken.NFT
+        pub fun borrowNFT(): &NonFungibleToken.NFT
 
         // rent
         // Rent the listing. Distributing fees to all parties and taking a deposit to be held
         // until the nft is either returned or the rental defaults. A rental can be automatically returned
         // if renterNFTProvider is provided, giving us a way obtain the the rented nft automatically
         // to be returned.
-        access(all) rent(
+        pub fun rent(
             payment: @FungibleToken.Vault,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             renterNFTProvider: Capability<&AnyResource{NonFungibleToken.Collection, NonFungibleToken.Provider}>?
         )
 
-        access(all) getDetails(): ListingDetails
+        pub fun getDetails(): ListingDetails
 
         // suspensionTimeRemaining
         // returns the amount of time left until a listing can be filled.
         //
-        access(all) suspensionTimeRemaining(): Fix64
+        pub fun suspensionTimeRemaining(): Fix64
 
         // remainingTimeToRent
         // returns the amount of time left until this listing is no longer valid
         //
-        access(all) remainingTimeToRent(): Fix64
+        pub fun remainingTimeToRent(): Fix64
 
         // isRentingEnabled
         // checks if a listing can be rented or not.
         //
-        access(all) isRentingEnabled(): Bool
+        pub fun isRentingEnabled(): Bool
     }
 
     // Listing
@@ -338,7 +338,7 @@ pub contract FlowtyRentals {
         // This will assert in the same way as the NFT standard borrowNFT()
         // if the NFT is absent, for example if it has been sold via another listing.
         //
-        access(all) borrowNFT(): &NonFungibleToken.NFT {
+        pub fun borrowNFT(): &NonFungibleToken.NFT {
             pre {
                 self.nftProviderCapability.check(): "provider capability failed check"
             }
@@ -354,7 +354,7 @@ pub contract FlowtyRentals {
         // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
-        access(all) getDetails(): ListingDetails {
+        pub fun getDetails(): ListingDetails {
             return self.details
         }
 
@@ -363,7 +363,7 @@ pub contract FlowtyRentals {
         // until the nft is either returned or the rental defaults. A rental can be automatically returned
         // if renterNFTProvider is provided, giving us a way obtain the the rented nft automatically
         // to be returned.
-        access(all) rent(
+        pub fun rent(
             payment: @FungibleToken.Vault,
             renterFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
             renterNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
@@ -468,7 +468,7 @@ pub contract FlowtyRentals {
         // suspensionTimeRemaining
         // returns the amount of time left until a listing can be filled.
         //
-        access(all) suspensionTimeRemaining() : Fix64 {
+        pub fun suspensionTimeRemaining() : Fix64 {
             let listedTime = self.details.listedTime
             let currentTime = getCurrentBlock().timestamp
 
@@ -480,7 +480,7 @@ pub contract FlowtyRentals {
         // remainingTimeToRent
         // returns the amount of time left until this listing is no longer valid
         //
-        access(all) remainingTimeToRent(): Fix64 {
+        pub fun remainingTimeToRent(): Fix64 {
             let listedTime = self.details.listedTime
             let currentTime = getCurrentBlock().timestamp
             let remaining = Fix64(listedTime + self.details.expiresAfter) - Fix64(currentTime)
@@ -490,7 +490,7 @@ pub contract FlowtyRentals {
         // isRentingEnabled
         // checks if a listing can be rented or not.
         //
-        access(all) isRentingEnabled(): Bool {
+        pub fun isRentingEnabled(): Bool {
             let timeRemaining = self.suspensionTimeRemaining()
             let listingTimeRemaining = self.remainingTimeToRent()
             return timeRemaining < Fix64(0.0) && listingTimeRemaining > Fix64(0.0)
@@ -615,19 +615,19 @@ pub contract FlowtyRentals {
     pub resource interface RentalPublic {
         // The entry point method to return a rental.
         // The same NFT as the one that was rented must be returned.
-        access(all) returnNFT(nft: @NonFungibleToken.NFT)
+        pub fun returnNFT(nft: @NonFungibleToken.NFT)
 
         // Return the details of this Rental
-        access(all) getDetails(): RentalDetails
+        pub fun getDetails(): RentalDetails
 
         // Return the listingDetails that were used to create this rental
-        access(all) getListingDetails(): FlowtyRentals.ListingDetails
+        pub fun getListingDetails(): FlowtyRentals.ListingDetails
 
         // How much time is left until this Rental has expired
-        access(all) timeRemaining() : Fix64
+        pub fun timeRemaining() : Fix64
 
         // Whether this rental has expired and can be settled
-        access(all) isRentalExpired(): Bool
+        pub fun isRentalExpired(): Bool
     }
 
     // The resource used to represent a Rental.
@@ -694,17 +694,17 @@ pub contract FlowtyRentals {
             )
         }
 
-        access(all) getDetails(): RentalDetails {
+        pub fun getDetails(): RentalDetails {
             return self.details
         }
 
-        access(all) getListingDetails(): ListingDetails {
+        pub fun getListingDetails(): ListingDetails {
             return self.listingDetails
         }
 
         // The entry point method to return a rental.
         // The same NFT as the one that was rented must be returned.
-        access(all) returnNFT(nft: @NonFungibleToken.NFT) {
+        pub fun returnNFT(nft: @NonFungibleToken.NFT) {
             pre {
                 !self.isRentalExpired(): "rental has expired"
                 !self.details.returned: "rental has been returned"
@@ -738,7 +738,7 @@ pub contract FlowtyRentals {
         // If the Renter supplied an optional provider which we can withdraw the NFT with,
         // Then we will attempt to automatically take the NFT back. If this is possible, the deposit will
         // be returned to the renter.
-        access(all) settleRental() {
+        pub fun settleRental() {
             pre {
                 self.isRentalExpired(): "rental hasn't expired"
                 self.details.returned == false: "rental has already been returned"
@@ -843,7 +843,7 @@ pub contract FlowtyRentals {
         }
 
         // how much time is left to return this rental
-        access(all) timeRemaining() : Fix64 {
+        pub fun timeRemaining() : Fix64 {
             let rentalTerm = self.details.term
             let startTime = self.details.startTime
             let currentTime = getCurrentBlock().timestamp
@@ -851,7 +851,7 @@ pub contract FlowtyRentals {
             return remaining
         }
 
-        access(all) isRentalExpired() : Bool {
+        pub fun isRentalExpired() : Bool {
             return self.timeRemaining() < Fix64(0.0)
         }
     }
@@ -881,14 +881,14 @@ pub contract FlowtyRentals {
         // removeRental
         // Allows the FlowtyRentalsMarketplace owner to remove any rental resource.
         //
-        access(all) removeRental(rentalResourceID: UInt64)
+        pub fun removeRental(rentalResourceID: UInt64)
 
-        access(all) borrowPrivateRental(rentalResourceID: UInt64): &Rental?
+        pub fun borrowPrivateRental(rentalResourceID: UInt64): &Rental?
     }
 
     pub resource interface FlowtyRentalsMarketplacePublic {
-        access(all) getRentalIDs(): [UInt64]
-        access(all) borrowRental(rentalResourceID: UInt64): &Rental{RentalPublic}?
+        pub fun getRentalIDs(): [UInt64]
+        pub fun borrowRental(rentalResourceID: UInt64): &Rental{RentalPublic}?
     }
 
     pub resource FlowtyRentalsMarketplace: FlowtyRentalsMarketplaceManager, FlowtyRentalsMarketplacePublic { 
@@ -941,7 +941,7 @@ pub contract FlowtyRentals {
         }
 
         // removes a rental from our contract
-        access(all) removeRental(rentalResourceID: UInt64) {
+        pub fun removeRental(rentalResourceID: UInt64) {
             let rental <- self.rentals.remove(key: rentalResourceID)
                 ?? panic("missing Rental")
     
@@ -951,11 +951,11 @@ pub contract FlowtyRentals {
             destroy rental
         }
 
-        access(all) getRentalIDs(): [UInt64] {
+        pub fun getRentalIDs(): [UInt64] {
             return self.rentals.keys
         }
 
-        access(all) borrowRental(rentalResourceID: UInt64): &Rental{RentalPublic}? {
+        pub fun borrowRental(rentalResourceID: UInt64): &Rental{RentalPublic}? {
             if self.rentals[rentalResourceID] != nil {
                 return &self.rentals[rentalResourceID] as &Rental{RentalPublic}?
             } else {
@@ -963,7 +963,7 @@ pub contract FlowtyRentals {
             }
         }
 
-        access(all) borrowPrivateRental(rentalResourceID: UInt64): &Rental? {
+        pub fun borrowPrivateRental(rentalResourceID: UInt64): &Rental? {
             if self.rentals[rentalResourceID] != nil {
                 return &self.rentals[rentalResourceID] as &Rental?
             } else {
@@ -987,7 +987,7 @@ pub contract FlowtyRentals {
     }
 
     pub resource interface FlowtyRentalsStorefrontManager {
-        access(all) createListing(
+        pub fun createListing(
             nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
             nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&AnyResource{FungibleToken.Receiver}>,
@@ -1002,13 +1002,13 @@ pub contract FlowtyRentals {
             renter: Address?
         ): UInt64
 
-        access(all) removeListing(listingResourceID: UInt64)
+        pub fun removeListing(listingResourceID: UInt64)
     }
 
     pub resource interface FlowtyRentalsStorefrontPublic {
-        access(all) getListingIDs(): [UInt64]
-        access(all) borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}?
-        access(all) cleanup(listingResourceID: UInt64)
+        pub fun getListingIDs(): [UInt64]
+        pub fun borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}?
+        pub fun cleanup(listingResourceID: UInt64)
    }
 
    // FlowtyRentalsStorefront -  The storefront which stores listing and provides functionality to fill them
@@ -1018,7 +1018,7 @@ pub contract FlowtyRentals {
 
        // create a new listing. Takes in a provider to withdraw the listed nft, and details
        // about the terms of the rental and ways to send out payment
-       access(all) createListing(
+       pub fun createListing(
             nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
             nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             ownerFungibleTokenReceiver: Capability<&AnyResource{FungibleToken.Receiver}>,
@@ -1082,18 +1082,18 @@ pub contract FlowtyRentals {
             return listingResourceID
         }
 
-        access(all) removeListing(listingResourceID: UInt64) {
+        pub fun removeListing(listingResourceID: UInt64) {
             let listing <- self.listings.remove(key: listingResourceID)
                 ?? panic("missing Listing")
     
             destroy listing
         }
 
-        access(all) getListingIDs(): [UInt64] {
+        pub fun getListingIDs(): [UInt64] {
             return self.listings.keys
         }
 
-        access(all) borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}? {
+        pub fun borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}? {
             if self.listings[listingResourceID] != nil {
                 return &self.listings[listingResourceID] as &Listing{ListingPublic}?
             } else {
@@ -1101,7 +1101,7 @@ pub contract FlowtyRentals {
             }
         }
 
-        access(all) cleanup(listingResourceID: UInt64) {
+        pub fun cleanup(listingResourceID: UInt64) {
             pre {
                 self.listings[listingResourceID] != nil: "could not find listing with given id"
             }
@@ -1127,7 +1127,7 @@ pub contract FlowtyRentals {
    }
 
    pub resource FlowtyAdmin {
-        access(all) setFees(fee: UFix64) {
+        pub fun setFees(fee: UFix64) {
             pre {
                 fee <= 1.0: "rental is a percentage"
             }
@@ -1136,7 +1136,7 @@ pub contract FlowtyRentals {
         }
     }
 
-    access(all) createStorefront(): @FlowtyRentalsStorefront {
+    pub fun createStorefront(): @FlowtyRentalsStorefront {
         return <-create FlowtyRentalsStorefront()
     }
 
@@ -1145,7 +1145,7 @@ pub contract FlowtyRentals {
     }
 
     pub resource FlowtyRentalsAdmin {
-        access(all) setFees(rentalFee: UFix64) {
+        pub fun setFees(rentalFee: UFix64) {
             pre {
                 rentalFee <= 1.0: "Funding fee should be a percentage"
             }
@@ -1153,7 +1153,7 @@ pub contract FlowtyRentals {
             FlowtyRentals.Fee = rentalFee
         }
 
-        access(all) setSuspendedFundingPeriod(period: UFix64) {
+        pub fun setSuspendedFundingPeriod(period: UFix64) {
             FlowtyRentals.SuspendedFundingPeriod = period
         }
      }

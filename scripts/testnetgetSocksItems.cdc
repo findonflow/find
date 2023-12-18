@@ -2,7 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+pub fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
 	return {}
 }
@@ -44,7 +44,7 @@ pub struct MetadataCollectionItem {
 
 // Helper function
 
-access(all) resolveAddress(user: String) : PublicAccount? {
+pub fun resolveAddress(user: String) : PublicAccount? {
 	let address = FIND.resolve(user)
 	if address == nil {
 		return nil

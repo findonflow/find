@@ -2,7 +2,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String) : {String : [UInt64]} {
+pub fun main(user: String) : {String : [UInt64]} {
 
 	if let address = FIND.resolve(user) {
 		var resultMap : {String : [UInt64]} = {}

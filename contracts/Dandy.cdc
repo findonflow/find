@@ -75,11 +75,11 @@ pub contract Dandy: NonFungibleToken {
 			}
 		}
 
-		access(all) increaseNounce() {
+		pub fun increaseNounce() {
 			self.nounce=self.nounce+1
 		}
 
-		access(all) getMinterPlatform() : FindForge.MinterPlatform {
+		pub fun getMinterPlatform() : FindForge.MinterPlatform {
 			if let fetch = FindForge.getMinterPlatform(name: self.platform.name, forgeType: Dandy.getForgeType()) {
 				
 				let platform = &self.platform as &FindForge.MinterPlatform
@@ -94,7 +94,7 @@ pub contract Dandy: NonFungibleToken {
 			return self.platform
 		}
 
-		access(all) getViews() : [Type] {
+		pub fun getViews() : [Type] {
 
 			var views : [Type]=[]
 			views.append(Type<FindViews.Nounce>())
@@ -146,7 +146,7 @@ pub contract Dandy: NonFungibleToken {
 			return MetadataViews.Royalties(royalties)
 		}
 
-		access(all) resolveDisplay() : MetadataViews.Display {
+		pub fun resolveDisplay() : MetadataViews.Display {
 			return MetadataViews.Display(
 				name: self.name,
 				description: self.description,
@@ -156,7 +156,7 @@ pub contract Dandy: NonFungibleToken {
 
 		//Note that when resolving schemas shared data are loaded last, so use schema names that are unique. ie prefix with shared/ or something
 		//NB! This will _not_ error out if it does not return Optional!
-		access(all) resolveView(_ type: Type): AnyStruct? {
+		pub fun resolveView(_ type: Type): AnyStruct? {
 
 			if type == Type<MetadataViews.NFTCollectionDisplay>() {
 				let minterPlatform = self.getMinterPlatform()
@@ -215,8 +215,8 @@ pub contract Dandy: NonFungibleToken {
 
 
 	pub resource interface CollectionPublic {
-		access(all) getIDsFor(minter: String): [UInt64] 
-		access(all) getMinters(): [String] 
+		pub fun getIDsFor(minter: String): [UInt64] 
+		pub fun getMinters(): [String] 
 	}
 
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, CollectionPublic {
@@ -234,7 +234,7 @@ pub contract Dandy: NonFungibleToken {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. withdrawID : ".concat(withdrawID.toString()))
 
 			let dandyToken <- token as! @NFT
@@ -254,7 +254,7 @@ pub contract Dandy: NonFungibleToken {
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-		access(all) deposit(token: @NonFungibleToken.NFT) {
+		pub fun deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
 
 			let minterPlatform = token.getMinterPlatform()
@@ -278,22 +278,22 @@ pub contract Dandy: NonFungibleToken {
 			destroy oldToken
 		}
 
-		access(all) getMinters(): [String] {
+		pub fun getMinters(): [String] {
 			return self.nftIndex.keys
 		}
 
-		access(all) getIDsFor(minter: String): [UInt64] {
+		pub fun getIDsFor(minter: String): [UInt64] {
 			return self.nftIndex[minter]?.keys ?? []
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		access(all) getIDs(): [UInt64] {
+		pub fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			if self.ownedNFTs[id] == nil {
 				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
@@ -301,7 +301,7 @@ pub contract Dandy: NonFungibleToken {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			if self.ownedNFTs[id] == nil {
 				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
@@ -310,7 +310,7 @@ pub contract Dandy: NonFungibleToken {
 			return nft as! &Dandy.NFT
 		}
 
-		access(all) borrow(_ id: UInt64): &NFT {
+		pub fun borrow(_ id: UInt64): &NFT {
 			if self.ownedNFTs[id] == nil {
 				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
@@ -347,12 +347,12 @@ pub contract Dandy: NonFungibleToken {
 
 	//TODO: do we want to store minter 
 	pub resource Forge: FindForge.Forge {
-		access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
 			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)
 		}
 
-		access(all) addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+		pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			// not used here 
 
 			panic("Not supported for Dandy Contract") 
@@ -364,11 +364,11 @@ pub contract Dandy: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
-	access(all) getForgeType() : Type {
+	pub fun getForgeType() : Type {
 		return Type<@Forge>()
 	}
 
@@ -378,7 +378,7 @@ pub contract Dandy: NonFungibleToken {
 		pub let to: Type
 		pub let from: Type
 
-		access(all) convert(_ value:AnyStruct) : AnyStruct
+		pub fun convert(_ value:AnyStruct) : AnyStruct
 	}
 
 	init() {

@@ -3,7 +3,7 @@ import FIND from "../contracts/FIND.cdc"
 // import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
-access(all) main(user: String , project: String, id: UInt64, views: [String]) : AlchemyMetadataWrapperTestnetShard3.NFTData? {
+pub fun main(user: String , project: String, id: UInt64, views: [String]) : AlchemyMetadataWrapperTestnetShard3.NFTData? {
 
 	if let address = FIND.resolve(user) {
 		let ids : {String:[UInt64]} = {project : [id]}

@@ -3,7 +3,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 //Fetch a single view from a nft on a given path
-access(all) main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: String) : AnyStruct? {
+pub fun main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: String) : AnyStruct? {
 
 	let publicPath = getPublicPath(aliasOrIdentifier)
 	let resolveAddress = FIND.resolve(user) 
@@ -26,7 +26,7 @@ access(all) main(user: String, aliasOrIdentifier:String, id: UInt64, identifier:
 	return nil
 }
 
-access(all) getPublicPath(_ nftIdentifier: String) : PublicPath {
+pub fun getPublicPath(_ nftIdentifier: String) : PublicPath {
 	let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftIdentifier)) 
 	let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])! 
 	return collection.collectionData.publicPath

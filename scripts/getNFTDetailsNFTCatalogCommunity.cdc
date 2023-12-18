@@ -29,7 +29,7 @@ pub struct NFTDetailReport {
 	}
 }
 
-access(all) main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
+pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user)
 	if resolveAddress == nil {
 		return nil
@@ -70,7 +70,7 @@ access(all) main(user: String, project:String, id: UInt64, views: [String]) : NF
 
 }
 
-access(all) getStoragePath(_ nftIdentifier: String) : StoragePath {
+pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		return collection.collectionData.storagePath

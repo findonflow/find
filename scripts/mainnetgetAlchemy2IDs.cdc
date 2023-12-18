@@ -17,7 +17,7 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
 
 
 
-    access(all) main(user: String, collections: [String]) : {String : ItemReport} {
+    pub fun main(user: String, collections: [String]) : {String : ItemReport} {
         return fetchAlchemyShard2(user: user, targetCollections:collections)
     }
 
@@ -41,11 +41,11 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
 
     // Helper function
 
-    access(all) resolveAddress(user: String) : Address? {
+    pub fun resolveAddress(user: String) : Address? {
 	    return FIND.resolve(user)
     }
 
-    access(all) getNFTCatalogContracts() : [String] {
+    pub fun getNFTCatalogContracts() : [String] {
         let catalogs = FINDNFTCatalog.getCatalog()
         let names : [String] = []
         for catalog in catalogs.values {
@@ -54,7 +54,7 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
         return names
     }
 
-    access(all) fetchAlchemyShard2(user: String, targetCollections: [String]) : {String : ItemReport} {
+    pub fun fetchAlchemyShard2(user: String, targetCollections: [String]) : {String : ItemReport} {
         let source = "Shard2"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
@@ -93,7 +93,7 @@ import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
 
     }
 
-    access(all) rename(_ name: String) : String {
+    pub fun rename(_ name: String) : String {
 
 		if FindUtils.contains(name, element: "MintStoreItem") {
 			return "MintStoreItem"

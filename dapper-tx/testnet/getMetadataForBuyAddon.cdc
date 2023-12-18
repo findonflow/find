@@ -1,6 +1,6 @@
 import FIND from 0x35717efbbce11c74
 
-access(all) main(merchAccount: Address, name: String, addon:String, amount:UFix64) : PurchaseData {
+pub fun main(merchAccount: Address, name: String, addon:String, amount:UFix64) : PurchaseData {
     let description = "Purchase addon ".concat(addon).concat(" for name :").concat(name).concat(" for DUC ").concat(amount.toString())
     let imageURL = "https://i.imgur.com/8W8NoO1.png"
 

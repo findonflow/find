@@ -8,12 +8,12 @@ pub contract FindMarketCut {
 
 	pub event Cut(tenant: String, type: String, category: String, contractName: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
 
-	access(all) getRuleId(listingType: Type, nftType:Type, ftType:Type) : String {
+	pub fun getRuleId(listingType: Type, nftType:Type, ftType:Type) : String {
 		let s : [String] = [listingType.identifier, nftType.identifier, ftType.identifier]
 		return FindUtils.joinString(s, sep: "-")
 	}
 
-	access(all) getCuts(tenant: String, listingType: Type, nftType:Type, ftType:Type): {String : FindMarketCutStruct.Cuts} {
+	pub fun getCuts(tenant: String, listingType: Type, nftType:Type, ftType:Type): {String : FindMarketCutStruct.Cuts} {
 		let res : {String : FindMarketCutStruct.Cuts} = {}
 		for category in self.categoryToContractName.keys {
 			let contractName = self.categoryToContractName[category]!
@@ -60,7 +60,7 @@ pub contract FindMarketCut {
 		con.setTenantRulesCache(tenant: tenant, ruleId: ruleId, result: result)
 	}
 
-	access(all) getTenantRules(tenant: String, ruleId: String, category: String) : FindMarketCutStruct.Cuts? {
+	pub fun getTenantRules(tenant: String, ruleId: String, category: String) : FindMarketCutStruct.Cuts? {
 		let contractName = self.categoryToContractName[category] ?? panic("Category is not set to link with contract. Category ".concat(category))
 		let con = self.borrowContract(contractName)
 		let res = con.getTenantRulesCache(tenant: tenant, ruleId: ruleId)

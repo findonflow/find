@@ -53,7 +53,7 @@ func TestFindForge(t *testing.T) {
 			`
 				import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 
-				access(all) main() : UInt64 {return ExampleNFT.totalSupply - 1}
+				pub fun main() : UInt64 {return ExampleNFT.totalSupply - 1}
 			`,
 		).GetAsInterface()
 		assert.NoError(t, err)

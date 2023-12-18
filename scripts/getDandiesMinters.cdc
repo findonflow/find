@@ -1,7 +1,7 @@
 import Dandy from "../contracts/Dandy.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String) : [String] {
+pub fun main(user: String) : [String] {
 	let address = FIND.resolve(user)
 	if address == nil {
 		return []

@@ -111,13 +111,13 @@ pub contract FindLegacyCollectionc {
 		}
 	}
 
-	access(all) getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+	pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 
 		return []
 
 	}
 
-	access(all) getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
+	pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		let account = getAccount(ownerAddress)
 		let ids: {String: [UInt64]} = {}
 
@@ -332,7 +332,7 @@ pub contract FindLegacyCollectionc {
 
 
 
-access(all) main(user: String) : MetadataCollections? {
+pub fun main(user: String) : MetadataCollections? {
 
 	let resolvingAddress = FIND.resolve(user)
 	if resolvingAddress == nil {
@@ -1561,7 +1561,7 @@ return MetadataCollections(items: resultMap, collections:results, curatedCollect
 }
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-access(all) getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
+pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
 	let items: [MetadataCollectionItem] = []
 	let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(path)
 	if resolverCollectionCap.check() {
