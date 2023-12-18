@@ -37,7 +37,7 @@ pub contract FindMetadataFactory {
 		}
 	}
 
-	pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+	access(all) getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 		let account= getAccount(ownerAddress)
 		let items : [MetadataCollectionItem] = []
 
@@ -110,7 +110,7 @@ pub contract FindMetadataFactory {
 		return items
 	}
 
-	pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
+	access(all) getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		let account= getAccount(ownerAddress)
 		let registryData = NFTRegistry.getNFTInfoAll()
 

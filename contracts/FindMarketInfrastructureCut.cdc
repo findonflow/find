@@ -13,7 +13,7 @@ pub contract FindMarketInfrastructureCut : FindMarketCutInterface {
 
 	pub event Cut(tenant: String, type: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
 
-	pub fun getCut(tenant: String, listingType: Type, nftType: Type, ftType: Type) : FindMarketCutStruct.Cuts? {
+	access(all) getCut(tenant: String, listingType: Type, nftType: Type, ftType: Type) : FindMarketCutStruct.Cuts? {
 
 		let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
 		if let cache = self.getTenantRulesCache(tenant: tenant, ruleId: ruleId) {
@@ -73,7 +73,7 @@ pub contract FindMarketInfrastructureCut : FindMarketCutInterface {
 		self.cutsCache[tenant] = old
 	}
 
-	pub fun getTenantRulesCache(tenant: String, ruleId: String) : FindMarketCutStruct.Cuts? {
+	access(all) getTenantRulesCache(tenant: String, ruleId: String) : FindMarketCutStruct.Cuts? {
 		if self.cutsCache[tenant] == nil {
 			return nil
 		}

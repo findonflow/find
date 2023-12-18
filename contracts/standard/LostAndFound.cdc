@@ -46,7 +46,7 @@ pub contract LostAndFound {
 
     // Placeholder receiver so that any resource can be supported, not just FT and NFT Receivers
     pub resource interface AnyResourceReceiver {
-        pub fun deposit(resource: @AnyResource)
+        access(all) deposit(resource: @AnyResource)
     }
 
     pub resource DepositEstimate {
@@ -58,7 +58,7 @@ pub contract LostAndFound {
             self.storageFee = storageFee
         }
 
-        pub fun withdraw(): @AnyResource {
+        access(all) withdraw(): @AnyResource {
             let resource <- self.item <- nil
             return <-resource!
         }
@@ -105,21 +105,21 @@ pub contract LostAndFound {
             self.flowTokenRepayment = flowTokenRepayment
         }
 
-        pub fun itemType(): Type {
+        access(all) itemType(): Type {
             return self.type
         }
 
-        pub fun checkItem(): Bool {
+        access(all) checkItem(): Bool {
             return self.item != nil
         }
 
         // A function to get depositor address / flow Repayment address
-        pub fun getFlowRepaymentAddress() : Address? {
+        access(all) getFlowRepaymentAddress() : Address? {
             return self.flowTokenRepayment?.address
         }
 
         // If this is an instance of NFT, return the id , otherwise return nil
-        pub fun getNonFungibleTokenID() : UInt64? {
+        access(all) getNonFungibleTokenID() : UInt64? {
             if self.type.isSubtype(of: Type<@NonFungibleToken.NFT>()) {
                 let ref = (&self.item as auth &AnyResource?)!
                 let nft = ref as! &NonFungibleToken.NFT
@@ -129,7 +129,7 @@ pub contract LostAndFound {
         }
 
         // If this is an instance of FT, return the vault balance , otherwise return nil
-        pub fun getFungibleTokenBalance() : UFix64? {
+        access(all) getFungibleTokenBalance() : UFix64? {
             if self.type.isSubtype(of: Type<@FungibleToken.Vault>()) {
                 let ref = (&self.item as auth &AnyResource?)!
                 let ft = ref as! &FungibleToken.Vault
@@ -138,7 +138,7 @@ pub contract LostAndFound {
             return nil
         }
 
-        pub fun withdraw(receiver: Capability) {
+        access(all) withdraw(receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver address and redeemer must match"
                 !self.redeemed: "already redeemed"
@@ -208,11 +208,11 @@ pub contract LostAndFound {
             self.flowTokenRepayment = flowTokenRepayment
         }
 
-        pub fun borrowTicket(id: UInt64): &LostAndFound.Ticket? {
+        access(all) borrowTicket(id: UInt64): &LostAndFound.Ticket? {
             return &self.tickets[id] as &LostAndFound.Ticket?
         }
 
-        pub fun borrowAllTicketsByType(): [&LostAndFound.Ticket] {
+        access(all) borrowAllTicketsByType(): [&LostAndFound.Ticket] {
             let tickets: [&LostAndFound.Ticket] = []
             let ids = self.tickets.keys
             for id in ids {
@@ -243,7 +243,7 @@ pub contract LostAndFound {
             emit TicketDeposited(redeemer: redeemer, ticketID: ticketID, type: self.type, memo: memo, name: name, description: description, thumbnail: thumbnail)
         }
 
-        pub fun getTicketIDs(): [UInt64] {
+        access(all) getTicketIDs(): [UInt64] {
             return self.tickets.keys
         }
 
@@ -274,11 +274,11 @@ pub contract LostAndFound {
             self.flowTokenRepayment = flowTokenRepayment
         }
 
-        pub fun getOwner(): Address {
+        access(all) getOwner(): Address {
             return self.owner!.address
         }
 
-        pub fun getRedeemableTypes(): [Type] {
+        access(all) getRedeemableTypes(): [Type] {
             let types: [Type] = []
             for k in self.bins.keys {
                 let t = self.identifierToType[k]!
@@ -289,11 +289,11 @@ pub contract LostAndFound {
             return types
         }
 
-        pub fun hasType(type: Type): Bool {
+        access(all) hasType(type: Type): Bool {
             return self.bins[type.identifier] != nil
         }
 
-        pub fun borrowBin(type: Type): &LostAndFound.Bin? {
+        access(all) borrowBin(type: Type): &LostAndFound.Bin? {
             return &self.bins[type.identifier] as &LostAndFound.Bin?
         }
 
@@ -324,7 +324,7 @@ pub contract LostAndFound {
         // Only one of the three receiver options can be specified, and an optional maximum number of tickets
         // to redeem can be picked to prevent gas issues in case there are large numbers of tickets to be
         // redeemed at once.
-        pub fun redeemAll(type: Type, max: Int?, receiver: Capability) {
+        access(all) redeemAll(type: Type, max: Int?, receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver must match the redeemer of this shelf"
                 self.bins.containsKey(type.identifier): "no bin for provided type"
@@ -343,7 +343,7 @@ pub contract LostAndFound {
         }
 
         // Redeem a specific ticket instead of all of a certain type.
-        pub fun redeem(type: Type, ticketID: UInt64, receiver: Capability) {
+        access(all) redeem(type: Type, ticketID: UInt64, receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver must match the redeemer of this shelf"
                 self.bins.containsKey(type.identifier): "no bin for provided type"
@@ -410,7 +410,7 @@ pub contract LostAndFound {
             return (&self.shelves[addr] as &LostAndFound.Shelf?)!
         }
 
-        pub fun deposit(
+        access(all) deposit(
             redeemer: Address,
             item: @AnyResource,
             memo: String?,
@@ -453,14 +453,14 @@ pub contract LostAndFound {
             return uuid
         }
 
-        pub fun borrowShelf(redeemer: Address): &LostAndFound.Shelf? {
+        access(all) borrowShelf(redeemer: Address): &LostAndFound.Shelf? {
             return &self.shelves[redeemer] as &LostAndFound.Shelf?
         }
 
         // deleteShelf
         //
         // delete a shelf if it has no redeemable types
-        pub fun deleteShelf(_ addr: Address) {
+        access(all) deleteShelf(_ addr: Address) {
             let storageBefore = LostAndFound.account.storageUsed
             assert(self.shelves.containsKey(addr), message: "shelf does not exist")
             let tmp <- self.shelves[addr] <- nil
@@ -484,8 +484,8 @@ pub contract LostAndFound {
     }
 
     pub resource interface DepositorPublic {
-        pub fun balance(): UFix64
-        pub fun addFlowTokens(vault: @FlowToken.Vault)
+        access(all) balance(): UFix64
+        access(all) addFlowTokens(vault: @FlowToken.Vault)
     }
 
     pub resource Depositor: DepositorPublic {
@@ -502,15 +502,15 @@ pub contract LostAndFound {
             return false
         }
 
-        pub fun setLowBalanceThreshold(threshold: UFix64?) {
+        access(all) setLowBalanceThreshold(threshold: UFix64?) {
             self.lowBalanceThreshold = threshold
         }
 
-        pub fun getLowBalanceThreshold(): UFix64? {
+        access(all) getLowBalanceThreshold(): UFix64? {
             return self.lowBalanceThreshold
         }
 
-        pub fun deposit(
+        access(all) deposit(
             redeemer: Address,
             item: @AnyResource,
             memo: String?,
@@ -549,7 +549,7 @@ pub contract LostAndFound {
             return uuid
         }
 
-            pub fun trySendResource(
+            access(all) trySendResource(
                 item: @AnyResource,
                 cap: Capability,
                 memo: String?,
@@ -570,21 +570,21 @@ pub contract LostAndFound {
             }
         }
 
-        pub fun withdrawTokens(amount: UFix64): @FungibleToken.Vault {
+        access(all) withdrawTokens(amount: UFix64): @FungibleToken.Vault {
             let tokens <-self.flowTokenVault.withdraw(amount: amount)
             emit DepositorTokensWithdrawn(uuid: self.uuid, tokens: amount, balance: self.flowTokenVault.balance)
             self.checkForLowBalance()
             return <-tokens
         }
 
-        pub fun addFlowTokens(vault: @FlowToken.Vault) {
+        access(all) addFlowTokens(vault: @FlowToken.Vault) {
             let tokensAdded = vault.balance
             self.flowTokenVault.deposit(from: <-vault)
             emit DepositorTokensAdded(uuid: self.uuid, tokens: tokensAdded, balance: self.flowTokenVault.balance)
             self.checkForLowBalance()
         }
 
-        pub fun balance(): UFix64 {
+        access(all) balance(): UFix64 {
             return self.flowTokenVault.balance
         }
 
@@ -601,17 +601,17 @@ pub contract LostAndFound {
         }
     }
 
-    pub fun createDepositor(_ flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, lowBalanceThreshold: UFix64?): @Depositor {
+    access(all) createDepositor(_ flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>, lowBalanceThreshold: UFix64?): @Depositor {
         let depositor <- create Depositor(flowTokenRepayment, lowBalanceThreshold: lowBalanceThreshold)
         emit DepositorCreated(uuid: depositor.uuid)
         return <- depositor
     }
 
-    pub fun borrowShelfManager(): &LostAndFound.ShelfManager {
+    access(all) borrowShelfManager(): &LostAndFound.ShelfManager {
         return self.account.getCapability<&LostAndFound.ShelfManager>(LostAndFound.LostAndFoundPublicPath).borrow()!
     }
 
-    pub fun borrowAllTicketsByType(addr: Address, type: Type): [&LostAndFound.Ticket] {
+    access(all) borrowAllTicketsByType(addr: Address, type: Type): [&LostAndFound.Ticket] {
         let manager = LostAndFound.borrowShelfManager()
         let shelf = manager.borrowShelf(redeemer: addr)
         if shelf == nil {
@@ -626,7 +626,7 @@ pub contract LostAndFound {
         return bin!.borrowAllTicketsByType()
     }
 
-    pub fun borrowAllTickets(addr: Address): [&LostAndFound.Ticket] {
+    access(all) borrowAllTickets(addr: Address): [&LostAndFound.Ticket] {
         let manager = LostAndFound.borrowShelfManager()
         let shelf = manager.borrowShelf(redeemer: addr)
         if shelf == nil {
@@ -644,7 +644,7 @@ pub contract LostAndFound {
         return allTickets
     }
 
-    pub fun redeemAll(type: Type, max: Int?, receiver: Capability) {
+    access(all) redeemAll(type: Type, max: Int?, receiver: Capability) {
         let manager = LostAndFound.borrowShelfManager()
         let shelf = manager.borrowShelf(redeemer: receiver.address)
         assert(shelf != nil, message: "shelf not found")
@@ -656,7 +656,7 @@ pub contract LostAndFound {
         }
     }
 
-    pub fun estimateDeposit(
+    access(all) estimateDeposit(
         redeemer: Address,
         item: @AnyResource,
         memo: String?,
@@ -689,7 +689,7 @@ pub contract LostAndFound {
         return <- estimate
     }
 
-    pub fun getRedeemableTypes(_ addr: Address): [Type] {
+    access(all) getRedeemableTypes(_ addr: Address): [Type] {
         let manager = LostAndFound.borrowShelfManager()
         let shelf = manager.borrowShelf(redeemer: addr)
         if shelf == nil {
@@ -699,7 +699,7 @@ pub contract LostAndFound {
         return shelf!.getRedeemableTypes()
     }
 
-    pub fun deposit(
+    access(all) deposit(
         redeemer: Address,
         item: @AnyResource,
         memo: String?,
@@ -716,7 +716,7 @@ pub contract LostAndFound {
         return shelfManager.deposit(redeemer: redeemer, item: <-item, memo: memo, display: display, storagePayment: storagePayment, flowTokenRepayment: flowTokenRepayment)
     }
 
-    pub fun trySendResource(
+    access(all) trySendResource(
         resource: @AnyResource,
         cap: Capability,
         memo: String?,
@@ -738,7 +738,7 @@ pub contract LostAndFound {
         }
     }
 
-    pub fun getAddress(): Address {
+    access(all) getAddress(): Address {
         return self.account.address
     }
 

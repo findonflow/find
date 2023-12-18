@@ -17,7 +17,7 @@ pub contract PartyFavorzExtraData {
 		self.extraData[id]!.remove(key: field)!
 	}
 
-	pub fun getData(id: UInt64, field: String) : AnyStruct? {
+	access(all) getData(id: UInt64, field: String) : AnyStruct? {
 		let partyfavorz = self.extraData[id]
 		if partyfavorz == nil {
 			return nil

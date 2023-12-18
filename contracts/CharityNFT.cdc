@@ -24,11 +24,11 @@ pub contract CharityNFT: NonFungibleToken {
 			self.metadata = metadata
 		}
 
-		pub fun getMetadata() : { String : String} {
+		access(all) getMetadata() : { String : String} {
 			return self.metadata
 		}
 
-        pub fun getViews(): [Type] {
+        access(all) getViews(): [Type] {
 			return [
 				Type<MetadataViews.Display>() ,
 				Type<MetadataViews.Royalties>() ,
@@ -39,7 +39,7 @@ pub contract CharityNFT: NonFungibleToken {
 			]
 		}
 
-        pub fun resolveView(_ view: Type): AnyStruct? {
+        access(all) resolveView(_ view: Type): AnyStruct? {
 			switch view {
 
 				case Type<MetadataViews.Display>() : 
@@ -109,7 +109,7 @@ pub contract CharityNFT: NonFungibleToken {
 
 		}
 
-		pub fun parseUInt64(_ string: String) : UInt64? {
+		access(all) parseUInt64(_ string: String) : UInt64? {
 			let chars : {Character : UInt64} = {
 				"0" : 0 , 
 				"1" : 1 , 
@@ -140,16 +140,16 @@ pub contract CharityNFT: NonFungibleToken {
 	//The public interface can show metadata and the content for the Art piece
 	pub resource interface Public {
 		pub let id: UInt64
-		pub fun getMetadata() : {String : String}
+		access(all) getMetadata() : {String : String}
 	}
 
 	//Standard NFT collectionPublic interface that can also borrowArt as the correct type
 	pub resource interface CollectionPublic {
 
-		pub fun deposit(token: @NonFungibleToken.NFT)
-		pub fun getIDs(): [UInt64]
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-		pub fun borrowCharity(id: UInt64): &{Public}?
+		access(all) deposit(token: @NonFungibleToken.NFT)
+		access(all) getIDs(): [UInt64]
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
+		access(all) borrowCharity(id: UInt64): &{Public}?
 	}
 
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
@@ -162,7 +162,7 @@ pub contract CharityNFT: NonFungibleToken {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. WithdrawID : ".concat(withdrawID.toString()))
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -172,7 +172,7 @@ pub contract CharityNFT: NonFungibleToken {
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-		pub fun deposit(token: @NonFungibleToken.NFT) {
+		access(all) deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @CharityNFT.NFT
 
 			let id: UInt64 = token.id
@@ -186,18 +186,18 @@ pub contract CharityNFT: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		pub fun getIDs(): [UInt64] {
+		access(all) getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		//borrow charity
-		pub fun borrowCharity(id: UInt64): &{CharityNFT.Public}? {
+		access(all) borrowCharity(id: UInt64): &{CharityNFT.Public}? {
 			if self.ownedNFTs[id] != nil {
 				let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 				return ref as! &NFT
@@ -207,7 +207,7 @@ pub contract CharityNFT: NonFungibleToken {
 		}
 
 		//borrow view resolver
-        pub fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+        access(all) borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			if self.ownedNFTs[id] == nil {
 				panic("NFT does not exist. ID : ".concat(id.toString()))
 			}
@@ -222,7 +222,7 @@ pub contract CharityNFT: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 

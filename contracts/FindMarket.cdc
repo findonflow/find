@@ -62,7 +62,7 @@ pub contract FindMarket {
 	}
 
 	// ========================================
-	pub fun getPublicPath(_ type: Type, name:String) : PublicPath {
+	access(all) getPublicPath(_ type: Type, name:String) : PublicPath {
 
 		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
@@ -70,32 +70,32 @@ pub contract FindMarket {
 		return PublicPath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
 	}
 
-	pub fun getStoragePath(_ type: Type, name:String) : StoragePath {
+	access(all) getStoragePath(_ type: Type, name:String) : StoragePath {
 
 		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
 		return StoragePath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
 	}
-	pub fun getFindTenantAddress() : Address {
+	access(all) getFindTenantAddress() : Address {
 		return FindMarket.account.address
 	}
 
 	/* Get Tenant */
-	pub fun getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic} {
+	access(all) getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic} {
 		return FindMarket.getTenantCapability(tenant)!.borrow()!
 	}
 
-	pub fun getSaleItemTypes() : [Type] {
+	access(all) getSaleItemTypes() : [Type] {
 		return self.saleItemTypes
 	}
 
 	/* Get SaleItemCollections */
-	pub fun getSaleItemCollectionTypes() : [Type] {
+	access(all) getSaleItemCollectionTypes() : [Type] {
 		return self.saleItemCollectionTypes
 	}
 
-	pub fun getSaleItemCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.SaleItemCollectionPublic}>] {
+	access(all) getSaleItemCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.SaleItemCollectionPublic}>] {
 		var caps : [Capability<&{FindMarket.SaleItemCollectionPublic}>] = []
 		for type in self.getSaleItemCollectionTypes() {
 			if type != nil {
@@ -108,7 +108,7 @@ pub contract FindMarket {
 		return caps
 	}
 
-	pub fun getSaleItemCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
+	access(all) getSaleItemCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
 		for type in self.getSaleItemCollectionTypes() {
 			if self.getMarketOptionFromType(type) == marketOption{
 				let cap = getAccount(address).getCapability<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))
@@ -121,7 +121,7 @@ pub contract FindMarket {
 
 
 	/* Get Sale Reports and Sale Item */
-	pub fun assertOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
+	access(all) assertOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
 
 		let tenantRef=self.getTenant(tenant)
 
@@ -141,7 +141,7 @@ pub contract FindMarket {
 
 	// Get Royalties Changed Items
 
-	pub fun getRoyaltiesChangedIds(tenant:Address, address: Address) : {String : [UInt64]} {
+	access(all) getRoyaltiesChangedIds(tenant:Address, address: Address) : {String : [UInt64]} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : [UInt64]} = {}
 		for type in self.getSaleItemCollectionTypes() {
@@ -158,7 +158,7 @@ pub contract FindMarket {
 		return report
 	}
 
-	pub fun getRoyaltiesChangedItems(tenant:Address, address: Address) : {String : FindMarket.SaleItemCollectionReport} {
+	access(all) getRoyaltiesChangedItems(tenant:Address, address: Address) : {String : FindMarket.SaleItemCollectionReport} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
@@ -172,7 +172,7 @@ pub contract FindMarket {
 	}
 
 	/* Get Sale Reports and Sale Item */
-	pub fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
+	access(all) getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
 
 		let tenantRef=self.getTenant(tenant)
 		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo, getRoyaltyChanged: true )
@@ -182,7 +182,7 @@ pub contract FindMarket {
 		return nil
 	}
 
-	pub fun getSaleItemReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
+	access(all) getSaleItemReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
@@ -195,7 +195,7 @@ pub contract FindMarket {
 		return report
 	}
 
-	pub fun getSaleItems(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
+	access(all) getSaleItems(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemCollectionReport} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
@@ -208,7 +208,7 @@ pub contract FindMarket {
 		return report
 	}
 
-	pub fun getNFTListing(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemInformation} {
+	access(all) getNFTListing(tenant:Address, address: Address, id: UInt64, getNFTInfo: Bool) : {String : FindMarket.SaleItemInformation} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindMarket.SaleItemInformation} = {}
 		for type in self.getSaleItemCollectionTypes() {
@@ -299,15 +299,15 @@ pub contract FindMarket {
 	}
 
 	/* Get Bid Collections */
-	pub fun getMarketBidTypes() : [Type] {
+	access(all) getMarketBidTypes() : [Type] {
 		return self.marketBidTypes
 	}
 
-	pub fun getMarketBidCollectionTypes() : [Type] {
+	access(all) getMarketBidCollectionTypes() : [Type] {
 		return self.marketBidCollectionTypes
 	}
 
-	pub fun getMarketBidCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.MarketBidCollectionPublic}>] {
+	access(all) getMarketBidCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.MarketBidCollectionPublic}>] {
 		var caps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = []
 		for type in self.getMarketBidCollectionTypes() {
 			let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
@@ -318,7 +318,7 @@ pub contract FindMarket {
 		return caps
 	}
 
-	pub fun getMarketBidCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
+	access(all) getMarketBidCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
 		for type in self.getMarketBidCollectionTypes() {
 			if self.getMarketOptionFromType(type) == marketOption{
 				let cap = getAccount(address).getCapability<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
@@ -328,7 +328,7 @@ pub contract FindMarket {
 		panic("Cannot find market option : ".concat(marketOption))
 	}
 
-	pub fun getBid(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
+	access(all) getBid(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.BidInfo? {
 		let tenantRef=self.getTenant(tenant)
 		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo)
 		if bidInfo.items.length > 0 {
@@ -337,7 +337,7 @@ pub contract FindMarket {
 		return nil
 	}
 
-	pub fun getBidsReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.BidItemCollectionReport} {
+	access(all) getBidsReport(tenant:Address, address: Address, getNFTInfo: Bool) : {String : FindMarket.BidItemCollectionReport} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindMarket.BidItemCollectionReport} = {}
 		for type in self.getMarketBidCollectionTypes() {
@@ -390,7 +390,7 @@ pub contract FindMarket {
 		return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
 	}
 
-	pub fun assertBidOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
+	access(all) assertBidOperationValid(tenant: Address, address: Address, marketOption: String, id:UInt64) : &{SaleItem} {
 
 		let tenantRef=self.getTenant(tenant)
 		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -416,11 +416,11 @@ pub contract FindMarket {
 	}
 
 	/* Helper Function */
-	pub fun getMarketOptionFromType(_ type:Type) : String {
+	access(all) getMarketOptionFromType(_ type:Type) : String {
 		return self.listingName[type.identifier]!
 	}
 
-	pub fun typeToListingName(_ type: Type) : String {
+	access(all) typeToListingName(_ type: Type) : String {
 		let identifier = type.identifier
 		var dots = 0
 		var start = 0
@@ -522,7 +522,7 @@ pub contract FindMarket {
 		}
 	}
 
-	pub fun typeToPathIdentifier(_ type:Type) : String {
+	access(all) typeToPathIdentifier(_ type:Type) : String {
 		let identifier=type.identifier
 
 		var i=0
@@ -583,7 +583,7 @@ pub contract FindMarket {
 		}
 
 
-		pub fun accept(_ relevantType: Type): Bool {
+		access(all) accept(_ relevantType: Type): Bool {
 			let contains=self.types.contains(relevantType)
 
 			if self.allow && contains{
@@ -641,12 +641,12 @@ pub contract FindMarket {
 	}
 
 	pub resource interface TenantPublic {
-		pub fun getStoragePath(_ type: Type) : StoragePath
-		pub fun getPublicPath(_ type: Type) : PublicPath
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindRulesCache.ActionResult
-		pub fun getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts}
-		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing?
-		pub fun getBlockedNFT(marketType: Type) : [Type]
+		access(all) getStoragePath(_ type: Type) : StoragePath
+		access(all) getPublicPath(_ type: Type) : PublicPath
+		access(all) allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindRulesCache.ActionResult
+		access(all) getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts}
+		access(all) getAllowedListings(nftType: Type, marketType: Type) : AllowedListing?
+		access(all) getBlockedNFT(marketType: Type) : [Type]
 		pub let name:String
 	}
 
@@ -749,7 +749,7 @@ pub contract FindMarket {
 			FindMarketCut.setTenantCuts(tenant: self.name, types: types, category: category, cuts: cuts)
 		}
 
-		pub fun getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts} {
+		access(all) getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts} {
 
 			let cuts = FindMarketCut.getCuts(tenant: self.name, listingType: listingType, nftType: nftType, ftType: ftType)
 
@@ -760,7 +760,7 @@ pub contract FindMarket {
 			return cuts
 		}
 
-		pub fun getFindCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
+		access(all) getFindCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
 			let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
 			let findRuleId = ruleId.concat("-find")
 			if let cache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: findRuleId) {
@@ -810,7 +810,7 @@ pub contract FindMarket {
 			return returningCut
 		}
 
-		pub fun getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
+		access(all) getTenantCut(name:String, listingType: Type, nftType:Type, ftType:Type) : FindMarketCutStruct.Cuts? {
 			let ruleId = FindMarketCut.getRuleId(listingType: listingType, nftType: nftType, ftType: ftType)
 			let tenantRuleId = ruleId.concat("-tenant")
 			if let cache = FindRulesCache.getTenantCut(tenant: self.name, ruleId: tenantRuleId) {
@@ -952,7 +952,7 @@ pub contract FindMarket {
 			panic("Panic executing emitRulesEvent, Must be nft/ft/listing")
 		}
 
-		pub fun allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : FindRulesCache.ActionResult{
+		access(all) allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address?, buyer: Address?) : FindRulesCache.ActionResult{
 			/* Check for Honour Banning */
 			let profile = getAccount(FindMarket.tenantNameAddress[self.name]!).getCapability<&Profile.User{Profile.Public}>(Profile.publicPath).borrow() ?? panic("Cannot get reference to Profile to check honour banning. Tenant Name : ".concat(self.name))
 			if seller != nil && profile.isBanned(seller!) {
@@ -1038,15 +1038,15 @@ pub contract FindMarket {
 
 		}
 
-		pub fun getPublicPath(_ type: Type) : PublicPath {
+		access(all) getPublicPath(_ type: Type) : PublicPath {
 			return FindMarket.getPublicPath(type, name: self.name)
 		}
 
-		pub fun getStoragePath(_ type: Type) : StoragePath {
+		access(all) getStoragePath(_ type: Type) : StoragePath {
 			return FindMarket.getStoragePath(type, name: self.name)
 		}
 
-		pub fun getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
+		access(all) getAllowedListings(nftType: Type, marketType: Type) : AllowedListing? {
 
 			// Find Rules have to be deny rules
 			var containsNFTType = false
@@ -1100,7 +1100,7 @@ pub contract FindMarket {
 			return AllowedListing(listingType: marketType, ftTypes: returningFTTypes, status: "active")
 		}
 
-		pub fun getBlockedNFT(marketType: Type) : [Type] {
+		access(all) getBlockedNFT(marketType: Type) : [Type] {
 			// Find Rules have to be deny rules
 			let list : [Type] = []
 			var containsListingType = true
@@ -1158,14 +1158,14 @@ pub contract FindMarket {
 
 	// Tenant admin stuff
 	//Admin client to use for capability receiver pattern
-	pub fun createTenantClient() : @TenantClient {
+	access(all) createTenantClient() : @TenantClient {
 		return <- create TenantClient()
 	}
 
 
 	//interface to use for capability receiver pattern
 	pub resource interface TenantClientPublic  {
-		pub fun addCapability(_ cap: Capability<&Tenant>)
+		access(all) addCapability(_ cap: Capability<&Tenant>)
 	}
 
 	/*
@@ -1179,7 +1179,7 @@ pub contract FindMarket {
 
 		access(self) var capability: Capability<&Tenant>?
 
-		pub fun addCapability(_ cap: Capability<&Tenant>) {
+		access(all) addCapability(_ cap: Capability<&Tenant>) {
 
 			if !cap.check() {
 				panic("Invalid tenant")
@@ -1194,32 +1194,32 @@ pub contract FindMarket {
 			self.capability = nil
 		}
 
-		pub fun setMarketOption(saleItem: TenantSaleItem) {
+		access(all) setMarketOption(saleItem: TenantSaleItem) {
 			let tenant = self.getTenantRef()
 			tenant.addSaleItem(saleItem, type: "tenant")
 		}
 
-		pub fun removeMarketOption(name: String) {
+		access(all) removeMarketOption(name: String) {
 			let tenant = self.getTenantRef()
 			tenant.removeSaleItem(name, type: "tenant")
 		}
 
-		pub fun enableMarketOption(_ name: String) {
+		access(all) enableMarketOption(_ name: String) {
 			let tenant = self.getTenantRef()
 			tenant.alterMarketOption(name: name, status: "active")
 		}
 
-		pub fun deprecateMarketOption(_ name: String) {
+		access(all) deprecateMarketOption(_ name: String) {
 			let tenant = self.getTenantRef()
 			tenant.alterMarketOption(name: name, status: "deprecated")
 		}
 
-		pub fun stopMarketOption(_ name: String) {
+		access(all) stopMarketOption(_ name: String) {
 			let tenant = self.getTenantRef()
 			tenant.alterMarketOption(name: name, status: "stopped")
 		}
 
-		pub fun getTenantRef() : &Tenant {
+		access(all) getTenantRef() : &Tenant {
 			if self.capability == nil {
 				panic("TenantClient is not present")
 			}
@@ -1230,7 +1230,7 @@ pub contract FindMarket {
 			return self.capability!.borrow()!
 		}
 
-		pub fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+		access(all) setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
 			let tenant = self.getTenantRef()
 			tenant.setExtraCut(types: types, category: category, cuts: cuts)
 		}
@@ -1286,7 +1286,7 @@ pub contract FindMarket {
 		return account.getCapability<&Tenant>(pp)
 	}
 
-	pub fun getTenantPathForName(_ name:String) : String {
+	access(all) getTenantPathForName(_ name:String) : String {
 		if !self.tenantNameAddress.containsKey(name) {
 			panic("tenant is not registered in registry")
 		}
@@ -1294,7 +1294,7 @@ pub contract FindMarket {
 		return self.tenantPathPrefix.concat("_").concat(name)
 	}
 
-	pub fun getTenantPathForAddress(_ address:Address) : String {
+	access(all) getTenantPathForAddress(_ address:Address) : String {
 		if !self.tenantAddressName.containsKey(address) {
 			panic("tenant is not registered in registry")
 		}
@@ -1302,7 +1302,7 @@ pub contract FindMarket {
 		return self.getTenantPathForName(self.tenantAddressName[address]!)
 	}
 
-	pub fun getTenantCapability(_ marketplace:Address) : Capability<&Tenant{TenantPublic}>? {
+	access(all) getTenantCapability(_ marketplace:Address) : Capability<&Tenant{TenantPublic}>? {
 
 		if !self.tenantAddressName.containsKey(marketplace)  {
 			"tenant is not registered in registry"
@@ -1634,11 +1634,11 @@ pub contract FindMarket {
 	}
 
 	pub resource interface SaleItemCollectionPublic {
-		pub fun getIds(): [UInt64]
-		pub fun getRoyaltyChangedIds(): [UInt64]
-		pub fun containsId(_ id: UInt64): Bool
+		access(all) getIds(): [UInt64]
+		access(all) getRoyaltyChangedIds(): [UInt64]
+		access(all) containsId(_ id: UInt64): Bool
 		access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
-		pub fun getListingType() : Type
+		access(all) getListingType() : Type
 	}
 
 	pub struct SaleItemCollectionReport {
@@ -1652,9 +1652,9 @@ pub contract FindMarket {
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getIds() : [UInt64]
-		pub fun containsId(_ id: UInt64): Bool
-		pub fun getBidType() : Type
+		access(all) getIds() : [UInt64]
+		access(all) containsId(_ id: UInt64): Bool
+		access(all) getBidType() : Type
 		access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
 	}
 
@@ -1669,47 +1669,47 @@ pub contract FindMarket {
 	}
 
 	pub resource interface Bid {
-		pub fun getBalance() : UFix64
-		pub fun getSellerAddress() : Address
-		pub fun getBidExtraField() : {String : AnyStruct}
+		access(all) getBalance() : UFix64
+		access(all) getSellerAddress() : Address
+		access(all) getBidExtraField() : {String : AnyStruct}
 	}
 
 	pub resource interface SaleItem {
 
 		//this is the type of sale this is, auction, direct offer etc
-		pub fun getSaleType(): String
-		pub fun getListingTypeIdentifier(): String
+		access(all) getSaleType(): String
+		access(all) getListingTypeIdentifier(): String
 
-		pub fun getSeller(): Address
-		pub fun getBuyer(): Address?
+		access(all) getSeller(): Address
+		access(all) getBuyer(): Address?
 
-		pub fun getSellerName() : String?
-		pub fun getBuyerName() : String?
+		access(all) getSellerName() : String?
+		access(all) getBuyerName() : String?
 
-		pub fun toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo
-		pub fun checkPointer() : Bool
-		pub fun checkSoulBound() : Bool
-		pub fun getListingType() : Type
+		access(all) toNFTInfo(_ detail: Bool) : FindMarket.NFTInfo
+		access(all) checkPointer() : Bool
+		access(all) checkSoulBound() : Bool
+		access(all) getListingType() : Type
 
-		// pub fun getFtAlias(): String
+		// access(all) getFtAlias(): String
 		//the Type of the item for sale
-		pub fun getItemType(): Type
+		access(all) getItemType(): Type
 		//The id of the nft for sale
-		pub fun getItemID() : UInt64
+		access(all) getItemID() : UInt64
 		//The id of this sale item, ie the UUID of the item listed for sale
-		pub fun getId() : UInt64
+		access(all) getId() : UInt64
 
-		pub fun getBalance(): UFix64
-		pub fun getAuction(): AuctionItem?
-		pub fun getFtType() : Type //The type of FT used for this sale item
-		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
+		access(all) getBalance(): UFix64
+		access(all) getAuction(): AuctionItem?
+		access(all) getFtType() : Type //The type of FT used for this sale item
+		access(all) getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 
-		pub fun getSaleItemExtraField() : {String : AnyStruct}
+		access(all) getSaleItemExtraField() : {String : AnyStruct}
 
-		pub fun getTotalRoyalties() : UFix64
-		pub fun validateRoyalties() : Bool
-		pub fun getDisplay() : MetadataViews.Display
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
+		access(all) getTotalRoyalties() : UFix64
+		access(all) validateRoyalties() : Bool
+		access(all) getDisplay() : MetadataViews.Display
+		access(all) getNFTCollectionData() : MetadataViews.NFTCollectionData
 	}
 
 	pub struct SaleItemInformation {
@@ -1778,7 +1778,7 @@ pub contract FindMarket {
 		}
 	}
 
-	pub fun getTenantAddress(_ name: String) : Address? {
+	access(all) getTenantAddress(_ name: String) : Address? {
 		return FindMarket.tenantNameAddress[name]
 	}
 

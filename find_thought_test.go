@@ -279,7 +279,7 @@ func TestFindThought(t *testing.T) {
 		import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 		import FindViews from "../contracts/FindViews.cdc"
 
-		pub fun main(quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?) : FindMarket.NFTInfo? {
+		access(all) main(quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?) : FindMarket.NFTInfo? {
 
 			var nftPointer : FindViews.ViewReadPointer? = nil
 			if quoteNFTOwner != nil {

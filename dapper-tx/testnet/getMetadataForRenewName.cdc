@@ -1,6 +1,6 @@
 import FIND from 0x35717efbbce11c74
 
-pub fun main(merchAccount: Address, name: String, amount: UFix64) : PurchaseData {
+access(all) main(merchAccount: Address, name: String, amount: UFix64) : PurchaseData {
 
     let description = "Renew name :".concat(name).concat(" for DUC ").concat(amount.toString())
     let imageURL = "https://ik.imagekit.io/xyvsisxky/tr:ot-".concat(name).concat(",ots-55,otc-58B792,ox-N166,oy-N24,ott-b/https://i.imgur.com/8W8NoO1.png")

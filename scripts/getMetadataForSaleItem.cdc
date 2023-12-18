@@ -16,7 +16,7 @@ pub struct PurchaseData {
 		self.imageURL = imageURL
 	}
 }
-pub fun main(merchantAddress: Address,  address: Address, id: UInt64, amount: UFix64) : PurchaseData{
+access(all) main(merchantAddress: Address,  address: Address, id: UInt64, amount: UFix64) : PurchaseData{
 	let marketplace = FindMarket.getFindTenantAddress()
 	let saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 	let saleItemCollection = saleItemsCap.borrow()!
@@ -34,7 +34,7 @@ pub fun main(merchantAddress: Address,  address: Address, id: UInt64, amount: UF
 	)
 }
 
-pub fun replacePrefix(_ original: String, prefix:String, replace:String) : String {
+access(all) replacePrefix(_ original: String, prefix:String, replace:String) : String {
 	if original.length < prefix.length  {
 		return original
 	}

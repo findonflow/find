@@ -12,7 +12,7 @@ Let's take a closer look on code implementation.
 
 ```cadence
 
-pub fun resolveView(_ type: Type): AnyStruct? {
+access(all) resolveView(_ type: Type): AnyStruct? {
 	switch type {
 
 		// Example for Display 
@@ -60,7 +60,7 @@ To enable a decent collection display, the specific NFT that implements Metadata
 
 ```cadence
 
-pub fun resolveView(_ type: Type): AnyStruct? {
+access(all) resolveView(_ type: Type): AnyStruct? {
 	switch type {
 
 		// Example for NFTCollectionDisplay 
@@ -106,7 +106,7 @@ By returning trait views as recommended, you can fit the data in the places you 
 
 ```cadence
 
-pub fun resolveView(_ type: Type): AnyStruct? {
+access(all) resolveView(_ type: Type): AnyStruct? {
 	switch type {
 
 		// Example for NFTCollectionDisplay 

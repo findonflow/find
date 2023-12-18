@@ -28,11 +28,11 @@ pub contract FindRewardToken {
         return FindRewardToken.tenantTokenCapabilities.values
     }
 
-    pub fun getDefaultTaskRewards() : {String : UFix64} {
+    access(all) getDefaultTaskRewards() : {String : UFix64} {
         return self.defaultTaskRewards
     }
 
-    pub fun getTasks() : [String] {
+    access(all) getTasks() : [String] {
         return self.defaultTaskRewards.keys
     }
 

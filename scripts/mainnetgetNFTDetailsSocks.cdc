@@ -1,7 +1,7 @@
 import FIND from "../contracts/FIND.cdc"
 import RaribleNFT from 0x01ab36aaf654a13e
 
-pub fun main(user: String , project: String, id: UInt64, views: [String]) : NFTData? {
+access(all) main(user: String , project: String, id: UInt64, views: [String]) : NFTData? {
 
 	if let address = FIND.resolve(user) {
 		if let uuid = getSocks(ownerAddress: address, id: id) {
@@ -34,7 +34,7 @@ pub fun main(user: String , project: String, id: UInt64, views: [String]) : NFTD
 
 }
 
-pub fun getSocks(ownerAddress: Address, id: UInt64) : UInt64? {
+access(all) getSocks(ownerAddress: Address, id: UInt64) : UInt64? {
 
 	let account = getAuthAccount(ownerAddress)
 	let ref = account.borrow<&RaribleNFT.Collection>(from: RaribleNFT.collectionStoragePath)

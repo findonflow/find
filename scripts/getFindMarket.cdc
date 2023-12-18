@@ -26,7 +26,7 @@ pub struct FINDReport{
 }
 
 
-pub fun main(user: String) : FINDReport? {
+access(all) main(user: String) : FINDReport? {
 
 	let maybeAddress=FIND.resolve(user)
 	if maybeAddress == nil{

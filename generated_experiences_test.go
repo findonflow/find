@@ -143,7 +143,7 @@ func TestGeneratedExperiences(t *testing.T) {
 		import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
 		import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-		pub fun main(user: Address): AnyStruct {
+		access(all) main(user: Address): AnyStruct {
 			let acct = getAccount(user)
 			let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
 				.borrow<&{ViewResolver.ResolverCollection}>()
@@ -202,7 +202,7 @@ func TestGeneratedExperiences(t *testing.T) {
 	import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
 	import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-	pub fun main(user: Address, view: String): AnyStruct {
+	access(all) main(user: Address, view: String): AnyStruct {
 		let acct = getAccount(user)
 		let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
 			.borrow<&{ViewResolver.ResolverCollection}>()

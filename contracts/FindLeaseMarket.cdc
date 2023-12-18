@@ -26,20 +26,20 @@ pub contract FindLeaseMarket {
 	// ========================================
 
 	/* Get Tenant */
-	pub fun getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic} {
+	access(all) getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic} {
 		return FindMarket.getTenantCapability(tenant)!.borrow()!
 	}
 
-	pub fun getSaleItemTypes() : [Type] {
+	access(all) getSaleItemTypes() : [Type] {
 		return self.saleItemTypes
 	}
 
 	/* Get SaleItemCollections */
-	pub fun getSaleItemCollectionTypes() : [Type] {
+	access(all) getSaleItemCollectionTypes() : [Type] {
 		return self.saleItemCollectionTypes
 	}
 
-	pub fun getSaleItemCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindLeaseMarket.SaleItemCollectionPublic}>] {
+	access(all) getSaleItemCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindLeaseMarket.SaleItemCollectionPublic}>] {
 		var caps : [Capability<&{FindLeaseMarket.SaleItemCollectionPublic}>] = []
 		for type in self.getSaleItemCollectionTypes() {
 			if type != nil {
@@ -52,7 +52,7 @@ pub contract FindLeaseMarket {
 		return caps
 	}
 
-	pub fun getSaleItemCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindLeaseMarket.SaleItemCollectionPublic}> {
+	access(all) getSaleItemCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindLeaseMarket.SaleItemCollectionPublic}> {
 		for type in self.getSaleItemCollectionTypes() {
 			if FindMarket.getMarketOptionFromType(type) == marketOption{
 				let cap = getAccount(address).getCapability<&{FindLeaseMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))
@@ -65,7 +65,7 @@ pub contract FindLeaseMarket {
 
 
 	/* Get Sale Reports and Sale Item */
-	pub fun assertOperationValid(tenant: Address, name: String, marketOption: String) : &{SaleItem} {
+	access(all) assertOperationValid(tenant: Address, name: String, marketOption: String) : &{SaleItem} {
 
 		let tenantRef=self.getTenant(tenant)
 		let address=FIND.lookupAddress(name) ?? panic("Name is not owned by anyone. Name : ".concat(name))
@@ -84,7 +84,7 @@ pub contract FindLeaseMarket {
 	}
 
 	/* Get Sale Reports and Sale Item */
-	pub fun getSaleInformation(tenant: Address, name: String, marketOption: String, getLeaseInfo: Bool) : FindLeaseMarket.SaleItemInformation? {
+	access(all) getSaleInformation(tenant: Address, name: String, marketOption: String, getLeaseInfo: Bool) : FindLeaseMarket.SaleItemInformation? {
 		let address = FIND.lookupAddress(name) ?? panic("Name is not owned by anyone. Name : ".concat(name))
 		let tenantRef=self.getTenant(tenant)
 		let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, name: name, getGhost: false, getLeaseInfo: getLeaseInfo)
@@ -94,7 +94,7 @@ pub contract FindLeaseMarket {
 		return nil
 	}
 
-	pub fun getSaleItemReport(tenant:Address, address: Address, getLeaseInfo: Bool) : {String : FindLeaseMarket.SaleItemCollectionReport} {
+	access(all) getSaleItemReport(tenant:Address, address: Address, getLeaseInfo: Bool) : {String : FindLeaseMarket.SaleItemCollectionReport} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindLeaseMarket.SaleItemCollectionReport} = {}
 		for type in self.getSaleItemCollectionTypes() {
@@ -107,7 +107,7 @@ pub contract FindLeaseMarket {
 		return report
 	}
 
-	pub fun getSaleItems(tenant:Address, name: String, getLeaseInfo: Bool) : {String : FindLeaseMarket.SaleItemCollectionReport} {
+	access(all) getSaleItems(tenant:Address, name: String, getLeaseInfo: Bool) : {String : FindLeaseMarket.SaleItemCollectionReport} {
 		let address = FIND.lookupAddress(name) ?? panic("Name is not owned by anyone. Name : ".concat(name))
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindLeaseMarket.SaleItemCollectionReport} = {}
@@ -121,7 +121,7 @@ pub contract FindLeaseMarket {
 		return report
 	}
 
-	pub fun getLeaseListing(tenant:Address, name: String, getLeaseInfo: Bool) : {String : FindLeaseMarket.SaleItemInformation} {
+	access(all) getLeaseListing(tenant:Address, name: String, getLeaseInfo: Bool) : {String : FindLeaseMarket.SaleItemInformation} {
 		let address = FIND.lookupAddress(name) ?? panic("Name is not owned by anyone. Name : ".concat(name))
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindLeaseMarket.SaleItemInformation} = {}
@@ -201,15 +201,15 @@ pub contract FindLeaseMarket {
 	}
 
 	/* Get Bid Collections */
-	pub fun getMarketBidTypes() : [Type] {
+	access(all) getMarketBidTypes() : [Type] {
 		return self.marketBidTypes
 	}
 
-	pub fun getMarketBidCollectionTypes() : [Type] {
+	access(all) getMarketBidCollectionTypes() : [Type] {
 		return self.marketBidCollectionTypes
 	}
 
-	pub fun getMarketBidCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindLeaseMarket.MarketBidCollectionPublic}>] {
+	access(all) getMarketBidCollectionCapabilities(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindLeaseMarket.MarketBidCollectionPublic}>] {
 		var caps : [Capability<&{FindLeaseMarket.MarketBidCollectionPublic}>] = []
 		for type in self.getMarketBidCollectionTypes() {
 			let cap = getAccount(address).getCapability<&{FindLeaseMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
@@ -220,7 +220,7 @@ pub contract FindLeaseMarket {
 		return caps
 	}
 
-	pub fun getMarketBidCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindLeaseMarket.MarketBidCollectionPublic}> {
+	access(all) getMarketBidCollectionCapability(tenantRef: &FindMarket.Tenant{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindLeaseMarket.MarketBidCollectionPublic}> {
 		for type in self.getMarketBidCollectionTypes() {
 			if FindMarket.getMarketOptionFromType(type) == marketOption{
 				let cap = getAccount(address).getCapability<&{FindLeaseMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
@@ -230,7 +230,7 @@ pub contract FindLeaseMarket {
 		panic("Cannot find market option : ".concat(marketOption))
 	}
 
-	pub fun getBid(tenant: Address, address: Address, marketOption: String, name:String, getLeaseInfo: Bool) : FindLeaseMarket.BidInfo? {
+	access(all) getBid(tenant: Address, address: Address, marketOption: String, name:String, getLeaseInfo: Bool) : FindLeaseMarket.BidInfo? {
 		let tenantRef=self.getTenant(tenant)
 		let bidInfo = self.checkBidInformation(tenantRef: tenantRef, marketOption: marketOption, address: address, name: name, getGhost: false, getLeaseInfo: getLeaseInfo)
 		if bidInfo.items.length > 0 {
@@ -239,7 +239,7 @@ pub contract FindLeaseMarket {
 		return nil
 	}
 
-	pub fun getBidsReport(tenant:Address, address: Address, getLeaseInfo: Bool) : {String : FindLeaseMarket.BidItemCollectionReport} {
+	access(all) getBidsReport(tenant:Address, address: Address, getLeaseInfo: Bool) : {String : FindLeaseMarket.BidItemCollectionReport} {
 		let tenantRef = self.getTenant(tenant)
 		var report : {String : FindLeaseMarket.BidItemCollectionReport} = {}
 		for type in self.getMarketBidCollectionTypes() {
@@ -292,7 +292,7 @@ pub contract FindLeaseMarket {
 		return FindLeaseMarket.BidItemCollectionReport(items: info, ghosts: ghost)
 	}
 
-	pub fun assertBidOperationValid(tenant: Address, address: Address, marketOption: String, name:String) : &{SaleItem} {
+	access(all) assertBidOperationValid(tenant: Address, address: Address, marketOption: String, name:String) : &{SaleItem} {
 
 		let tenantRef=self.getTenant(tenant)
 		let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -323,10 +323,10 @@ pub contract FindLeaseMarket {
 		pub let name: String
 		pub let uuid: UInt64
 
-		pub fun valid() : Bool
-		pub fun getUUID() :UInt64
-		pub fun getLease() : FIND.LeaseInformation
-		pub fun owner() : Address
+		access(all) valid() : Bool
+		access(all) getUUID() :UInt64
+		access(all) getLease() : FIND.LeaseInformation
+		access(all) owner() : Address
 		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic}
 	}
 
@@ -355,19 +355,19 @@ pub contract FindLeaseMarket {
 			return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
 		}
 
-		pub fun getLease() : FIND.LeaseInformation {
+		access(all) getLease() : FIND.LeaseInformation {
 			return self.borrow().getLease(self.name) ?? panic("The owner doesn't hold the lease anymore".concat(self.name))
 		}
 
-		pub fun getUUID() :UInt64{
+		access(all) getUUID() :UInt64{
 			return self.uuid
 		}
 
-		pub fun owner() : Address {
+		access(all) owner() : Address {
 			return self.cap.address
 		}
 
-		pub fun valid() : Bool {
+		access(all) valid() : Bool {
 			if !self.cap.check() || !self.cap.borrow()!.getNames().contains(self.name) {
 				return false
 			}
@@ -404,15 +404,15 @@ pub contract FindLeaseMarket {
 			return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
 		}
 
-		pub fun getLease() : FIND.LeaseInformation {
+		access(all) getLease() : FIND.LeaseInformation {
 			return self.borrow().getLease(self.name) ?? panic("The owner doesn't hold the lease anymore".concat(self.name))
 		}
 
-		pub fun getUUID() :UInt64{
+		access(all) getUUID() :UInt64{
 			return self.uuid
 		}
 
-		pub fun valid() : Bool {
+		access(all) valid() : Bool {
 			if !self.cap.check() || !self.cap.borrow()!.getNames().contains(self.name) {
 				return false
 			}
@@ -433,7 +433,7 @@ pub contract FindLeaseMarket {
 			self.borrow().move(name: self.name, profile: profile, to: leases)
 		}
 
-		pub fun owner() : Address {
+		access(all) owner() : Address {
 			return self.cap.address
 		}
 
@@ -502,36 +502,36 @@ pub contract FindLeaseMarket {
 
 	pub resource interface SaleItem {
 		//this is the type of sale this is, active, cancelled etc
-		pub fun getSaleType(): String
-		pub fun getSeller(): Address
-		pub fun getBuyer(): Address?
+		access(all) getSaleType(): String
+		access(all) getSeller(): Address
+		access(all) getBuyer(): Address?
 
-		pub fun getSellerName() : String?
-		pub fun getBuyerName() : String?
+		access(all) getSellerName() : String?
+		access(all) getBuyerName() : String?
 
-		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo
-		pub fun checkPointer() : Bool
-		pub fun getListingType() : Type
-		pub fun getListingTypeIdentifier(): String
+		access(all) toLeaseInfo() : FindLeaseMarket.LeaseInfo
+		access(all) checkPointer() : Bool
+		access(all) getListingType() : Type
+		access(all) getListingTypeIdentifier(): String
 
 		//the Type of the item for sale
-		pub fun getItemType(): Type
+		access(all) getItemType(): Type
 		//The id of the nft for sale
-		pub fun getLeaseName() : String
+		access(all) getLeaseName() : String
 
-		pub fun getBalance(): UFix64
-		pub fun getAuction(): AuctionItem?
-		pub fun getFtType() : Type //The type of FT used for this sale item
-		pub fun getValidUntil() : UFix64? //A timestamp that says when this item is valid until
+		access(all) getBalance(): UFix64
+		access(all) getAuction(): AuctionItem?
+		access(all) getFtType() : Type //The type of FT used for this sale item
+		access(all) getValidUntil() : UFix64? //A timestamp that says when this item is valid until
 
-		pub fun getSaleItemExtraField() : {String : AnyStruct}
-		pub fun getId() : UInt64
+		access(all) getSaleItemExtraField() : {String : AnyStruct}
+		access(all) getId() : UInt64
 	}
 
 	pub resource interface Bid {
-		pub fun getBalance() : UFix64
-		pub fun getSellerAddress() : Address
-		pub fun getBidExtraField() : {String : AnyStruct}
+		access(all) getBalance() : UFix64
+		access(all) getSellerAddress() : Address
+		access(all) getBidExtraField() : {String : AnyStruct}
 	}
 
 	pub struct SaleItemInformation {
@@ -623,16 +623,16 @@ pub contract FindLeaseMarket {
 	}
 
 	pub resource interface SaleItemCollectionPublic {
-		pub fun getNameSales(): [String]
-		pub fun containsNameSale(_ name: String): Bool
+		access(all) getNameSales(): [String]
+		access(all) containsNameSale(_ name: String): Bool
 		access(account) fun borrowSaleItem(_ name: String) : &{SaleItem}
-		pub fun getListingType() : Type
+		access(all) getListingType() : Type
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getNameBids() : [String]
-		pub fun containsNameBid(_ name: String): Bool
-		pub fun getBidType() : Type
+		access(all) getNameBids() : [String]
+		access(all) containsNameBid(_ name: String): Bool
+		access(all) getBidType() : Type
 		access(account) fun borrowBidItem(_ name: String) : &{Bid}
 	}
 

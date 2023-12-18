@@ -53,18 +53,18 @@ pub contract NFTRegistry {
 	} 
 
 	/* getters */
-	pub fun getNFTInfoByTypeIdentifier(_ typeIdentifier: String) : NFTInfo? {
+	access(all) getNFTInfoByTypeIdentifier(_ typeIdentifier: String) : NFTInfo? {
 		return NFTRegistry.nonFungibleTokenList[typeIdentifier]
 	}
 
-	pub fun getNFTInfoByAlias(_ alias: String) : NFTInfo? {
+	access(all) getNFTInfoByAlias(_ alias: String) : NFTInfo? {
 		if let identifier = NFTRegistry.aliasMap[alias] {
 			return NFTRegistry.nonFungibleTokenList[identifier]
 		}
 		return nil
 	}
 
-	pub fun getNFTInfo(_ input: String) : NFTInfo? {
+	access(all) getNFTInfo(_ input: String) : NFTInfo? {
 		if let info = self.getNFTInfoByAlias(input) {
 			return info
 		}
@@ -74,19 +74,19 @@ pub contract NFTRegistry {
 		return nil
 	}
 
-	pub fun getTypeIdentifier(_ alias: String) : String? {
+	access(all) getTypeIdentifier(_ alias: String) : String? {
 		return NFTRegistry.aliasMap[alias]
 	}
 
-	pub fun getNFTInfoAll() : {String : NFTInfo} {
+	access(all) getNFTInfoAll() : {String : NFTInfo} {
 		return NFTRegistry.nonFungibleTokenList
 	}
 
-	pub fun getSupportedNFTAlias() : [String] {
+	access(all) getSupportedNFTAlias() : [String] {
 		return NFTRegistry.aliasMap.keys
 	}
 
-	pub fun getSupportedNFTTypeIdentifier() : [String] {
+	access(all) getSupportedNFTTypeIdentifier() : [String] {
 		return NFTRegistry.aliasMap.values
 	}
 

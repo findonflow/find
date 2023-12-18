@@ -5,7 +5,7 @@ import DapperUtilityCoin from 0xead892083b3e2c6c
 import FindLeaseMarketSale from 0x097bafa4e0b48eef
 import FindLeaseMarket from 0x097bafa4e0b48eef
 
-pub fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
+access(all) main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
 
     let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
     let leaseMarketplace = FindMarket.getFindTenantAddress()

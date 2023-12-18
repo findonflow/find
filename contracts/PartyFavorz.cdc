@@ -61,7 +61,7 @@ pub contract PartyFavorz: NonFungibleToken {
 			PartyFavorzExtraData.setData(id: self.id, field: "nftCollectionDisplay", value: {"squareImage" : squareImage, "bannerImage" : bannerImage})
 		}
 
-		pub fun getViews(): [Type] {
+		access(all) getViews(): [Type] {
 			return [
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Royalties>(),
@@ -75,7 +75,7 @@ pub contract PartyFavorz: NonFungibleToken {
 			]
 		}
 
-		pub fun resolveView(_ view: Type): AnyStruct? {
+		access(all) resolveView(_ view: Type): AnyStruct? {
 	
 
 			let imageFile = MetadataViews.IPFSFile( cid: self.info.thumbnailHash, path: nil)
@@ -233,7 +233,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -243,7 +243,7 @@ pub contract PartyFavorz: NonFungibleToken {
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-		pub fun deposit(token: @NonFungibleToken.NFT) {
+		access(all) deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @PartyFavorz.NFT
 
 			let id: UInt64 = token.id
@@ -257,17 +257,17 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		pub fun getIDs(): [UInt64] {
+		access(all) getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let PartyFavorz = nft as! &PartyFavorz.NFT
 			return PartyFavorz as &AnyResource{ViewResolver.Resolver}
@@ -279,12 +279,12 @@ pub contract PartyFavorz: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
 	pub resource Forge: FindForge.Forge {
-		pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+		access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form as needed.")
 
 			assert(info.length == 5, message: "Please make sure to pass in `Info, season, royalties, squareImage, bannerImage`")
@@ -304,14 +304,14 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 
 
-		pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+		access(all) addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			// not used here 
 
 			panic("Not supported for PartyFavorz Contract") 
         }
 	}
 
-	pub fun getForgeType() : Type {
+	access(all) getForgeType() : Type {
 		return Type<@Forge>()
 	}
 

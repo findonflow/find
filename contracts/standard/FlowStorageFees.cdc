@@ -39,7 +39,7 @@ pub contract FlowStorageFees {
     pub resource Administrator {
 
         // Changes the amount of storage capacity an account has per accounts' reserved storage FLOW.
-        pub fun setStorageMegaBytesPerReservedFLOW(_ storageMegaBytesPerReservedFLOW: UFix64) {
+        access(all) setStorageMegaBytesPerReservedFLOW(_ storageMegaBytesPerReservedFLOW: UFix64) {
             if FlowStorageFees.storageMegaBytesPerReservedFLOW == storageMegaBytesPerReservedFLOW {
               return
             }
@@ -48,7 +48,7 @@ pub contract FlowStorageFees {
         }
 
         // Changes the minimum amount of FLOW an account has to have reserved.
-        pub fun setMinimumStorageReservation(_ minimumStorageReservation: UFix64) {
+        access(all) setMinimumStorageReservation(_ minimumStorageReservation: UFix64) {
             if FlowStorageFees.minimumStorageReservation == minimumStorageReservation {
               return
             }
@@ -60,7 +60,7 @@ pub contract FlowStorageFees {
     }
 
     // Returns megabytes
-    pub fun calculateAccountCapacity(_ accountAddress: Address): UFix64 {
+    access(all) calculateAccountCapacity(_ accountAddress: Address): UFix64 {
         let balanceRef = getAccount(accountAddress)
             .getCapability<&FlowToken.Vault{FungibleToken.Balance}>(/public/flowTokenBalance)!
             .borrow() ?? panic("Could not borrow FLOW balance capability")
@@ -77,20 +77,20 @@ pub contract FlowStorageFees {
 
     // Amount in Flow tokens
     // Returns megabytes
-    pub fun flowToStorageCapacity(_ amount: UFix64): UFix64 {
+    access(all) flowToStorageCapacity(_ amount: UFix64): UFix64 {
         return amount * FlowStorageFees.storageMegaBytesPerReservedFLOW
     }
 
     // Amount in megabytes
     // Returns Flow tokens
-    pub fun storageCapacityToFlow(_ amount: UFix64): UFix64 {
+    access(all) storageCapacityToFlow(_ amount: UFix64): UFix64 {
         // possible loss of precision
         // putting the result back into `flowToStorageCapacity` might not yield the same result
         return amount / FlowStorageFees.storageMegaBytesPerReservedFLOW
     }
 
     // converts storage used from UInt64 Bytes to UFix64 Megabytes.
-    pub fun convertUInt64StorageBytesToUFix64Megabytes(_ storage: UInt64): UFix64 {
+    access(all) convertUInt64StorageBytesToUFix64Megabytes(_ storage: UInt64): UFix64 {
         // safe convert UInt64 to UFix64 (without overflow)
         let f = UFix64(storage % 100000000 as UInt64) * 0.00000001 as UFix64 + UFix64(storage / 100000000 as UInt64)
         // decimal point correction. Megabytes to bytes have a conversion of 10^-6 while UFix64 minimum value is 10^-8
@@ -100,7 +100,7 @@ pub contract FlowStorageFees {
 
     // Gets "available" balance of an account
     // The available balance is its default token balance minus what is reserved for storage.
-    pub fun defaultTokenAvailableBalance(_ accountAddress: Address): UFix64 {
+    access(all) defaultTokenAvailableBalance(_ accountAddress: Address): UFix64 {
         //get balance of account
         let acct = getAccount(accountAddress)
         let balanceRef = acct
