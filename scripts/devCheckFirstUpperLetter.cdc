@@ -1,5 +1,5 @@
 import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(string: String) : String {
+access(all) main(string: String) : String {
 	return FindUtils.firstUpperLetter(string)
 }

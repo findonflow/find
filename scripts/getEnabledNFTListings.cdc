@@ -37,7 +37,7 @@ pub let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
 		}
 
 
-pub fun main(page: Int, detail: Bool) : AnyStruct {
+access(all) main(page: Int, detail: Bool) : AnyStruct {
 
 	let tenant = FindMarket.getFindTenantAddress()
 	let tenantRef = FindMarket.getTenant(tenant)

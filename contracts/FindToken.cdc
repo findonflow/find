@@ -37,13 +37,13 @@ pub contract FindToken : FungibleToken {
             emit TokensBurned(amount: self.balance)
         }
 
-        pub fun withdraw(amount: UFix64) : @FungibleToken.Vault {
+        access(all) withdraw(amount: UFix64) : @FungibleToken.Vault {
             self.balance = self.balance - amount 
             emit TokensWithdrawn(amount: amount, from: self.owner?.address)
             return <-create Vault(balance: amount)
         }
 
-        pub fun deposit(from: @FungibleToken.Vault) {
+        access(all) deposit(from: @FungibleToken.Vault) {
             let vault <- from as! @Vault 
             self.balance = self.balance + vault.balance
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
@@ -51,7 +51,7 @@ pub contract FindToken : FungibleToken {
             destroy vault
         }
 
-        pub fun getViews() : [Type] {
+        access(all) getViews() : [Type] {
             return [
                 Type<FindViews.FTVaultData>() , 
                 Type<&FindToken.Vault{FungibleToken.Receiver}>() ,
@@ -60,7 +60,7 @@ pub contract FindToken : FungibleToken {
             ]
         }
 
-        pub fun resolveView(_ view: Type) : AnyStruct? {
+        access(all) resolveView(_ view: Type) : AnyStruct? {
             switch view {
                 case Type<FindViews.FTVaultData>() :
                     return FindViews.FTVaultData(
@@ -89,18 +89,18 @@ pub contract FindToken : FungibleToken {
 
     }
 
-    pub fun createEmptyVault() : @FungibleToken.Vault {
+    access(all) createEmptyVault() : @FungibleToken.Vault {
         return <- create FindToken.Vault(balance: 0.0)
     }
 
-    pub fun createEmptyVaultFN() : (() : @FungibleToken.Vault) {
+    access(all) createEmptyVaultFN() : (() : @FungibleToken.Vault) {
         return fun () : @FungibleToken.Vault {
             return <- FindToken.createEmptyVault()
         }
     }
 
     pub resource Minter {
-        pub fun mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
+        access(all) mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
             if amount == 0.0 {
                 panic("Amount minted must be greater than zero")
             }
@@ -110,15 +110,15 @@ pub contract FindToken : FungibleToken {
         }
     }
 
-    pub fun getBalanceCapability(address: Address) : Capability<&{FungibleToken.Balance}> {
+    access(all) getBalanceCapability(address: Address) : Capability<&{FungibleToken.Balance}> {
         return getAccount(address).getCapability<&{FungibleToken.Balance}>(FindToken.balancePublicPath)
     }
 
-    pub fun getReceiverCapability(address: Address) : Capability<&{FungibleToken.Receiver}> {
+    access(all) getReceiverCapability(address: Address) : Capability<&{FungibleToken.Receiver}> {
         return getAccount(address).getCapability<&{FungibleToken.Receiver}>(FindToken.receiverPublicPath)
     }
 
-    pub fun getVaultType() : Type {
+    access(all) getVaultType() : Type {
         return Type<@Vault>()
     }
 

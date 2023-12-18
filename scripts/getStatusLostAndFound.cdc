@@ -4,7 +4,7 @@ import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 
-pub fun main(user: String) :  {String : NFTCatalog.NFTCollectionData} {
+access(all) main(user: String) :  {String : NFTCatalog.NFTCollectionData} {
 	let lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}={}
 
 	if let address=FIND.resolve(user) {

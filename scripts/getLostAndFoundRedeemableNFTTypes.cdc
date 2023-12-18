@@ -2,7 +2,7 @@ import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: String) : Report {
+access(all) main(user: String) : Report {
 
     if let address = FIND.resolve(user){
         let type : Type = Type<@NonFungibleToken.NFT>()
@@ -12,7 +12,7 @@ pub fun main(user: String) : Report {
 
 }
 
-pub fun typeToStringArray(_ array: [Type]) : [String] {
+access(all) typeToStringArray(_ array: [Type]) : [String] {
     let res : [String] = []
     for type in array {
         res.append(type.identifier)
@@ -30,6 +30,6 @@ pub struct Report {
     }
 }
 
-pub fun logErr(_ err: String) : Report{
+access(all) logErr(_ err: String) : Report{
     return Report(nftTypes: [], err: err)
 }

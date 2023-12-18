@@ -86,8 +86,8 @@ pub contract FlovatarComponentTemplate {
 
     // Standard CollectionPublic interface that can also borrow Component Templates
     pub resource interface CollectionPublic {
-        pub fun getIDs(): [UInt64]
-        pub fun borrowComponentTemplate(id: UInt64): &{FlovatarComponentTemplate.Public}?
+        access(all) getIDs(): [UInt64]
+        access(all) borrowComponentTemplate(id: UInt64): &{FlovatarComponentTemplate.Public}?
     }
 
     // The main Collection that manages the Templates and that implements also the Public interface
@@ -103,7 +103,7 @@ pub contract FlovatarComponentTemplate {
 
         // deposit takes a Component Template and adds it to the collections dictionary
         // and adds the ID to the id array
-        pub fun deposit(componentTemplate: @FlovatarComponentTemplate.ComponentTemplate) {
+        access(all) deposit(componentTemplate: @FlovatarComponentTemplate.ComponentTemplate) {
 
             let id: UInt64 = componentTemplate.id
 
@@ -114,13 +114,13 @@ pub contract FlovatarComponentTemplate {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        pub fun getIDs(): [UInt64] {
+        access(all) getIDs(): [UInt64] {
             return self.ownedComponentTemplates.keys
         }
 
         // borrowComponentTemplate returns a borrowed reference to a Component Template
         // so that the caller can read data and call methods from it.
-        pub fun borrowComponentTemplate(id: UInt64): &{FlovatarComponentTemplate.Public}? {
+        access(all) borrowComponentTemplate(id: UInt64): &{FlovatarComponentTemplate.Public}? {
             if self.ownedComponentTemplates[id] != nil {
                 let ref = (&self.ownedComponentTemplates[id] as auth &FlovatarComponentTemplate.ComponentTemplate?)!
                 return ref as! &FlovatarComponentTemplate.ComponentTemplate
@@ -182,7 +182,7 @@ pub contract FlovatarComponentTemplate {
 
     // Get all the Component Templates from the account. 
     // We hide the SVG field because it might be too big to execute in a script
-    pub fun getComponentTemplates() : [ComponentTemplateData] {
+    access(all) getComponentTemplates() : [ComponentTemplateData] {
         var componentTemplateData: [ComponentTemplateData] = []
 
         if let componentTemplateCollection = self.account.getCapability(self.CollectionPublicPath).borrow<&{FlovatarComponentTemplate.CollectionPublic}>()  {
@@ -205,7 +205,7 @@ pub contract FlovatarComponentTemplate {
     }
 
     // Gets a specific Template from its ID
-    pub fun getComponentTemplate(id: UInt64) : ComponentTemplateData? {
+    access(all) getComponentTemplate(id: UInt64) : ComponentTemplateData? {
         if let componentTemplateCollection = self.account.getCapability(self.CollectionPublicPath).borrow<&{FlovatarComponentTemplate.CollectionPublic}>()  {
             if let componentTemplate = componentTemplateCollection.borrowComponentTemplate(id: id) {
                 return ComponentTemplateData(
@@ -225,11 +225,11 @@ pub contract FlovatarComponentTemplate {
     }
 
     // Returns the amount of minted Components for a specific Template
-    pub fun getTotalMintedComponents(id: UInt64) : UInt64? {
+    access(all) getTotalMintedComponents(id: UInt64) : UInt64? {
         return FlovatarComponentTemplate.totalMintedComponents[id]
     }
     // Returns the timestamp of the last time a Component for a specific Template was minted
-    pub fun getLastComponentMintedAt(id: UInt64) : UFix64? {
+    access(all) getLastComponentMintedAt(id: UInt64) : UFix64? {
         return FlovatarComponentTemplate.lastComponentMintedAt[id]
     }
 

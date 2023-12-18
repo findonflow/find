@@ -29,7 +29,7 @@ pub contract DapperStorageRent {
   /// Get the current StorageRentRefillThreshold
   ///
   /// @return UInt64 value of the current StorageRentRefillThreshold value
-  pub fun getStorageRentRefillThreshold(): UInt64 {
+  access(all) getStorageRentRefillThreshold(): UInt64 {
     return self.StorageRentRefillThreshold
   }
 
@@ -37,7 +37,7 @@ pub contract DapperStorageRent {
   /// Get the current StorageRentRefillThreshold
   ///
   /// @return List of refilled Accounts
-  pub fun getRefilledAccounts(): [Address] {
+  access(all) getRefilledAccounts(): [Address] {
     return self.RefilledAccounts
   }
 
@@ -45,7 +45,7 @@ pub contract DapperStorageRent {
   /// Get the current StorageRentRefillThreshold
   ///
   /// @return List of blocked accounts
-  pub fun getBlockedAccounts() : [Address] {
+  access(all) getBlockedAccounts() : [Address] {
     return self.BlockedAccounts
   }
 
@@ -53,7 +53,7 @@ pub contract DapperStorageRent {
   /// Get the current StorageRentRefillThreshold
   ///
   /// @return Address: RefilledAccountInfo mapping
-  pub fun getRefilledAccountInfos(): {Address: RefilledAccountInfo} {
+  access(all) getRefilledAccountInfos(): {Address: RefilledAccountInfo} {
     return self.RefilledAccountInfos
   }
 
@@ -61,12 +61,12 @@ pub contract DapperStorageRent {
   /// Get the current StorageRentRefillThreshold
   ///
   /// @return UInt64 value of the current RefillRequiredBlocks value
-  pub fun getRefillRequiredBlocks(): UInt64 {
+  access(all) getRefillRequiredBlocks(): UInt64 {
     return self.RefillRequiredBlocks
   }
 
 
-  pub fun fundedRefill(address: Address, tokens: @FungibleToken.Vault) {
+  access(all) fundedRefill(address: Address, tokens: @FungibleToken.Vault) {
 		destroy tokens
 
 		/*
@@ -80,7 +80,7 @@ pub contract DapperStorageRent {
   /// Attempt to refill an accounts storage capacity if it has dipped below threshold and passes other checks.
   ///
   /// @param address: Address to attempt a storage refill on
-  pub fun tryRefill(_ address: Address) {
+  access(all) tryRefill(_ address: Address) {
 		/*
     let REFUEL_AMOUNT = 0.06;
 
@@ -155,7 +155,7 @@ pub contract DapperStorageRent {
   ///
   /// @param address: Address to check eligibility on
   /// @return Boolean valued based on if the provided address is below the storage threshold
-  pub fun checkEligibility(_ address: Address): Bool {
+  access(all) checkEligibility(_ address: Address): Bool {
     if self.RefilledAccountInfos[address] != nil && getCurrentBlock().height - self.RefilledAccountInfos[address]!.atBlock < self.RefillRequiredBlocks {
        return false
     }
@@ -189,7 +189,7 @@ pub contract DapperStorageRent {
   /// public method to clean up expired accounts based on current block height
   ///
   /// @param batchSize: Int to set the batch size of the cleanup
-  pub fun cleanExpiredRefilledAccounts(_ batchSize: Int) {
+  access(all) cleanExpiredRefilledAccounts(_ batchSize: Int) {
     var index = 0
     while index < batchSize && self.RefilledAccounts.length > index {
       if self.RefilledAccountInfos[self.RefilledAccounts[index]] != nil &&
@@ -218,22 +218,22 @@ pub contract DapperStorageRent {
   /// Admin resource
   /// Used to set different configuration levers such as StorageRentRefillThreshold, RefillRequiredBlocks, and BlockedAccounts
   pub resource Admin {
-    pub fun setStorageRentRefillThreshold(_ threshold: UInt64) {
+    access(all) setStorageRentRefillThreshold(_ threshold: UInt64) {
       DapperStorageRent.StorageRentRefillThreshold = threshold
     }
 
-    pub fun setRefillRequiredBlocks(_ blocks: UInt64) {
+    access(all) setRefillRequiredBlocks(_ blocks: UInt64) {
       DapperStorageRent.RefillRequiredBlocks = blocks
     }
 
-    pub fun blockAddress(_ address: Address) {
+    access(all) blockAddress(_ address: Address) {
         if !DapperStorageRent.getBlockedAccounts().contains(address) {
             DapperStorageRent.BlockedAccounts.append(address)
             emit BlockedAddress(DapperStorageRent.getBlockedAccounts())
         }
     }
 
-    pub fun unblockAddress(_ address: Address) {
+    access(all) unblockAddress(_ address: Address) {
         if DapperStorageRent.getBlockedAccounts().contains(address) {
             let position = DapperStorageRent.BlockedAccounts.firstIndex(of: address) ?? panic("Trying to unblock an address that is not blocked.")
             if position != nil {

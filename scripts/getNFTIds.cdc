@@ -24,7 +24,7 @@ pub struct Report{
 	}
 }
 
-pub fun main(address: Address, targetPaths: [String]): {String : Report}{
+access(all) main(address: Address, targetPaths: [String]): {String : Report}{
 
 	let resolvers = {
 	"CricketMomentsCollection" : 1,
@@ -152,21 +152,21 @@ pub fun main(address: Address, targetPaths: [String]): {String : Report}{
 	return report
 }
 
-pub fun getAlchemyItem(_ shard: Int?) : String? {
+access(all) getAlchemyItem(_ shard: Int?) : String? {
 	if shard == nil {
 		return nil
 	}
 	return "getAlchemy".concat(shard!.toString()).concat("Items")
 }
 
-pub fun getAlchemyDetail(_ shard: Int?) : String? {
+access(all) getAlchemyDetail(_ shard: Int?) : String? {
 		if shard == nil {
 		return nil
 	}
 	return "getNFTDetailsShard".concat(shard!.toString())
 }
 
-pub fun getProject(_ shard: String?) : String? {
+access(all) getProject(_ shard: String?) : String? {
 
 	if shard == "BarterYardPackNFT" {
 		return "BarterYardPack"

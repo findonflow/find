@@ -1,6 +1,6 @@
 import FindVerifier from "../contracts/FindVerifier.cdc"
 
-pub fun main(user: Address, path: String, threshold: Int) : Result {
+access(all) main(user: Address, path: String, threshold: Int) : Result {
     let verifier = FindVerifier.HasNFTsInPath(path: PublicPath(identifier: path)!, threshold: threshold)
     let input : {String : AnyStruct} = {"address" : user}
     return Result(verifier, input: input)

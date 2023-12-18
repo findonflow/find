@@ -34,7 +34,7 @@ pub contract EmeraldIdentityDapper {
         // 1-to-1
         access(account) var discordToAccount: {String: Address}
 
-        pub fun createEmeraldID(account: Address, discordID: String) {
+        access(all) createEmeraldID(account: Address, discordID: String) {
             pre {
                 EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID) == nil:
                     "The old discordID must remove their EmeraldID first."
@@ -48,12 +48,12 @@ pub contract EmeraldIdentityDapper {
             emit EmeraldIDCreated(account: account, discordID: discordID)
         }
 
-        pub fun removeByAccount(account: Address) {
+        access(all) removeByAccount(account: Address) {
             let discordID = EmeraldIdentityDapper.getDiscordFromAccount(account: account) ?? panic("This EmeraldID does not exist!")
             self.remove(account: account, discordID: discordID)
         }
 
-        pub fun removeByDiscord(discordID: String) {
+        access(all) removeByDiscord(discordID: String) {
             let account = EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID) ?? panic("This EmeraldID does not exist!")
             self.remove(account: account, discordID: discordID)
         }
@@ -65,7 +65,7 @@ pub contract EmeraldIdentityDapper {
             emit EmeraldIDRemoved(account: account, discordID: discordID)
         }
 
-        pub fun createAdministrator(): Capability<&Administrator> {
+        access(all) createAdministrator(): Capability<&Administrator> {
             return EmeraldIdentityDapper.account.getCapability<&Administrator>(EmeraldIdentityDapper.AdministratorPrivatePath)
         }
 
@@ -77,12 +77,12 @@ pub contract EmeraldIdentityDapper {
 
     /*** USE THE BELOW FUNCTIONS FOR SECURE VERIFICATION OF ID ***/ 
 
-    pub fun getDiscordFromAccount(account: Address): String?  {
+    access(all) getDiscordFromAccount(account: Address): String?  {
         let admin = EmeraldIdentityDapper.account.storage.borrow<&Administrator>(from: EmeraldIdentityDapper.AdministratorStoragePath)!
         return admin.accountToDiscord[account]
     }
 
-    pub fun getAccountFromDiscord(discordID: String): Address? {
+    access(all) getAccountFromDiscord(discordID: String): Address? {
         let admin = EmeraldIdentityDapper.account.storage.borrow<&Administrator>(from: EmeraldIdentityDapper.AdministratorStoragePath)!
         return admin.discordToAccount[discordID]
     }

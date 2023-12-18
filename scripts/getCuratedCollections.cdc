@@ -1,5 +1,5 @@
 
-pub fun main(address: Address) : &{String: [String]}? {
+access(all) main(address: Address) : &{String: [String]}? {
 	let account=getAccount(address)
 
 	if account.balance == 0.0 {

@@ -93,7 +93,7 @@ pub contract Bl0x: NonFungibleToken {
 			self.royalties=MetadataViews.Royalties(Bl0x.royalties)
 		}
 
-		pub fun getViews(): [Type] {
+		access(all) getViews(): [Type] {
 			return  [
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Medias>(),
@@ -108,7 +108,7 @@ pub contract Bl0x: NonFungibleToken {
 			]
 		}
 
-		pub fun resolveView(_ view: Type): AnyStruct? {
+		access(all) resolveView(_ view: Type): AnyStruct? {
 
 			let imageFile=MetadataViews.IPFSFile( url: self.rootHash, path: "thumbnail/".concat(self.serial.toString()).concat(".webp"))
 
@@ -198,11 +198,11 @@ pub contract Bl0x: NonFungibleToken {
 			return nil
 		}
 
-		pub fun increaseNounce() {
+		access(all) increaseNounce() {
 			self.nounce=self.nounce+1
 		}
 
-		pub fun getRarity() : String {
+		access(all) getRarity() : String {
 			var traitRarity : [String] = []
 			for trait in self.getAllTraitsMetadata().values {
 				traitRarity.append(trait.metadata["rarity"]!)
@@ -219,7 +219,7 @@ pub contract Bl0x: NonFungibleToken {
 			return rarity 
 		}
 
-		pub fun getTraitsAsTraits() : MetadataViews.Traits {
+		access(all) getTraitsAsTraits() : MetadataViews.Traits {
 			let traits=self.getAllTraitsMetadata()
 
 			let mvt : [MetadataViews.Trait] = []
@@ -233,7 +233,7 @@ pub contract Bl0x: NonFungibleToken {
 			return MetadataViews.Traits(mvt)
 		}
 
-		pub fun getAllTraitsMetadataAsArray() : [{String : String}] {
+		access(all) getAllTraitsMetadataAsArray() : [{String : String}] {
 			let traits = self.traits
 			if self.serial == 885 {
 				traits.remove(key: "Module")
@@ -252,7 +252,7 @@ pub contract Bl0x: NonFungibleToken {
 			return traitMetadata
 		}
 
-		pub fun getAllTraitsMetadata() : {String : Trait} {
+		access(all) getAllTraitsMetadata() : {String : Trait} {
 
 			let traits = self.traits
 			if self.serial == 885 {
@@ -282,7 +282,7 @@ pub contract Bl0x: NonFungibleToken {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -292,7 +292,7 @@ pub contract Bl0x: NonFungibleToken {
 
 		// deposit takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
-		pub fun deposit(token: @NonFungibleToken.NFT) {
+		access(all) deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
 
 			let id: UInt64 = token.id
@@ -309,17 +309,17 @@ pub contract Bl0x: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		pub fun getIDs(): [UInt64] {
+		access(all) getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let bl0x = nft as! &NFT
 			return bl0x as &AnyResource{ViewResolver.Resolver}
@@ -331,7 +331,7 @@ pub contract Bl0x: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
@@ -380,11 +380,11 @@ pub contract Bl0x: NonFungibleToken {
 				self.metadata=metadata
 			}
 
-			pub fun getName() : String{
+			access(all) getName() : String{
 				return self.metadata["name"]!
 			}
 
-			pub fun getRarity() : String{
+			access(all) getRarity() : String{
 				return self.metadata["rarity"]!
 			}
 		}
@@ -394,11 +394,11 @@ pub contract Bl0x: NonFungibleToken {
 			self.traits[trait.id]=trait
 		}
 
-		pub fun getTraits() : {UInt64:Trait}{
+		access(all) getTraits() : {UInt64:Trait}{
 			return self.traits
 		}
 
-		pub fun getTrait(_ id:UInt64) : Trait? {
+		access(all) getTrait(_ id:UInt64) : Trait? {
 			return self.traits[id]
 		}
 

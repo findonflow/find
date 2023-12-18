@@ -44,7 +44,7 @@ pub contract FindRulesCache {
 		panic("There is already a cache for this find rule. RuleId : ".concat(ruleId))
 	}
 
-	pub fun getTenantFindRules(tenant: String, ruleId: String) : ActionResult? {
+	access(all) getTenantFindRules(tenant: String, ruleId: String) : ActionResult? {
 		if self.tenantFindRules[tenant] == nil {
 			return nil
 		}
@@ -71,7 +71,7 @@ pub contract FindRulesCache {
 		panic("There is already a cache for this tenant rule. RuleId : ".concat(ruleId))
 	}
 
-	pub fun getTenantTenantRules(tenant: String, ruleId: String) : ActionResult? {
+	access(all) getTenantTenantRules(tenant: String, ruleId: String) : ActionResult? {
 		if self.tenantTenantRules[tenant] == nil {
 			return nil
 		}
@@ -97,7 +97,7 @@ pub contract FindRulesCache {
 		panic("There is already a cache for this tenant cut information. RuleId : ".concat(ruleId))
 	}
 
-	pub fun getTenantCut(tenant: String, ruleId: String) : TenantCuts? {
+	access(all) getTenantCut(tenant: String, ruleId: String) : TenantCuts? {
 		if self.tenantCuts[tenant] == nil {
 			return nil
 		}

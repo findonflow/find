@@ -2,7 +2,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-pub fun main(user: String, collections: [String]) : {String : ItemReport} {
+access(all) main(user: String, collections: [String]) : {String : ItemReport} {
 	return fetchNFTCatalog(user: user, targetCollections:collections)
 }
 
@@ -56,11 +56,11 @@ pub struct NFTIDs {
 
 // Helper function 
 
-pub fun resolveAddress(user: String) : Address? {
+access(all) resolveAddress(user: String) : Address? {
 	return FIND.resolve(user)
 }
 
-pub fun getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
+access(all) getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
 
 	let account = getAuthAccount(ownerAddress)
 
@@ -91,7 +91,7 @@ pub fun getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
 	return inventory
 }
 
-pub fun fetchNFTCatalog(user: String, targetCollections: [String]) : {String : ItemReport} {
+access(all) fetchNFTCatalog(user: String, targetCollections: [String]) : {String : ItemReport} {
 	let source = "NFTCatalog"
 	let account = resolveAddress(user: user)
 	if account == nil { return {} }

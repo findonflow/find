@@ -5,7 +5,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(address: Address) : [Thought] {
+access(all) main(address: Address) : [Thought] {
 	let thoughts : [Thought] = [] 
 
 
@@ -85,7 +85,7 @@ pub struct Thought {
 	}
 }
 
-pub fun getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Thought {
+access(all) getThought(_ t: &{FindThoughts.ThoughtPublic}, withQuote: Bool) : Thought {
 
 		var creatorProfileName : String? = nil
 		var creatorAvatar : String? = nil 

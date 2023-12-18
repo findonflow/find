@@ -30,16 +30,16 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			self.pointer=pointer
 		}
 
-		pub fun getName() : String {
+		access(all) getName() : String {
 			return self.pointer.name
 		}
 
-		pub fun acceptDirectOffer() {
+		access(all) acceptDirectOffer() {
 			self.directOfferAccepted=true
 		}
 
 		//Here we do not get a vault back, it is sent in to the method itself
-		pub fun acceptNonEscrowedBid() {
+		access(all) acceptNonEscrowedBid() {
 			pre{
 				self.offerCallback.check() : "Bidder unlinked the bid collection capability."
 				self.pointer != nil : "Please accept offer"
@@ -49,96 +49,96 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			pointer.move(to: self.offerCallback.address)
 		}
 
-		pub fun getFtType() : Type {
+		access(all) getFtType() : Type {
 			pre{
 				self.offerCallback.check() : "Bidder unlinked the bid collection capability."
 			}
 			return self.offerCallback.borrow()!.getVaultType(self.getLeaseName())
 		}
 
-		pub fun getLeaseName() : String {
+		access(all) getLeaseName() : String {
 			return self.pointer.name
 		}
 
-		pub fun getItemType() : Type {
+		access(all) getItemType() : Type {
 			return Type<@FIND.Lease>()
 		}
 
-		pub fun getAuction(): FindLeaseMarket.AuctionItem? {
+		access(all) getAuction(): FindLeaseMarket.AuctionItem? {
 			return nil
 		}
 
-		pub fun getId() : UInt64 {
+		access(all) getId() : UInt64 {
 			return self.pointer.getUUID()
 		}
 
-		pub fun getSaleType() : String {
+		access(all) getSaleType() : String {
 			if self.directOfferAccepted {
 				return "active_finished"
 			}
 			return "active_ongoing"
 		}
 
-		pub fun getListingType() : Type {
+		access(all) getListingType() : Type {
 			return Type<@SaleItem>()
 		}
 
-		pub fun getListingTypeIdentifier() : String {
+		access(all) getListingTypeIdentifier() : String {
 			return Type<@SaleItem>().identifier
 		}
 
-		pub fun getBalance() : UFix64 {
+		access(all) getBalance() : UFix64 {
 			pre{
 				self.offerCallback.check() : "Bidder unlinked the bid collection capability."
 			}
 			return self.offerCallback.borrow()!.getBalance(self.getLeaseName())
 		}
 
-		pub fun getSeller() : Address {
+		access(all) getSeller() : Address {
 			return self.pointer.owner()
 		}
 
-		pub fun getSellerName() : String? {
+		access(all) getSellerName() : String? {
 			let address = self.pointer.owner()
 			return FIND.reverseLookup(address)
 		}
 
-		pub fun getBuyer() : Address? {
+		access(all) getBuyer() : Address? {
 			return self.offerCallback.address
 		}
 
-		pub fun getBuyerName() : String? {
+		access(all) getBuyerName() : String? {
 			if let name = FIND.reverseLookup(self.offerCallback.address) {
 				return name
 			}
 			return nil
 		}
 
-		pub fun toLeaseInfo() : FindLeaseMarket.LeaseInfo{
+		access(all) toLeaseInfo() : FindLeaseMarket.LeaseInfo{
 			return FindLeaseMarket.LeaseInfo(self.pointer)
 		}
 
-		pub fun setValidUntil(_ time: UFix64?) {
+		access(all) setValidUntil(_ time: UFix64?) {
 			self.validUntil=time
 		}
 
-		pub fun getValidUntil() : UFix64? {
+		access(all) getValidUntil() : UFix64? {
 			return self.validUntil
 		}
 
-		pub fun setPointer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
+		access(all) setPointer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
 			self.pointer=pointer
 		}
 
-		pub fun setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
+		access(all) setCallback(_ callback: Capability<&MarketBidCollection{MarketBidCollectionPublic}>) {
 			self.offerCallback=callback
 		}
 
-		pub fun checkPointer() : Bool {
+		access(all) checkPointer() : Bool {
 			return self.pointer.valid()
 		}
 
-		pub fun getSaleItemExtraField() : {String : AnyStruct} {
+		access(all) getSaleItemExtraField() : {String : AnyStruct} {
 			return self.saleItemExtraField
 		}
 
@@ -150,8 +150,8 @@ pub contract FindLeaseMarketDirectOfferSoft {
 
 	pub resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
-		pub fun getNameSales(): [String]
-		pub fun containsNameSale(_ name: String): Bool
+		access(all) getNameSales(): [String]
+		access(all) containsNameSale(_ name: String): Bool
 		access(contract) fun cancelBid(_ name: String)
 		access(contract) fun registerIncreasedBid(_ name: String)
 
@@ -182,7 +182,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			return self.tenantCapability.borrow()!
 		}
 
-		pub fun isAcceptedDirectOffer(_ name:String) : Bool{
+		access(all) isAcceptedDirectOffer(_ name:String) : Bool{
 			pre {
 				self.items.containsKey(name) : "Invalid name sale=".concat(name)
 			}
@@ -191,7 +191,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			return saleItem.directOfferAccepted
 		}
 
-		pub fun getListingType() : Type {
+		access(all) getListingType() : Type {
 			return Type<@SaleItem>()
 		}
 
@@ -302,7 +302,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 
 
 		//cancel will reject a direct offer
-		pub fun cancel(_ name: String) {
+		access(all) cancel(_ name: String) {
 			pre {
 				self.items.containsKey(name) : "Invalid name sale=".concat(name)
 			}
@@ -323,7 +323,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			destroy <- self.items.remove(key: name)
 		}
 
-		pub fun acceptOffer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
+		access(all) acceptOffer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
 			pre {
 				self.items.containsKey(pointer.name) : "Invalid name sale=".concat(pointer.name)
 			}
@@ -377,22 +377,22 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			destroy <- self.items.remove(key: name)
 		}
 
-		pub fun getNameSales(): [String] {
+		access(all) getNameSales(): [String] {
 			return self.items.keys
 		}
 
-		pub fun containsNameSale(_ name: String): Bool {
+		access(all) containsNameSale(_ name: String): Bool {
 			return self.items.containsKey(name)
 		}
 
-		pub fun borrow(_ name: String): &SaleItem {
+		access(all) borrow(_ name: String): &SaleItem {
 			pre{
 				self.items.containsKey(name) : "This name sale does not exist.".concat(name)
 			}
 			return (&self.items[name] as &SaleItem?)!
 		}
 
-		pub fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
+		access(all) borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
 			pre{
 				self.items.containsKey(name) : "This name sale does not exist.".concat(name)
 			}
@@ -437,24 +437,24 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			self.balance=self.balance+amount
 		}
 
-		pub fun getBalance() : UFix64 {
+		access(all) getBalance() : UFix64 {
 			return self.balance
 		}
 
-		pub fun getSellerAddress() : Address {
+		access(all) getSellerAddress() : Address {
 			return self.from.address
 		}
 
-		pub fun getBidExtraField() : {String : AnyStruct} {
+		access(all) getBidExtraField() : {String : AnyStruct} {
 			return self.bidExtraField
 		}
 	}
 
 	pub resource interface MarketBidCollectionPublic {
-		pub fun getBalance(_ name: String) : UFix64
-		pub fun getVaultType(_ name: String) : Type
-		pub fun containsNameBid(_ name: String): Bool
-		pub fun getNameBids() : [String]
+		access(all) getBalance(_ name: String) : UFix64
+		access(all) getVaultType(_ name: String) : Type
+		access(all) containsNameBid(_ name: String): Bool
+		access(all) getNameBids() : [String]
 		access(contract) fun acceptNonEscrowed(_ name: String)
 		access(contract) fun cancelBidFromSaleItem(_ name: String)
 	}
@@ -486,24 +486,24 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			destroy bid
 		}
 
-		pub fun getVaultType(_ name:String) : Type {
+		access(all) getVaultType(_ name:String) : Type {
 			return self.borrowBid(name).vaultType
 		}
 
-		pub fun getNameBids() : [String] {
+		access(all) getNameBids() : [String] {
 			return self.bids.keys
 		}
 
-		pub fun containsNameBid(_ name: String) : Bool {
+		access(all) containsNameBid(_ name: String) : Bool {
 			return self.bids.containsKey(name)
 		}
 
-		pub fun getBidType() : Type {
+		access(all) getBidType() : Type {
 			return Type<@Bid>()
 		}
 
 
-		pub fun bid(name: String, amount:UFix64, vaultType:Type, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
+		access(all) bid(name: String, amount:UFix64, vaultType:Type, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
 			pre {
 				self.owner!.address != FIND.status(name).owner!  : "You cannot bid on your own resource"
 				self.bids[name] == nil : "You already have an bid for this item, use increaseBid on that bid"
@@ -530,7 +530,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			destroy oldToken
 		}
 
-		pub fun fulfillDirectOffer(name:String, vault: @FungibleToken.Vault) {
+		access(all) fulfillDirectOffer(name:String, vault: @FungibleToken.Vault) {
 			pre {
 				self.bids[name] != nil : "You need to have a bid here already"
 			}
@@ -545,7 +545,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			saleItem.fulfillDirectOfferNonEscrowed(name:name, vault: <- vault)
 		}
 
-		pub fun increaseBid(name: String, increaseBy: UFix64) {
+		access(all) increaseBid(name: String, increaseBy: UFix64) {
 			let bid =self.borrowBid(name)
 			bid.setBidAt(Clock.time())
 			bid.increaseBid(increaseBy)
@@ -556,7 +556,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 		}
 
 		/// The users cancel a bid himself
-		pub fun cancelBid(_ name: String) {
+		access(all) cancelBid(_ name: String) {
 			let bid= self.borrowBid(name)
 			if !bid.from.check() {
 				panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
@@ -572,21 +572,21 @@ pub contract FindLeaseMarketDirectOfferSoft {
 			destroy bid
 		}
 
-		pub fun borrowBid(_ name: String): &Bid {
+		access(all) borrowBid(_ name: String): &Bid {
 			pre{
 				self.bids.containsKey(name) : "This name bid does not exist.".concat(name)
 			}
 			return (&self.bids[name] as &Bid?)!
 		}
 
-		pub fun borrowBidItem(_ name: String): &{FindLeaseMarket.Bid} {
+		access(all) borrowBidItem(_ name: String): &{FindLeaseMarket.Bid} {
 			pre{
 				self.bids.containsKey(name) : "This name bid does not exist.".concat(name)
 			}
 			return (&self.bids[name] as &Bid{FindLeaseMarket.Bid}?)!
 		}
 
-		pub fun getBalance(_ name: String) : UFix64 {
+		access(all) getBalance(_ name: String) : UFix64 {
 			let bid= self.borrowBid(name)
 			return bid.balance
 		}
@@ -597,15 +597,15 @@ pub contract FindLeaseMarketDirectOfferSoft {
 	}
 
 	//Create an empty lease collection that store your leases to a name
-	pub fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
+	access(all) createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
 		return <- create SaleItemCollection(tenantCapability)
 	}
 
-	pub fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
+	access(all) createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) : @MarketBidCollection {
 		return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
 	}
 
-	pub fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
+	access(all) getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
 		pre{
 			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}
@@ -615,7 +615,7 @@ pub contract FindLeaseMarketDirectOfferSoft {
 		return nil
 	}
 
-	pub fun getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>? {
+	access(all) getBidCapability( marketplace:Address, user:Address) : Capability<&MarketBidCollection{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>? {
 		pre{
 			FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
 		}

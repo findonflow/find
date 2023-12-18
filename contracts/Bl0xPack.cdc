@@ -94,14 +94,14 @@ pub contract Bl0xPack: NonFungibleToken {
 			self.requiresReservation=requiresReservation
 		}
 
-		pub fun getThumbnail() : AnyStruct{MetadataViews.File} {
+		access(all) getThumbnail() : AnyStruct{MetadataViews.File} {
 			if let hash = self.thumbnailHash {
 				return MetadataViews.IPFSFile(cid: hash, path:nil)
 			}
 			return MetadataViews.HTTPFile(url:self.thumbnailUrl!)
 		}
 
-		pub fun canBeOpened() : Bool {
+		access(all) canBeOpened() : Bool {
 			return self.openTime >= Clock.time()
 		}
 	}
@@ -111,7 +111,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		self.packMetadata[typeId]= metadata
 	}
 
-	pub fun getMetadata(typeId: UInt64): Metadata? {
+	access(all) getMetadata(typeId: UInt64): Metadata? {
 		return self.packMetadata[typeId]
 	}
 
@@ -136,14 +136,14 @@ pub contract Bl0xPack: NonFungibleToken {
 			self.hash=hash
 		}
 
-		pub fun getOpenedBy() : Capability<&{NonFungibleToken.Receiver}> {
+		access(all) getOpenedBy() : Capability<&{NonFungibleToken.Receiver}> {
 			if self.openedBy== nil {
 				panic("Pack is not opened")
 			}
 			return self.openedBy!
 		}
 
-		pub fun getHash() : String{
+		access(all) getHash() : String{
 			return self.hash
 		}
 
@@ -168,15 +168,15 @@ pub contract Bl0xPack: NonFungibleToken {
 			self.openedBy=cap
 		}
 
-		pub fun getTypeID() :UInt64 {
+		access(all) getTypeID() :UInt64 {
 			return self.typeId
 		}
 
-		pub fun getMetadata(): Metadata {
+		access(all) getMetadata(): Metadata {
 			return Bl0xPack.getMetadata(typeId: self.typeId)!
 		}
 
-		pub fun getViews(): [Type] {
+		access(all) getViews(): [Type] {
 			return [
 			Type<MetadataViews.Display>(), 
 			Type<Metadata>(),
@@ -184,11 +184,11 @@ pub contract Bl0xPack: NonFungibleToken {
 			]
 		}
 
-		pub fun getThumbnail() : AnyStruct{MetadataViews.File} {
+		access(all) getThumbnail() : AnyStruct{MetadataViews.File} {
 			return self.getMetadata().getThumbnail()
 		}
 
-		pub fun resolveView(_ view: Type): AnyStruct? {
+		access(all) resolveView(_ view: Type): AnyStruct? {
 			let metadata = self.getMetadata()
 			switch view {
 			case Type<MetadataViews.Display>():
@@ -234,13 +234,13 @@ pub contract Bl0xPack: NonFungibleToken {
 	}
 
 	pub resource interface CollectionPublic {
-		pub fun deposit(token: @NonFungibleToken.NFT)
-		pub fun getIDs(): [UInt64]
-		pub fun getPacksLeftForType(_ type:UInt64) : UInt64
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-		pub fun borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? 
-		pub fun buy(typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
-		pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
+		access(all) deposit(token: @NonFungibleToken.NFT)
+		access(all) getIDs(): [UInt64]
+		access(all) getPacksLeftForType(_ type:UInt64) : UInt64
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
+		access(all) borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? 
+		access(all) buy(typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
+		access(all) buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
 	}
 
 	// Collection
@@ -267,7 +267,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		}
 
 		//this has to be called on the DLQ collection
-		pub fun requeue(packId:UInt64) {
+		access(all) requeue(packId:UInt64) {
 			let token <- self.withdraw(withdrawID: packId) as! @NFT
 
 			let address=token.resetOpendBy()
@@ -277,7 +277,7 @@ pub contract Bl0xPack: NonFungibleToken {
 			emit Requeued(packId:packId, address: cap.address)
 		}
 
-		pub fun open(packId: UInt64, receiverCap: Capability<&{NonFungibleToken.Receiver}>) {
+		access(all) open(packId: UInt64, receiverCap: Capability<&{NonFungibleToken.Receiver}>) {
 			if !receiverCap.check() {
 				panic("Receiver cap is not valid")
 			}
@@ -302,7 +302,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		}
 
 		//TODO: pre that needs requiresReservation
-		pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+		access(all) buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
 			pre {
 				self.owner!.address == Bl0xPack.account.address : "You can only buy pack directly from the Bl0xPack account"
 			}
@@ -368,7 +368,7 @@ pub contract Bl0xPack: NonFungibleToken {
 			emit Purchased(packId: packId, address: collectionCapability.address, amount:metadata.price)
 		}
 
-		pub fun buy(typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+		access(all) buy(typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
 			pre {
 				self.owner!.address == Bl0xPack.account.address : "You can only buy pack directly from the Bl0xPack account"
 			}
@@ -437,7 +437,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		// withdraw
 		// Removes an NFT from the collection and moves it to the caller
 		//
-		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
 			let nft <- token as! @NFT
@@ -455,7 +455,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		// Takes a NFT and adds it to the collections dictionary
 		// and adds the ID to the id array
 		//
-		pub fun deposit(token: @NonFungibleToken.NFT) {
+		access(all) deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @Bl0xPack.NFT
 
 			let id: UInt64 = token.id
@@ -473,12 +473,12 @@ pub contract Bl0xPack: NonFungibleToken {
 		// getIDs
 		// Returns an array of the IDs that are in the collection
 		//
-		pub fun getIDs(): [UInt64] {
+		access(all) getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		//return the number of packs left of a type
-		pub fun getPacksLeftForType(_ type:UInt64) : UInt64 {
+		access(all) getPacksLeftForType(_ type:UInt64) : UInt64 {
 			return self.nftsPerType[type] ?? 0
 		}
 
@@ -486,7 +486,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		// Gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
 		//
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
@@ -495,7 +495,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		// exposing all of its fields.
 		// This is safe as there are no functions that can be called on the Bl0xPack.
 		//
-		pub fun borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? {
+		access(all) borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? {
 			if self.ownedNFTs[id] != nil {
 				let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 				return ref as! &Bl0xPack.NFT
@@ -504,7 +504,7 @@ pub contract Bl0xPack: NonFungibleToken {
 			}
 		}
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let exampleNFT = nft as! &NFT
 			return exampleNFT 
@@ -524,7 +524,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		}
 	}
 
-	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
@@ -605,11 +605,11 @@ pub contract Bl0xPack: NonFungibleToken {
 	}
 
 
-	pub fun getPacksCollection() : &Bl0xPack.Collection{CollectionPublic} {
+	access(all) getPacksCollection() : &Bl0xPack.Collection{CollectionPublic} {
 		return Bl0xPack.account.getCapability<&Bl0xPack.Collection{Bl0xPack.CollectionPublic}>(Bl0xPack.CollectionPublicPath).borrow() ?? panic("Could not borow Bl0xPack collection")
 	}
 
-	pub fun canBuy(packTypeId:UInt64, user:Address) : Bool {
+	access(all) canBuy(packTypeId:UInt64, user:Address) : Bool {
 
 		let packs=Bl0xPack.getPacksCollection()
 
@@ -650,7 +650,7 @@ pub contract Bl0xPack: NonFungibleToken {
 		return true
 	}
 
-	pub fun hasFloat(floatEventId:UInt64, user:Address) : Bool {
+	access(all) hasFloat(floatEventId:UInt64, user:Address) : Bool {
 
 		let float = getAccount(user).getCapability(FLOAT.FLOATCollectionPublicPath).borrow<&FLOAT.Collection{FLOAT.CollectionPublic}>() 
 

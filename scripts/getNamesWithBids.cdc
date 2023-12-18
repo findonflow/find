@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: String) : [FIND.LeaseInformation] {
+access(all) main(user: String) : [FIND.LeaseInformation] {
 
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return []}

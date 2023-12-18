@@ -28,7 +28,7 @@ pub contract FindLostAndFoundWrapper {
     pub let storagePaymentVaults : @{UInt64 : FungibleToken.Vault}
 
     // Deposit 
-    pub fun depositNFT(
+    access(all) depositNFT(
         receiver: Address,
         collectionPublicPath: PublicPath,
         item: FindViews.AuthNFTPointer,
@@ -129,7 +129,7 @@ pub contract FindLostAndFoundWrapper {
     }
 
     // Redeem 
-    pub fun redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
+    access(all) redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
 
         let metadataViewsCap = getAccount(receiverAddress).getCapability<&{ViewResolver.ResolverCollection}>(collectionPublicPath)
 
@@ -172,7 +172,7 @@ pub contract FindLostAndFoundWrapper {
     }
 
     // Check 
-    pub fun getTickets(user: Address, specificType: Type?) : {String : [LostAndFoundHelper.Ticket]} {
+    access(all) getTickets(user: Address, specificType: Type?) : {String : [LostAndFoundHelper.Ticket]} {
 
         let allTickets : {String : [LostAndFoundHelper.Ticket]} = {}
 
@@ -201,7 +201,7 @@ pub contract FindLostAndFoundWrapper {
         return allTickets
     }
 
-    pub fun getTicketIDs(user: Address, specificType: Type?) : {String : [UInt64]} {
+    access(all) getTicketIDs(user: Address, specificType: Type?) : {String : [UInt64]} {
 
         let allTickets : {String : [UInt64]} = {}
 
@@ -228,7 +228,7 @@ pub contract FindLostAndFoundWrapper {
     }
 
     // Check for all types that are in Lost and found which are NFTs
-    pub fun getSpecificRedeemableTypes(user: Address, specificType: Type?) : [Type] {
+    access(all) getSpecificRedeemableTypes(user: Address, specificType: Type?) : [Type] {
         let allTypes : [Type] = []
         if specificType != nil {
             for type in LostAndFound.getRedeemableTypes(user) {

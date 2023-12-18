@@ -1,7 +1,7 @@
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(user: String) :  Profile.UserReport? {
+access(all) main(user: String) :  Profile.UserReport? {
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return nil}
 	let address = resolveAddress!

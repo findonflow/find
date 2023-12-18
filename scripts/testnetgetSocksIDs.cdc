@@ -3,7 +3,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 
-pub fun main(user: String, collections: [String]) : {String : ItemReport} {
+access(all) main(user: String, collections: [String]) : {String : ItemReport} {
 	return {}
 }
 

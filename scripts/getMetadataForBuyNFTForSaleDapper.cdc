@@ -1,7 +1,7 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
-pub fun main(address: Address, id: UInt64, amount: UFix64) : PurchaseData {
+access(all) main(address: Address, id: UInt64, amount: UFix64) : PurchaseData {
 
 	let marketplace = FindMarket.getFindTenantAddress()
 	let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())

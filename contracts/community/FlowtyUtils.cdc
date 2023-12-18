@@ -11,7 +11,7 @@ pub contract FlowtyUtils {
     pub resource FlowtyUtilsAdmin {
         // addSupportedTokenType
         // add a supported token type that can be used in Flowty loans
-        pub fun addSupportedTokenType(type: Type) {
+        access(all) addSupportedTokenType(type: Type) {
             var supportedTokens = FlowtyUtils.Attributes["supportedTokens"]
             if supportedTokens == nil {
                 supportedTokens = [Type<@FUSD.Vault>()] as! [Type] 
@@ -27,21 +27,21 @@ pub contract FlowtyUtils {
         }
     }
 
-    pub fun getSupportedTokens(): AnyStruct {
+    access(all) getSupportedTokens(): AnyStruct {
         return self.Attributes["supportedTokens"]!
     }
 
     // getAllowedTokens
     // return an array of types that are able to be used as the payment type
     // for loans
-    pub fun getAllowedTokens(): [Type] {
+    access(all) getAllowedTokens(): [Type] {
         var supportedTokens = self.Attributes["supportedTokens"]
         return supportedTokens != nil ? supportedTokens! as! [Type] : [Type<@FUSD.Vault>()]
     }
 
     // isTokenSupported
     // check if the given type is able to be used as payment
-    pub fun isTokenSupported(type: Type): Bool {
+    access(all) isTokenSupported(type: Type): Bool {
         for t in FlowtyUtils.getAllowedTokens() {
             if t == type {
                 return true

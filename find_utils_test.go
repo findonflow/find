@@ -19,7 +19,7 @@ func TestFindUtils(t *testing.T) {
 
 	devCheckContainsChar := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String, char:Character) : Bool {
+	access(all) main(string: String, char:Character) : Bool {
 		return FindUtils.containsChar(string, char: char)
 	}`
 	// containsChar
@@ -41,7 +41,7 @@ func TestFindUtils(t *testing.T) {
 
 	devCheckContains := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String, element:String) : Bool {
+	access(all) main(string: String, element:String) : Bool {
 		return FindUtils.contains(string, element: element)
 	}`
 
@@ -96,7 +96,7 @@ func TestFindUtils(t *testing.T) {
 
 	devCheckHasSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String, suffix:String) : Bool {
+	access(all) main(string: String, suffix:String) : Bool {
 		return FindUtils.hasSuffix(string, suffix: suffix)
 	}`
 
@@ -143,7 +143,7 @@ func TestFindUtils(t *testing.T) {
 
 	devCheckHasPrefix := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String, prefix:String) : Bool {
+	access(all) main(string: String, prefix:String) : Bool {
 		return FindUtils.hasPrefix(string, prefix: prefix)
 	}`
 
@@ -198,7 +198,7 @@ func TestFindUtils(t *testing.T) {
 
 	devCheckToUpper := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String) : String {
+	access(all) main(string: String) : String {
 		return FindUtils.toUpper(string)
 	}
 	`
@@ -222,7 +222,7 @@ func TestFindUtils(t *testing.T) {
 
 	devCheckFirstUpperLetter := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String) : String {
+	access(all) main(string: String) : String {
 		return FindUtils.firstUpperLetter(string)
 	}
 	`
@@ -254,7 +254,7 @@ func TestFindUtils(t *testing.T) {
 
 	dev_check_to_snake_case := `import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(string: String) : String {
+access(all) main(string: String) : String {
 	return FindUtils.to_snake_case(string)
 }
 `
@@ -286,7 +286,7 @@ pub fun main(string: String) : String {
 
 	devCheckToCamelCase := `import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(string: String) : String {
+access(all) main(string: String) : String {
 	return FindUtils.toCamelCase(string)
 }
 `
@@ -326,7 +326,7 @@ pub fun main(string: String) : String {
 
 	devTrimSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(string: String, suffix:String) : String {
+access(all) main(string: String, suffix:String) : String {
 	return FindUtils.trimSuffix(string, suffix:suffix)
 }
 `
@@ -359,7 +359,7 @@ pub fun main(string: String, suffix:String) : String {
 
 	devTrimFindSuffix := `import FIND from "../contracts/FIND.cdc"
 
-pub fun main(name: String) : String {
+access(all) main(name: String) : String {
 	return FIND.trimFindSuffix(name)
 }
 `
@@ -380,7 +380,7 @@ pub fun main(name: String) : String {
 	// splitString
 	devSplitString := `import FindUtils from "../contracts/FindUtils.cdc"
 
-	pub fun main(string: String, sep: Character) : [String] {
+	access(all) main(string: String, sep: Character) : [String] {
 		return FindUtils.splitString(string, sep:sep)
 	}
 	`
@@ -419,7 +419,7 @@ pub fun main(name: String) : String {
 	// joinMapToString
 	devJoinMapToString := `import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(map: {String : String}) : String {
+access(all) main(map: {String : String}) : String {
 	return FindUtils.joinMapToString(map)
 }
 `
@@ -437,7 +437,7 @@ pub fun main(map: {String : String}) : String {
 	// joinString
 	devJoinString := `import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(s: [String], sep: String) : String {
+access(all) main(s: [String], sep: String) : String {
 	return FindUtils.joinString(s, sep:sep)
 }
 `
@@ -456,7 +456,7 @@ pub fun main(s: [String], sep: String) : String {
 	// deDupTypeArray
 	devDeDupTypeArray := `import FindUtils from "../contracts/FindUtils.cdc"
 
-pub fun main(s: [String]) : [Type] {
+access(all) main(s: [String]) : [Type] {
 	var typ : [Type] = []
 	for t in s {
 		typ.append(CompositeType(t)!)

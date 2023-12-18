@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 
-pub fun main(addr:Address) : String?{
+access(all) main(addr:Address) : String?{
 
 	return FIND.reverseLookup(addr)
 

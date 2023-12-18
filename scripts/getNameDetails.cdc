@@ -44,7 +44,7 @@ pub struct NameReport {
 	}
 }
 
-pub fun main(user: String) : NameReport? {
+access(all) main(user: String) : NameReport? {
 
 	var findReport: FINDReport? = nil
 	var nameLease: LeaseInformation? = nil
@@ -202,13 +202,13 @@ pub fun main(user: String) : NameReport? {
 			}
 		}
 
-		pub fun addSale(_ s: FindLeaseMarket.SaleItemInformation) {
+		access(all) addSale(_ s: FindLeaseMarket.SaleItemInformation) {
 			self.salePrice = s.amount
 			self.saleFtAlias = s.ftAlias
 			self.saleFtIdentifier = s.ftTypeIdentifier
 		}
 
-		pub fun addAuction(_ s: FindLeaseMarket.SaleItemInformation) {
+		access(all) addAuction(_ s: FindLeaseMarket.SaleItemInformation) {
 			self.latestBid = s.amount
 			self.auctionEnds = s.auction?.auctionEndsAt
 			self.latestBidBy = s.bidder

@@ -15,7 +15,7 @@ import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 
 
 
-    pub fun main(user: String, collections: [String]) : {String : ItemReport}  {
+    access(all) main(user: String, collections: [String]) : {String : ItemReport}  {
         return fetchAlchemyShard1(user: user, targetCollections:collections)
     }
 
@@ -38,12 +38,12 @@ import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 
     // Helper function 
 
-    pub fun resolveAddress(user: String) : Address? {
+    access(all) resolveAddress(user: String) : Address? {
 	    return FIND.resolve(user)
     }
 
 
-    pub fun fetchAlchemyShard1(user: String, targetCollections: [String]) : {String : ItemReport} {
+    access(all) fetchAlchemyShard1(user: String, targetCollections: [String]) : {String : ItemReport} {
         let source = "Shard1"
         let account = resolveAddress(user: user)
         if account == nil { return {} }

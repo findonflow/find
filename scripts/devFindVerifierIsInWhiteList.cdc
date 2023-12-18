@@ -1,6 +1,6 @@
 import FindVerifier from "../contracts/FindVerifier.cdc"
 
-pub fun main(user: Address, addresses: [Address]) : Result {
+access(all) main(user: Address, addresses: [Address]) : Result {
     let verifier = FindVerifier.IsInWhiteList(addresses)
     let input : {String : AnyStruct} = {"address" : user}
     return Result(verifier, input: input)

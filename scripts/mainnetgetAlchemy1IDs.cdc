@@ -16,7 +16,7 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 
 
 
-    pub fun main(user: String, collections: [String]) : {String : ItemReport}  {
+    access(all) main(user: String, collections: [String]) : {String : ItemReport}  {
         return fetchAlchemyShard1(user: user, targetCollections:collections)
     }
 
@@ -40,11 +40,11 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 
     // Helper function 
 
-    pub fun resolveAddress(user: String) : Address? {
+    access(all) resolveAddress(user: String) : Address? {
 	    return FIND.resolve(user)
     }
 
-    pub fun getNFTCatalogContracts() : [String] {
+    access(all) getNFTCatalogContracts() : [String] {
         let catalogs = FINDNFTCatalog.getCatalog()
         let names : [String] = []
         for catalog in catalogs.values {
@@ -53,7 +53,7 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
         return names
     }
 
-    pub fun fetchAlchemyShard1(user: String, targetCollections: [String]) : {String : ItemReport} {
+    access(all) fetchAlchemyShard1(user: String, targetCollections: [String]) : {String : ItemReport} {
         let source = "Shard1"
         let account = resolveAddress(user: user)
         if account == nil { return {} }
