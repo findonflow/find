@@ -2,7 +2,7 @@ import Dandy from "../contracts/Dandy.cdc"
 
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		destroy account.load<@Dandy.Collection>(from: Dandy.CollectionStoragePath)
 	}
 }

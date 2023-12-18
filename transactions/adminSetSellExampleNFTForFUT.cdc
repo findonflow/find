@@ -5,7 +5,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 
 transaction(tenant: Address) {
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let flowExample = FindMarket.TenantSaleItem(name:"FlowExampleNFT", cut: nil, rules:[

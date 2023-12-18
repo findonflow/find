@@ -12,7 +12,7 @@ transaction(leaseName: String, amount: UFix64) {
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let ftVaultType: Type
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let resolveAddress = FIND.resolve(leaseName)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}

@@ -6,7 +6,7 @@ transaction(name: String, amount: UFix64) {
 	let vaultRef : &FUSD.Vault?
 	let bidRef : &FIND.BidCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		self.vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault)
 		self.bidRef = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)

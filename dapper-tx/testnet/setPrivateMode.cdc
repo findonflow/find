@@ -4,7 +4,7 @@ transaction(mode: Bool) {
 
     let profile : &Profile.User?
 
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
         self.profile =acct.borrow<&Profile.User>(from:Profile.storagePath)
     }
 

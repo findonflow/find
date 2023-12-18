@@ -6,7 +6,7 @@ transaction(name: String, target: String) {
 	var relatedAccounts : &FindRelatedAccounts.Accounts?
 	let address : Address?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 
 		self.address = FIND.resolve(target)

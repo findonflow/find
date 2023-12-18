@@ -5,7 +5,7 @@ import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 transaction(dapperAddress:Address) {
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
 		// Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC
 		let dapper = getAccount(dapperAddress)
 		let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)

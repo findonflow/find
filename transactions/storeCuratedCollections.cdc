@@ -1,6 +1,6 @@
 
 transaction(collections: {String :  [String]}) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let path=/storage/FindCuratedCollections
 		let publicPath=/public/FindCuratedCollections

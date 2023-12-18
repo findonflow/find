@@ -2,7 +2,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 
 transaction(ftTypes: [String], category: String, cuts: [FindMarketCutStruct.ThresholdCut]){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
 
 		let types : [Type] = []
 		for t in ftTypes {

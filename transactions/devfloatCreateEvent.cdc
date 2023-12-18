@@ -26,7 +26,7 @@ transaction(
 
   let FLOATEvents: &FLOAT.FLOATEvents
 
-  prepare(acct: AuthAccount) {
+  prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
     // SETUP COLLECTION
     if acct.borrow<&FLOAT.Collection>(from: FLOAT.FLOATCollectionStoragePath) == nil {
         acct.save(<- FLOAT.createEmptyCollection(), to: FLOAT.FLOATCollectionStoragePath)

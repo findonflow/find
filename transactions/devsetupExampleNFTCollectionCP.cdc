@@ -3,7 +3,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !dandyCap.check() {
 			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)

@@ -12,7 +12,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
 	let vaultType : Type
 	let pointer : FindViews.AuthNFTPointer
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!

@@ -4,7 +4,7 @@ import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscro
 transaction(id: UInt64) {
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())

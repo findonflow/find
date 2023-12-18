@@ -1,7 +1,7 @@
 import Admin from "../contracts/Admin.cdc"
 
 transaction(name: String, addon: String){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
         let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         adminRef.addAddon(name: name, addon: addon)

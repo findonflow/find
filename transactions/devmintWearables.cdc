@@ -1,7 +1,7 @@
 import WearablesDev from "../contracts/community/WearablesDev.cdc"
 
 transaction(receiver: Address,) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		WearablesDev.mintWearablesForTest(receiver: receiver)
 	}
 }

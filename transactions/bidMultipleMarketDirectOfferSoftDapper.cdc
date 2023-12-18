@@ -19,7 +19,7 @@ transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftA
 	let ftVaultType: [Type]
 	let walletBalances : {Type : UFix64}
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		if nftAliasOrIdentifiers.length != users.length {
 			panic("The length of arrays passed in has to be the same")

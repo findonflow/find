@@ -3,7 +3,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 transaction(){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
         let path = FindMarket.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 

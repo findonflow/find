@@ -6,7 +6,7 @@ transaction(owner: String, id: UInt64) {
 
 	let saleItem : Capability<&FindMarketAuctionEscrow.SaleItemCollection{FindMarketAuctionEscrow.SaleItemCollectionPublic}>?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(owner)
 		if resolveAddress == nil {

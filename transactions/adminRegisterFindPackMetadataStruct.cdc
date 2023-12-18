@@ -16,7 +16,7 @@ transaction(info: FindPack.PackRegisterInfo) {
 	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let types : [Type]
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(info.paymentAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 

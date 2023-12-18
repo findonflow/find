@@ -11,7 +11,7 @@ transaction(id: UInt64) {
 	let market : &FindMarketDirectOfferEscrow.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

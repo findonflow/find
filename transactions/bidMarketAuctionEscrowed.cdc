@@ -18,7 +18,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 	let balanceBeforeBid: UFix64
 	let pointer: FindViews.ViewReadPointer
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}

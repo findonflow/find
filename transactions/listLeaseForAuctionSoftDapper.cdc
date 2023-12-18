@@ -10,7 +10,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
 	let pointer : FindLeaseMarket.AuthLeasePointer
 	let vaultType : Type
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))

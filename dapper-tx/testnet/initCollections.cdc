@@ -7,7 +7,7 @@ import NFGv3 from 0x3e5b4c627064625d
 import Dandy from 0x35717efbbce11c74
 
 transaction() {
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
         // Dandy
         let DandyRef= account.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath)

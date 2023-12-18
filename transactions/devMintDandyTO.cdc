@@ -8,7 +8,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, rarity: String, rarityNum:UFix64, to: Address) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let dancyReceiver =getAccount(to)
 		let dandyCap= dancyReceiver.getCapability<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)

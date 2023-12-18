@@ -8,7 +8,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 	
 	let profile : &Profile.User
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 

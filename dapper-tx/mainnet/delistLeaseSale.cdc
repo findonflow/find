@@ -4,7 +4,7 @@ import FindLeaseMarketSale from 0x097bafa4e0b48eef
 transaction(leases: [String]) {
     let saleItems : &FindLeaseMarketSale.SaleItemCollection?
 
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
         let tenant=FindMarket.getTenant(FindMarket.getFindTenantAddress())
         self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketSale.SaleItemCollection>()))

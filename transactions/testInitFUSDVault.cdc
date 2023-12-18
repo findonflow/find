@@ -4,7 +4,7 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		if !fusdReceiver.check() {
 			let fusd <- FUSD.createEmptyVault()

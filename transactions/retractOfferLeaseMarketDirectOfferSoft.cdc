@@ -4,7 +4,7 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 transaction(leaseName: String) {
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())

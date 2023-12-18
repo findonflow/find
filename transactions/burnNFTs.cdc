@@ -10,7 +10,7 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
 	let authPointers : [FindViews.AuthNFTPointer]
 
-	prepare(account : AuthAccount) {
+	prepare(account : auth(BorrowValue)  AuthAccountAccount) {
 
 		self.authPointers = []
 

@@ -5,7 +5,7 @@ transaction(tenant: Address, ftName: String, nftName: String, listingName: Strin
 
      let adminRef : &FindMarketAdmin.AdminProxy
 
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
         self.adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
     }

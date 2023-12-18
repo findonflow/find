@@ -6,7 +6,7 @@ transaction(users: [String], ids: [UInt64] , reactions: [String], undoReactionUs
 
     let collection : &FindThoughts.Collection
 
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue)  AuthAccountAccount) {
         let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
         if !thoughtsCap.check() {
             account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)

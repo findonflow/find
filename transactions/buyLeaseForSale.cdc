@@ -12,7 +12,7 @@ transaction(leaseName: String, amount: UFix64) {
 	let saleItemsCap: Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>
 	let buyer: Address
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let resolveAddress = FIND.resolve(leaseName)
 		if resolveAddress == nil {

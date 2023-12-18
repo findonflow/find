@@ -4,7 +4,7 @@ import FindForge from "../contracts/FindForge.cdc"
 import FindPack from "../contracts/FindPack.cdc"
 
 transaction(lease: String) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(lease)

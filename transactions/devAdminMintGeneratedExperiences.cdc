@@ -6,7 +6,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 transaction(name: String, info: [GeneratedExperiences.Info]) {
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
 
 		// setup Collection
 		if account.borrow<&GeneratedExperiences.Collection>(from: GeneratedExperiences.CollectionStoragePath) == nil {

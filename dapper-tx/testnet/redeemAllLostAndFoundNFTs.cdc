@@ -20,7 +20,7 @@ transaction() {
     let nftInfos : {String : NFTCatalog.NFTCollectionData}
     let receiverAddress : Address
 
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
 
         //LINK
         // Dandy

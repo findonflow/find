@@ -10,7 +10,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
 transaction(nftName: String, nftType: String, cut: UFix64){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue)  AuthAccountAccount){
 
 		let defaultRules : [FindMarket.TenantRule] = [
 			FindMarket.TenantRule(

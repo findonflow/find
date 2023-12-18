@@ -5,7 +5,7 @@ transaction() {
 
 	let saleItems : &FindLeaseMarketDirectOfferSoft.SaleItemCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

@@ -12,7 +12,7 @@
         let Collection: &FLOAT.Collection
         let FlowTokenVault: &FlowToken.Vault
       
-        prepare(acct: AuthAccount) {
+        prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
           // SETUP COLLECTION
           if acct.borrow<&FLOAT.Collection>(from: FLOAT.FLOATCollectionStoragePath) == nil {
               acct.save(<- FLOAT.createEmptyCollection(), to: FLOAT.FLOATCollectionStoragePath)

@@ -10,7 +10,7 @@ import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
 //Transaction that is signed by find to create a find market tenant for find
 transaction(dapperAddress: Address) {
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
         //in finds case the
         acct.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
         acct.link<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)

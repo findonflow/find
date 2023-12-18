@@ -8,7 +8,7 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
 	let balanceBeforeTransfer: UFix64
 	let price : UFix64
 
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(BorrowValue)  AuthAccountAccount, account: auth(BorrowValue)  AuthAccountAccount) {
 
 		self.price=FIND.calculateCost(name)
 		log("The cost for registering this name is ".concat(self.price.toString()))

@@ -11,7 +11,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 	let ftVaultType: Type
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
