@@ -10,7 +10,8 @@
       "source": "./contracts/standard/NonFungibleToken.cdc",
       "aliases": {
         "testnet": "0x631e88ae7f1d7c20",
-        "mainnet": "0x1d7e57aa55817448"
+        "mainnet": "0x1d7e57aa55817448",
+        "emulator": "0xf8d6e0586b0a20c7"
       }
     },
     "MetadataViews": {
@@ -21,11 +22,25 @@
         "emulator": "0xf8d6e0586b0a20c7"
       }
     },
+    "TokenForwarding": {
+      "source": "./contracts/standard/TokenForwarding.cdc",
+      "aliases": {
+        "mainnet": "0xe544175ee0461c4b",
+        "testnet": "0x51ea0e37c27a1f1a"
+      }
+    },
     "FUSD": {
       "source": "./contracts/standard/FUSD.cdc",
       "aliases": {
         "testnet": "0xe223d8a629e49c68",
         "mainnet": "0x3c5959b568896393"
+      }
+    },
+    "DapperStorageRent": {
+      "source": "./contracts/standard/DapperStorageRent.cdc",
+      "aliases": {
+        "testnet": "0x43ee8c22fcf94ea3",
+        "mainnet": "0xa08e88e23f332538"
       }
     },
     "FungibleToken": {
@@ -77,6 +92,20 @@
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
+    "FindAirdropper": "./contracts/FindAirdropper.cdc",
+    "FindFurnace": "./contracts/FindFurnace.cdc",
+    "FindMarketAdmin": "./contracts/FindMarketAdmin.cdc",
+    "FindUserStatus": "./contracts/FindUserStatus.cdc",
+    "FindMarket": "./contracts/FindMarket.cdc",
+    "FindMarketSale": "./contracts/FindMarketSale.cdc",
+    "FindMarketDirectOfferEscrow": "./contracts/FindMarketDirectOfferEscrow.cdc",
+    "FindMarketDirectOfferSoft": "./contracts/FindMarketDirectOfferSoft.cdc",
+    "FindMarketAuctionEscrow": "./contracts/FindMarketAuctionEscrow.cdc",
+    "FindMarketAuctionSoft": "./contracts/FindMarketAuctionSoft.cdc",
+    "FindLeaseMarket": "./contracts/FindLeaseMarket.cdc",
+    "FindLeaseMarketSale": "./contracts/FindLeaseMarketSale.cdc",
+    "FindLeaseMarketAuctionSoft": "./contracts/FindLeaseMarketAuctionSoft.cdc",
+    "FindLeaseMarketDirectOfferSoft": "./contracts/FindLeaseMarketDirectOfferSoft.cdc",
     "Admin": "./contracts/Admin.cdc",
     "Sender": "./contracts/Sender.cdc",
     "Clock": "./contracts/Clock.cdc",
@@ -87,15 +116,23 @@
     "FindForge": "./contracts/FindForge.cdc",
     "FindPack": "./contracts/FindPack.cdc",
     "FindForgeOrder": "./contracts/FindForgeOrder.cdc",
+    "FindRulesCache": "./contracts/FindRulesCache.cdc",
+    "FindForgeStruct": "./contracts/FindForgeStruct.cdc",
     "NFTCatalog": "./contracts/standard/NFTCatalog.cdc",
     "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
+    "FindRelatedAccounts": "./contracts/FindRelatedAccounts.cdc",
     "FindViews": "./contracts/FindViews.cdc",
     "NameVoucher": "./contracts/NameVoucher.cdc",
     "FindVerifier": "./contracts/FindVerifier.cdc",
     "FLOAT": "./contracts/standard/FLOAT.cdc",
     "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
     "FungibleTokenSwitchboard": "./contracts/standard/FungibleTokenSwitchboard.cdc",
-    "GrantedAccountAccess": "./contracts/standard/GrantedAccountAccess.cdc"
+    "GrantedAccountAccess": "./contracts/standard/GrantedAccountAccess.cdc",
+    "FindMarketCut": "./contracts/FindMarketCut.cdc",
+    "FindMarketCutInterface": "./contracts/FindMarketCutInterface.cdc",
+    "FindMarketCutStruct": "./contracts/FindMarketCutStruct.cdc",
+    "FindMarketInfrastructureCut": "./contracts/FindMarketInfrastructureCut.cdc",
+    "Dev": "./contracts/Dev.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -171,35 +208,57 @@
   "deployments": {
     "emulator": {
       "emulator-account": [
-        "FUSD",
-        "FungibleTokenMetadataViews",
-        "MetadataViews",
-        "DapperUtilityCoin",
-        "NFTCatalog",
         "FungibleTokenSwitchboard",
-        "NonFungibleToken"
+        "FUSD",
+        "TokenForwarding",
+        "FLOAT",
+        "GrantedAccountAccess",
+        "DapperStorageRent"
       ],
-      "emulator-dapper": [],
+      "emulator-dapper": [
+        "DapperUtilityCoin",
+        "FlowUtilityToken"
+      ],
       "emulator-find": [
+        "ExampleNFT",
         "FIND",
         "Clock",
         "Profile",
         "Debug",
-        "Sender",
-        "FindUtils",
-        "ProfileCache",
         "Admin",
+        "FindMarketAdmin",
+        "FindViews",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "Sender",
+        "FindRelatedAccounts",
         "FTRegistry",
         "FindForge",
         "FindForgeOrder",
-        "FindPack",
-        "FINDNFTCatalogAdmin",
-        "FindViews",
-        "NameVoucher",
-        "FLOAT",
-        "FindVerifier",
+        "FindForgeStruct",
+        "ProfileCache",
+        "FindRulesCache",
         "FINDNFTCatalog",
-        "GrantedAccountAccess"
+        "FINDNFTCatalogAdmin",
+        "FindPack",
+        "FindVerifier",
+        "FindFurnace",
+        "FindUtils",
+        "FindUserStatus",
+        "FindMarketCut",
+        "FindMarketCutStruct",
+        "FindMarketCutInterface",
+        "FindMarketInfrastructureCut",
+        "Dev",
+        "NameVoucher"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [],
