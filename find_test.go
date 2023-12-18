@@ -12,17 +12,16 @@ import (
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
 func TestFIND(t *testing.T) {
-
 	otu := &OverflowTestUtils{T: t, O: ot.O}
 
-	//these users have profiles and names
+	// these users have profiles and names
 	user1Address := otu.O.Address("user1")
 	user2Address := otu.O.Address("user2")
 
-	//this user has a profile but no name
+	// this user has a profile but no name
 	user3Address := otu.O.Address("user3")
 
-	//this use does not have a profile at all
+	// this use does not have a profile at all
 	user4Address := otu.O.Address("user4")
 
 	ot.Run(t, "Should be able to register a name", func(t *testing.T) {
@@ -56,7 +55,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should allow registering a lease after it is freed", func(t *testing.T) {
-
 		otu.expireLease().tickClock(2.0)
 
 		otu.O.Tx(`
@@ -64,7 +62,7 @@ func TestFIND(t *testing.T) {
 
 				transaction(name: String) {
 
-				    prepare(account: AuthAccount) {
+				    prepare(account: &Account) {
 				        let status=FIND.status(name)
 								if status.status == FIND.LeaseStatus.LOCKED {
 									panic("locked")
@@ -86,17 +84,14 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should not be able to lookup lease after expired", func(t *testing.T) {
-
 		otu.expireLease().tickClock(2.0)
 
 		otu.O.Script("getNameStatus",
 			WithArg("name", "user1"),
 		).AssertWant(t, autogold.Want("getNameStatus", nil))
-
 	})
 
 	ot.Run(t, "Admin should be able to register without paying FUSD", func(t *testing.T) {
-
 		otu.O.Tx("adminRegisterName",
 			WithSigner("find-admin"),
 			WithArg("names", `["find-admin"]`),
@@ -115,7 +110,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should automatically set Find Name if sender have one", func(t *testing.T) {
-
 		otu.registerUserWithName("user3", "name1")
 
 		otu.O.Script("getName",
@@ -124,7 +118,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to register related account and remove it", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "dapper"),
@@ -169,11 +162,9 @@ func TestFIND(t *testing.T) {
 		).
 			AssertWithPointerError(t, "/accounts",
 				"Object has no key 'accounts'")
-
 	})
 
 	ot.Run(t, "Should be able to set private mode", func(t *testing.T) {
-
 		otu.O.Tx("setPrivateMode",
 			WithSigner("user1"),
 			WithArg("mode", true),
@@ -197,11 +188,9 @@ func TestFIND(t *testing.T) {
 			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode false", false),
 			)
-
 	})
 
 	ot.Run(t, "Should be able to getFindPaths of a user", func(t *testing.T) {
-
 		otu.O.Script("getFindPaths",
 			WithArg("user", "user1"),
 		).AssertWant(t,
@@ -214,7 +203,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
-
 		otu.moveNameTo("user2", "user1", "user2")
 		otu.O.Script("getFindStatus",
 			WithArg("user", user2Address),
@@ -225,7 +213,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to create and edit the social link", func(t *testing.T) {
-
 		otu.O.Tx("editProfile",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
@@ -271,11 +258,9 @@ func TestFIND(t *testing.T) {
 			"/profile/links/FindTwitter",
 			"Object has no key 'FindTwitter'",
 		)
-
 	})
 
 	ot.Run(t, "Should not be able to buy forge for less then amount", func(t *testing.T) {
-
 		otu.O.Tx("buyAddon",
 			WithSigner("user2"),
 			WithArg("name", "user2"),
@@ -287,7 +272,6 @@ func TestFIND(t *testing.T) {
 
 	ot.Run(t, "Should be able to buy addons that are on Network", func(t *testing.T) {
 		otu.buyForge("user2")
-
 	})
 
 	ot.Run(t, "Should not be able to buy unavaialbe addon", func(t *testing.T) {
@@ -298,11 +282,9 @@ func TestFIND(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "This addon is not available.")
-
 	})
 
 	ot.Run(t, "Should be able to fund users without profile", func(t *testing.T) {
-
 		otu.O.Tx("sendFT",
 			WithSigner("user1"),
 			WithArg("name", user4Address),
@@ -316,7 +298,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to fund users with profile but without find name", func(t *testing.T) {
-
 		otu.O.Tx("sendFT",
 			WithSigner("user1"),
 			WithArg("name", user3Address),
@@ -334,7 +315,6 @@ func TestFIND(t *testing.T) {
 			WithArg("name", "user1.find"),
 		).
 			AssertWant(t, autogold.Want("user 1 address", otu.O.Address("user1")))
-
 	})
 
 	ot.Run(t, "Should panic if user pass in invalid character '.'", func(t *testing.T) {
@@ -345,7 +325,6 @@ func TestFIND(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid byte in hex string")
-
 	})
 
 	ot.Run(t, "Should be able to getFindStatus of an FREE lease", func(t *testing.T) {
@@ -395,7 +374,6 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to register related account and mutually link it for trust", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "link"),
@@ -468,11 +446,9 @@ func TestFIND(t *testing.T) {
 			WithArg("address", user1Address),
 		).
 			AssertSuccess(t)
-
 	})
 
 	ot.Run(t, "Should be able to getFindStatus for trusted accounts", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
 			WithArg("name", "link"),
@@ -515,7 +491,6 @@ func TestFIND(t *testing.T) {
     "trusted": true,
   },
 }`))
-
 	})
 
 	ot.Run(t, "Should be able to follow someone", func(t *testing.T) {
@@ -567,13 +542,12 @@ func TestFIND(t *testing.T) {
 	*/
 
 	ot.Run(t, "Should not be able to get old leases information", func(t *testing.T) {
-
 		otu.expireLease().expireLease().tickClock(2.0)
 
 		otu.O.Script(`
 		 			import FIND from "../contracts/FIND.cdc"
 
-		 			pub fun main(user: Address) : [FIND.LeaseInformation] {
+		 			access(all) fun main(user: Address) : [FIND.LeaseInformation] {
 		 			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		 			return finLeases.getLeaseInformation()
 		 			}
@@ -581,17 +555,15 @@ func TestFIND(t *testing.T) {
 			WithArg("user", "user1"),
 		).
 			AssertWant(t, autogold.Want("should be nil", nil))
-
 	})
 
 	ot.Run(t, "Should not be able to get old leases", func(t *testing.T) {
-
 		otu.expireLease().expireLease().tickClock(2.0)
 
 		otu.O.Script(`
 		 			import FIND from "../contracts/FIND.cdc"
 
-		 			pub fun main(user: Address) : [String] {
+		 			access(all) fun main(user: Address) : [String] {
 		 			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		 			return finLeases.getLeases()
 		 			}
@@ -601,17 +573,15 @@ func TestFIND(t *testing.T) {
 			AssertWant(t, autogold.Want("should not be able to get old leases", `[]interface {}{
   "user1",
 }`))
-
 	})
 
 	ot.Run(t, "Should be able to get old leases in getInvalidatedLeases", func(t *testing.T) {
-
 		otu.expireLease().expireLease().tickClock(2.0)
 
 		otu.O.Script(`
 		 			import FIND from "../contracts/FIND.cdc"
 
-		 			pub fun main(user: Address) : [String] {
+		 			access(all) fun main(user: Address) : [String] {
 		 			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		 			return finLeases.getInvalidatedLeases()
 		 			}
@@ -619,7 +589,6 @@ func TestFIND(t *testing.T) {
 			WithArg("user", "user1"),
 		).
 			AssertWant(t, autogold.Want("should get invalid leases", nil))
-
 	})
 
 	//TODO fix this
@@ -707,5 +676,4 @@ func TestFIND(t *testing.T) {
 			).AssertSuccess(t)
 		})
 	*/
-
 }

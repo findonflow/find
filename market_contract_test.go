@@ -10,7 +10,6 @@ import (
 )
 
 func TestMarketContract(t *testing.T) {
-
 	/*
 		User 1 : with profile and switchboard
 		User 2 : with profile only
@@ -276,7 +275,7 @@ func TestMarketContract(t *testing.T) {
 		import FindMarket from "../contracts/FindMarket.cdc"
 		import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-		pub fun main(addr: Address, ftType: String, path: PublicPath, outcomeRefPath: PublicPath, goToResidual: Bool) : Bool {
+		access(all) fun main(addr: Address, ftType: String, path: PublicPath, outcomeRefPath: PublicPath, goToResidual: Bool) : Bool {
 			let ref = Dev.getPaymentWallet(addr: addr, ftType: ftType, path: path, panicOnFailCheck: false)
 			var account = getAccount(addr)
 			if goToResidual {
@@ -294,7 +293,6 @@ func TestMarketContract(t *testing.T) {
 	for testFrameIndex, tf := range tcs {
 		for testCaseIndex, tc := range tf.Case {
 			t.Run(fmt.Sprintf("TestFrameIndex:%d,TestCaseIndex:%d,description:Fund for %s %s", testFrameIndex, testCaseIndex, tc.User, tc.Description), func(t *testing.T) {
-
 				res, err := otu.O.Script(
 					trx,
 					WithArg("addr", tc.User),
@@ -310,7 +308,5 @@ func TestMarketContract(t *testing.T) {
 				assert.Truef(otu.T, status, fmt.Sprintf("[TestFailed] TestFrameIndex : %d, TestCase no: %d, description: Fund for %s %s", testFrameIndex, testCaseIndex, tc.User, tc.Description))
 			})
 		}
-
 	}
-
 }

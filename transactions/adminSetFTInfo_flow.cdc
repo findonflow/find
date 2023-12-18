@@ -1,12 +1,12 @@
-import Admin from "../contracts/Admin.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "Admin"
+import "FlowToken"
 
 transaction() {
 
     let adminRef : &Admin.AdminProxy
 
-    prepare(account: AuthAccount){
-        self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth (BorrowValue) &Account){
+        self.adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
     }
 
     execute{

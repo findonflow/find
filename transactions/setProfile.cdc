@@ -1,20 +1,22 @@
-import Profile from "../contracts/Profile.cdc"
+import "Profile"
 
 transaction(avatar: String) {
 
-	let profile : &Profile.User?
+    let profile : &Profile.User?
 
-	prepare(acct: AuthAccount) {
-		self.profile =acct.borrow<&Profile.User>(from:Profile.storagePath)
-	}
+    prepare(acct: auth (BorrowValue) &Account) {
+        self.profile =acct.storage.borrow<&Profile.User>(from:Profile.storagePath)!
+    }
 
-	pre{
-		self.profile != nil : "Cannot borrow reference to profile"
-	}
+    pre{
+        self.profile != nil : "Cannot borrow reference to profile"
+    }
 
-	execute{
-		self.profile!.setAvatar(avatar)
-		self.profile!.emitUpdatedEvent()
-	}
+    execute{
+
+        //TODO: entitlement!
+        self.profile!.setAvatar(avatar)
+        self.profile!.emitUpdatedEvent()
+    }
 }
 

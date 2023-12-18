@@ -27,15 +27,15 @@ access(all) contract FUSD: ViewResolver {
 
     access(all) view fun getViews(): [Type] {
         let vaultRef = self.account.capabilities.borrow<&FUSD.Vault>(/public/fusdVault)
-            ?? panic("Could not borrow a reference to the vault resolver")
-        
+        ?? panic("Could not borrow a reference to the vault resolver")
+
         return vaultRef.getViews()
     }
 
     access(all) fun resolveView(_ view: Type): AnyStruct? {
         let vaultRef = self.account.capabilities.borrow<&FUSD.Vault>(/public/fusdVault)
-            ?? panic("Could not borrow a reference to the vault resolver")
-        
+        ?? panic("Could not borrow a reference to the vault resolver")
+
         return vaultRef.resolveView(view)
     }
 
@@ -77,57 +77,57 @@ access(all) contract FUSD: ViewResolver {
 
         access(all) view fun getViews(): [Type] {
             return [
-                Type<FungibleTokenMetadataViews.FTView>(),
-                Type<FungibleTokenMetadataViews.FTDisplay>(),
-                Type<FungibleTokenMetadataViews.FTVaultData>(),
-                Type<FungibleTokenMetadataViews.TotalSupply>()
+            Type<FungibleTokenMetadataViews.FTView>(),
+            Type<FungibleTokenMetadataViews.FTDisplay>(),
+            Type<FungibleTokenMetadataViews.FTVaultData>(),
+            Type<FungibleTokenMetadataViews.TotalSupply>()
             ]
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
-                case Type<FungibleTokenMetadataViews.FTView>():
-                    return FungibleTokenMetadataViews.FTView(
-                        ftDisplay: self.resolveView(Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
-                        ftVaultData: self.resolveView(Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
-                    )
-                case Type<FungibleTokenMetadataViews.FTDisplay>():
-                    let media = MetadataViews.Media(
-                            file: MetadataViews.HTTPFile(
-                            url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
-                        ),
-                        mediaType: "image/svg+xml"
-                    )
-                    let medias = MetadataViews.Medias([media])
-                    return FungibleTokenMetadataViews.FTDisplay(
-                        name: "Example Fungible Token",
-                        symbol: "EFT",
-                        description: "This fungible token is used as an example to help you develop your next FT #onFlow.",
-                        externalURL: MetadataViews.ExternalURL("https://example-ft.onflow.org"),
-                        logos: medias,
-                        socials: {
-                            "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
-                        }
-                    )
-                case Type<FungibleTokenMetadataViews.FTVaultData>():
-                    let vaultRef = FUSD.account.storage.borrow<&FUSD.Vault>(from: self.storagePath)
-                        ?? panic("Could not borrow a reference to the stored vault")
-                    return FungibleTokenMetadataViews.FTVaultData(
-                        storagePath: self.storagePath,
-                        receiverPath: self.receiverPath,
-                        metadataPath: self.publicPath,
-                        providerPath: /private/fusdVault,
-                        receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
-                        metadataLinkedType: Type<&FUSD.Vault>(),
-                        providerLinkedType: Type<&FUSD.Vault>(),
-                        createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
-                            return <-vaultRef.createEmptyVault()
-                        })
-                    )
-                case Type<FungibleTokenMetadataViews.TotalSupply>():
-                    return FungibleTokenMetadataViews.TotalSupply(
-                        totalSupply: FUSD.totalSupply
-                    )
+            case Type<FungibleTokenMetadataViews.FTView>():
+                return FungibleTokenMetadataViews.FTView(
+                    ftDisplay: self.resolveView(Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
+                    ftVaultData: self.resolveView(Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
+                )
+            case Type<FungibleTokenMetadataViews.FTDisplay>():
+                let media = MetadataViews.Media(
+                    file: MetadataViews.HTTPFile(
+                        url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                    ),
+                    mediaType: "image/svg+xml"
+                )
+                let medias = MetadataViews.Medias([media])
+                return FungibleTokenMetadataViews.FTDisplay(
+                    name: "Example Fungible Token",
+                    symbol: "EFT",
+                    description: "This fungible token is used as an example to help you develop your next FT #onFlow.",
+                    externalURL: MetadataViews.ExternalURL("https://example-ft.onflow.org"),
+                    logos: medias,
+                    socials: {
+                        "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                    }
+                )
+            case Type<FungibleTokenMetadataViews.FTVaultData>():
+                let vaultRef = FUSD.account.storage.borrow<&FUSD.Vault>(from: self.storagePath)
+                ?? panic("Could not borrow a reference to the stored vault")
+                return FungibleTokenMetadataViews.FTVaultData(
+                    storagePath: self.storagePath,
+                    receiverPath: self.receiverPath,
+                    metadataPath: self.publicPath,
+                    providerPath: /private/fusdVault,
+                    receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
+                    metadataLinkedType: Type<&FUSD.Vault>(),
+                    providerLinkedType: Type<&FUSD.Vault>(),
+                    createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
+                        return <-vaultRef.createEmptyVault()
+                    })
+                )
+            case Type<FungibleTokenMetadataViews.TotalSupply>():
+                return FungibleTokenMetadataViews.TotalSupply(
+                    totalSupply: FUSD.totalSupply
+                )
             }
             return nil
         }
@@ -194,7 +194,7 @@ access(all) contract FUSD: ViewResolver {
 
             // Get a reference to the recipient's Receiver
             let receiverRef = receiver.borrow()
-                ?? panic("Could not borrow receiver reference to the recipient's Vault")
+            ?? panic("Could not borrow receiver reference to the recipient's Vault")
 
             // Deposit the withdrawn tokens in the recipient's receiver
             receiverRef.deposit(from: <-transferVault)
@@ -282,6 +282,9 @@ access(all) contract FUSD: ViewResolver {
         self.account.capabilities.publish(fusdCap, at: self.VaultPublicPath)
         let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(self.VaultStoragePath)
         self.account.capabilities.publish(receiverCap, at: self.ReceiverPublicPath)
+
+        let capb = self.account.capabilities.storage.issue<&{FungibleToken.Vault}>(self.VaultStoragePath)
+        self.account.capabilities.publish(capb, at: /public/fusdBalance)
 
         let admin <- create Minter()
         self.account.storage.save(<-admin, to: self.AdminStoragePath)

@@ -1,10 +1,10 @@
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(clock: UFix64) {
-	prepare(account: AuthAccount) {
+    prepare(account: auth (BorrowValue) &Account) {
 
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
-		adminClient.advanceClock(clock)
+        let adminClient=account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+        adminClient.advanceClock(clock)
 
-	}
+    }
 }

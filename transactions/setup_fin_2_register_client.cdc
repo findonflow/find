@@ -1,23 +1,28 @@
-import Admin from "../contracts/Admin.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Admin"
+//import "FindMarketAdmin"
+import "FIND"
 
 //link together the administrator to the client, signed by the owner of the contract
 transaction(ownerAddress: Address) {
 
     //versus account
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue, IssueStorageCapabilityController, GetStorageCapabilityController) &Account) {
 
         let owner= getAccount(ownerAddress)
-        let client= owner.getCapability<&{Admin.AdminProxyClient}>(Admin.AdminProxyPublicPath)
-                .borrow() ?? panic("Could not borrow admin client")
 
-        let findMarketClient= owner.getCapability<&{FindMarketAdmin.AdminProxyClient}>(FindMarketAdmin.AdminProxyPublicPath)
-                .borrow() ?? panic("Could not borrow find market admin client")
+        let client= owner.capabilities.borrow<&{Admin.AdminProxyClient}>(Admin.AdminProxyPublicPath) ?? panic("Could not borrow admin client")
+        //let findMarketClient= owner.capabilities.borrow<&{FindMarketAdmin.AdminProxyClient}>(FindMarketAdmin.AdminProxyPublicPath) ?? panic("Could not borrow admin client")
 
-        let network=account.getCapability<&FIND.Network>(FIND.NetworkPrivatePath)
-        client.addCapability(network)
-        findMarketClient.addCapability(network)
+        let storage= account.capabilities.storage
+        //we issue a capability from our storage
+        let capability = storage.issue<&FIND.Network>(FIND.NetworkStoragePath)
+
+        //we set the name as tag so it is easy for us to revoke it later using a friendly name
+        let capcon = storage.getController(byCapabilityID:capability.id)!
+        capcon.setTag("findAdmin")
+
+        client.addCapability(capability)
+        //       findMarketClient.addCapability(capability)
 
     }
 }
