@@ -48,7 +48,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
 		if !saleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.storage.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
 
@@ -132,7 +132,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 						)
 						targetCapability = account.getCapability<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
 					} else {
-						account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+						account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
 						account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
 						account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 					}

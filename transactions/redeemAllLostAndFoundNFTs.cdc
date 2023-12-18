@@ -26,7 +26,7 @@ transaction() {
         // Dandy
         let DandyRef= account.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath)
         if DandyRef == nil {
-            account.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
             account.unlink(Dandy.CollectionPublicPath)
             account.link<&Dandy.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Dandy.CollectionPublic}>(
                 Dandy.CollectionPublicPath,
@@ -60,7 +60,7 @@ transaction() {
         //findPack
         let FindPackRef= account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
         if FindPackRef == nil {
-            account.save<@NonFungibleToken.Collection>(<- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
             account.unlink(FindPack.CollectionPublicPath)
             account.link<&FindPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
                 FindPack.CollectionPublicPath,
@@ -94,7 +94,7 @@ transaction() {
         // NFGv3
         let NFGv3Ref= account.borrow<&NFGv3.Collection>(from: NFGv3.CollectionStoragePath)
         if NFGv3Ref == nil {
-            account.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
             account.unlink(NFGv3.CollectionPublicPath)
             account.link<&NFGv3.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
                 NFGv3.CollectionPublicPath,
@@ -128,7 +128,7 @@ transaction() {
         // Party Favorz
         let PartyFavorzRef= account.borrow<&PartyFavorz.Collection>(from: PartyFavorz.CollectionStoragePath)
         if PartyFavorzRef == nil {
-            account.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
             account.unlink(PartyFavorz.CollectionPublicPath)
             account.link<&PartyFavorz.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
                 PartyFavorz.CollectionPublicPath,
@@ -162,7 +162,7 @@ transaction() {
         // Name Voucher
         let nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
         if nameVoucherRef == nil {
-            account.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
             account.unlink(NameVoucher.CollectionPublicPath)
             account.link<&NameVoucher.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
                 NameVoucher.CollectionPublicPath,
@@ -196,7 +196,7 @@ transaction() {
         // Wearables
         let wearablesRef= account.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
         if wearablesRef == nil {
-            account.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
             account.unlink(Wearables.CollectionPublicPath)
             account.link<&Wearables.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
                 Wearables.CollectionPublicPath,

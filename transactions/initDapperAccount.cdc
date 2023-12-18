@@ -12,7 +12,7 @@ transaction(dapperAddress: Address) {
 		if !ducReceiver.check() {
 			// Create a new Forwarder resource for DUC and store it in the new account's storage
 			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
-			account.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
+			account.storage.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
 			// Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
 			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinVault)
 		}
@@ -22,7 +22,7 @@ transaction(dapperAddress: Address) {
 		if !futReceiver.check() {
 			// Create a new Forwarder resource for FUT and store it in the new account's storage
 			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver))
-			account.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
+			account.storage.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
 			// Publish a Receiver capability for the new account, which is linked to the FUT Forwarder
 			account.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver,target: /storage/flowUtilityTokenReceiver)
 		}

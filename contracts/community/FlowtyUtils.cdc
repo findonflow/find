@@ -82,6 +82,6 @@ pub contract FlowtyUtils {
         self.FlowtyUtilsStoragePath = /storage/FlowtyUtils
 
         let utilsAdmin <- create FlowtyUtilsAdmin()
-        self.account.save(<-utilsAdmin, to: self.FlowtyUtilsStoragePath)
+        self.account.storage.save(<-utilsAdmin, to: self.FlowtyUtilsStoragePath)
     }
 }

@@ -11,7 +11,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
-			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
+			account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 
 		}

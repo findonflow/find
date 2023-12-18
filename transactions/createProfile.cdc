@@ -37,7 +37,7 @@ transaction(name: String) {
         /*
         let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         if !usdcCap.check() {
-            account.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
+            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
 
             let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
             account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
@@ -66,14 +66,14 @@ transaction(name: String) {
         /*
         let dandyCap= account.capabilities.get<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
         if !dandyCap.check() {
-            account.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+            account.storage.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
             let cap = account.capabilities.storage.issue<&Dandy.Collection>(Dandy.CollectionStoragePath)
             account.capabilities.publish(cap, at: Dandy.CollectionPublicPath)
         }
 
         let thoughtsCap= account.capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
         if !thoughtsCap.check() {
-            account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
+            account.storage.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
             let cap = account.capabilities.storage.issue<&FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
             account.capabilities.publish(cap, at: FindThoughts.CollectionPublicPath)
         }
@@ -148,7 +148,7 @@ transaction(name: String) {
         let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
         let doeSaleCap= account.capabilities.get<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath) 
         if !doeSaleCap.check() {
-            account.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
+            account.storage.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
             account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
         }
         //SYNC with register

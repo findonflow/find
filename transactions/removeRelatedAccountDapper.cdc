@@ -9,7 +9,7 @@ transaction(name: String, network: String, address: String){
 		self.relatedAccounts= account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		if self.relatedAccounts == nil {
 			let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
-			account.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
+			account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
 			account.link<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath, target: FindRelatedAccounts.storagePath)
 			self.relatedAccounts= account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		}

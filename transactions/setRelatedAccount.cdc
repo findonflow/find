@@ -14,7 +14,7 @@ transaction(name: String, target: String) {
         self.relatedAccounts= account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
         if self.relatedAccounts == nil {
             let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
-            account.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
+            account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
 
             let cap = account.capabilities.storage.issue<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.storagePath)
             account.capabilities.publish(cap, at: FindRelatedAccounts.publicPath)

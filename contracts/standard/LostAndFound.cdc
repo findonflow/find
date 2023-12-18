@@ -751,7 +751,7 @@ pub contract LostAndFound {
         self.DepositorStoragePath = /storage/lostAndFoundDepositor
 
         let manager <- create ShelfManager()
-        self.account.save(<-manager, to: self.LostAndFoundStoragePath)
+        self.account.storage.save(<-manager, to: self.LostAndFoundStoragePath)
         self.account.link<&LostAndFound.ShelfManager>(self.LostAndFoundPublicPath, target: self.LostAndFoundStoragePath)
     }
 }

@@ -433,7 +433,7 @@ pub contract FlovatarComponent: NonFungibleToken {
         // Initialize the total supply
         self.totalSupply = UInt64(0)
 
-        self.account.save<@NonFungibleToken.Collection>(<- FlovatarComponent.createEmptyCollection(), to: FlovatarComponent.CollectionStoragePath)
+        self.account.storage.save<@NonFungibleToken.Collection>(<- FlovatarComponent.createEmptyCollection(), to: FlovatarComponent.CollectionStoragePath)
         self.account.link<&{FlovatarComponent.CollectionPublic}>(FlovatarComponent.CollectionPublicPath, target: FlovatarComponent.CollectionStoragePath)
 
         emit ContractInitialized()

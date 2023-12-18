@@ -93,7 +93,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 		}
 
 		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
-			account.save(<- Sender.create(), to: Sender.storagePath)
+			account.storage.save(<- Sender.create(), to: Sender.storagePath)
 		}
 
 		self.token =account.borrow<&Sender.Token>(from: Sender.storagePath)!

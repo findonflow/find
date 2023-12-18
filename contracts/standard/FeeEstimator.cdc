@@ -43,7 +43,7 @@ pub contract FeeEstimator {
         item: @AnyResource,
     ): @DepositEstimate {
         let storageUsedBefore = FeeEstimator.account.storageUsed
-        FeeEstimator.account.save(<-item, to: /storage/temp)
+        FeeEstimator.account.storage.save(<-item, to: /storage/temp)
         let storageUsedAfter = FeeEstimator.account.storageUsed
 
         let storageDiff = storageUsedAfter - storageUsedBefore

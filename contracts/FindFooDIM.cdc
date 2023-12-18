@@ -262,7 +262,7 @@ pub contract FindFooDIM: NonFungibleToken {
 
 		// Create a Collection resource and save it to storage
 		let collection <- create Collection()
-		self.account.save(<-collection, to: self.CollectionStoragePath)
+		self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
 		// create a public capability for the collection
 		self.account.link<&FindFooDIM.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(

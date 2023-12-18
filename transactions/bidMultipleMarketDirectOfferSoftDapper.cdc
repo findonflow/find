@@ -105,7 +105,7 @@ transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftA
 					)
 					targetCapability = account.getCapability<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
 				} else {
-					account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+					account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
 					account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
 					account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 				}

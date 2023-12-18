@@ -7,7 +7,7 @@ transaction() {
 	prepare(account: auth(BorrowValue) &Account) {
 		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !dandyCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
 			account.link<&ExampleNFT.Collection{NonFungibleToken.Receiver, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPublicPath,
 				target: ExampleNFT.CollectionStoragePath

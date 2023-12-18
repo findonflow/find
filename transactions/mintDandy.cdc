@@ -13,7 +13,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 		if !dandyCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
 			account.link<&Dandy.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Dandy.CollectionPublic}>(
 				Dandy.CollectionPublicPath,
 				target: Dandy.CollectionStoragePath

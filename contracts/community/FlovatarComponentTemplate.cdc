@@ -286,7 +286,7 @@ pub contract FlovatarComponentTemplate {
         self.totalMintedComponents = {}
         self.lastComponentMintedAt = {}
 
-        self.account.save<@FlovatarComponentTemplate.Collection>(<- FlovatarComponentTemplate.createEmptyCollection(), to: FlovatarComponentTemplate.CollectionStoragePath)
+        self.account.storage.save<@FlovatarComponentTemplate.Collection>(<- FlovatarComponentTemplate.createEmptyCollection(), to: FlovatarComponentTemplate.CollectionStoragePath)
         self.account.link<&{FlovatarComponentTemplate.CollectionPublic}>(FlovatarComponentTemplate.CollectionPublicPath, target: FlovatarComponentTemplate.CollectionStoragePath)
 
         emit ContractInitialized()

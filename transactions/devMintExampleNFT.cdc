@@ -13,7 +13,7 @@ transaction(name: String, artist:String, nftName:String, nftDescription:String, 
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !collectionCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
 			account.link<&ExampleNFT.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPublicPath,
 				target: ExampleNFT.CollectionStoragePath

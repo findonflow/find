@@ -33,7 +33,7 @@ transaction(packId:UInt64) {
             let storage= account.borrow<&NonFungibleToken.Collection>(from: collectionInfo.storagePath)
             if storage == nil {
                 let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
-                account.save(<- newCollection, to: collectionInfo.storagePath)
+                account.storage.save(<- newCollection, to: collectionInfo.storagePath)
                 account.link<&{NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath)
             }
 

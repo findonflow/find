@@ -883,7 +883,7 @@ pub contract Wearables: NonFungibleToken {
 		self.CollectionPublicPath = /public/wearables
 		self.CollectionPrivatePath = /private/wearables
 
-		self.account.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
+		self.account.storage.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
 		self.account.link<&Wearables.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPublicPath,
 			target: Wearables.CollectionStoragePath

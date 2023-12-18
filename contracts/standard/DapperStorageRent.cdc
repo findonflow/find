@@ -254,7 +254,7 @@ pub contract DapperStorageRent {
     self.BlockedAccounts = []
 
     let admin <- create Admin()
-    self.account.save(<-admin, to: self.DapperStorageRentAdminStoragePath)
+    self.account.storage.save(<-admin, to: self.DapperStorageRentAdminStoragePath)
   }
 }
 

@@ -14,7 +14,7 @@ transaction(name: String, data: [AnyStruct], receivers: [String]) {
 
 		let nftCap= account.getCapability<&{NonFungibleToken.Collection}>(FindFooDIM.CollectionPublicPath)
 		if !nftCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- FindFooDIM.createEmptyCollection(), to: FindFooDIM.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- FindFooDIM.createEmptyCollection(), to: FindFooDIM.CollectionStoragePath)
 			account.link<&FindFooDIM.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindFooDIM.CollectionPublicPath,
 				target: FindFooDIM.CollectionStoragePath

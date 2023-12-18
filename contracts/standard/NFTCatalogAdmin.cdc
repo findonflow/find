@@ -113,7 +113,7 @@ access(all) contract NFTCatalogAdmin {
 
         let admin    <- create Admin()
 
-        self.account.save(<-admin, to: self.AdminStoragePath)
+        self.account.storage.save(<-admin, to: self.AdminStoragePath)
         let adminCap = self.account.capabilities.storage.issue<&Admin>(AdminStoragePath)
     }
 }

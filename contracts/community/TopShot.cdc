@@ -234,7 +234,7 @@ pub contract TopShot: NonFungibleToken {
         self.totalSupply = 0
 
         // Put a new Collection in storage
-        self.account.save<@Collection>(<- create Collection(), to: /storage/MomentCollection)
+        self.account.storage.save<@Collection>(<- create Collection(), to: /storage/MomentCollection)
 
         // Create a public capability for the Collection
         self.account.link<&{MomentCollectionPublic}>(/public/MomentCollection, target: /storage/MomentCollection)

@@ -138,12 +138,12 @@ pub contract FindToken : FungibleToken {
 
         vault.deposit(from: <- minter.mintTokens(self.initialSupply))
 
-        self.account.save(<- vault, to: self.vaultStoragePath)
+        self.account.storage.save(<- vault, to: self.vaultStoragePath)
         self.account.link<&Vault{FungibleToken.Receiver, FindViews.VaultViews}>(self.receiverPublicPath, target: self.vaultStoragePath)
         self.account.link<&Vault{FungibleToken.Balance, FindViews.VaultViews}>(self.balancePublicPath, target: self.vaultStoragePath)
         self.account.link<&Vault{FungibleToken.Provider, FindViews.VaultViews}>(self.providerPath, target: self.vaultStoragePath)
         
-        self.account.save(<- minter, to: self.minterPath)
+        self.account.storage.save(<- minter, to: self.minterPath)
 
         emit TokensInitialized(initialSupply: self.initialSupply)
 

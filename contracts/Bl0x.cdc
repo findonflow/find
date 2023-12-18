@@ -433,7 +433,7 @@ pub contract Bl0x: NonFungibleToken {
 			self.CollectionPublicPath = /public/bl0xNFTs
 			self.CollectionPrivatePath = /private/bl0xNFTs
 
-			self.account.save<@NonFungibleToken.Collection>(<- Bl0x.createEmptyCollection(), to: Bl0x.CollectionStoragePath)
+			self.account.storage.save<@NonFungibleToken.Collection>(<- Bl0x.createEmptyCollection(), to: Bl0x.CollectionStoragePath)
 			self.account.link<&Bl0x.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				Bl0x.CollectionPublicPath,
 				target: Bl0x.CollectionStoragePath

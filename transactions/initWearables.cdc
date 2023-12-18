@@ -7,7 +7,7 @@ transaction() {
 
 		let wearablesRef= account.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
 		if wearablesRef == nil {
-			account.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
 			account.unlink(Wearables.CollectionPublicPath)
 			account.link<&Wearables.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				Wearables.CollectionPublicPath,

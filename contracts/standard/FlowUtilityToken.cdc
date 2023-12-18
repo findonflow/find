@@ -172,11 +172,11 @@ pub contract FlowUtilityToken: FungibleToken {
 
         let admin <- create Administrator()
         let minter <- admin.createNewMinter(allowedAmount: self.totalSupply)
-        self.account.save(<-admin, to: /storage/flowUtilityTokenAdmin)
+        self.account.storage.save(<-admin, to: /storage/flowUtilityTokenAdmin)
 
         // mint tokens
         let tokenVault <- minter.mintTokens(amount: self.totalSupply)
-        self.account.save(<-tokenVault, to: /storage/flowUtilityTokenVault)
+        self.account.storage.save(<-tokenVault, to: /storage/flowUtilityTokenVault)
         destroy minter
 
         // Create a public capability to the stored Vault that only exposes

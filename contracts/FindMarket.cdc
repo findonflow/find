@@ -1280,7 +1280,7 @@ pub contract FindMarket {
 		let pp=PrivatePath(identifier: tenantPath)!
 		let pubp=PublicPath(identifier:tenantPath)!
 
-		account.save(<- tenant, to: sp)
+		account.storage.save(<- tenant, to: sp)
 		account.link<&Tenant>(pp, target:sp)
 		account.link<&Tenant{TenantPublic}>(pubp, target:sp)
 		return account.getCapability<&Tenant>(pp)

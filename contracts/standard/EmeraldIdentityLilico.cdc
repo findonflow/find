@@ -91,7 +91,7 @@ pub contract EmeraldIdentityLilico {
         self.AdministratorStoragePath = /storage/EmeraldIDLilicoAdministrator
         self.AdministratorPrivatePath = /private/EmeraldIDLilicoAdministrator
 
-        self.account.save(<- create Administrator(), to: EmeraldIdentityLilico.AdministratorStoragePath)
+        self.account.storage.save(<- create Administrator(), to: EmeraldIdentityLilico.AdministratorStoragePath)
         self.account.link<&Administrator>(EmeraldIdentityLilico.AdministratorPrivatePath, target: EmeraldIdentityLilico.AdministratorStoragePath)
     }
 }

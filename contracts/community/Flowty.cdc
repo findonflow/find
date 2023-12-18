@@ -1395,13 +1395,13 @@ pub contract Flowty {
 
         let marketplace <- create FlowtyMarketplace()
 
-        self.account.save(<-marketplace, to: self.FlowtyMarketplaceStoragePath) 
+        self.account.storage.save(<-marketplace, to: self.FlowtyMarketplaceStoragePath) 
         // create a public capability for the .Marketplace
         self.account.link<&Flowty.FlowtyMarketplace{Flowty.FlowtyMarketplacePublic}>(Flowty.FlowtyMarketplacePublicPath, target: Flowty.FlowtyMarketplaceStoragePath)
 
         // FlowtyAdmin
         let flowtyAdmin <- create FlowtyAdmin()
-        self.account.save(<-flowtyAdmin, to: self.FlowtyAdminStoragePath)
+        self.account.storage.save(<-flowtyAdmin, to: self.FlowtyAdminStoragePath)
 
         emit FlowtyInitialized()
     }

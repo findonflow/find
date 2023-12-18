@@ -1225,11 +1225,11 @@ pub contract Flovatar: NonFungibleToken {
         self.royaltyCut = 0.01
         self.marketplaceCut = 0.05
 
-        self.account.save<@NonFungibleToken.Collection>(<- Flovatar.createEmptyCollection(), to: Flovatar.CollectionStoragePath)
+        self.account.storage.save<@NonFungibleToken.Collection>(<- Flovatar.createEmptyCollection(), to: Flovatar.CollectionStoragePath)
         self.account.link<&{Flovatar.CollectionPublic}>(Flovatar.CollectionPublicPath, target: Flovatar.CollectionStoragePath)
 
         // Put the Admin resource in storage
-        self.account.save<@Admin>(<- create Admin(), to: self.AdminStoragePath)
+        self.account.storage.save<@Admin>(<- create Admin(), to: self.AdminStoragePath)
 
         emit ContractInitialized()
 	}

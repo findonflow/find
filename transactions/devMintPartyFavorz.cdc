@@ -12,7 +12,7 @@ transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nf
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(PartyFavorz.CollectionPublicPath)
 		if !collectionCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
 			account.link<&PartyFavorz.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				PartyFavorz.CollectionPublicPath,
 				target: PartyFavorz.CollectionStoragePath

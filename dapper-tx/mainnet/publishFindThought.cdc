@@ -11,7 +11,7 @@ transaction(header: String , body: String , tags: [String], mediaHash: String?, 
     prepare(account: auth(BorrowValue) &Account) {
         let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
         if !thoughtsCap.check() {
-            account.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
+            account.storage.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
             account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , ViewResolver.ResolverCollection}>(
                 FindThoughts.CollectionPublicPath,
                 target: FindThoughts.CollectionStoragePath

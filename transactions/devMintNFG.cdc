@@ -12,7 +12,7 @@ transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:Str
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(NFGv3.CollectionPublicPath)
 		if !collectionCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
 			account.link<&NFGv3.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				NFGv3.CollectionPublicPath,
 				target: NFGv3.CollectionStoragePath

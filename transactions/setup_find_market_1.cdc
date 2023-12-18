@@ -9,7 +9,7 @@ import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchb
 transaction() {
     prepare(account: auth(BorrowValue) &Account) {
         //in finds case the
-        account.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
+        account.storage.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
         account.link<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)
 
         let ftCaps : [Capability<&{FungibleToken.Receiver}>] = []
@@ -25,7 +25,7 @@ transaction() {
         let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         if !fusdReceiver.check() {
             let fusd <- FUSD.createEmptyVault()
-            account.save(<- fusd, to: /storage/fusdVault)
+            account.storage.save(<- fusd, to: /storage/fusdVault)
             account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
             account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
         }
@@ -33,7 +33,7 @@ transaction() {
 
         let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         if !usdcCap.check() {
-            account.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
+            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
             account.link<&FiatToken.Vault{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
             account.link<&FiatToken.Vault{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
             account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
@@ -43,7 +43,7 @@ transaction() {
         // setup switch board
         var checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
         if checkSB == nil {
-            account.save(<- FungibleTokenSwitchboard.createSwitchboard(), to: FungibleTokenSwitchboard.StoragePath)
+            account.storage.save(<- FungibleTokenSwitchboard.createSwitchboard(), to: FungibleTokenSwitchboard.StoragePath)
             account.link<&FungibleTokenSwitchboard.Switchboard{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath, target: FungibleTokenSwitchboard.StoragePath)
             account.link<&FungibleTokenSwitchboard.Switchboard{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath, target: FungibleTokenSwitchboard.StoragePath)
             checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)

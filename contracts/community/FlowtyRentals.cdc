@@ -1170,12 +1170,12 @@ pub contract FlowtyRentals {
 
         let marketplace <- create FlowtyRentalsMarketplace()
 
-        self.account.save(<-marketplace, to: self.FlowtyRentalsMarketplaceStoragePath) 
+        self.account.storage.save(<-marketplace, to: self.FlowtyRentalsMarketplaceStoragePath) 
         self.account.link<&FlowtyRentals.FlowtyRentalsMarketplace{FlowtyRentals.FlowtyRentalsMarketplacePublic}>(FlowtyRentals.FlowtyRentalsMarketplacePublicPath, target: FlowtyRentals.FlowtyRentalsMarketplaceStoragePath)
 
         // FlowtyAdmin
         let flowtyAdmin <- create FlowtyRentalsAdmin()
-        self.account.save(<-flowtyAdmin, to: self.FlowtyRentalsAdminStoragePath)
+        self.account.storage.save(<-flowtyAdmin, to: self.FlowtyRentalsAdminStoragePath)
 
         emit FlowtyRentalsInitialized()
     }

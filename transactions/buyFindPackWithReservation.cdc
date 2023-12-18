@@ -22,7 +22,7 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 
 		let findPackCap= account.getCapability<&{NonFungibleToken.Collection}>(FindPack.CollectionPublicPath)
 		if !findPackCap.check() {
-			account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
 			account.link<&FindPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				FindPack.CollectionPublicPath,
 				target: FindPack.CollectionStoragePath
@@ -37,7 +37,7 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 			let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 			if !fusdReceiver.check() {
 				let fusd <- FUSD.createEmptyVault()
-				account.save(<- fusd, to: /storage/fusdVault)
+				account.storage.save(<- fusd, to: /storage/fusdVault)
 				account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 				account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
 			}
@@ -60,7 +60,7 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 				names: ["flow"]
 			)
 			profile.addWallet(flowWallet)
-			account.save(<-profile, to: Profile.storagePath)
+			account.storage.save(<-profile, to: Profile.storagePath)
 			account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
 			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 

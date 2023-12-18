@@ -14,7 +14,7 @@ transaction(id: UInt64, name: String) {
 
 		var nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
 		if nameVoucherRef == nil {
-			account.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
 			account.unlink(NameVoucher.CollectionPublicPath)
 			account.link<&NameVoucher.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 				NameVoucher.CollectionPublicPath,

@@ -10,7 +10,7 @@ transaction(name: String) {
 			 collections=account.load<{String: [String]}>(from:path)!
 		}
 		collections.remove(key: name)
-		account.save(collections, to: path)
+		account.storage.save(collections, to: path)
 		let link = account.getCapability<&{String: [String]}>(publicPath)
 		if !link.check() {
 			account.link<&{String: [String]}>( publicPath, target: path)

@@ -15,7 +15,7 @@ transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: Stri
 		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath)
 
 		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
-			account.save(<- Sender.create(), to: Sender.storagePath)
+			account.storage.save(<- Sender.create(), to: Sender.storagePath)
 		}
 
 		self.token =account.borrow<&Sender.Token>(from: Sender.storagePath)!

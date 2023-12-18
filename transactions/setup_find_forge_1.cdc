@@ -5,7 +5,7 @@ import FindForge from "../contracts/FindForge.cdc"
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {
 		//in finds case the 
-		account.save(<- FindForge.createForgeAdminProxyClient(), to:/storage/findForgeAdminProxy)
+		account.storage.save(<- FindForge.createForgeAdminProxyClient(), to:/storage/findForgeAdminProxy)
 		account.link<&{FindForge.ForgeAdminProxyClient}>(/public/findForgeAdminProxy, target: /storage/findForgeAdminProxy)
 	}
 }

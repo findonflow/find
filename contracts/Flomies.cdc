@@ -366,7 +366,7 @@ pub contract Flomies: NonFungibleToken {
 		self.CollectionPublicPath = /public/flomiesNFT
 		self.CollectionPrivatePath = /private/flomiesNFT
 
-		self.account.save<@NonFungibleToken.Collection>(<- Flomies.createEmptyCollection(), to: Flomies.CollectionStoragePath)
+		self.account.storage.save<@NonFungibleToken.Collection>(<- Flomies.createEmptyCollection(), to: Flomies.CollectionStoragePath)
 		self.account.link<&Flomies.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Flomies.CollectionPublicPath,
 			target: Flomies.CollectionStoragePath
