@@ -36,7 +36,8 @@ transaction(
             tokenKeyPath: path,
             deadline: deadline
         )
-        self.payVault <- swapResVault.removeFirst()
+        let tempVault <- swapResVault.removeFirst() 
+        self.payVault <- tempVault as! @FiatToken.Vault
         let vaultInLeft <- swapResVault.removeLast()
         destroy swapResVault
         inVaultRef.deposit(from: <-vaultInLeft)

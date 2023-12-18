@@ -1,6 +1,9 @@
 package main
 
-import . "github.com/bjartek/overflow"
+import (
+	. "github.com/bjartek/overflow"
+	"github.com/samber/lo"
+)
 
 func main() {
 	o := Overflow(
@@ -8,18 +11,20 @@ func main() {
 		WithGlobalPrintOptions(),
 	)
 
+	users := lo.RepeatBy(3, func(_ int) string {
+		return "0x99bd48c8036e2876"
+	})
+
 	list := map[uint64][]string{
-		3: {"0x7f97054dc583b63c"},
-		4: {"0x7f97054dc583b63c"},
-		5: {"0x7f97054dc583b63c"},
+		//		3: {""},
+		//		4: {""},
+		5: users,
 	}
 
 	AirdropNameVoucher(list, o)
-
 }
 
 func AirdropNameVoucher(list map[uint64][]string, o *OverflowState) {
-
 	for characters, addrs := range list {
 		o.Tx(
 			"adminMintAndAirdropNameVoucher",
@@ -28,5 +33,4 @@ func AirdropNameVoucher(list map[uint64][]string, o *OverflowState) {
 			WithArg("minCharLength", characters),
 		)
 	}
-
 }
