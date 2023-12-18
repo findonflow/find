@@ -15,7 +15,6 @@ pub contract FindAirdropper {
 
     // The normal way of airdrop. If the user didn't init account, they cannot receive it
     pub fun safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, deepValidation: Bool) {
-
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
         let fromName = FIND.reverseLookup(from)

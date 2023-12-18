@@ -4,16 +4,16 @@ import Profile from "../contracts/Profile.cdc"
 
 transaction(names: [String], user: Address) {
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue) &Account) {
 
-		let userAccount=getAccount(user)
-		let profileCap = userAccount.getCapability<&{Profile.Public}>(Profile.publicPath)
-		let leaseCollectionCap=userAccount.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+        let userAccount=getAccount(user)
+        let profileCap = userAccount.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+        let leaseCollectionCap=userAccount.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        let adminClient=account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
-		for name in names {
-			adminClient.register(name: name,  profile: profileCap, leases: leaseCollectionCap)
-		}
-	}
+        for name in names {
+            adminClient.register(name: name,  profile: profileCap, leases: leaseCollectionCap)
+        }
+    }
 }
 

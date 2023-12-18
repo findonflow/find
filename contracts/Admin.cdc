@@ -33,6 +33,8 @@ access(all) contract Admin {
 
     //interface to use for capability receiver pattern
     access(all) resource interface AdminProxyClient {
+        //TODO: all methods but this in here needs to be behind and entitlement
+        //the rule is, any method that is publicly linked that was previously _not_ in the linked interface needs an entitlement
         access(all) fun addCapability(_ cap: Capability<&FIND.Network>)
     }
 
