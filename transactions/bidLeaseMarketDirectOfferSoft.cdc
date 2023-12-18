@@ -11,7 +11,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 
 		let resolveAddress = FIND.resolve(leaseName)

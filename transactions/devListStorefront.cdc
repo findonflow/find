@@ -13,7 +13,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
     let exampleNFTProvider: Capability<&Dandy.Collection{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>
     let storefront: &NFTStorefront.Storefront
 
-    prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(acct: AuthAccount) {
 
 			 // If the account doesn't already have a Storefront
         if acct.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {

@@ -7,7 +7,7 @@ transaction(owner: Address, name: String) {
 
 	let leaseCollectionOwner : &FIND.LeaseCollection{FIND.LeaseCollectionPublic}?
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 
 	//Add exising FUSD or create a new one and add it

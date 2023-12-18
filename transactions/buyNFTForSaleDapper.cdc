@@ -19,7 +19,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
 	let balanceBeforeTransfer: UFix64
-	prepare(dapper: auth(BorrowValue)  AuthAccountAccount, account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(dapper: AuthAccount, account: AuthAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		self.receiver=account.address
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()

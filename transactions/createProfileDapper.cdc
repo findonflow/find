@@ -12,7 +12,7 @@ import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOf
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(name: String) {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {
 			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)

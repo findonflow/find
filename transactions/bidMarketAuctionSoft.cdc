@@ -19,7 +19,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)

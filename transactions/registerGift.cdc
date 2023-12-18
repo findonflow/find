@@ -10,7 +10,7 @@ transaction(name: String, amount: UFix64, recipient: String) {
 	let receiverProfile : Capability<&{Profile.Public}>
 	let leases : &FIND.LeaseCollection?
 
-	prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(acct: AuthAccount) {
 
 		let resolveAddress = FIND.resolve(recipient)
 		if resolveAddress == nil {panic("The input pass in is not a valid name or address. Input : ".concat(recipient))}

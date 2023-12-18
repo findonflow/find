@@ -10,7 +10,7 @@ transaction(leaseName: String, amount:UFix64) {
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection
 	let requiredAmount:UFix64
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())

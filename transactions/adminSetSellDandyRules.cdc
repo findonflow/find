@@ -5,7 +5,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 transaction(tenant: Address) {
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let fusdDandy = FindMarket.TenantSaleItem(name:"FUSDDandy", cut: nil, rules:[

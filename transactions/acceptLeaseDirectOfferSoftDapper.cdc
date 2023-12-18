@@ -12,7 +12,7 @@ transaction(leaseName: String) {
 	let market : &FindLeaseMarketDirectOfferSoft.SaleItemCollection
 	let pointer : FindLeaseMarket.AuthLeasePointer
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

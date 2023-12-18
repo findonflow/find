@@ -15,7 +15,7 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 	let saleItemCollection: &FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}
 	let balanceBeforeTransfer: UFix64
 
-	prepare(dapper: auth(BorrowValue)  AuthAccountAccount, account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(dapper: AuthAccount, account: AuthAccount) {
 
 		let profile=account.borrow<&Profile.User>(from: Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 

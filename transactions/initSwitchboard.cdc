@@ -8,7 +8,7 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
 transaction(dapperAddress: Address) {
-    prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(acct: AuthAccount) {
 
         let dapper = getAccount(dapperAddress)
 

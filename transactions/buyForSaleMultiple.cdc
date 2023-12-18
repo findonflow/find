@@ -21,7 +21,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 	let prices : [UFix64]
 	let buyer : Address
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {

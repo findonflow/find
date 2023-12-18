@@ -3,7 +3,7 @@ import Admin from "../contracts/Admin.cdc"
 
 transaction(packTypeName: String, typeId: UInt64, hashes: [String]) {
 	let admin: &Admin.AdminProxy
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 	}
 

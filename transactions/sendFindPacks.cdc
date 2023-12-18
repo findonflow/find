@@ -6,7 +6,7 @@ import Admin from "../contracts/Admin.cdc"
 
 transaction(packInfo: FindPack.AirdropInfo) {
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let pathIdentifier = "FindPack_".concat(packInfo.packTypeName).concat("_").concat(packInfo.packTypeId.toString())
 

@@ -4,7 +4,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 
 transaction() {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		account.unlink(Dandy.CollectionPrivatePath)
 		account.link<&{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(Dandy.CollectionPrivatePath, target: Dandy.CollectionStoragePath)
 	}

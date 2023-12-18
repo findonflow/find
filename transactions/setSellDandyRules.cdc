@@ -4,7 +4,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 transaction(){
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
         let path = FindMarket.TenantClientStoragePath
         let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 

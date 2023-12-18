@@ -3,7 +3,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction() {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let wearablesRef= account.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
 		if wearablesRef == nil {

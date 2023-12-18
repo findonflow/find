@@ -5,7 +5,7 @@ transaction(ids: [UInt64]) {
 
 	let saleItems : &FindMarketDirectOfferSoft.SaleItemCollection?
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)

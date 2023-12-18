@@ -3,7 +3,7 @@ import Dandy from "../contracts/Dandy.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		account.unlink(Dandy.CollectionPrivatePath)
 		account.unlink(Dandy.CollectionPublicPath)
 		destroy <- account.load<@NonFungibleToken.Collection>(from:Dandy.CollectionStoragePath)

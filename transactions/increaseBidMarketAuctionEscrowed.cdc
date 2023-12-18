@@ -9,7 +9,7 @@ transaction(id: UInt64, amount: UFix64) {
 	let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection
 	let balanceBeforeBid: UFix64
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		// Get the accepted vault type from BidInfo
 		let marketplace = FindMarket.getFindTenantAddress()

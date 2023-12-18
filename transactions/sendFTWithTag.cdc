@@ -11,7 +11,7 @@ import CharityNFT from "../contracts/CharityNFT.cdc"
 
 transaction(name: String, amount: UFix64, type: String, tag:String) {
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let stdCap= account.getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 		if !stdCap.check() {

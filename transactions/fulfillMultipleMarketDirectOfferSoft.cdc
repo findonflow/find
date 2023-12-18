@@ -9,7 +9,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
 	let requiredAmount: [UFix64]
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())

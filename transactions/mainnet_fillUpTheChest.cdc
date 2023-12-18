@@ -11,7 +11,7 @@ transaction() {
 	// The Vault resource that holds the tokens that are being transfered
 	let sentVault: @FungibleToken.Vault
 
-	prepare(signer: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(signer: AuthAccount) {
 		// Get a reference to the signer's stored vault
 		let vaultRef = signer.borrow<&FUSD.Vault>(from: /storage/fusdVault)
 		?? panic("Could not borrow reference to the owner's Vault!")

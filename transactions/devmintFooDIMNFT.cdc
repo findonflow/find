@@ -10,7 +10,7 @@ transaction(name: String, data: [AnyStruct], receivers: [String]) {
 	let addresses: [Address]
 	let lease: &FIND.Lease
 
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
 
 		let nftCap= account.getCapability<&{NonFungibleToken.Collection}>(FindFooDIM.CollectionPublicPath)
 		if !nftCap.check() {

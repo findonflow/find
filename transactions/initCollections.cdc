@@ -7,7 +7,7 @@ import NFGv3 from "../contracts/NFGv3.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 
 transaction() {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		// Dandy
 		let DandyRef= account.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath)

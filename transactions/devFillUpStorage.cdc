@@ -3,7 +3,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
 
 transaction() {
-    prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(acct: AuthAccount) {
 
         let sender = acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
             ?? panic("Cannot borrow FlowToken vault from authAcct storage")

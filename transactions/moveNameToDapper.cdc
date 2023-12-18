@@ -8,7 +8,7 @@ transaction(name: String, receiver:String) {
 	let receiverAddress:Address?
 	let sender : &FIND.LeaseCollection
 
-	prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(acct: AuthAccount) {
 		self.sender= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("You do not have a profile set up, initialize the user first")
 		self.receiverAddress=FIND.resolve(receiver)
 	} 

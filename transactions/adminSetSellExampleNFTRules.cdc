@@ -7,7 +7,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(tenant: Address, merchAddress: Address) {
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let rules = [

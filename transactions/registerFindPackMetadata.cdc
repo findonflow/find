@@ -17,7 +17,7 @@ transaction(forge: String, name: String, description:String, typeId: UInt64, ext
 	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let types : [Type]
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		let leaseCol =account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Could not borrow leases collection")
 		self.lease = leaseCol.borrow(forge)
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)

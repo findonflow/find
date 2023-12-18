@@ -13,7 +13,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers
 	let pointers : [FindViews.AuthNFTPointer]
 	let vaultTypes : [Type]
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		if nftAliasOrIdentifiers.length != ids.length {
 			panic("The length of arrays passed in has to be the same")

@@ -9,7 +9,7 @@ import FindViews from "../contracts/FindViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 transaction(name: String, artist:String, nftName:String, nftDescription:String, traits: [UInt64], nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let collectionCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !collectionCap.check() {

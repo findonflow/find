@@ -20,7 +20,7 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 transaction(dapperMerchantAccountAddress: Address) {
 
-	prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(acct: AuthAccount) {
 		// Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC and FUT
 		let dapper = getAccount(dapperMerchantAccountAddress)
 

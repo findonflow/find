@@ -5,7 +5,7 @@ import NeoVoucher from 0xd6b39e5b5b367aad
 
 
 transaction(tenant: Address){
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
         let adminRef = account.borrow<&Admin.FindMarketAdmin>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let saleItem = FindMarket.TenantSaleItem(name:"FlowNeo", cut: nil, rules:[

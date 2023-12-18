@@ -4,7 +4,7 @@ transaction(addon:String, price:UFix64) {
 
     let adminRef : &Admin.AdminProxy
 
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
         self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
         
     }

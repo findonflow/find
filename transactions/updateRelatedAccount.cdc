@@ -4,7 +4,7 @@ transaction(name: String, network: String, oldAddress:String, address: String) {
 
 	var relatedAccounts : &FindRelatedAccounts.Accounts?
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		self.relatedAccounts= account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		if self.relatedAccounts == nil {

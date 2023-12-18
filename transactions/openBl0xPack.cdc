@@ -11,7 +11,7 @@ transaction(packId:UInt64) {
 	let packs: &Bl0xPack.Collection
 	var receiver: Capability<&{NonFungibleToken.Receiver}>
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		self.packs=account.borrow<&Bl0xPack.Collection>(from: Bl0xPack.CollectionStoragePath)!
 		self.receiver = account.getCapability<&{NonFungibleToken.Receiver}>(Bl0x.CollectionPublicPath)
 		if !self.receiver.check() {

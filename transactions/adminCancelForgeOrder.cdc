@@ -7,7 +7,7 @@ transaction(name: String, mintType:String) {
 
 	let admin : &Admin.AdminProxy
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
         self.admin = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 	}

@@ -10,7 +10,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
     let pointer : FindLeaseMarket.AuthLeasePointer
     let vaultType : Type
 
-    prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(account: AuthAccount) {
 
         // Get the salesItemRef from tenant
         let leaseMarketplace = FindMarket.getFindTenantAddress()

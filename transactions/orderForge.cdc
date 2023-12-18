@@ -7,7 +7,7 @@ transaction(name: String, mintType:String, minterCut: UFix64, collectionDisplay:
 
 	let leases : &FIND.LeaseCollection?
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		self.leases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
 

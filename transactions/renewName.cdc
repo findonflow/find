@@ -7,7 +7,7 @@ transaction(name: String, amount: UFix64) {
 	let vaultRef : &FUSD.Vault? 
 	let finLeases : &FIND.LeaseCollection? 
 
-	prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(acct: AuthAccount) {
 		self.price=FIND.calculateCost(name)
 		self.vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault)
 		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)

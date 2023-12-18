@@ -7,7 +7,7 @@ transaction(user: String, id: UInt64) {
 	let cap : Capability<&ExampleNFT.Collection{NonFungibleToken.Collection}>
 	let senderRef : &ExampleNFT.Collection
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
 		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 

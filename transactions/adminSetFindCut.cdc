@@ -8,7 +8,7 @@ import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction(tenant: Address, cut: UFix64){
-    prepare(account: auth(BorrowValue)  AuthAccountAccount){
+    prepare(account: AuthAccount){
         let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let defaultRules : [FindMarket.TenantRule] = [

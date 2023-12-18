@@ -5,7 +5,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 
 transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:String, folderHash:String) {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)

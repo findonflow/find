@@ -9,7 +9,7 @@ transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
     let authPointers : [FindViews.AuthNFTPointer]
 
-    prepare(account : auth(BorrowValue)  AuthAccountAccount) {
+    prepare(account : AuthAccount) {
 
         self.authPointers = []
         let privatePath = Wearables.CollectionPrivatePath

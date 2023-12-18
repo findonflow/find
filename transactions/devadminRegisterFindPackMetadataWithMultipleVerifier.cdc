@@ -20,7 +20,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let itemTypes : [Type]
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		self.royaltyWallet = getAccount(royaltyAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)

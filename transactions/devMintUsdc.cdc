@@ -5,7 +5,7 @@ transaction(recipient: Address, amount: UFix64) {
 	let tokenAdmin: &FiatToken.Administrator
 	let tokenReceiver: &{FungibleToken.Receiver}
 
-	prepare(signer: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(signer: AuthAccount) {
 
 		self.tokenAdmin = signer.borrow<&FiatToken.Administrator>(from: FiatToken.AdminStoragePath)
 		?? panic("Signer is not the token admin")

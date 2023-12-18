@@ -28,7 +28,7 @@ transaction(
     
     let adminResource: &Admin.AdminProxy
     
-    prepare(acct: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(acct: AuthAccount) {
         self.adminResource = acct.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
     }
     

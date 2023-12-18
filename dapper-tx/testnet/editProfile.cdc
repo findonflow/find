@@ -5,7 +5,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
     
     let profile : &Profile.User
 
-    prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(account: AuthAccount) {
 
         self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 

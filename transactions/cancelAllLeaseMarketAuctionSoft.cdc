@@ -5,7 +5,7 @@ transaction() {
 
 	let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
 
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 		let leaseMarketplace = FindMarket.getFindTenantAddress()
 		let tenant = FindMarket.getTenant(leaseMarketplace)
 		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()))

@@ -4,7 +4,7 @@ import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 transaction(dapperAddress: Address) {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let dapper=getAccount(dapperAddress)
 		//this is only for emulator

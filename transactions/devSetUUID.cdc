@@ -1,7 +1,7 @@
 import Dandy from "../contracts/Dandy.cdc"
 
 transaction(target: UInt64) {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount){}
+	prepare(account: AuthAccount){}
 	execute{
 		let col <- Dandy.createEmptyCollection()
 		var uuid = col.uuid

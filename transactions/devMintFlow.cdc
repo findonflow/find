@@ -6,7 +6,7 @@ transaction(recipient: Address, amount: UFix64) {
     let tokenAdmin: &FlowToken.Administrator
     let tokenReceiver: &{FungibleToken.Receiver}
 
-    prepare(signer: auth(BorrowValue)  AuthAccountAccount) {
+    prepare(signer: AuthAccount) {
 
         self.tokenAdmin = signer
             .borrow<&FlowToken.Administrator>(from: /storage/flowTokenAdmin)

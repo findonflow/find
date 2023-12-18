@@ -4,7 +4,7 @@ import CharityNFT from "../contracts/CharityNFT.cdc"
 
 //This transaction will prepare the art collection
 transaction() {
-	prepare(account: auth(BorrowValue)  AuthAccountAccount) {
+	prepare(account: AuthAccount) {
 
 		let stdCap= account.getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 		if !stdCap.check() {
