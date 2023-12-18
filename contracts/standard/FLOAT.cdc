@@ -124,7 +124,7 @@ access(all) contract FLOAT {
         // about the event. Which is fine, since we store the
         // crucial data to know about the FLOAT in the FLOAT itself.
         access(all) let eventsCap: Capability<&FLOATEvents>
-        
+
         // Helper function to get the metadata of the event 
         // this FLOAT is from.
         access(all) fun getEventMetadata(): &FLOATEvent? {
@@ -136,27 +136,27 @@ access(all) contract FLOAT {
 
         // This is for the MetdataStandard
         access(all) view fun getViews(): [Type] {
-             return [
-                Type<MetadataViews.Display>(),
-                Type<TokenIdentifier>()
+            return [
+            Type<MetadataViews.Display>(),
+            Type<TokenIdentifier>()
             ]
         }
 
         // This is for the MetdataStandard
         access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
-                case Type<MetadataViews.Display>():
-                    return MetadataViews.Display(
-                        name: self.eventName, 
-                        description: self.eventDescription, 
-                        file: MetadataViews.IPFSFile(cid: self.eventImage, path: nil)
-                    )
-                case Type<TokenIdentifier>():
-                    return TokenIdentifier(
-                        _id: self.id, 
-                        _address: self.owner!.address,
-                        _serial: self.serial
-                    ) 
+            case Type<MetadataViews.Display>():
+                return MetadataViews.Display(
+                    name: self.eventName, 
+                    description: self.eventDescription, 
+                    thumbnail: MetadataViews.IPFSFile(cid: self.eventImage, path: nil)
+                )
+            case Type<TokenIdentifier>():
+                return TokenIdentifier(
+                    _id: self.id, 
+                    _address: self.owner!.address,
+                    _serial: self.serial
+                ) 
             }
 
             return nil
@@ -175,8 +175,8 @@ access(all) contract FLOAT {
 
             // Stores a capability to the FLOATEvents of its creator
             self.eventsCap = getAccount(_eventHost)
-                .capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)!
-            
+            .capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)!
+
             emit FLOATMinted(
                 id: self.id, 
                 eventHost: _eventHost, 
@@ -208,7 +208,7 @@ access(all) contract FLOAT {
 
     // A public interface for people to call into our Collection
     access(all) resource interface CollectionPublic {
-        access(all) fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT}
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) fun deposit(token: @{NonFungibleToken.NFT})
@@ -233,7 +233,7 @@ access(all) contract FLOAT {
             let nft <- token as! @NFT
             let id = nft.id
             let eventId = nft.eventId
-        
+
             // Update self.events[eventId] to have
             // this FLOAT's id in it
             if self.events[eventId] == nil {
@@ -253,7 +253,48 @@ access(all) contract FLOAT {
             self.ownedNFTs[id] <-! nft
         }
 
-        access(all) fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+
+
+        //TODO: this will be removed
+        /// withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
+        access(NonFungibleToken.Withdrawable) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            return <-nft
+
+        }
+
+        /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
+        /// This would be used by a collection that can store multiple NFT types
+        access(NonFungibleToken.Withdrawable) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            return <-nft
+
+        }
+
+        /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
+        /// This would be used by a collection that can store multiple NFT types
+        access(NonFungibleToken.Withdrawable) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            return <-nft
+        }
+
+
+        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("You do not own this FLOAT in your collection")
             let nft <- token as! @NFT
             let id = nft.id
@@ -282,9 +323,49 @@ access(all) contract FLOAT {
             return <- nft
         }
 
+
+        access(NonFungibleToken.Withdrawable) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+            let token <- self.ownedNFTs.remove(key: id) ?? panic("missing NFT")
+            let receiver = receiver as! &{NonFungibleToken.Receiver}
+            receiver.deposit(token: <-token)
+            return true
+        }
+
+
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            let supportedTypes: {Type: Bool} = {}
+            return supportedTypes
+        }
+
+        /// Returns whether or not the given type is accepted by the collection
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            return type == Type<@FLOAT.NFT>()
+        }
+
+
+        /// Gets the amount of NFTs stored in the collection
+        access(all) view fun getLength(): Int {
+            return self.ownedNFTs.length
+        }
+
+        /// getIDsWithTypes returns a list of IDs that are in the collection, keyed by type
+        /// Should only be used by collections that can store multiple NFT types
+        access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
+            let ids: {Type: [UInt64]} = {}
+            return ids
+        }
+
+        // public function that anyone can call to create a new empty collection
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- FLOAT.createEmptyCollection()
+        }
+
         // Only returns the FLOATs for which we can still
         // access data about their event.
         access(all) view fun getIDs(): [UInt64] {
+            return []
+            //TODO not sure how to do this here
+            /*
             let ids: [UInt64] = []
             for key in self.ownedNFTs.keys {
                 let nftRef = self.borrowFLOAT(id: key)!
@@ -293,6 +374,7 @@ access(all) contract FLOAT {
                 }
             }
             return ids
+            */
         }
 
         // Returns all the FLOATs ids
@@ -320,7 +402,7 @@ access(all) contract FLOAT {
             return answer
         }
 
-        access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} {
             return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
         }
 
@@ -380,7 +462,7 @@ access(all) contract FLOAT {
         access(all) fun getExtraMetadata(): {String: AnyStruct}
         access(all) fun getVerifiers(): {String: [{IVerifier}]}
         access(all) fun getGroups(): [String]
-        access(all) fun getPrices(): {String: TokenInfo}?
+        access(all) view fun getPrices(): {String: TokenInfo}?
         access(all) fun hasClaimed(account: Address): TokenIdentifier?
 
         access(account) fun updateFLOATHome(id: UInt64, serial: UInt64, owner: Address?)
@@ -492,14 +574,14 @@ access(all) contract FLOAT {
         access(all) fun getCurrentHolder(serial: UInt64): TokenIdentifier? {
             pre {
                 self.currentHolders[serial] != nil:
-                    "This serial has not been created yet."
+                "This serial has not been created yet."
             }
             let data = self.currentHolders[serial]!
-            let collection = getAccount(data.address).capabilities.get(FLOAT.FLOATCollectionPublicPath)!.borrow<&Collection>() 
+            let collection : &Collection? = getAccount(data.address).capabilities.get<&Collection>(FLOAT.FLOATCollectionPublicPath)!.borrow()
             if collection?.borrowFLOAT(id: data.id) != nil {
                 return data
             }
-                
+
             return nil
         }
 
@@ -533,12 +615,12 @@ access(all) contract FLOAT {
         }
 
         access(all) view fun getViews(): [Type] {
-             return [
-                Type<MetadataViews.Display>()
+            return [
+            Type<MetadataViews.Display>()
             ]
         }
 
-        access(all) fun getPrices(): {String: TokenInfo}? {
+        access(all) view fun getPrices(): {String: TokenInfo}? {
             if let prices = self.extraMetadata["prices"] {
                 return prices as! {String: TokenInfo}
             }
@@ -547,12 +629,12 @@ access(all) contract FLOAT {
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
-                case Type<MetadataViews.Display>():
-                    return MetadataViews.Display(
-                        name: self.name, 
-                        description: self.description, 
-                        thumbnail: MetadataViews.IPFSFile(cid: self.image, path: nil)
-                    )
+            case Type<MetadataViews.Display>():
+                return MetadataViews.Display(
+                    name: self.name, 
+                    description: self.description, 
+                    thumbnail: MetadataViews.IPFSFile(cid: self.image, path: nil)
+                )
             }
 
             return nil
@@ -582,7 +664,7 @@ access(all) contract FLOAT {
         access(all) fun mint(recipient: &Collection): UInt64 {
             pre {
                 self.claimed[recipient.owner!.address] == nil:
-                    "This person already claimed their FLOAT!"
+                "This person already claimed their FLOAT!"
             }
             let recipientAddr: Address = recipient.owner!.address
             let serial = self.totalSupply
@@ -612,26 +694,30 @@ access(all) contract FLOAT {
             )
 
             self.totalSupply = self.totalSupply + 1
-            recipient.deposit(token: <- token as @{NonFungibleToken.NFT})
+            recipient.deposit(token: <- token)
             return id
         }
 
         access(account) fun verifyAndMint(recipient: &Collection, params: {String: AnyStruct}): UInt64 {
             params["event"] = &self as &FLOATEvent
             params["claimee"] = recipient.owner!.address
-            
+
             // Runs a loop over all the verifiers that this FLOAT Events
             // implements. For example, "Limited", "Timelock", "Secret", etc.  
             // All the verifiers are in the FLOATVerifiers.cdc contract
+            /* TODO:: do not bother fixing this now
             for identifier in self.verifiers.keys {
                 let typedModules = (&self.verifiers[identifier] as &[{IVerifier}]?)!
                 var i = 0
+
                 while i < typedModules.length {
-                    let verifier = &typedModules[i]
+                    //Dont know how to fix this
+                    let verifier = &typedModules[i] as {FLOAT.IVerifier}
                     verifier.verify(params)
                     i = i + 1
                 }
             }
+            */
 
             // You're good to go.
             let id = self.mint(recipient: recipient)
@@ -658,9 +744,9 @@ access(all) contract FLOAT {
         access(all) fun claim(recipient: &Collection, params: {String: AnyStruct}) {
             pre {
                 self.claimed[recipient.owner!.address] == nil:
-                    "This person already claimed their FLOAT!"
+                "This person already claimed their FLOAT!"
                 self.claimable: 
-                    "This FLOATEvent is not claimable, and thus not currently active."
+                "This FLOATEvent is not claimable, and thus not currently active."
             }
 
             if (self.getPrices() != nil) {
@@ -668,18 +754,18 @@ access(all) contract FLOAT {
             }
             self.verifyAndMint(recipient: recipient, params: params)
         }
- 
+
         access(all) fun purchase(recipient: &Collection, params: {String: AnyStruct}, payment: @{FungibleToken.Vault}) {
             pre {
                 self.getPrices() != nil:
-                    "Don't call this function. The FLOAT is free."
+                "Don't call this function. The FLOAT is free."
                 self.claimed[recipient.owner!.address] == nil:
-                    "This person already claimed their FLOAT!"
+                "This person already claimed their FLOAT!"
                 self.claimable: 
-                    "This FLOATEvent is not claimable, and thus not currently active."
+                "This FLOATEvent is not claimable, and thus not currently active."
             }
             if (self.getPrices()![payment.getType().identifier] == nil) {
-                 panic("This FLOAT does not support purchasing in the passed in token.")
+                panic("This FLOAT does not support purchasing in the passed in token.")
             }       
             if (payment.getBalance() != self.getPrices()![payment.getType().identifier]!.price) {
                 panic("You did not pass in the correct amount of tokens.")
@@ -689,25 +775,23 @@ access(all) contract FLOAT {
             let paymentType: String = payment.getType().identifier
             let tokenInfo: TokenInfo = self.getPrices()![paymentType]!
 
-            let EventHostVault = getAccount(self.host).capabilities.get(tokenInfo.path)!
-                                    .borrow<&{FungibleToken.Receiver}>()
-                                    ?? panic("Could not borrow the &{FungibleToken.Receiver} from the event host.")
+            let EventHostVault = getAccount(self.host).capabilities.get<&{FungibleToken.Receiver}>(tokenInfo.path)!.borrow()
+            ?? panic("Could not borrow the &{FungibleToken.Receiver} from the event host.")
 
             assert(
                 EventHostVault.getType().identifier == paymentType,
                 message: "The event host's path is not associated with the intended token."
             )
-            
-            let EmeraldCityVault = getAccount(emeraldCityTreasury).capabilities.get(tokenInfo.path)!
-                                    .borrow<&{FungibleToken.Receiver}>() 
-                                    ?? panic("Could not borrow the &{FungibleToken.Receiver} from Emerald City's Vault.")
+
+            let EmeraldCityVault = getAccount(emeraldCityTreasury).capabilities.get<&{FungibleToken.Receiver}>(tokenInfo.path)!.borrow() 
+            ?? panic("Could not borrow the &{FungibleToken.Receiver} from Emerald City's Vault.")
 
             assert(
                 EmeraldCityVault.getType().identifier == paymentType,
                 message: "Emerald City's path is not associated with the intended token."
             )
 
-            let emeraldCityCut <- payment.withdraw(amount: payment.balance * royalty)
+            let emeraldCityCut <- payment.withdraw(amount: payment.getBalance() * royalty)
 
             EmeraldCityVault.deposit(from: <- emeraldCityCut)
             EventHostVault.deposit(from: <- payment)
@@ -784,13 +868,13 @@ access(all) contract FLOAT {
             self.events = {}
         }
     }
- 
+
     // 
     // FLOATEvents
     //
     access(all) resource interface FLOATEventsPublic {
         // Public Getters
-        access(all) fun borrowPublicEventRef(eventId: UInt64): &{FLOATEvent}?
+        access(all) fun borrowPublicEventRef(eventId: UInt64): &FLOATEvent?
         access(all) fun getAllEvents(): {UInt64: String}
         access(all) view fun getIDs(): [UInt64]
         access(all) fun getGroup(groupName: String): &Group?
@@ -871,7 +955,7 @@ access(all) contract FLOAT {
         // the group from all the events that use it.
         access(all) fun deleteGroup(groupName: String) {
             let eventsInGroup = self.groups[groupName]?.getEvents() 
-                                ?? panic("This Group does not exist.")
+            ?? panic("This Group does not exist.")
             for eventId in eventsInGroup {
                 let ref = (&self.events[eventId] as &FLOATEvent?)!
                 ref.removeFromGroup(groupName: groupName)
@@ -912,7 +996,7 @@ access(all) contract FLOAT {
             }
             return nil
         }
-        
+
         access(all) fun getGroups(): [String] {
             return self.groups.keys
         }
@@ -922,16 +1006,14 @@ access(all) contract FLOAT {
         // in the GrantedAccountAccess.cdc contract, you can get a reference
         // to their FLOATEvents here and do pretty much whatever you want.
         access(all) fun borrowSharedRef(fromHost: Address): &FLOATEvents {
-            let sharedInfo = getAccount(fromHost).capabilities.get(GrantedAccountAccess.InfoPublicPath)!
-                                .borrow<&GrantedAccountAccess.Info>() 
-                                ?? panic("Cannot borrow the InfoPublic from the host")
+            let sharedInfo = getAccount(fromHost).capabilities.get<&GrantedAccountAccess.Info>(GrantedAccountAccess.InfoPublicPath)!.borrow() 
+            ?? panic("Cannot borrow the InfoPublic from the host")
             assert(
                 sharedInfo.isAllowed(account: self.owner!.address),
                 message: "This account owner does not share their account with you."
             )
-            let otherFLOATEvents = getAccount(fromHost).capabilities.get(FLOAT.FLOATEventsPublicPath)!
-                                    .borrow<&FLOATEvents>()
-                                    ?? panic("Could not borrow the public FLOATEvents.")
+            let otherFLOATEvents = getAccount(fromHost).capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)!.borrow()
+            ?? panic("Could not borrow the public FLOATEvents.")
             return otherFLOATEvents.borrowEventsRef()
         }
 
@@ -951,9 +1033,9 @@ access(all) contract FLOAT {
 
         // Get a public reference to the FLOATEvent
         // so you can call some helpful getters
-        access(all) fun borrowPublicEventRef(eventId: UInt64): &{FLOATEvent}? {
+        access(all) fun borrowPublicEventRef(eventId: UInt64): &FLOATEvent? {
             if self.events[eventId] != nil {
-                return &self.events[eventId] as &{FLOATEvent}?
+                return &self.events[eventId] as &FLOATEvent?
             }
             return nil
         }

@@ -49,6 +49,7 @@ access(all) contract FindPack {
         access(all) let packTypeName: String
         access(all) let packTypeId: UInt64
         access(all) let users: [String]
+
         access(all) let message: String
 
         init(packTypeName: String , packTypeId: UInt64 , users: [String],  message: String){
@@ -153,6 +154,7 @@ access(all) contract FindPack {
         access(all) let name : String
         access(all) let startTime : UFix64
         access(all) let price : UFix64
+        //TODO:potential breaking change?
         access(all) let verifiers : [{FindVerifier.Verifier}]
         access(all) let verifyAll : Bool
         access(contract) let extra: {String: AnyStruct}
@@ -341,14 +343,15 @@ access(all) contract FindPack {
         access(all) let extraData : {String : AnyStruct}
 
         access(all) let itemTypes: [Type]
-        access(contract) let providerCaps: {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
+        //TODO not sure we even need to restrict this on interface anymore
+        access(contract) let providerCaps: {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 
         access(contract) let primarySaleRoyalties : MetadataViews.Royalties
         access(contract) let royalties : MetadataViews.Royalties
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -577,7 +580,7 @@ access(all) contract FindPack {
         access(all) view fun getIDs(): [UInt64]
         access(all) fun contains(_ id: UInt64): Bool
         access(all) fun getPacksLeft() : Int   // returns the no of a type
-        access(all) fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT}
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} 
         access(all) fun borrowFindPack(id: UInt64): &FindPack.NFT?
         access(all) fun buyWithSignature(packId: UInt64, signature:String, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
         access(all) fun buy(packTypeName: String, typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
@@ -817,13 +820,57 @@ access(all) contract FindPack {
             return <-nft
         }
 
-        access(all) fun getSupportedNFTTypes() : [Type] {
-            return [
-            Type<@FindPack.NFT>()
-            ]
+
+        //TODO: this will be removed
+        /// withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
+        access(NonFungibleToken.Withdrawable) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            return <-nft
+
         }
 
-        access(all) fun isSupportedNFTType(_ type: Type) : Bool {
+        /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
+        /// This would be used by a collection that can store multiple NFT types
+        access(NonFungibleToken.Withdrawable) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            return <-nft
+
+        }
+
+        /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
+        /// This would be used by a collection that can store multiple NFT types
+        access(NonFungibleToken.Withdrawable) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
+
+            let nft <- token as! @NFT
+
+            emit Withdraw(id: nft.id, from: self.owner?.address)
+
+            return <-nft
+        }
+
+
+
+        access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
+            return {}
+        }
+
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            return {}
+        }
+
+
+        access(all) view fun isSupportedNFTType(type: Type) : Bool {
             return type == Type<@FindPack.NFT>()
         }
 
@@ -838,18 +885,13 @@ access(all) contract FindPack {
 
             emit Withdraw(id: nft.id, from: self.owner?.address)
 
-            receiver.borrow().deposit(token: <-nft)
+            receiver.borrow()!.deposit(token: <-nft)
 
             return true
         }
 
         access(all) view fun getLength() : Int {
             return self.ownedNFTs.length
-        }
-
-        access(all) view fun getIDsWithTypes() : [{UInt64 : Type}] {
-            let ids : [{UInt64 : Type}] = []
-            return ids
         }
 
         // deposit
@@ -889,7 +931,6 @@ access(all) contract FindPack {
         // borrowNFT
         // Gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        //
         access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} {
             return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
         }
@@ -942,7 +983,7 @@ access(all) contract FindPack {
 
     access(account) fun fulfill(packId: UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 
-        let openedPacksCollection = FindPack.account.storage.borrow<auth (NonFungibleToken.Withdrawable) &{FindPack.Collection}>(from: FindPack.OpenedCollectionStoragePath)!
+        let openedPacksCollection = FindPack.account.storage.borrow<auth (NonFungibleToken.Withdrawable) &FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
         let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
         let packTypeName = pack.packTypeName
         let packTypeId = pack.getTypeID()
@@ -1005,7 +1046,7 @@ access(all) contract FindPack {
         for i, type in types {
             let id = rewardIds[i]
             let target=receiver[type]!.borrow()!
-            let source=rewards[type]!.borrow<auth (NonFungibleToken.Withdrawable)>()!
+            let source=rewards[type]!.borrow()!
 
             let viewType= Type<PackRevealData>()
             let nft=source.borrowViewResolver(id: id)!
