@@ -89,6 +89,20 @@
         "testnet": "0x9a0766d93b6608b7"
       }
     },
+    "NFTCatalog": {
+      "source": "./contracts/standard/NFTCatalog.cdc",
+      "aliases": {
+        "mainnet": "0x49a7cda3a1eecc29",
+        "testnet": "0x324c34e1c517e4db"
+      }
+    },
+    "NFTCatalogAdmin": {
+      "source": "./contracts/standard/NFTCatalogAdmin.cdc",
+      "aliases": {
+        "mainnet": "0x49a7cda3a1eecc29",
+        "testnet": "0x324c34e1c517e4db"
+      }
+    },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
@@ -118,7 +132,6 @@
     "FindForgeOrder": "./contracts/FindForgeOrder.cdc",
     "FindRulesCache": "./contracts/FindRulesCache.cdc",
     "FindForgeStruct": "./contracts/FindForgeStruct.cdc",
-    "NFTCatalog": "./contracts/standard/NFTCatalog.cdc",
     "FINDNFTCatalogAdmin": "./contracts/FINDNFTCatalogAdmin.cdc",
     "FindRelatedAccounts": "./contracts/FindRelatedAccounts.cdc",
     "FindViews": "./contracts/FindViews.cdc",
@@ -213,7 +226,9 @@
         "TokenForwarding",
         "FLOAT",
         "GrantedAccountAccess",
-        "DapperStorageRent"
+        "DapperStorageRent",
+        "NFTCatalog",
+        "NFTCatalogAdmin"
       ],
       "emulator-dapper": [
         "DapperUtilityCoin",
