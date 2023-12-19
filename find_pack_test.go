@@ -294,7 +294,7 @@ func TestFindPack(t *testing.T) {
 		packTypeId++
 	})
 
-	t.Run("Should not be able to buy nft if the user doesnt have the float during the whitelist period, but can buy in access(all)lic sale.", func(t *testing.T) {
+	t.Run("Should not be able to buy nft if the user doesnt have the float during the whitelist period, but can buy in public sale.", func(t *testing.T) {
 
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}

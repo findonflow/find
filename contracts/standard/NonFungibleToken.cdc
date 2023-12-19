@@ -222,7 +222,7 @@ access(all) contract NonFungibleToken {
             return nil
         }
 
-        /// Return the default access(all)lic path for the collection
+        /// Return the default public path for the collection
         access(all) view fun getDefaultPublicPath(): PublicPath? {
             return nil
         }

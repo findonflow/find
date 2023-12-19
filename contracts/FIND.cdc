@@ -1459,12 +1459,12 @@ access(all) contract FIND {
         access(contract) var lengthPrices: {Int: UFix64}
         access(contract) var addonPrices: {String: UFix64}
 
-        access(contract) var access(all)licEnabled: Bool
+        access(contract) var publicEnabled: Bool
 
         //map from name to lease for that name
         access(contract) let profiles: { String: NetworkLease}
 
-        init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>, access(all)licEnabled:Bool) {
+        init(leasePeriod: UFix64, lockPeriod: UFix64, secondaryCut: UFix64, defaultPrice: UFix64, lengthPrices: {Int:UFix64}, wallet:Capability<&{FungibleToken.Receiver}>, publicEnabled:Bool) {
             self.leasePeriod=leasePeriod
             self.addonPrices = {
                 "forge" : 50.0 ,    // will have to run transactions on this when update on mainnet.
@@ -2059,7 +2059,7 @@ access(all) contract FIND {
             // Save the vault to storage
             self.account.storage.save(<-vault, to: FUSD.VaultStoragePath)
 
-            // Create a access(all)lic capability for the vault
+            // Create a public capability for the vault
             let vaultCap = self.account.capabilities.storage.issue<&FUSD.Vault>(
                 FUSD.VaultStoragePath
             )
@@ -2069,7 +2069,7 @@ access(all) contract FIND {
             self.account.capabilities.publish(capb, at: /public/fusdBalance)
 
 
-            // Create a access(all)lic Capability to the Vault's Receiver functionality
+            // Create a public Capability to the Vault's Receiver functionality
             let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
                 FUSD.VaultStoragePath
             )
@@ -2087,7 +2087,7 @@ access(all) contract FIND {
             defaultPrice: 5.0,
             lengthPrices: {3: 500.0, 4:100.0},
             wallet: wallet,
-            access(all)licEnabled: false
+            publicEnabled: false
         )
         self.account.storage.save(<-network, to: FIND.NetworkStoragePath)
         //not sure if this last line here is needed

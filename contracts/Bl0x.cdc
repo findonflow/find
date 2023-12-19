@@ -330,7 +330,7 @@ pub contract Bl0x: NonFungibleToken {
 		}
 	}
 
-	// access(all)lic function that anyone can call to create a new empty collection
+	// public function that anyone can call to create a new empty collection
 	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}

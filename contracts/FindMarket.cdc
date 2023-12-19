@@ -67,7 +67,7 @@ pub contract FindMarket {
 		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
-		return PublicPath(identifier: path) ?? panic("Cannot find access(all)lic path for type ".concat(type.identifier))
+		return PublicPath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
 	}
 
 	access(all) getStoragePath(_ type: Type, name:String) : StoragePath {
@@ -75,7 +75,7 @@ pub contract FindMarket {
 		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
-		return StoragePath(identifier: path) ?? panic("Cannot find access(all)lic path for type ".concat(type.identifier))
+		return StoragePath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
 	}
 	access(all) getFindTenantAddress() : Address {
 		return FindMarket.account.address

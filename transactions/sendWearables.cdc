@@ -43,7 +43,7 @@ transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
 	execute {
 		let addresses : {String : Address} = {}
-		let access(all)licPath = Wearables.CollectionPublicPath
+		let publicPath = Wearables.CollectionPublicPath
 
 		let ctx : {String : String} = {
 			"tenant" : "find"
@@ -61,7 +61,7 @@ transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 			}
 
 			// airdrop thru airdropper
-			FindAirdropper.safeAirdrop(pointer: pointer, receiver: user!, path: access(all)licPath, context: ctx, deepValidation: true)
+			FindAirdropper.safeAirdrop(pointer: pointer, receiver: user!, path: publicPath, context: ctx, deepValidation: true)
 		}
 
 	}

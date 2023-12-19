@@ -24,7 +24,7 @@ pub contract FiatToken: FungibleToken {
     // The storage Path for minters' MinterProxy
     access(all) let MinterProxyStoragePath: StoragePath
 
-    // The access(all)lic path for minters' MinterProxy capability
+    // The public path for minters' MinterProxy capability
     access(all) let MinterProxyPublicPath: PublicPath
 
     // Event that is emitted when a new minter resource is created

@@ -25,7 +25,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
-		let access(all)licPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
@@ -66,7 +66,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 					account.unlink(cd.publicPath)
 					account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
 				} else {
-					panic("This collection access(all)lic link is not set up properly.")
+					panic("This collection public link is not set up properly.")
 				}
 			} else {
 				account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)

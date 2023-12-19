@@ -86,11 +86,11 @@ access(all) contract FungibleTokenSwitchboard {
         /// Adds a number of new fungible token receiver capabilities by using
         /// the paths where they are stored.
         ///                    
-        /// @param paths: The paths where the access(all)lic capabilities are stored.
+        /// @param paths: The paths where the public capabilities are stored.
         /// @param address: The address of the owner of the capabilities.
         /// 
         access(all) fun addNewVaultsByPath(paths: [PublicPath], address: Address) {
-            // Get the account where the access(all)lic capabilities are stored
+            // Get the account where the public capabilities are stored
             let owner = getAccount(address)
             // For each path, get the saved capability and store it 
             // into the switchboard's receiver capabilities dictionary
@@ -154,13 +154,13 @@ access(all) contract FungibleTokenSwitchboard {
         /// used to overwrite the types attached to certain capabilities without 
         /// having to remove those capabilities first.
         ///                    
-        /// @param paths: The paths where the access(all)lic capabilities are stored.
+        /// @param paths: The paths where the public capabilities are stored.
         /// @param types: The types of the fungible token to be deposited on each path.
         /// @param address: The address of the owner of the capabilities.
         /// 
         access(all) fun addNewVaultWrappersByPath(paths: [PublicPath], types: [Type], 
                                                                   address: Address) {
-            // Get the account where the access(all)lic capabilities are stored
+            // Get the account where the public capabilities are stored
             let owner = getAccount(address)
             // For each path, get the saved capability and store it 
             // into the switchboard's receiver capabilities dictionary

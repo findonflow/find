@@ -3,7 +3,7 @@ pub contract RelatedAccounts {
 	// The entire contract is deprecated
 
 	pub let storagePath: StoragePath
-	pub let access(all)licPath: PublicPath
+	pub let publicPath: PublicPath
 
 	// Deprecated
 	pub event RelatedFlowAccountAdded()

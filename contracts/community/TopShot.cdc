@@ -57,10 +57,10 @@ pub contract TopShot: NonFungibleToken {
                 case Type<MetadataViews.NFTCollectionData>():
                     return MetadataViews.NFTCollectionData(
                         storagePath: /storage/MomentCollection,
-                        access(all)licPath: /public/MomentCollection,
+                        publicPath: /public/MomentCollection,
                         providerPath: /private/MomentCollection,
-                        access(all)licCollection: Type<&TopShot.Collection{TopShot.MomentCollectionPublic}>(),
-                        access(all)licLinkedType: Type<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
+                        publicCollection: Type<&TopShot.Collection{TopShot.MomentCollectionPublic}>(),
+                        publicLinkedType: Type<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
                         providerLinkedType: Type<&TopShot.Collection{NonFungibleToken.Provider,TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
                         createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                             return <-TopShot.createEmptyCollection()
@@ -236,7 +236,7 @@ pub contract TopShot: NonFungibleToken {
         // Put a new Collection in storage
         self.account.storage.save<@Collection>(<- create Collection(), to: /storage/MomentCollection)
 
-        // Create a access(all)lic capability for the Collection
+        // Create a public capability for the Collection
         self.account.link<&{MomentCollectionPublic}>(/public/MomentCollection, target: /storage/MomentCollection)
 
         emit ContractInitialized()

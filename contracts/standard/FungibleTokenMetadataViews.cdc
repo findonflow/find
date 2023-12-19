@@ -109,16 +109,16 @@ access(all) contract FungibleTokenMetadataViews {
 
     /// View to expose the information needed store and interact with a FT vault.
     /// This can be used by applications to setup a FT vault with proper 
-    /// storage and access(all)lic capabilities.
+    /// storage and public capabilities.
     ///
     access(all) struct FTVaultData {
         /// Path in storage where this FT vault is recommended to be stored.
         access(all) let storagePath: StoragePath
 
-        /// Public path which must be linked to expose the access(all)lic receiver capability.
+        /// Public path which must be linked to expose the public receiver capability.
         access(all) let receiverPath: PublicPath
 
-        /// Public path which must be linked to expose the balance and resolver access(all)lic capabilities.
+        /// Public path which must be linked to expose the balance and resolver public capabilities.
         access(all) let metadataPath: PublicPath
 
         /// Private path which should be linked to expose the provider capability to withdraw funds 
@@ -152,8 +152,8 @@ access(all) contract FungibleTokenMetadataViews {
             createEmptyVaultFunction: fun(): @{FungibleToken.Vault}
         ) {
             pre {
-                receiverLinkedType.isSubtype(of: Type<&{FungibleToken.Receiver}>()): "Receiver access(all)lic type must include FungibleToken.Receiver."
-                metadataLinkedType.isSubtype(of: Type<&{ViewResolver.Resolver}>()): "Metadata access(all)lic type must include ViewResolver.Resolver interfaces."
+                receiverLinkedType.isSubtype(of: Type<&{FungibleToken.Receiver}>()): "Receiver public type must include FungibleToken.Receiver."
+                metadataLinkedType.isSubtype(of: Type<&{ViewResolver.Resolver}>()): "Metadata public type must include ViewResolver.Resolver interfaces."
                 providerLinkedType.isSubtype(of: Type<&{FungibleToken.Provider}>()): "Provider type must include FungibleToken.Provider interface."
             }
             self.storagePath = storagePath

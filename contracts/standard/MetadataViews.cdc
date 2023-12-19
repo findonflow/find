@@ -140,8 +140,8 @@ access(all) contract MetadataViews {
         access(all) let mediaType: String
 
         view init(file: {File}, mediaType: String) {
-          self.file=file
-          self.mediaType=mediaType
+            self.file=file
+            self.mediaType=mediaType
         }
     }
 
@@ -595,15 +595,15 @@ access(all) contract MetadataViews {
 
     /// View to expose the information needed store and retrieve an NFT.
     /// This can be used by applications to setup a NFT collection with proper
-    /// storage and access(all)lic capabilities.
+    /// storage and public capabilities.
     ///
     access(all) struct NFTCollectionData {
         /// Path in storage where this NFT is recommended to be stored.
         access(all) let storagePath: StoragePath
 
-        /// Public path which must be linked to expose access(all)lic capabilities of this NFT
+        /// Public path which must be linked to expose public capabilities of this NFT
         /// including standard NFT interfaces and metadataviews interfaces
-        access(all) let access(all)licPath: PublicPath
+        access(all) let publicPath: PublicPath
 
         /// Private path which should be linked to expose the provider
         /// capability to withdraw NFTs from the collection holding NFTs
@@ -612,12 +612,12 @@ access(all) contract MetadataViews {
         /// Public collection type that is expected to provide sufficient read-only access to standard
         /// functions (deposit + getIDs + borrowNFT). For new
         /// collections, this may be set to be equal to the type specified in `publicLinkedType`.
-        access(all) let access(all)licCollection: Type
+        access(all) let publicCollection: Type
 
-        /// Type that should be linked at the aforementioned access(all)lic path. This is normally a
+        /// Type that should be linked at the aforementioned public path. This is normally a
         /// restricted type with many interfaces. Notably the
         /// `NFT.Receiver`, and `ViewResolver.ResolverCollection` interfaces are required.
-        access(all) let access(all)licLinkedType: Type
+        access(all) let publicLinkedType: Type
 
         /// Type that should be linked at the aforementioned private path. This is normally
         /// a restricted type with at a minimum the `NFT.Provider` interface
@@ -629,15 +629,15 @@ access(all) contract MetadataViews {
 
         view init(
             storagePath: StoragePath,
-            access(all)licPath: PublicPath,
+            publicPath: PublicPath,
             providerPath: PrivatePath,
-            access(all)licCollection: Type,
-            access(all)licLinkedType: Type,
+            publicCollection: Type,
+            publicLinkedType: Type,
             providerLinkedType: Type,
             createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection}
         ) {
             pre {
-                access(all)licLinkedType.isSubtype(of: Type<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>()): "Public type must include NonFungibleToken.Receiver and ViewResolver.ResolverCollection interfaces."
+                publicLinkedType.isSubtype(of: Type<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>()): "Public type must include NonFungibleToken.Receiver and ViewResolver.ResolverCollection interfaces."
                 providerLinkedType.isSubtype(of: Type<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>()): "Provider type must include NonFungibleToken.Provider and ViewResolver.ResolverCollection interface."
             }
             self.storagePath=storagePath

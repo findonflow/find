@@ -5,7 +5,7 @@ import MetadataViews from "./MetadataViews.cdc"
 // A general purpose NFT registry for Flow NonFungibleTokens.
 //
 // Each catalog entry stores data about the NFT including
-// its collection identifier, nft type, storage and access(all)lic paths, etc.
+// its collection identifier, nft type, storage and public paths, etc.
 //
 // To make an addition to the catalog you can propose an NFT and provide its metadata.
 // An Admin can approve a proposal which would add the NFT to the catalog
@@ -19,9 +19,9 @@ access(all) contract NFTCatalog {
         contractAddress : Address,
         nftType : Type,
         storagePath: StoragePath,
-        access(all)licPath: PublicPath,
+        publicPath: PublicPath,
         privatePath: PrivatePath,
-        access(all)licLinkedType : Type,
+        publicLinkedType : Type,
         privateLinkedType : Type,
         displayName : String,
         description: String,
@@ -36,9 +36,9 @@ access(all) contract NFTCatalog {
         contractAddress : Address,
         nftType : Type,
         storagePath: StoragePath,
-        access(all)licPath: PublicPath,
+        publicPath: PublicPath,
         privatePath: PrivatePath,
-        access(all)licLinkedType : Type,
+        publicLinkedType : Type,
         privateLinkedType : Type,
         displayName : String,
         description: String,
@@ -101,22 +101,22 @@ access(all) contract NFTCatalog {
     access(all) struct NFTCollectionData {
 
         access(all) let storagePath : StoragePath
-        access(all) let access(all)licPath : PublicPath
+        access(all) let publicPath : PublicPath
         access(all) let privatePath: PrivatePath
-        access(all) let access(all)licLinkedType: Type
+        access(all) let publicLinkedType: Type
         access(all) let privateLinkedType: Type
 
         init(
             storagePath : StoragePath,
-            access(all)licPath : PublicPath,
+            publicPath : PublicPath,
             privatePath : PrivatePath,
-            access(all)licLinkedType : Type,
+            publicLinkedType : Type,
             privateLinkedType : Type
         ) {
             self.storagePath = storagePath
-            self.publicPath = access(all)licPath
+            self.publicPath = publicPath
             self.privatePath = privatePath
-            self.publicLinkedType = access(all)licLinkedType
+            self.publicLinkedType = publicLinkedType
             self.privateLinkedType = privateLinkedType
         }
     }
@@ -245,9 +245,9 @@ access(all) contract NFTCatalog {
             contractAddress : metadata.contractAddress,
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
-            access(all)licPath: metadata.collectionData.publicPath,
+            publicPath: metadata.collectionData.publicPath,
             privatePath: metadata.collectionData.privatePath,
-            access(all)licLinkedType : metadata.collectionData.publicLinkedType,
+            publicLinkedType : metadata.collectionData.publicLinkedType,
             privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,
@@ -274,9 +274,9 @@ access(all) contract NFTCatalog {
             contractAddress : metadata.contractAddress,
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
-            access(all)licPath: metadata.collectionData.publicPath,
+            publicPath: metadata.collectionData.publicPath,
             privatePath: metadata.collectionData.privatePath,
-            access(all)licLinkedType : metadata.collectionData.publicLinkedType,
+            publicLinkedType : metadata.collectionData.publicLinkedType,
             privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,

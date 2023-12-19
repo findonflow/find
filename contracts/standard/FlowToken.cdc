@@ -69,7 +69,7 @@ access(all) contract FlowToken: ViewResolver {
             return /storage/flowTokenVault
         }
 
-        /// Returns the access(all)lic path where this vault should have a access(all)lic capability
+        /// Returns the public path where this vault should have a public capability
         access(all) view fun getDefaultPublicPath(): PublicPath? {
             return /public/flowTokenReceiver
         }
@@ -299,13 +299,13 @@ access(all) contract FlowToken: ViewResolver {
 
         adminAccount.storage.save(<-vault, to: /storage/flowTokenVault)
 
-        // Create a access(all)lic capability to the stored Vault that only exposes
+        // Create a public capability to the stored Vault that only exposes
         // the  method through the  interface
         //
         let receiverCapability = adminAccount.capabilities.storage.issue<&FlowToken.Vault>(/storage/flowTokenVault)
         adminAccount.capabilities.publish(receiverCapability, at: /public/flowTokenReceiver)
 
-        // Create a access(all)lic capability to the stored Vault that only exposes
+        // Create a public capability to the stored Vault that only exposes
         // the  field through the  interface
         //
         let balanceCapability = adminAccount.capabilities.storage.issue<&FlowToken.Vault>(/storage/flowTokenVault)

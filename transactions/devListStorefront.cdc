@@ -24,7 +24,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
             // save it to the account
             acct.save(<-storefront, to: NFTStorefront.StorefrontStoragePath)
 
-            // create a access(all)lic capability for the .Storefront
+            // create a public capability for the .Storefront
             acct.link<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath, target: NFTStorefront.StorefrontStoragePath)
         }
 

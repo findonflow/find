@@ -32,7 +32,7 @@ pub struct MetadataCollectionItem {
 
 access(all) main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
 
-	let access(all)licPath = getPublicPath(aliasOrIdentifier)
+	let publicPath = getPublicPath(aliasOrIdentifier)
 
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return nil}

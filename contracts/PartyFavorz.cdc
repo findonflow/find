@@ -278,7 +278,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		}
 	}
 
-	// access(all)lic function that anyone can call to create a new empty collection
+	// public function that anyone can call to create a new empty collection
 	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
@@ -337,7 +337,7 @@ pub contract PartyFavorz: NonFungibleToken {
 		let collection <- create Collection()
 		self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-		// create a access(all)lic capability for the collection
+		// create a public capability for the collection
 		self.account.link<&PartyFavorz.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath

@@ -228,7 +228,7 @@ access(all) contract FindForgeOrder {
 	}
 
 
-	// access(all)lic function that anyone can call to create a new empty collection
+	// public function that anyone can call to create a new empty collection
 	access(all) fun createEmptyCollection(): @{FindForgeOrder.OrderCollection} {
 		return <- create Collection()
 	}
@@ -248,7 +248,7 @@ access(all) contract FindForgeOrder {
 		let queuedCollection <- create Collection()
 		self.account.storage.save(<-queuedCollection, to: self.QueuedCollectionStoragePath)
 
-		// create a access(all)lic capability for the collection
+		// create a public capability for the collection
 		let cap = self.account.capabilities.storage.issue<&{FindForgeOrder.OrderCollection}>(self.QueuedCollectionStoragePath)
 		self.account.capabilities.publish(cap, at: self.QueuedCollectionPublicPath)
 
@@ -256,7 +256,7 @@ access(all) contract FindForgeOrder {
 		let completedCollection <- create Collection()
 		self.account.storage.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
 
-		// create a access(all)lic capability for the collection
+		// create a public capability for the collection
 		let cap2 = self.account.capabilities.storage.issue<&{FindForgeOrder.OrderCollection}>(self.CompletedCollectionStoragePath)
 		self.account.capabilities.publish(cap2, at: self.CompletedCollectionPublicPath)
 	}

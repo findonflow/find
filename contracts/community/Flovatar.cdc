@@ -112,7 +112,7 @@ pub contract Flovatar: NonFungibleToken {
         }
     }
 
-    // The access(all)lic interface can show metadata and the content for the Flovatar.
+    // The public interface can show metadata and the content for the Flovatar.
     // In addition to it, it provides methods to access the additional optional
     // components (accessory, hat, eyeglasses, background) for everyone.
     access(all) resource interface Public {
@@ -529,10 +529,10 @@ pub contract Flovatar: NonFungibleToken {
             if type == Type<MetadataViews.NFTCollectionData>() {
                 return MetadataViews.NFTCollectionData(
                 storagePath: Flovatar.CollectionStoragePath,
-                access(all)licPath: Flovatar.CollectionPublicPath,
+                publicPath: Flovatar.CollectionPublicPath,
                 providerPath: /private/FlovatarCollection,
-                access(all)licCollection: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
-                access(all)licLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                publicCollection: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                publicLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
                 providerLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Flovatar.createEmptyCollection()}
                 )
@@ -639,7 +639,7 @@ pub contract Flovatar: NonFungibleToken {
         }
     }
 
-    // access(all)lic function that anyone can call to create a new empty collection
+    // public function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
@@ -812,7 +812,7 @@ pub contract Flovatar: NonFungibleToken {
     }
 
 
-    // This is a access(all)lic function that anyone can call to generate a new Flovatar
+    // This is a public function that anyone can call to generate a new Flovatar
     // A list of components resources needs to be passed to executed.
     // It will check first for uniqueness of the combination + name and will then
     // generate the Flovatar and burn all the passed components.

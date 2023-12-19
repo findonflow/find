@@ -8,7 +8,7 @@ access(all) main(user: String) : {String : [UInt64]} {
 		var resultMap : {String : [UInt64]} = {}
 		let account = getAccount(address)
 		for nftInfo in FINDNFTCatalog.getCatalog().values {
-			let access(all)licPath = nftInfo.collectionData.publicPath
+			let publicPath = nftInfo.collectionData.publicPath
 
 			if let subCollections = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftInfo.nftType.identifier) {
 				if subCollections.length < 1 {

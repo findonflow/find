@@ -44,7 +44,7 @@ func main() {
 				panic(err)
 			}
 		// Remove old Dandy from FIND NFT Catalog
-		//panic: the interaction 'adminRemoveNFTCatalog' has the following extra arguments [addressWithNFT nftID access(all)licPathIdentifier contractName contractAddress]
+		//panic: the interaction 'adminRemoveNFTCatalog' has the following extra arguments [addressWithNFT nftID publicPathIdentifier contractName contractAddress]
 
 		// Add Dandy to FIND NFT Catalog
 		o.Tx("adminRemoveNFTCatalog",

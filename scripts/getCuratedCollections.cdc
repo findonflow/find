@@ -6,7 +6,7 @@ access(all) main(address: Address) : &{String: [String]}? {
 		return nil
 	}
 
-	let access(all)licPath=/public/FindCuratedCollections
+	let publicPath=/public/FindCuratedCollections
 	let link = account.getCapability<&{String: [String]}>(publicPath)
 	if link.check() {
 		return link.borrow()

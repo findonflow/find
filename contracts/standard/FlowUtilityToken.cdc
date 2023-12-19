@@ -59,7 +59,7 @@ access(all) contract FlowUtilityToken: ViewResolver  {
         access(all) var balance: UFix64
 
         access(self) var storagePath: StoragePath
-        access(self) var access(all)licPath: PublicPath
+        access(self) var publicPath: PublicPath
         access(self) var receiverPath: PublicPath
 
         /// Returns the storage path where the vault should typically be stored
@@ -67,12 +67,12 @@ access(all) contract FlowUtilityToken: ViewResolver  {
             return self.storagePath
         }
 
-        /// Returns the access(all)lic path where this vault should have a access(all)lic capability
+        /// Returns the public path where this vault should have a public capability
         access(all) view fun getDefaultPublicPath(): PublicPath? {
             return self.publicPath
         }
 
-        /// Returns the access(all)lic path where this vault's Receiver should have a access(all)lic capability
+        /// Returns the public path where this vault's Receiver should have a public capability
         access(all) view fun getDefaultReceiverPath(): PublicPath? {
             return self.receiverPath
         }
@@ -320,12 +320,12 @@ access(all) contract FlowUtilityToken: ViewResolver  {
         self.account.storage.save(<-tokenVault, to: /storage/flowUtilityTokenVault)
         destroy minter
 
-        // Create a access(all)lic capability to the stored Vault that only exposes
+        // Create a public capability to the stored Vault that only exposes
         // the `balance` field through the `Balance` interface
         let vaultCap = self.account.capabilities.storage.issue<&Vault>(/storage/flowUtilityTokenVault)
         self.account.capabilities.publish(vaultCap, at: /public/flowUtilityTokenBalance)
 
-        // Create a access(all)lic capability to the stored Vault that only exposes
+        // Create a public capability to the stored Vault that only exposes
         // the `deposit` method through the `Receiver` interface
         let recieverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenVault)
         self.account.capabilities.publish(recieverCap, at: /public/flowUtilityTokenReceiver)

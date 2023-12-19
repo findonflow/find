@@ -97,7 +97,7 @@ pub contract NFTStorefrontV2 {
     access(all) let StorefrontStoragePath: StoragePath
 
     /// StorefrontPublicPath
-    /// The access(all)lic location for a Storefront link.
+    /// The public location for a Storefront link.
     access(all) let StorefrontPublicPath: PublicPath
 
 
@@ -218,7 +218,7 @@ pub contract NFTStorefrontV2 {
 
 
     /// ListingPublic
-    /// An interface providing a useful access(all)lic interface to a Listing.
+    /// An interface providing a useful public interface to a Listing.
     ///
     access(all) resource interface ListingPublic {
         /// borrowNFT
@@ -765,7 +765,7 @@ pub contract NFTStorefrontV2 {
     }
 
     /// createStorefront
-    /// Make creating a Storefront access(all)licly accessible.
+    /// Make creating a Storefront publicly accessible.
     ///
     access(all) createStorefront(): @Storefront {
         return <-create Storefront()

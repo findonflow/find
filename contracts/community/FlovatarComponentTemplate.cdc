@@ -32,7 +32,7 @@ pub contract FlovatarComponentTemplate {
     access(all) event ContractInitialized()
     access(all) event Created(id: UInt64, name: String, category: String, color: String, maxMintableComponents: UInt64)
 
-    // The access(all)lic interface providing the SVG and all the other 
+    // The public interface providing the SVG and all the other 
     // metadata like name, category, color, series, description and 
     // the maximum mintable Components
     access(all) resource interface Public {
@@ -47,7 +47,7 @@ pub contract FlovatarComponentTemplate {
         access(all) let rarity: String
     }
 
-    // The Component resource implementing the access(all)lic interface as well
+    // The Component resource implementing the public interface as well
     access(all) resource ComponentTemplate: Public {
         access(all) let id: UInt64
         access(all) let name: String

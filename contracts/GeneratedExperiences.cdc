@@ -152,10 +152,10 @@ pub contract GeneratedExperiences: NonFungibleToken {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
                     storagePath: GeneratedExperiences.CollectionStoragePath,
-                    access(all)licPath: GeneratedExperiences.CollectionPublicPath,
+                    publicPath: GeneratedExperiences.CollectionPublicPath,
                     providerPath: GeneratedExperiences.CollectionPrivatePath,
-                    access(all)licCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    access(all)licLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
                     providerLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-GeneratedExperiences.createEmptyCollection()
@@ -261,7 +261,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    // access(all)lic function that anyone can call to create a new empty collection
+    // public function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
@@ -323,7 +323,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-        // create a access(all)lic capability for the collection
+        // create a public capability for the collection
         self.account.link<&GeneratedExperiences.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath

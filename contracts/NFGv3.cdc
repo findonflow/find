@@ -123,10 +123,10 @@ pub contract NFGv3: NonFungibleToken {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
                     storagePath: NFGv3.CollectionStoragePath,
-                    access(all)licPath: NFGv3.CollectionPublicPath,
+                    publicPath: NFGv3.CollectionPublicPath,
                     providerPath: NFGv3.CollectionPrivatePath,
-                    access(all)licCollection: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    access(all)licLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicCollection: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
                     providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-NFGv3.createEmptyCollection()
@@ -220,7 +220,7 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    // access(all)lic function that anyone can call to create a new empty collection
+    // public function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
@@ -269,7 +269,7 @@ pub contract NFGv3: NonFungibleToken {
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-        // create a access(all)lic capability for the collection
+        // create a public capability for the collection
         self.account.link<&NFGv3.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath

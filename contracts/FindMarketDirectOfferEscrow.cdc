@@ -39,7 +39,7 @@ pub contract FindMarketDirectOfferEscrow {
 				panic("Bidder unlinked bid collection capability. Bidder Address : ".concat(self.offerCallback.address.toString()))
 			}
 			let pointer= self.pointer as! FindViews.AuthNFTPointer
-			let access(all)licPath = pointer.getNFTCollectionData().publicPath
+			let publicPath = pointer.getNFTCollectionData().publicPath
 			let vault <- self.offerCallback.borrow()!.accept(<- pointer.withdraw(), path:publicPath)
 			return <- vault
 		}

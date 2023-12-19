@@ -176,11 +176,11 @@ pub contract Flowty {
     access(all) let FlowtyMarketplaceStoragePath: StoragePath
 
     // FlowtyStorefrontPublicPath
-    // The access(all)lic location for a FlowtyStorefront link.
+    // The public location for a FlowtyStorefront link.
     access(all) let FlowtyStorefrontPublicPath: PublicPath
 
     // FlowtyMarketplacePublicPath
-    // The access(all)lic location for a FlowtyMarketplace link.
+    // The public location for a FlowtyMarketplace link.
     access(all) let FlowtyMarketplacePublicPath: PublicPath
 
     // FlowtyAdminStoragePath
@@ -192,11 +192,11 @@ pub contract Flowty {
     access(all) let FusdVaultStoragePath: StoragePath
 
     // FusdReceiverPublicPath
-    // The access(all)lic location for a FUSD Receiver link.
+    // The public location for a FUSD Receiver link.
     access(all) let FusdReceiverPublicPath: PublicPath
 
     // FusdBalancePublicPath
-    // The access(all)lic location for a FUSD Balance link.
+    // The public location for a FUSD Balance link.
     access(all) let FusdBalancePublicPath: PublicPath
 
     // ListingFee
@@ -351,7 +351,7 @@ pub contract Flowty {
     }
 
     // ListingPublic
-    // An interface providing a useful access(all)lic interface to a Listing.
+    // An interface providing a useful public interface to a Listing.
     //
     access(all) resource interface ListingPublic {
         // borrowNFT
@@ -400,7 +400,7 @@ pub contract Flowty {
         // way that it claims.
         access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
-        // A capability allowing this resource to access the owner's NFT access(all)lic collection 
+        // A capability allowing this resource to access the owner's NFT public collection 
         access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>
 
 
@@ -422,7 +422,7 @@ pub contract Flowty {
 
         // getDetails
         // Get the details of the current state of the Listing as a struct.
-        // This avoids having more access(all)lic variables and getter methods for them, and plays
+        // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
         access(all) getDetails(): ListingDetails {
@@ -677,7 +677,7 @@ pub contract Flowty {
     }
 
     // FundingPublic
-    // An interface providing a useful access(all)lic interface to a Funding.
+    // An interface providing a useful public interface to a Funding.
     //
     access(all) resource interface FundingPublic {
 
@@ -713,10 +713,10 @@ pub contract Flowty {
         access(self) let details: FundingDetails
         access(self) let listingDetails: ListingDetails
 
-        // A capability allowing this resource to access the owner's NFT access(all)lic collection 
+        // A capability allowing this resource to access the owner's NFT public collection 
         access(contract) let ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
-        // A capability allowing this resource to access the lender's NFT access(all)lic collection 
+        // A capability allowing this resource to access the lender's NFT public collection 
         access(contract) let lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // The receiver for the repayment.
@@ -733,7 +733,7 @@ pub contract Flowty {
 
         // getDetails
         // Get the details of the current state of the Listing as a struct.
-        // This avoids having more access(all)lic variables and getter methods for them, and plays
+        // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
         access(all) getDetails(): FundingDetails {
@@ -1321,7 +1321,7 @@ pub contract Flowty {
     }
 
     // createStorefront
-    // Make creating a FlowtyStorefront access(all)licly accessible.
+    // Make creating a FlowtyStorefront publicly accessible.
     //
     access(all) createStorefront(): @FlowtyStorefront {
         return <-create FlowtyStorefront()
@@ -1396,7 +1396,7 @@ pub contract Flowty {
         let marketplace <- create FlowtyMarketplace()
 
         self.account.storage.save(<-marketplace, to: self.FlowtyMarketplaceStoragePath) 
-        // create a access(all)lic capability for the .Marketplace
+        // create a public capability for the .Marketplace
         self.account.link<&Flowty.FlowtyMarketplace{Flowty.FlowtyMarketplacePublic}>(Flowty.FlowtyMarketplacePublicPath, target: Flowty.FlowtyMarketplaceStoragePath)
 
         // FlowtyAdmin

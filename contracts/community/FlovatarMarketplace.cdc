@@ -40,7 +40,7 @@ pub contract FlovatarMarketplace {
     access(all) event FlovatarComponentSaleWithdrawn(tokenId: UInt64, address: Address)
 
     // Interface that users will access(all)lish for their Sale collection
-    // that only exposes the methods that are supposed to be access(all)lic
+    // that only exposes the methods that are supposed to be public
     access(all) resource interface SalePublic {
         access(all) purchaseFlovatar(tokenId: UInt64, recipientCap: Capability<&{Flovatar.CollectionPublic}>, buyTokens: @FungibleToken.Vault)
         access(all) purchaseFlovatarComponent(tokenId: UInt64, recipientCap: Capability<&{FlovatarComponent.CollectionPublic}>, buyTokens: @FungibleToken.Vault)

@@ -186,7 +186,7 @@ pub contract DapperStorageRent {
   }
 
   /// cleanExpiredRefilledAccounts
-  /// access(all)lic method to clean up expired accounts based on current block height
+  /// public method to clean up expired accounts based on current block height
   ///
   /// @param batchSize: Int to set the batch size of the cleanup
   access(all) cleanExpiredRefilledAccounts(_ batchSize: Int) {

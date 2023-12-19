@@ -80,7 +80,7 @@ pub contract NFTStorefront {
     access(all) let StorefrontStoragePath: StoragePath
 
     // StorefrontPublicPath
-    // The access(all)lic location for a Storefront link.
+    // The public location for a Storefront link.
     access(all) let StorefrontPublicPath: PublicPath
 
 
@@ -176,7 +176,7 @@ pub contract NFTStorefront {
 
 
     // ListingPublic
-    // An interface providing a useful access(all)lic interface to a Listing.
+    // An interface providing a useful public interface to a Listing.
     //
     access(all) resource interface ListingPublic {
         // borrowNFT
@@ -227,7 +227,7 @@ pub contract NFTStorefront {
 
         // getDetails
         // Get the details of the current state of the Listing as a struct.
-        // This avoids having more access(all)lic variables and getter methods for them, and plays
+        // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources). 
         //
         access(all) getDetails(): ListingDetails {
@@ -494,7 +494,7 @@ pub contract NFTStorefront {
     }
 
     // createStorefront
-    // Make creating a Storefront access(all)licly accessible.
+    // Make creating a Storefront publicly accessible.
     //
     access(all) createStorefront(): @Storefront {
         return <-create Storefront()

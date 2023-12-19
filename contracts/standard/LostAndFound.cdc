@@ -223,7 +223,7 @@ pub contract LostAndFound {
         }
 
         // deposit a ticket to this bin. The item type must match this bin's item type.
-        // this function is not access(all)lic because if it were there would be a way to get around
+        // this function is not public because if it were there would be a way to get around
         // deposit fees
         access(contract) fun deposit(ticket: @LostAndFound.Ticket) {
             pre {

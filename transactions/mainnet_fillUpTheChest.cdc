@@ -23,7 +23,7 @@ transaction() {
 	execute {
 
 		let recipient: Address = 0x936851d3e331acd4
-		// Get the recipient's access(all)lic account object
+		// Get the recipient's public account object
 		let recipientAccount = getAccount(recipient)
 
 		// Get a reference to the recipient's Receiver

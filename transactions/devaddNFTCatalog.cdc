@@ -9,7 +9,7 @@ transaction(
     contractAddress: Address,
     addressWithNFT: Address,
     nftID: UInt64,
-    access(all)licPathIdentifier: String
+    publicPathIdentifier: String
 ) {
 
     let adminResource: &NFTCatalogAdmin.Admin
@@ -21,7 +21,7 @@ transaction(
     execute {
 
         let nftAccount = getAccount(addressWithNFT)
-        let access(all)Path = PublicPath(identifier: access(all)licPathIdentifier)!
+        let access(all)Path = PublicPath(identifier: publicPathIdentifier)!
         let collectionCap = nftAccount.capabilities.get<&{ViewResolver.ResolverCollection}>(pubPath)!
         assert(collectionCap.check(), message: "MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
         let collectionRef = collectionCap.borrow()!
@@ -38,9 +38,9 @@ transaction(
 
         let collectionData = NFTCatalog.NFTCollectionData(
             storagePath: metadataCollectionData.storagePath,
-            access(all)licPath: metadataCollectionData.publicPath,
+            publicPath: metadataCollectionData.publicPath,
             privatePath: metadataCollectionData.providerPath,
-            access(all)licLinkedType : metadataCollectionData.publicLinkedType,
+            publicLinkedType : metadataCollectionData.publicLinkedType,
             privateLinkedType : metadataCollectionData.providerLinkedType
         )
 

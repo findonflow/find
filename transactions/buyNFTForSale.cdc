@@ -20,7 +20,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 
 		let tenant = tenantCapability.borrow()!
-		let access(all)licPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)

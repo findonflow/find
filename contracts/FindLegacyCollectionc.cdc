@@ -1547,7 +1547,7 @@ if results.keys.length == 0 {
 	return nil
 }
 
-let access(all)licPath=/public/FindCuratedCollections
+let publicPath=/public/FindCuratedCollections
 let link = account.getCapability<&{String: [String]}>(publicPath)
 var curatedCollections : {String: [String]} = {}
 if link.check() {

@@ -27,7 +27,7 @@ pub contract FlovatarComponent: NonFungibleToken {
     access(all) event Created(id: UInt64, templateId: UInt64, mint: UInt64)
     access(all) event Destroyed(id: UInt64, templateId: UInt64)
 
-    // The access(all)lic interface provides all the basic informations about
+    // The public interface provides all the basic informations about
     // the Component and also the Template ID associated with it.
     access(all) resource interface Public {
         access(all) let id: UInt64
@@ -222,10 +222,10 @@ pub contract FlovatarComponent: NonFungibleToken {
             if type == Type<MetadataViews.NFTCollectionData>() {
                 return MetadataViews.NFTCollectionData(
                 storagePath: FlovatarComponent.CollectionStoragePath,
-                access(all)licPath: FlovatarComponent.CollectionPublicPath,
+                publicPath: FlovatarComponent.CollectionPublicPath,
                 providerPath: /private/FlovatarComponentCollection,
-                access(all)licCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
-                access(all)licLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                publicCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                publicLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
                 providerLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- FlovatarComponent.createEmptyCollection()}
                 )
@@ -320,7 +320,7 @@ pub contract FlovatarComponent: NonFungibleToken {
         }
     }
 
-    // access(all)lic function that anyone can call to create a new empty collection
+    // public function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }

@@ -276,7 +276,7 @@ pub contract FlowtyRentals {
     }
 
     // ListingPublic
-    // An inerface providing a useful access(all)lic interface to a listing
+    // An inerface providing a useful public interface to a listing
     //
     access(all) resource interface ListingPublic {
         // borrowNFT
@@ -328,7 +328,7 @@ pub contract FlowtyRentals {
         // way that it claims.
         access(contract) let nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
-        // A capability allowing this resource to access the owner's NFT access(all)lic collection
+        // A capability allowing this resource to access the owner's NFT public collection
         access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // reference to the owner's fungibleTokenReceiver to pay them in the event of a settlement.
@@ -351,7 +351,7 @@ pub contract FlowtyRentals {
 
         // getDetails
         // Get the details of the current state of the Listing as a struct.
-        // This avoids having more access(all)lic variables and getter methods for them, and plays
+        // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
         access(all) getDetails(): ListingDetails {
@@ -610,7 +610,7 @@ pub contract FlowtyRentals {
     }
 
     // RentalPublic
-    // An interface providing a useful access(all)lic interface to a Rental.
+    // An interface providing a useful public interface to a Rental.
     //
     access(all) resource interface RentalPublic {
         // The entry point method to return a rental.

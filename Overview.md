@@ -54,7 +54,7 @@ addons - .find leases can support add ons to the name itself.
 	// lookupAddress look up the address of a find name, and return the owner if there is one (and if the lease is still valid / active)
 	access(all) lookupAddress(_ name:String): Address?
 
-	// lookup looks up the find name owner's profile access(all)lic interface if there is one
+	// lookup looks up the find name owner's profile public interface if there is one
 	access(all) lookup(_ input:String): &{Profile.Public}?
 
 	// reverse lookup looks up the address for the user's find name
@@ -559,7 +559,7 @@ The configuration enables us to add as many more as we want on top
 		access(all) getFindTenantAddress() : Address
 
 
-		// access(all)lic function to get tenant referece with access(all)lic interface
+		// public function to get tenant referece with public interface
 		// the tenant reference and address are vital to do market operations on that particular tenant
 		access(all) getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic}
 	}
@@ -593,7 +593,7 @@ pub contract FindMarketSale {
 		access(contract) let totalRoyalties: UFix64
 	}
 
-	// This is a access(all)lic interface that expose needed information and required function to execute market interaction.
+	// This is a public interface that expose needed information and required function to execute market interaction.
 	pub resource interface SaleItemCollectionPublic {
 		// fetch all the tokens in the collection
 		access(all) getIds(): [UInt64]
@@ -963,7 +963,7 @@ pub contract FindThoughts {
 		access(all) getHide() : Bool
 	}
 
-	// CollectionPublic interface exposes below functions to the access(all)lic
+	// CollectionPublic interface exposes below functions to the public
 	pub resource interface CollectionPublic {
 		access(all) contains(_ id: UInt64) : Bool
 		access(all) getIDs() : [UInt64]

@@ -43,8 +43,8 @@ pub struct NFTContractData {
 	pub let name: String
 	pub let address: Address
 	pub let storage_path: String
-	pub let access(all)lic_path: String
-	pub let access(all)lic_collection_name: String
+	pub let public_path: String
+	pub let public_collection_name: String
 	pub let external_domain: String
 
 	init(
@@ -58,8 +58,8 @@ pub struct NFTContractData {
 		self.name = name
 		self.address = address
 		self.storage_path = storage_path
-		self.public_path = access(all)lic_path
-		self.public_collection_name = access(all)lic_collection_name
+		self.public_path = public_path
+		self.public_collection_name = public_collection_name
 		self.external_domain = external_domain
 	}
 }
