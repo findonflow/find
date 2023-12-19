@@ -2733,7 +2733,7 @@ func (otu *OverflowTestUtils) mintPack(minter string, packTypeId uint64, input [
 		WithArg("contractAddress", "find"),
 		WithArg("addressWithNFT", "find"),
 		WithArg("nftID", res),
-		WithArg("publicPathIdentifier", access(all)licPathIdentifier),
+		WithArg("publicPathIdentifier", publicPathIdentifier),
 	).
 		AssertSuccess(otu.T)
 
