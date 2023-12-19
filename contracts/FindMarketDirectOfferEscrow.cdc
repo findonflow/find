@@ -10,7 +10,7 @@ import Profile from "./Profile.cdc"
 
 access(all) contract FindMarketDirectOfferEscrow {
 
-	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
+	access(all) event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 
 	access(all) resource SaleItem : FindMarket.SaleItem {

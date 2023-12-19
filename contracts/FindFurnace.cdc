@@ -5,7 +5,7 @@ import FIND from "./FIND.cdc"
 
 access(all) contract FindFurnace {
 
-	pub event Burned(from: Address, fromName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String})
+	access(all) event Burned(from: Address, fromName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String})
 
 	access(all) burn(pointer: FindViews.AuthNFTPointer, context: {String : String}) {
 		if !pointer.valid() {

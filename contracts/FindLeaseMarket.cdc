@@ -17,11 +17,11 @@ access(all) contract FindLeaseMarket {
 	access(contract) let  marketBidTypes : [Type]
 	access(contract) let  marketBidCollectionTypes : [Type]
 
-	pub event RoyaltyPaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo)
-	pub event RoyaltyCouldNotBePaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo, residualAddress: Address)
-	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
-	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
-	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], listingTypes:[String], status:String)
+	access(all) event RoyaltyPaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo)
+	access(all) event RoyaltyCouldNotBePaid(tenant:String, leaseName: String, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, leaseInfo:LeaseInfo, residualAddress: Address)
+	access(all) event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
+	access(all) event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], listingTypes:[String], status:String)
+	access(all) event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], listingTypes:[String], status:String)
 
 	// ========================================
 

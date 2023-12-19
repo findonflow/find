@@ -12,11 +12,11 @@ access(all) contract FindFooDIM: NonFungibleToken {
 	access(all) var totalSupply: UInt64
 	access(all) let nftCollectionDisplay: MetadataViews.NFTCollectionDisplay
 
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id: UInt64, name: String, description: String, image: String, edition: UInt64, maxEdition: UInt64, medias: {String: String})
-	pub event Burned(id: UInt64, name: String, description: String, image: String, edition: UInt64, maxEdition: UInt64, medias: {String: String})
+	access(all) event ContractInitialized()
+	access(all) event Withdraw(id: UInt64, from: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
+	access(all) event Minted(id: UInt64, name: String, description: String, image: String, edition: UInt64, maxEdition: UInt64, medias: {String: String})
+	access(all) event Burned(id: UInt64, name: String, description: String, image: String, edition: UInt64, maxEdition: UInt64, medias: {String: String})
 
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPrivatePath: PrivatePath

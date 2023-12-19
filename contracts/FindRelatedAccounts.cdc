@@ -3,7 +3,7 @@ access(all) contract FindRelatedAccounts {
 	access(all) let storagePath: StoragePath
 	access(all) let publicPath: PublicPath
 
-	pub event RelatedAccount(user: Address, walletId: String, walletName: String, address: String, network: String, action: String)
+	access(all) event RelatedAccount(user: Address, walletId: String, walletName: String, address: String, network: String, action: String)
 
 	access(all) struct AccountInformation{
 		access(all) let name:String

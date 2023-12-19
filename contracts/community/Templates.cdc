@@ -9,7 +9,7 @@ access(all) contract Templates {
 	access(contract) let counters : {String : UInt64}
 	access(contract) let features : {String : Bool}
 
-	pub event CountersReset()
+	access(all) event CountersReset()
 
 	access(account) fun createEditionInfoManually(name: String, counter:String, edition:UInt64?) : EditionInfo {
 		let oldMax=Templates.counters[counter] ?? 0

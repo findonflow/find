@@ -2,9 +2,9 @@
 access(all) contract NFTRegistry {
 
 	/* Event */
-	pub event ContractInitialized()
-	pub event NFTInfoRegistered(alias: String, typeIdentifier: String)
-	pub event NFTInfoRemoved(alias: String, typeIdentifier: String)
+	access(all) event ContractInitialized()
+	access(all) event NFTInfoRegistered(alias: String, typeIdentifier: String)
+	access(all) event NFTInfoRemoved(alias: String, typeIdentifier: String)
 
 	/* Variables */
 	// Mapping of {Type Identifier : NFT Info Struct}

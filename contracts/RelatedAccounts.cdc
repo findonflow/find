@@ -6,11 +6,11 @@ access(all) contract RelatedAccounts {
 	access(all) let publicPath: PublicPath
 
 	// Deprecated
-	pub event RelatedFlowAccountAdded()
-	pub event RelatedFlowAccountRemoved()
+	access(all) event RelatedFlowAccountAdded()
+	access(all) event RelatedFlowAccountRemoved()
 
-	pub event RelatedAccountAdded(name: String, address: Address, related: String, network: String)
-	pub event RelatedAccountRemoved(name: String, address: Address, related: String, network: String)
+	access(all) event RelatedAccountAdded(name: String, address: Address, related: String, network: String)
+	access(all) event RelatedAccountRemoved(name: String, address: Address, related: String, network: String)
 
 	access(all) struct AccountInformation{
 		// unique alias for each wallet

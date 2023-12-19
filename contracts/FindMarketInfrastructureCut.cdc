@@ -11,7 +11,7 @@ access(all) contract FindMarketInfrastructureCut : FindMarketCutInterface {
 	access(contract) let cuts : {String : {String : FindMarketCutStruct.Cuts}}
 	access(contract) let cutsCache : {String : {String : FindMarketCutStruct.Cuts}}
 
-	pub event Cut(tenant: String, type: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
+	access(all) event Cut(tenant: String, type: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
 
 	access(all) getCut(tenant: String, listingType: Type, nftType: Type, ftType: Type) : FindMarketCutStruct.Cuts? {
 

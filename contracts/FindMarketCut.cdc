@@ -6,7 +6,7 @@ access(all) contract FindMarketCut {
 
 	access(all) let categoryToContractName: {String : String}
 
-	pub event Cut(tenant: String, type: String, category: String, contractName: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
+	access(all) event Cut(tenant: String, type: String, category: String, contractName: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
 
 	access(all) getRuleId(listingType: Type, nftType:Type, ftType:Type) : String {
 		let s : [String] = [listingType.identifier, nftType.identifier, ftType.identifier]

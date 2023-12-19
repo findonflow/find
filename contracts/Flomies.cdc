@@ -9,11 +9,11 @@ access(all) contract Flomies: NonFungibleToken {
 
 	access(all) var totalSupply: UInt64
 
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id:UInt64, serial: UInt64, traits: [UInt64])
-	pub event RegisteredTraits(traitId:UInt64, trait:{String : String})
+	access(all) event ContractInitialized()
+	access(all) event Withdraw(id: UInt64, from: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
+	access(all) event Minted(id:UInt64, serial: UInt64, traits: [UInt64])
+	access(all) event RegisteredTraits(traitId:UInt64, trait:{String : String})
 
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPublicPath: PublicPath

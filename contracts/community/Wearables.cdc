@@ -17,16 +17,16 @@ access(all) contract Wearables: NonFungibleToken {
 	//Holds the total supply of wearables ever minted
 	access(all) var totalSupply: UInt64
 
-	pub event ContractInitialized()
+	access(all) event ContractInitialized()
 
 	//emitted when a NFT is withdrawn as defined in the NFT standard
-	pub event Withdraw(id: UInt64, from: Address?)
+	access(all) event Withdraw(id: UInt64, from: Address?)
 
 	//emitted when a NFT is deposited as defined in the NFT standard
-	pub event Deposit(id: UInt64, to: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
 
 	//emitted when an Wearable is minted either as part of dooplication or later as part of batch minting, note that context and its fields will vary according to when/how it was minted
-	pub event Minted(id:UInt64, address:Address, name: String, thumbnail:String, set: String, position: String, template: String, tags:[String], templateId:UInt64, context: {String : String})
+	access(all) event Minted(id:UInt64, address:Address, name: String, thumbnail:String, set: String, position: String, template: String, tags:[String], templateId:UInt64, context: {String : String})
 
 	//standard paths in the nft metadata standard
 	access(all) let CollectionStoragePath: StoragePath
@@ -37,8 +37,8 @@ access(all) contract Wearables: NonFungibleToken {
 	// SETS
 
 	// sets is a registry that is stored in the contract for ease of reuse and also to be able to count the mints of a set an retire it
-	pub event SetRegistered(id:UInt64, name:String)
-	pub event SetRetired(id:UInt64)
+	access(all) event SetRegistered(id:UInt64, name:String)
+	access(all) event SetRetired(id:UInt64)
 
 	//a registry of sets to group Wearables
 	access(all) let sets: {UInt64 : Set}
@@ -98,8 +98,8 @@ access(all) contract Wearables: NonFungibleToken {
 	// POSITION
 	// a concept that tells where on a Doodle2 a wearable can be equipped.
 
-	pub event PositionRegistered(id:UInt64, name:String, classifiers:[String])
-	pub event PositionRetired(id:UInt64)
+	access(all) event PositionRegistered(id:UInt64, name:String, classifiers:[String])
+	access(all) event PositionRetired(id:UInt64)
 
 	access(all) let positions: {UInt64 : Position}
 
@@ -169,8 +169,8 @@ access(all) contract Wearables: NonFungibleToken {
 	// a template is a preregistered set of values that a Wearable can get when it is minted, it is then copied into the NFT for provenance
 
 	//these events are there to track changes internally for registers that are needed to make this contract work
-	pub event TemplateRegistered(id:UInt64, set: UInt64, position: UInt64, name: String, tags:[String])
-	pub event TemplateRetired(id:UInt64)
+	access(all) event TemplateRegistered(id:UInt64, set: UInt64, position: UInt64, name: String, tags:[String])
+	access(all) event TemplateRetired(id:UInt64)
 
 	//a registry of templates that defines how a Wearable can be minted
 	access(all) let templates: {UInt64 : Template}

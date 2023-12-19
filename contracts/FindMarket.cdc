@@ -18,12 +18,12 @@ access(all) contract FindMarket {
 	access(contract) let  marketBidTypes : [Type]
 	access(contract) let  marketBidCollectionTypes : [Type]
 
-	pub event RoyaltyPaid(tenant:String, id: UInt64, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
-	pub event RoyaltyCouldNotBePaid(tenant:String, id: UInt64, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo, residualAddress: Address)
-	pub event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
-	pub event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
-	pub event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
-	pub event FindTenantRemoved(tenant: String, address: Address)
+	access(all) event RoyaltyPaid(tenant:String, id: UInt64, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
+	access(all) event RoyaltyCouldNotBePaid(tenant:String, id: UInt64, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo, residualAddress: Address)
+	access(all) event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+	access(all) event TenantAllowRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+	access(all) event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
+	access(all) event FindTenantRemoved(tenant: String, address: Address)
 
 	//Residual Royalty
 	access(all) var residualAddress : Address

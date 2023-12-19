@@ -9,21 +9,21 @@ import Bl0x from "../contracts/Bl0x.cdc"
 
 access(all) contract Bl0xPack: NonFungibleToken {
 	// Events
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id: UInt64, typeId:UInt64)
+	access(all) event ContractInitialized()
+	access(all) event Withdraw(id: UInt64, from: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
+	access(all) event Minted(id: UInt64, typeId:UInt64)
 
-	pub event Requeued(packId: UInt64, address:Address)
+	access(all) event Requeued(packId: UInt64, address:Address)
 
-	pub event Opened(packId: UInt64, address:Address)
-	pub event Fulfilled(packId:UInt64, address:Address)
-	pub event PackReveal(packId:UInt64, address:Address, packTypeId:UInt64, rewardId:UInt64, nftName:String, nftImage:String, nftRarity:String)
+	access(all) event Opened(packId: UInt64, address:Address)
+	access(all) event Fulfilled(packId:UInt64, address:Address)
+	access(all) event PackReveal(packId:UInt64, address:Address, packTypeId:UInt64, rewardId:UInt64, nftName:String, nftImage:String, nftRarity:String)
 
-	pub event Purchased(packId: UInt64, address: Address, amount:UFix64)
-	pub event MetadataRegistered(typeId:UInt64)
-	pub event FulfilledError(packId:UInt64, address:Address?, reason:String)
-	pub event OpenDebug(packId:UInt64, message:String)
+	access(all) event Purchased(packId: UInt64, address: Address, amount:UFix64)
+	access(all) event MetadataRegistered(typeId:UInt64)
+	access(all) event FulfilledError(packId:UInt64, address:Address?, reason:String)
+	access(all) event OpenDebug(packId:UInt64, message:String)
 
 	access(all) let PackMetadataStoragePath: StoragePath
 

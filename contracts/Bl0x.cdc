@@ -6,10 +6,10 @@ access(all) contract Bl0x: NonFungibleToken {
 
 	access(all) var totalSupply: UInt64
 
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id:UInt64, address:Address)
+	access(all) event ContractInitialized()
+	access(all) event Withdraw(id: UInt64, from: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
+	access(all) event Minted(id:UInt64, address:Address)
 
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPublicPath: PublicPath

@@ -10,7 +10,7 @@ import Profile from "./Profile.cdc"
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 access(all) contract FindMarketAuctionEscrow {
 
-	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, startsAt: UFix64?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
+	access(all) event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, startsAt: UFix64?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
 	access(all) resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer

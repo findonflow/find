@@ -2,7 +2,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 
 access(all) contract FindForgeStruct {
 
-	pub event ContractInitialized()
+	access(all) event ContractInitialized()
 
 	// for all traits in info :
 	/* 

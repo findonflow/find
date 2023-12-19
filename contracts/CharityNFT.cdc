@@ -9,10 +9,10 @@ access(all) contract CharityNFT: NonFungibleToken {
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPublicPath: PublicPath
 
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event Minted(id: UInt64, metadata: {String:String}, to:Address)
+	access(all) event ContractInitialized()
+	access(all) event Withdraw(id: UInt64, from: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
+	access(all) event Minted(id: UInt64, metadata: {String:String}, to:Address)
 
 	access(all) resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
 		access(all) let id: UInt64
