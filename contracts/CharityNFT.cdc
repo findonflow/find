@@ -6,8 +6,8 @@ access(all) contract CharityNFT: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPublicPath: PublicPath
 
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
@@ -15,7 +15,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 	pub event Minted(id: UInt64, metadata: {String:String}, to:Address)
 
 	pub resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
-		pub let id: UInt64
+		access(all) let id: UInt64
 
 		access(self) let metadata: {String: String}
 
@@ -139,7 +139,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 
 	//The public interface can show metadata and the content for the Art piece
 	pub resource interface Public {
-		pub let id: UInt64
+		access(all) let id: UInt64
 		access(all) getMetadata() : {String : String}
 	}
 

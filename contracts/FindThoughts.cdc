@@ -12,13 +12,13 @@ access(all) contract FindThoughts {
 	pub event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
 	pub event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
 
-	pub let CollectionStoragePath : StoragePath 
-	pub let CollectionPublicPath : PublicPath 
-	pub let CollectionPrivatePath : PrivatePath 
+	access(all) let CollectionStoragePath : StoragePath 
+	access(all) let CollectionPublicPath : PublicPath 
+	access(all) let CollectionPrivatePath : PrivatePath 
 
 	access(all) struct ThoughtPointer {
-		pub let cap: Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>
-		pub let id: UInt64 
+		access(all) let cap: Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>
+		access(all) let id: UInt64 
 
 		init(creator: Address, id: UInt64) {
 			let cap = getAccount(creator).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
@@ -52,14 +52,14 @@ access(all) contract FindThoughts {
 	}
 
 	pub resource interface ThoughtPublic {
-		pub let id: UInt64 
-		pub let creator: Address 
+		access(all) let id: UInt64 
+		access(all) let creator: Address 
 		pub var header: String 
 		pub var body: String 
-		pub let created: UFix64 
+		access(all) let created: UFix64 
 		pub var lastUpdated: UFix64?
-		pub let medias: [MetadataViews.Media]
-		pub let nft: [FindViews.ViewReadPointer]
+		access(all) let medias: [MetadataViews.Media]
+		access(all) let nft: [FindViews.ViewReadPointer]
 		pub var tags: [String]
 		pub var reacted: {Address : String}
 		pub var reactions: {String : Int}
@@ -70,11 +70,11 @@ access(all) contract FindThoughts {
 	}
 
 	pub resource Thought : ThoughtPublic , ViewResolver.Resolver {
-		pub let id: UInt64 
-		pub let creator: Address 
+		access(all) let id: UInt64 
+		access(all) let creator: Address 
 		pub var header: String 
 		pub var body: String 
-		pub let created: UFix64 
+		access(all) let created: UFix64 
 		pub var lastUpdated: UFix64?
 		pub var tags: [String]
 		// user : Reactions
@@ -83,10 +83,10 @@ access(all) contract FindThoughts {
 		pub var reactions: {String : Int}
 
 		// only one image is enabled at the moment
-		pub let medias: [MetadataViews.Media]
+		access(all) let medias: [MetadataViews.Media]
 
 		// These are here only for future extension
-		pub let nft: [FindViews.ViewReadPointer]
+		access(all) let nft: [FindViews.ViewReadPointer]
 		access(self) let stringTags: {String : String} 
 		access(self) let scalars: {String : UFix64} 
 		access(self) let extras: {String : AnyStruct} 

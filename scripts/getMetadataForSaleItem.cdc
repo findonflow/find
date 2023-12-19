@@ -2,11 +2,11 @@ import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
 access(all) struct PurchaseData {
-	pub let id: UInt64
-	pub let name: String
-	pub let amount: UFix64
-	pub let description: String
-	pub let imageURL: String
+	access(all) let id: UInt64
+	access(all) let name: String
+	access(all) let amount: UFix64
+	access(all) let description: String
+	access(all) let imageURL: String
 
 	init(id: UInt64, name: String, amount: UFix64, description: String, imageURL: String) {
 		self.id = id

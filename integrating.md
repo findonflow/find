@@ -84,14 +84,14 @@ Implementing MetadataViews standards in the right way can help your NFTs display
 
 In essence what we need for each nft is the fields:
 ```
-	pub let id:UInt64
-	pub let name: String: The name of the nft
-	pub let image: String : the http url to the image, or ipfs://<cid>
-	pub let url: String: the url to go to when an nft is clicked
-	pub let listPrice: UFix64? : if this is item is listed in a marketplace show the price here
-	pub let listToken: String? : the string representation of the token used. Identifier of FT
-	pub let contentType:String : content type of image url, image or video works fine here
-	pub let rarity:String: rarity description for this NFT
+	access(all) let id:UInt64
+	access(all) let name: String: The name of the nft
+	access(all) let image: String : the http url to the image, or ipfs://<cid>
+	access(all) let url: String: the url to go to when an nft is clicked
+	access(all) let listPrice: UFix64? : if this is item is listed in a marketplace show the price here
+	access(all) let listToken: String? : the string representation of the token used. Identifier of FT
+	access(all) let contentType:String : content type of image url, image or video works fine here
+	access(all) let rarity:String: rarity description for this NFT
 ``` -->
 
 <!-- There are lots of examples for how this is done in the collections script already. 

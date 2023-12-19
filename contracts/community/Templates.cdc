@@ -66,7 +66,7 @@ access(all) contract Templates {
 	}
 
 	access(all) struct interface RoyaltyHolder {
-		pub let royalties: [Templates.Royalty]
+		access(all) let royalties: [Templates.Royalty]
 
 		access(all) getRoyalties() : [MetadataViews.Royalty] {
 			let royalty : [MetadataViews.Royalty] = []
@@ -78,9 +78,9 @@ access(all) contract Templates {
 	}
 
 	access(all) struct EditionInfo {
-		pub let counter :String
-		pub let name : String
-		pub let number:UInt64
+		access(all) let counter :String
+		access(all) let name : String
+		access(all) let number:UInt64
 
 		init(counter: String, name:String, number:UInt64) {
 			self.counter=counter
@@ -107,11 +107,11 @@ access(all) contract Templates {
 	}
 
 	access(all) struct Royalty {
-		pub let name : String
-		pub let address: Address
-		pub let cut: UFix64
-		pub let description: String
-		pub let publicPath: String
+		access(all) let name : String
+		access(all) let address: Address
+		access(all) let cut: UFix64
+		access(all) let description: String
+		access(all) let publicPath: String
 
 		init(name : String , address: Address , cut: UFix64 , description: String , publicPath: String) {
 			self.name = name

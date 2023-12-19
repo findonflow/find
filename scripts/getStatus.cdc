@@ -15,30 +15,30 @@ import Wearables from "../contracts/community/Wearables.cdc"
 import Clock from "../contracts/Clock.cdc"
 
 access(all) struct FINDReport{
-	pub let isDapper: Bool
-	pub let profile:Profile.UserReport?
-	pub let bids: [FIND.BidInfo]
+	access(all) let isDapper: Bool
+	access(all) let profile:Profile.UserReport?
+	access(all) let bids: [FIND.BidInfo]
 
-	pub let leases: [FIND.LeaseInformation]
-	pub let privateMode: Bool
-	pub let leasesForSale: {String : SaleItemCollectionReport}
-	pub let leasesBids: {String : BidItemCollectionReport}
-	pub let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
-	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
-	pub let activatedAccount: Bool
+	access(all) let leases: [FIND.LeaseInformation]
+	access(all) let privateMode: Bool
+	access(all) let leasesForSale: {String : SaleItemCollectionReport}
+	access(all) let leasesBids: {String : BidItemCollectionReport}
+	access(all) let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
+	access(all) let marketBids: {String : FindMarket.BidItemCollectionReport}
+	access(all) let activatedAccount: Bool
 
 
 	// This is deprecating, moving to accounts
-	pub let relatedAccounts: { String: [Address]}
+	access(all) let relatedAccounts: { String: [Address]}
 
- 	pub let lostAndFoundTypes: {String : String}
+ 	access(all) let lostAndFoundTypes: {String : String}
 	// This is deprecating, moving to accounts
 	// EmeraldID Account Linkage
-	pub let emeraldIDAccounts : {String : Address}
+	access(all) let emeraldIDAccounts : {String : Address}
 
-	pub let accounts : [AccountInformation]?
+	access(all) let accounts : [AccountInformation]?
 
-	pub let readyForWearables : Bool?
+	access(all) let readyForWearables : Bool?
 
 	init(profile: Profile.UserReport?,
 		 relatedAccounts: {String: [Address]},
@@ -75,11 +75,11 @@ access(all) struct FINDReport{
 }
 
 access(all) struct AccountInformation {
-	pub let name: String
-	pub let address: String
-	pub let network: String
-	pub let trusted: Bool
-	pub let node: String
+	access(all) let name: String
+	access(all) let address: String
+	access(all) let network: String
+	access(all) let trusted: Bool
+	access(all) let node: String
 
 	init(name: String, address: String, network: String, trusted: Bool, node: String) {
 		self.name = name
@@ -91,12 +91,12 @@ access(all) struct AccountInformation {
 }
 
 access(all) struct NameReport {
-	pub let status: String
-	pub let cost: UFix64
-	pub let owner: Address?
-	pub let validUntil: UFix64?
-	pub let lockedUntil: UFix64?
-	pub let registeredTime: UFix64?
+	access(all) let status: String
+	access(all) let cost: UFix64
+	access(all) let owner: Address?
+	access(all) let validUntil: UFix64?
+	access(all) let lockedUntil: UFix64?
+	access(all) let registeredTime: UFix64?
 
 	init(status: String, cost: UFix64, owner: Address?, validUntil: UFix64?, lockedUntil: UFix64?, registeredTime: UFix64? ) {
 		self.status=status
@@ -109,8 +109,8 @@ access(all) struct NameReport {
 }
 
 access(all) struct Report {
-	pub let FINDReport: FINDReport?
-	pub let NameReport: NameReport?
+	access(all) let FINDReport: FINDReport?
+	access(all) let NameReport: NameReport?
 
 	init(FINDReport: FINDReport?, NameReport: NameReport?) {
 		self.FINDReport=FINDReport
@@ -304,8 +304,8 @@ access(all) main(user: String) : Report? {
 
 // These are for consolidating FIND Lease Sales
 access(all) struct SaleItemCollectionReport {
-	pub let items : [SaleItemInformation]
-	pub let ghosts: [FindLeaseMarket.GhostListing]
+	access(all) let items : [SaleItemInformation]
+	access(all) let ghosts: [FindLeaseMarket.GhostListing]
 
 	init(items: [SaleItemInformation], ghosts: [FindLeaseMarket.GhostListing]) {
 		self.items=items
@@ -385,13 +385,13 @@ access(all) struct SaleItemInformation {
 }
 
 access(all) struct LeaseInfo {
-	pub let name: String
-	pub let address: Address
-	pub let cost: UFix64
-	pub let status: String
-	pub let validUntil: UFix64
-	pub let lockedUntil: UFix64
-	pub let addons: [String]
+	access(all) let name: String
+	access(all) let address: Address
+	access(all) let cost: UFix64
+	access(all) let status: String
+	access(all) let validUntil: UFix64
+	access(all) let lockedUntil: UFix64
+	access(all) let addons: [String]
 
 	init(
 		name: String,
@@ -616,12 +616,12 @@ access(all) addLeasesSale(_ leases: [FIND.LeaseInformation], _ sales : {String :
 }
 
 access(all) struct BidInfo{
-	pub let name: String
-	pub let bidAmount: UFix64
-	pub let bidTypeIdentifier: String
-	pub let timestamp: UFix64
-	pub let item: SaleItemInformation
-	pub let market: String
+	access(all) let name: String
+	access(all) let bidAmount: UFix64
+	access(all) let bidTypeIdentifier: String
+	access(all) let timestamp: UFix64
+	access(all) let item: SaleItemInformation
+	access(all) let market: String
 
 	init(
 		name: String,
@@ -653,8 +653,8 @@ access(all) BidInfoFromFindLeaseMarket(_ b: FindLeaseMarket.BidInfo) : BidInfo {
 }
 
 access(all) struct BidItemCollectionReport {
-	pub let items : [BidInfo]
-	pub let ghosts: [FindLeaseMarket.GhostListing]
+	access(all) let items : [BidInfo]
+	access(all) let ghosts: [FindLeaseMarket.GhostListing]
 
 	init(items: [BidInfo], ghosts: [FindLeaseMarket.GhostListing]) {
 		self.items=items

@@ -2,8 +2,8 @@ access(all) contract RelatedAccounts {
 
 	// The entire contract is deprecated
 
-	pub let storagePath: StoragePath
-	pub let publicPath: PublicPath
+	access(all) let storagePath: StoragePath
+	access(all) let publicPath: PublicPath
 
 	// Deprecated
 	pub event RelatedFlowAccountAdded()
@@ -14,10 +14,10 @@ access(all) contract RelatedAccounts {
 
 	access(all) struct AccountInformation{
 		// unique alias for each wallet
-		pub let name:String
-		pub let address:Address?
-		pub let network:String //do not use enum because of contract upgrade
-		pub let otherAddress: String? //other networks besides flow may be not support Address
+		access(all) let name:String
+		access(all) let address:Address?
+		access(all) let network:String //do not use enum because of contract upgrade
+		access(all) let otherAddress: String? //other networks besides flow may be not support Address
 
 		init(name:String, address:Address?, network:String, otherAddress:String?){
 			self.name=name

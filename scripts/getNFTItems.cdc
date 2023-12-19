@@ -60,17 +60,17 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
 }
 
 access(all) struct MetadataCollectionItem {
-	pub let id:UInt64
-	pub let uuid:UInt64
-	pub let name: String
-	pub let collection: String
-	pub let storagePath: String
-	pub let nftIdentifier:String
-	pub let media  : String
-	pub let mediaType  : String
-	pub let source  : String
-	pub let project : String
-	pub let community : String
+	access(all) let id:UInt64
+	access(all) let uuid:UInt64
+	access(all) let name: String
+	access(all) let collection: String
+	access(all) let storagePath: String
+	access(all) let nftIdentifier:String
+	access(all) let media  : String
+	access(all) let mediaType  : String
+	access(all) let source  : String
+	access(all) let project : String
+	access(all) let community : String
 
 	init(id:UInt64, uuid:UInt64, name: String, collection: String, storagePath:String, identifier: String, media  : String) {
 		self.id=id

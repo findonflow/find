@@ -11,12 +11,12 @@ import FlovatarComponent from "../contracts/community/FlovatarComponent.cdc"
 access(all) contract FindUserStatus {
 
 	access(all) struct StoreFrontCut {
-		pub let amount:UFix64
-		pub let address: Address
-		pub let findName:String?
-		pub let tags: {String : String} 
-		pub let scalars: {String : UFix64}
-		pub let extra: {String : AnyStruct}
+		access(all) let amount:UFix64
+		access(all) let address: Address
+		access(all) let findName:String?
+		access(all) let tags: {String : String} 
+		access(all) let scalars: {String : UFix64}
+		access(all) let extra: {String : AnyStruct}
 
 		init(amount:UFix64, address:Address){
 			self.amount=amount
@@ -33,17 +33,17 @@ access(all) contract FindUserStatus {
 		pub var listingId: UInt64
 		// if purchased is true -> don't show it
 		//pub var purchased: Bool
-		pub let nftIdentifier: String
-		pub let nftId: UInt64
-		pub let ftTypeIdentifier: String
-		pub let amount: UFix64
-		pub let cuts: [StoreFrontCut]
+		access(all) let nftIdentifier: String
+		access(all) let nftId: UInt64
+		access(all) let ftTypeIdentifier: String
+		access(all) let amount: UFix64
+		access(all) let cuts: [StoreFrontCut]
 		pub var customID: String?
-		pub let commissionAmount: UFix64?
-		pub let listingValidUntil: UInt64?
-		pub let tags: {String : String} 
-		pub let scalars: {String : UFix64}
-		pub let extra: {String : AnyStruct}
+		access(all) let commissionAmount: UFix64?
+		access(all) let listingValidUntil: UInt64?
+		access(all) let tags: {String : String} 
+		access(all) let scalars: {String : UFix64}
+		access(all) let extra: {String : AnyStruct}
 
 		init(storefrontID: UInt64, nftType: String, nftID: UInt64, salePaymentVaultType: String, salePrice: UFix64, saleCuts: [StoreFrontCut], customID: String?, commissionAmount: UFix64?, expiry: UInt64?) {
 			self.listingId = storefrontID
@@ -64,22 +64,22 @@ access(all) contract FindUserStatus {
 	access(all) struct FlowtyListing {
 		pub var listingId: UInt64
 		pub var funded: Bool
-		pub let nftIdentifier: String
-		pub let nftId: UInt64
-		pub let amount: UFix64
-		pub let interestRate: UFix64
+		access(all) let nftIdentifier: String
+		access(all) let nftId: UInt64
+		access(all) let amount: UFix64
+		access(all) let interestRate: UFix64
 		pub var term: UFix64
-		pub let paymentVaultType: String
+		access(all) let paymentVaultType: String
 
-		pub let paymentCuts: [StoreFrontCut]
+		access(all) let paymentCuts: [StoreFrontCut]
 		pub var listedTime: UFix64
 		pub var royaltyRate: UFix64
 		pub var listingValidUntil: UFix64
 		pub var repaymentAmount: UFix64
 
-		pub let tags: {String : String} 
-		pub let scalars: {String : UFix64}
-		pub let extra: {String : AnyStruct}
+		access(all) let tags: {String : String} 
+		access(all) let scalars: {String : UFix64}
+		access(all) let extra: {String : AnyStruct}
 
 		init(flowtyStorefrontID: UInt64, funded: Bool, nftType: String, nftID: UInt64, amount: UFix64, interestRate: UFix64, term: UFix64, paymentVaultType: String,paymentCuts: [StoreFrontCut], listedTime: UFix64, royaltyRate: UFix64, expiresAfter: UFix64, repaymentAmount: UFix64) {
 			self.listingId = flowtyStorefrontID
@@ -104,15 +104,15 @@ access(all) contract FindUserStatus {
 	access(all) struct FlowtyRental {
 		pub var listingId: UInt64
 		pub var rented: Bool
-		pub let nftIdentifier: String
-		pub let nftId: UInt64
-		pub let amount: UFix64
-		pub let deposit: UFix64
+		access(all) let nftIdentifier: String
+		access(all) let nftId: UInt64
+		access(all) let amount: UFix64
+		access(all) let deposit: UFix64
 		pub var term: UFix64
-		pub let paymentVaultType: String
-		pub let reenableOnReturn: Bool
+		access(all) let paymentVaultType: String
+		access(all) let reenableOnReturn: Bool
 
-		pub let paymentCuts: [StoreFrontCut]
+		access(all) let paymentCuts: [StoreFrontCut]
 		pub var listedTime: UFix64
 		pub var royaltyRate: UFix64
 		pub var listingValidUntil: UFix64
@@ -120,9 +120,9 @@ access(all) contract FindUserStatus {
 		pub var renter: Address? 
 		pub var renterName: String? 
 
-		pub let tags: {String : String} 
-		pub let scalars: {String : UFix64}
-		pub let extra: {String : AnyStruct}
+		access(all) let tags: {String : String} 
+		access(all) let scalars: {String : UFix64}
+		access(all) let extra: {String : AnyStruct}
 
 		init(flowtyStorefrontID: UInt64, rented: Bool, nftType: String, nftID: UInt64, amount: UFix64, deposit: UFix64, term: UFix64, paymentVaultType: String, reenableOnReturn:Bool, paymentCuts: [StoreFrontCut], listedTime: UFix64, royaltyRate: UFix64, expiresAfter: UFix64, repaymentAmount: UFix64, renter: Address?) {
 			self.listingId = flowtyStorefrontID
@@ -152,25 +152,25 @@ access(all) contract FindUserStatus {
 
 	access(all) struct FlovatarListing {
 		pub var listingId: UInt64
-		pub let nftIdentifier: String
-		pub let nftId: UInt64
-		pub let ftTypeIdentifier: String
-		pub let amount: UFix64
-		pub let cuts: [StoreFrontCut]
-		pub let accessoryId: UInt64?
-		pub let hatId: UInt64?
-		pub let eyeglassesId: UInt64?
-		pub let backgroundId: UInt64?
-		pub let mint: UInt64
-		pub let series: UInt32
-		pub let creatorAddress: Address
-		pub let components: {String: UInt64}
-		pub let rareCount: UInt8
-		pub let epicCount: UInt8
-		pub let legendaryCount: UInt8
-		pub let tags: {String : String} 
-		pub let scalars: {String : UFix64}
-		pub let extra: {String : AnyStruct}
+		access(all) let nftIdentifier: String
+		access(all) let nftId: UInt64
+		access(all) let ftTypeIdentifier: String
+		access(all) let amount: UFix64
+		access(all) let cuts: [StoreFrontCut]
+		access(all) let accessoryId: UInt64?
+		access(all) let hatId: UInt64?
+		access(all) let eyeglassesId: UInt64?
+		access(all) let backgroundId: UInt64?
+		access(all) let mint: UInt64
+		access(all) let series: UInt32
+		access(all) let creatorAddress: Address
+		access(all) let components: {String: UInt64}
+		access(all) let rareCount: UInt8
+		access(all) let epicCount: UInt8
+		access(all) let legendaryCount: UInt8
+		access(all) let tags: {String : String} 
+		access(all) let scalars: {String : UFix64}
+		access(all) let extra: {String : AnyStruct}
 
 		init(storefrontID: UInt64, nftType: String, nftID: UInt64, salePaymentVaultType: String, salePrice: UFix64, saleCuts: [StoreFrontCut], flovatarMetadata: FlovatarMarketplace.FlovatarSaleData) {
 			self.listingId = storefrontID
@@ -200,21 +200,21 @@ access(all) contract FindUserStatus {
 
 	access(all) struct FlovatarComponentListing {
 		pub var listingId: UInt64
-		pub let nftIdentifier: String
-		pub let nftId: UInt64
-		pub let ftTypeIdentifier: String
-		pub let amount: UFix64
-		pub let cuts: [StoreFrontCut]
-		pub let mint: UInt64
-		pub let templateId: UInt64
-		pub let name: String
-		pub let description: String
-		pub let category: String
-		pub let rarity: String
-		pub let color: String
-		pub let tags: {String : String} 
-		pub let scalars: {String : UFix64}
-		pub let extra: {String : AnyStruct}
+		access(all) let nftIdentifier: String
+		access(all) let nftId: UInt64
+		access(all) let ftTypeIdentifier: String
+		access(all) let amount: UFix64
+		access(all) let cuts: [StoreFrontCut]
+		access(all) let mint: UInt64
+		access(all) let templateId: UInt64
+		access(all) let name: String
+		access(all) let description: String
+		access(all) let category: String
+		access(all) let rarity: String
+		access(all) let color: String
+		access(all) let tags: {String : String} 
+		access(all) let scalars: {String : UFix64}
+		access(all) let extra: {String : AnyStruct}
 
 		init(storefrontID: UInt64, nftType: String, nftID: UInt64, salePaymentVaultType: String, salePrice: UFix64, saleCuts: [StoreFrontCut], flovatarComponentMetadata: FlovatarMarketplace.FlovatarComponentSaleData) {
 			self.listingId = storefrontID

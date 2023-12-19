@@ -5,12 +5,12 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
 access(all) struct NFTDetailReport {
-	pub let storefront: FindUserStatus.StorefrontListing?
-	pub let storefrontV2: FindUserStatus.StorefrontListing?
-	pub let flowty: FindUserStatus.FlowtyListing?
-	pub let flowtyRental: FindUserStatus.FlowtyRental?
-	pub let flovatar: FindUserStatus.FlovatarListing?
-	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
+	access(all) let storefront: FindUserStatus.StorefrontListing?
+	access(all) let storefrontV2: FindUserStatus.StorefrontListing?
+	access(all) let flowty: FindUserStatus.FlowtyListing?
+	access(all) let flowtyRental: FindUserStatus.FlowtyRental?
+	access(all) let flovatar: FindUserStatus.FlovatarListing?
+	access(all) let flovatarComponent: FindUserStatus.FlovatarComponentListing?
 
 	init(
 		 storefront: FindUserStatus.StorefrontListing?,

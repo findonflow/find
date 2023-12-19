@@ -10,11 +10,11 @@ import FlovatarMarketplace from  0x921ea449dffec68a
 // This script returns the details for a listing within a storefront
 
 access(all) struct Listing {
-	pub let marketplace : String
-	pub let ftVault: Type
-	pub let price:UFix64
-	pub let nftType: Type
-	pub let nftId: UInt64
+	access(all) let marketplace : String
+	access(all) let ftVault: Type
+	access(all) let price:UFix64
+	access(all) let nftType: Type
+	access(all) let nftId: UInt64
 
 	init(marketplace:String, ftVault:Type, price:UFix64, nftType:Type, nftId:UInt64) {
 		self.marketplace=marketplace

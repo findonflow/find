@@ -7,9 +7,9 @@ access(all) contract FindRulesCache {
 	access(contract) let tenantCuts : {String : {String : TenantCuts}}
 
 	access(all) struct ActionResult {
-		pub let allowed:Bool
-		pub let message:String
-		pub let name:String
+		access(all) let allowed:Bool
+		access(all) let message:String
+		access(all) let name:String
 
 		init(allowed:Bool, message:String, name:String) {
 			self.allowed=allowed
@@ -19,8 +19,8 @@ access(all) contract FindRulesCache {
 	}
 
 	access(all) struct TenantCuts {
-		pub let findCut:MetadataViews.Royalty?
-		pub let tenantCut:MetadataViews.Royalty?
+		access(all) let findCut:MetadataViews.Royalty?
+		access(all) let tenantCut:MetadataViews.Royalty?
 
 		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
 			self.findCut=findCut

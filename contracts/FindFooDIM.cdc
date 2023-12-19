@@ -10,7 +10,7 @@ import FindUtils from "./FindUtils.cdc"
 access(all) contract FindFooDIM: NonFungibleToken {
 
 	pub var totalSupply: UInt64
-	pub let nftCollectionDisplay: MetadataViews.NFTCollectionDisplay
+	access(all) let nftCollectionDisplay: MetadataViews.NFTCollectionDisplay
 
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
@@ -18,15 +18,15 @@ access(all) contract FindFooDIM: NonFungibleToken {
 	pub event Minted(id: UInt64, name: String, description: String, image: String, edition: UInt64, maxEdition: UInt64, medias: {String: String})
 	pub event Burned(id: UInt64, name: String, description: String, image: String, edition: UInt64, maxEdition: UInt64, medias: {String: String})
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPrivatePath: PrivatePath
-	pub let CollectionPublicPath: PublicPath
-	pub let MinterStoragePath: StoragePath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionPublicPath: PublicPath
+	access(all) let MinterStoragePath: StoragePath
 
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
-		pub let id: UInt64
+		access(all) let id: UInt64
 
-		pub let info: FindForgeStruct.FindDIM
+		access(all) let info: FindForgeStruct.FindDIM
 		access(self) let royalties: MetadataViews.Royalties
 
 		init(

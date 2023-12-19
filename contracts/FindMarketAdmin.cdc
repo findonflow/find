@@ -7,8 +7,8 @@ import FindMarketCutStruct from "./FindMarketCutStruct.cdc"
 access(all) contract FindMarketAdmin {
 
 	//store the proxy for the admin
-	pub let AdminProxyPublicPath: PublicPath
-	pub let AdminProxyStoragePath: StoragePath
+	access(all) let AdminProxyPublicPath: PublicPath
+	access(all) let AdminProxyStoragePath: StoragePath
 
 	/// ===================================================================================
 	// Admin things

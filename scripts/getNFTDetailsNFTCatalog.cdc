@@ -7,11 +7,11 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
 access(all) struct NFTDetailReport {
-	pub let findMarket: {String : FindMarket.SaleItemInformation}
-	pub let nftDetail: NFTDetail?
-	pub let allowedListingActions: {String : ListingTypeReport}
-	pub let dapperAllowedListingActions: {String : ListingTypeReport}
-	pub let linkedForMarket : Bool?
+	access(all) let findMarket: {String : FindMarket.SaleItemInformation}
+	access(all) let nftDetail: NFTDetail?
+	access(all) let allowedListingActions: {String : ListingTypeReport}
+	access(all) let dapperAllowedListingActions: {String : ListingTypeReport}
+	access(all) let linkedForMarket : Bool?
 
 
 	init(findMarket:{String : FindMarket.SaleItemInformation},
@@ -28,11 +28,11 @@ access(all) struct NFTDetailReport {
 }
 
 access(all) struct ListingTypeReport {
-	pub let ftAlias: [String]
-	pub let ftIdentifiers: [String]
-	pub let listingType: String
-	pub let status: String
-	pub let ListingDetails: [ListingRoyalties]
+	access(all) let ftAlias: [String]
+	access(all) let ftIdentifiers: [String]
+	access(all) let listingType: String
+	access(all) let status: String
+	access(all) let ListingDetails: [ListingRoyalties]
 
 	init(listingType: String, ftAlias: [String], ftIdentifiers: [String],  status: String , ListingDetails: [ListingRoyalties]) {
 		self.listingType=listingType
@@ -44,12 +44,12 @@ access(all) struct ListingTypeReport {
 }
 
 access(all) struct NFTDetail {
-	pub let id: UInt64
-	pub let uuid: UInt64
-	pub let name:String
-	pub let description:String
-	pub let thumbnail:String
-	pub let type: String
+	access(all) let id: UInt64
+	access(all) let uuid: UInt64
+	access(all) let name:String
+	access(all) let description:String
+	access(all) let thumbnail:String
+	access(all) let type: String
 	pub var externalViewURL: String?
 	pub var rarity:MetadataViews.Rarity?
 	pub var editions: [MetadataViews.Edition]
@@ -180,9 +180,9 @@ access(all) struct NFTDetail {
 
 access(all) struct ListingRoyalties {
 
-	pub let ftAlias: String?
-	pub let ftIdentifier: String
-	pub let royalties: [Royalties]
+	access(all) let ftAlias: String?
+	access(all) let ftIdentifier: String
+	access(all) let royalties: [Royalties]
 
 	init(ftAlias: String?, ftIdentifier: String, royalties: [Royalties]) {
 		self.ftAlias=ftAlias
@@ -193,10 +193,10 @@ access(all) struct ListingRoyalties {
 
 access(all) struct Royalties {
 
-	pub let royaltyName: String
-	pub let address: Address
-	pub let findName: String?
-	pub let cut: UFix64
+	access(all) let royaltyName: String
+	access(all) let address: Address
+	access(all) let findName: String?
+	access(all) let cut: UFix64
 
 	init(royaltyName: String , address: Address, findName: String?, cut: UFix64) {
 		self.royaltyName=royaltyName
@@ -208,23 +208,23 @@ access(all) struct Royalties {
 
 access(all) struct NFTCollectionDisplay {
 	// Name that should be used when displaying this NFT collection.
-	pub let name: String
+	access(all) let name: String
 
 	// Description that should be used to give an overview of this collection.
-	pub let description: String
+	access(all) let description: String
 
 	// External link to a URL to view more information about this collection.
-	pub let externalURL: String
+	access(all) let externalURL: String
 
 	// Square-sized image to represent this collection.
-	pub let squareImage: {String : String}
+	access(all) let squareImage: {String : String}
 
 	// Banner-sized image for this collection, recommended to have a size near 1200x630.
-	pub let bannerImage: {String : String}
+	access(all) let bannerImage: {String : String}
 
 	// Social links to reach this collection's social homepages.
 	// Possible keys may be "instagram", "twitter", "discord", etc.
-	pub let socials: {String: String}
+	access(all) let socials: {String: String}
 
 	init(
 		_ nftCD : MetadataViews.NFTCollectionDisplay
@@ -309,7 +309,7 @@ access(all) main(user: String, project:String, id: UInt64, views: [String]) : NF
 
 }
 
-pub let resolvedAddresses : {Address : String} = {}
+access(all) let resolvedAddresses : {Address : String} = {}
 
 pub var nftRoyalties : [Royalties]? = nil
 

@@ -11,9 +11,9 @@ access(all) contract Bl0x: NonFungibleToken {
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id:UInt64, address:Address)
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
-	pub let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPublicPath: PublicPath
+	access(all) let CollectionPrivatePath: PrivatePath
 
 	access(self) var rarities : [String]
 	access(account) let royalties : [MetadataViews.Royalty]
@@ -28,13 +28,13 @@ access(all) contract Bl0x: NonFungibleToken {
 	*/
 
 	access(all) struct Metadata {
-		pub let nftId: UInt64
-		pub let name: String
-		pub let serial:UInt64
-		pub let rarity: String
-		pub let thumbnail: String
-		pub let image: String
-		pub let traits: [{String : String}]
+		access(all) let nftId: UInt64
+		access(all) let name: String
+		access(all) let serial:UInt64
+		access(all) let rarity: String
+		access(all) let thumbnail: String
+		access(all) let image: String
+		access(all) let traits: [{String : String}]
 
 		init(nftId: UInt64,name:String,rarity: String,thumbnail: String, image:String, serial:UInt64, traits: [{String : String}]) {
 			self.nftId=nftId
@@ -49,13 +49,13 @@ access(all) contract Bl0x: NonFungibleToken {
 
 	//TODO: This can be removed before mainnet
 	access(all) struct Data {
-		pub let nftId: UInt64
-		pub let name: String
-		pub let serial:UInt64
-		pub let rarity: String
-		pub let thumbnail: String
-		pub let image: String
-		pub let traits: {String : Trait}
+		access(all) let nftId: UInt64
+		access(all) let name: String
+		access(all) let serial:UInt64
+		access(all) let rarity: String
+		access(all) let thumbnail: String
+		access(all) let image: String
+		access(all) let traits: {String : Trait}
 
 		init(nftId: UInt64,name:String,rarity: String,thumbnail: String, image:String, serial:UInt64, traits: {String : Trait}) {
 			self.nftId=nftId
@@ -70,13 +70,13 @@ access(all) contract Bl0x: NonFungibleToken {
 
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
-		pub let id:UInt64
-		pub let serial:UInt64
+		access(all) let id:UInt64
+		access(all) let serial:UInt64
 		pub var nounce:UInt64
-		pub let rootHash:String
-		pub let season:UInt64
-		pub let traits: {String: UInt64}
-		pub let royalties: MetadataViews.Royalties
+		access(all) let rootHash:String
+		access(all) let season:UInt64
+		access(all) let traits: {String: UInt64}
+		access(all) let royalties: MetadataViews.Royalties
 
 		init(
 			serial:UInt64,
@@ -368,8 +368,8 @@ access(all) contract Bl0x: NonFungibleToken {
 
 		/// A trait contains information about a trait
 		access(all) struct Trait {
-			pub let id:UInt64
-			pub let metadata : {String:String}
+			access(all) let id:UInt64
+			access(all) let metadata : {String:String}
 
 			init(id:UInt64, metadata:{String:String}) {
 				pre {

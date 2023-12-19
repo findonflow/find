@@ -17,23 +17,23 @@ access(all) contract NFTRegistry {
 	//TODO: name of check storage slot script
 	/* Struct */
 	access(all) struct NFTInfo {
-		pub let alias : String
+		access(all) let alias : String
 		// Pass in @NFT type
-		pub let type : Type              
-		pub let typeIdentifier : String
-		pub let icon : String?
-		pub let providerPath : PrivatePath
-		pub let providerPathIdentifier : String
+		access(all) let type : Type              
+		access(all) let typeIdentifier : String
+		access(all) let icon : String?
+		access(all) let providerPath : PrivatePath
+		access(all) let providerPathIdentifier : String
 		// Must implement {ViewResolver.ResolverCollection}
-		pub let publicPath : PublicPath
-		pub let publicPathIdentifier : String
-		pub let storagePath : StoragePath
-		pub let storagePathIdentifier : String
+		access(all) let publicPath : PublicPath
+		access(all) let publicPathIdentifier : String
+		access(all) let storagePath : StoragePath
+		access(all) let storagePathIdentifier : String
 		// Pass in arrays of allowed Token Vault, nil => support  all types of FTs
-		pub let allowedFTTypes : [Type]?  
+		access(all) let allowedFTTypes : [Type]?  
 		// Pass in the Contract Address
-		pub let address : Address
-		pub let externalFixedUrl : String
+		access(all) let address : Address
+		access(all) let externalFixedUrl : String
 
 		init(alias: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
 			self.alias = alias

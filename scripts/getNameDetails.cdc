@@ -8,14 +8,14 @@ import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 access(all) struct FINDReport {
-	pub let profile:Profile.UserReport?
-	pub let bids: [FIND.BidInfo]
-	pub let relatedAccounts: { String: [Address]}
-	pub let leases: [LeaseInformation]
-	pub let privateMode: Bool
-	pub let activatedAccount: Bool
-	pub let isDapper: Bool?
-	pub let address: Address?
+	access(all) let profile:Profile.UserReport?
+	access(all) let bids: [FIND.BidInfo]
+	access(all) let relatedAccounts: { String: [Address]}
+	access(all) let leases: [LeaseInformation]
+	access(all) let privateMode: Bool
+	access(all) let activatedAccount: Bool
+	access(all) let isDapper: Bool?
+	access(all) let address: Address?
 
 
 	init(profile: Profile.UserReport?, relatedAccounts: { String: [Address]}, bids: [FIND.BidInfo], leases : [LeaseInformation], privateMode: Bool, activatedAccount: Bool , isDapper: Bool?, address: Address?) {
@@ -31,10 +31,10 @@ access(all) struct FINDReport {
 }
 
 access(all) struct NameReport {
-	pub let status: String
-	pub let cost: UFix64
-	pub let leaseStatus: LeaseInformation?
-	pub let userReport: FINDReport?
+	access(all) let status: String
+	access(all) let cost: UFix64
+	access(all) let leaseStatus: LeaseInformation?
+	access(all) let userReport: FINDReport?
 
 	init(status: String, cost: UFix64, leaseStatus: LeaseInformation?, userReport: FINDReport? ) {
 		self.status=status

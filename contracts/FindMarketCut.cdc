@@ -4,7 +4,7 @@ import FindUtils from "../contracts/FindUtils.cdc"
 
 access(all) contract FindMarketCut {
 
-	pub let categoryToContractName: {String : String}
+	access(all) let categoryToContractName: {String : String}
 
 	pub event Cut(tenant: String, type: String, category: String, contractName: String, cutInfo: [FindMarketCutStruct.EventSafeCut], action: String, remark: String?)
 

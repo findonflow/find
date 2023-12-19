@@ -3,14 +3,14 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 
 access(all) struct Report{
-	pub let alias:String
-	pub let ids:[UInt64]
-	pub let key:String
-	pub let address:Address
-	pub let resolver:String
-	pub let source:String
-	pub let community:String?
-	pub let project:String
+	access(all) let alias:String
+	access(all) let ids:[UInt64]
+	access(all) let key:String
+	access(all) let address:Address
+	access(all) let resolver:String
+	access(all) let source:String
+	access(all) let community:String?
+	access(all) let project:String
 
 	init(alias: String,ids:[UInt64], key:String, address:Address, resolver:String, source: String, community: String?, project: String) {
 		self.alias=alias

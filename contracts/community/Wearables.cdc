@@ -29,9 +29,9 @@ access(all) contract Wearables: NonFungibleToken {
 	pub event Minted(id:UInt64, address:Address, name: String, thumbnail:String, set: String, position: String, template: String, tags:[String], templateId:UInt64, context: {String : String})
 
 	//standard paths in the nft metadata standard
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
-	pub let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPublicPath: PublicPath
+	access(all) let CollectionPrivatePath: PrivatePath
 
 
 	// SETS
@@ -41,15 +41,15 @@ access(all) contract Wearables: NonFungibleToken {
 	pub event SetRetired(id:UInt64)
 
 	//a registry of sets to group Wearables
-	pub let sets: {UInt64 : Set}
+	access(all) let sets: {UInt64 : Set}
 
 	//the definition of a set, a data structure that is Retriable and Editionable
 	access(all) struct Set : Templates.Retirable, Templates.Editionable, Templates.RoyaltyHolder {
-		pub let id:UInt64
-		pub let name: String
+		access(all) let id:UInt64
+		access(all) let name: String
 		pub var active:Bool
-		pub let royalties: [Templates.Royalty]
-		pub let creator : String
+		access(all) let royalties: [Templates.Royalty]
+		access(all) let creator : String
 		access(self) let extra: {String : AnyStruct}
 
 		init(id:UInt64, name:String, creator: String, royalties: [Templates.Royalty]) {
@@ -101,13 +101,13 @@ access(all) contract Wearables: NonFungibleToken {
 	pub event PositionRegistered(id:UInt64, name:String, classifiers:[String])
 	pub event PositionRetired(id:UInt64)
 
-	pub let positions: {UInt64 : Position}
+	access(all) let positions: {UInt64 : Position}
 
 	//the definition of a position, a data structure that is Retriable and Editionable
 	access(all) struct Position : Templates.Retirable, Templates.Editionable{
-		pub let id:UInt64
-		pub let name: String
-		pub let classifiers: [String]
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) let classifiers: [String]
 		pub var active:Bool
 		access(self) let extra: {String : AnyStruct}
 
@@ -173,20 +173,20 @@ access(all) contract Wearables: NonFungibleToken {
 	pub event TemplateRetired(id:UInt64)
 
 	//a registry of templates that defines how a Wearable can be minted
-	pub let templates: {UInt64 : Template}
+	access(all) let templates: {UInt64 : Template}
 
 	//the definition of a template, a data structure that is Retriable and Editionable
 	access(all) struct Template : Templates.Retirable, Templates.Editionable {
-		pub let id:UInt64
-		pub let name: String
-		pub let set: UInt64
-		pub let position: UInt64
-		pub let tags: [Tag]
-		pub let thumbnail: MetadataViews.Media
-		pub let image: MetadataViews.Media
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) let set: UInt64
+		access(all) let position: UInt64
+		access(all) let tags: [Tag]
+		access(all) let thumbnail: MetadataViews.Media
+		access(all) let image: MetadataViews.Media
 		pub var active: Bool
-		pub let hidden: Bool
-		pub let plural: Bool
+		access(all) let hidden: Bool
+		access(all) let plural: Bool
 		access(self) let extra: {String : AnyStruct}
 
 		init(id:UInt64, set: UInt64, position: UInt64, name: String, tags:[Tag], thumbnail: MetadataViews.Media, image: MetadataViews.Media, hidden: Bool, plural: Bool) {
@@ -273,7 +273,7 @@ access(all) contract Wearables: NonFungibleToken {
 
 	//A tag is a label for a Wearable, they can have many tags associated with them
 	access(all) struct Tag : Templates.Editionable {
-		pub let value : String
+		access(all) let value : String
 		access(self) let extra: {String : AnyStruct}
 
 		init(value: String) {
@@ -325,26 +325,26 @@ access(all) contract Wearables: NonFungibleToken {
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 		//the unique id of a NFT, Wearables uses UUID so this id is unique across _all_ resources on flow
-		pub let id:UInt64
+		access(all) let id:UInt64
 
 		//The template that this Werable was made as
-		pub let template: Template
+		access(all) let template: Template
 
 		//a list of edition info used to present counters for the various types of data
-		pub let editions: [Templates.EditionInfo]
+		access(all) let editions: [Templates.EditionInfo]
 
 		//stores who has interacted with this wearable, that
-		pub let interactions: [Pointer]
+		access(all) let interactions: [Pointer]
 
 		//internal counter to count how many times a wearable has been deposited.
 		access(account) var nounce:UInt64
 
 		//the royalties defined in this werable
-		pub let royalties: MetadataViews.Royalties
+		access(all) let royalties: MetadataViews.Royalties
 
-		pub let context: { String: String}
+		access(all) let context: { String: String}
 		//stores extra data in case we need it for later iterations since we cannot add data
-		pub let extra: {String : AnyStruct}
+		access(all) let extra: {String : AnyStruct}
 
 		init(
 			template: Template,
@@ -597,9 +597,9 @@ access(all) contract Wearables: NonFungibleToken {
 
 	//A metadata for technical information that is not useful as traits
 	access(all) struct Metadata {
-		pub let templateId:UInt64
-		pub let setId:UInt64
-		pub let positionId:UInt64
+		access(all) let templateId:UInt64
+		access(all) let setId:UInt64
+		access(all) let positionId:UInt64
 
 		init(templateId:UInt64, setId:UInt64, positionId:UInt64) {
 			self.templateId=templateId
@@ -612,9 +612,9 @@ access(all) contract Wearables: NonFungibleToken {
 
 	// a struct to store who has interacted with a wearable
 	access(all) struct Pointer {
-		pub let id: UInt64
-		pub let characterId: UInt64
-		pub let address: Address
+		access(all) let id: UInt64
+		access(all) let characterId: UInt64
+		access(all) let address: Address
 		access(self) let extra: {String : AnyStruct}
 		init(id: UInt64 , characterId: UInt64 , address: Address )  {
 			self.id = id
@@ -826,13 +826,13 @@ access(all) contract Wearables: NonFungibleToken {
 
 	//internal struct to use for batch minting that points to a specific wearable
 	access(all) struct WearableMintData {
-		pub let template: UInt64
-		pub let setEdition: UInt64
-		pub let positionEdition: UInt64
-		pub let templateEdition: UInt64
-		pub let taggedTemplateEdition: UInt64
-		pub let tagEditions: [UInt64]
-		pub let extra: {String : AnyStruct}
+		access(all) let template: UInt64
+		access(all) let setEdition: UInt64
+		access(all) let positionEdition: UInt64
+		access(all) let templateEdition: UInt64
+		access(all) let taggedTemplateEdition: UInt64
+		access(all) let tagEditions: [UInt64]
+		access(all) let extra: {String : AnyStruct}
 
 		init(
 			template: UInt64,
@@ -855,11 +855,11 @@ access(all) contract Wearables: NonFungibleToken {
 	// This is not in use anymore. Use WearableMintData
 	//cadence does not allow us to remove this
 	access(all) struct MintData {
-		pub let template: UInt64
-		pub let setEdition: UInt64
-		pub let positionEdition: UInt64
-		pub let templateEdition: UInt64
-		pub let tagEditions: [UInt64]
+		access(all) let template: UInt64
+		access(all) let setEdition: UInt64
+		access(all) let positionEdition: UInt64
+		access(all) let templateEdition: UInt64
+		access(all) let tagEditions: [UInt64]
 
 		init(
 		) {

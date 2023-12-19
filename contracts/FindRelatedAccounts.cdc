@@ -1,16 +1,16 @@
 access(all) contract FindRelatedAccounts {
 
-	pub let storagePath: StoragePath
-	pub let publicPath: PublicPath
+	access(all) let storagePath: StoragePath
+	access(all) let publicPath: PublicPath
 
 	pub event RelatedAccount(user: Address, walletId: String, walletName: String, address: String, network: String, action: String)
 
 	access(all) struct AccountInformation{
-		pub let name:String
-		pub let address:Address?
-		pub let network:String //do not use enum because of contract upgrade
-		pub let stringAddress: String //other networks besides flow may be not support Address, duplication of flow address in string
-		pub let extra: {String : AnyStruct}
+		access(all) let name:String
+		access(all) let address:Address?
+		access(all) let network:String //do not use enum because of contract upgrade
+		access(all) let stringAddress: String //other networks besides flow may be not support Address, duplication of flow address in string
+		access(all) let extra: {String : AnyStruct}
 
 		init(name:String, address:Address?, network:String, otherAddress:String?){
 			pre{

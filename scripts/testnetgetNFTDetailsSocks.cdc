@@ -6,15 +6,15 @@ access(all) main(user: String , project: String, id: UInt64, views: [String]) : 
 }
 
 access(all) struct NFTData {
-	pub let contract: NFTContractData
-	pub let id: UInt64
-	pub let uuid: UInt64?
-	pub let title: String?
-	pub let description: String?
-	pub let external_domain_view_url: String?
-	pub let token_uri: String?
-	pub let media: [NFTMedia?]
-	pub let metadata: {String: String?}
+	access(all) let contract: NFTContractData
+	access(all) let id: UInt64
+	access(all) let uuid: UInt64?
+	access(all) let title: String?
+	access(all) let description: String?
+	access(all) let external_domain_view_url: String?
+	access(all) let token_uri: String?
+	access(all) let media: [NFTMedia?]
+	access(all) let metadata: {String: String?}
 
 	init(
 		contract: NFTContractData,
@@ -40,12 +40,12 @@ access(all) struct NFTData {
 }
 
 access(all) struct NFTContractData {
-	pub let name: String
-	pub let address: Address
-	pub let storage_path: String
-	pub let public_path: String
-	pub let public_collection_name: String
-	pub let external_domain: String
+	access(all) let name: String
+	access(all) let address: Address
+	access(all) let storage_path: String
+	access(all) let public_path: String
+	access(all) let public_collection_name: String
+	access(all) let external_domain: String
 
 	init(
 		name: String,
@@ -65,8 +65,8 @@ access(all) struct NFTContractData {
 }
 
 access(all) struct NFTMedia {
-	pub let uri: String?
-	pub let mimetype: String?
+	access(all) let uri: String?
+	access(all) let mimetype: String?
 
 	init(
 		uri: String?,

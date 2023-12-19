@@ -5,10 +5,10 @@ import Clock from "../contracts/Clock.cdc"
 
 access(all) struct FINDReport{
 
-	pub let leases: [FIND.LeaseInformation]
-	pub let leasesBids: [FIND.BidInfo]
-	pub let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
-	pub let marketBids: {String : FindMarket.BidItemCollectionReport}
+	access(all) let leases: [FIND.LeaseInformation]
+	access(all) let leasesBids: [FIND.BidInfo]
+	access(all) let itemsForSale: {String : FindMarket.SaleItemCollectionReport}
+	access(all) let marketBids: {String : FindMarket.BidItemCollectionReport}
 
 	init(
 		 bids: [FIND.BidInfo],

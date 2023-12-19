@@ -7,11 +7,11 @@ access(all) main(user: String, collections: [String]) : {String : ItemReport} {
 }
 
 access(all) struct ItemReport {
-	pub let length : Int // mapping of collection to no. of ids 
-	pub let extraIDs : [UInt64]
-	pub let shard : String 
-	pub let extraIDsIdentifier : String 
-	pub let collectionName: String
+	access(all) let length : Int // mapping of collection to no. of ids 
+	access(all) let extraIDs : [UInt64]
+	access(all) let shard : String 
+	access(all) let extraIDsIdentifier : String 
+	access(all) let collectionName: String
 
 	init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
 		self.length=length 
@@ -23,11 +23,11 @@ access(all) struct ItemReport {
 }
 
 access(all) struct NFTView {
-	pub let id: UInt64
-	pub let display: MetadataViews.Display?
-	pub let editions: MetadataViews.Editions?
-	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
-	pub let nftType: Type
+	access(all) let id: UInt64
+	access(all) let display: MetadataViews.Display?
+	access(all) let editions: MetadataViews.Editions?
+	access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay?
+	access(all) let nftType: Type
 
 	init(
 		id : UInt64,
@@ -45,8 +45,8 @@ access(all) struct NFTView {
 }
 
 access(all) struct NFTIDs {
-	pub let ids: [UInt64]
-	pub let collectionName: String 
+	access(all) let ids: [UInt64]
+	access(all) let collectionName: String 
 
 	init(ids: [UInt64], collectionName: String ) {
 		self.ids = ids

@@ -44,10 +44,10 @@ access(all) main(user: String) : Report {
 
 access(all) struct Report {
 
-	pub let nftCatalogTicketInfo : {String : [LostAndFoundHelper.Ticket]}
-	pub let ticketInfo : {String : [LostAndFoundHelper.Ticket]}
-	pub let ticketIds : {String : [UInt64]}
-	pub let error : String?
+	access(all) let nftCatalogTicketInfo : {String : [LostAndFoundHelper.Ticket]}
+	access(all) let ticketInfo : {String : [LostAndFoundHelper.Ticket]}
+	access(all) let ticketIds : {String : [UInt64]}
+	access(all) let error : String?
 
 	init(nftCatalogTicketInfo : {String : [LostAndFoundHelper.Ticket]}, ticketInfo : {String : [LostAndFoundHelper.Ticket]}, ticketIds : {String : [UInt64]}, error: String?) {
 		self.nftCatalogTicketInfo = nftCatalogTicketInfo

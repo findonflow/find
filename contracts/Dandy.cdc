@@ -6,9 +6,9 @@ import FindForge from "./FindForge.cdc"
 
 access(all) contract Dandy: NonFungibleToken {
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPrivatePath: PrivatePath
-	pub let CollectionPublicPath: PublicPath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionPublicPath: PublicPath
 	pub var totalSupply: UInt64
 
 	/*store all valid type converters for Dandys
@@ -35,11 +35,11 @@ access(all) contract Dandy: NonFungibleToken {
 	}
 
 	access(all) struct DandyInfo {
-		pub let name: String
-		pub let description: String
-		pub let thumbnail: MetadataViews.Media
-		pub let schemas: [AnyStruct]
-		pub let externalUrlPrefix:String?
+		access(all) let name: String
+		access(all) let description: String
+		access(all) let thumbnail: MetadataViews.Media
+		access(all) let schemas: [AnyStruct]
+		access(all) let externalUrlPrefix:String?
 
 		init(name: String, description: String, thumbnail: MetadataViews.Media, schemas: [AnyStruct], externalUrlPrefix:String?) {
 			self.name=name 
@@ -50,7 +50,7 @@ access(all) contract Dandy: NonFungibleToken {
 		}
 	}
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
-		pub let id: UInt64
+		access(all) let id: UInt64
 		access(self) var nounce: UInt64
 
 		access(self) var primaryCutPaid: Bool
@@ -375,8 +375,8 @@ access(all) contract Dandy: NonFungibleToken {
 	/// This struct interface is used on a contract level to convert from one View to another. 
 	/// See Dandy nft for an example on how to convert one type to another
 	access(all) struct interface ViewConverter {
-		pub let to: Type
-		pub let from: Type
+		access(all) let to: Type
+		access(all) let from: Type
 
 		access(all) convert(_ value:AnyStruct) : AnyStruct
 	}

@@ -7,7 +7,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-pub let paging : (([String], Int) : [String]) = fun(_ items : [String], _ page: Int) : [String] {
+access(all) let paging : (([String], Int) : [String]) = fun(_ items : [String], _ page: Int) : [String] {
 	let pageSize = 20
 	var start = (page - 1) * pageSize
 	let end = start + pageSize
@@ -27,7 +27,7 @@ pub let paging : (([String], Int) : [String]) = fun(_ items : [String], _ page: 
 }
 
 
-pub let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
+access(all) let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
 			var i = arr.firstIndex(of: element)
 			while i != nil {
 				arr.remove(at: i!)
@@ -100,8 +100,8 @@ access(all) main(page: Int, detail: Bool) : AnyStruct {
 }
 
 access(all) struct Report {
-	pub let nonDapper : [AnyStruct]
-	pub let dapper : [AnyStruct]
+	access(all) let nonDapper : [AnyStruct]
+	access(all) let dapper : [AnyStruct]
 
 	init(
 		nonDapper : [AnyStruct],
@@ -114,9 +114,9 @@ access(all) struct Report {
 }
 
 access(all) struct Item {
-	pub let type: String
-	pub let listingType: String
-	pub let ftType: [Type]
+	access(all) let type: String
+	access(all) let listingType: String
+	access(all) let ftType: [Type]
 
 	init(
 		type: String,

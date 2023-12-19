@@ -320,8 +320,8 @@ access(all) contract FindLeaseMarket {
 	/////// Pointer Section
 
 	access(all) struct interface LeasePointer {
-		pub let name: String
-		pub let uuid: UInt64
+		access(all) let name: String
+		access(all) let uuid: UInt64
 
 		access(all) valid() : Bool
 		access(all) getUUID() :UInt64
@@ -332,8 +332,8 @@ access(all) contract FindLeaseMarket {
 
 	access(all) struct ReadLeasePointer : LeasePointer {
 		access(self) let cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
-		pub let name: String
-		pub let uuid: UInt64
+		access(all) let name: String
+		access(all) let uuid: UInt64
 
 		// Passing in the reference here to ensure that is the owner
 		init(name: String) {
@@ -381,8 +381,8 @@ access(all) contract FindLeaseMarket {
 
 	access(all) struct AuthLeasePointer : LeasePointer {
 		access(self) let cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
-		pub let name: String
-		pub let uuid: UInt64
+		access(all) let name: String
+		access(all) let uuid: UInt64
 
 		// Passing in the reference here to ensure that is the owner
 		init(ref:&FIND.LeaseCollection, name: String) {
@@ -466,13 +466,13 @@ access(all) contract FindLeaseMarket {
 
 	//struct to expose information about leases
 	access(all) struct LeaseInfo {
-		pub let name: String
-		pub let address: Address
-		pub let cost: UFix64
-		pub let status: String
-		pub let validUntil: UFix64
-		pub let lockedUntil: UFix64
-		pub let addons: [String]
+		access(all) let name: String
+		access(all) let address: Address
+		access(all) let cost: UFix64
+		access(all) let status: String
+		access(all) let validUntil: UFix64
+		access(all) let lockedUntil: UFix64
+		access(all) let addons: [String]
 
 		init(_ pointer: AnyStruct{FindLeaseMarket.LeasePointer}){
 			let network = FindLeaseMarket.getNetwork()
@@ -535,25 +535,25 @@ access(all) contract FindLeaseMarket {
 	}
 
 	access(all) struct SaleItemInformation {
-		pub let leaseIdentifier: String
-		pub let leaseName: String
-		pub let seller: Address
-		pub let sellerName: String?
-		pub let amount: UFix64?
-		pub let bidder: Address?
+		access(all) let leaseIdentifier: String
+		access(all) let leaseName: String
+		access(all) let seller: Address
+		access(all) let sellerName: String?
+		access(all) let amount: UFix64?
+		access(all) let bidder: Address?
 		pub var bidderName: String?
-		pub let listingId: UInt64
+		access(all) let listingId: UInt64
 
-		pub let saleType: String
-		pub let listingTypeIdentifier: String
-		pub let ftAlias: String
-		pub let ftTypeIdentifier: String
-		pub let listingValidUntil: UFix64?
+		access(all) let saleType: String
+		access(all) let listingTypeIdentifier: String
+		access(all) let ftAlias: String
+		access(all) let ftTypeIdentifier: String
+		access(all) let listingValidUntil: UFix64?
 
 		pub var lease: LeaseInfo?
-		pub let auction: AuctionItem?
-		pub let listingStatus:String
-		pub let saleItemExtraField: {String : AnyStruct}
+		access(all) let auction: AuctionItem?
+		access(all) let listingStatus:String
+		access(all) let saleItemExtraField: {String : AnyStruct}
 
 		init(item: &{SaleItem}, status:String, leaseInfo: Bool) {
 			self.leaseIdentifier= item.getItemType().identifier
@@ -585,11 +585,11 @@ access(all) contract FindLeaseMarket {
 	}
 
 	access(all) struct BidInfo{
-		pub let name: String
-		pub let bidAmount: UFix64
-		pub let bidTypeIdentifier: String
-		pub let timestamp: UFix64
-		pub let item: SaleItemInformation
+		access(all) let name: String
+		access(all) let bidAmount: UFix64
+		access(all) let bidTypeIdentifier: String
+		access(all) let timestamp: UFix64
+		access(all) let item: SaleItemInformation
 
 		init(name: String, bidTypeIdentifier: String, bidAmount: UFix64, timestamp: UFix64, item:SaleItemInformation) {
 			self.name=name
@@ -603,13 +603,13 @@ access(all) contract FindLeaseMarket {
 	access(all) struct AuctionItem {
 		//end time
 		//current time
-		pub let startPrice: UFix64
-		pub let currentPrice: UFix64
-		pub let minimumBidIncrement: UFix64
-		pub let reservePrice: UFix64
-		pub let extentionOnLateBid: UFix64
-		pub let auctionEndsAt: UFix64?
-		pub let timestamp: UFix64
+		access(all) let startPrice: UFix64
+		access(all) let currentPrice: UFix64
+		access(all) let minimumBidIncrement: UFix64
+		access(all) let reservePrice: UFix64
+		access(all) let extentionOnLateBid: UFix64
+		access(all) let auctionEndsAt: UFix64?
+		access(all) let timestamp: UFix64
 
 		init(startPrice: UFix64, currentPrice: UFix64, minimumBidIncrement: UFix64, reservePrice: UFix64, extentionOnLateBid: UFix64, auctionEndsAt: UFix64? , timestamp: UFix64){
 			self.startPrice = startPrice
@@ -637,9 +637,9 @@ access(all) contract FindLeaseMarket {
 	}
 
 	access(all) struct GhostListing{
-		//		pub let listingType: Type
-		pub let listingTypeIdentifier: String
-		pub let name: String
+		//		access(all) let listingType: Type
+		access(all) let listingTypeIdentifier: String
+		access(all) let name: String
 
 
 		init(listingType:Type, name:String) {
@@ -650,8 +650,8 @@ access(all) contract FindLeaseMarket {
 	}
 
 	access(all) struct SaleItemCollectionReport {
-		pub let items : [FindLeaseMarket.SaleItemInformation]
-		pub let ghosts: [FindLeaseMarket.GhostListing]
+		access(all) let items : [FindLeaseMarket.SaleItemInformation]
+		access(all) let ghosts: [FindLeaseMarket.GhostListing]
 
 		init(items: [SaleItemInformation], ghosts: [GhostListing]) {
 			self.items=items
@@ -660,8 +660,8 @@ access(all) contract FindLeaseMarket {
 	}
 
 	access(all) struct BidItemCollectionReport {
-		pub let items : [FindLeaseMarket.BidInfo]
-		pub let ghosts: [FindLeaseMarket.GhostListing]
+		access(all) let items : [FindLeaseMarket.BidInfo]
+		access(all) let ghosts: [FindLeaseMarket.GhostListing]
 
 		init(items: [BidInfo], ghosts: [GhostListing]) {
 			self.items=items

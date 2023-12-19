@@ -4,7 +4,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 access(all) contract FindMarketCutStruct {
 
 	access(all) struct Cuts {
-		pub let cuts : [{Cut}]
+		access(all) let cuts : [{Cut}]
 		access(contract) let extra: {String : AnyStruct}
 
 		init(cuts: [{Cut}]) {
@@ -22,11 +22,11 @@ access(all) contract FindMarketCutStruct {
 	}
 
 	access(all) struct EventSafeCut {
-		pub let name: String
-		pub let description: String
-		pub let cut: UFix64
-		pub let receiver: Address
-		pub let extra: {String : String}
+		access(all) let name: String
+		access(all) let description: String
+		access(all) let cut: UFix64
+		access(all) let receiver: Address
+		access(all) let extra: {String : String}
 
 		init(name: String, description: String, cut: UFix64, receiver: Address, extra: {String : String}) {
 			self.name = name
@@ -71,11 +71,11 @@ access(all) contract FindMarketCutStruct {
 
 	access(all) struct GeneralCut : Cut {
 		// This is the description of the royalty struct
-		pub let name : String
-		pub let cap: Capability<&{FungibleToken.Receiver}>
-		pub let cut: UFix64
+		access(all) let name : String
+		access(all) let cap: Capability<&{FungibleToken.Receiver}>
+		access(all) let cut: UFix64
 		// This is the description to the cut that can be visible to give detail on detail page
-		pub let description: String
+		access(all) let description: String
 		access(self) let extra : {String : AnyStruct}
 
 		init(name : String, cap: Capability<&{FungibleToken.Receiver}>, cut: UFix64, description: String) {
@@ -114,13 +114,13 @@ access(all) contract FindMarketCutStruct {
 
 	access(all) struct ThresholdCut : Cut {
 		// This is the description of the royalty struct
-		pub let name : String
-		pub let address: Address
-		pub let cut: UFix64
+		access(all) let name : String
+		access(all) let address: Address
+		access(all) let cut: UFix64
 		// This is the description to the cut that can be visible to give detail on detail page
-		pub let description: String
-		pub let publicPath: String
-		pub let minimumPayment: UFix64
+		access(all) let description: String
+		access(all) let publicPath: String
+		access(all) let minimumPayment: UFix64
 		access(self) let extra : {String : AnyStruct}
 
 		init(name : String , address: Address , cut: UFix64 , description: String , publicPath: String, minimumPayment: UFix64) {

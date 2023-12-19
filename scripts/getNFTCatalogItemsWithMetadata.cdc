@@ -9,15 +9,15 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
 }
 
 access(all) struct NFTView {
-	pub let id: UInt64
-	pub let display: MetadataViews.Display?
-	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
+	access(all) let id: UInt64
+	access(all) let display: MetadataViews.Display?
+	access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay?
 	pub var rarity:MetadataViews.Rarity?
 	pub var editions: MetadataViews.Editions?
 	pub var serial: UInt64?
 	pub var traits: MetadataViews.Traits?
-	pub let soulBounded: Bool 
-	pub let nftType: Type
+	access(all) let soulBounded: Bool 
+	access(all) let nftType: Type
 
 	init(
 		id : UInt64,
@@ -131,9 +131,9 @@ access(all) getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView]
 }
 
 access(all) struct CollectionReport {
-	pub let items : {String : [MetadataCollectionItem]} 
-	pub let collections : {String : Int} // mapping of collection to no. of ids 
-	pub let extraIDs : {String : [UInt64]} 
+	access(all) let items : {String : [MetadataCollectionItem]} 
+	access(all) let collections : {String : Int} // mapping of collection to no. of ids 
+	access(all) let extraIDs : {String : [UInt64]} 
 
 	init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
 		self.items=items 
@@ -143,16 +143,16 @@ access(all) struct CollectionReport {
 }
 
 access(all) struct MetadataCollectionItem {
-	pub let id:UInt64
-	pub let name: String
-	pub let collection: String // <- This will be Alias unless they want something else
-	pub let subCollection: String? // <- This will be Alias unless they want something else
-	pub let nftDetailIdentifier: String
-	pub let soulBounded: Bool 
+	access(all) let id:UInt64
+	access(all) let name: String
+	access(all) let collection: String // <- This will be Alias unless they want something else
+	access(all) let subCollection: String? // <- This will be Alias unless they want something else
+	access(all) let nftDetailIdentifier: String
+	access(all) let soulBounded: Bool 
 
-	pub let media  : String
-	pub let mediaType : String 
-	pub let source : String 
+	access(all) let media  : String
+	access(all) let mediaType : String 
+	access(all) let source : String 
 
 	pub var rarity:MetadataViews.Rarity?
 	pub var editions: MetadataViews.Editions?

@@ -30,13 +30,13 @@ access(all) main(name: String) : NameReport? {
 }
 
 access(all) struct NameReport {
-	pub let status: String
-	pub let cost: UFix64
-	pub let owner: Address?
-	pub let avatar: String?
-	pub let validUntil: UFix64?
-	pub let lockedUntil: UFix64?
-	pub let registeredTime: UFix64?
+	access(all) let status: String
+	access(all) let cost: UFix64
+	access(all) let owner: Address?
+	access(all) let avatar: String?
+	access(all) let validUntil: UFix64?
+	access(all) let lockedUntil: UFix64?
+	access(all) let registeredTime: UFix64?
 
 	init(status: String, cost: UFix64, owner: Address?, avatar: String?, validUntil: UFix64?, lockedUntil: UFix64?, registeredTime: UFix64? ) {
 		self.status=status

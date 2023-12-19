@@ -29,8 +29,8 @@ access(all) contract FindMarket {
 	pub var residualAddress : Address
 
 	// Tenant information
-	pub let TenantClientPublicPath: PublicPath
-	pub let TenantClientStoragePath: StoragePath
+	access(all) let TenantClientPublicPath: PublicPath
+	access(all) let TenantClientStoragePath: StoragePath
 
 	access(contract) let tenantPathPrefix :String
 
@@ -39,8 +39,8 @@ access(all) contract FindMarket {
 
 	// Deprecated in testnet
 	access(all) struct TenantCuts {
-		pub let findCut:MetadataViews.Royalty?
-		pub let tenantCut:MetadataViews.Royalty?
+		access(all) let findCut:MetadataViews.Royalty?
+		access(all) let tenantCut:MetadataViews.Royalty?
 
 		init(findCut:MetadataViews.Royalty?, tenantCut:MetadataViews.Royalty?) {
 			self.findCut=findCut
@@ -50,9 +50,9 @@ access(all) contract FindMarket {
 
 	// Deprecated in testnet
 	access(all) struct ActionResult {
-		pub let allowed:Bool
-		pub let message:String
-		pub let name:String
+		access(all) let allowed:Bool
+		access(all) let message:String
+		access(all) let name:String
 
 		init(allowed:Bool, message:String, name:String) {
 			self.allowed=allowed
@@ -543,9 +543,9 @@ access(all) contract FindMarket {
 
 	/// A struct to return what action an NFT can execute
 	access(all) struct AllowedListing {
-		pub let listingType: Type
-		pub let ftTypes: [Type]
-		pub let status: String
+		access(all) let listingType: Type
+		access(all) let ftTypes: [Type]
+		access(all) let status: String
 
 		init(listingType: Type, ftTypes: [Type], status: String) {
 			self.listingType=listingType
@@ -556,8 +556,8 @@ access(all) contract FindMarket {
 
 	/// If this is a listing action it will not be allowed if deprecated
 	access(all) struct MarketAction{
-		pub let listing:Bool
-		pub let name:String
+		access(all) let listing:Bool
+		access(all) let name:String
 
 		init(listing:Bool, name:String){
 			self.listing=listing
@@ -566,10 +566,10 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct TenantRule{
-		pub let name:String
-		pub let types:[Type]
-		pub let ruleType:String
-		pub let allow:Bool
+		access(all) let name:String
+		access(all) let types:[Type]
+		access(all) let ruleType:String
+		access(all) let allow:Bool
 
 		init(name:String, types:[Type], ruleType:String, allow:Bool){
 
@@ -598,9 +598,9 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct TenantSaleItem {
-		pub let name:String
-		pub let cut:MetadataViews.Royalty?
-		pub let rules:[TenantRule]
+		access(all) let name:String
+		access(all) let cut:MetadataViews.Royalty?
+		access(all) let rules:[TenantRule]
 		pub var status:String
 
 		init(name:String, cut:MetadataViews.Royalty?, rules:[TenantRule], status:String){
@@ -647,7 +647,7 @@ access(all) contract FindMarket {
 		access(all) getCuts(name:String, listingType: Type, nftType:Type, ftType:Type) : {String : FindMarketCutStruct.Cuts}
 		access(all) getAllowedListings(nftType: Type, marketType: Type) : AllowedListing?
 		access(all) getBlockedNFT(marketType: Type) : [Type]
-		pub let name:String
+		access(all) let name:String
 	}
 
 	//this needs to be a resource so that nobody else can make it.
@@ -657,7 +657,7 @@ access(all) contract FindMarket {
 		access(self) let tenantSaleItems : {String : TenantSaleItem}
 		access(self) let findCuts : {String : TenantSaleItem}
 
-		pub let name: String
+		access(all) let name: String
 
 		init(_ name:String) {
 			self.name=name
@@ -1454,10 +1454,10 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct NFTInfo {
-		pub let id: UInt64
-		pub let name:String
-		pub let thumbnail:String
-		pub let type: String
+		access(all) let id: UInt64
+		access(all) let name:String
+		access(all) let thumbnail:String
+		access(all) let type: String
 		pub var rarity:String?
 		pub var editionNumber: UInt64?
 		pub var totalInEdition: UInt64?
@@ -1599,9 +1599,9 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct GhostListing{
-		//		pub let listingType: Type
-		pub let listingTypeIdentifier: String
-		pub let id: UInt64
+		//		access(all) let listingType: Type
+		access(all) let listingTypeIdentifier: String
+		access(all) let id: UInt64
 
 
 		init(listingType:Type, id:UInt64) {
@@ -1614,13 +1614,13 @@ access(all) contract FindMarket {
 	access(all) struct AuctionItem {
 		//end time
 		//current time
-		pub let startPrice: UFix64
-		pub let currentPrice: UFix64
-		pub let minimumBidIncrement: UFix64
-		pub let reservePrice: UFix64
-		pub let extentionOnLateBid: UFix64
-		pub let auctionEndsAt: UFix64?
-		pub let timestamp: UFix64
+		access(all) let startPrice: UFix64
+		access(all) let currentPrice: UFix64
+		access(all) let minimumBidIncrement: UFix64
+		access(all) let reservePrice: UFix64
+		access(all) let extentionOnLateBid: UFix64
+		access(all) let auctionEndsAt: UFix64?
+		access(all) let timestamp: UFix64
 
 		init(startPrice: UFix64, currentPrice: UFix64, minimumBidIncrement: UFix64, reservePrice: UFix64, extentionOnLateBid: UFix64, auctionEndsAt: UFix64? , timestamp: UFix64){
 			self.startPrice = startPrice
@@ -1642,8 +1642,8 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct SaleItemCollectionReport {
-		pub let items : [FindMarket.SaleItemInformation]
-		pub let ghosts: [FindMarket.GhostListing]
+		access(all) let items : [FindMarket.SaleItemInformation]
+		access(all) let ghosts: [FindMarket.GhostListing]
 
 		init(items: [SaleItemInformation], ghosts: [GhostListing]) {
 			self.items=items
@@ -1659,8 +1659,8 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct BidItemCollectionReport {
-		pub let items : [FindMarket.BidInfo]
-		pub let ghosts: [FindMarket.GhostListing]
+		access(all) let items : [FindMarket.BidInfo]
+		access(all) let ghosts: [FindMarket.GhostListing]
 
 		init(items: [BidInfo], ghosts: [GhostListing]) {
 			self.items=items
@@ -1713,25 +1713,25 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct SaleItemInformation {
-		pub let nftIdentifier: String
-		pub let nftId: UInt64
-		pub let seller: Address
-		pub let sellerName: String?
-		pub let amount: UFix64?
-		pub let bidder: Address?
+		access(all) let nftIdentifier: String
+		access(all) let nftId: UInt64
+		access(all) let seller: Address
+		access(all) let sellerName: String?
+		access(all) let amount: UFix64?
+		access(all) let bidder: Address?
 		pub var bidderName: String?
-		pub let listingId: UInt64
+		access(all) let listingId: UInt64
 
-		pub let saleType: String
-		pub let listingTypeIdentifier: String
-		pub let ftAlias: String
-		pub let ftTypeIdentifier: String
-		pub let listingValidUntil: UFix64?
+		access(all) let saleType: String
+		access(all) let listingTypeIdentifier: String
+		access(all) let ftAlias: String
+		access(all) let ftTypeIdentifier: String
+		access(all) let listingValidUntil: UFix64?
 
 		pub var nft: NFTInfo?
-		pub let auction: AuctionItem?
-		pub let listingStatus:String
-		pub let saleItemExtraField: {String : AnyStruct}
+		access(all) let auction: AuctionItem?
+		access(all) let listingStatus:String
+		access(all) let saleItemExtraField: {String : AnyStruct}
 
 		init(item: &{SaleItem}, status:String, nftInfo: Bool) {
 			self.nftIdentifier= item.getItemType().identifier
@@ -1763,11 +1763,11 @@ access(all) contract FindMarket {
 	}
 
 	access(all) struct BidInfo{
-		pub let id: UInt64
-		pub let bidAmount: UFix64
-		pub let bidTypeIdentifier: String
-		pub let timestamp: UFix64
-		pub let item: SaleItemInformation
+		access(all) let id: UInt64
+		access(all) let bidAmount: UFix64
+		access(all) let bidTypeIdentifier: String
+		access(all) let timestamp: UFix64
+		access(all) let item: SaleItemInformation
 
 		init(id: UInt64, bidTypeIdentifier: String, bidAmount: UFix64, timestamp: UFix64, item:SaleItemInformation) {
 			self.id=id

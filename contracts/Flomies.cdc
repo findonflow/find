@@ -15,9 +15,9 @@ access(all) contract Flomies: NonFungibleToken {
 	pub event Minted(id:UInt64, serial: UInt64, traits: [UInt64])
 	pub event RegisteredTraits(traitId:UInt64, trait:{String : String})
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
-	pub let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPublicPath: PublicPath
+	access(all) let CollectionPrivatePath: PrivatePath
 
 	access(account) var royalties : [MetadataViews.Royalty]
 	access(self) let traits : {UInt64: MetadataViews.Trait}
@@ -30,12 +30,12 @@ access(all) contract Flomies: NonFungibleToken {
 	*/
 
 	access(all) struct Metadata {
-		pub let nftId: UInt64
-		pub let name: String
-		pub let serial:UInt64
-		pub let thumbnail: String
-		pub let image: String
-		pub let traits: [UInt64]
+		access(all) let nftId: UInt64
+		access(all) let name: String
+		access(all) let serial:UInt64
+		access(all) let thumbnail: String
+		access(all) let image: String
+		access(all) let traits: [UInt64]
 
 		init(nftId: UInt64,name:String,thumbnail: String, image:String, serial:UInt64, traits: [UInt64]) {
 			self.nftId=nftId
@@ -49,11 +49,11 @@ access(all) contract Flomies: NonFungibleToken {
 
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
-		pub let id:UInt64
-		pub let serial:UInt64
+		access(all) let id:UInt64
+		access(all) let serial:UInt64
 		pub var nounce:UInt64
-		pub let rootHash:String
-		pub let traits: [UInt64]
+		access(all) let rootHash:String
+		access(all) let traits: [UInt64]
 
 		init(
 			serial:UInt64,

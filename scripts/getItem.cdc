@@ -3,16 +3,16 @@ import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
 access(all) struct MetadataCollectionItem {
-	pub let id:UInt64
-	pub let uuid:UInt64
-	pub let name: String
-	pub let description: String?
-	pub let image: String
-	pub let url: String
-	pub let contentType:String
-	pub let rarity:String
-	pub let minter:String?
-	pub let type:Type
+	access(all) let id:UInt64
+	access(all) let uuid:UInt64
+	access(all) let name: String
+	access(all) let description: String?
+	access(all) let image: String
+	access(all) let url: String
+	access(all) let contentType:String
+	access(all) let rarity:String
+	access(all) let minter:String?
+	access(all) let type:Type
 
 
 	init(id:UInt64, uuid:UInt64, name:String, description:String?, image:String, url:String, contentType: String, rarity: String, minter:String?, type:Type) {

@@ -14,21 +14,21 @@ access(all) contract PartyFavorz: NonFungibleToken {
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id:UInt64, serial: UInt64, season: UInt64, name: String )
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPrivatePath: PrivatePath
-	pub let CollectionPublicPath: PublicPath
-	pub let MinterStoragePath: StoragePath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionPublicPath: PublicPath
+	access(all) let MinterStoragePath: StoragePath
 
-	pub let royalties: [MetadataViews.Royalty]
+	access(all) let royalties: [MetadataViews.Royalty]
 
 	access(all) struct Info {
-		pub let name: String
-		pub let description: String
-		pub let thumbnailHash: String
-		pub let edition: UInt64
-		pub let maxEdition: UInt64
-		pub let fullsizeHash: String 
-		pub let artist: String
+		access(all) let name: String
+		access(all) let description: String
+		access(all) let thumbnailHash: String
+		access(all) let edition: UInt64
+		access(all) let maxEdition: UInt64
+		access(all) let fullsizeHash: String 
+		access(all) let artist: String
 
 		init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, fullsizeHash: String, artist: String) {
 			self.name=name 
@@ -42,9 +42,9 @@ access(all) contract PartyFavorz: NonFungibleToken {
 	}
 
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
-		pub let id: UInt64
+		access(all) let id: UInt64
 
-		pub let info: Info
+		access(all) let info: Info
 
 		init(
 			info: Info,

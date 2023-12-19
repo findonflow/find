@@ -25,17 +25,17 @@ access(all) contract Bl0xPack: NonFungibleToken {
 	pub event FulfilledError(packId:UInt64, address:Address?, reason:String)
 	pub event OpenDebug(packId:UInt64, message:String)
 
-	pub let PackMetadataStoragePath: StoragePath
+	access(all) let PackMetadataStoragePath: StoragePath
 
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPublicPath: PublicPath
 
-	pub let OpenedCollectionPublicPath: PublicPath
-	pub let OpenedCollectionStoragePath: StoragePath
+	access(all) let OpenedCollectionPublicPath: PublicPath
+	access(all) let OpenedCollectionStoragePath: StoragePath
 
 
-	pub let DLQCollectionPublicPath: PublicPath
-	pub let DLQCollectionStoragePath: StoragePath
+	access(all) let DLQCollectionPublicPath: PublicPath
+	access(all) let DLQCollectionStoragePath: StoragePath
 
 
 	pub var totalSupply: UInt64
@@ -43,31 +43,31 @@ access(all) contract Bl0xPack: NonFungibleToken {
 	access(contract) let packMetadata: {UInt64: Metadata}
 
 	access(all) struct Metadata {
-		pub let name: String
-		pub let description: String
+		access(all) let name: String
+		access(all) let description: String
 
-		pub let thumbnailHash: String?
-		pub let thumbnailUrl:String?
+		access(all) let thumbnailHash: String?
+		access(all) let thumbnailUrl:String?
 
-		pub let wallet: Capability<&{FungibleToken.Receiver}>
-		pub let walletType: Type
-		pub let price: UFix64
+		access(all) let wallet: Capability<&{FungibleToken.Receiver}>
+		access(all) let walletType: Type
+		access(all) let price: UFix64
 
-		pub let buyTime:UFix64
+		access(all) let buyTime:UFix64
 
-		pub let openTime:UFix64
-		pub let whiteListTime:UFix64?
+		access(all) let openTime:UFix64
+		access(all) let whiteListTime:UFix64?
 
-		pub let floatEventId: UInt64?
+		access(all) let floatEventId: UInt64?
 
-		pub let storageRequirement: UInt64
+		access(all) let storageRequirement: UInt64
 
 		access(contract) let providerCap: Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
 
 		access(contract) let royaltyCap: Capability<&{FungibleToken.Receiver}>?
 		access(contract) let royaltyCut: UFix64
 
-		pub let requiresReservation: Bool
+		access(all) let requiresReservation: Bool
 
 		init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
 			self.name = name
@@ -117,7 +117,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 
 	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		// The token's ID
-		pub let id: UInt64
+		access(all) let id: UInt64
 
 		// The token's typeId
 		access(self) var typeId: UInt64

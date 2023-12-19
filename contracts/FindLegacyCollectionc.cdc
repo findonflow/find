@@ -65,9 +65,9 @@ access(all) contract FindLegacyCollectionc {
 
 	access(all) struct MetadataCollections {
 
-		pub let items: {String : MetadataCollectionItem}
-		pub let collections: {String : [String]}
-		pub let curatedCollections: {String : [String]}
+		access(all) let items: {String : MetadataCollectionItem}
+		access(all) let collections: {String : [String]}
+		access(all) let curatedCollections: {String : [String]}
 
 		init(items: {String : MetadataCollectionItem}, collections: {String : [String]}, curatedCollections: {String: [String]}) {
 			self.items=items
@@ -78,8 +78,8 @@ access(all) contract FindLegacyCollectionc {
 
 
 	access(all) struct MetadataCollection{
-		pub let type: String
-		pub let items: [MetadataCollectionItem]
+		access(all) let type: String
+		access(all) let items: [MetadataCollectionItem]
 
 		init(type:String, items: [MetadataCollectionItem]) {
 			self.type=type
@@ -89,14 +89,14 @@ access(all) contract FindLegacyCollectionc {
 
 
 	access(all) struct MetadataCollectionItem {
-		pub let id:UInt64
-		pub let name: String
-		pub let image: String
-		pub let url: String
-		pub let listPrice: UFix64?
-		pub let listToken: String?
-		pub let contentType:String
-		pub let rarity:String
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) let image: String
+		access(all) let url: String
+		access(all) let listPrice: UFix64?
+		access(all) let listToken: String?
+		access(all) let contentType:String
+		access(all) let rarity:String
 
 
 		init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String, rarity: String) {

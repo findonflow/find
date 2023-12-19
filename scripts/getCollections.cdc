@@ -5,10 +5,10 @@ import FIND from "../contracts/FIND.cdc"
 
 access(all) struct MetadataCollections {
 
-	pub let items: {String : MetadataCollectionItem}
-	pub let collections: {String : [String]}
+	access(all) let items: {String : MetadataCollectionItem}
+	access(all) let collections: {String : [String]}
 	// supports new contracts that supports metadataViews 
-	pub let curatedCollections: {String : [String]}
+	access(all) let curatedCollections: {String : [String]}
 
 	init(items: {String : MetadataCollectionItem}, collections: {String : [String]}, curatedCollections: {String: [String]}) {
 		self.items=items
@@ -19,8 +19,8 @@ access(all) struct MetadataCollections {
 
 
 access(all) struct MetadataCollection{
-	pub let type: String
-	pub let items: [MetadataCollectionItem]
+	access(all) let type: String
+	access(all) let items: [MetadataCollectionItem]
 
 	init(type:String, items: [MetadataCollectionItem]) {
 		self.type=type
@@ -31,8 +31,8 @@ access(all) struct MetadataCollection{
 // Collection Index.cdc Address : [{Path, ID}]
 /* 
 	access(all) struct CollectionItemPointer {
-		pub let path 
-		pub let id 
+		access(all) let path 
+		access(all) let id 
 	}
  */
 // Need : A metadata collection index : -> path, id, collection (Where do you want to group them)
@@ -45,18 +45,18 @@ access(all) struct MetadataCollection{
 // Another list -> take these path, id, collection and return the specific collection information (similar in collections)
 
 access(all) struct MetadataCollectionItem {
-	pub let id:UInt64
-	pub let typeIdentifier: String
-	pub let uuid: UInt64 
-	pub let name: String
-	pub let image: String
-	pub let url: String
-	pub let contentTypes:[String]
-	pub let rarity:MetadataViews.Rarity?
+	access(all) let id:UInt64
+	access(all) let typeIdentifier: String
+	access(all) let uuid: UInt64 
+	access(all) let name: String
+	access(all) let image: String
+	access(all) let url: String
+	access(all) let contentTypes:[String]
+	access(all) let rarity:MetadataViews.Rarity?
 	//Refine later 
-	pub let medias: [MetadataViews.Media]
-	pub let collection: String // <- This will be Alias unless they want something else
-	pub let traits: [MetadataViews.Trait]
+	access(all) let medias: [MetadataViews.Media]
+	access(all) let collection: String // <- This will be Alias unless they want something else
+	access(all) let traits: [MetadataViews.Trait]
 
 	init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: MetadataViews.Rarity?, medias: [MetadataViews.Media], collection: String, traits: [MetadataViews.Trait]) {
 		self.id=id

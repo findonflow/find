@@ -39,10 +39,10 @@ access(all) main(collectionIdentifier : String, type: String?) : NFTCatalogMetad
 }
 
 access(all) struct NFTCatalogMetadata {
-	pub let contractName : String
-	pub let contractAddress : Address
-	pub let nftType: String
-	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
+	access(all) let contractName : String
+	access(all) let contractAddress : Address
+	access(all) let nftType: String
+	access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
 	init (contractName : String, contractAddress : Address, nftType: Type, collectionDisplay : MetadataViews.NFTCollectionDisplay) {
 		self.contractName = contractName

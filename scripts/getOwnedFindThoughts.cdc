@@ -25,10 +25,10 @@ access(all) main(address: Address) : [Thought] {
 
 access(all) struct User {
 	pub var name: String?
-	pub let address: Address 
-	pub let findName: String? 
+	access(all) let address: Address 
+	access(all) let findName: String? 
 	pub var avatar: String? 
-	pub let reaction: String
+	access(all) let reaction: String
 
 	init(address: Address, reaction: String){
 		self.name = nil
@@ -46,17 +46,17 @@ access(all) struct User {
 }
 
 access(all) struct Thought {
-	pub let id: UInt64 
-	pub let creator: Address 
-	pub let creatorName: String? 
+	access(all) let id: UInt64 
+	access(all) let creator: Address 
+	access(all) let creatorName: String? 
 	pub var creatorProfileName: String? 
 	pub var creatorAvatar: String? 
 	pub var header: String?
 	pub var body: String?
-	pub let created: UFix64? 
+	access(all) let created: UFix64? 
 	pub var lastUpdated: UFix64?
-	pub let medias: {String : String}
-	pub let nft: [FindMarket.NFTInfo]
+	access(all) let medias: {String : String}
+	access(all) let nft: [FindMarket.NFTInfo]
 	pub var tags: [String]
 	pub var reacted: {String : [User]}
 	pub var reactions: {String : Int}

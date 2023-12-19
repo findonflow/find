@@ -74,14 +74,14 @@ import MintStoreItem from 0x20187093790b9aef
 
 
 access(all) struct MetadataCollectionItem {
-	pub let id:UInt64
-	pub let name: String
-	pub let image: String
-	pub let url: String
-	pub let listPrice: UFix64?
-	pub let listToken: String?
-	pub let contentType:String
-	pub let rarity:String
+	access(all) let id:UInt64
+	access(all) let name: String
+	access(all) let image: String
+	access(all) let url: String
+	access(all) let listPrice: UFix64?
+	access(all) let listToken: String?
+	access(all) let contentType:String
+	access(all) let rarity:String
 
 
 	init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String, rarity: String) {

@@ -6,8 +6,8 @@ import Clock from "../contracts/Clock.cdc"
 
 access(all) struct FINDReport{
 
-	pub let leasesForSale: {String : SaleItemCollectionReport}
-	pub let leasesBids: {String : BidItemCollectionReport}
+	access(all) let leasesForSale: {String : SaleItemCollectionReport}
+	access(all) let leasesBids: {String : BidItemCollectionReport}
 
 	init(
 		 leasesForSale: {String : SaleItemCollectionReport},
@@ -47,8 +47,8 @@ access(all) main(user: String) : FINDReport? {
 
 // These are for consolidating FIND Lease Sales
 access(all) struct SaleItemCollectionReport {
-	pub let items : [SaleItemInformation]
-	pub let ghosts: [FindLeaseMarket.GhostListing]
+	access(all) let items : [SaleItemInformation]
+	access(all) let ghosts: [FindLeaseMarket.GhostListing]
 
 	init(items: [SaleItemInformation], ghosts: [FindLeaseMarket.GhostListing]) {
 		self.items=items
@@ -128,13 +128,13 @@ access(all) struct SaleItemInformation {
 }
 
 access(all) struct LeaseInfo {
-	pub let name: String
-	pub let address: Address
-	pub let cost: UFix64
-	pub let status: String
-	pub let validUntil: UFix64
-	pub let lockedUntil: UFix64
-	pub let addons: [String]
+	access(all) let name: String
+	access(all) let address: Address
+	access(all) let cost: UFix64
+	access(all) let status: String
+	access(all) let validUntil: UFix64
+	access(all) let lockedUntil: UFix64
+	access(all) let addons: [String]
 
 	init(
 		name: String,
@@ -359,12 +359,12 @@ access(all) addLeasesSale(_ leases: [FIND.LeaseInformation], _ sales : {String :
 }
 
 access(all) struct BidInfo{
-	pub let name: String
-	pub let bidAmount: UFix64
-	pub let bidTypeIdentifier: String
-	pub let timestamp: UFix64
-	pub let item: SaleItemInformation
-	pub let market: String
+	access(all) let name: String
+	access(all) let bidAmount: UFix64
+	access(all) let bidTypeIdentifier: String
+	access(all) let timestamp: UFix64
+	access(all) let item: SaleItemInformation
+	access(all) let market: String
 
 	init(
 		name: String,
@@ -396,8 +396,8 @@ access(all) BidInfoFromFindLeaseMarket(_ b: FindLeaseMarket.BidInfo) : BidInfo {
 }
 
 access(all) struct BidItemCollectionReport {
-	pub let items : [BidInfo]
-	pub let ghosts: [FindLeaseMarket.GhostListing]
+	access(all) let items : [BidInfo]
+	access(all) let ghosts: [FindLeaseMarket.GhostListing]
 
 	init(items: [BidInfo], ghosts: [FindLeaseMarket.GhostListing]) {
 		self.items=items

@@ -947,14 +947,14 @@ access(all) contract FindThoughts {
 	// One thing to mention is that Thought supports NFT views.
 	// We implemented FindViews.ViewReadPointer in thoughts, therefore it can be used to point to NFTs (and fetch NFT information)
 	pub resource interface ThoughtPublic {
-		pub let id: UInt64
-		pub let creator: Address
+		access(all) let id: UInt64
+		access(all) let creator: Address
 		pub var header: String
 		pub var body: String
-		pub let created: UFix64
+		access(all) let created: UFix64
 		pub var lastUpdated: UFix64?
-		pub let medias: [MetadataViews.Media]
-		pub let nft: [FindViews.ViewReadPointer]
+		access(all) let medias: [MetadataViews.Media]
+		access(all) let nft: [FindViews.ViewReadPointer]
 		pub var tags: [String]
 		pub var reacted: {Address : String}
 		pub var reactions: {String : Int}
@@ -1099,23 +1099,23 @@ returning object
 
 ```cadence
 access(all) struct Thought {
-	pub let id: UInt64
-	pub let creator: Address
-	pub let creatorName: String?
+	access(all) let id: UInt64
+	access(all) let creator: Address
+	access(all) let creatorName: String?
 	pub var creatorProfileName: String?
 	pub var creatorAvatar: String?
 	pub var header: String?
 	pub var body: String?
-	pub let created: UFix64?
+	access(all) let created: UFix64?
 	pub var lastUpdated: UFix64?
-	pub let medias: {String : String}
-	pub let nft: [FindMarket.NFTInfo]
+	access(all) let medias: {String : String}
+	access(all) let nft: [FindMarket.NFTInfo]
 	pub var tags: [String]
 	pub var reacted: {String : [User]}
 	pub var reactions: {String : Int}
 	pub var reactedUsers: {String : [String]}
 	pub var quotedThought: Thought?
-	pub let hidden: Bool?
+	access(all) let hidden: Bool?
 	}
 ```
 

@@ -14,8 +14,8 @@ access(all) main(user: String) : {String : CollectionLength} {
 }
 
 access(all) struct CollectionLength {
-	pub let shard : String 
-	pub let length : Int 
+	access(all) let shard : String 
+	access(all) let length : Int 
 	init(shard : String, length : Int ) {
 		self.shard=shard 
 		self.length=length

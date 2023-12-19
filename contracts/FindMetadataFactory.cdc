@@ -5,21 +5,21 @@ import FindViews from "../contracts/FindViews.cdc"
 access(all) contract FindMetadataFactory {
 
 	access(all) struct MetadataCollectionItem {
-		pub let id:UInt64
-		pub let uuid: UInt64 
-		pub let name: String
-		pub let image: String
-		pub let collection: String
+		access(all) let id:UInt64
+		access(all) let uuid: UInt64 
+		access(all) let name: String
+		access(all) let image: String
+		access(all) let collection: String
 		// access(all) let source: String //which alchemy shard or our own Factory
 
-		pub let rarity:String
-		pub let subCollection: String? // <- This will be Alias unless they want something else
+		access(all) let rarity:String
+		access(all) let subCollection: String? // <- This will be Alias unless they want something else
 
-		pub let url: String
-		pub let contentTypes:[String]
-		pub let medias: [MetadataViews.Media]
-		pub let tag: {String : String}
-		pub let scalar: {String : UFix64}
+		access(all) let url: String
+		access(all) let contentTypes:[String]
+		access(all) let medias: [MetadataViews.Media]
+		access(all) let tag: {String : String}
+		access(all) let scalar: {String : UFix64}
 
 		init(id:UInt64, type: Type, uuid: UInt64, name:String, image:String, url:String, contentTypes: [String], rarity: String, medias: [MetadataViews.Media], collection: String, subCollection: String?, tag: {String : String}, scalar: {String : UFix64}) {
 			self.id=id

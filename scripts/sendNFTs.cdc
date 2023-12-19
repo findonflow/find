@@ -120,22 +120,22 @@ access(all) main(sender: Address, nftIdentifiers: [String],  allReceivers:[Strin
 
 
 access(all) struct Report {
-	pub let receiver: String
-	pub let address: Address?
-	pub let inputName: String?
-	pub let findName: String?
-	pub let avatar: String?
-	pub let isDapper: Bool?
-	pub let type: String
-	pub let id: UInt64
-	pub let message: String
+	access(all) let receiver: String
+	access(all) let address: Address?
+	access(all) let inputName: String?
+	access(all) let findName: String?
+	access(all) let avatar: String?
+	access(all) let isDapper: Bool?
+	access(all) let type: String
+	access(all) let id: UInt64
+	access(all) let message: String
 	pub var ok: Bool
-	pub let receiverLinked: Bool?
-	pub let collectionPublicLinked: Bool?
-	pub let accountInitialized: Bool?
-	pub let nftInPlace: Bool?
-	pub let royalties: Royalties?
-	pub let err: String?
+	access(all) let receiverLinked: Bool?
+	access(all) let collectionPublicLinked: Bool?
+	access(all) let accountInitialized: Bool?
+	access(all) let nftInPlace: Bool?
+	access(all) let royalties: Royalties?
+	access(all) let err: String?
 
 	init(receiver: String , address: Address?, inputName: String?, findName: String?, avatar: String?, isDapper: Bool? , type: String, id: UInt64 , message: String ,receiverLinked: Bool? , collectionPublicLinked: Bool? , accountInitialized: Bool? , nftInPlace: Bool?, royalties: Royalties?, err: String?) {
 		self.receiver=receiver
@@ -163,8 +163,8 @@ access(all) struct Report {
 }
 
 access(all) struct Royalties {
-	pub let totalRoyalty: UFix64
-	pub let royalties: [Royalty]
+	access(all) let totalRoyalty: UFix64
+	access(all) let royalties: [Royalty]
 
 	init(_ royalties: MetadataViews.Royalties) {
 		var totalR = 0.0
@@ -179,11 +179,11 @@ access(all) struct Royalties {
 }
 
 access(all) struct Royalty {
-	pub let name: String?
-	pub let address: Address
-	pub let cut: UFix64
-	pub let acceptTypes: [String]
-	pub let description: String
+	access(all) let name: String?
+	access(all) let address: Address
+	access(all) let cut: UFix64
+	access(all) let acceptTypes: [String]
+	access(all) let description: String
 
 	init(_ r: MetadataViews.Royalty) {
 		self.name = FIND.reverseLookup(r.receiver.address)
