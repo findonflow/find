@@ -6,7 +6,7 @@ import Wearables from "./Wearables.cdc"
 
 access(all) contract WearablesDev {
 
-	pub var initiated: Bool
+	access(all) var initiated: Bool
 
 	access(all) mintWearablesForTest(receiver: Address) {
 		self.initialize()

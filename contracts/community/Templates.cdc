@@ -51,7 +51,7 @@ access(all) contract Templates {
 
 	access(all) struct interface Retirable{
 
-		pub var active:Bool
+		access(all) var active:Bool
 
 		access(all) getCounterSuffix() : String
 		access(all) getClassifier() : String

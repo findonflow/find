@@ -23,10 +23,10 @@ access(all) main(addresses: [Address], ids: [UInt64]) : [Thought] {
 }
 
 access(all) struct User {
-	pub var name: String?
+	access(all) var name: String?
 	access(all) let address: Address 
 	access(all) let findName: String? 
-	pub var avatar: String? 
+	access(all) var avatar: String? 
 	access(all) let reaction: String
 
 	init(address: Address, reaction: String){
@@ -48,19 +48,19 @@ access(all) struct Thought {
 	access(all) let id: UInt64 
 	access(all) let creator: Address 
 	access(all) let creatorName: String? 
-	pub var creatorProfileName: String? 
-	pub var creatorAvatar: String? 
-	pub var header: String?
-	pub var body: String?
+	access(all) var creatorProfileName: String? 
+	access(all) var creatorAvatar: String? 
+	access(all) var header: String?
+	access(all) var body: String?
 	access(all) let created: UFix64? 
-	pub var lastUpdated: UFix64?
+	access(all) var lastUpdated: UFix64?
 	access(all) let medias: {String : String}
 	access(all) let nft: [FindMarket.NFTInfo]
-	pub var tags: [String]
-	pub var reacted: {String : [User]}
-	pub var reactions: {String : Int}
-	pub var reactedUsers: {String : [String]}
-	pub var quotedThought: Thought?
+	access(all) var tags: [String]
+	access(all) var reacted: {String : [User]}
+	access(all) var reactions: {String : Int}
+	access(all) var reactedUsers: {String : [String]}
+	access(all) var quotedThought: Thought?
 	access(all) let hidden: Bool?
 
 	init(id: UInt64 , creator: Address , creatorName: String? , creatorProfileName: String? , creatorAvatar: String? , header: String? , body: String? , created: UFix64? , lastUpdated: UFix64?, medias: {String : String}, nft: [FindMarket.NFTInfo], tags: [String], reacted: {String : [User]}, reactions: {String : Int}, reactedUsers: {String : [String]}, quotedThought: Thought?, hidden: Bool?) {

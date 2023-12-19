@@ -25,7 +25,7 @@ access(all) struct Report {
 		access(all) let walletAlias: String?
 
 		access(all) let openTime: UFix64
-		pub var saleEnded: Bool
+		access(all) var saleEnded: Bool
 		access(all) let saleInfos: [SaleInfo]
 
 		access(all) let storageRequirement: UInt64

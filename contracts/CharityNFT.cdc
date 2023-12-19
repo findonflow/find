@@ -4,7 +4,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 
 access(all) contract CharityNFT: NonFungibleToken {
 
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPublicPath: PublicPath
@@ -155,7 +155,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		init () {
 			self.ownedNFTs <- {}

@@ -129,7 +129,7 @@ access(all) struct Report {
 	access(all) let type: String
 	access(all) let id: UInt64
 	access(all) let message: String
-	pub var ok: Bool
+	access(all) var ok: Bool
 	access(all) let receiverLinked: Bool?
 	access(all) let collectionPublicLinked: Bool?
 	access(all) let accountInitialized: Bool?

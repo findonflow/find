@@ -949,15 +949,15 @@ access(all) contract FindThoughts {
 	pub resource interface ThoughtPublic {
 		access(all) let id: UInt64
 		access(all) let creator: Address
-		pub var header: String
-		pub var body: String
+		access(all) var header: String
+		access(all) var body: String
 		access(all) let created: UFix64
-		pub var lastUpdated: UFix64?
+		access(all) var lastUpdated: UFix64?
 		access(all) let medias: [MetadataViews.Media]
 		access(all) let nft: [FindViews.ViewReadPointer]
-		pub var tags: [String]
-		pub var reacted: {Address : String}
-		pub var reactions: {String : Int}
+		access(all) var tags: [String]
+		access(all) var reacted: {Address : String}
+		access(all) var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?)
 		access(all) getQuotedThought() : ThoughtPointer?
@@ -1102,19 +1102,19 @@ access(all) struct Thought {
 	access(all) let id: UInt64
 	access(all) let creator: Address
 	access(all) let creatorName: String?
-	pub var creatorProfileName: String?
-	pub var creatorAvatar: String?
-	pub var header: String?
-	pub var body: String?
+	access(all) var creatorProfileName: String?
+	access(all) var creatorAvatar: String?
+	access(all) var header: String?
+	access(all) var body: String?
 	access(all) let created: UFix64?
-	pub var lastUpdated: UFix64?
+	access(all) var lastUpdated: UFix64?
 	access(all) let medias: {String : String}
 	access(all) let nft: [FindMarket.NFTInfo]
-	pub var tags: [String]
-	pub var reacted: {String : [User]}
-	pub var reactions: {String : Int}
-	pub var reactedUsers: {String : [String]}
-	pub var quotedThought: Thought?
+	access(all) var tags: [String]
+	access(all) var reacted: {String : [User]}
+	access(all) var reactions: {String : Int}
+	access(all) var reactedUsers: {String : [String]}
+	access(all) var quotedThought: Thought?
 	access(all) let hidden: Bool?
 	}
 ```

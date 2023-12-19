@@ -30,15 +30,15 @@ access(all) contract FindUserStatus {
 
 
 	access(all) struct StorefrontListing {
-		pub var listingId: UInt64
+		access(all) var listingId: UInt64
 		// if purchased is true -> don't show it
-		//pub var purchased: Bool
+		//access(all) var purchased: Bool
 		access(all) let nftIdentifier: String
 		access(all) let nftId: UInt64
 		access(all) let ftTypeIdentifier: String
 		access(all) let amount: UFix64
 		access(all) let cuts: [StoreFrontCut]
-		pub var customID: String?
+		access(all) var customID: String?
 		access(all) let commissionAmount: UFix64?
 		access(all) let listingValidUntil: UInt64?
 		access(all) let tags: {String : String} 
@@ -62,20 +62,20 @@ access(all) contract FindUserStatus {
 	}
 
 	access(all) struct FlowtyListing {
-		pub var listingId: UInt64
-		pub var funded: Bool
+		access(all) var listingId: UInt64
+		access(all) var funded: Bool
 		access(all) let nftIdentifier: String
 		access(all) let nftId: UInt64
 		access(all) let amount: UFix64
 		access(all) let interestRate: UFix64
-		pub var term: UFix64
+		access(all) var term: UFix64
 		access(all) let paymentVaultType: String
 
 		access(all) let paymentCuts: [StoreFrontCut]
-		pub var listedTime: UFix64
-		pub var royaltyRate: UFix64
-		pub var listingValidUntil: UFix64
-		pub var repaymentAmount: UFix64
+		access(all) var listedTime: UFix64
+		access(all) var royaltyRate: UFix64
+		access(all) var listingValidUntil: UFix64
+		access(all) var repaymentAmount: UFix64
 
 		access(all) let tags: {String : String} 
 		access(all) let scalars: {String : UFix64}
@@ -102,23 +102,23 @@ access(all) contract FindUserStatus {
 	}
 
 	access(all) struct FlowtyRental {
-		pub var listingId: UInt64
-		pub var rented: Bool
+		access(all) var listingId: UInt64
+		access(all) var rented: Bool
 		access(all) let nftIdentifier: String
 		access(all) let nftId: UInt64
 		access(all) let amount: UFix64
 		access(all) let deposit: UFix64
-		pub var term: UFix64
+		access(all) var term: UFix64
 		access(all) let paymentVaultType: String
 		access(all) let reenableOnReturn: Bool
 
 		access(all) let paymentCuts: [StoreFrontCut]
-		pub var listedTime: UFix64
-		pub var royaltyRate: UFix64
-		pub var listingValidUntil: UFix64
-		pub var repaymentAmount: UFix64
-		pub var renter: Address? 
-		pub var renterName: String? 
+		access(all) var listedTime: UFix64
+		access(all) var royaltyRate: UFix64
+		access(all) var listingValidUntil: UFix64
+		access(all) var repaymentAmount: UFix64
+		access(all) var renter: Address? 
+		access(all) var renterName: String? 
 
 		access(all) let tags: {String : String} 
 		access(all) let scalars: {String : UFix64}
@@ -151,7 +151,7 @@ access(all) contract FindUserStatus {
 	}
 
 	access(all) struct FlovatarListing {
-		pub var listingId: UInt64
+		access(all) var listingId: UInt64
 		access(all) let nftIdentifier: String
 		access(all) let nftId: UInt64
 		access(all) let ftTypeIdentifier: String
@@ -199,7 +199,7 @@ access(all) contract FindUserStatus {
 	}
 
 	access(all) struct FlovatarComponentListing {
-		pub var listingId: UInt64
+		access(all) var listingId: UInt64
 		access(all) let nftIdentifier: String
 		access(all) let nftId: UInt64
 		access(all) let ftTypeIdentifier: String

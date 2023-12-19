@@ -26,7 +26,7 @@ access(all) contract FindMarket {
 	pub event FindTenantRemoved(tenant: String, address: Address)
 
 	//Residual Royalty
-	pub var residualAddress : Address
+	access(all) var residualAddress : Address
 
 	// Tenant information
 	access(all) let TenantClientPublicPath: PublicPath
@@ -601,7 +601,7 @@ access(all) contract FindMarket {
 		access(all) let name:String
 		access(all) let cut:MetadataViews.Royalty?
 		access(all) let rules:[TenantRule]
-		pub var status:String
+		access(all) var status:String
 
 		init(name:String, cut:MetadataViews.Royalty?, rules:[TenantRule], status:String){
 			self.name=name
@@ -1458,13 +1458,13 @@ access(all) contract FindMarket {
 		access(all) let name:String
 		access(all) let thumbnail:String
 		access(all) let type: String
-		pub var rarity:String?
-		pub var editionNumber: UInt64?
-		pub var totalInEdition: UInt64?
-		pub var scalars: {String:UFix64}
-		pub var tags : {String:String}
-		pub var collectionName: String?
-		pub var collectionDescription: String?
+		access(all) var rarity:String?
+		access(all) var editionNumber: UInt64?
+		access(all) var totalInEdition: UInt64?
+		access(all) var scalars: {String:UFix64}
+		access(all) var tags : {String:String}
+		access(all) var collectionName: String?
+		access(all) var collectionDescription: String?
 
 		init(_ item: &{ViewResolver.Resolver}, id: UInt64, detail: Bool){
 
@@ -1719,7 +1719,7 @@ access(all) contract FindMarket {
 		access(all) let sellerName: String?
 		access(all) let amount: UFix64?
 		access(all) let bidder: Address?
-		pub var bidderName: String?
+		access(all) var bidderName: String?
 		access(all) let listingId: UInt64
 
 		access(all) let saleType: String
@@ -1728,7 +1728,7 @@ access(all) contract FindMarket {
 		access(all) let ftTypeIdentifier: String
 		access(all) let listingValidUntil: UFix64?
 
-		pub var nft: NFTInfo?
+		access(all) var nft: NFTInfo?
 		access(all) let auction: AuctionItem?
 		access(all) let listingStatus:String
 		access(all) let saleItemExtraField: {String : AnyStruct}

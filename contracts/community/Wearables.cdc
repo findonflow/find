@@ -15,7 +15,7 @@ import FindUtils from "../FindUtils.cdc"
 access(all) contract Wearables: NonFungibleToken {
 
 	//Holds the total supply of wearables ever minted
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 
 	pub event ContractInitialized()
 
@@ -47,7 +47,7 @@ access(all) contract Wearables: NonFungibleToken {
 	access(all) struct Set : Templates.Retirable, Templates.Editionable, Templates.RoyaltyHolder {
 		access(all) let id:UInt64
 		access(all) let name: String
-		pub var active:Bool
+		access(all) var active:Bool
 		access(all) let royalties: [Templates.Royalty]
 		access(all) let creator : String
 		access(self) let extra: {String : AnyStruct}
@@ -108,7 +108,7 @@ access(all) contract Wearables: NonFungibleToken {
 		access(all) let id:UInt64
 		access(all) let name: String
 		access(all) let classifiers: [String]
-		pub var active:Bool
+		access(all) var active:Bool
 		access(self) let extra: {String : AnyStruct}
 
 		init(id:UInt64, name:String) {
@@ -184,7 +184,7 @@ access(all) contract Wearables: NonFungibleToken {
 		access(all) let tags: [Tag]
 		access(all) let thumbnail: MetadataViews.Media
 		access(all) let image: MetadataViews.Media
-		pub var active: Bool
+		access(all) var active: Bool
 		access(all) let hidden: Bool
 		access(all) let plural: Bool
 		access(self) let extra: {String : AnyStruct}
@@ -634,7 +634,7 @@ access(all) contract Wearables: NonFungibleToken {
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection  {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		init () {
 			self.ownedNFTs <- {}

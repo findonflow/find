@@ -38,7 +38,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 	access(all) let DLQCollectionStoragePath: StoragePath
 
 
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 
 	access(contract) let packMetadata: {UInt64: Metadata}
 
@@ -250,9 +250,9 @@ access(all) contract Bl0xPack: NonFungibleToken {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		//
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
-		pub var nftsPerType: {UInt64:UInt64}
+		access(all) var nftsPerType: {UInt64:UInt64}
 
 		// since maps are not ordered in cadence this will pick any random key and that works really well
 		access(self) fun getPackIdForType(_ typeId: UInt64): UInt64? {

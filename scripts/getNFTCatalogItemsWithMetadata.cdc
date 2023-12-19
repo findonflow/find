@@ -12,10 +12,10 @@ access(all) struct NFTView {
 	access(all) let id: UInt64
 	access(all) let display: MetadataViews.Display?
 	access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay?
-	pub var rarity:MetadataViews.Rarity?
-	pub var editions: MetadataViews.Editions?
-	pub var serial: UInt64?
-	pub var traits: MetadataViews.Traits?
+	access(all) var rarity:MetadataViews.Rarity?
+	access(all) var editions: MetadataViews.Editions?
+	access(all) var serial: UInt64?
+	access(all) var traits: MetadataViews.Traits?
 	access(all) let soulBounded: Bool 
 	access(all) let nftType: Type
 
@@ -154,10 +154,10 @@ access(all) struct MetadataCollectionItem {
 	access(all) let mediaType : String 
 	access(all) let source : String 
 
-	pub var rarity:MetadataViews.Rarity?
-	pub var editions: MetadataViews.Editions?
-	pub var serial: UInt64?
-	pub var traits: MetadataViews.Traits?
+	access(all) var rarity:MetadataViews.Rarity?
+	access(all) var editions: MetadataViews.Editions?
+	access(all) var serial: UInt64?
+	access(all) var traits: MetadataViews.Traits?
 
 	init(id:UInt64, 
 		 name: String, 

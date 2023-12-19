@@ -50,17 +50,17 @@ access(all) struct NFTDetail {
 	access(all) let description:String
 	access(all) let thumbnail:String
 	access(all) let type: String
-	pub var externalViewURL: String?
-	pub var rarity:MetadataViews.Rarity?
-	pub var editions: [MetadataViews.Edition]
-	pub var serial: UInt64?
-	pub var traits: [MetadataViews.Trait]
-	pub var media : {String: String} //url to mediaType
-	pub var collection : NFTCollectionDisplay?
-	pub var license : String?
-	pub var data: {String : AnyStruct?}
-	pub var soulBounded: Bool
-	pub var views :[String]
+	access(all) var externalViewURL: String?
+	access(all) var rarity:MetadataViews.Rarity?
+	access(all) var editions: [MetadataViews.Edition]
+	access(all) var serial: UInt64?
+	access(all) var traits: [MetadataViews.Trait]
+	access(all) var media : {String: String} //url to mediaType
+	access(all) var collection : NFTCollectionDisplay?
+	access(all) var license : String?
+	access(all) var data: {String : AnyStruct?}
+	access(all) var soulBounded: Bool
+	access(all) var views :[String]
 
 	init(_ pointer: FindViews.ViewReadPointer, views: {String : AnyStruct}, resolvedViews: [Type]){
 
@@ -311,7 +311,7 @@ access(all) main(user: String, project:String, id: UInt64, views: [String]) : NF
 
 access(all) let resolvedAddresses : {Address : String} = {}
 
-pub var nftRoyalties : [Royalties]? = nil
+access(all) var nftRoyalties : [Royalties]? = nil
 
 access(all) reverseLookup(_ addr: Address) : String? {
 

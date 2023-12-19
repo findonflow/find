@@ -150,25 +150,25 @@ access(all) main(user: String) : NameReport? {
 }
 
 	access(all) struct LeaseInformation {
-		pub var name: String
-		pub var address: Address
-		pub var cost: UFix64
-		pub var status: String
-		pub var validUntil: UFix64
-		pub var lockedUntil: UFix64
-		pub var latestBid: UFix64?
-		pub var auctionEnds: UFix64?
-		pub var salePrice: UFix64?
-		pub var latestBidBy: Address?
-		pub var currentTime: UFix64
-		pub var auctionStartPrice: UFix64?
-		pub var auctionReservePrice: UFix64?
-		pub var extensionOnLateBid: UFix64?
-		pub var addons: [String]
-		pub var saleFtAlias: String?
-		pub var saleFtIdentifier: String?
-		pub var auctionFtAlias: String?
-		pub var auctionFtIdentifier: String?
+		access(all) var name: String
+		access(all) var address: Address
+		access(all) var cost: UFix64
+		access(all) var status: String
+		access(all) var validUntil: UFix64
+		access(all) var lockedUntil: UFix64
+		access(all) var latestBid: UFix64?
+		access(all) var auctionEnds: UFix64?
+		access(all) var salePrice: UFix64?
+		access(all) var latestBidBy: Address?
+		access(all) var currentTime: UFix64
+		access(all) var auctionStartPrice: UFix64?
+		access(all) var auctionReservePrice: UFix64?
+		access(all) var extensionOnLateBid: UFix64?
+		access(all) var addons: [String]
+		access(all) var saleFtAlias: String?
+		access(all) var saleFtIdentifier: String?
+		access(all) var auctionFtAlias: String?
+		access(all) var auctionFtIdentifier: String?
 
 		init(_ l: FIND.LeaseInformation){
 

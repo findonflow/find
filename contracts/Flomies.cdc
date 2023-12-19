@@ -7,7 +7,7 @@ import FindPack from "./FindPack.cdc"
 
 access(all) contract Flomies: NonFungibleToken {
 
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)
@@ -51,7 +51,7 @@ access(all) contract Flomies: NonFungibleToken {
 
 		access(all) let id:UInt64
 		access(all) let serial:UInt64
-		pub var nounce:UInt64
+		access(all) var nounce:UInt64
 		access(all) let rootHash:String
 		access(all) let traits: [UInt64]
 
@@ -198,7 +198,7 @@ access(all) contract Flomies: NonFungibleToken {
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		init () {
 			self.ownedNFTs <- {}

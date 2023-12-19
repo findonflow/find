@@ -9,7 +9,7 @@ import FindUtils from "./FindUtils.cdc"
 // DIM stands for Direct Immuatble Minting, cannot mutate minted NFT states. So all nfts has to be minted in one go. 
 access(all) contract FindFooDIM: NonFungibleToken {
 
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 	access(all) let nftCollectionDisplay: MetadataViews.NFTCollectionDisplay
 
 	pub event ContractInitialized()
@@ -160,7 +160,7 @@ access(all) contract FindFooDIM: NonFungibleToken {
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		init () {
 			self.ownedNFTs <- {}

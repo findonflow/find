@@ -322,26 +322,26 @@ access(all) struct SaleItemCollectionReport {
 }
 
 access(all) struct SaleItemInformation {
-	pub var leaseIdentifier: String
-	pub var leaseName: String
-	pub var seller: Address?
-	pub var sellerName: String?
-	pub var amount: UFix64?
-	pub var bidder: Address?
-	pub var bidderName: String?
-	pub var listingId: UInt64?
+	access(all) var leaseIdentifier: String
+	access(all) var leaseName: String
+	access(all) var seller: Address?
+	access(all) var sellerName: String?
+	access(all) var amount: UFix64?
+	access(all) var bidder: Address?
+	access(all) var bidderName: String?
+	access(all) var listingId: UInt64?
 
-	pub var saleType: String
-	pub var listingTypeIdentifier: String
-	pub var ftAlias: String
-	pub var ftTypeIdentifier: String
-	pub var listingValidUntil: UFix64?
+	access(all) var saleType: String
+	access(all) var listingTypeIdentifier: String
+	access(all) var ftAlias: String
+	access(all) var ftTypeIdentifier: String
+	access(all) var listingValidUntil: UFix64?
 
-	pub var lease: LeaseInfo?
-	pub var auction: FindLeaseMarket.AuctionItem?
-	pub var listingStatus:String
-	pub var saleItemExtraField: {String : AnyStruct}
-	pub var market: String
+	access(all) var lease: LeaseInfo?
+	access(all) var auction: FindLeaseMarket.AuctionItem?
+	access(all) var listingStatus:String
+	access(all) var saleItemExtraField: {String : AnyStruct}
+	access(all) var market: String
 
 	init(
 		leaseIdentifier: String,

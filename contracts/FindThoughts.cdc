@@ -54,15 +54,15 @@ access(all) contract FindThoughts {
 	pub resource interface ThoughtPublic {
 		access(all) let id: UInt64 
 		access(all) let creator: Address 
-		pub var header: String 
-		pub var body: String 
+		access(all) var header: String 
+		access(all) var body: String 
 		access(all) let created: UFix64 
-		pub var lastUpdated: UFix64?
+		access(all) var lastUpdated: UFix64?
 		access(all) let medias: [MetadataViews.Media]
 		access(all) let nft: [FindViews.ViewReadPointer]
-		pub var tags: [String]
-		pub var reacted: {Address : String}
-		pub var reactions: {String : Int}
+		access(all) var tags: [String]
+		access(all) var reacted: {Address : String}
+		access(all) var reactions: {String : Int}
 
 		access(contract) fun internal_react(user: Address, reaction: String?) 
 		access(all) getQuotedThought() : ThoughtPointer? 
@@ -72,15 +72,15 @@ access(all) contract FindThoughts {
 	pub resource Thought : ThoughtPublic , ViewResolver.Resolver {
 		access(all) let id: UInt64 
 		access(all) let creator: Address 
-		pub var header: String 
-		pub var body: String 
+		access(all) var header: String 
+		access(all) var body: String 
 		access(all) let created: UFix64 
-		pub var lastUpdated: UFix64?
-		pub var tags: [String]
+		access(all) var lastUpdated: UFix64?
+		access(all) var tags: [String]
 		// user : Reactions
-		pub var reacted: {Address : String}
+		access(all) var reacted: {Address : String}
 		// Reactions : Counts
-		pub var reactions: {String : Int}
+		access(all) var reactions: {String : Int}
 
 		// only one image is enabled at the moment
 		access(all) let medias: [MetadataViews.Media]

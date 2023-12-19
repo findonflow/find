@@ -9,7 +9,7 @@ access(all) contract Dandy: NonFungibleToken {
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPrivatePath: PrivatePath
 	access(all) let CollectionPublicPath: PublicPath
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 
 	/*store all valid type converters for Dandys
 	This is to be able to make the contract compatible with the forthcomming NFT standard. 
@@ -222,7 +222,7 @@ access(all) contract Dandy: NonFungibleToken {
 	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, CollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
 		// Mapping of {Minter Platform Name : [NFT ID]}
 		access(self) let nftIndex: {String : {UInt64 : Bool}}

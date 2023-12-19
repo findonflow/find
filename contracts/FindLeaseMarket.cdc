@@ -541,7 +541,7 @@ access(all) contract FindLeaseMarket {
 		access(all) let sellerName: String?
 		access(all) let amount: UFix64?
 		access(all) let bidder: Address?
-		pub var bidderName: String?
+		access(all) var bidderName: String?
 		access(all) let listingId: UInt64
 
 		access(all) let saleType: String
@@ -550,7 +550,7 @@ access(all) contract FindLeaseMarket {
 		access(all) let ftTypeIdentifier: String
 		access(all) let listingValidUntil: UFix64?
 
-		pub var lease: LeaseInfo?
+		access(all) var lease: LeaseInfo?
 		access(all) let auction: AuctionItem?
 		access(all) let listingStatus:String
 		access(all) let saleItemExtraField: {String : AnyStruct}
