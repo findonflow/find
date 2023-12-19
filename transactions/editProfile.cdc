@@ -10,7 +10,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
 	prepare(account: auth(BorrowValue) &Account) {
 
-		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
+		self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
 		//Add exising FUSD or create a new one and add it
 		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)

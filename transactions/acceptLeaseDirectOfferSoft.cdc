@@ -15,10 +15,10 @@ transaction(leaseName: String) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
-		self.market = account.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
+		self.market = account.storage.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
 		let item = FindLeaseMarket.assertOperationValid(tenant: marketplace, name: leaseName, marketOption: marketOption)
-		let ref = account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection. Account : ".concat(account.address.toString()))
+		let ref = account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection. Account : ".concat(account.address.toString()))
 		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
 	}
 

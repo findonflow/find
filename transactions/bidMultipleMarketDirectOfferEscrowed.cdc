@@ -41,7 +41,7 @@ transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftA
 		let tenant = tenantCapability.borrow()!
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: bidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: bidStoragePath)
 		self.walletReference = []
 		self.pointer = []
 		self.targetCapability = []
@@ -86,7 +86,7 @@ transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftA
 			if vaultRefs[ft!.vaultPath] != nil {
 				self.walletReference.append(vaultRefs[ft!.vaultPath]!)
 			} else {
-				let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+				let walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
 				vaultRefs[ft!.vaultPath] = walletReference
 				self.walletReference.append(walletReference)
 			}

@@ -25,7 +25,7 @@ import YourThing from "../contracts/YouThing.cdc"
 transaction(clock: UFix64) {
     prepare(account: auth(BorrowValue) &Account) {
 
-        let adminClient=account.borrow<&YourThing.AdminProxy>(from: YourThing.AdminProxyStoragePath)!
+        let adminClient=account.storage.borrow<&YourThing.AdminProxy>(from: YourThing.AdminProxyStoragePath)!
         adminClient.tickClock(clock)
 
     }

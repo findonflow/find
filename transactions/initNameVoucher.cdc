@@ -5,7 +5,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {
 
-		let nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+		let nameVoucherRef= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
 		if nameVoucherRef == nil {
 			account.storage.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
 			account.unlink(NameVoucher.CollectionPublicPath)

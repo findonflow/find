@@ -23,7 +23,7 @@ transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:Str
 			)
 		}
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = NFGv3.getForgeType()
 

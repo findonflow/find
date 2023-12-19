@@ -10,7 +10,7 @@ import FindForge from "../contracts/FindForge.cdc"
 transaction(name: String, minterCut: UFix64, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String, socials: {String: String}) {
 	prepare(account: auth(BorrowValue) &Account) {
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = PartyFavorz.getForgeType()
 		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {

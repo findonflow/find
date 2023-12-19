@@ -67,7 +67,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		}
 
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 	}
 
 	pre {

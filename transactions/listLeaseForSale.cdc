@@ -27,13 +27,13 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
 		}
 
-		self.saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
+		self.saleItems= account.storage.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 		self.vaultType= ft.type
 
-		let lease=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
+		let lease=account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 
 
 		self.pointer= FindLeaseMarket.AuthLeasePointer(ref:lease, name: leaseName)

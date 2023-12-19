@@ -71,21 +71,21 @@ transaction(name: String, amount: UFix64, type: String, tag:String) {
 			account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 		}
 
-		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+		if account.storage.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
 			account.storage.save(<- Sender.create(), to: Sender.storagePath)
 		}
 
-		let token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
+		let token =account.storage.borrow<&Sender.Token>(from: Sender.storagePath)!
 
 
 		if type == "fusd" {
-			let vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
+			let vaultRef = account.storage.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("Could not borrow reference to the fusdVault!")
 			let vault <- vaultRef.withdraw(amount: amount)
 			FIND.depositWithTagAndMessage(to: name, message: "", tag: tag, vault: <- vault, from: token)
 			return 
 		}
 
-		let vaultRef = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow reference to the fusdVault!")
+		let vaultRef = account.storage.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow reference to the fusdVault!")
 		let vault <- vaultRef.withdraw(amount: amount)
 		FIND.depositWithTagAndMessage(to: name, message: "", tag: tag, vault: <- vault, from: token)
 	}

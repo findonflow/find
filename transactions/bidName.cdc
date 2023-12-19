@@ -8,8 +8,8 @@ transaction(name: String, amount: UFix64) {
 
 	prepare(account: auth(BorrowValue) &Account) {
 
-		self.vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault)
-		self.bidRef = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
+		self.vaultRef = account.storage.borrow<&FUSD.Vault>(from: /storage/fusdVault)
+		self.bidRef = account.storage.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
 	}
 
 	pre{

@@ -71,11 +71,11 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		}
 
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		let bidSstoragePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 
-		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: bidSstoragePath)
+		self.bidsReference= account.storage.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: bidSstoragePath)
 		self.balanceBeforeBid=self.walletReference.balance
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: item.getItemID())
 	}

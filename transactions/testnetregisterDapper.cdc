@@ -14,7 +14,7 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
 		log("The cost for registering this name is ".concat(self.price.toString()))
 		self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
 		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
-		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")
+		self.finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")
 	}
 
 	pre{

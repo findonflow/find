@@ -17,7 +17,7 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 
 	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 
-		let profile=account.borrow<&Profile.User>(from: Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
+		let profile=account.storage.borrow<&Profile.User>(from: Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 
 		let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
 

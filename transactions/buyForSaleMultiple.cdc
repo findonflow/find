@@ -54,7 +54,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 
 		self.buyer = account.address
 		self.leaseNames = []
-		self.leaseBidReference = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath) ?? panic("Could not borrow reference to the bid collection!" )
+		self.leaseBidReference = account.storage.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath) ?? panic("Could not borrow reference to the bid collection!" )
 
 		var vaultType : Type? = nil
 
@@ -75,7 +75,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 				self.leaseNames.append(name)
 
 				self.walletReference.append(
-					account.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No suitable wallet linked for this account")
+					account.storage.borrow<&FUSD.Vault>(from: /storage/fusdVault) ?? panic("No suitable wallet linked for this account")
 				)
 			}
 
@@ -115,7 +115,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 				}
 
 				self.walletReference.append(
-					account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+					account.storage.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
 				)
 
 				var targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)

@@ -4,7 +4,7 @@ transaction() {
 
 	prepare(account: auth(BorrowValue) &Account) {
 
-		let relatedAccounts= account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+		let relatedAccounts= account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		if relatedAccounts == nil {
 			let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
 			account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)

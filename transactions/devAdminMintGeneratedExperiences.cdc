@@ -9,14 +9,14 @@ transaction(name: String, info: [GeneratedExperiences.Info]) {
     prepare(account: auth(BorrowValue) &Account){
 
 		// setup Collection
-		if account.borrow<&GeneratedExperiences.Collection>(from: GeneratedExperiences.CollectionStoragePath) == nil {
+		if account.storage.borrow<&GeneratedExperiences.Collection>(from: GeneratedExperiences.CollectionStoragePath) == nil {
 			let collection <- GeneratedExperiences.createEmptyCollection()
 			account.storage.save(<-collection, to: GeneratedExperiences.CollectionStoragePath)
 			account.link<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(GeneratedExperiences.CollectionPublicPath, target: GeneratedExperiences.CollectionStoragePath)
 			account.link<&GeneratedExperiences.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(GeneratedExperiences.CollectionPrivatePath, target: GeneratedExperiences.CollectionStoragePath)
 		}
 
-        let adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let forgeType = GeneratedExperiences.getForgeType()
 		if !FindForge.checkMinterPlatform(name: name, forgeType: forgeType ) {

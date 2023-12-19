@@ -12,13 +12,13 @@ transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: Stri
 	prepare(account: auth(BorrowValue) &Account) {
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath)
+		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath)
 
-		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+		if account.storage.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
 			account.storage.save(<- Sender.create(), to: Sender.storagePath)
 		}
 
-		self.token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
+		self.token =account.storage.borrow<&Sender.Token>(from: Sender.storagePath)!
 	}
 
 	pre{

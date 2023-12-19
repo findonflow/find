@@ -43,7 +43,7 @@ transaction(leaseName: String, amount: UFix64) {
 
 		let bidStoragePath=leaseTenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
-		self.bidsReference= account.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
 	}
 
 	pre {

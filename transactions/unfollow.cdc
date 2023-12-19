@@ -8,7 +8,7 @@ transaction(unfollows:[String]) {
 
 	prepare(account: auth(BorrowValue) &Account) {
 
-		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
+		self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
 	}
 

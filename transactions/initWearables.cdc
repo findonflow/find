@@ -5,7 +5,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {
 
-		let wearablesRef= account.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
+		let wearablesRef= account.storage.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
 		if wearablesRef == nil {
 			account.storage.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
 			account.unlink(Wearables.CollectionPublicPath)

@@ -56,7 +56,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
 			}
 		}
 
-		self.saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: path)
+		self.saleItems= account.storage.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: path)
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 		self.vaultType= ft.type
 	}

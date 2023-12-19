@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow"
+	"github.com/findonflow/find/findGo"
 )
 
 // we set the shared overflow test struct that will reset to known setup state after each test
@@ -44,48 +45,45 @@ func SetupFIND(o *OverflowState) error {
 	// set up fin network as the fin user
 	stx("setup_fin_3_create_network", findAdminSigner)
 
-	//TODO:commented out for now
-	/*
-		stx("setup_find_market_1_dapper",
-			findSigner,
-			WithArg("dapperAddress", "dapper"),
-		)
-
-		// link in the server in the versus client
-		res := stx("setup_find_market_2",
-			findAdminSigner,
-			WithArg("tenant", "find"),
-			WithArg("tenantAddress", "find"),
-			WithArg("findCut", 0.025),
-		)
-
-		if res.Err != nil {
-			panic(res.Err.Error())
-		}
-
-		id, err := o.QualifiedIdentifier("DapperUtilityCoin", "Vault")
-		if err != nil {
-			panic(err)
-		}
-		stx(
-			"tenantsetExtraCut",
-			WithSigner("find"),
-			WithArg("ftTypes", []string{id}),
-			WithArg("category", "infrastructure"),
-			WithArg("cuts", []findGo.FindMarketCutStruct_ThresholdCut{
-				{
-					Name:           "dapper",
-					Address:        o.Address("dapper"),
-					Cut:            0.01,
-					Description:    "Dapper takes 0.01% or 0.44 dollars, whichever is higher",
-					PublicPath:     "dapperUtilityCoinReceiver",
-					MinimumPayment: 0.44,
-				},
-			}),
-		)
-	*/
+	stx("setup_find_market_1_dapper",
+		findSigner,
+		WithArg("dapperAddress", "dapper"),
+	)
 
 	createUser(stx, 100.0, "find")
+
+	// link in the server in the versus client
+	res := stx("setup_find_market_2",
+		findAdminSigner,
+		WithArg("tenant", "find"),
+		WithArg("tenantAddress", "find"),
+		WithArg("findCut", 0.025),
+	)
+
+	if res.Err != nil {
+		panic(res.Err.Error())
+	}
+
+	id, err := o.QualifiedIdentifier("DapperUtilityCoin", "Vault")
+	if err != nil {
+		panic(err)
+	}
+	stx(
+		"tenantsetExtraCut",
+		WithSigner("find"),
+		WithArg("ftTypes", []string{id}),
+		WithArg("category", "infrastructure"),
+		WithArg("cuts", []findGo.FindMarketCutStruct_ThresholdCut{
+			{
+				Name:           "dapper",
+				Address:        o.Address("dapper"),
+				Cut:            0.01,
+				Description:    "Dapper takes 0.01% or 0.44 dollars, whichever is higher",
+				PublicPath:     "dapperUtilityCoinReceiver",
+				MinimumPayment: 0.44,
+			},
+		}),
+	)
 
 	// link in the server in the versus client
 	stx("devSetResidualAddress",
@@ -93,13 +91,13 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("address", "residual"),
 	)
 
-	/*
-			stx(
-				"initSwitchboard",
-				WithSigner("residual"),
-				WithArg("dapperAddress", "dapper"),
-			)
+	stx(
+		"initSwitchboard",
+		WithSigner("residual"),
+		WithArg("dapperAddress", "dapper"),
+	)
 
+	/*
 		// setup find forge
 		stx("setup_find_forge_1", WithSigner("find-forge"))
 

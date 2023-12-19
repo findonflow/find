@@ -11,7 +11,7 @@ import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cd
 
 transaction(market: String, merchAddress: Address, tenantCut: UFix64){
     prepare(account: auth(BorrowValue) &Account){
-        let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
+        let clientRef = account.storage.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
 
 		// emulator
 		var identifier = "A.f8d6e0586b0a20c7.Wearables.NFT"

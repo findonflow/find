@@ -17,7 +17,7 @@ transaction(ids: [UInt64]) {
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.SaleItemCollection>())
-		self.market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
+		self.market = account.storage.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
 		self.pointer = []
 
 		let nfts : {String : NFTCatalog.NFTCollectionData} = {}

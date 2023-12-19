@@ -18,7 +18,7 @@ transaction(forge: String, name: String, description:String, typeId: UInt64, ext
 	let types : [Type]
 
 	prepare(account: auth(BorrowValue) &Account) {
-		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+		self.admin =account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
 		//for each tier you need a providerAddress and path

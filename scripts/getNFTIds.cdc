@@ -101,7 +101,7 @@ access(all) main(address: Address, targetPaths: [String]): {String : Report}{
 		let storagePath = StoragePath(identifier:p)!
 		var type = account.type(at: storagePath)!
 		if type.isSubtype(of: Type<@NonFungibleToken.Collection>()) {
-			let collection = account.borrow<&NonFungibleToken.Collection>(from: storagePath)!
+			let collection = account.storage.borrow<&NonFungibleToken.Collection>(from: storagePath)!
 			let ids = collection.getIDs()
 			if ids.length > 0{
 

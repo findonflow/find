@@ -47,7 +47,7 @@ transaction(id: UInt64) {
 		}
 
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
-		self.market = account.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
+		self.market = account.storage.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
 
 	}
 

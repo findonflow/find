@@ -667,7 +667,7 @@ transaction(id: UInt64, directSellPrice:UFix64) {
 		let tenant = tenantCapability.borrow()!
 
 		// get saleItemCollection from tenant specific storage path and saleItemType (in this case FindMarketSale)
-		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 
 		// getProvider private capability of the selling NFT
 		var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(${NFT_Provider_Private_Path})
@@ -737,7 +737,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		// get FT information from item
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 	}
 
 	pre {

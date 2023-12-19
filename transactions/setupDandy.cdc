@@ -21,7 +21,7 @@ transaction(name: String, minterCut: UFix64, description:String, externalUrl:Str
 			)
 		}
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = Dandy.getForgeType()
 		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {

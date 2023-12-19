@@ -8,7 +8,7 @@ transaction(id: UInt64) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: storagePath)
 	}
 
 	pre{

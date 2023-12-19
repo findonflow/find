@@ -37,7 +37,7 @@ access(all) main(user: String , project: String, id: UInt64, views: [String]) : 
 access(all) getSocks(ownerAddress: Address, id: UInt64) : UInt64? {
 
 	let account = getAuthAccount(ownerAddress)
-	let ref = account.borrow<&RaribleNFT.Collection>(from: RaribleNFT.collectionStoragePath)
+	let ref = account.storage.borrow<&RaribleNFT.Collection>(from: RaribleNFT.collectionStoragePath)
 	if ref != nil {
 		let nfts = ref!
 		if nfts.ownedNFTs.containsKey(id) {

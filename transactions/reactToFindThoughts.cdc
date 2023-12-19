@@ -15,7 +15,7 @@ transaction(users: [String], ids: [UInt64] , reactions: [String], undoReactionUs
 				target: FindThoughts.CollectionStoragePath
 			)
 		}
-		self.collection=account.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
+		self.collection=account.storage.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
 	}
 
 	execute {

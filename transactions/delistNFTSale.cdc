@@ -9,7 +9,7 @@ transaction(ids: [UInt64]) {
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
-		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 	}
 
 	pre{

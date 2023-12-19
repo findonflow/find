@@ -34,8 +34,8 @@ access(all) contract FiatToken: FungibleToken {
     access(all) var totalSupply: UFix64
 
 
-		//paths copied from Fiattoken https://github.com/flow-usdc/flow-usdc/blob/main/contracts/FiatToken.cdc
-	  access(all) let VaultStoragePath: StoragePath
+    //paths copied from Fiattoken https://github.com/flow-usdc/flow-usdc/blob/main/contracts/FiatToken.cdc
+    access(all) let VaultStoragePath: StoragePath
     access(all) let VaultBalancePubPath: PublicPath
     access(all) let VaultUUIDPubPath: PublicPath
     access(all) let VaultReceiverPubPath: PublicPath
@@ -53,7 +53,7 @@ access(all) contract FiatToken: FungibleToken {
     // new tokens.
     //
 
-		access(all) resource interface ResourceId {
+    access(all) resource interface ResourceId {
         access(all) UUID(): UInt64
     }
 
@@ -67,7 +67,7 @@ access(all) contract FiatToken: FungibleToken {
             self.balance = balance
         }
 
-				 access(all) UUID(): UInt64 {
+        access(all) UUID(): UInt64 {
             return self.uuid
         }
         // withdraw
@@ -156,11 +156,11 @@ access(all) contract FiatToken: FungibleToken {
 
         // Anyone can call this, but only the admin can create Minter capabilities,
         // so the type system constrains this to being called by the admin.
-        access(all) setMinterCapability(cap: Capability<&Minter>) {
+        access(all) fun setMinterCapability(cap: Capability<&Minter>) {
             self.minterCapability = cap
         }
 
-        access(all) mintTokens(amount: UFix64): @FiatToken.Vault {
+        access(all) fun mintTokens(amount: UFix64): @FiatToken.Vault {
             return <- self.minterCapability!
             .borrow()!
             .mintTokens(amount:amount)
@@ -192,7 +192,7 @@ access(all) contract FiatToken: FungibleToken {
     // and cache all of this information to enable easy revocation but String/Path comversion isn't yet supported.
     //
     access(all) resource Administrator {
-        access(all) createNewMinter(): @Minter {
+        access(all) fun createNewMinter(): @Minter {
             emit MinterCreated()
             return <- create Minter()
         }
@@ -208,15 +208,15 @@ access(all) contract FiatToken: FungibleToken {
         self.totalSupply = 0.0
 
         let admin <- create Administrator()
-        adminAccount.save(<-admin, to: self.AdminStoragePath)
+        adminAccount.storage.save(<-admin, to: self.AdminStoragePath)
 
         // Emit an event that shows that the contract was initialized
         emit TokensInitialized(initialSupply: 0.0)
 
-				self.VaultStoragePath= /storage/USDCVault
-				self.VaultBalancePubPath = /public/USDCVaultBalance
-				self.VaultUUIDPubPath = /public/USDCVaultUUID
-				self.VaultReceiverPubPath = /public/USDCVaultReceiver
+        self.VaultStoragePath= /storage/USDCVault
+        self.VaultBalancePubPath = /public/USDCVaultBalance
+        self.VaultUUIDPubPath = /public/USDCVaultUUID
+        self.VaultReceiverPubPath = /public/USDCVaultReceiver
 
     }
 }

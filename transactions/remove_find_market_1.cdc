@@ -4,7 +4,7 @@ import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 transaction(tenant: Address) {
 	//versus account
 	prepare(account: auth(BorrowValue) &Account) {
-		let adminClient=account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
+		let adminClient=account.storage.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
 		adminClient.removeFindMarketTenant(tenant: tenant)
 	}

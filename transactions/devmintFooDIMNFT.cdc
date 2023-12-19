@@ -25,7 +25,7 @@ transaction(name: String, data: [AnyStruct], receivers: [String]) {
 			)
 		}
 
-		let leaseCol = account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Cannot borrow lease collection reference")
+		let leaseCol = account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Cannot borrow lease collection reference")
 		self.lease = leaseCol.borrow(name)
 
 		self.addresses = []

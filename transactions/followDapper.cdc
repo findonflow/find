@@ -11,7 +11,7 @@ transaction(follows:{String : [String]}) {
 
 	prepare(account: auth(BorrowValue) &Account) {
 
-		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
+		self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 		if !leaseCollection.check() {

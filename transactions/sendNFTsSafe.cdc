@@ -68,7 +68,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 				if self.vaultRefs[dt] == nil {
 					let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
 					let ftPath = info.vaultPath
-					let ref = account.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+					let ref = account.storage.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
 					self.vaultRefs[dt] = ref
 				}
 
@@ -87,16 +87,16 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 			if self.vaultRefs[dt] == nil {
 				let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
 				let ftPath = info.vaultPath
-				let ref = account.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+				let ref = account.storage.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
 				self.vaultRefs[dt] = ref
 			}
 		}
 
-		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+		if account.storage.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
 			account.storage.save(<- Sender.create(), to: Sender.storagePath)
 		}
 
-		self.token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
+		self.token =account.storage.borrow<&Sender.Token>(from: Sender.storagePath)!
 
 	}
 

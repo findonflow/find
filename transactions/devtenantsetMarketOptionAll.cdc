@@ -43,7 +43,7 @@ transaction(nftName: String, nftType: String, cut: UFix64){
 			status: "active"
 		)
 
-        let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
+        let clientRef = account.storage.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
         clientRef.setMarketOption(saleItem: saleItem)
     }
 }

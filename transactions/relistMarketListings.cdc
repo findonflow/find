@@ -13,7 +13,7 @@ transaction(ids: {String : [UInt64]}) {
 
 		var saleType = Type<@FindMarketAuctionEscrow.SaleItemCollection>()
 		if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {
-			let saleItems= account.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
+			let saleItems= account.storage.borrow<&FindMarketAuctionEscrow.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
 			for id in ids {
 				saleItems.relist(id)
 			}
@@ -21,7 +21,7 @@ transaction(ids: {String : [UInt64]}) {
 
 		saleType = Type<@FindMarketAuctionSoft.SaleItemCollection>()
 		if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {
-			let saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
+			let saleItems= account.storage.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
 			for id in ids {
 				saleItems.relist(id)
 			}
@@ -29,7 +29,7 @@ transaction(ids: {String : [UInt64]}) {
 
 		saleType = Type<@FindMarketSale.SaleItemCollection>()
 		if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {
-			let saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
+			let saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
 			for id in ids {
 				saleItems.relist(id)
 			}

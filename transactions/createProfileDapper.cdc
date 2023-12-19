@@ -43,7 +43,7 @@ transaction(name: String) {
 			created=true
 		}
 
-		let profile=account.borrow<&Profile.User>(from: Profile.storagePath)!
+		let profile=account.storage.borrow<&Profile.User>(from: Profile.storagePath)!
 
 		if !profile.hasWallet("DUC") {
 			let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)

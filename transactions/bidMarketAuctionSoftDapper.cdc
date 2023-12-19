@@ -74,7 +74,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())
 
-		self.bidsReference= account.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: item.getItemID())
 	}
 

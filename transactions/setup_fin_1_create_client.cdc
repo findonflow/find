@@ -1,13 +1,22 @@
 
-import "Admin"
-//import "FindMarketAdmin"
-import "FUSD"
-import "FungibleToken"
+import Admin  from "../contracts/Admin.cdc"
+import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 //set up the adminClient in the contract that will own the network
 transaction() {
 
     prepare(account: auth(SaveValue, IssueStorageCapabilityController,PublishCapability) &Account) {
+
+        let fusd <- FUSD.createEmptyVault()
+        account.storage.save(<- fusd, to: /storage/fusdVault)
+        let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
+        account.capabilities.publish(cap, at: /public/fusdReceiver)
+
+        let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
+        account.capabilities.publish(capb, at: /public/fusdBalance)
+
 
         let caps = account.capabilities
         let storage = account.storage
@@ -28,19 +37,10 @@ transaction() {
             caps.unpublish(FindMarketAdmin.AdminProxyPublicPath)
             destroy <- storage.load<@AnyResource>(from:FindMarketAdmin.AdminProxyStoragePath)
         }
+        */
         storage.save(<- FindMarketAdmin.createAdminProxyClient(), to:FindMarketAdmin.AdminProxyStoragePath)
         let marketProxyCap =caps.storage.issue<&{FindMarketAdmin.AdminProxyClient}>(FindMarketAdmin.AdminProxyStoragePath)
         caps.publish(marketProxyCap, at: FindMarketAdmin.AdminProxyPublicPath)
-        */
-
-
-        let fusd <- FUSD.createEmptyVault()
-        account.storage.save(<- fusd, to: /storage/fusdVault)
-        let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
-        account.capabilities.publish(cap, at: /public/fusdReceiver)
-
-        let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
-        account.capabilities.publish(capb, at: /public/fusdBalance)
 
 
     }

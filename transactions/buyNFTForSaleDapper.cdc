@@ -60,8 +60,8 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
 		if !self.targetCapability.check() {
 			let cd = item.getNFTCollectionData()
-			if let storage = account.borrow<&AnyResource>(from: cd.storagePath) {
-				if let st = account.borrow<&TopShot.Collection>(from: cd.storagePath) {
+			if let storage = account.storage.borrow<&AnyResource>(from: cd.storagePath) {
+				if let st = account.storage.borrow<&TopShot.Collection>(from: cd.storagePath) {
 					// here means the topShot is not linked in the way it should be. We can relink that for our use
 					account.unlink(cd.publicPath)
 					account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)

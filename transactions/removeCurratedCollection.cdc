@@ -6,7 +6,7 @@ transaction(name: String) {
 		let publicPath=/public/FindCuratedCollections
 
 		var collections : {String: [String]} = {}
-		if account.borrow<&{String: [String]}>(from:path) != nil {
+		if account.storage.borrow<&{String: [String]}>(from:path) != nil {
 			 collections=account.load<{String: [String]}>(from:path)!
 		}
 		collections.remove(key: name)

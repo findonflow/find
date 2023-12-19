@@ -9,7 +9,7 @@ transaction(id: UInt64) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
+		self.bidsReference= account.storage.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
 
 
 	}

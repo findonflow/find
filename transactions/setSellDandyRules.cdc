@@ -6,7 +6,7 @@ import Dandy from "../contracts/Dandy.cdc"
 transaction(){
     prepare(account: auth(BorrowValue) &Account){
         let path = FindMarket.TenantClientStoragePath
-        let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+        let tenantRef = account.storage.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 
         tenantRef.setMarketOption(name:"FUSDDandy", cut: nil, rules:[
             FindMarket.TenantRule(name:"FUSD", types:[Type<@FUSD.Vault>()], ruleType: "ft", allow: true),

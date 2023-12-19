@@ -13,7 +13,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 
 		var counter = 0
@@ -38,7 +38,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 			if vaultRefs[ft!.vaultPath] != nil {
 				self.walletReference.append(vaultRefs[ft!.vaultPath]!)
 			} else {
-				let walletReference = account.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+				let walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
 				vaultRefs[ft!.vaultPath] = walletReference
 				self.walletReference.append(walletReference)
 			}

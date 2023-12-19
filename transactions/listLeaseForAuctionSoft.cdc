@@ -29,8 +29,8 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auction
 			account.link<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
 		}
 
-		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
-		let ref = account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
+		self.saleItems= account.storage.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
+		let ref = account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
 		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
 		self.vaultType= ft.type
 

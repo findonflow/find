@@ -12,7 +12,7 @@ transaction() {
 		let ref = cap.borrow() ?? panic("Cannot borrow reference to the capability.")
 
 		let listingType=Type<@FindLeaseMarketSale.SaleItemCollection>()
-		let saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: tenant.getStoragePath(listingType))!
+		let saleItems= account.storage.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: tenant.getStoragePath(listingType))!
 		let leases = ref.getNameSales()
 		for lease in leases {
 			saleItems.delist(lease)

@@ -62,7 +62,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
 			)
 		}
 		// Get the salesItemRef from tenant
-		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 		self.vaultType= ft.type
 	}

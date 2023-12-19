@@ -40,7 +40,7 @@ transaction(users: [String], nftAliasOrIdentifiers: [String], ids: [UInt64], ftA
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
 		let bidStoragePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: bidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: bidStoragePath)
 
 		self.pointer = []
 		self.targetCapability = []

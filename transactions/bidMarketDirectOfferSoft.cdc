@@ -34,7 +34,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 		self.ftVaultType = ft.type
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
@@ -49,7 +49,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 			account.link<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath, target: dosBidStoragePath)
 		}
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
 		self.balanceBeforeBid=self.walletReference.balance
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
 

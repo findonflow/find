@@ -11,7 +11,7 @@ transaction(user: String, id: UInt64) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
 		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 
-		self.senderRef = account.borrow<&ExampleNFT.Collection>(from: ExampleNFT.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
+		self.senderRef = account.storage.borrow<&ExampleNFT.Collection>(from: ExampleNFT.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
 	}
 
 	pre{

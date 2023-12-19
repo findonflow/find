@@ -44,7 +44,7 @@ access(all) main(sender: Address, nftIdentifiers: [String],  allReceivers:[Strin
 
 			let path = data!.collectionData
 
-			let checkCol = account.borrow<&NonFungibleToken.Collection>(from: path.storagePath)
+			let checkCol = account.storage.borrow<&NonFungibleToken.Collection>(from: path.storagePath)
 			if checkCol == nil {
 				report.append(logErr(i, err: "Cannot borrow collection from sender. Type : ".concat(type.identifier)))
 				continue
@@ -92,7 +92,7 @@ access(all) main(sender: Address, nftIdentifiers: [String],  allReceivers:[Strin
 			}
 
 			var royalties : Royalties? = nil
-			let mv = account.borrow<&{ViewResolver.ResolverCollection}>(from: path.storagePath)
+			let mv = account.storage.borrow<&{ViewResolver.ResolverCollection}>(from: path.storagePath)
 			if mv != nil {
 				let rv = mv!.borrowViewResolver(id: id)
 				if let r = MetadataViews.getRoyalties(rv) {

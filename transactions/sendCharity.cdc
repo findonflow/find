@@ -10,7 +10,7 @@ transaction(
 	let charityCollection: &NonFungibleToken.Collection
 
 	prepare(account: auth(BorrowValue) &Account) {
-		self.charityCollection =account.borrow<&NonFungibleToken.Collection>(from: CharityNFT.CollectionStoragePath)!
+		self.charityCollection =account.storage.borrow<&NonFungibleToken.Collection>(from: CharityNFT.CollectionStoragePath)!
 		self.receiverCap= getAccount(recipient).getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 	}
 

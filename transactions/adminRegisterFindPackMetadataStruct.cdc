@@ -17,7 +17,7 @@ transaction(info: FindPack.PackRegisterInfo) {
 	let types : [Type]
 
 	prepare(account: auth(BorrowValue) &Account) {
-		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+		self.admin =account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(info.paymentAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
 		//for each tier you need a providerAddress and path

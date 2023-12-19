@@ -25,7 +25,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 		self.vaultTypes= []
 		self.pointers= []
 		self.leaseNames= []
-		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection")
+		self.finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection")
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
 		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
@@ -37,7 +37,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 			account.storage.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
-		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: storagePath)!
+		self.saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: storagePath)!
 
 		var counter = 0
 

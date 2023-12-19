@@ -12,7 +12,7 @@ transaction(id: UInt64, name: String) {
 
 	prepare(account:AuthAccount) {
 
-		var nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+		var nameVoucherRef= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
 		if nameVoucherRef == nil {
 			account.storage.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
 			account.unlink(NameVoucher.CollectionPublicPath)
@@ -25,7 +25,7 @@ transaction(id: UInt64, name: String) {
 				NameVoucher.CollectionPrivatePath,
 				target: NameVoucher.CollectionStoragePath
 			)
-			nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+			nameVoucherRef= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
 		}
 
 

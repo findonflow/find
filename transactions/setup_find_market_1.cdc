@@ -2,35 +2,38 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+//import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 
-//Transaction that is signed by find to create a find market tenant for find
 transaction() {
-    prepare(account: auth(BorrowValue) &Account) {
+    prepare(account: auth(BorrowValue, SaveValue, IssueAccountCapabilityController, PublishCapability) &Account) {
         //in finds case the
         account.storage.save(<- FindMarket.createTenantClient(), to:FindMarket.TenantClientStoragePath)
-        account.link<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath, target: FindMarket.TenantClientStoragePath)
+
+        let capb = account.capabilities.storage.issue<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientStoragePath)
+        account.capabilities.publish(capb, at: FindMarket.TenantClientPublicPath)
 
         let ftCaps : [Capability<&{FungibleToken.Receiver}>] = []
 
-        // setup Token for switchboard
-        let flowReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-        if !flowReceiver.check() {
-            account.link<&{FungibleToken.Receiver}>( /public/flowTokenReceiver, target: /storage/flowTokenVault)
-            account.link<&{FungibleToken.Balance}>( /public/flowTokenBalance, target: /storage/flowTokenVault)
-        }
+        //this has to be here, if not something is very wrong
+        let flowReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
         ftCaps.append(flowReceiver)
 
-        let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if !fusdReceiver.check() {
-            let fusd <- FUSD.createEmptyVault()
-            account.storage.save(<- fusd, to: /storage/fusdVault)
-            account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-            account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-        }
-        ftCaps.append(fusdReceiver)
 
+        var fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+        if fusdReceiver == nil {
+            let fusd <- FUSD.createEmptyVault()
+
+            account.storage.save(<- fusd, to: /storage/fusdVault)
+            var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
+            account.capabilities.publish(cap, at: /public/fusdReceiver)
+            let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
+            account.capabilities.publish(capb, at: /public/fusdBalance)
+            fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+        }
+        ftCaps.append(fusdReceiver!)
+
+        /*
         let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         if !usdcCap.check() {
             account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
@@ -39,14 +42,19 @@ transaction() {
             account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
         }
         ftCaps.append(usdcCap)
+        */
 
         // setup switch board
-        var checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
+        var checkSB = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
         if checkSB == nil {
             account.storage.save(<- FungibleTokenSwitchboard.createSwitchboard(), to: FungibleTokenSwitchboard.StoragePath)
-            account.link<&FungibleTokenSwitchboard.Switchboard{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath, target: FungibleTokenSwitchboard.StoragePath)
-            account.link<&FungibleTokenSwitchboard.Switchboard{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath, target: FungibleTokenSwitchboard.StoragePath)
-            checkSB = account.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
+
+            var cap = account.capabilities.storage.issue<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.StoragePath)
+            account.capabilities.publish(cap, at: FungibleTokenSwitchboard.PublicPath)
+
+            var capr = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.StoragePath)
+            account.capabilities.publish(capr, at: FungibleTokenSwitchboard.ReceiverPublicPath)
+            checkSB = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
         }
 
         let sb = checkSB!
@@ -60,7 +68,5 @@ transaction() {
 
             sb.addNewVault(capability: cap)
         }
-
-
     }
 }

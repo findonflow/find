@@ -22,7 +22,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 
 		self.ftVaultType = ft.type
 
-		let walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		let walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		assert(walletReference.balance > amount , message: "Bidder has to have enough balance in wallet")
 
 		let leaseMarketplace = FindMarket.getFindTenantAddress()
@@ -39,7 +39,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 			account.link<&FindLeaseMarketDirectOfferSoft.MarketBidCollection{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidPublicPath, target: leaseDOSBidStoragePath)
 		}
 
-		self.bidsReference= account.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: leaseDOSBidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: leaseDOSBidStoragePath)
 
 	}
 

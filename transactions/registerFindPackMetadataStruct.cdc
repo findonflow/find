@@ -18,7 +18,7 @@ transaction(info: FindPack.PackRegisterInfo) {
 	let types : [Type]
 
 	prepare(account: auth(BorrowValue) &Account) {
-		let leaseCol =account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Could not borrow leases collection")
+		let leaseCol =account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Could not borrow leases collection")
 		self.lease = leaseCol.borrow(info.forge)
 		self.wallet = getAccount(info.paymentAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 

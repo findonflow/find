@@ -46,7 +46,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 			account.link<&FindMarketDirectOfferSoft.MarketBidCollection{FindMarketDirectOfferSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(dosBidPublicPath, target: dosBidStoragePath)
 		}
 
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
 
 		/* Check for nftCapability */

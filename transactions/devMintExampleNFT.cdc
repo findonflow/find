@@ -24,7 +24,7 @@ transaction(name: String, artist:String, nftName:String, nftDescription:String, 
 			)
 		}
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = ExampleNFT.getForgeType()
 		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {

@@ -26,7 +26,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
-		self.saleItems= account.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 		self.vaultTypes= []
 		self.pointers= []
 

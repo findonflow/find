@@ -24,7 +24,7 @@ transaction(ids: {String : [UInt64]}) {
 
         //LINK
         // Dandy
-        let DandyRef= account.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath)
+        let DandyRef= account.storage.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath)
         if DandyRef == nil {
             account.storage.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
             account.unlink(Dandy.CollectionPublicPath)
@@ -59,7 +59,7 @@ transaction(ids: {String : [UInt64]}) {
 
 
         //findPack
-        let FindPackRef= account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
+        let FindPackRef= account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
         if FindPackRef == nil {
             account.storage.save<@NonFungibleToken.Collection>(<- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
             account.unlink(FindPack.CollectionPublicPath)
@@ -94,7 +94,7 @@ transaction(ids: {String : [UInt64]}) {
 
 
         // NFGv3
-        let NFGv3Ref= account.borrow<&NFGv3.Collection>(from: NFGv3.CollectionStoragePath)
+        let NFGv3Ref= account.storage.borrow<&NFGv3.Collection>(from: NFGv3.CollectionStoragePath)
         if NFGv3Ref == nil {
             account.storage.save<@NonFungibleToken.Collection>(<- NFGv3.createEmptyCollection(), to: NFGv3.CollectionStoragePath)
             account.unlink(NFGv3.CollectionPublicPath)
@@ -128,7 +128,7 @@ transaction(ids: {String : [UInt64]}) {
         }
 
         // Party Favorz
-        let PartyFavorzRef= account.borrow<&PartyFavorz.Collection>(from: PartyFavorz.CollectionStoragePath)
+        let PartyFavorzRef= account.storage.borrow<&PartyFavorz.Collection>(from: PartyFavorz.CollectionStoragePath)
         if PartyFavorzRef == nil {
             account.storage.save<@NonFungibleToken.Collection>(<- PartyFavorz.createEmptyCollection(), to: PartyFavorz.CollectionStoragePath)
             account.unlink(PartyFavorz.CollectionPublicPath)
@@ -162,7 +162,7 @@ transaction(ids: {String : [UInt64]}) {
         }
 
         // Name Voucher
-        let nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+        let nameVoucherRef= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
         if nameVoucherRef == nil {
             account.storage.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
             account.unlink(NameVoucher.CollectionPublicPath)
@@ -196,7 +196,7 @@ transaction(ids: {String : [UInt64]}) {
         }
 
         // Wearables
-        let wearablesRef= account.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
+        let wearablesRef= account.storage.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
         if wearablesRef == nil {
             account.storage.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
             account.unlink(Wearables.CollectionPublicPath)

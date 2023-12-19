@@ -5,7 +5,7 @@ transaction(typeIdentifier: String) {
     let adminRef : &Admin.AdminProxy
 
     prepare(account: auth(BorrowValue) &Account){
-        self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        self.adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
         
     }
 

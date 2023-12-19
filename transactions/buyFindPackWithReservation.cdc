@@ -75,7 +75,7 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 		self.packsLeft= UInt64(self.packs.getPacksLeft())
 
 
-		self.userFlowTokenVault = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
+		self.userFlowTokenVault = account.storage.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
 		self.balanceBeforeTransfer = self.userFlowTokenVault.balance
 
 		if self.balanceBeforeTransfer < amount {

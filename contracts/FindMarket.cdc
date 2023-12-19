@@ -1153,7 +1153,7 @@ access(all) fun getBlockedNFT(marketType: Type) : [Type] {
 
 // Tenant admin stuff
 //Admin client to use for capability receiver pattern
-access(all) fun funcreateTenantClient() : @TenantClient {
+access(all) fun createTenantClient() : @TenantClient {
     return <- create TenantClient()
 }
 

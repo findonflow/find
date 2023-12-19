@@ -17,7 +17,7 @@ transaction(ids: [UInt64]) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
-		self.market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
+		self.market = account.storage.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
 
 		var counter = 0

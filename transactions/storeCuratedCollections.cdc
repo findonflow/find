@@ -5,7 +5,7 @@ transaction(collections: {String :  [String]}) {
 		let path=/storage/FindCuratedCollections
 		let publicPath=/public/FindCuratedCollections
 
-		if account.borrow<&{String: [String]}>(from:path) != nil {
+		if account.storage.borrow<&{String: [String]}>(from:path) != nil {
 			 account.load<{String: [String]}>(from:path)
 		}
 		account.storage.save(collections, to: path)

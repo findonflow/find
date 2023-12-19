@@ -23,7 +23,7 @@ transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nf
 			)
 		}
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = PartyFavorz.getForgeType()
 

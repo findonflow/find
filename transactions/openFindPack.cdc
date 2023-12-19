@@ -13,7 +13,7 @@ transaction(packId:UInt64) {
     let receiver: { Type : Capability<&{NonFungibleToken.Receiver}>}
 
     prepare(account: auth(BorrowValue) &Account) {
-        self.packs=account.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
+        self.packs=account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
 
         let packData = self.packs.borrowFindPack(id: packId) ?? panic("You do not own this pack. ID : ".concat(packId.toString()))
         let packMetadata = packData.getMetadata()
@@ -30,7 +30,7 @@ transaction(packId:UInt64) {
             let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
 
             let cap = account.getCapability<&{NonFungibleToken.Receiver}>(collectionInfo.publicPath)
-            let storage= account.borrow<&NonFungibleToken.Collection>(from: collectionInfo.storagePath)
+            let storage= account.storage.borrow<&NonFungibleToken.Collection>(from: collectionInfo.storagePath)
             if storage == nil {
                 let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
                 account.storage.save(<- newCollection, to: collectionInfo.storagePath)

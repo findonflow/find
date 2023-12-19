@@ -12,7 +12,7 @@ transaction(user: String, id: UInt64) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
 		self.cap = getAccount(self.address).getCapability<&Dandy.Collection{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 
-		self.senderRef = account.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
+		self.senderRef = account.storage.borrow<&Dandy.Collection>(from: Dandy.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
 	}
 
 	pre{

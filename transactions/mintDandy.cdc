@@ -24,7 +24,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 			)
 		}
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = Dandy.getForgeType()
 		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {

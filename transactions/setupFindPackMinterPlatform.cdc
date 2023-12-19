@@ -6,7 +6,7 @@ import FindPack from "../contracts/FindPack.cdc"
 transaction(lease: String) {
 	prepare(account: auth(BorrowValue) &Account) {
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(lease)
 		let forgeType = Type<@FindPack.Forge>()
 		if !FindForge.checkMinterPlatform(name: lease.getName(), forgeType: forgeType ) {

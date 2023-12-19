@@ -24,7 +24,7 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
 		let ids = collectionIDs[collection]!
 
 		let storagePath = StoragePath(identifier:collection)!
-		let colRef = account.borrow<&NonFungibleToken.Collection>(from: storagePath)
+		let colRef = account.storage.borrow<&NonFungibleToken.Collection>(from: storagePath)
 		if colRef ==nil{
 			return  report
 		}
